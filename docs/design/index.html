@@ -1,0 +1,2984 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal Rating</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/neon.css">
+<style>
+:root{ --lime:var(--primary) }
+
+/* ═══ Общее для всех экранов ═════════════════════════════════════ */
+
+/* ─── Неоновая кромка окна ───────────────────────────────────────── */
+/* Механика та же, что у карточек Phone Hub: нить в 1px плюс размытое
+   гало. Здесь нить идёт во всю ширину окна, а гало центром сидит на
+   самой кромке, поэтому разлив света уходит вниз, на страницу. */
+
+.app{
+  position:relative;
+  /* Тихое свечение от верхней кромки — стеклу есть что преломлять. */
+  background:radial-gradient(
+    ellipse at 50% 5%,
+    color-mix(in srgb, var(--lime) 3%, transparent) 0%,
+    transparent 45%);
+}
+
+.app::before,
+.app::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  pointer-events:none;
+}
+
+.app::before{
+  top:0;
+  height:1px;
+  z-index:2;
+  background:linear-gradient(90deg, transparent, var(--lime) 22%, var(--lime) 78%, transparent);
+  box-shadow:0 0 8px color-mix(in srgb, var(--lime) 55%, transparent);
+}
+
+.app::after{
+  top:-8px;
+  height:16px;
+  z-index:1;
+  border-radius:50%;
+  background:color-mix(in srgb, var(--lime) 38%, transparent);
+  filter:blur(12px);
+}
+
+
+/* ─── Содержимое окна ────────────────────────────────────────────── */
+
+.app__main{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+
+@keyframes screen-in{
+  from { opacity:0 }
+  to   { opacity:1 }
+}
+
+
+/* ═══ Основной экран ═════════════════════════════════════════════ */
+
+/* Три зоны: переключатель держится центра окна независимо от того,
+   насколько длинное имя справа. */
+.topbar{
+  /* Все три блока одной ширины — по переключателю. Значение ставит
+     JS замером; здесь запас до первого срабатывания. */
+  --side-w:370px;
+  --corner:24px;
+
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:auto auto auto;
+  justify-content:center;
+  align-items:center;
+  column-gap:18px;
+  padding:14px var(--corner);
+}
+
+.search{
+  grid-column:1;
+  width:var(--side-w);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  height:42px;                /* вровень с капсулой переключателя */
+  padding:0 16px;
+  border-radius:var(--r-full);
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.06);
+  transition:background .18s, border-color .18s;
+}
+
+.search:hover{
+  background:rgba(255,255,255,.05);
+  border-color:rgba(255,255,255,.1);
+}
+
+.search:focus-within{
+  background:rgba(255,255,255,.05);
+  border-color:color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.search__icon{
+  flex:0 0 auto;
+  font-size:20px;
+  color:rgba(255,255,255,.35);
+  transition:color .18s;
+}
+.search:focus-within .search__icon{ color:var(--primary) }
+
+.search__input{
+  flex:1;
+  min-width:0;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:var(--text);
+  font:var(--body-l);
+  caret-color:var(--primary);
+  user-select:text;
+}
+.search__input::placeholder{ color:rgba(255,255,255,.28) }
+
+/* Своя кнопка очистки вместо системной: та рисуется цветом ОС. */
+.search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration{
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.search__clear{
+  flex:0 0 auto;
+  display:block;
+  width:26px;
+  height:26px;
+  margin-right:-6px;
+  padding:0;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:var(--primary);
+  cursor:pointer;
+  transition:background .15s;
+}
+/* Центрируем межстрочным интервалом: у иконочного шрифта глиф сидит
+   на базовой линии, и выравнивание по коробке уводит его вниз. */
+.search__clear .material-symbols-outlined{
+  display:block;
+  width:26px;
+  font-size:18px;
+  line-height:26px;
+  text-align:center;
+}
+.search__clear:hover{ background:color-mix(in srgb, var(--primary) 14%, transparent) }
+
+/* Подложка та же, что у переключателя; кнопка 34px плюс отступы даёт
+   ровно те же 42px высоты. */
+.tools{
+  grid-column:3;
+  width:var(--side-w);
+  display:flex;
+  justify-content:space-between;
+  padding:3px;
+  border-radius:var(--r-full);
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.tools__btn{
+  position:relative;
+  flex:0 0 auto;             /* иконки не должны сплющиваться в овалы */
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:rgba(255,255,255,.45);
+  cursor:pointer;
+  transition:background .18s, color .18s;
+}
+.tools__btn .material-symbols-outlined{ font-size:19px }
+
+.tools__btn:hover{
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.75);
+}
+
+.tools__btn.is-active{
+  background:color-mix(in srgb, var(--primary) 14%, transparent);
+  color:var(--primary);
+}
+
+/* Гистограмма — не шрифтовой глиф, а SVG: столбики должны расти
+   поодиночке, а у иконки шрифта частей нет. Заливки у неё изначально
+   нет, поэтому состояние показывает сама анимация. */
+.tools__chart{
+  width:19px;
+  height:19px;
+  display:block;
+  fill:currentColor;
+}
+.tools__chart rect{
+  transform-box:fill-box;
+  transform-origin:50% 100%;   /* растём от пола, а не от центра */
+}
+
+/* Класс вешает JS на каждый клик, а не состояние — иначе анимация
+   играла бы только при включении. */
+.is-drawing .tools__chart rect{
+  animation:bar-grow .42s cubic-bezier(.2,.8,.2,1) both;
+}
+.is-drawing .tools__chart rect:nth-child(2){ animation-delay:.07s }
+.is-drawing .tools__chart rect:nth-child(3){ animation-delay:.14s }
+
+@keyframes bar-grow{
+  from { transform:scaleY(0) }
+  to   { transform:scaleY(1) }
+}
+
+/* ─── Плашка сообщений ───────────────────────────────────────────── */
+/* Единственное место, где приложение что-то сообщает: и отказ
+   источника, и непредвиденный сбой. Уехавшая вниз плашка пустая —
+   отсутствие сообщений само себя ничем не обозначает. */
+
+.snack{
+  --neon:var(--error);
+  --halo-h:30px;
+
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  z-index:20;
+  max-width:min(560px, calc(100vw - 48px));
+  padding:12px 24px;
+  border-radius:var(--r-full);
+  font:var(--body-m);
+  text-align:center;
+
+  background:var(--glass-error);
+  backdrop-filter:blur(14px) saturate(125%);
+
+  transform:translate(-50%, calc(100% + 32px));
+  transition:transform .22s cubic-bezier(.2,.8,.2,1);
+}
+
+.snack.is-shown{ transform:translate(-50%, 0) }
+
+/* Сортировка: критерий крупной иконкой, направление — стрелкой в углу.
+   Критерий сдвинут, чтобы стрелка не наезжала на него. */
+.tools__btn[data-role="sort"] .material-symbols-outlined{
+  transform:translate(-3px,-2px);
+}
+.tools__dir{
+  position:absolute;
+  right:1px;
+  bottom:1px;
+  font-size:13px !important;
+  transform:none !important;
+}
+
+/* Колонки в 1fr при авто-ширине контейнера выравниваются по самой
+   широкой — сегменты получаются одинаковыми без ручной ширины. */
+.seg{
+  grid-column:2;
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:1fr;
+  gap:2px;
+  padding:3px;
+  border-radius:var(--r-full);
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.seg__btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:7px 16px;
+  white-space:nowrap;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:rgba(255,255,255,.45);
+  font:var(--title-s);
+  cursor:pointer;
+  transition:background .18s, color .18s;
+}
+.seg__btn .material-symbols-outlined{ font-size:19px }
+
+.seg__btn:hover{
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.75);
+}
+
+.seg__btn.is-active{
+  background:color-mix(in srgb, var(--primary) 14%, transparent);
+  color:var(--primary);
+}
+.seg__btn.is-active:hover{
+  background:color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.content{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+}
+
+/* ─── Карточка ───────────────────────────────────────────────────── */
+
+/* Те же границы, что у гистограммы и у содержимого шапки. */
+.feed{
+  width:100%;
+  max-width:var(--content-w, 1146px);
+  margin:0 auto;
+  padding:18px 0 28px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.film{
+  /* Колонка под угловые иконки: шеврон сверху, закладка снизу. */
+  --gutter:52px;
+  --icon-inset:14px;
+
+  position:relative;
+  display:flex;
+  gap:20px;
+  padding:18px var(--gutter) 18px 18px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+}
+
+/* ─── Сворачивание ───────────────────────────────────────────────── */
+
+.film__toggle{
+  position:absolute;
+  top:10px;
+  right:var(--icon-inset);
+  display:block;
+  width:28px;
+  height:28px;
+  padding:0;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:rgba(255,255,255,.3);
+  cursor:pointer;
+  transition:background .16s, color .16s;
+}
+.film__toggle .material-symbols-outlined{
+  display:block;
+  width:28px;
+  font-size:22px;
+  line-height:28px;
+  text-align:center;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1);
+}
+.film__toggle:hover{ color:#fff }
+
+.film.is-collapsed .film__toggle .material-symbols-outlined{
+  transform:rotate(180deg);
+}
+
+/* Свёрнутая карточка — только название и оценка. Ряд иконок уходит
+   вместе с остальным содержимым и возвращается при развороте. */
+.film.is-collapsed .film__acts{ display:none }
+
+
+/* Свёрнутая карточка — одна строка: название и оценка. */
+.film.is-collapsed .film__poster,
+.film.is-collapsed .film__chips,
+.film.is-collapsed .film__facts,
+.film.is-collapsed .film__synopsis,
+.film.is-collapsed .film__aggr,
+.film.is-collapsed .film__verdict{ display:none }
+
+/* У игры три шкалы сворачиваются в одну усреднённую. Селектор двойной:
+   иначе общее правило .film__scores ниже по файлу перебьёт скрытие. */
+.film__scores.film__scores--avg{ display:none }
+.film.is-collapsed .film__scores--avg{ display:flex }
+.film.is-collapsed .film__scores--aspect{ display:none }
+
+.film.is-collapsed{ padding:12px var(--gutter) 12px 18px }
+
+.film.is-collapsed .film__body{
+  flex-direction:row;
+  align-items:center;
+  gap:16px;
+}
+.film.is-collapsed .film__title{ font:var(--body-l) }
+.film.is-collapsed .film__scores{ margin-left:auto }
+
+.film__poster{
+  flex:0 0 auto;
+  /* Без этого флекс растянул бы постер на всю высоту карточки
+     и соотношение сторон не сработало бы. */
+  align-self:flex-start;
+  width:158px;             /* 158 × 1.5 = 237 — высота текстовой колонки */
+  aspect-ratio:2 / 3;      /* пропорция афиши */
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
+  color:rgba(255,255,255,.16);
+}
+.film__poster .material-symbols-outlined{ font-size:38px }
+
+.film__body{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  /* Остаток высоты раскладывается по промежуткам, поэтому последняя
+     строка встаёт вровень с нижним краем постера. */
+  justify-content:space-between;
+  gap:6px;
+}
+
+.film__title{
+  margin:0;
+  font:var(--title-l);
+  font-weight:600;
+  letter-spacing:-.2px;
+  color:#fff;
+}
+/* ─── Жанры и теги ───────────────────────────────────────────────── */
+
+.film__chips{
+  display:flex;
+  flex-wrap:wrap;
+  /* Оправа вылезает на 10px в каждую сторону, ещё 4 — воздух между
+     соседними пилюлями. */
+  gap:8px 24px;
+  /* Без оправы строка стала легче — подтягиваем её к названию.
+     Сдвиг вправо на вылет оправы: иначе она торчит за левый край
+     колонки, где все остальные строки начинаются вровень. */
+  margin:2px 0 0 7px;
+}
+
+/* Внешняя база отдаёт жанры строчными — поднимаем первую букву
+   стилями, чтобы не зависеть от источника. */
+.chip::first-letter{ text-transform:uppercase }
+
+.chip{
+  position:relative;
+  font:var(--label-m);
+  color:rgba(255,255,255,.55);
+  cursor:pointer;
+}
+/* Свои теги отличаются от жанров из внешней базы. */
+.chip--tag{ color:#fff }
+
+/* Оправа рисуется псевдоэлементом с отрицательными отступами: она
+   выходит за границы слова, не занимая места, поэтому соседи при
+   наведении не разъезжаются. */
+.chip::before{
+  content:'';
+  position:absolute;
+  inset:-3px -10px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:var(--r-full);
+  background:transparent;
+  pointer-events:none;
+  transition:border-color .18s ease, background .18s ease;
+}
+.chip:hover{ color:var(--primary) }
+.chip:hover::before{
+  border-color:color-mix(in srgb, var(--primary) 55%, transparent);
+  background:color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* ─── Добавить тег ───────────────────────────────────────────────── */
+/* Видна всегда и приглушённой: спрятанная кнопка — ловушка,
+   про которую надо догадаться. */
+
+.chip--add{
+  padding:0;
+  border:none;
+  background:transparent;
+  font:var(--label-m);
+  color:rgba(255,255,255,.3);
+  transition:color .18s ease;
+}
+
+/* ─── Факты ──────────────────────────────────────────────────────── */
+
+.film__facts{
+  margin:0;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:2px 12px;
+  font:var(--body-m);
+}
+.film__facts dt{
+  color:rgba(255,255,255,.35);
+  white-space:nowrap;
+}
+.film__facts dd{
+  margin:0;
+  color:rgba(255,255,255,.85);
+}
+
+/* Подпись роли внутри строки — выглядит как заголовок в левой колонке. */
+.film__role{
+  margin:0 8px 0 20px;
+  color:rgba(255,255,255,.35);
+}
+
+/* Каждое имя — отдельная цель: по нему можно будет найти остальное
+   с его участием. */
+.person{
+  padding:0;
+  border:none;
+  background:transparent;
+  font:inherit;
+  color:inherit;
+  cursor:pointer;
+  transition:color .16s ease;
+}
+.person:hover{ color:var(--primary) }
+
+.film__synopsis{
+  margin:0;
+  font:var(--body-m);
+  line-height:1.55;
+  color:rgba(255,255,255,.55);
+}
+
+/* Раскрывает обрезанный текст. Появляется только когда содержимое
+   не поместилось; здесь показана всегда — для примера. */
+.more{
+  margin-left:5px;
+  padding:0;
+  border:none;
+  background:transparent;
+  font:inherit;
+  color:rgba(255,255,255,.4);
+  cursor:pointer;
+  transition:color .16s ease;
+}
+.more:hover{ color:var(--primary) }
+
+/* ─── Оценки агрегаторов ─────────────────────────────────────────── */
+/* Значения красятся по той же шкале, что и свои оценки: 0–10 и 0–100
+   приводятся к десятибалльной. */
+
+.film__aggr{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  font:var(--body-m);
+}
+.film__aggr span{ color:rgba(255,255,255,.35) }
+
+/* Название источника ведёт на страницу фильма у него. */
+.aggr{
+  color:inherit;
+  text-decoration:none;
+  cursor:pointer;
+  transition:color .16s ease;
+}
+.aggr:hover{ color:var(--primary) }
+.film__aggr b{
+  margin-left:5px;
+  font-weight:600;
+  color:var(--score);
+}
+
+/* Оценка ещё едет. Имя источника остаётся на месте, число заменено
+   кольцом — так строка не прыгает, когда цифра приедет. В Qt это
+   глиф progress_activity под вращением. */
+.aggr-wait{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  margin-left:6px;
+  vertical-align:-1px;
+  border:2px solid rgba(255,255,255,.16);
+  border-top-color:rgba(255,255,255,.55);
+  border-radius:50%;
+  animation:aggr-spin .8s linear infinite;
+}
+
+@keyframes aggr-spin{
+  to { transform:rotate(360deg) }
+}
+
+/* ─── Своя оценка ────────────────────────────────────────────────── */
+/* Порядок в строке: звёзды, удаление, ярлык, оценки агрегаторов. */
+
+.film__scores{
+  position:relative;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px 0;
+}
+
+/* Подпись стороны оценки у игр. Ширина общая, чтобы звёзды в трёх
+   строках стояли по одной вертикали. */
+.film__aspect{
+  flex:0 0 auto;
+  width:86px;
+  font:var(--body-m);
+  color:rgba(255,255,255,.35);
+}
+
+
+.stars{ display:flex; gap:2px }
+
+.stars button,
+.stars > span{
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:none;
+  background:transparent;
+  color:rgba(255,255,255,.16);
+}
+.stars button{ cursor:pointer }
+
+/* Дробная часть: поверх контурной звезды лежит закрашенная,
+   обрезанная по ширине. */
+.stars .star--part{ position:relative }
+.stars .star--part i{
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:var(--fill);
+  overflow:hidden;
+  color:var(--score);
+}
+.stars .star--part i .material-symbols-outlined{
+  font-variation-settings:'FILL' 1;
+}
+.stars .material-symbols-outlined{
+  font-size:21px;
+  font-variation-settings:'FILL' 0;
+  transition:color .12s, font-variation-settings .12s;
+}
+.stars .is-on{ color:var(--score) }
+.stars .is-on .material-symbols-outlined{ font-variation-settings:'FILL' 1 }
+
+.film__verdict{
+  margin-left:8px;
+  font:var(--title-s);
+  color:var(--score);
+}
+
+/* Ряд вынесен из потока: он выше строки со звёздами и иначе растягивал
+   бы её, разводя строки оценки на разное расстояние. Закладка при этом
+   встаёт в ту же колонку, что и шеврон, а правка с удалением уходят
+   левее, внутрь карточки. */
+.film__acts{
+  position:absolute;
+  top:50%;
+  right:calc(var(--icon-inset) - var(--gutter));
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+  gap:2px;
+}
+
+.film__wish,
+.film__act{
+  display:block;
+  width:28px;
+  height:28px;
+  padding:0;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:rgba(255,255,255,.3);
+  cursor:pointer;
+  transition:color .16s, opacity .16s;
+}
+.film__wish .material-symbols-outlined,
+.film__act  .material-symbols-outlined{
+  display:block;
+  width:28px;
+  font-size:20px;
+  line-height:28px;
+  text-align:center;
+}
+.film__wish:hover,
+.film__act:hover{ color:var(--primary) }
+.film__wish.is-on{ color:var(--primary) }
+
+/* Удаление — единственное необратимое действие на карточке. */
+.film__act[data-act="delete"]:hover{ color:var(--error) }
+
+/* Правка и удаление показываются только под курсором: в покое карточка
+   остаётся чистой. */
+.film__act{
+  opacity:0;
+  pointer-events:none;
+}
+.film:hover .film__act{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ─── Гистограмма оценок ─────────────────────────────────────────── */
+/* Цвет столбца — из шкалы в tokens.css, той же, что у звёзд. */
+
+/* Ширина равна содержимому шапки: график живёт в той же колонке,
+   что поиск, переключатель и кнопки. Значение считает JS. */
+.chart{
+  flex:1;
+  min-height:0;
+  width:100%;
+  max-width:var(--content-w, 1146px);
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  /* Сверху запас под число над самым высоким столбцом. */
+  padding:34px 0 16px;
+}
+
+.chart__bars{
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:stretch;
+  gap:14px;
+}
+
+.bar{
+  flex:1;
+  min-width:0;
+  display:grid;
+  grid-template-rows:1fr auto;
+  justify-items:center;
+  gap:7px;
+}
+
+.bar__plot{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:flex-end;
+}
+
+.bar__fill{
+  position:relative;
+  width:100%;
+  height:max(var(--h), 6px);
+  border-radius:5px 5px 0 0;
+  background:var(--score);
+}
+
+/* Число привязано к верхушке своего столбца, а не к общей строке. */
+.bar__count{
+  position:absolute;
+  bottom:100%;
+  left:0;
+  right:0;
+  margin-bottom:5px;
+  text-align:center;
+  font:var(--label-l);
+  font-weight:700;
+  color:var(--score);
+}
+
+.bar__value{
+  font:var(--title-s);
+  font-weight:700;
+  color:#fff;
+}
+
+.chart__foot{
+  margin:14px 0 0;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.07);
+  text-align:center;
+  font:var(--body-m);
+  color:rgba(255,255,255,.45);
+}
+.chart__foot b{
+  color:rgba(255,255,255,.8);
+  font-weight:600;
+}
+
+/* Столбцы вырастают из пола при каждом заходе на вкладку. Растёт
+   высота, а не масштаб: масштаб сплющил бы и число над столбцом. */
+.view.is-drawing .bar__fill{
+  animation:bar-rise .5s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay:calc(var(--i) * 45ms);
+}
+
+@keyframes bar-rise{
+  from { height:0 }
+  to   { height:max(var(--h), 6px) }
+}
+
+.view{ display:none }
+/* Высота именно задана, а не минимальна: содержимое считает свои
+   проценты от неё. */
+.view.is-shown{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  animation:screen-in .16s ease-out;
+}
+
+
+/* ═══ Модалка ════════════════════════════════════════════════════ */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:rgba(0,0,0,.32);
+  animation:overlay-in .18s ease-out;
+}
+
+.modal{
+  position:relative;
+  width:min(560px, 100%);
+  min-height:200px;
+  padding:22px 24px 18px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:var(--r-card);
+
+  /* Тёмное стекло: заливка чёрная и полупрозрачная, поэтому окно
+     остаётся тёмным и при этом размывает то, что под ним. */
+  background:rgba(6,7,9,.72);
+  -webkit-backdrop-filter:blur(8px) saturate(140%);
+  backdrop-filter:blur(8px) saturate(140%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.25),
+    0 30px 90px rgba(0,0,0,.6);
+
+  animation:modal-in .22s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Содержимое фиксированной ширины — тянуть окно не за чем. */
+.modal--narrow{ width:min(400px, 100%) }
+
+/* Неоновая кромка — та же, что по верху окна приложения. */
+.modal::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:24px;
+  right:24px;
+  height:1px;
+  /* Промежуточные точки: переход от цвета к прозрачности по прямой
+     даёт заметный обрыв, ступени его сглаживают. */
+  background:linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--primary) 18%, transparent) 14%,
+    color-mix(in srgb, var(--primary) 55%, transparent) 26%,
+    color-mix(in srgb, var(--primary) 88%, transparent) 38%,
+    var(--primary) 50%,
+    color-mix(in srgb, var(--primary) 88%, transparent) 62%,
+    color-mix(in srgb, var(--primary) 55%, transparent) 74%,
+    color-mix(in srgb, var(--primary) 18%, transparent) 86%,
+    transparent 100%);
+}
+
+/* Свечение отдельным слоем, а не тенью: тень легла бы ровной полосой
+   во всю ширину и торцы бы срезались. Здесь оно гаснет вместе с нитью. */
+.modal::after{
+  content:'';
+  position:absolute;
+  top:-11px;
+  left:24px;
+  right:24px;
+  height:24px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--primary) 4%,  transparent) 18%,
+    color-mix(in srgb, var(--primary) 15%, transparent) 40%,
+    color-mix(in srgb, var(--primary) 15%, transparent) 60%,
+    color-mix(in srgb, var(--primary) 4%,  transparent) 82%,
+    transparent 100%);
+  filter:blur(12px);
+  pointer-events:none;
+}
+
+/* ─── Окно карточки ──────────────────────────────────────────────── */
+/* Окно создания и правки — одно и то же: пустое заводит, заполненное
+   правит. Раскладка считается от постера, поэтому его ширина, высота
+   строки и оба отступа — переменные, а не числа по месту. */
+
+.modal--card{
+  --poster-w:230px;
+  --field-h:46px;
+  --row-gap:14px;
+  --col-gap:36px;
+
+  width:min(1080px, 100%);
+  max-height:100%;
+  display:flex;
+  flex-direction:column;
+  gap:var(--row-gap);
+  padding:34px 40px 28px;
+}
+
+/* Постер слева, поля справа от него. */
+.cardform__top{
+  display:flex;
+  align-items:flex-start;
+  gap:var(--col-gap);
+}
+
+/* Высота задана постером, а не соседней колонкой: иначе каждое новое
+   поле слева растягивало бы синопсис и уводило режиссёра вниз. */
+.cardform__fields{
+  flex:1;
+  min-width:0;
+  height:calc(var(--poster-w) * 1.5);
+  display:flex;
+  flex-direction:column;
+  gap:var(--row-gap);
+}
+
+/* Строка из нескольких полей: длинное тянется, короткое стоит по своей
+   ширине. */
+.cardform__row{
+  display:flex;
+  gap:20px;
+}
+.cardform__row .field{ flex:1 }
+.cardform__row .field--short{ flex:0 0 92px }
+
+/* Галочка появляется, только когда ссылка разобрана, — она и есть
+   единственный признак, что адрес понят. */
+.cardform__valid{
+  flex:0 0 auto;
+  align-self:center;
+  font-size:22px;
+  color:var(--primary);
+}
+
+/* Чекбокс «перезаписать» виден всегда; что он значит — в подсказке. */
+.cardform__check{
+  flex:0 0 auto;
+  align-self:center;
+}
+
+/* Пропорция та же, что у обложки в ленте: постер обрезается под 2:3. */
+.cardform__poster{
+  flex:0 0 var(--poster-w);
+  align-self:flex-start;
+  aspect-ratio:2 / 3;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;
+  color:rgba(255,255,255,.22);
+  cursor:pointer;
+  transition:border-color .16s, color .16s;
+}
+.cardform__poster .material-symbols-outlined{
+  font-size:56px;
+}
+
+.cardform__poster:hover{
+  border-color:var(--primary);
+  color:var(--primary);
+}
+
+/* ─── Поле ввода ─────────────────────────────────────────────────── */
+/* Подчёркивание вместо рамки. Сама строка ввода одна на всё окно
+   и на строку нового тега — отличаются только обёртки. */
+
+.field{
+  display:flex;
+  align-items:center;
+  /* Без этого поле не сожмётся ниже собственной ширины input, и заданная
+     ширина короткого поля не сработает. */
+  min-width:0;
+  min-height:var(--field-h, 46px);
+  padding:0 2px;
+  border-bottom:2px solid rgba(255,255,255,.08);
+  transition:border-color .18s;
+}
+.field:focus-within{ border-bottom-color:var(--primary) }
+
+.field__input,
+.newtag__input{
+  flex:1;
+  min-width:0;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:var(--text-bright);
+  font:var(--body-l);
+  caret-color:var(--primary);
+  user-select:text;         /* body запрещает выделение, полю оно нужно */
+}
+.field__input::placeholder,
+.newtag__input::placeholder{
+  color:rgba(255,255,255,.32);
+  transition:color .16s;
+}
+.field:hover .field__input::placeholder,
+.newtag__input:hover::placeholder{ color:var(--text-bright) }
+
+.field__input:focus::placeholder,
+.newtag__input:focus::placeholder{ color:transparent }
+
+/* Название — главное поле карточки, поэтому крупнее остальных. */
+.field--title .field__input{ font:var(--title-l) }
+
+/* Синопсис. Подчёркивания нет намеренно: под абзацем оно читается как
+   черта, а не как поле. Рамки и фона тоже нет — только подсказка,
+   которая уступает место курсору. */
+.field--area{
+  flex:1;
+  align-items:stretch;
+  padding-top:12px;
+  border-bottom:none;
+}
+/* Системная полоса прокрутки убрана: вместо неё своя, та же, что
+   в списках тегов. Отступ справа — место под неё. */
+.field--area .field__input{
+  resize:none;
+  line-height:22px;
+  padding-right:14px;
+  scrollbar-width:none;
+}
+.field--area .field__input::-webkit-scrollbar{ display:none }
+
+/* ─── Поле с подсказкой и выбранным ──────────────────────────────── */
+/* Актёры и жанры: поле стоит под постером, той же ширины, а выбранное
+   ложится справа — в место, которое иначе пустует. */
+
+.cardform__pick{
+  display:flex;
+  align-items:flex-start;
+  gap:var(--col-gap);
+}
+
+.cardform__pick .picker{
+  position:relative;
+  flex:0 0 var(--poster-w);
+}
+
+/* Список совпадений висит над содержимым и ничего не сдвигает. */
+.picker__hits{
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  z-index:5;
+  margin:4px 0 0;
+  padding:4px;
+  max-height:216px;
+  overflow-y:auto;
+  list-style:none;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:10px;
+  background:var(--surface-pop);
+  box-shadow:0 18px 40px rgba(0,0,0,.55);
+  scrollbar-width:none;
+}
+.picker__hits::-webkit-scrollbar{ display:none }
+
+.picker__hit{
+  display:block;
+  width:100%;
+  padding:7px 10px;
+  border:none;
+  border-radius:6px;
+  background:transparent;
+  color:rgba(255,255,255,.75);
+  font:var(--body-m);
+  text-align:left;
+  cursor:pointer;
+}
+.picker__hit:hover{
+  background:var(--fill-primary-hover);
+  color:var(--primary);
+}
+
+/* Выбранное — не «таблетки», а имена подряд, у каждого крестик. */
+.picker__chosen{
+  flex:1;
+  min-width:0;
+  min-height:var(--field-h);
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:0 18px;
+}
+
+.picked{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  color:rgba(255,255,255,.8);
+  font:var(--body-m);
+}
+.picked__del{
+  display:block;
+  width:20px;
+  height:20px;
+  padding:0;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:rgba(255,255,255,.3);
+  cursor:pointer;
+  transition:color .16s;
+}
+.picked__del .material-symbols-outlined{
+  display:block;
+  width:20px;
+  font-size:15px;
+  line-height:20px;
+  text-align:center;
+}
+.picked__del:hover{ color:var(--error) }
+
+/* ─── Кнопки окна ────────────────────────────────────────────────── */
+/* Стекло то же, что у плашки сообщений, кромка и гало — из класса
+   neon; вариант neon--hover зажигает их только под курсором. */
+
+.cardform__foot{
+  margin-top:auto;
+  display:flex;
+  justify-content:flex-end;
+  gap:14px;
+}
+
+.btn{
+  position:relative;
+  min-width:150px;
+  padding:12px 26px;
+  border:none;
+  border-radius:var(--r-full);
+  font:var(--label-l);
+  cursor:pointer;
+
+  background:var(--glass);
+  backdrop-filter:blur(14px) saturate(120%);
+  color:rgba(255,255,255,.7);
+  transition:color .16s, background .16s;
+}
+
+/* Обе кнопки в покое одинаковы и блёклы, цвет и неон приходят под
+   курсором. Различает их только он: отмена красная, сохранение
+   акцентное. */
+.btn--cancel{ --neon:var(--error) }
+.btn--cancel:hover{ background:var(--glass-error) }
+
+.btn--go{
+  --neon:var(--primary);
+  backdrop-filter:blur(14px) saturate(140%);
+}
+.btn--go:hover{ background:var(--glass-primary) }
+
+/* ─── Список тегов ───────────────────────────────────────────────── */
+
+/* Полоса прокрутки своя, а не системная: Chromium не анимирует
+   переходы на ::-webkit-scrollbar, он её только мгновенно
+   перерисовывает. */
+.taglist{
+  margin:0;
+  padding:0 14px 0 0;      /* обнуляет и браузерный отступ списка слева */
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  /* Тянемся по высоте окна, но не во всю: у списка есть свой потолок,
+     дальше он прокручивается. */
+  max-height:min(calc(100vh - 140px), 640px);
+  overflow-y:auto;
+  scrollbar-width:none;
+}
+.taglist::-webkit-scrollbar{ display:none }
+
+.scrollarea{ position:relative }
+
+.scrollbar{
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:8px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease;
+}
+.scrollbar.is-shown{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.scrollbar__thumb{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  border-radius:4px;
+  background:rgba(255,255,255,.16);
+  cursor:grab;
+  transition:background .18s;
+}
+.scrollbar__thumb:hover  { background:rgba(255,255,255,.28) }
+.scrollbar__thumb:active { cursor:grabbing; background:rgba(255,255,255,.34) }
+
+.tagrow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:4px 0;
+}
+
+.tagrow__name{
+  flex:1;
+  min-width:0;
+  color:#fff;
+  font:var(--body-l);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ─── Строка оценки ──────────────────────────────────────────────── */
+/* Цвет берётся из --score, который строка получает инлайн; сами
+   значения лежат в tokens.css одним блоком. */
+
+.scorerow{
+  flex:1;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.scorerow__stars{
+  display:flex;
+  gap:1px;
+  color:var(--score);
+}
+.scorerow__stars .material-symbols-outlined{
+  font-size:17px;
+  font-variation-settings:'FILL' 1;
+}
+.scorerow__stars .is-empty{
+  color:rgba(255,255,255,.14);
+  font-variation-settings:'FILL' 0;
+}
+
+.scorerow__label{
+  margin-left:auto;          /* прижата к правому краю строки */
+  color:var(--score);
+  font:var(--title-s);
+  white-space:nowrap;
+}
+
+/* Ручка перетаскивания: сетка 2×3 из квадратиков. */
+/* Размер и шаг кратны четырём: при масштабе 125% и 150% это целые
+   физические пиксели, иначе квадраты размывает по-разному. */
+.taggrip{
+  flex:0 0 auto;
+  align-self:center;
+  display:grid;
+  grid-template-columns:repeat(2, 4px);
+  gap:4px;
+  opacity:.28;
+  cursor:grab;
+  touch-action:none;
+  transition:opacity .16s;
+}
+.taggrip:hover{ opacity:.7 }
+.taggrip i{
+  display:block;
+  width:4px;
+  height:4px;
+  background:#fff;
+}
+
+.tagrow.is-dragging{
+  opacity:.55;
+}
+.tagrow.is-dragging .taggrip{ cursor:grabbing }
+
+/* Три состояния: пусто, галочка, крестик. */
+.tagbox{
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:20px;
+  height:20px;
+  padding:0;
+  border:2px solid rgba(255,255,255,.25);
+  border-radius:var(--r-full);
+  background:transparent;
+  color:transparent;
+  cursor:pointer;
+  transition:border-color .16s, background .16s, color .16s;
+}
+.tagbox .material-symbols-outlined{
+  font-size:15px;
+  font-variation-settings:'wght' 600;
+}
+
+.tagbox[data-state="on"]{
+  border-color:var(--primary);
+  background:var(--primary);
+  color:#0a0a0a;
+}
+.tagbox[data-state="ex"]{
+  border-color:#ef4444;
+  background:#ef4444;
+  color:#0a0a0a;
+}
+
+.tagrow__del{
+  flex:0 0 auto;
+  display:block;
+  width:28px;
+  height:28px;
+  padding:0;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:rgba(255,255,255,.3);
+  cursor:pointer;
+  transition:background .16s, color .16s;
+}
+.tagrow__del .material-symbols-outlined{
+  display:block;
+  width:28px;
+  font-size:18px;
+  line-height:28px;
+  text-align:center;
+}
+.tagrow__del:hover{
+  background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.85);
+}
+
+/* ─── Новый тег ──────────────────────────────────────────────────── */
+
+/* Без фона и рамки: в покое это просто серая надпись, при фокусе
+   под ней проступает акцентная полоса. */
+.newtag{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:34px;
+  margin-top:10px;
+  padding:0 2px;
+  border-bottom:2px solid transparent;
+  transition:border-color .18s;
+}
+.newtag:focus-within{ border-bottom-color:var(--primary) }
+
+/* Сама строка ввода общая с полями окна карточки — см. «Поле ввода».
+   Здесь только то, чем эта отличается. */
+
+/* Появляется, только когда есть что подтверждать. */
+.newtag__ok{
+  flex:0 0 auto;
+  display:block;
+  width:26px;
+  height:26px;
+  padding:0;
+  border:none;
+  border-radius:var(--r-full);
+  background:transparent;
+  color:var(--primary);
+  cursor:pointer;
+  opacity:0;
+  transform:scale(.7);
+  pointer-events:none;
+  transition:opacity .16s, transform .16s, background .15s;
+}
+.newtag__ok .material-symbols-outlined{
+  display:block;
+  width:26px;
+  font-size:18px;
+  line-height:26px;
+  text-align:center;
+}
+.newtag__ok:hover{ background:color-mix(in srgb, var(--primary) 14%, transparent) }
+
+.newtag.is-filled .newtag__ok{
+  opacity:1;
+  transform:none;
+  pointer-events:auto;
+}
+
+@keyframes overlay-in{
+  from { opacity:0 }
+  to   { opacity:1 }
+}
+@keyframes modal-in{
+  from { opacity:0; transform:scale(.94) translateY(8px) }
+  to   { opacity:1; transform:none }
+}
+
+
+</style>
+</head>
+<body>
+  <div class="app">
+
+    <main class="app__main">
+      <header class="topbar">
+        <label class="search">
+          <span class="material-symbols-outlined search__icon" aria-hidden="true">search</span>
+          <input class="search__input" type="search" placeholder="Поиск" aria-label="Поиск"
+                 spellcheck="false" autocomplete="off">
+          <button type="button" class="search__clear" id="searchClear" hidden aria-label="Очистить">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </label>
+
+        <nav class="seg" id="kinds">
+          <button type="button" class="seg__btn is-active" data-kind="movies" aria-pressed="true">
+            <span class="material-symbols-outlined" aria-hidden="true">movie</span>
+            <span class="seg__label">Фильмы</span>
+          </button>
+          <button type="button" class="seg__btn" data-kind="series" aria-pressed="false">
+            <span class="material-symbols-outlined" aria-hidden="true">live_tv</span>
+            <span class="seg__label">Сериалы</span>
+          </button>
+          <button type="button" class="seg__btn" data-kind="games" aria-pressed="false">
+            <span class="material-symbols-outlined" aria-hidden="true">sports_esports</span>
+            <span class="seg__label">Игры</span>
+          </button>
+        </nav>
+
+        <div class="tools" id="tools">
+          <button type="button" class="tools__btn" data-role="view" data-view="rated"
+                  aria-pressed="false" aria-label="Оценённые" title="Оценённые">
+            <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
+          </button>
+          <button type="button" class="tools__btn" data-role="view" data-view="wish"
+                  aria-pressed="false" aria-label="Хочу посмотреть" title="Хочу посмотреть">
+            <span class="material-symbols-outlined" aria-hidden="true">bookmark</span>
+          </button>
+          <button type="button" class="tools__btn" data-role="view" data-view="stats"
+                  aria-pressed="false" aria-label="Статистика" title="Статистика">
+            <svg class="tools__chart" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4"  y="9"  width="4" height="11"/>
+              <rect x="10" y="4"  width="4" height="16"/>
+              <rect x="16" y="13" width="4" height="7"/>
+            </svg>
+          </button>
+
+          <button type="button" class="tools__btn" data-role="filter" data-modal="genres"
+                  aria-pressed="false" aria-label="Жанры" title="Жанры">
+            <span class="material-symbols-outlined" aria-hidden="true">category</span>
+          </button>
+          <button type="button" class="tools__btn" data-role="filter" data-modal="tags"
+                  aria-pressed="false" aria-label="Теги" title="Теги">
+            <span class="material-symbols-outlined" aria-hidden="true">label</span>
+          </button>
+          <button type="button" class="tools__btn" data-role="filter" data-modal="scores"
+                  aria-pressed="false" aria-label="Фильтр по оценке" title="Фильтр по оценке">
+            <span class="material-symbols-outlined" aria-hidden="true">star</span>
+          </button>
+
+          <button type="button" class="tools__btn" data-role="collapse"
+                  aria-pressed="false" aria-label="Свернуть всё" title="Свернуть всё">
+            <span class="material-symbols-outlined" aria-hidden="true">unfold_less</span>
+          </button>
+          <button type="button" class="tools__btn" data-role="sort" aria-label="Сортировка">
+            <span class="material-symbols-outlined" aria-hidden="true">star</span>
+            <span class="material-symbols-outlined tools__dir" aria-hidden="true">arrow_downward</span>
+          </button>
+          <button type="button" class="tools__btn" data-role="add"
+                  aria-label="Добавить" title="Завести карточку">
+            <span class="material-symbols-outlined" aria-hidden="true">add</span>
+          </button>
+        </div>
+
+      </header>
+
+      <div class="content">
+        <section class="view is-shown" data-view="list">
+          <div class="feed" id="feed"></div>
+        </section>
+        <section class="view" data-view="stats">
+          <div class="chart">
+            <div class="chart__bars" id="chartBars"></div>
+            <p class="chart__foot" id="chartFoot"></p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Теги фильма -->
+    <div class="overlay" id="filmTagsModal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Теги фильма">
+        <div class="scrollarea">
+          <ul class="taglist" id="filmTagsList"></ul>
+          <div class="scrollbar" id="filmTagsBar" hidden>
+            <div class="scrollbar__thumb"></div>
+          </div>
+        </div>
+
+        <form class="newtag" id="filmNewTag">
+          <input class="newtag__input" type="text" maxlength="24" spellcheck="false"
+                 autocomplete="off" placeholder="+ Новый тег" aria-label="Название нового тега">
+          <button type="submit" class="newtag__ok" aria-label="Добавить тег">
+            <span class="material-symbols-outlined" aria-hidden="true">check</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Оценки -->
+    <div class="overlay" id="scoresModal" hidden>
+      <div class="modal modal--narrow" role="dialog" aria-modal="true" aria-label="Фильтр по оценке">
+        <div class="scrollarea">
+          <ul class="taglist" id="scoresList"></ul>
+          <div class="scrollbar" id="scoresBar" hidden>
+            <div class="scrollbar__thumb"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Жанры -->
+    <div class="overlay" id="genresModal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Жанры">
+        <div class="scrollarea">
+          <ul class="taglist" id="genresList"></ul>
+          <div class="scrollbar" id="genresBar" hidden>
+            <div class="scrollbar__thumb"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Теги -->
+    <div class="overlay" id="tagsModal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Теги">
+        <div class="scrollarea">
+          <ul class="taglist" id="tagsList"></ul>
+          <div class="scrollbar" id="tagsBar" hidden>
+            <div class="scrollbar__thumb"></div>
+          </div>
+        </div>
+
+        <form class="newtag" id="newTag">
+          <input class="newtag__input" type="text" maxlength="24" spellcheck="false"
+                 autocomplete="off" placeholder="+ Новый тег" aria-label="Название нового тега">
+          <button type="submit" class="newtag__ok" aria-label="Добавить тег">
+            <span class="material-symbols-outlined" aria-hidden="true">check</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Карточка: создание и правка -->
+    <div class="overlay" id="cardModal" hidden>
+      <div class="modal modal--card" role="dialog" aria-modal="true" aria-label="Карточка">
+        <div class="cardform__top">
+          <div class="cardform__poster">
+            <span class="material-symbols-outlined" aria-hidden="true">photo_camera</span>
+          </div>
+
+          <div class="cardform__fields">
+            <label class="field field--title">
+              <input class="field__input" type="text" placeholder="Название"
+                     spellcheck="false" autocomplete="off" aria-label="Название">
+            </label>
+
+            <div class="cardform__row">
+              <label class="field">
+                <input class="field__input" type="text" placeholder="Оригинальное название"
+                       spellcheck="false" autocomplete="off" aria-label="Оригинальное название">
+              </label>
+              <label class="field field--short">
+                <input class="field__input" type="text" placeholder="Год"
+                       spellcheck="false" autocomplete="off" aria-label="Год">
+              </label>
+              <label class="field field--short" data-for="movies">
+                <input class="field__input" type="text" placeholder="Минуты"
+                       spellcheck="false" autocomplete="off" aria-label="Длительность в минутах">
+              </label>
+
+              <label class="field field--short" data-for="series">
+                <input class="field__input" type="text" placeholder="Сезоны"
+                       spellcheck="false" autocomplete="off" aria-label="Число сезонов">
+              </label>
+              <label class="field field--short" data-for="series">
+                <input class="field__input" type="text" placeholder="Серии"
+                       spellcheck="false" autocomplete="off" aria-label="Число серий">
+              </label>
+            </div>
+
+            <div class="cardform__row">
+              <label class="field">
+                <input class="field__input" type="text" id="cardLink"
+                       placeholder="Ссылка на внешнюю базу"
+                       spellcheck="false" autocomplete="off"
+                       aria-label="Ссылка на внешнюю базу">
+              </label>
+
+              <span class="cardform__valid material-symbols-outlined" id="cardLinkValid"
+                    hidden role="img" aria-label="Ссылка разобрана">check</span>
+
+              <button type="button" class="tagbox cardform__check" id="cardOverwrite"
+                      data-state="off"
+                      title="Перезаписать данные" aria-label="Перезаписать данные">
+                <span class="material-symbols-outlined" aria-hidden="true">check</span>
+              </button>
+            </div>
+
+            <label class="field field--area scrollarea">
+              <textarea class="field__input" id="cardSynopsis" placeholder="Синопсис"
+                        spellcheck="false" aria-label="Синопсис"></textarea>
+              <div class="scrollbar" id="cardSynopsisBar" hidden>
+                <div class="scrollbar__thumb"></div>
+              </div>
+            </label>
+
+            <label class="field" data-for="movies">
+              <input class="field__input" type="text" placeholder="Режиссёр"
+                     spellcheck="false" autocomplete="off" aria-label="Режиссёр">
+            </label>
+
+            <label class="field" data-for="series">
+              <input class="field__input" type="text" placeholder="Шоураннер"
+                     spellcheck="false" autocomplete="off" aria-label="Шоураннер">
+            </label>
+
+            <div class="cardform__row" data-for="games">
+              <label class="field">
+                <input class="field__input" type="text" placeholder="Разработчик"
+                       spellcheck="false" autocomplete="off" aria-label="Разработчик">
+              </label>
+              <label class="field">
+                <input class="field__input" type="text" placeholder="Издатель"
+                       spellcheck="false" autocomplete="off" aria-label="Издатель">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="cardform__pick" id="pickActors" data-for="movies series">
+          <div class="picker">
+            <label class="field">
+              <input class="field__input" type="text" placeholder="Актёры"
+                     spellcheck="false" autocomplete="off" aria-label="Актёры">
+            </label>
+            <ul class="picker__hits" hidden></ul>
+          </div>
+          <ul class="picker__chosen"></ul>
+        </div>
+
+        <div class="cardform__pick" id="pickGenres">
+          <div class="picker">
+            <label class="field">
+              <input class="field__input" type="text" placeholder="Жанры"
+                     spellcheck="false" autocomplete="off" aria-label="Жанры">
+            </label>
+            <ul class="picker__hits" hidden></ul>
+          </div>
+          <ul class="picker__chosen"></ul>
+        </div>
+
+        <div class="cardform__foot">
+          <button type="button" class="btn btn--cancel neon neon--hover"
+                  id="cardCancel">Отмена</button>
+          <button type="button" class="btn btn--go neon neon--hover">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="snack neon" id="snack" role="status" aria-live="polite"></div>
+
+  </div>
+
+<script>
+// ─── Ширина боковых блоков ─────────────────────────────────────────
+// Поиск и блок кнопок равны переключателю, а его ширину задаёт самая
+// длинная подпись — поэтому не число в CSS, а замер.
+
+const topbar   = document.querySelector('.topbar');
+const seg      = document.getElementById('kinds');
+const toolsBar = document.getElementById('tools');
+
+new ResizeObserver(() => {
+  topbar.style.setProperty('--side-w', seg.offsetWidth + 'px');
+  syncContentWidth();
+}).observe(seg);
+
+// Полоса содержимого шапки — от левого края поиска до правого края
+// кнопок. Под неё равняются наполнения основного экрана.
+const appRoot = document.querySelector('.app');
+
+function syncContentWidth(){
+  const boxes = [document.querySelector('.search'), seg, toolsBar]
+    .map((el) => el.getBoundingClientRect());
+
+  const left  = Math.min(...boxes.map((box) => box.left));
+  const right = Math.max(...boxes.map((box) => box.right));
+
+  appRoot.style.setProperty('--content-w', (right - left) + 'px');
+}
+
+window.addEventListener('resize', syncContentWidth);
+syncContentWidth();
+
+// Минимальная ширина окна: три блока по ширине переключателя, два
+// зазора между ними и отступы по краям. Считаем замером — от длины
+// подписей зависит слишком многое, чтобы вписывать сюда число.
+function syncMinWidth(){
+  document.body.style.minWidth = (seg.offsetWidth * 3 + 18 * 2 + 24 * 2) + 'px';
+}
+
+// Шрифт приезжает позже разметки, а от него зависит ширина подписей.
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(syncMinWidth);
+} else {
+  syncMinWidth();
+}
+
+
+// ─── Круглые кнопки ────────────────────────────────────────────────
+// Четыре разных поведения в одном ряду:
+//   filter   — независимы, горят пока фильтр применён;
+//   view     — взаимоисключающие, подменяют содержимое;
+//   collapse — переключатель с двумя иконками;
+//   sort     — перебор состояний по кругу.
+
+const tools = document.getElementById('tools');
+const views = document.querySelectorAll('.view');
+
+const SORT_STATES = [
+  { icon:'star',          dir:'arrow_downward', label:'По оценке, сначала высокие' },
+  { icon:'star',          dir:'arrow_upward',   label:'По оценке, сначала низкие' },
+  { icon:'history',       dir:'arrow_downward', label:'По времени оценки, сначала свежие' },
+  { icon:'history',       dir:'arrow_upward',   label:'По времени оценки, сначала давние' },
+  { icon:'event',         dir:'arrow_downward', label:'По дате выхода, сначала новые' },
+  { icon:'event',         dir:'arrow_upward',   label:'По дате выхода, сначала старые' },
+  { icon:'sort_by_alpha', dir:'arrow_downward', label:'По алфавиту, А → Я' },
+  { icon:'sort_by_alpha', dir:'arrow_upward',   label:'По алфавиту, Я → А' },
+];
+let sortIndex = 0;
+let collapsed = false;
+
+function drawSort(btn){
+  const state = SORT_STATES[sortIndex];
+  btn.querySelector('.material-symbols-outlined').textContent = state.icon;
+  btn.querySelector('.tools__dir').textContent = state.dir;
+  btn.title = btn.ariaLabel = 'Сортировка: ' + state.label.toLowerCase();
+}
+
+drawSort(tools.querySelector('[data-role="sort"]'));
+
+tools.addEventListener('click', (event) => {
+  const btn = event.target.closest('.tools__btn');
+  if (!btn) return;
+
+  const role = btn.dataset.role;
+
+  if (role === 'filter') {
+    // Горит — значит фильтр задан, и повторное нажатие его сбрасывает.
+    const filter = FILTERS[btn.dataset.modal];
+    if (filter) {
+      filter.isActive() ? filter.reset() : filter.open();
+      return;
+    }
+
+    // Фильтр по оценке ещё не сделан — клик пока изображает
+    // применение и сброс.
+    const on = btn.classList.toggle('is-active');
+    btn.setAttribute('aria-pressed', String(on));
+    return;
+  }
+
+  // Повторный клик гасит переключатель и возвращает обычный список —
+  // отдельной кнопки под него нет.
+  if (role === 'view') {
+    // Столбики отрастают заново на каждый клик, включая выключение.
+    if (btn.dataset.view === 'stats') {
+      btn.classList.remove('is-drawing');
+      void btn.offsetWidth;              // без перерасчёта анимация не перезапустится
+      btn.classList.add('is-drawing');
+    }
+
+    const turnOff = btn.classList.contains('is-active');
+    const target  = turnOff ? 'list' : btn.dataset.view;
+
+    tools.querySelectorAll('[data-role="view"]').forEach((b) => {
+      const on = b === btn && !turnOff;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+
+    // Оценённые и отложенные — не отдельные экраны, а срез той же ленты.
+    const shown = target === 'stats' ? 'stats' : 'list';
+    views.forEach((v) => v.classList.toggle('is-shown', v.dataset.view === shown));
+
+    if (shown === 'list') {
+      activeView = target;
+      renderFeed();
+    }
+
+    // Столбцы отрастают заново при каждом заходе на статистику.
+    const stats = document.querySelector('.view[data-view="stats"]');
+    stats.classList.remove('is-drawing');
+    if (shown === 'stats') {
+      void stats.offsetWidth;          // без перерасчёта анимация не перезапустится
+      stats.classList.add('is-drawing');
+    }
+    return;
+  }
+
+  if (role === 'add') {
+    cardWindow.open();
+    return;
+  }
+
+  // Подсветки нет: как и сортировка, кнопка сообщает состояние иконкой.
+  if (role === 'collapse') {
+    collapsed = !collapsed;
+    btn.setAttribute('aria-pressed', String(collapsed));
+    btn.querySelector('.material-symbols-outlined').textContent =
+      collapsed ? 'unfold_more' : 'unfold_less';
+    btn.title = btn.ariaLabel = collapsed ? 'Развернуть всё' : 'Свернуть всё';
+    document.querySelectorAll('.film').forEach((card) => setCollapsed(card, collapsed));
+    return;
+  }
+
+  if (role === 'sort') {
+    sortIndex = (sortIndex + 1) % SORT_STATES.length;
+    drawSort(btn);
+  }
+});
+
+
+// ─── Модалки фильтров ──────────────────────────────────────────────
+// Теги и жанры устроены одинаково: строки с трёхпозиционным
+// переключателем. Состояние живёт в модели и переживает закрытие,
+// фильтр вступает в силу сразу, кнопка в шапке горит пока он задан,
+// повторное нажатие на неё сбрасывает всё.
+// Отличие одно: теги свои — их можно создавать, удалять и
+// переставлять; жанры приходят из внешней базы.
+
+const BOX_STATES = {
+  off: { glyph:'check', label:'не выбран' },
+  on:  { glyph:'check', label:'включён' },
+  ex:  { glyph:'close', label:'исключён' },
+};
+
+// Фильтрам нужно исключение, простановке тегов фильму — нет.
+const CYCLE_FILTER = ['off','on','ex'];
+const CYCLE_TOGGLE = ['off','on'];
+
+
+// ─── Своя полоса прокрутки ─────────────────────────────────────────
+// Системную не берём: Chromium не анимирует переходы на
+// ::-webkit-scrollbar, он её только мгновенно перерисовывает.
+
+function attachScrollbar(list, bar){
+  const thumb = bar.querySelector('.scrollbar__thumb');
+  const MIN_THUMB = 28;
+
+  let hovered = false;
+  let timer;
+
+  function layout(){
+    const { scrollHeight, clientHeight, scrollTop } = list;
+
+    if (scrollHeight <= clientHeight + 1) { bar.hidden = true; return }
+    bar.hidden = false;
+
+    const height = Math.max(MIN_THUMB, clientHeight * clientHeight / scrollHeight);
+    const travel = clientHeight - height;
+    const offset = travel * scrollTop / (scrollHeight - clientHeight);
+
+    thumb.style.height = height + 'px';
+    thumb.style.transform = `translateY(${offset}px)`;
+  }
+
+  const show = () => bar.classList.add('is-shown');
+  const hideSoon = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (!hovered) bar.classList.remove('is-shown');
+    }, 700);
+  };
+
+  list.parentElement.addEventListener('mouseenter', () => { hovered = true; show() });
+  list.parentElement.addEventListener('mouseleave', () => {
+    hovered = false;
+    clearTimeout(timer);
+    bar.classList.remove('is-shown');
+  });
+
+  list.addEventListener('scroll', () => { layout(); show(); hideSoon() });
+  window.addEventListener('resize', layout);
+
+  thumb.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    thumb.setPointerCapture(event.pointerId);
+
+    const startY   = event.clientY;
+    const startTop = list.scrollTop;
+    const travel   = list.clientHeight - thumb.offsetHeight;
+    const range    = list.scrollHeight - list.clientHeight;
+
+    const onMove = (moveEvent) => {
+      list.scrollTop = startTop + (moveEvent.clientY - startY) * range / travel;
+    };
+    thumb.addEventListener('pointermove', onMove);
+    thumb.addEventListener('pointerup', () => {
+      thumb.removeEventListener('pointermove', onMove);
+    }, { once:true });
+  });
+
+  return layout;
+}
+
+
+// ─── Перетаскивание строк ──────────────────────────────────────────
+// Порядок хранит сам DOM: строка переставляется, как только курсор
+// перешёл середину соседней.
+
+const EDGE_ZONE  = 48;   // полоса у края, в которой список начинает ехать
+const EDGE_SPEED = 13;   // пикселей за кадр на самой кромке
+
+function attachRowDrag(list, onDrop){
+  list.addEventListener('pointerdown', (event) => {
+    const grip = event.target.closest('.taggrip');
+    if (!grip) return;
+    event.preventDefault();
+
+    const row = grip.closest('.tagrow');
+    row.classList.add('is-dragging');
+    document.body.style.cursor = 'grabbing';
+
+    let pointerY = event.clientY;
+    let frame = null;
+
+    function reorder(){
+      const others = [...list.querySelectorAll('.tagrow:not(.is-dragging)')];
+      const before = others.find((other) => {
+        const box = other.getBoundingClientRect();
+        return pointerY < box.top + box.height / 2;
+      });
+
+      before ? list.insertBefore(row, before) : list.appendChild(row);
+    }
+
+    // У краёв список подъезжает сам, иначе до дальнего конца длинного
+    // списка одним движением не добраться.
+    function step(){
+      const box = list.getBoundingClientRect();
+      let force = 0;
+
+      if (pointerY < box.top + EDGE_ZONE) {
+        force = (pointerY - (box.top + EDGE_ZONE)) / EDGE_ZONE;
+      } else if (pointerY > box.bottom - EDGE_ZONE) {
+        force = (pointerY - (box.bottom - EDGE_ZONE)) / EDGE_ZONE;
+      }
+
+      if (force) {
+        list.scrollTop += Math.max(-1, Math.min(1, force)) * EDGE_SPEED;
+        reorder();          // содержимое уехало под курсором
+      }
+
+      frame = requestAnimationFrame(step);
+    }
+
+    const onMove = (moveEvent) => {
+      pointerY = moveEvent.clientY;
+      reorder();
+    };
+
+    // Слушаем окно, а не ручку: при перестановке строка переезжает в
+    // DOM, и захват указателя на ней срывается после первой же
+    // перестановки.
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      cancelAnimationFrame(frame);
+      row.classList.remove('is-dragging');
+      document.body.style.cursor = '';
+      onDrop();
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp, { once:true });
+    frame = requestAnimationFrame(step);
+  });
+}
+
+
+// ─── Общая модалка фильтра ─────────────────────────────────────────
+
+function createFilterModal({ modal, list, bar, button, items, editable, renderBody,
+                             cycle = CYCLE_FILTER, selected = [] }){
+  const state = new Map(items.map((name) => [name, selected.includes(name) ? 'on' : 'off']));
+  let order = [...items];
+
+  const layout = attachScrollbar(list, bar);
+
+  // У модалки простановки тегов кнопки в шапке нет.
+  function syncButton(){
+    if (!button) return;
+    const on = [...state.values()].some((value) => value !== 'off');
+    button.classList.toggle('is-active', on);
+    button.setAttribute('aria-pressed', String(on));
+  }
+
+  function syncOrder(){
+    order = [...list.querySelectorAll('.tagrow')].map((li) => li.dataset.tag);
+  }
+
+  function makeRow(name){
+    const value = state.get(name) ?? 'off';
+
+    const li = document.createElement('li');
+    li.className = 'tagrow';
+    li.innerHTML =
+      (editable
+        ? '<span class="taggrip" aria-hidden="true">' +
+            '<i></i><i></i><i></i><i></i><i></i><i></i>' +
+          '</span>'
+        : '') +
+      '<button type="button" class="tagbox">' +
+        '<span class="material-symbols-outlined" aria-hidden="true"></span>' +
+      '</button>' +
+      (renderBody ? renderBody(name) : '<span class="tagrow__name"></span>') +
+      (editable
+        ? '<button type="button" class="tagrow__del" aria-label="Удалить тег">' +
+            '<span class="material-symbols-outlined" aria-hidden="true">delete</span>' +
+          '</button>'
+        : '');
+
+    const box = li.querySelector('.tagbox');
+    box.dataset.state = value;
+    box.querySelector('.material-symbols-outlined').textContent = BOX_STATES[value].glyph;
+    box.setAttribute('aria-label', name + ': ' + BOX_STATES[value].label);
+
+    if (!renderBody) li.querySelector('.tagrow__name').textContent = name;
+    li.dataset.tag = name;
+    return li;
+  }
+
+  function draw(){
+    list.innerHTML = '';
+    order.forEach((name) => list.appendChild(makeRow(name)));
+  }
+
+  list.addEventListener('click', (event) => {
+    const box = event.target.closest('.tagbox');
+    if (box) {
+      const name  = box.closest('.tagrow').dataset.tag;
+      const value = cycle[(cycle.indexOf(box.dataset.state) + 1) % cycle.length];
+
+      box.dataset.state = value;
+      box.querySelector('.material-symbols-outlined').textContent = BOX_STATES[value].glyph;
+      box.setAttribute('aria-label', name + ': ' + BOX_STATES[value].label);
+
+      state.set(name, value);
+      syncButton();               // фильтр вступает в силу сразу
+      return;
+    }
+
+    const del = event.target.closest('.tagrow__del');
+    if (del) {
+      const name = del.closest('.tagrow').dataset.tag;
+      del.closest('.tagrow').remove();
+      state.delete(name);
+      syncOrder();
+      syncButton();
+      layout();
+    }
+  });
+
+  if (editable) attachRowDrag(list, syncOrder);
+
+  modal.addEventListener('click', (event) => {
+    if (event.target === modal) close();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !modal.hidden) close();
+  });
+
+  function open(){
+    draw();
+    modal.hidden = false;
+    layout();                     // размеры известны только после показа
+  }
+  function close(){ modal.hidden = true }
+
+  function reset(){
+    state.forEach((_, name) => state.set(name, 'off'));
+    syncButton();
+  }
+
+  function add(name){
+    if (!name || state.has(name)) return false;
+    state.set(name, 'off');
+    list.appendChild(makeRow(name));
+    syncOrder();
+    layout();
+    return true;
+  }
+
+  return {
+    open, close, reset, add,
+    isActive: () => button.classList.contains('is-active'),
+  };
+}
+
+
+// ─── Теги ──────────────────────────────────────────────────────────
+
+const tagsFilter = createFilterModal({
+  modal:  document.getElementById('tagsModal'),
+  list:   document.getElementById('tagsList'),
+  bar:    document.getElementById('tagsBar'),
+  button: tools.querySelector('[data-modal="tags"]'),
+  items: ['Анимация','Аниме','Байопик','Веха','Гибли','Джеймс Бонд',
+          'Documentary','Звёздные Войны','Инди','Классика','Кооператив',
+          'Марвел','Нуар','Одиночный','Пересмотреть','Пиксар',
+          'Постапокалипсис','Ретро','Сериал','Сюрреализм','Тарантино',
+          'Ужасы','Фильм','Хоррор','Шедевр'],
+  editable: true,
+});
+
+
+// ─── Жанры ─────────────────────────────────────────────────────────
+// Приходят из внешней базы, поэтому без создания и удаления.
+
+const genresFilter = createFilterModal({
+  modal:  document.getElementById('genresModal'),
+  list:   document.getElementById('genresList'),
+  bar:    document.getElementById('genresBar'),
+  button: tools.querySelector('[data-modal="genres"]'),
+  items: ['Боевик','Вестерн','Военный','Детектив','Документальный','Драма',
+          'История','Комедия','Криминал','Мелодрама','Музыка','Мультфильм',
+          'Приключения','Семейный','Телефильм','Триллер','Ужасы',
+          'Фантастика','Фэнтези'],
+  editable: false,
+});
+
+// ─── Нотация оценок ────────────────────────────────────────────────
+// Цвета лежат в tokens.css (--score-1…10), ярлыки — здесь.
+
+const SCORE_LABELS = {
+  10:'Шедевр', 9:'Отлично', 8:'Хорошо', 7:'Интересно', 6:'Неплохо',
+  5:'Средне', 4:'Посредственно', 3:'Уныло', 2:'Плохо', 1:'Отвратительно',
+};
+
+
+// ─── Карточки ──────────────────────────────────────────────────────
+
+const FILMS = [
+  {
+    kind: 'movies',
+    title: 'Девушка с татуировкой дракона (2011)',
+    runtime: 158,
+    genres: ['Криминал','Детектив','Триллер'],
+    tags:   ['Фильм','Одиночный'],
+    crew:   { 'Режиссёр': ['Дэвид Финчер'],
+              'Актёры':   ['Робин Райт','Джеральдин Джеймс','Стеллан Скарсгард',
+                           'Дэниел Крейг','Кристофер Пламмер'] },
+    synopsis: '40 лет назад Харриет Вангер бесследно пропала на острове, ' +
+              'принадлежащем могущественному клану Вангер. Тело так и не нашли, ' +
+              'но её дядя убеждён, что девушку убил кто-то из родственников.',
+    aggr: [
+      { name:'КП',   value:7.8, max:10  },
+      { name:'IMDB', value:7.8, max:10  },
+      { name:'TMDB', value:7.4, max:10  },
+      { name:'RT',   value:86,  max:100, suffix:'%' },
+      { name:'MC',   value:71,  max:100 },
+    ],
+    rating: 10,
+  },
+  {
+    kind: 'movies',
+    title: 'Властелин колец: Братство кольца (2001)',
+    runtime: 178,
+    genres: ['Боевик','Приключения','Фэнтези'],
+    tags:   ['Фильм','Франшиза'],
+    crew:   { 'Режиссёр': ['Питер Джексон'],
+              'Актёры':   ['Элайджа Вуд','Шон Бин','Шон Эстин','Иэн МакКеллен',
+                           'Вигго Мортенсен'] },
+    synopsis: 'Тёмный властелин Саурон отковывает магическое Кольцо Всевластия, ' +
+              'которое должно покорить все народы. Но в одной из битв кольцо было ' +
+              'утрачено, и спустя тысячелетия его находит хоббит Бильбо Бэггинс.',
+    aggr: [
+      { name:'КП',   value:8.6, max:10  },
+      { name:'IMDB', value:8.9, max:10  },
+      { name:'TMDB', value:8.4, max:10  },
+      { name:'RT',   value:91,  max:100, suffix:'%' },
+      { name:'MC',   value:92,  max:100 },
+    ],
+    rating: 9,
+  },
+  {
+    kind: 'movies',
+    title: 'Пианист (2002)',
+    runtime: 150,
+    wish: true,
+    genres: ['Драма','Военный','Биография'],
+    tags:   ['Фильм','Одиночный'],
+    crew:   { 'Режиссёр': ['Роман Полански'],
+              'Актёры':   ['Эдриен Броуди','Томас Кречман','Фрэнк Финлей',
+                           'Морин Липман','Эмилия Фокс'] },
+    synopsis: 'Владислав Шпильман — известный польский пианист еврейского ' +
+              'происхождения. Когда в Варшаву входят немецкие войска, он теряет ' +
+              'семью и остаётся один в разрушенном городе.',
+    // Две оценки уже приехали, остальные ещё едут — на их месте кольцо.
+    aggr: [
+      { name:'КП',   value:8.6, max:10  },
+      { name:'IMDB', pending:true },
+      { name:'TMDB', value:8.4, max:10  },
+      { name:'RT',   pending:true },
+      { name:'MC',   pending:true },
+    ],
+    rating: 0,          // ещё не смотрел — лежит в отложенном
+  },
+
+  {
+    kind: 'series',
+    title: 'Andor (2022)',
+    seasons: { count:2, episodes:24 },
+    genres: ['Боевик','Приключения','Драма','Фантастика'],
+    tags:   ['Сериал','Звёздные Войны'],
+    crew:   { 'Шоураннер': ['Тони Гилрой'],
+              'Актёры':    ['Диего Луна','Стеллан Скарсгард','Кайл Соллер',
+                            'Адрия Архона','Фиона Шоу'] },
+    synopsis: 'Приключения шпиона-повстанца Кассиана Андора в годы становления ' +
+              'Восстания, предшествовавшие событиям «Изгоя-один». История о том, ' +
+              'как обычные люди становятся частью сопротивления.',
+    aggr: [
+      { name:'КП',   value:8.2, max:10  },
+      { name:'IMDB', value:8.6, max:10  },
+      { name:'TMDB', value:8.3, max:10  },
+      { name:'RT',   value:96,  max:100, suffix:'%' },
+      { name:'MC',   value:84,  max:100 },
+    ],
+    rating: 10,
+  },
+  {
+    kind: 'series',
+    title: 'Чернобыль (2019)',
+    seasons: { count:1, episodes:5 },
+    genres: ['Драма','История','Триллер'],
+    tags:   ['Сериал','Мини-сериал'],
+    crew:   { 'Шоураннер': ['Крэйг Мейзин'],
+              'Актёры':    ['Джаред Харрис','Стеллан Скарсгард','Эмили Уотсон',
+                            'Пол Риттер','Джесси Бакли'] },
+    synopsis: 'Реконструкция событий апреля 1986 года: авария на Чернобыльской ' +
+              'АЭС, работа ликвидаторов и расследование причин катастрофы.',
+    aggr: [
+      { name:'КП',   value:8.9, max:10  },
+      { name:'IMDB', value:9.3, max:10  },
+      { name:'TMDB', value:8.6, max:10  },
+      { name:'RT',   value:96,  max:100, suffix:'%' },
+      { name:'MC',   value:82,  max:100 },
+    ],
+    rating: 9,
+  },
+
+  {
+    kind: 'games',
+    title: 'Disco Elysium (2019)',
+    genres: ['RPG','Детектив','Приключения'],
+    tags:   ['Игра','Одиночный'],
+    crewInline: true,          // разработчик и издатель в одну строку
+    crew:   { 'Разработчик': ['ZA/UM'], 'Издатель': ['ZA/UM'] },
+    synopsis: 'Детектив с амнезией расследует убийство в приморском городе, ' +
+              'разбираясь заодно с собственным рассудком. Двадцать четыре ' +
+              'внутренних голоса спорят между собой, и каждый может взять верх.',
+    aggr: [
+      { name:'Metacritic', value:91, max:100 },
+      { name:'OpenCritic', value:91, max:100 },
+      { name:'Steam',      value:94, max:100, suffix:'%' },
+    ],
+    ratings: [
+      { label:'Визуал',   value:9  },
+      { label:'Нарратив', value:10 },
+      { label:'Геймплей', value:8  },
+    ],
+  },
+  {
+    kind: 'games',
+    title: 'The Witcher 3: Wild Hunt (2015)',
+    wish: true,
+    genres: ['RPG','Приключения','Фэнтези'],
+    tags:   ['Игра','Франшиза'],
+    crewInline: true,          // разработчик и издатель в одну строку
+    crew:   { 'Разработчик': ['CD Projekt Red'], 'Издатель': ['CD Projekt'] },
+    synopsis: 'Ведьмак Геральт ищет приёмную дочь, за которой охотится Дикая ' +
+              'Охота. Поиски ведут через земли, разорённые войной, где у каждого ' +
+              'выбора есть цена.',
+    aggr: [
+      { name:'Metacritic', value:93, max:100 },
+      { name:'OpenCritic', value:92, max:100 },
+      { name:'Steam',      value:97, max:100, suffix:'%' },
+    ],
+    ratings: [
+      { label:'Визуал',   value:10 },
+      { label:'Нарратив', value:9  },
+      { label:'Геймплей', value:9  },
+    ],
+  },
+];
+
+// Любая внешняя шкала приводится к десятибалльной, чтобы цвет брался
+// из той же нотации, что и своя оценка.
+function scoreColor(value, max){
+  const step = Math.min(10, Math.max(1, Math.ceil(value / max * 10)));
+  return `var(--score-${step})`;
+}
+
+function starsHtml(rating){
+  let out = '';
+  for (let i = 1; i <= 10; i++) {
+    out += `<button type="button" class="${i <= rating ? 'is-on' : ''}"` +
+           ` style="--score:var(--score-${rating})" data-score="${i}"` +
+           ` aria-label="Оценка ${i}">` +
+           '<span class="material-symbols-outlined" aria-hidden="true">star</span></button>';
+  }
+  return out;
+}
+
+// Свёрнутой игре три шкалы не нужны — показываем одну усреднённую.
+// Значение дробное: цвет берётся по целой части, остаток дорисовывается
+// частично закрашенной звездой.
+function avgRating(film){
+  const values = film.ratings.map((aspect) => aspect.value);
+  return values.reduce((sum, n) => sum + n, 0) / values.length;
+}
+
+function avgStarsHtml(value){
+  const whole = Math.floor(value);
+  const part  = value - whole;
+  const color = `var(--score-${Math.max(1, whole)})`;
+
+  const icon = '<span class="material-symbols-outlined" aria-hidden="true">star</span>';
+  let out = '';
+
+  for (let i = 1; i <= 10; i++) {
+    if (i <= whole) {
+      out += `<span class="is-on" style="--score:${color}">${icon}</span>`;
+    } else if (i === whole + 1 && part > 0) {
+      out += `<span class="star--part" style="--score:${color}; --fill:${Math.round(part * 100)}%">` +
+               `${icon}<i>${icon}</i>` +
+             '</span>';
+    } else {
+      out += `<span>${icon}</span>`;
+    }
+  }
+  return out;
+}
+
+// Ссылки ведут на страницу фильма у каждого источника. Здесь заглушки.
+function aggrHtml(list){
+  return list.map((item) => {
+    const link = `<a class="aggr" href="#" title="Открыть на ${item.name}">${item.name}</a>`;
+
+    if (item.pending) {
+      return `<span>${link}<i class="aggr-wait" aria-label="Загружается"></i></span>`;
+    }
+
+    return `<span style="--score:${scoreColor(item.value, item.max)}">` +
+             link +
+             `<b>${item.value}${item.suffix ?? ''}</b>` +
+           '</span>';
+  }).join('');
+}
+
+// Склонение по числу: 1 сезон, 2 сезона, 5 сезонов.
+function plural(n, one, few, many){
+  const tens = n % 100;
+  if (tens >= 11 && tens <= 14) return many;
+  const ones = n % 10;
+  if (ones === 1) return one;
+  if (ones >= 2 && ones <= 4) return few;
+  return many;
+}
+
+// У фильма хронометраж, у сериала — объём: сезоны и серии всего.
+// Разбивку по сезонам и среднюю длину серии не показываем.
+function runtimeText(film){
+  if (film.runtime) return film.runtime + ' мин';
+
+  const s = film.seasons;
+  if (!s) return '';
+
+  return `${s.count} ${plural(s.count, 'сезон', 'сезона', 'сезонов')}, ` +
+         `${s.episodes} ${plural(s.episodes, 'серия', 'серии', 'серий')}`;
+}
+
+function peopleHtml(names){
+  return names
+    .map((name) => `<button type="button" class="person">${name}</button>`)
+    .join(', ');
+}
+
+function buildFilm(film){
+  const el = document.createElement('article');
+  el.className = 'film';
+
+  const chips =
+    film.genres.map((g) => `<span class="chip">${g}</span>`).join('') +
+    film.tags.map((t) => `<span class="chip chip--tag">${t}</span>`).join('') +
+    '<button type="button" class="chip chip--add">± Тег</button>';
+
+  const runtime = runtimeText(film);
+
+  const crew = Object.entries(film.crew);
+
+  // Короткие роли — разработчик и издатель — умещаются в одну строку,
+  // подпись второй уходит внутрь значения.
+  const crewRows = film.crewInline
+    ? [`<dt>${crew[0][0]}</dt><dd>${peopleHtml(crew[0][1])}` +
+       crew.slice(1).map(([role, names]) =>
+         `<span class="film__role">${role}</span>${peopleHtml(names)}`).join('') +
+       '</dd>']
+    : crew.map(([role, names]) =>
+        `<dt>${role}</dt><dd>${peopleHtml(names)}` +
+        (names.length > 3 ? '<button type="button" class="more">… ещё</button>' : '') +
+        '</dd>');
+
+  const facts = crewRows.join('') +
+    (runtime ? `<dt>Длительность</dt><dd>${runtime}</dd>` : '');
+
+  el.innerHTML =
+    '<button type="button" class="film__toggle" aria-expanded="true"' +
+    ' aria-label="Свернуть карточку">' +
+      '<span class="material-symbols-outlined" aria-hidden="true">expand_less</span>' +
+    '</button>' +
+
+    '<div class="film__poster">' +
+      '<span class="material-symbols-outlined" aria-hidden="true">movie</span>' +
+    '</div>' +
+
+    '<div class="film__body">' +
+      `<h3 class="film__title">${film.title}</h3>` +
+      `<div class="film__chips">${chips}</div>` +
+      `<dl class="film__facts">${facts}</dl>` +
+      `<p class="film__synopsis">${film.synopsis}` +
+        '<button type="button" class="more">… ещё</button></p>' +
+      `<div class="film__aggr">${aggrHtml(film.aggr)}</div>` +
+      scoresHtml(film) +
+    '</div>';
+
+  if (film.ratings) {
+    el.querySelectorAll('.film__scores--aspect').forEach((row, i) => {
+      drawVerdict(row, film.ratings[i].value);
+    });
+    drawVerdict(el.querySelector('.film__scores--avg'), Math.floor(avgRating(film)));
+  } else {
+    drawVerdict(el.querySelector('.film__scores'), film.rating);
+  }
+
+  return el;
+}
+
+// Ряд иконок живёт в последней строке оценки — у игр это «Геймплей».
+// Правка и удаление стоят слева от закладки и всплывают под курсором.
+function wishHtml(film){
+  return '<div class="film__acts">' +
+           '<button type="button" class="film__act" data-act="edit"' +
+           ' title="Править" aria-label="Править">' +
+             '<span class="material-symbols-outlined" aria-hidden="true">edit</span>' +
+           '</button>' +
+           '<button type="button" class="film__act" data-act="delete"' +
+           ' title="Удалить" aria-label="Удалить">' +
+             '<span class="material-symbols-outlined" aria-hidden="true">delete</span>' +
+           '</button>' +
+           '<button type="button" class="film__wish' + (film.wish ? ' is-on' : '') + '"' +
+           ` aria-pressed="${Boolean(film.wish)}" title="${wishLabel(film)}"` +
+           ` aria-label="${wishLabel(film)}">` +
+             '<span class="material-symbols-outlined" aria-hidden="true">bookmark</span>' +
+           '</button>' +
+         '</div>';
+}
+
+function wishLabel(film){
+  return film.kind === 'games' ? 'Хочу поиграть' : 'Хочу посмотреть';
+}
+
+// У кино одна оценка, у игры три: визуал, нарратив, геймплей.
+function scoresHtml(film){
+  if (!film.ratings) {
+    return '<div class="film__scores">' +
+             `<span class="stars">${starsHtml(film.rating)}</span>` +
+             '<span class="film__verdict"></span>' +
+             wishHtml(film) +
+           '</div>';
+  }
+
+  const last = film.ratings.length - 1;
+
+  const aspects = film.ratings.map((aspect, i) =>
+    '<div class="film__scores film__scores--aspect">' +
+      `<span class="film__aspect">${aspect.label}</span>` +
+      `<span class="stars" data-aspect="${i}">${starsHtml(aspect.value)}</span>` +
+      '<span class="film__verdict"></span>' +
+      (i === last ? wishHtml(film) : '') +
+    '</div>'
+  ).join('');
+
+  return aspects + avgHtml(film);
+}
+
+// Строка живёт только в свёрнутой карточке, а там закладки нет.
+function avgHtml(film){
+  return '<div class="film__scores film__scores--avg">' +
+           `<span class="stars">${avgStarsHtml(avgRating(film))}</span>` +
+           '<span class="film__verdict"></span>' +
+         '</div>';
+}
+
+function drawVerdict(row, rating){
+  const verdict = row.querySelector('.film__verdict');
+  verdict.textContent = rating ? SCORE_LABELS[rating] : '';
+  verdict.style.setProperty('--score', `var(--score-${rating})`);
+}
+
+const feed = document.getElementById('feed');
+let activeKind = 'movies';
+let activeView = 'list';        // list | rated | wish
+
+function isRated(film){
+  return film.ratings
+    ? film.ratings.some((aspect) => aspect.value > 0)
+    : film.rating > 0;
+}
+
+// В ленту попадает то, что относится к выбранному типу контента
+// и проходит текущий срез: всё, только оценённое или только отложенное.
+function renderFeed(){
+  feed.innerHTML = '';
+
+  FILMS.forEach((film, index) => {
+    if (film.kind !== activeKind) return;
+    if (activeView === 'rated' && !isRated(film)) return;
+    if (activeView === 'wish'  && !film.wish)     return;
+
+    const card = buildFilm(film);
+    card.dataset.index = index;
+    feed.appendChild(card);
+  });
+}
+
+renderFeed();
+
+
+// ─── Оценка и сворачивание ─────────────────────────────────────────
+// Обработчик один на всю ленту: карточек будет много.
+
+function setCollapsed(card, collapsed){
+  card.classList.toggle('is-collapsed', collapsed);
+
+  const toggle = card.querySelector('.film__toggle');
+  toggle.setAttribute('aria-expanded', String(!collapsed));
+  toggle.setAttribute('aria-label', collapsed ? 'Развернуть карточку' : 'Свернуть карточку');
+}
+
+feed.addEventListener('click', (event) => {
+  const card = event.target.closest('.film');
+  if (!card) return;
+
+  const film = FILMS[card.dataset.index];
+
+  if (event.target.closest('.film__toggle')) {
+    setCollapsed(card, !card.classList.contains('is-collapsed'));
+    return;
+  }
+
+  if (event.target.closest('[data-act="edit"]')) {
+    cardWindow.open();
+    return;
+  }
+
+  if (event.target.closest('.chip--add')) {
+    filmTags.open();
+    return;
+  }
+
+  if (event.target.closest('.film__wish')) {
+    film.wish = !film.wish;
+
+    const wish = card.querySelector('.film__wish');
+    wish.classList.toggle('is-on', film.wish);
+    wish.setAttribute('aria-pressed', String(film.wish));
+    return;
+  }
+
+  // Клик по уже выставленной оценке снимает её: отдельной кнопки нет.
+  const star = event.target.closest('.stars button');
+  if (!star) return;
+
+  // Строку запоминаем до перерисовки: она сносит кликнутую кнопку из
+  // документа, и после этого искать по ней родителя уже нечем.
+  const row    = star.closest('.film__scores');
+  const stars  = star.closest('.stars');
+  const aspect = stars.dataset.aspect;                 // у игр — номер строки
+  const score  = Number(star.dataset.score);
+
+  const current = aspect === undefined ? film.rating : film.ratings[aspect].value;
+  const next    = score === current ? 0 : score;
+
+  if (aspect === undefined) film.rating = next;
+  else film.ratings[aspect].value = next;
+
+  stars.innerHTML = starsHtml(next);
+  drawVerdict(row, next);
+
+  // Средняя пересчитывается вместе со сторонами.
+  if (film.ratings) {
+    const avgRow = card.querySelector('.film__scores--avg');
+    const value  = avgRating(film);
+
+    avgRow.querySelector('.stars').innerHTML = avgStarsHtml(value);
+    drawVerdict(avgRow, Math.floor(value));
+  }
+});
+
+
+// ─── Гистограмма ───────────────────────────────────────────────────
+
+const SCORE_COUNTS = { 1:5, 2:6, 3:9, 4:17, 5:43, 6:124, 7:171, 8:113, 9:41, 10:10 };
+
+const TOTAL_LABEL = {
+  movies: 'Всего фильмов',
+  series: 'Всего сериалов',
+  games:  'Всего игр',
+};
+
+function drawChart(){
+  const bars = document.getElementById('chartBars');
+  const peak = Math.max(...Object.values(SCORE_COUNTS));
+
+  bars.innerHTML = '';
+
+  for (let score = 1; score <= 10; score++) {
+    const count = SCORE_COUNTS[score];
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.setProperty('--score', `var(--score-${score})`);
+    bar.style.setProperty('--h', (count / peak * 100) + '%');
+    bar.style.setProperty('--i', score - 1);
+    bar.innerHTML =
+      '<span class="bar__plot">' +
+        '<span class="bar__fill"><span class="bar__count"></span></span>' +
+      '</span>' +
+      '<span class="bar__value"></span>';
+
+    bar.querySelector('.bar__count').textContent = count;
+    bar.querySelector('.bar__value').textContent = score;
+    bars.appendChild(bar);
+  }
+
+  const total = Object.values(SCORE_COUNTS).reduce((sum, n) => sum + n, 0);
+  const sum   = Object.entries(SCORE_COUNTS)
+                      .reduce((acc, [score, n]) => acc + score * n, 0);
+
+  document.getElementById('chartFoot').innerHTML =
+    'Средняя оценка: <b>' + (sum / total).toFixed(2) + '</b>' +
+    ' &nbsp;•&nbsp; ' + TOTAL_LABEL[activeKind] + ': <b>' + total + '</b>';
+}
+
+drawChart();
+
+
+// ─── Фильтр по оценке ──────────────────────────────────────────────
+
+function renderScore(score){
+  let stars = '';
+  for (let i = 1; i <= 10; i++) {
+    stars += '<span class="material-symbols-outlined' +
+             (i <= score ? '' : ' is-empty') + '" aria-hidden="true">star</span>';
+  }
+
+  return '<span class="scorerow" style="--score:var(--score-' + score + ')">' +
+           '<span class="scorerow__stars">' + stars + '</span>' +
+           '<span class="scorerow__label">' + SCORE_LABELS[score] + '</span>' +
+         '</span>';
+}
+
+const scoresFilter = createFilterModal({
+  modal:  document.getElementById('scoresModal'),
+  list:   document.getElementById('scoresList'),
+  bar:    document.getElementById('scoresBar'),
+  button: tools.querySelector('[data-modal="scores"]'),
+  items: ['10','9','8','7','6','5','4','3','2','1'],
+  editable: false,
+  renderBody: renderScore,
+});
+
+
+const FILTERS = { tags: tagsFilter, genres: genresFilter, scores: scoresFilter };
+
+
+// ─── Теги фильма ───────────────────────────────────────────────────
+// Тот же список, но чекбокс переключается между «есть» и «нет»:
+// исключать тег у конкретного фильма нечего.
+
+const filmTags = createFilterModal({
+  modal:  document.getElementById('filmTagsModal'),
+  list:   document.getElementById('filmTagsList'),
+  bar:    document.getElementById('filmTagsBar'),
+  button: null,
+  items: ['Анимация','Аниме','Байопик','Веха','Гибли','Джеймс Бонд',
+          'Documentary','Звёздные Войны','Инди','Классика','Кооператив',
+          'Марвел','Нуар','Одиночный','Пересмотреть','Пиксар',
+          'Постапокалипсис','Ретро','Сериал','Сюрреализм','Тарантино',
+          'Ужасы','Фильм','Хоррор','Шедевр'],
+  editable: true,
+  cycle: CYCLE_TOGGLE,
+  selected: ['Фильм','Одиночный'],   // те же, что стоят чипами в карточке
+});
+
+
+// ─── Создание тега ─────────────────────────────────────────────────
+
+function wireNewTag(form, filter){
+  const input = form.querySelector('.newtag__input');
+
+  const sync = () => form.classList.toggle('is-filled', input.value.trim() !== '');
+
+  input.addEventListener('input', sync);
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!filter.add(input.value.trim())) return;
+
+    input.value = '';
+    sync();
+    input.focus();
+  });
+}
+
+wireNewTag(document.getElementById('newTag'), tagsFilter);
+wireNewTag(document.getElementById('filmNewTag'), filmTags);
+
+
+
+// ─── Поиск ─────────────────────────────────────────────────────────
+
+const searchInput = document.querySelector('.search__input');
+const searchClear = document.getElementById('searchClear');
+
+searchInput.addEventListener('input', () => {
+  searchClear.hidden = searchInput.value === '';
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchClear.hidden = true;
+  searchInput.focus();
+});
+
+
+// ─── Переключатель типа контента ───────────────────────────────────
+// Пока взаимоисключающий: активен ровно один.
+
+const kinds = document.getElementById('kinds');
+
+kinds.addEventListener('click', (event) => {
+  const btn = event.target.closest('.seg__btn');
+  if (!btn) return;
+
+  kinds.querySelectorAll('.seg__btn').forEach((b) => {
+    const on = b === btn;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+
+  // Отложенное для игр называется иначе.
+  const wish = document.querySelector('[data-view="wish"][data-role="view"]');
+  const text = btn.dataset.kind === 'games' ? 'Хочу поиграть' : 'Хочу посмотреть';
+  wish.title = wish.ariaLabel = text;
+
+  activeKind = btn.dataset.kind;
+  renderFeed();
+  drawChart();          // в подвале статистики свой тип содержимого
+});
+
+
+// ─── Поле с подсказкой ─────────────────────────────────────────────
+// Печатаешь — снизу совпадения, выбранное ложится справа. Того, чего
+// в списке нет, добавляет Enter: у заведённого руками человека внешнего
+// идентификатора всё равно не бывает.
+
+const HITS_SHOWN = 8;
+
+function createPicker(root, options){
+  const input  = root.querySelector('.field__input');
+  const hits   = root.querySelector('.picker__hits');
+  const chosen = root.querySelector('.picker__chosen');
+  const taken  = new Set();
+
+  function suggest(){
+    const query = input.value.trim().toLowerCase();
+    const list  = options
+      .filter((name) => !taken.has(name) && name.toLowerCase().includes(query))
+      .slice(0, HITS_SHOWN);
+
+    hits.innerHTML = list
+      .map((name) => `<li><button type="button" class="picker__hit">${name}</button></li>`)
+      .join('');
+    hits.hidden = list.length === 0;
+  }
+
+  function add(name){
+    if (!name || taken.has(name)) return;
+    taken.add(name);
+
+    const li = document.createElement('li');
+    li.className = 'picked';
+    li.dataset.name = name;
+    li.innerHTML =
+      '<span></span>' +
+      '<button type="button" class="picked__del" aria-label="Убрать">' +
+        '<span class="material-symbols-outlined" aria-hidden="true">close</span>' +
+      '</button>';
+    li.firstChild.textContent = name;
+
+    chosen.appendChild(li);
+    input.value = '';
+    hits.hidden = true;
+  }
+
+  input.addEventListener('input', suggest);
+  input.addEventListener('focus', suggest);
+  input.addEventListener('blur',  () => { hits.hidden = true });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter')  { event.preventDefault(); add(input.value.trim()) }
+    if (event.key === 'Escape') { hits.hidden = true }
+  });
+
+  // mousedown, а не click: поле теряет фокус раньше, чем клик состоится.
+  hits.addEventListener('mousedown', (event) => {
+    const hit = event.target.closest('.picker__hit');
+    if (!hit) return;
+    event.preventDefault();
+    add(hit.textContent);
+  });
+
+  chosen.addEventListener('click', (event) => {
+    const del = event.target.closest('.picked__del');
+    if (!del) return;
+
+    const li = del.closest('.picked');
+    taken.delete(li.dataset.name);
+    li.remove();
+  });
+}
+
+// Рыба для подсказок: жанры кино.
+const FILM_GENRES = [
+  'Боевик', 'Вестерн', 'Военный', 'Детектив', 'Детский', 'Документальный',
+  'Драма', 'История', 'Комедия', 'Криминал', 'Мелодрама', 'Музыка',
+  'Мультфильм', 'Мыльная опера', 'Новости', 'Политика', 'Приключения',
+  'Реалити-шоу', 'Семейный', 'Телевизионный фильм', 'Ток-шоу', 'Триллер',
+  'Ужасы', 'Фантастика', 'Фэнтези',
+];
+
+// Подсказываются уже заведённые: в макете это те, кто есть в ленте.
+const PEOPLE = [...new Set(FILMS.flatMap((film) => film.crew['Актёры'] ?? []))].sort();
+
+createPicker(document.getElementById('pickActors'), PEOPLE);
+createPicker(document.getElementById('pickGenres'), FILM_GENRES);
+
+
+// ─── Окно карточки ─────────────────────────────────────────────────
+// Одно на создание и на правку: пустое заводит, заполненное правит.
+
+// Проверяется только вид вставленного адреса, ничего больше.
+const LINK_PATTERNS = [
+  /themoviedb\.org\/(movie|tv)\/(\d+)/i,
+  /store\.steampowered\.com\/app\/(\d+)/i,
+  /gog\.com\/(?:[a-z]{2}\/)?game\/([a-z0-9_]+)/i,
+  /^\s*\d+\s*$/,
+];
+
+const cardWindow = (() => {
+  const overlay   = document.getElementById('cardModal');
+  const modal     = overlay.querySelector('.modal--card');
+  const link      = document.getElementById('cardLink');
+  const overwrite = document.getElementById('cardOverwrite');
+  const valid     = document.getElementById('cardLinkValid');
+  const synopsis  = document.getElementById('cardSynopsis');
+
+  link.addEventListener('input', () => {
+    valid.hidden = !LINK_PATTERNS.some((re) => re.test(link.value));
+  });
+
+  // Полоса пересчитывается и по вводу: текст прибавляется без прокрутки.
+  const layoutSynopsis = attachScrollbar(synopsis,
+    document.getElementById('cardSynopsisBar'));
+  synopsis.addEventListener('input', layoutSynopsis);
+
+  overwrite.addEventListener('click', () => {
+    overwrite.dataset.state = overwrite.dataset.state === 'on' ? 'off' : 'on';
+  });
+
+  // Поля, у которых есть data-for, показываются только своему типу
+  // содержимого. Тип берётся из переключателя в шапке: он всегда на
+  // виду, и спрашивать его отдельно незачем.
+  function open(){
+    modal.querySelectorAll('[data-for]').forEach((el) => {
+      el.hidden = !el.dataset.for.split(' ').includes(activeKind);
+    });
+
+    overlay.hidden = false;
+    layoutSynopsis();      // высота известна только у показанного окна
+  }
+  function close(){ overlay.hidden = true }
+
+  document.getElementById('cardCancel').addEventListener('click', close);
+
+  // Клик мимо окна закрывает, внутри — нет.
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) close();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !overlay.hidden) close();
+  });
+
+  return { open, close };
+})();
+
+
+// ─── Плашка сообщений ──────────────────────────────────────────────
+// Одна на всё приложение: и отказ источника, и непредвиденный сбой.
+// Выезжает снизу, держится несколько секунд и уходит.
+
+const snack = document.getElementById('snack');
+let snackTimer = null;
+
+function notify(text){
+  snack.textContent = text;
+  snack.classList.add('is-shown');
+
+  clearTimeout(snackTimer);
+  snackTimer = setTimeout(() => snack.classList.remove('is-shown'), 4000);
+}
+
+// Временно: пока подбираем вид, плашка висит и не уезжает.
+snack.textContent = 'Внешняя база недоступна — показано только своё';
+snack.classList.add('is-shown');
+
+</script>
+</body>
+</html>

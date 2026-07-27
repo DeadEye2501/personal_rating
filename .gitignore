@@ -1,0 +1,34 @@
+# Секреты
+.env
+
+# Данные
+*.db
+*.db-wal
+*.db-shm
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Сборка
+build/
+dist/
+*.spec
+*.exe
+
+# Логи
+*.log
+logs/
+
+# IDE / ОС
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini
+
+# Артефакты инструментов
+.playwright-mcp/

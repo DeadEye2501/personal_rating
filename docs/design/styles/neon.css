@@ -1,0 +1,78 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Неоновая кромка
+   Общий приём: полоса по верхней кромке, гаснущая к краям, гало под
+   ней и свечение текста. Цвет берёт из --neon, высоту гало — из
+   --halo-h; и то и другое задаёт тот, кто применяет класс.
+   Подключать после tokens.css.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.neon{
+  --halo-h:22px;
+
+  /* Свечение текста в два слоя: ближний держит контур, дальний
+     разливается. Отдельной переменной — чтобы вариант ниже гасил и
+     зажигал его, не переписывая. */
+  --neon-glow:
+    0 0 6px  color-mix(in srgb, var(--neon) 55%, transparent),
+    0 0 16px color-mix(in srgb, var(--neon) 30%, transparent);
+
+  position:relative;
+  color:var(--neon);
+  text-shadow:var(--neon-glow);
+}
+
+/* Кромка идёт по скруглению, а не прямой чертой поверх него: это
+   верхняя граница подложки того же радиуса. Гашение к краям делает
+   маска — она съедает и линию, и её свечение разом, потому что
+   drop-shadow считает по прозрачности источника. */
+.neon::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+
+  border-radius:inherit;
+  border-top:1px solid var(--neon);
+  mask-image:linear-gradient(90deg, transparent, #000 50%, transparent);
+  filter:drop-shadow(0 0 3px var(--neon)) drop-shadow(0 0 9px var(--neon));
+}
+
+/* Гало — отдельная подложка, а не размытие кромки: маска обрезала бы
+   разлив по краю блока. Эллиптический градиент гаснет и вбок, и вверх
+   сам, без маски и без размытия. */
+.neon::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(var(--halo-h) / -2);
+  height:var(--halo-h);
+  z-index:1;
+  pointer-events:none;
+
+  background:radial-gradient(
+    60% 50% at 50% 50%,
+    color-mix(in srgb, var(--neon) 24%, transparent) 0%,
+    transparent 72%);
+}
+
+/* Вариант «зажигается под курсором»: в покое цвет приглушён, кромки,
+   гало и свечения нет вовсе. */
+.neon--hover{
+  color:color-mix(in srgb, var(--neon) 55%, transparent);
+  text-shadow:none;
+  transition:color .16s, text-shadow .16s;
+}
+.neon--hover::before,
+.neon--hover::after{
+  opacity:0;
+  transition:opacity .16s;
+}
+
+.neon--hover:hover{
+  color:var(--neon);
+  text-shadow:var(--neon-glow);
+}
+.neon--hover:hover::before,
+.neon--hover:hover::after{ opacity:1 }
