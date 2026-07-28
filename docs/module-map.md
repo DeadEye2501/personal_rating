@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 9 модулей
+## backend — 13 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -93,6 +93,38 @@
 - `def fold(value: str | None) -> str | None` (5)
 - `def create_engine(path: Path) -> AsyncEngine` (13)
 - `def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]` (2)
+
+### `backend/storage/tables/__init__.py` — 34 строк
+
+Поверхность схемы: отсюда таблицы берут репозитории.
+
+Зависит от: `backend.storage.tables.base`, `backend.storage.tables.catalog`, `backend.storage.tables.mine`
+
+Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_map`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `tag`, `wishlist`
+
+
+### `backend/storage/tables/base.py` — 32 строк
+
+Общее для всех объявлений схемы.
+
+Зависит от: —
+
+- `def item_fk(**kwargs: Any) -> Column` (6)
+- `def genre_fk(**kwargs: Any) -> Column` (5)
+
+### `backend/storage/tables/catalog.py` — 127 строк
+
+Таблицы каталога: то, что наполняется из источников.
+
+Зависит от: `backend.storage.tables.base`
+
+
+### `backend/storage/tables/mine.py` — 56 строк
+
+Таблицы моих данных: то, что не зависит от источника.
+
+Зависит от: `backend.storage.tables.base`
+
 
 ## client — 0 модулей
 

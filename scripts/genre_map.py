@@ -42,7 +42,9 @@ def from_plan() -> dict[str, dict[str, list[str]]]:
     text = PLAN.read_text(encoding="utf-8")
     body = "GAME = [" + text.split("GAME = [")[1].split("\n\n\ndef upgrade")[0]
     scope: dict = {}
-    exec(body, scope)  # noqa: S102 — свой же план, не чужой ввод
+    # Свой же план, не чужой ввод: разбирать его парсером ради четырёх
+    # словарей — лишняя работа.
+    exec(body, scope)
     return {name: scope[name] for name in BOOKS}
 
 
