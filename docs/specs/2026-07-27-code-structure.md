@@ -17,7 +17,7 @@ personal_rating/
 │  │  ├─ session.py       движок и фабрика сессий
 │  │  ├─ tables/          объявления таблиц
 │  │  ├─ repository/      library, ratings, tags, wishlist, genres
-│  │  └─ posters.py       вторая база: картинка по хешу URL
+│  │  └─ posters.py       вторая база: картинка по item_id
 │  ├─ sources/
 │  │  ├─ http.py          общий клиент: таймауты, откат, предохранитель
 │  │  ├─ errors.py        единая классификация отказов
