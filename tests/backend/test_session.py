@@ -1,0 +1,90 @@
+import pytest
+from sqlalchemy import text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+from backend.storage.session import create_engine, fold, session_factory
+
+
+@pytest.fixture
+async def engine(tmp_path):
+    made = create_engine(tmp_path / "library.db")
+    yield made
+    await made.dispose()
+
+
+async def test_foreign_keys_are_enabled_on_every_connection(engine):
+    """PRAGMA живёт на соединении, а не на базе, и SQLite сбрасывает её на
+    каждом новом. Проверять на одном соединении бесполезно: `first_connect`
+    вместо `connect` прошёл бы незамеченным, а каскадное удаление сломалось бы
+    молча на втором запросе из пула."""
+    async with engine.connect() as first, engine.connect() as second:
+        for connection in (first, second):
+            result = await connection.execute(text("PRAGMA foreign_keys"))
+            assert result.scalar() == 1
+
+
+async def test_case_folding_is_registered_on_every_connection(engine):
+    async with engine.connect() as first, engine.connect() as second:
+        for connection in (first, second):
+            result = await connection.execute(text("SELECT py_lower('ВЕДЬМАК')"))
+            assert result.scalar() == "ведьмак"
+
+
+async def test_case_folding_handles_cyrillic(engine):
+    """Встроенный в SQLite lower() умеет только ASCII, поэтому сравнение
+    названий держится на своей функции."""
+    async with engine.connect() as connection:
+        result = await connection.execute(text("SELECT py_lower('Ведьмак')"))
+        assert result.scalar() == "ведьмак"
+
+
+def test_folding_passes_none_through():
+    # NULL приезжает из базы как None: без этой ветки сравнение падало бы на
+    # карточке без оригинального названия.
+    assert fold(None) is None
+    assert fold("Ведьмак") == "ведьмак"
+
+
+async def test_case_folding_works_inside_an_index(engine):
+    """`deterministic=True` — не украшение: без него SQLite отказывается
+    строить индекс по выражению, и падает миграция, а не тест."""
+    async with engine.begin() as connection:
+        await connection.execute(text("CREATE TABLE item (title TEXT)"))
+        await connection.execute(
+            text("CREATE INDEX item_title ON item (py_lower(title))")
+        )
+
+
+async def test_engine_creates_missing_folders(tmp_path):
+    target = tmp_path / "data" / "personal" / "library.db"
+    made = create_engine(target)
+    async with made.connect():
+        pass
+    await made.dispose()
+    assert target.exists()
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Note(Base):
+    __tablename__ = "note"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str]
+
+
+async def test_sessions_do_not_expire_objects_on_commit(engine):
+    """`expire_on_commit=False` — не украшение: с ним объект после коммита
+    остаётся годным, а без него первое же обращение к полю лезет в базу за
+    обновлением и падает `MissingGreenlet` — из чужого потока в asyncio так
+    нельзя."""
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+
+    async with session_factory(engine)() as session:
+        note = Note(title="Ведьмак")
+        session.add(note)
+        await session.commit()
+        assert note.title == "Ведьмак"
