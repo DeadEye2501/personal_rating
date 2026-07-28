@@ -3,7 +3,22 @@ from datetime import datetime
 
 import pytest
 
-from backend.model import Item, Kind, Rating, Source, average_score
+from backend.model import (
+    CompanyRole,
+    Credit,
+    ExternalId,
+    ExternalRating,
+    Genre,
+    GenreKind,
+    IdSource,
+    Item,
+    Kind,
+    PersonRole,
+    Rating,
+    RatingSource,
+    Source,
+    average_score,
+)
 
 
 def test_average_of_three_aspects_is_not_rounded():
@@ -27,17 +42,27 @@ def test_zero_is_a_value_and_not_an_absence():
     assert average_score(0, 10, None) == 5.0
 
 
-def test_item_is_frozen():
-    item = Item(
-        id=1,
-        kind=Kind.MOVIE,
-        source=Source.TMDB,
-        source_id="157336",
-        title="Интерстеллар",
-        synced_at=datetime(2026, 7, 27),
-    )
+MOMENT = datetime(2026, 7, 27)
+
+FROZEN = [
+    (Item(id=1, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
+          title="Интерстеллар", synced_at=MOMENT), "title", "другое"),
+    (Rating(item_id=1, score=8.0), "score", 1.0),
+    (Credit(name="Нолан", role=PersonRole.DIRECTOR), "name", "не Нолан"),
+    (Genre(id=1, name="Драма", kind=GenreKind.FILM), "name", "Комедия"),
+    (ExternalId(source=IdSource.IMDB, value="tt0816692"), "value", "tt0000000"),
+    (ExternalRating(source=RatingSource.IMDB, value=8.6, fetched_at=MOMENT),
+     "value", 1.0),
+]
+
+
+@pytest.mark.parametrize(("value", "field", "other"), FROZEN,
+                         ids=lambda item: type(item).__name__)
+def test_boundary_types_are_frozen(value, field, other):
+    # Через границу слоёв они ходят между потоками: разморозь один — и
+    # состояние карточки поедет вслед за ссылкой.
     with pytest.raises(FrozenInstanceError):
-        item.title = "другое"
+        setattr(value, field, other)
 
 
 def test_optional_fields_have_sane_defaults():
@@ -59,7 +84,21 @@ def test_rating_of_a_film_carries_no_aspects():
     assert (rating.visual, rating.narrative, rating.gameplay) == (None, None, None)
 
 
-def test_enum_values_match_the_schema():
-    # Значения ложатся в базу текстом — они часть схемы, а не деталь кода.
-    assert Kind.SERIES == "series"
-    assert Source.MANUAL == "manual"
+# Значения ложатся в базу текстом — они часть схемы, а не деталь кода:
+# переименование здесь ломает уже записанные строки, а не только код.
+SCHEMA = [
+    (Kind, {"movie", "series", "game"}),
+    (Source, {"manual", "tmdb", "steam", "gog"}),
+    (IdSource, {"imdb", "kinopoisk", "steam", "gog"}),
+    (RatingSource, {"imdb", "kinopoisk", "tmdb", "rotten", "metacritic",
+                    "steam", "gog"}),
+    (PersonRole, {"director", "actor", "showrunner"}),
+    (CompanyRole, {"developer", "publisher"}),
+    (GenreKind, {"film", "game"}),
+]
+
+
+@pytest.mark.parametrize(("enum", "expected"), SCHEMA,
+                         ids=lambda item: getattr(item, "__name__", ""))
+def test_enum_values_match_the_schema(enum, expected):
+    assert {member.value for member in enum} == expected

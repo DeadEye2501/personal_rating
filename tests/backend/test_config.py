@@ -26,10 +26,34 @@ def test_file_paths_sit_inside_data_dir(tmp_path):
     assert config.log_file == tmp_path / "data" / "app.log"
 
 
-def test_keys_are_read_and_missing_ones_are_empty():
-    config = load_config({"TMDB_API_KEY": "abc"}, base_dir=Path("."))
-    assert config.tmdb_key == "abc"
-    assert config.omdb_key == ""
+# Значения нарочно разные: с одинаковыми перепутанные местами переменные
+# окружения прошли бы молча, а ключ не от того источника — это отказ в ответе,
+# который потом ищут в клиенте.
+KEYS = {
+    "TMDB_API_KEY": ("tmdb_key", "ключ-tmdb"),
+    "MDBLIST_API_KEY": ("mdblist_key", "ключ-mdblist"),
+    "OMDB_API_KEY": ("omdb_key", "ключ-omdb"),
+    "POISKKINO_API_KEY": ("poiskkino_key", "ключ-poiskkino"),
+    "KINOPOISK_UNOFFICIAL_API_KEY": ("kinopoisk_unofficial_key", "ключ-kinopoisk"),
+}
+
+
+def test_every_key_is_read_from_its_own_variable():
+    config = load_config(
+        {name: value for name, (_, value) in KEYS.items()}, base_dir=Path(".")
+    )
+    assert {field: getattr(config, field) for field, _ in KEYS.values()} == {
+        field: value for field, value in KEYS.values()
+    }
+
+
+def test_missing_keys_are_empty():
+    config = load_config({}, base_dir=Path("."))
+    assert [getattr(config, field) for field, _ in KEYS.values()] == [""] * len(KEYS)
+
+
+def test_log_level_is_read_from_env():
+    assert load_config({"LOG_LEVEL": "DEBUG"}, base_dir=Path(".")).log_level == "DEBUG"
 
 
 def test_log_level_defaults_to_info():
