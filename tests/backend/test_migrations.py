@@ -1,27 +1,13 @@
-import subprocess
-import sys
 from pathlib import Path
 
-import pytest
 from sqlalchemy import create_engine, inspect, text
 
 from backend.storage.tables import metadata
+from tests.alembic_runner import alembic
 from tests.conftest import TABLES
-
-ROOT = Path(__file__).resolve().parents[2]
 
 # Alembic заводит её сам и в схему проекта не входит.
 STAMP = "alembic_version"
-
-
-def alembic(db_path: Path, *command: str) -> None:
-    result = subprocess.run(
-        [sys.executable, "-m", "alembic", "-x", f"db={db_path}", *command],
-        cwd=ROOT, capture_output=True, text=True,
-    )
-    if result.returncode != 0:
-        joined = " ".join(command)
-        pytest.fail(f"alembic {joined} провалился:\n{result.stdout}\n{result.stderr}")
 
 
 def declared(db_path: Path) -> None:

@@ -1,9 +1,11 @@
 from datetime import datetime
 
 import pytest
+import sqlalchemy
 
 from backend.storage.session import create_engine
 from backend.storage.tables import metadata
+from tests.alembic_runner import alembic
 
 MOMENT = datetime(2026, 7, 29, 12, 0)
 
@@ -26,6 +28,19 @@ MINIMAL = {
     "company": {"name": "CD Projekt RED"},
     "tag": {"name": "любимое", "kind": "movie", "position": 1},
 }
+
+
+@pytest.fixture
+def migrated(tmp_path):
+    """Соединение с базой, поднятой миграциями. Синхронное: миграции идут
+    синхронным драйвером, и проверяется здесь их результат, а не работа
+    приложения с базой."""
+    db_path = tmp_path / "library.db"
+    alembic(db_path, "upgrade", "head")
+    engine = sqlalchemy.create_engine(f"sqlite:///{db_path}")
+    with engine.connect() as connection:
+        yield connection
+    engine.dispose()
 
 
 @pytest.fixture
