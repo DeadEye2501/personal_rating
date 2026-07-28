@@ -52,6 +52,12 @@ def test_missing_keys_are_empty():
     assert [getattr(config, field) for field, _ in KEYS.values()] == [""] * len(KEYS)
 
 
+def test_keys_are_trimmed():
+    # В .env пробел после `=` глазами не виден, а ключ с ним получает отказ.
+    config = load_config({"TMDB_API_KEY": "  abc  "}, base_dir=Path("."))
+    assert config.tmdb_key == "abc"
+
+
 def test_log_level_is_read_from_env():
     assert load_config({"LOG_LEVEL": "DEBUG"}, base_dir=Path(".")).log_level == "DEBUG"
 

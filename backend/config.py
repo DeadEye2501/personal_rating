@@ -28,14 +28,20 @@ class Config:
         return self.data_dir / "app.log"
 
 
+def value(env: Mapping[str, str], name: str) -> str:
+    """Значение без краёв. В `.env` пробел после `=` не виден глазами, а ключ
+    с пробелом — это отказ источника, который потом ищут в клиенте."""
+    return env.get(name, "").strip()
+
+
 def load_config(env: Mapping[str, str], base_dir: Path) -> Config:
-    override = env.get("DATA_DIR", "").strip()
+    override = value(env, "DATA_DIR")
     return Config(
         data_dir=Path(override) if override else base_dir / DEFAULT_DATA_DIR,
-        tmdb_key=env.get("TMDB_API_KEY", ""),
-        mdblist_key=env.get("MDBLIST_API_KEY", ""),
-        omdb_key=env.get("OMDB_API_KEY", ""),
-        poiskkino_key=env.get("POISKKINO_API_KEY", ""),
-        kinopoisk_unofficial_key=env.get("KINOPOISK_UNOFFICIAL_API_KEY", ""),
-        log_level=env.get("LOG_LEVEL", "").strip() or "INFO",
+        tmdb_key=value(env, "TMDB_API_KEY"),
+        mdblist_key=value(env, "MDBLIST_API_KEY"),
+        omdb_key=value(env, "OMDB_API_KEY"),
+        poiskkino_key=value(env, "POISKKINO_API_KEY"),
+        kinopoisk_unofficial_key=value(env, "KINOPOISK_UNOFFICIAL_API_KEY"),
+        log_level=value(env, "LOG_LEVEL") or "INFO",
     )

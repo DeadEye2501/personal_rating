@@ -16,8 +16,9 @@ Roguelike, Sandbox, Fighting, Multiplayer, Tabletop
 За основу взят список GOG: он подробнее списка Steam, где нет ни «шутера», ни
 «головоломки», ни «хоррора» — всё это сваливается в «Экшены» и «Казуальные
 игры». Дальше набор урезан до того, чем пользуются: четыре вида гонок у GOG
-(`racing`, `offroad`, `rally`, `touring`) сходятся в один `Racing`, восемь видов
-спорта — в `Sport`, пятнадцать разновидностей шутера у Steam — в `Shooter`.
+(`racing`, `offroad`, `rally`, `touring`) сходятся в один `Racing`, три вида
+спорта у GOG и шестнадцать у Steam — в `Sport`, пятнадцать разновидностей шутера
+у Steam — в `Shooter`.
 
 Три жанра заведены сверх списка GOG:
 
@@ -72,8 +73,20 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 
 ## Соответствия
 
-206 строк `genre_map`: 8 + 157 + 39 + 2. Ни один идентификатор не ведёт в два
-наших жанра — это проверяется при сборке миграции.
+283 идентификатора и 296 строк `genre_map`: 8 + 168 + 39 + 68.
+
+**Составной тег ведёт в два жанра сразу.** `Action RPG` — это и `Action`, и
+`RPG`; игра, у которой в тегах есть он, но нет голого `RPG`, иначе ролевой не
+станет. Та же возможность `genre_map` держит сборные жанры TMDB, и у игр она
+работает так же. Составных тринадцать: девять тегов Steam, три тега GOG и слаг
+`jrpg`, который значит и `JRPG`, и `RPG`.
+
+**Теги GOG размечены наравне со Steam.** Жанры GOG вешает скупо, а теги
+подробно, и приезжают они в той же карточке товара — дополнительного запроса не
+стоят. Без них настольная игра из GOG получала бы `Strategy`: «настольность» у
+неё живёт в теге `board-game`, а не в жанре. То же с рогаликами — в жанрах у GOG
+слаг с опечаткой `rougelike`, который вешают редко, а в тегах правильные
+`roguelike` и `roguelite`.
 
 **Соответствие ставится по смыслу тега, а не по его русскому имени.** У Steam
 русское имя местами не перевод, а другое слово: `1320952` «Настольный компаньон»
@@ -84,7 +97,7 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 
 ### STEAM
 
-| id жанра | имя у магазина | наш жанр |
+| id жанра | имя у магазина | наши жанры |
 |---|---|---|
 | `1` | Экшены | Action |
 | `25` | Приключенческие игры | Quest |
@@ -97,17 +110,19 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 
 ### STEAM_TAG
 
-| id тега | имя у магазина | наш жанр |
+| id тега | имя у магазина | наши жанры |
 |---|---|---|
 | `19` | Экшен | Action |
-| `4106` | Приключенческий экшен | Action |
-| `4231` | Ролевой экшен | Action |
+| `4106` | Приключенческий экшен | Action + Quest |
+| `4231` | Ролевой экшен | Action + RPG |
 | `1646` | Слэшер | Action |
 | `4158` | Beat 'em up | Action |
 | `323922` | Мусоу | Action |
 | `3993` | Бой | Action |
 | `4608` | Сражения на мечах | Action |
 | `11104` | Гонки на выживание | Action |
+| `29482` | Похожа на Dark Souls | Action + RPG |
+| `42804` | Экшен-рогалик | Action + Roguelike |
 | `21` | Приключение | Quest |
 | `1698` | Point & Click | Quest |
 | `11014` | Интерактивная литература | Quest |
@@ -119,7 +134,10 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `122` | Ролевая игра | RPG |
 | `4474` | Компьютерная ролевая игра | RPG |
 | `10695` | Партийная ролевая игра | RPG |
-| `1754` | MMORPG | RPG |
+| `1754` | MMORPG | RPG + Multiplayer |
+| `1720` | Подземелья | RPG |
+| `21725` | Тактическая ролевая игра | RPG + Tactical |
+| `17305` | Ролевая стратегия | RPG + Strategy |
 | `4434` | Японская ролевая игра | JRPG |
 | `9` | Стратегия | Strategy |
 | `1741` | Пошаговая стратегия | Strategy |
@@ -133,7 +151,6 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `4695` | Экономика | Strategy |
 | `4845` | Капитализм | Strategy |
 | `6310` | Дипломатия | Strategy |
-| `17305` | Ролевая стратегия | Strategy |
 | `17389` | Настольная игра | Tabletop |
 | `1770` | Настольная с полем | Tabletop |
 | `1666` | Карточная игра | Tabletop |
@@ -145,10 +162,11 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `7556` | Игральные кости | Tabletop |
 | `6835` | Покер | Tabletop |
 | `4852` | Бильярд | Tabletop |
+| `791774` | Карточный баттлер | Tabletop |
+| `1091588` | Карточный рогалик | Tabletop + Roguelike |
 | `1708` | Тактика | Tactical |
 | `14139` | Пошаговая тактика | Tactical |
 | `3813` | Тактика в реальном времени | Tactical |
-| `21725` | Тактическая ролевая игра | Tactical |
 | `599` | Симулятор | Simulator |
 | `10235` | Симулятор жизни | Simulator |
 | `9551` | Симулятор свиданий | Simulator |
@@ -159,6 +177,9 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `35079` | Симулятор работы | Simulator |
 | `1100688` | Медицинский симулятор | Simulator |
 | `1100686` | Симулятор эпидемии | Simulator |
+| `9564` | Охота | Simulator |
+| `1220528` | Симулятор хобби | Simulator |
+| `91114` | Работа в магазине | Simulator |
 | `699` | Гонки | Racing |
 | `1644` | Вождение | Racing |
 | `4102` | Боевые гонки | Racing |
@@ -202,7 +223,7 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `5379` | 2D-платформер | Platformer |
 | `5395` | 3D-платформер | Platformer |
 | `3877` | Платформер на точность | Platformer |
-| `5537` | Головоломка-платформер | Platformer |
+| `5537` | Головоломка-платформер | Platformer + Puzzle |
 | `1628` | Метроидвания | Metroidvania |
 | `1664` | Головоломка | Puzzle |
 | `6129` | Логика | Puzzle |
@@ -211,8 +232,8 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `37376` | Падающие блоки | Puzzle |
 | `1738` | Поиск предметов | Puzzle |
 | `5432` | Программирование | Puzzle |
-| `5502` | Хакерство | Puzzle |
 | `10437` | Викторина | Puzzle |
+| `769306` | Квест-комната | Puzzle |
 | `1773` | Аркада | Arcade |
 | `6621` | Пинбол | Arcade |
 | `8666` | Раннер | Arcade |
@@ -220,7 +241,6 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `5154` | Набор очков | Arcade |
 | `1662` | Выживание | Survival |
 | `1100689` | Симулятор выживания и крафтинга в открытом мире | Survival |
-| `1702` | Крафтинг | Survival |
 | `1667` | Хоррор | Horror |
 | `3978` | Хоррор на выживание | Horror |
 | `1721` | Психологический хоррор | Horror |
@@ -233,8 +253,6 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `1716` | Рогалик | Roguelike |
 | `454187` | Традиционный рогалик | Roguelike |
 | `3959` | Упрощённый рогалик | Roguelike |
-| `42804` | Экшен-рогалик | Roguelike |
-| `1091588` | Карточный рогалик | Roguelike |
 | `198631` | Загадочные подземелья | Roguelike |
 | `3810` | Песочница | Sandbox |
 | `1643` | Строительство | Sandbox |
@@ -244,7 +262,6 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `255534` | Автоматизация | Sandbox |
 | `5300` | Симулятор бога | Sandbox |
 | `5981` | Горное дело | Sandbox |
-| `9564` | Охота | Sandbox |
 | `1743` | Файтинг | Fighting |
 | `4736` | 2D-файтинг | Fighting |
 | `6506` | 3D-файтинг | Fighting |
@@ -256,10 +273,17 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `176981` | Королевская битва | Multiplayer |
 | `1718` | MOBA | Multiplayer |
 | `3843` | Сетевой кооператив | Multiplayer |
+| `7368` | Локальный мультиплеер | Multiplayer |
+| `3841` | Локальный кооператив | Multiplayer |
+| `4508` | Совместная кампания | Multiplayer |
+| `4840` | Локальная игра на четверых | Multiplayer |
+| `10816` | Разделение экрана | Multiplayer |
+| `7178` | Командная игра | Multiplayer |
+| `17770` | Асинхронный мультиплеер | Multiplayer |
 
 ### GOG
 
-| слаг жанра | имя у магазина | наш жанр |
+| слаг жанра | имя у магазина | наши жанры |
 |---|---|---|
 | `action` | Экшн | Action |
 | `combat` | Сражения | Action |
@@ -267,7 +291,7 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `pointandclick` | Квест | Quest |
 | `visual-novel` | Визуальные новеллы | Quest |
 | `rpg` | Ролевая игра | RPG |
-| `jrpg` | JRPG | JRPG |
+| `jrpg` | JRPG | RPG + JRPG |
 | `strategy` | Стратегия | Strategy |
 | `managerial` | Менеджмент | Strategy |
 | `economic` | Экономика | Strategy |
@@ -303,10 +327,76 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 
 ### GOG_TAG
 
-| слаг тега | имя у магазина | наш жанр |
+| слаг тега | имя у магазина | наши жанры |
 |---|---|---|
+| `hack-and-slash` | Слэшер | Action |
+| `beat-em-up` | Beat 'em up | Action |
+| `combat` | Сражения | Action |
+| `souls-like` | Похожа на Dark Souls | Action + RPG |
+| `point-and-click` | Point&Click | Quest |
+| `text-based` | Текстовая | Quest |
+| `choose-your-own-adventure` | Выбери себе приключение | Quest |
+| `walking-simulator` | Симультор ходьбы | Quest |
+| `visual-novel` | Визуальная новелла | Quest |
+| `crpg` | Компьютерная ролевая игра | RPG |
+| `dungeon-crawler` | Подземелья | RPG |
+| `tactical-rpg` | Тактическая ролевая игра | RPG + Tactical |
+| `rts` | Стратегия в реальном времени | Strategy |
+| `four-x` | 4X | Strategy |
+| `grand-strategy` | Глобальная стратегия | Strategy |
+| `tower-defense` | Башенная защита | Strategy |
+| `management` | Управление | Strategy |
+| `resource-management` | Управление ресурсами | Strategy |
+| `trading` | Торговля | Strategy |
+| `board-game` | Настольная с полем | Tabletop |
+| `tabletop` | Настольная игра | Tabletop |
+| `deckbuilding` | Карточная | Tabletop |
+| `lifesim` | Симулятор жизни | Simulator |
+| `dating-sim` | Симулятор свиданий | Simulator |
+| `flight` | Полеты | Simulator |
+| `trains` | Поезда | Simulator |
+| `farming` | Фермерство | Simulator |
+| `football` | Футбол | Sport |
+| `martial-arts` | Боевые искусства | Sport |
+| `fishing` | Рыбалка | Sport |
+| `team-sport` | Командный спорт | Sport |
+| `fps` | Шутер от первого лица | Shooter |
+| `bullet-hell` | Скролл-шутер | Shooter |
+| `twin-stick-shooter` | Твин-стик шутер | Shooter |
+| `looter-shooter` | Лутер-шутер | Shooter |
+| `sniper` | Снайпер | Shooter |
+| `platformer` | Платформер | Platformer |
+| `metroidvania` | Метроидвания | Platformer |
+| `puzzle-platformer` | Головоломка-платформер | Platformer + Puzzle |
+| `logic` | Логическая | Puzzle |
+| `match-three` | Три в ряд | Puzzle |
+| `escape-room` | Побег из комнаты | Puzzle |
+| `programming` | Программирование | Puzzle |
+| `hidden-object` | Поиск предметов | Puzzle |
+| `rhythm` | Ритм | Arcade |
+| `pinball` | Пинболл | Arcade |
+| `arcade` | Аркада | Arcade |
+| `crafting` | Крафтинг | Survival |
+| `survival` | Выживание | Survival |
+| `survival-horror` | Хоррор на выживание | Horror |
+| `psychological-horror` | Психологический хоррор | Horror |
+| `lovecraftian` | Лавкрафт | Horror |
+| `zombies` | Зомби | Horror |
+| `vampire` | Вампир | Horror |
+| `roguelike` | Рогалик | Roguelike |
+| `roguelite` | Упрощенный рогалик | Roguelike |
+| `perma-death` | Перманентная смерть | Roguelike |
+| `city-builder` | Градостроение | Sandbox |
+| `base-building` | Строительство базы | Sandbox |
+| `building` | Строительство | Sandbox |
+| `sandbox` | Песочница | Sandbox |
 | `multiplayer` | Многопользовательская игра | Multiplayer |
 | `local-multiplayer` | Локальный мультиплеер | Multiplayer |
+| `local-co-op` | Локальный кооператив | Multiplayer |
+| `split-screen` | Разделение экрана | Multiplayer |
+| `crossplay` | Crossplay | Multiplayer |
+| `online-only` | Online-only | Multiplayer |
+| `party-game` | Партийная игра | Multiplayer |
 
 ## Что не переводится ни во что
 
@@ -343,6 +433,15 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 слаг или номер, которого здесь нет. Правило на этот случай одно: **незнакомый
 идентификатор попадает в лог, а не заводит жанр на лету.** Карточка показывается
 без него.
+
+**Правило действует только на жанры, не на теги.** У жанров словарь закрытый и
+известен целиком — двенадцать значений у Steam, 55 слагов у GOG, — поэтому
+незнакомое там означает, что магазин расширил справочник, и это стоит увидеть. У
+тегов словарь открытый и огромный: 432 у Steam, 203 у GOG, и большинство из них
+жанрами не являются вовсе — «Атмосферная», «Для одного игрока», «Отличный
+саундтрек». Неразмеченный тег — это не новость, а норма, и в лог он не идёт.
+Иначе на каждой карточке в лог сыпалось бы по полтора десятка строк, и настоящее
+расширение справочника в этом шуме никто не заметил бы.
 
 Молча пропускать нельзя — иначе расширение справочника никто не заметит.
 Заводить автоматически тоже нельзя: имена в справочнике наши, и сведение

@@ -38,7 +38,9 @@ def test_no_aspects_at_all_gives_nothing():
     assert average_score(None, None, None) is None
 
 
-def test_zero_is_a_value_and_not_an_absence():
+def test_zero_counts_as_a_filled_aspect():
+    # Шкала в спеке 1–10, нуля на ней нет — проверяется именно то, что функция
+    # отличает выставленное от невыставленного по `is None`, а не по ложности.
     assert average_score(0, 10, None) == 5.0
 
 
@@ -66,6 +68,8 @@ def test_boundary_types_are_frozen(value, field, other):
 
 
 def test_optional_fields_have_sane_defaults():
+    # Умолчания уезжают в базу как есть: строка вместо None у необязательного
+    # поля — это пустое название вместо «неизвестно».
     item = Item(
         id=1,
         kind=Kind.GAME,
@@ -74,9 +78,9 @@ def test_optional_fields_have_sane_defaults():
         title="The Witcher 3",
         synced_at=datetime(2026, 7, 27),
     )
-    assert item.year is None
-    assert item.original_title == ""
-    assert item.seasons_count is None
+    assert (item.original_title, item.synopsis, item.poster_url) == ("", "", "")
+    assert (item.year, item.released_at, item.runtime) == (None, None, None)
+    assert (item.seasons_count, item.episodes_count) == (None, None)
 
 
 def test_rating_of_a_film_carries_no_aspects():

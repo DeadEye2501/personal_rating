@@ -15,7 +15,7 @@ BANNED_IN_BACKEND = {"client", "PySide6"}
 # SQLAlchemy, и поход к диску в главном потоке, то есть ровно то, от чего
 # граница слоёв и заведена. Список корневых имён этого не ловит: они
 # `backend.*`, а не `sqlalchemy`.
-ALLOWED_FROM_BACKEND = {"backend.model", "backend.config", "backend.app"}
+ALLOWED_FROM_BACKEND = {"backend.model", "backend.config"}
 
 
 def imported_modules(path: Path):
