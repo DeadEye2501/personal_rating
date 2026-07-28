@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 13 модулей
+## backend — 14 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -83,6 +83,22 @@
 
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
+
+### `backend/storage/repository/library.py` — 122 строк
+
+Карточки библиотеки.
+
+Зависит от: `backend.model`, `backend.storage.session`, `backend.storage.tables`
+
+- `class ItemExists(Exception)` (2)
+- `def _values(item: Item) -> dict` (6)
+- `def _to_item(row: Row) -> Item` (22)
+- `class LibraryRepository` (68)
+  - `async def create(self, item: Item) -> int` (16)
+  - `async def get(self, item_id: int) -> Item | None` (2)
+  - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
+  - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (11)
+  - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (15)
 
 ### `backend/storage/session.py` — 44 строк
 

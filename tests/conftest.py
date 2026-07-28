@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 import sqlalchemy
 
-from backend.storage.session import create_engine
+from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
 from tests.alembic_runner import alembic
 
@@ -52,6 +52,13 @@ async def engine(tmp_path):
         await connection.run_sync(metadata.create_all)
     yield made
     await made.dispose()
+
+
+@pytest.fixture
+async def sessions(engine):
+    """Фабрика сессий поверх тестовой базы: репозитории принимают её, а не
+    движок."""
+    return session_factory(engine)
 
 
 @pytest.fixture

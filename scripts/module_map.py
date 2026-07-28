@@ -118,16 +118,22 @@ def module_block(path: str, tree: ast.Module, lines_total: int) -> str:
 
 
 def implementations(found: list[tuple]) -> dict[str, list[str]]:
-    """Базовый класс -> кто его наследует. Пусто у того, кого не наследуют."""
+    """Базовый класс -> кто его наследует. Пусто у того, кого не наследуют.
+
+    Чужие основания не в счёт: `Exception` с единственным наследником — не
+    заведённая нами абстракция, а обычное своё исключение, и правило 7 про
+    него ничего не говорит."""
     children: dict[str, list[str]] = {}
+    ours: set[str] = set()
     for _, tree, _lines in found:
         for node in ast.walk(tree):
             if not isinstance(node, ast.ClassDef):
                 continue
+            ours.add(node.name)
             children.setdefault(node.name, [])
             for base in node.bases:
                 children.setdefault(ast.unparse(base), []).append(node.name)
-    return children
+    return {base: kids for base, kids in children.items() if base in ours}
 
 
 def lonely_block(found: list[tuple]) -> str:
