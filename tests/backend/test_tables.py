@@ -3,14 +3,7 @@ from sqlalchemy import Date, DateTime, Float, Integer, Text, func, inspect, sele
 from sqlalchemy.exc import IntegrityError
 
 from backend.storage.tables import metadata
-from tests.conftest import MINIMAL, MOMENT
-
-TABLES = {
-    "item", "genre", "genre_map", "item_genre",
-    "person", "person_credit", "company", "company_credit",
-    "external_id", "external_rating",
-    "rating", "tag", "item_tag", "wishlist",
-}
+from tests.conftest import MINIMAL, MOMENT, TABLES
 
 
 async def counted(engine, table_name: str) -> int:
@@ -35,8 +28,10 @@ async def test_every_table_from_the_spec_exists(engine):
 
 
 async def test_every_index_from_the_spec_exists_in_the_database(engine):
-    """Индексы проверяются в базе, а не в объявлении: схему с задачи 7 строит
-    миграция, и объявленное там может не доехать до базы."""
+    """Индексы проверяются в поднятой базе, а не в объявлении: объявленный
+    индекс до базы может и не доехать. Здесь её поднимает `metadata.create_all`
+    из фикстуры; ту же схему, построенную миграцией, сторожит
+    `test_migrations.py`."""
     async with engine.connect() as connection:
         built = await connection.run_sync(
             lambda sync: {

@@ -7,6 +7,15 @@ from backend.storage.tables import metadata
 
 MOMENT = datetime(2026, 7, 29, 12, 0)
 
+# Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он
+# совпал бы с ним при любой пропаже таблицы.
+TABLES = {
+    "item", "genre", "genre_map", "item_genre",
+    "person", "person_credit", "company", "company_credit",
+    "external_id", "external_rating",
+    "rating", "tag", "item_tag", "wishlist",
+}
+
 # Минимально допустимая строка каждой таблицы: только обязательные колонки.
 # Отсюда же берутся значения, когда нужно проверить отказ на пропущенном.
 MINIMAL = {

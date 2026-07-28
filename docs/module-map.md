@@ -84,14 +84,15 @@
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
 
-### `backend/storage/session.py` — 37 строк
+### `backend/storage/session.py` — 44 строк
 
 Доступ к основной базе.
 
 Зависит от: —
 
 - `def fold(value: str | None) -> str | None` (5)
-- `def create_engine(path: Path) -> AsyncEngine` (13)
+- `def prepare_connection(dbapi_connection) -> None` (9)
+- `def create_engine(path: Path) -> AsyncEngine` (9)
 - `def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]` (2)
 
 ### `backend/storage/tables/__init__.py` — 34 строк

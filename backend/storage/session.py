@@ -18,17 +18,24 @@ def fold(value: str | None) -> str | None:
     return value.lower() if value is not None else None
 
 
+def prepare_connection(dbapi_connection) -> None:
+    """Соединение к нашей базе. И внешние ключи, и своё сравнение регистра
+    живут на соединении, а не на базе: SQLite выключает первые и забывает
+    второе на каждом новом подключении. Зовут отсюда двое — движок приложения
+    и Alembic, который ходит своим, синхронным."""
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+    dbapi_connection.create_function("py_lower", 1, fold, deterministic=True)
+
+
 def create_engine(path: Path) -> AsyncEngine:
     path.parent.mkdir(parents=True, exist_ok=True)
     engine = create_async_engine(f"sqlite+aiosqlite:///{path}")
 
     @event.listens_for(engine.sync_engine, "connect")
-    def prepare_connection(dbapi_connection, _record):
-        # SQLite выключает внешние ключи на каждом подключении заново.
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
-        dbapi_connection.create_function("py_lower", 1, fold, deterministic=True)
+    def prepare(dbapi_connection, _record):
+        prepare_connection(dbapi_connection)
 
     return engine
 
