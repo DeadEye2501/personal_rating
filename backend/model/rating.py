@@ -1,3 +1,5 @@
+"""Своя оценка карточки."""
+
 from dataclasses import dataclass
 
 

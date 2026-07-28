@@ -1,3 +1,5 @@
+"""Карточка любого типа содержимого на границе слоёв."""
+
 from dataclasses import dataclass
 from datetime import date, datetime
 

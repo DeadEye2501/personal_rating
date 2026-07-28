@@ -1,3 +1,5 @@
+"""Человек или студия в роли на карточке."""
+
 from dataclasses import dataclass
 
 from backend.model.kinds import CompanyRole, PersonRole, Source
@@ -5,8 +7,6 @@ from backend.model.kinds import CompanyRole, PersonRole, Source
 
 @dataclass(frozen=True, slots=True)
 class Credit:
-    """Человек или студия в роли на карточке."""
-
     name: str
     role: PersonRole | CompanyRole
     position: int | None = None   # порядок в титрах, нужен для «топ-5 актёров»

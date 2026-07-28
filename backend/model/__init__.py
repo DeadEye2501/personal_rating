@@ -1,3 +1,5 @@
+"""Поверхность модели: отсюда типы границы слоёв импортирует клиент."""
+
 from backend.model.credit import Credit
 from backend.model.external import ExternalId, ExternalRating
 from backend.model.genre import Genre

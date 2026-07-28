@@ -1,3 +1,5 @@
+"""Доступ к основной базе."""
+
 from pathlib import Path
 
 from sqlalchemy import event

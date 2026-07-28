@@ -1,3 +1,5 @@
+"""Жанр на границе слоёв."""
+
 from dataclasses import dataclass
 
 from backend.model.kinds import GenreKind
