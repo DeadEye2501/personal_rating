@@ -27,7 +27,7 @@ from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from tests.backend.sources.conftest import responding, unreachable
 from tests.conftest import MOMENT as WHEN
-from tests.conftest import picture, poster_service, seed
+from tests.conftest import card_parts, film_genres, picture, seed
 
 POSTER = picture(600, 900, fmt="JPEG")
 
@@ -76,32 +76,15 @@ def another_movie(source_id: str, **overrides) -> SourceCard:
     })
 
 
-async def reference(engine) -> None:
-    """Справочник жанров: в базе из объявлений он пуст, а разрешение чужих
-    идентификаторов идёт через него."""
-    await seed(
-        engine,
-        "INSERT INTO genre (id, name, kind) VALUES "
-        "(1, 'фантастика', 'film'), (2, 'приключения', 'film')",
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('tmdb', '878', 1), ('tmdb', '12', 2)",
-    )
-
-
 async def build(sessions, engine, posters, transport=None) -> CardWriter:
     """Писатель со всеми репозиториями поверх тестовой базы. Транспорт задаётся
-    там, где обложка должна не приехать."""
-    await reference(engine)
-    return CardWriter(
-        library=LibraryRepository(sessions),
-        genres=GenresRepository(sessions),
-        people=people(sessions),
-        companies=companies(sessions),
-        ids=ExternalIdsRepository(sessions),
-        ratings=ExternalRatingsRepository(sessions),
-        posters=poster_service(posters,
-                               transport or responding(content=POSTER)),
-    )
+    там, где обложка должна не приехать.
+
+    Справочник жанров кладётся руками: в базе из объявлений он пуст, а разрешение
+    чужих идентификаторов идёт через него."""
+    await film_genres(engine)
+    return CardWriter(**card_parts(sessions, posters,
+                                   transport or responding(content=POSTER)))
 
 
 @pytest.fixture

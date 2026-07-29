@@ -2,43 +2,19 @@
 
 import logging
 
-from backend.model import Credit, SourceCard
+from backend.model import SourceCard
+from backend.service.card_parts import CardParts
 from backend.service.genres import resolved_genres
-from backend.service.posters import PosterService
 from backend.sources.errors import Refusal, broken
-from backend.storage.repository.credits import CreditRepository
-from backend.storage.repository.external import (
-    ExternalIdsRepository,
-    ExternalRatingsRepository,
-)
-from backend.storage.repository.genres import GenresRepository
-from backend.storage.repository.library import ItemExists, LibraryRepository
+from backend.storage.repository.library import ItemExists
 
 logger = logging.getLogger(__name__)
 
 
-class CardWriter:
+class CardWriter(CardParts):
     """Порядок задан правилом «частичной карточки не бывает»: сначала добываем
     обложку, и только потом пишем. Если запись сорвалась на середине — убираем
     за собой: общей транзакции на два файла базы не бывает."""
-
-    def __init__(
-        self,
-        library: LibraryRepository,
-        genres: GenresRepository,
-        people: CreditRepository,
-        companies: CreditRepository,
-        ids: ExternalIdsRepository,
-        ratings: ExternalRatingsRepository,
-        posters: PosterService,
-    ) -> None:
-        self._library = library
-        self._genres = genres
-        self._people = people
-        self._companies = companies
-        self._ids = ids
-        self._ratings = ratings
-        self.posters = posters
 
     async def save(self, card: SourceCard,
                    poster: bytes | None = None) -> int | Refusal:
@@ -77,20 +53,10 @@ class CardWriter:
             item_id, await resolved_genres(self._genres, card.genre_ext_ids)
         )
 
-        await self._attach(self._people, item_id, card.people)
-        await self._attach(self._companies, item_id, card.companies)
+        await self._attach_credits(self._people, item_id, card.people)
+        await self._attach_credits(self._companies, item_id, card.companies)
 
-        for external in card.external_ids:
-            await self._ids.put(item_id, external)
-        for rating in card.ratings:
-            await self._ratings.record(item_id, rating)
+        await self._write_external(item_id, card)
 
         if poster is not None:
             await self.posters.save(item_id, poster, card.item.synced_at)
-
-    async def _attach(self, repository: CreditRepository, item_id: int,
-                      credits: tuple[Credit, ...]) -> None:
-        for credit in credits:
-            entity_id = await repository.ensure(credit)
-            await repository.attach(item_id, entity_id, credit.role,
-                                    credit.position)

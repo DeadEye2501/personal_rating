@@ -4,17 +4,7 @@ import pytest
 
 from backend.model import GenreKind, GenreSource, Kind
 from backend.storage.repository.genres import GenresRepository
-from tests.conftest import seed
-
-
-def ours(caplog) -> list[str]:
-    """Записи в лог, сделанные нашим кодом. Чужие не в счёт: драйвер базы на
-    уровне отладки говорит за каждый запрос."""
-    return [
-        record.getMessage()
-        for record in caplog.records
-        if record.name.startswith("backend")
-    ]
+from tests.conftest import ours, seed
 
 
 @pytest.fixture

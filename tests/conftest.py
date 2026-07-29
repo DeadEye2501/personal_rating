@@ -12,6 +12,12 @@ from backend.model import Item, Kind, Source
 from backend.service.posters import PosterService
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
+from backend.storage.repository.credits import companies, people
+from backend.storage.repository.external import (
+    ExternalIdsRepository,
+    ExternalRatingsRepository,
+)
+from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.session import (
     create_engine,
@@ -34,6 +40,44 @@ POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
 # Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
 # хранилищу постеров важно только то, что байты вернулись теми же.
 PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 512
+
+
+def ours(caplog) -> list[str]:
+    """Записи в лог, сделанные нашим кодом. Чужие не в счёт: драйвер базы на
+    уровне отладки говорит за каждый запрос."""
+    return [
+        record.getMessage()
+        for record in caplog.records
+        if record.name.startswith("backend")
+    ]
+
+
+def card_parts(sessions, store: PosterStore,
+               transport: httpx.MockTransport) -> dict:
+    """Репозитории одной карточки и сервис обложек: и писателя, и привязку
+    собирают из одного и того же — они наследники `CardParts`."""
+    return {
+        "library": LibraryRepository(sessions),
+        "genres": GenresRepository(sessions),
+        "people": people(sessions),
+        "companies": companies(sessions),
+        "ids": ExternalIdsRepository(sessions),
+        "ratings": ExternalRatingsRepository(sessions),
+        "posters": poster_service(store, transport),
+    }
+
+
+async def film_genres(engine) -> None:
+    """Два киножанра со соответствиями к ним. Два, а не один: с одним нельзя
+    проверить, что чужой жанр не затирает выбранный руками — дополнять было бы
+    нечем."""
+    await seed(
+        engine,
+        "INSERT INTO genre (id, name, kind) VALUES "
+        "(1, 'фантастика', 'film'), (2, 'приключения', 'film')",
+        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
+        "('tmdb', '878', 1), ('tmdb', '12', 2)",
+    )
 
 
 async def seed(engine, *statements: str) -> None:

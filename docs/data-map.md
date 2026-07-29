@@ -174,6 +174,12 @@
 - `TARGET_SIZE` = `набор из 2`
 - `_QUALITY` = `88`
 
+### `backend/service/linking.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `_FILLABLE` = `набор из 9`
+- `_EMPTY` = `набор из 2`
+
 ### `backend/service/posters.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -463,6 +469,10 @@
 - `BANNED_IN_CLIENT` = `набор из 5`
 - `BANNED_IN_BACKEND` = `набор из 2`
 - `ALLOWED_FROM_BACKEND` = `набор из 2`
+
+### `tests/backend/test_linking.py`
+
+- `POSTER` = `picture(600, 900, fmt='JPEG')`
 
 ### `tests/backend/test_links.py`
 
