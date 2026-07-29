@@ -1,6 +1,6 @@
 """Жанры карточки и разрешение чужих идентификаторов в свои."""
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Genre, GenreKind, GenreSource
@@ -41,9 +41,7 @@ class GenresRepository(Repository):
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:
         """Набор жанров заменяется целиком: пришедшее из источника — это весь
         список, а не добавка к прежнему."""
-        cleared = delete(item_genre_table).where(
-            item_genre_table.c.item_id == item_id
-        )
+        cleared = self._clearing(item_genre_table, item_id)
         if not genre_ids:
             await self._run(cleared)
             return

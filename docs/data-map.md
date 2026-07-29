@@ -260,6 +260,16 @@
 - `metadata` = `MetaData()`
 - `poster` = `Table('poster', metadata, Column('item_id', Inte…`
 
+### `backend/storage/repository/credits.py`
+
+- `class Entity`
+  - `table: Table`
+  - `credit: Table`
+  - `roles: Callable[[str], PersonRole | CompanyRole]`
+  - `position: Column | None` = `None`
+- `PEOPLE` = `Entity(person, person_credit, PersonRole, person…`
+- `COMPANIES` = `Entity(company, company_credit, CompanyRole)`
+
 ### `backend/storage/repository/library.py`
 
 - `_FIELDS` = `набор из 13`

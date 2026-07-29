@@ -118,7 +118,36 @@ personal_rating/
   `credits_of(item_id) -> list[Credit]`;
   фабрики `people(sessions)` и `companies(sessions)`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+**Сделано 29.07.2026 с четырьмя отклонениями от написанного ниже.** Все — от
+того, что план писался до реализации плана 1 и не знал, что в нём появилось:
+
+1. `CreditRepository` наследует `Repository` и ходит в базу его методами
+   (`_row`, `_rows`, `_mapped`, `_run`, `_created`). Ниже он держит фабрику
+   сессий сам и повторяет `async with self._sessions()` в каждом методе — это
+   восемь повторов подряд.
+2. Вместо пяти параметров конструктора заведён датакласс `Entity` с полями
+   `table`, `credit`, `roles`, `position` и две его константы `PEOPLE` и
+   `COMPANIES`. Пять параметров — нарушение правила 5 манифеста.
+3. Заведено исключение `IdentityTaken`: `_created` требует своё исключение
+   вместо `IntegrityError`, наружу чужое пробрасывать нельзя. К нему добавлен
+   тест, которого ниже нет. **Имя занято этой задачей**, и в задаче 3 то же
+   имя носить нельзя — там оно станет `ExternalIdTaken`.
+4. Локальные `make_card`, `NoPosters` и `WHEN` не написаны: вместо них взяты
+   фикстуры `card` и `posters` из `tests/conftest.py`. Иначе тот же помощник
+   переписывался бы в трёх файлах тестов этого плана.
+
+Плюс мелочь: перечисления кладутся в колонки как есть, без `str(...)`, — они
+`StrEnum`, и так делает `library.py`.
+
+**Ревью добавило ещё три правки.** «Снести всё по карточке» оказалось написано
+четырьмя копиями — три из них жили в проекте с плана 1, — и вынесено в
+`Repository._clearing`, возвращающий оператор, а не выполняющий его: жанрам он
+нужен внутри общей транзакции со вставкой. Внутри `credits.py` вынесены
+`_same_name` и `_found_id`. Тестов стало двадцать четыре: добавились двое
+безымянных тёзок, состав, не залезающий в соседнюю карточку, и проверка на то,
+что ручной заводится именно от `Source.MANUAL`.
+
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/backend/test_credits.py`:
 
@@ -375,12 +404,12 @@ async def test_deleting_the_card_takes_the_credits_but_not_the_person(sessions):
     assert await repository.find_by_name("Кристофер Нолан") == [person_id]
 ```
 
-- [ ] **Шаг 2: Убедиться, что тест падает**
+- [x] **Шаг 2: Убедиться, что тест падает**
 
 Запустить: `pipenv run pytest tests/backend/test_credits.py -v`
 Ожидается: FAIL — `No module named 'backend.storage.repository.credits'`.
 
-- [ ] **Шаг 3: Реализовать**
+- [x] **Шаг 3: Реализовать**
 
 Создать `backend/storage/repository/credits.py`:
 
@@ -554,12 +583,13 @@ def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository:
 `role is PersonRole.ACTOR` — если бы репозитории отдавали разное, это разошлось
 бы молча.
 
-- [ ] **Шаг 4: Убедиться, что тесты проходят**
+- [x] **Шаг 4: Убедиться, что тесты проходят**
 
 Запустить: `pipenv run pytest tests/backend/test_credits.py -v`
-Ожидается: PASS, двадцать один тест.
+Ожидается: PASS, двадцать два теста — двадцать один отсюда и один на
+`CreditExists`.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add backend/storage/repository/credits.py tests/backend/test_credits.py

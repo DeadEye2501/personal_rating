@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 43 модулей
+## backend — 44 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -368,31 +368,57 @@
   - `async def has(self, item_id: int) -> bool` (5)
   - `async def delete(self, item_id: int) -> None` (2)
 
-### `backend/storage/repository/base.py` — 70 строк
+### `backend/storage/repository/base.py` — 79 строк
 
 Общее у репозиториев: сессия и способы с ней обойтись.
 
 Зависит от: —
 
-- `class Repository` (61)
+- `class Repository` (70)
   - `async def _row(self, statement: Executable) -> Row | None` (3)
   - `async def _rows(self, statement: Executable) -> list[Row]` (3)
   - `async def _mapped(self, statement: Executable, make: Callable[[Row], object])` (3)
   - `async def _has_item(self, table: Table, item_id: int) -> bool` (8)
+  - `def _clearing(table: Table, item_id: int) -> Delete` (7)
   - `async def _created(self, statement: Executable, taken: Exception) -> int` (15)
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (7)
 
-### `backend/storage/repository/genres.py` — 76 строк
+### `backend/storage/repository/credits.py` — 165 строк
+
+Люди и студии в ролях на карточке.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
+
+- `class IdentityTaken(Exception)` (2)
+- `class Entity` (8)
+- `class CreditRepository(Repository)` (123)
+  - `def _link(self) -> Column` (2)
+  - `def _same_name(self, name: str) -> ColumnElement[bool]` (4)
+  - `async def _found_id(self, statement: Select) -> int | None` (3)
+  - `async def create(self, name: str, source: Source | None=None, source_id: str | None=None) -> int` (9)
+  - `async def create_manual(self, name: str) -> int` (5)
+  - `async def find_by_source(self, source: Source, source_id: str) -> int | None` (7)
+  - `async def find_by_name(self, name: str) -> list[int]` (8)
+  - `async def find_anonymous_by_name(self, name: str) -> int | None` (12)
+  - `async def ensure(self, credit: Credit) -> int` (10)
+  - `async def attach(self, item_id: int, entity_id: int, role: PersonRole | CompanyRole, position: int | None=None) -> None` (13)
+  - `async def detach_all(self, item_id: int) -> None` (2)
+  - `async def credits_of(self, item_id: int) -> list[Credit]` (14)
+  - `def _to_credit(self, row: Row) -> Credit` (11)
+- `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
+- `def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
+
+### `backend/storage/repository/genres.py` — 74 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
 - `def _to_genre(row) -> Genre` (2)
-- `class GenresRepository(Repository)` (60)
+- `class GenresRepository(Repository)` (58)
   - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (22)
-  - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (16)
+  - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (14)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
@@ -419,19 +445,19 @@
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
-### `backend/storage/repository/ratings.py` — 69 строк
+### `backend/storage/repository/ratings.py` — 67 строк
 
 Моя оценка карточки.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
-- `class RatingsRepository(Repository)` (57)
+- `class RatingsRepository(Repository)` (55)
   - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (11)
   - `async def set_score(self, item_id: int, score: float | None, now: datetime) -> None` (3)
   - `async def set_aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None, now: datetime) -> float | None` (16)
   - `async def set_review(self, item_id: int, review: str, now: datetime) -> None` (2)
   - `async def get(self, item_id: int) -> Rating | None` (14)
-  - `async def clear(self, item_id: int) -> None` (5)
+  - `async def clear(self, item_id: int) -> None` (3)
 
 ### `backend/storage/repository/tags.py` — 109 строк
 
@@ -452,15 +478,15 @@
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (8)
 
-### `backend/storage/repository/wishlist.py` — 38 строк
+### `backend/storage/repository/wishlist.py` — 36 строк
 
 Список запланированного.
 
 Зависит от: `backend.storage.repository.base`, `backend.storage.tables`
 
-- `class WishlistRepository(Repository)` (27)
+- `class WishlistRepository(Repository)` (25)
   - `async def add(self, item_id: int, now: datetime) -> None` (7)
-  - `async def remove(self, item_id: int) -> None` (4)
+  - `async def remove(self, item_id: int) -> None` (2)
   - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
@@ -640,7 +666,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 33 модулей
+## tests — 34 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -794,6 +820,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Зависит от: `backend.config`
 
 Тестов: 9
+
+
+### `tests/backend/test_credits.py` — 287 строк
+
+Люди и студии: одна реализация на две сущности, и различает их идентичность.
+
+Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
+
+Тестов: 24
 
 
 ### `tests/backend/test_delete.py` — 117 строк

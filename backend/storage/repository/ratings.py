@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Rating, average_score
@@ -64,6 +64,4 @@ class RatingsRepository(Repository):
 
     async def clear(self, item_id: int) -> None:
         """Снять оценку. Карточка остаётся — она уже загружена."""
-        await self._run(
-            delete(rating_table).where(rating_table.c.item_id == item_id)
-        )
+        await self._run(self._clearing(rating_table, item_id))

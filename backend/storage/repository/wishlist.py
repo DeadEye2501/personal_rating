@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.storage.repository.base import Repository
@@ -19,9 +19,7 @@ class WishlistRepository(Repository):
         )
 
     async def remove(self, item_id: int) -> None:
-        await self._run(
-            delete(wishlist_table).where(wishlist_table.c.item_id == item_id)
-        )
+        await self._run(self._clearing(wishlist_table, item_id))
 
     async def contains(self, item_id: int) -> bool:
         return await self._has_item(wishlist_table, item_id)
