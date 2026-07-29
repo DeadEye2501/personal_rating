@@ -1,6 +1,5 @@
 import io
 
-import httpx
 import pytest
 from PIL import Image
 
@@ -10,23 +9,16 @@ from backend.service.posters import PosterService
 from backend.sources.errors import Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
-from tests.backend.sources.conftest import capture, responding
+from tests.backend.sources.conftest import capture, responding, unreachable
 from tests.conftest import MOMENT as WHEN
-from tests.conftest import picture
+from tests.conftest import POSTER_SOURCES, picture, poster_service
 
 POSTER = picture(600, 900, fmt="JPEG")
-SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
-
-
-def service_with(store, transport: httpx.MockTransport) -> PosterService:
-    clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
-               for source in SOURCES}
-    return PosterService(clients, store)
 
 
 @pytest.fixture
 async def service(posters):
-    built = service_with(posters, responding(content=POSTER))
+    built = poster_service(posters, responding(content=POSTER))
     yield built
     await built.aclose()
 
@@ -50,7 +42,7 @@ async def test_a_failed_download_is_a_refusal(posters):
     отдаёт и заглушку-картинку, а сохранить её значило бы поселить в карточке
     чужую обложку насовсем. С телом-текстом эта проверка сторожила бы подпись
     формата, а не код ответа."""
-    service = service_with(posters, responding(404, content=POSTER))
+    service = poster_service(posters, responding(404, content=POSTER))
     result = await service.fetch(Source.TMDB, "https://example.com/missing.jpg")
     await service.aclose()
 
@@ -61,7 +53,7 @@ async def test_a_failed_download_is_a_refusal(posters):
 
 async def test_an_empty_body_is_a_refusal(posters):
     """Пустоту ловит проверка подписи: подписи у неё нет."""
-    service = service_with(posters, responding(content=b""))
+    service = poster_service(posters, responding(content=b""))
     result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
     await service.aclose()
 
@@ -72,7 +64,7 @@ async def test_a_page_instead_of_a_picture_is_a_refusal(posters):
     """CDN отдал заглушку или капчу под кодом 200. Проверку кода и непустоты она
     проходит насквозь, и HTML лёг бы в хранилище как обложка — а карточка
     считалась бы при этом полной."""
-    service = service_with(posters, responding(text="<html>404 not found</html>"))
+    service = poster_service(posters, responding(text="<html>404 not found</html>"))
     result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
     await service.aclose()
 
@@ -83,10 +75,7 @@ async def test_a_page_instead_of_a_picture_is_a_refusal(posters):
 async def test_a_refusal_of_the_client_passes_through_as_it_was(posters):
     """Сеть не отозвалась — это отказ клиента, и подменять его причину нельзя:
     по ней наверху решают, ждать или сказать человеку «нет связи»."""
-    def failing(request: httpx.Request) -> httpx.Response:
-        raise httpx.ConnectError("не дозвонились")
-
-    service = service_with(posters, httpx.MockTransport(failing))
+    service = poster_service(posters, unreachable())
     result = await service.fetch(Source.GOG, "https://example.com/poster.jpg")
     await service.aclose()
 
@@ -99,7 +88,7 @@ async def test_png_is_a_picture_too(posters):
     """Форматов у обложек три, и подпись проверяется у всех: у GOG приезжает
     PNG, и отказ на нём означал бы, что карточка не пишется никогда."""
     body = picture(600, 900)
-    service = service_with(posters, responding(content=body))
+    service = poster_service(posters, responding(content=body))
     result = await service.fetch(Source.GOG, "https://example.com/cover.png")
     await service.aclose()
 
@@ -110,7 +99,7 @@ async def test_webp_is_a_picture_too(posters):
     """Третий формат из набора подписей. Без проверки его подпись снимается
     безнаказанно, а с ней уходит и весь webp — CDN отдаёт его охотно."""
     body = picture(600, 900, fmt="WEBP")
-    service = service_with(posters, responding(content=body))
+    service = poster_service(posters, responding(content=body))
     result = await service.fetch(Source.STEAM, "https://example.com/cover.webp")
     await service.aclose()
 
@@ -121,7 +110,7 @@ async def test_the_poster_is_asked_at_the_address_it_was_given(posters):
     """На провод уходит переданный адрес, а не собранный по дороге: лишний слэш
     или чужой хост неотличимы от «обложки нет»."""
     transport, seen = capture(content=POSTER)
-    service = service_with(posters, transport)
+    service = poster_service(posters, transport)
     await service.fetch(Source.TMDB, "https://cdn.example.com/w500/poster.jpg")
     await service.aclose()
 
@@ -134,7 +123,7 @@ async def test_each_source_is_asked_through_its_own_client(posters):
     """Молчание одного CDN не должно выключать обложки остальных, а спрашивать
     надо того, у кого карточка: с общим клиентом на всех этого не видно."""
     bodies = {source: picture(600, 900 + number, fmt="JPEG")
-              for number, source in enumerate(SOURCES)}
+              for number, source in enumerate(POSTER_SOURCES)}
     clients = {
         source: SourceHttp(f"cdn:{source}", transport=responding(content=body))
         for source, body in bodies.items()
@@ -185,7 +174,7 @@ async def test_closing_the_service_closes_the_store(tmp_path):
     path = tmp_path / "posters.db"
     store = PosterStore(path)
     await store.open()
-    service = service_with(store, responding(content=POSTER))
+    service = poster_service(store, responding(content=POSTER))
     await service.save(1, POSTER, now=WHEN)
 
     await service.aclose()
@@ -196,9 +185,9 @@ async def test_closing_the_service_closes_the_store(tmp_path):
 async def test_closing_the_service_closes_every_client(posters):
     """Клиентов у сервиса три, и закрыть надо каждого: незакрытый держит
     соединение до конца работы приложения."""
-    service = service_with(posters, responding(content=POSTER))
+    service = poster_service(posters, responding(content=POSTER))
     await service.aclose()
 
-    for source in SOURCES:
+    for source in POSTER_SOURCES:
         with pytest.raises(RuntimeError):
             await service.fetch(source, "https://example.com/poster.jpg")

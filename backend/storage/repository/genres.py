@@ -33,11 +33,9 @@ class GenresRepository(Repository):
             )
         )
 
-        resolved: list[int] = []
-        for row in rows:
-            if row.genre_id not in resolved:
-                resolved.append(row.genre_id)
-        return resolved
+        # Порядок сохраняется: сборный жанр разворачивается в два, и оба должны
+        # прийти в том порядке, в каком лежат в справочнике.
+        return list(dict.fromkeys(row.genre_id for row in rows))
 
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:
         """Набор жанров заменяется целиком: пришедшее из источника — это весь

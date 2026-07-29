@@ -151,6 +151,10 @@
   - `hint: str`
   - `hint_item_id: int | None`
 
+### `backend/service/cards.py`
+
+- `logger` = `logging.getLogger(__name__)`
+
 ### `backend/service/images.py`
 
 - `TARGET_RATIO` = `2 / 3`
@@ -405,6 +409,10 @@
 
 - `SILENT` = `httpx.MockTransport(lambda request: httpx.Respon…`
 
+### `tests/backend/test_card_writer.py`
+
+- `POSTER` = `picture(600, 900, fmt='JPEG')`
+
 ### `tests/backend/test_config.py`
 
 - `KEYS` = `словарь из 5`
@@ -422,6 +430,11 @@
 - `FILM_GENRES` = `набор из 25`
 - `GAME_GENRES` = `набор из 22`
 - `COMPOSITE` = `словарь из 3`
+
+### `tests/backend/test_genre_resolution.py`
+
+- `REFERENCE` = `"INSERT INTO genre (id, name, kind) VALUES (1, '…`
+- `MAP` = `"INSERT INTO genre_map (source, ext_id, genre_id…`
 
 ### `tests/backend/test_genres.py`
 
@@ -450,7 +463,6 @@
 ### `tests/backend/test_poster_service.py`
 
 - `POSTER` = `picture(600, 900, fmt='JPEG')`
-- `SOURCES` = `набор из 3`
 
 ### `tests/backend/test_posters.py`
 
@@ -475,6 +487,7 @@
 
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
+- `POSTER_SOURCES` = `набор из 3`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`

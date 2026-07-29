@@ -3,11 +3,14 @@
 import io
 from datetime import datetime
 
+import httpx
 import pytest
 import sqlalchemy
 from PIL import Image
 
 from backend.model import Item, Kind, Source
+from backend.service.posters import PosterService
+from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.session import (
@@ -25,9 +28,30 @@ from tests.alembic_runner import alembic
 MOMENT = datetime(2026, 7, 29, 12, 0)
 LATER = datetime(2026, 7, 30, 12, 0)
 
+# Источники, у которых бывает обложка: у ручной карточки её скачивать негде.
+POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
+
 # Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
 # хранилищу постеров важно только то, что байты вернулись теми же.
 PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 512
+
+
+async def seed(engine, *statements: str) -> None:
+    """Сырые строки прямо в базу. Так кладётся справочник жанров: миграцией его
+    в базу из объявлений не притащить, а у каждого теста он свой — набор
+    соответствий и есть предмет проверки."""
+    async with engine.begin() as connection:
+        for statement in statements:
+            await connection.execute(sqlalchemy.text(statement))
+
+
+def poster_service(store: PosterStore,
+                   transport: httpx.MockTransport) -> PosterService:
+    """Сервис обложек с одним транспортом на все три источника. Где важно, кого
+    именно спросили, тест собирает клиентов сам."""
+    clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
+               for source in POSTER_SOURCES}
+    return PosterService(clients, store)
 
 
 def picture(width: int, height: int, fmt: str = "PNG") -> bytes:

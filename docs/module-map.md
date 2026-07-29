@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 49 модулей
+## backend — 51 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -118,6 +118,25 @@
 Зависит от: —
 
 - `class Suggestion` (9)
+
+### `backend/service/cards.py` — 96 строк
+
+Карточка источника строками базы.
+
+Зависит от: `backend.model`, `backend.service.genres`, `backend.service.posters`, `backend.sources.errors`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`
+
+- `class CardWriter` (77)
+  - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (30)
+  - `async def _write_the_rest(self, item_id: int, card: SourceCard, poster: bytes | None) -> None` (16)
+  - `async def _attach(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...]) -> None` (6)
+
+### `backend/service/genres.py` — 28 строк
+
+Чужие метки жанров в наши идентификаторы.
+
+Зависит от: `backend.model`, `backend.storage.repository.genres`
+
+- `async def resolved_genres(genres: GenresRepository, marked: tuple[tuple[GenreSource, str], ...]) -> list[int]` (22)
 
 ### `backend/service/images.py` — 51 строк
 
@@ -464,15 +483,15 @@
   - `async def ratings_of(self, item_id: int) -> list[ExternalRating]` (7)
   - `async def stale_sources(self, item_id: int, wanted: list[RatingSource], now: datetime) -> list[RatingSource]` (16)
 
-### `backend/storage/repository/genres.py` — 75 строк
+### `backend/storage/repository/genres.py` — 73 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.statements`, `backend.storage.tables`
 
 - `def _to_genre(row) -> Genre` (2)
-- `class GenresRepository(Repository)` (58)
-  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (22)
+- `class GenresRepository(Repository)` (56)
+  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (20)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (14)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
@@ -732,7 +751,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 39 модулей
+## tests — 41 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -742,7 +761,7 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 114 строк
+### `tests/backend/sources/conftest.py` — 123 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
@@ -754,6 +773,8 @@
 - `def _load(relative: str)` (4)
 - `def _meta(relative: str) -> dict` (3)
 - `def responding(status: int=200, *, json=None, text=None, content=None, headers=None)` (14)
+- `def unreachable() -> httpx.MockTransport` (7)
+  - `def handler(request: httpx.Request) -> httpx.Response` (2)
 - `def capture(*, content: bytes | None=None)` (14)
   - `def handler(request: httpx.Request) -> httpx.Response` (5)
 - `def fixture()` (3)
@@ -879,6 +900,21 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
+### `tests/backend/test_card_writer.py` — 376 строк ⚠ подошёл к 300
+
+
+
+Зависит от: `backend.model`, `backend.service.cards`, `backend.sources.errors`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.backend.sources.conftest`, `tests.conftest`
+
+Тестов: 21
+
+- `def source_card(**overrides) -> SourceCard` (18)
+- `def game_card(source_id: str='292030', **overrides) -> SourceCard` (10)
+- `def another_movie(source_id: str, **overrides) -> SourceCard` (10)
+- `async def reference(engine) -> None` (10)
+- `async def build(sessions, engine, posters, transport=None) -> CardWriter` (14)
+- `async def writer(sessions, engine, posters)` (4)
+
 ### `tests/backend/test_config.py` — 66 строк
 
 
@@ -936,16 +972,26 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def named(connection, source: str, ext_id: str) -> set[str]` (10)
 - `def counted(connection, where: str) -> int` (4)
 
-### `tests/backend/test_genres.py` — 184 строк
+### `tests/backend/test_genre_resolution.py` — 65 строк
+
+Разрешение чужих меток жанров: то, что видно в самом списке наших номеров.
+
+Зависит от: `backend.model`, `backend.service.genres`, `backend.storage.repository.genres`, `tests.conftest`
+
+Тестов: 4
+
+- `async def genres(engine, sessions)` (3)
+
+### `tests/backend/test_genres.py` — 182 строк
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `tests.conftest`
 
 Тестов: 14
 
 - `def ours(caplog) -> list[str]` (8)
-- `async def reference(engine)` (16)
+- `async def reference(engine)` (14)
 
 ### `tests/backend/test_images.py` — 126 строк
 
@@ -1014,7 +1060,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_poster_service.py` — 204 строк
+### `tests/backend/test_poster_service.py` — 193 строк
 
 
 
@@ -1022,7 +1068,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 16
 
-- `def service_with(store, transport: httpx.MockTransport) -> PosterService` (4)
 - `async def service(posters)` (4)
 
 ### `tests/backend/test_posters.py` — 173 строк
@@ -1094,12 +1139,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 135 строк
+### `tests/conftest.py` — 159 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
-Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
+Зависит от: `backend.model`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
 
+- `async def seed(engine, *statements: str) -> None` (7)
+- `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def migrated(tmp_path)` (16)
 - `async def engine(tmp_path)` (8)

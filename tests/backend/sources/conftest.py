@@ -51,6 +51,15 @@ def responding(status: int = 200, *, json=None, text=None, content=None,
     )
 
 
+def unreachable() -> httpx.MockTransport:
+    """Транспорт, до которого не дозвонились: сеть отвечает не кодом, а ничем, и
+    отказ по ней наверху решается иначе, чем непонятный ответ."""
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("не дозвонились")
+
+    return httpx.MockTransport(handler)
+
+
 def capture(*, content: bytes | None = None):
     """Запоминает ушедшее на провод: проверять надо запрос, а не намерение.
 
