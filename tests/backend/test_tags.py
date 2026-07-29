@@ -264,6 +264,32 @@ async def test_rename_keeps_the_tag_on_its_cards(sessions, card):
     assert [name for _, name in await repository.tags_of(item_id)] == ["переслушать"]
 
 
+async def test_rename_into_an_occupied_name_is_refused(sessions):
+    """Имя занято в этом наборе — отказ, и притом свой: `IntegrityError` из
+    SQLAlchemy, пробрось мы его, потащил бы знание о ней вверх по слоям."""
+    repository = TagsRepository(sessions)
+    first = await repository.create(Kind.MOVIE, "первый")
+    await repository.create(Kind.MOVIE, "второй")
+
+    with pytest.raises(TagExists):
+        await repository.rename(first, "второй")
+
+    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    assert names == ["первый", "второй"]
+
+
+async def test_renaming_into_a_name_from_another_set_is_allowed(sessions):
+    """Наборы независимы: «пересмотреть» может быть и у кино, и у игр."""
+    repository = TagsRepository(sessions)
+    movie_tag = await repository.create(Kind.MOVIE, "фильмовый")
+    await repository.create(Kind.GAME, "игровой")
+
+    await repository.rename(movie_tag, "игровой")
+
+    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    assert names == ["игровой"]
+
+
 async def test_rename_touches_only_the_asked_tag(sessions):
     repository = TagsRepository(sessions)
     first = await repository.create(Kind.MOVIE, "первый")

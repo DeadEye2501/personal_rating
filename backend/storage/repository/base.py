@@ -1,8 +1,8 @@
-"""Общее у репозиториев: сессия и три способа с ней обойтись."""
+"""Общее у репозиториев: сессия и способы с ней обойтись."""
 
 from collections.abc import Callable
 
-from sqlalchemy import Executable, Row, Select
+from sqlalchemy import Executable, Row, Table, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -28,10 +28,14 @@ class Repository:
         """Строки сразу в свои типы: наружу репозиторий отдаёт их, а не `Row`."""
         return [make(row) for row in await self._rows(statement)]
 
-    async def _exists(self, statement: Select) -> bool:
-        """Есть ли такая строка. Спрашивают об этом закладка и сводка перед
-        удалением, каждая про свою таблицу."""
-        return await self._row(statement) is not None
+    async def _has_item(self, table: Table, item_id: int) -> bool:
+        """Есть ли в таблице строка про эту карточку.
+
+        Спрашивают об этом трое — закладка про себя, сводка перед удалением
+        про оценку и про закладку, — и запрос у всех троих один и тот же."""
+        return await self._row(
+            select(table.c.item_id).where(table.c.item_id == item_id)
+        ) is not None
 
     async def _created(self, statement: Executable, taken: Exception) -> int:
         """Вставка, возвращающая выданный базой номер.

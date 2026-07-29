@@ -96,18 +96,27 @@
 - `class PosterStore` (56)
   - `async def open(self) -> None` (7)
   - `async def close(self) -> None` (4)
+  - `async def _read(self, statement: Executable)` (3)
+  - `async def _write(self, statement: Executable) -> None` (3)
   - `async def put(self, item_id: int, data: bytes, now: datetime) -> None` (11)
   - `async def get(self, item_id: int) -> bytes | None` (5)
   - `async def has(self, item_id: int) -> bool` (5)
   - `async def delete(self, item_id: int) -> None` (2)
 
-### `backend/storage/repository/base.py` — 66 строк
+### `backend/storage/repository/base.py` — 70 строк
 
-Общее у репозиториев: сессия и три способа с ней обойтись.
+Общее у репозиториев: сессия и способы с ней обойтись.
 
 Зависит от: —
 
-- `class Repository` (57)
+- `class Repository` (61)
+  - `async def _row(self, statement: Executable) -> Row | None` (3)
+  - `async def _rows(self, statement: Executable) -> list[Row]` (3)
+  - `async def _mapped(self, statement: Executable, make: Callable[[Row], object])` (3)
+  - `async def _has_item(self, table: Table, item_id: int) -> bool` (8)
+  - `async def _created(self, statement: Executable, taken: Exception) -> int` (15)
+  - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
+  - `async def _run(self, *statements: Executable) -> None` (7)
 
 ### `backend/storage/repository/genres.py` — 76 строк
 
@@ -122,7 +131,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 184 строк
+### `backend/storage/repository/library.py` — 178 строк
 
 Карточки библиотеки.
 
@@ -131,13 +140,14 @@
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
 - `def _to_item(row: Row) -> Item` (22)
-- `class LibraryRepository(Repository)` (125)
+- `class LibraryRepository(Repository)` (119)
+  - `async def _one(self, statement: Select) -> Item | None` (3)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (12)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
-  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (18)
+  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
   - `async def delete(self, item_id: int, posters: PosterStore) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
   - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
@@ -151,6 +161,7 @@
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
 - `class RatingsRepository(Repository)` (57)
+  - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (11)
   - `async def set_score(self, item_id: int, score: float | None, now: datetime) -> None` (3)
   - `async def set_aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None, now: datetime) -> float | None` (16)
   - `async def set_review(self, item_id: int, review: str, now: datetime) -> None` (2)
@@ -176,16 +187,16 @@
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (8)
 
-### `backend/storage/repository/wishlist.py` — 41 строк
+### `backend/storage/repository/wishlist.py` — 38 строк
 
 Список запланированного.
 
 Зависит от: `backend.storage.repository.base`, `backend.storage.tables`
 
-- `class WishlistRepository(Repository)` (30)
+- `class WishlistRepository(Repository)` (27)
   - `async def add(self, item_id: int, now: datetime) -> None` (7)
   - `async def remove(self, item_id: int) -> None` (4)
-  - `async def contains(self, item_id: int) -> bool` (5)
+  - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
 ### `backend/storage/session.py` — 44 строк

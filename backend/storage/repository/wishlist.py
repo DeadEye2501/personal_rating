@@ -24,10 +24,7 @@ class WishlistRepository(Repository):
         )
 
     async def contains(self, item_id: int) -> bool:
-        return await self._exists(
-            select(wishlist_table.c.item_id)
-            .where(wishlist_table.c.item_id == item_id)
-        )
+        return await self._has_item(wishlist_table, item_id)
 
     async def list_ids(self, limit: int, offset: int) -> list[int]:
         """Новые сверху: порядок раздела «Хочу посмотреть» — по дате добавления

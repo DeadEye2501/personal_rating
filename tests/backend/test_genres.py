@@ -84,6 +84,11 @@ async def test_the_known_part_survives_the_unknown(sessions, reference, caplog):
     assert ours(caplog) == []
 
 
+async def test_nothing_asked_is_nothing_resolved(sessions, reference):
+    """Пустой список — не повод идти в базу и не повод падать."""
+    assert await GenresRepository(sessions).resolve(GenreSource.TMDB, []) == []
+
+
 async def test_sources_do_not_leak_into_each_other(sessions, reference):
     # У Steam свой словарь: id 3 у него ролевая, а не драма.
     assert await GenresRepository(sessions).resolve(GenreSource.STEAM, ["3"]) == [4]
@@ -94,11 +99,12 @@ async def test_set_and_read_genres_of_a_card(sessions, reference, card):
     item_id = await card()
     repository = GenresRepository(sessions)
 
-    await repository.set_for_item(item_id, [3, 1])
+    await repository.set_for_item(item_id, [2, 3])
     names = [genre.name for genre in await repository.genres_of(item_id)]
-    # Порядок по названию, а не по тому, в каком пришли: сравнивается список,
-    # а не множество — иначе обратная сортировка прошла бы молча.
-    assert names == ["Боевик", "Драма"]
+    # Пара выбрана так, что алфавит обратен номерам строк: «Приключения» — это
+    # 2, «Драма» — 3. Сортировка по номеру дала бы обратный порядок, а на паре
+    # «Боевик» и «Драма» совпала бы с алфавитом и прошла молча.
+    assert names == ["Драма", "Приключения"]
 
 
 async def test_genres_come_back_with_their_set(sessions, reference, card):

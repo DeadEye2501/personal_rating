@@ -117,15 +117,9 @@ class LibraryRepository(Repository):
             .where(item_tag_table.c.item_id == item_id)
         )
         return {
-            "has_rating": await self._exists(
-                select(rating_table.c.item_id)
-                .where(rating_table.c.item_id == item_id)
-            ),
+            "has_rating": await self._has_item(rating_table, item_id),
             "tags": tags.count,
-            "in_wishlist": await self._exists(
-                select(wishlist_table.c.item_id)
-                .where(wishlist_table.c.item_id == item_id)
-            ),
+            "in_wishlist": await self._has_item(wishlist_table, item_id),
         }
 
     async def delete(self, item_id: int, posters: PosterStore) -> None:

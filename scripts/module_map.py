@@ -77,11 +77,16 @@ def depends_on(tree: ast.Module) -> list[str]:
 
 
 def members(node: ast.ClassDef) -> list[str]:
-    """Методы и свойства класса. Поля датакласса не в счёт: они в спеке."""
+    """Методы класса, включая приватные. Поля датакласса не в счёт: они в спеке.
+
+    Приватные показываются намеренно: карту читают, когда ищут повторы, а
+    общее выносят как раз в приватные помощники — спрятав их, карта слепнет
+    ровно к тому, ради чего её и завели. `__init__` пропущен: он есть у всех и
+    ничего не говорит."""
     return [
         f"  - `{signature(child)}` ({size(child)})"
         for child in node.body
-        if isinstance(child, DEFINITIONS) and not child.name.startswith("_")
+        if isinstance(child, DEFINITIONS) and child.name != "__init__"
     ]
 
 
