@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 31 модулей
+## backend — 34 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 41 строк
+### `backend/model/__init__.py` — 43 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `SearchHit`, `Source`, `SourceCard`, `average_score`, `new_manual_item`, `new_source_id`
+Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Source`, `SourceCard`, `average_score`, `new_manual_item`, `new_source_id`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -94,6 +94,14 @@
 
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
+
+### `backend/model/ratings.py` — 16 строк
+
+Ответ оценочного источника на границе слоёв.
+
+Зависит от: `backend.model.external`
+
+- `class Ratings` (8)
 
 ### `backend/model/search.py` — 27 строк
 
@@ -164,6 +172,27 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 - `def refuse_undocumented(http: SourceHttp, response: httpx.Response) -> Refusal` (14)
+
+### `backend/sources/ratings/mdblist/client.py` — 94 строк
+
+Разговор с MDBList по сети.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.parse`
+
+- `def _retry_after(response: httpx.Response) -> timedelta | None` (3)
+- `class MdbListClient` (60)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (8)
+  - `def _verdict(self, response: httpx.Response) -> Outcome` (26)
+  - `def _denied(self, response: httpx.Response) -> Refusal` (16)
+  - `async def aclose(self) -> None` (2)
+
+### `backend/sources/ratings/mdblist/parse.py` — 35 строк
+
+Перевод ответов MDBList в наши типы.
+
+Зависит от: `backend.model`
+
+- `def parse_ratings(payload: dict) -> Ratings` (18)
 
 ### `backend/sources/steam/client.py` — 128 строк
 
@@ -511,7 +540,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 28 модулей
+## tests — 29 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -567,6 +596,18 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)
+
+### `tests/backend/sources/test_mdblist.py` — 232 строк
+
+MDBList: квота, битый ключ и чужой периметр — три разные беды.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`
+
+Тестов: 19
+
+- `def responding(status, *, json=None, text=None, headers=None)` (5)
+  - `def handler(request: httpx.Request) -> httpx.Response` (2)
+- `async def ask(transport, kind=Kind.MOVIE)` (5)
 
 ### `tests/backend/sources/test_steam.py` — 332 строк ⚠ подошёл к 300
 

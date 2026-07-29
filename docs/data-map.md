@@ -123,6 +123,11 @@
   - `gameplay: int | None` = `None`
   - `review: str` = `''`
 
+### `backend/model/ratings.py`
+
+- `class Ratings`
+  - `values: tuple[ExternalRating, ...]` = `field(default_factory=tuple)`
+
 ### `backend/model/search.py`
 
 - `class SearchHit`
@@ -166,6 +171,16 @@
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
 - `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
+
+### `backend/sources/ratings/mdblist/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE` = `'https://api.mdblist.com'`
+- `QUOTA_FALLBACK` = `timedelta(hours=1)`
+
+### `backend/sources/ratings/mdblist/parse.py`
+
+- `OWNERS` = `словарь из 4`
 
 ### `backend/sources/steam/client.py`
 
