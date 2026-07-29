@@ -1,12 +1,18 @@
 """Карточки библиотеки."""
 
-from sqlalchemy import Row, Select, func, select
+from datetime import datetime
+
+from sqlalchemy import Row, Select, delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 
 from backend.model import Item, Kind, Source
+from backend.storage.posters import PosterStore
 from backend.storage.repository.base import Repository
 from backend.storage.session import fold
 from backend.storage.tables import item as item_table
+from backend.storage.tables import item_tag as item_tag_table
+from backend.storage.tables import rating as rating_table
+from backend.storage.tables import wishlist as wishlist_table
 
 
 class ItemExists(Exception):
@@ -114,4 +120,54 @@ class LibraryRepository(Repository):
                 (func.py_lower(item_table.c.title) == needle)
                 | (func.py_lower(item_table.c.original_title) == needle),
             )
+        )
+
+    async def deletion_summary(self, item_id: int) -> dict[str, int | bool]:
+        """Что именно пропадёт вместе с карточкой — для подтверждения."""
+        marked = await self._row(
+            select(wishlist_table.c.item_id)
+            .where(wishlist_table.c.item_id == item_id)
+        )
+        rated = await self._row(
+            select(rating_table.c.item_id).where(rating_table.c.item_id == item_id)
+        )
+        tags = await self._row(
+            select(func.count())
+            .select_from(item_tag_table)
+            .where(item_tag_table.c.item_id == item_id)
+        )
+        return {
+            "has_rating": rated is not None,
+            "tags": tags.count,
+            "in_wishlist": marked is not None,
+        }
+
+    async def delete(self, item_id: int, posters: PosterStore) -> None:
+        """Оценка, теги, закладка и связи уходят каскадом; постер — кодом:
+        внешних ключей между двумя файлами SQLite не бывает."""
+        await self._run(delete(item_table).where(item_table.c.id == item_id))
+        await posters.delete(item_id)
+
+    async def refresh_series_counts(self, item_id: int,
+                                    seasons_count: int | None,
+                                    episodes_count: int | None,
+                                    now: datetime) -> None:
+        """Единственное, что обновляется автоматически. Параметров, которыми
+        можно затронуть название или синопсис, здесь нет намеренно: они
+        принадлежат человеку с момента создания."""
+        await self._run(
+            update(item_table)
+            .where(item_table.c.id == item_id)
+            .values(seasons_count=seasons_count,
+                    episodes_count=episodes_count,
+                    synced_at=now)
+        )
+
+    async def replace_fields(self, item_id: int, item: Item) -> None:
+        """Правка человеком: пишет все поля карточки. Источник и его
+        идентификатор не трогает — это привязка, отдельная операция."""
+        values = _values(item)
+        del values["source"], values["source_id"]
+        await self._run(
+            update(item_table).where(item_table.c.id == item_id).values(**values)
         )

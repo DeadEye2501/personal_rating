@@ -6,8 +6,12 @@ from sqlalchemy import text
 
 from backend.model import Item, Kind, Source
 from backend.storage.repository.library import ItemExists, LibraryRepository
+from backend.storage.repository.ratings import RatingsRepository
+from backend.storage.repository.tags import TagsRepository
+from backend.storage.repository.wishlist import WishlistRepository
 
 WHEN = datetime(2026, 7, 27, 12, 0)
+LATER = datetime(2026, 8, 27, 12, 0)
 
 
 def make_item(**overrides) -> Item:
@@ -235,3 +239,115 @@ async def test_find_by_title_matches_whole_titles_only(sessions):
     assert await repository.find_by_title(Kind.MOVIE, "Ведьмак") == []
     hits = await repository.find_by_title(Kind.MOVIE, "Ведьмак 3")
     assert [item.title for item in hits] == ["Ведьмак 3"]
+
+
+async def test_refresh_touches_only_seasons_and_episodes(sessions):
+    """Спека прямо запрещает автоматически переписывать остальное."""
+    repository = LibraryRepository(sessions)
+    item_id = await repository.create(
+        make_item(kind=Kind.SERIES, source_id="83867", title="Андор",
+                  original_title="Andor", synopsis="мой текст",
+                  poster_url="/andor.jpg", year=2022, runtime=48,
+                  released_at=date(2022, 9, 21),
+                  seasons_count=1, episodes_count=12)
+    )
+
+    await repository.refresh_series_counts(item_id, 2, 24, now=LATER)
+
+    stored = await repository.get(item_id)
+    assert (stored.seasons_count, stored.episodes_count) == (2, 24)
+    assert stored.synced_at == LATER
+    # Всё остальное — человеку: перезаписывать это автоматически нельзя.
+    assert stored == replace(
+        make_item(kind=Kind.SERIES, source_id="83867", title="Андор",
+                  original_title="Andor", synopsis="мой текст",
+                  poster_url="/andor.jpg", year=2022, runtime=48,
+                  released_at=date(2022, 9, 21),
+                  seasons_count=2, episodes_count=24, synced_at=LATER),
+        id=item_id,
+    )
+
+
+async def test_refresh_takes_only_the_asked_card(sessions):
+    repository = LibraryRepository(sessions)
+    mine = await repository.create(make_item(kind=Kind.SERIES, source_id="1"))
+    other = await repository.create(
+        make_item(kind=Kind.SERIES, source_id="2", seasons_count=5)
+    )
+
+    await repository.refresh_series_counts(mine, 2, 24, now=LATER)
+
+    assert (await repository.get(other)).seasons_count == 5
+
+
+async def test_refresh_keeps_my_data(sessions):
+    """Перезагрузка карточки не должна сносить оценку, тег и закладку."""
+    repository = LibraryRepository(sessions)
+    item_id = await repository.create(make_item(kind=Kind.SERIES, source_id="1"))
+    await RatingsRepository(sessions).set_score(item_id, 9.0, now=WHEN)
+    tags = TagsRepository(sessions)
+    await tags.assign(item_id, await tags.create(Kind.SERIES, "пересмотреть"))
+    await WishlistRepository(sessions).add(item_id, now=WHEN)
+
+    await repository.refresh_series_counts(item_id, 3, 30, now=LATER)
+
+    assert (await RatingsRepository(sessions).get(item_id)).score == 9.0
+    assert len(await tags.tags_of(item_id)) == 1
+    assert await WishlistRepository(sessions).contains(item_id) is True
+
+
+async def test_replace_fields_rewrites_everything_the_human_gave(sessions):
+    """Сверяется карточка целиком: в форме правки человек меняет и дату
+    выхода, и постер, и число серий — проверка по нескольким полям пропустила
+    бы те, о которых забыли при записи."""
+    repository = LibraryRepository(sessions)
+    item_id = await repository.create(make_item(synopsis="старое", year=2014))
+
+    written = make_item(
+        kind=Kind.SERIES, title="Андор", original_title="Andor",
+        synopsis="новое", year=2015, released_at=date(2022, 9, 21),
+        poster_url="/andor.jpg", runtime=169,
+        seasons_count=2, episodes_count=24, synced_at=LATER,
+    )
+    await repository.replace_fields(item_id, written)
+
+    stored = await repository.get(item_id)
+    # Источник и его номер не трогаются: это привязка, отдельная операция.
+    assert stored == replace(
+        written, id=item_id, source=Source.TMDB, source_id="157336"
+    )
+
+
+async def test_replace_fields_takes_only_the_asked_card(sessions):
+    repository = LibraryRepository(sessions)
+    mine = await repository.create(make_item(source_id="1"))
+    other = await repository.create(make_item(source_id="2", title="соседняя"))
+
+    await repository.replace_fields(mine, make_item(title="новое"))
+
+    assert (await repository.get(other)).title == "соседняя"
+
+
+async def test_replace_fields_does_not_move_identity(sessions):
+    """Смена источника — это привязка, а не правка полей."""
+    repository = LibraryRepository(sessions)
+    item_id = await repository.create(make_item())
+
+    await repository.replace_fields(
+        item_id, make_item(source=Source.STEAM, source_id="999", title="другое")
+    )
+
+    stored = await repository.get(item_id)
+    assert stored.source == Source.TMDB
+    assert stored.source_id == "157336"
+    assert stored.title == "другое"
+
+
+async def test_emptying_a_field_by_hand_is_allowed(sessions):
+    """Правка человеком может и стереть: пустое здесь — это значение."""
+    repository = LibraryRepository(sessions)
+    item_id = await repository.create(make_item(synopsis="было"))
+
+    await repository.replace_fields(item_id, make_item(synopsis=""))
+
+    assert (await repository.get(item_id)).synopsis == ""

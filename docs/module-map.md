@@ -120,21 +120,25 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (7)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (9)
 
-### `backend/storage/repository/library.py` — 117 строк
+### `backend/storage/repository/library.py` — 173 строк
 
 Карточки библиотеки.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
 
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
 - `def _to_item(row: Row) -> Item` (22)
-- `class LibraryRepository(Repository)` (63)
+- `class LibraryRepository(Repository)` (113)
   - `async def create(self, item: Item) -> int` (16)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (11)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (15)
+  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (19)
+  - `async def delete(self, item_id: int, posters: PosterStore) -> None` (5)
+  - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
+  - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
 
 ### `backend/storage/repository/ratings.py` — 69 строк
 
