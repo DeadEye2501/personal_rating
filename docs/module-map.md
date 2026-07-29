@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 19 модулей
+## backend — 20 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -85,6 +85,20 @@
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
 
+### `backend/storage/posters.py` — 85 строк
+
+Второй файл базы: картинка по карточке.
+
+Зависит от: `backend.storage.session`
+
+- `class PosterStore` (53)
+  - `async def open(self) -> None` (7)
+  - `async def close(self) -> None` (4)
+  - `async def put(self, item_id: int, data: bytes, now: datetime) -> None` (11)
+  - `async def get(self, item_id: int) -> bytes | None` (6)
+  - `async def has(self, item_id: int) -> bool` (6)
+  - `async def delete(self, item_id: int) -> None` (5)
+
 ### `backend/storage/repository/base.py` — 36 строк
 
 Общее у репозиториев: сессия и три способа с ней обойтись.
@@ -93,18 +107,18 @@
 
 - `class Repository` (28)
 
-### `backend/storage/repository/genres.py` — 84 строк
+### `backend/storage/repository/genres.py` — 87 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
 - `def _to_genre(row) -> Genre` (2)
-- `class GenresRepository(Repository)` (64)
+- `class GenresRepository(Repository)` (67)
   - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (28)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (16)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (7)
-  - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (6)
+  - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (9)
 
 ### `backend/storage/repository/library.py` — 117 строк
 

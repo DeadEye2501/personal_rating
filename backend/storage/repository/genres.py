@@ -77,6 +77,9 @@ class GenresRepository(Repository):
         )
 
     async def list_for_kind(self, kind: GenreKind) -> list[Genre]:
+        """Наборов жанров два, и зовут их `film` и `game`, а не `movie` и
+        `game`: `Kind.MOVIE`, переданный сюда по ошибке, вернёт пустой список,
+        а не киношные жанры."""
         return await self._genres(
             select(genre_table)
             .where(genre_table.c.kind == kind)

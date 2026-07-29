@@ -4,6 +4,7 @@ import pytest
 import sqlalchemy
 
 from backend.model import Item, Kind, Source
+from backend.storage.posters import PosterStore
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
@@ -61,6 +62,15 @@ async def sessions(engine):
     """Фабрика сессий поверх тестовой базы: репозитории принимают её, а не
     движок."""
     return session_factory(engine)
+
+
+@pytest.fixture
+async def posters(tmp_path):
+    """Хранилище постеров на прогон: свой файл, отдельный от основной базы."""
+    store = PosterStore(tmp_path / "posters.db")
+    await store.open()
+    yield store
+    await store.close()
 
 
 @pytest.fixture
