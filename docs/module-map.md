@@ -329,9 +329,9 @@
 - `def differences(spec: dict, code: dict) -> list[str]` (8)
 - `def main() -> int` (9)
 
-### `scripts/module_map.py` — 262 строк
+### `scripts/module_map.py` — 391 строк ⚠ подошёл к 300
 
-Карта модулей: кто за что отвечает, что объявляет и от кого зависит.
+Карты проекта, собираемые из кода.
 
 Зависит от: —
 
@@ -345,10 +345,20 @@
 - `def declared(body: list, depth: int=0) -> tuple[list[str], int]` (30)
 - `def exported(tree: ast.Module) -> list[str]` (9)
 - `def module_block(path: str, tree: ast.Module, lines_total: int) -> str` (24)
+- `def _size(kind: str, counted: int, spread: bool) -> str` (2)
+- `def brief(value: ast.AST | None) -> str` (17)
+- `def assigned(node: ast.AST) -> list[tuple[str, str]]` (17)
+- `def _data_nodes(body: list) -> list[ast.AST]` (11)
+- `def _class_lines(node: ast.ClassDef) -> list[str]` (11)
+- `def contents(tree: ast.Module) -> list[str]` (20)
+- `def data_block(path: str, tree: ast.Module) -> list[str]` (4)
 - `def implementations(found: list[tuple]) -> dict[str, list[str]]` (17)
 - `def lonely_block(found: list[tuple]) -> str` (9)
-- `def render() -> str` (16)
-- `def main() -> int` (12)
+- `def within(found: list[tuple], root: str) -> list[tuple]` (4)
+- `def heading(title: str, note: str) -> list[str]` (5)
+- `def render(found: list[tuple]) -> str` (9)
+- `def render_data(found: list[tuple]) -> str` (11)
+- `def main() -> int` (16)
 
 ### `scripts/record_fixtures.py` — 198 строк
 
@@ -366,7 +376,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 19 модулей
+## tests — 20 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -568,6 +578,17 @@
   - `async def make(kind: Kind=Kind.MOVIE, source_id: str='1') -> int` (5)
 - `async def stored(engine)` (12)
   - `async def put(name: str, **values) -> int` (7)
+
+### `tests/scripts/test_module_map.py` — 82 строк
+
+Карта данных проверяется тем, что она показывает по данному ей коду.
+
+Зависит от: `scripts.module_map`
+
+Тестов: 10
+
+- `def shown(source: str) -> list[str]` (2)
+- `def only(source: str) -> str` (4)
 
 ## Абстракции с одной реализацией
 
