@@ -1,0 +1,41 @@
+{
+  "total": 1,
+  "totalPages": 1,
+  "items": [
+    {
+      "kinopoiskId": 258687,
+      "imdbId": "tt0816692",
+      "nameRu": "Интерстеллар",
+      "nameEn": null,
+      "nameOriginal": "Interstellar",
+      "countries": [
+        {
+          "country": "США"
+        },
+        {
+          "country": "Великобритания"
+        },
+        {
+          "country": "Канада"
+        }
+      ],
+      "genres": [
+        {
+          "genre": "драма"
+        },
+        {
+          "genre": "фантастика"
+        },
+        {
+          "genre": "приключения"
+        }
+      ],
+      "ratingKinopoisk": 8.7,
+      "ratingImdb": 8.7,
+      "year": 2014,
+      "type": "FILM",
+      "posterUrl": "https://kinopoiskapiunofficial.tech/images/posters/kp/258687.jpg",
+      "posterUrlPreview": "https://kinopoiskapiunofficial.tech/images/posters/kp_small/258687.jpg"
+    }
+  ]
+}

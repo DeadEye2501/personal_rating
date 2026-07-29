@@ -1,0 +1,3357 @@
+{
+  "pages": 1,
+  "currentlyShownProductCount": 14,
+  "productCount": 14,
+  "products": [
+    {
+      "id": "1456460669",
+      "slug": "baldurs_gate_iii",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "galaxy_multiplayer"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/12eb24fb7b04b4dacab55fdfc1c58f4c3539dc17955282317e50c621a12fa436_{formatter}.jpg",
+        "https://images.gog-statics.com/48327bab9f9d3b910cb476a59f9123fdb523fafe408cf3f72059073bf3360619_{formatter}.jpg",
+        "https://images.gog-statics.com/5c69db376648f7c760814b5979ca65fdd3be8aaf107971bde74f8e934d5f7703_{formatter}.jpg",
+        "https://images.gog-statics.com/90f7a7df0dd334dc2ace23f5706aed763292b7a0f5e5d09d3d84db58ab6306af_{formatter}.jpg",
+        "https://images.gog-statics.com/d8bb3aa39ff762c8134206d3bd0da3a59c8686eb3ce0042e1e8ca1e07f2a1bf9_{formatter}.jpg",
+        "https://images.gog-statics.com/639a138ae552da51c50f1a276f5a07f07eb7a4bf0374dcb4603d1aabfacde26d_{formatter}.jpg",
+        "https://images.gog-statics.com/e4c3041febd7d67799dba72185877866274ca505d6b5f2ecc12443ecdc360458_{formatter}.jpg",
+        "https://images.gog-statics.com/4ac85d615a085c8c24b1fcc6f63b7b2bc8dcda6c2b7fcc0d691871666c3de201_{formatter}.jpg",
+        "https://images.gog-statics.com/031b5010e665b8794be92683cfd3e03fa8d0cf9aa4bb2755055f0e4fb3381c8f_{formatter}.jpg",
+        "https://images.gog-statics.com/fddd5a08c0610b69a19bd7e1ef9a2ed566afd816514627618321d6a4ecf17808_{formatter}.jpg",
+        "https://images.gog-statics.com/85d0ddfcefd0762721e4e5b6869711d81dee2c16a7f3eac7e670d085341a10e5_{formatter}.jpg",
+        "https://images.gog-statics.com/2b57321cd5c71182db58fc865946e96cc71cd52b04855570eab6402ddc282299_{formatter}.jpg",
+        "https://images.gog-statics.com/2edb2f2b8575fdc81ed448ebede970b53e0967edc40d94af2f73d7fc12909cb1_{formatter}.jpg",
+        "https://images.gog-statics.com/0100c35a04a4c579106f11e80a8f181a5f4bb21b93a79c3ba0a545b6575c156f_{formatter}.jpg",
+        "https://images.gog-statics.com/799d396ed73de5cec866e0de32b5d65a9870db5b8d519588726bf3a995351416_{formatter}.jpg",
+        "https://images.gog-statics.com/d7f17d7ac1945eac8c52a629d9e1638501faf9c7003d7c9dfe5ae9d4a433e926_{formatter}.jpg",
+        "https://images.gog-statics.com/b63aabf0fef6e95833d073f31369562f92d7d6fecf9933f5c3ce18b9c08288e6_{formatter}.jpg",
+        "https://images.gog-statics.com/930ebc1a280984c9bc0c740fa33158ca547efd471e0912025e4ededd3fcae1fb_{formatter}.jpg",
+        "https://images.gog-statics.com/3ed742bb69a110007643c0ca14e3a488c6dc66a3a432e839654320a5a7400953_{formatter}.jpg",
+        "https://images.gog-statics.com/6c2766462c2934255f525916a5c977b22fe5c7eb29a91f65ed9046fbd9e293f2_{formatter}.jpg",
+        "https://images.gog-statics.com/f8b0ad06e204d77cc974f92c0bcc3e572907fbaacd7f76dc247bf4e38b7ab6f8_{formatter}.jpg",
+        "https://images.gog-statics.com/e286a99cbaa5bd8da3fe469ee4dc589c7798926a375985d1405fdf59af84de06_{formatter}.jpg",
+        "https://images.gog-statics.com/15dbce9f31d017f86e725faf066125dd235416cadd2a9ac40bbdc3eeeb769f1e_{formatter}.jpg",
+        "https://images.gog-statics.com/d6ce0459de62a77130c940cc3a23091aaf5219b4e2b8502144eee9794d6e5bbe_{formatter}.jpg",
+        "https://images.gog-statics.com/b4961a5c582c1122c3271d4bfbcb998432906aa11c8607e89e9c9eb5ce58c8c3_{formatter}.jpg",
+        "https://images.gog-statics.com/9e68582a548fd37aee678babf9467d520aa9920505a5d0d86dc7a772931403f9_{formatter}.jpg",
+        "https://images.gog-statics.com/b0c2190a8c811b67a79133765a91cfb8eb10fc875e2ffb53ab55e97a571f56da_{formatter}.jpg",
+        "https://images.gog-statics.com/836be36a22c6070e777b51c17385e11f2e5240c900df0a64de291b037a40b7d7_{formatter}.jpg",
+        "https://images.gog-statics.com/b7703563ec59fc5556f598bd0f91f2d789f708df61595bb86da789dd31d95b7d_{formatter}.jpg",
+        "https://images.gog-statics.com/69cef7bd44a620a5da2288b3e0a6f3332abfc83a69c677930d3762f634d51b7b_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2023.08.03",
+      "storeReleaseDate": "2020.10.06",
+      "productType": "game",
+      "title": "Baldur's Gate 3",
+      "coverHorizontal": "https://images.gog-statics.com/0a805be8cf3d0848483595fb492b2f99d6def432e2fb9ed42c029cb38f9ccfdd.png",
+      "coverVertical": "https://images.gog-statics.com/6f504c7fd4dcfb1bf964624f44b590390c88111d9fac6c0d0365f2c57b700a06.jpg",
+      "logo": "https://images.gog-statics.com/ac40b40a610a5564fb1a2fdba8fc8156f7673ad7b71d102ca6882ada0df728da.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/6142569dc721f23b35277e83ac93173e472e36215f8c7b71dc005b132bda3319.jpg",
+      "developers": [
+        "Larian Studios"
+      ],
+      "publishers": [
+        "Larian Studios"
+      ],
+      "operatingSystems": [
+        "windows",
+        "osx"
+      ],
+      "price": {
+        "final": "$59.99",
+        "base": "$59.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "59.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "59.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "Пошаговая",
+          "slug": "turnbased"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Исследовательские",
+          "slug": "exploration"
+        },
+        {
+          "name": "Пошаговая стратегия",
+          "slug": "turn-based"
+        },
+        {
+          "name": "Мрачная",
+          "slug": "dark"
+        },
+        {
+          "name": "Решения с последствиями",
+          "slug": "choices-matter"
+        },
+        {
+          "name": "От третьего лица",
+          "slug": "third-person"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "Для взрослых",
+          "slug": "mature"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Средневековье",
+          "slug": "medieval"
+        },
+        {
+          "name": "Локальный кооператив",
+          "slug": "local-co-op"
+        },
+        {
+          "name": "Выбери себе приключение",
+          "slug": "choose-your-own-adventure"
+        },
+        {
+          "name": "Романтическая",
+          "slug": "romance"
+        },
+        {
+          "name": "Тактическая ролевая игра",
+          "slug": "tactical-rpg"
+        },
+        {
+          "name": "Локальный мультиплеер",
+          "slug": "local-multiplayer"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Файтинг",
+          "slug": "fighting"
+        },
+        {
+          "name": "Котики",
+          "slug": "cats"
+        },
+        {
+          "name": "Собаки",
+          "slug": "dog"
+        },
+        {
+          "name": "Crossplay",
+          "slug": "crossplay"
+        }
+      ],
+      "reviewsRating": 46,
+      "reviewsCount": 9043,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_iii"
+    },
+    {
+      "id": "1268811982",
+      "slug": "baldurs_gate_reflections_of_myth_valor",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/0cb29a56b2ae6204927954cbb178d3cc774ee41fdda8c1ff1b1ee3c7040e46b2_{formatter}.jpg",
+        "https://images.gog-statics.com/e0609b20e03f2184517869cde809c98677741444a886b038f62b69f29db6888c_{formatter}.jpg",
+        "https://images.gog-statics.com/d64e66ede298414b0ad4ef30846ad062111d3a4dabad8e8c0eba48f2329fb63a_{formatter}.jpg",
+        "https://images.gog-statics.com/ed726286eab274c7bce5400bad2c7236c49e3e4d6868ffef751f2f369ee23a26_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2025.04.29",
+      "storeReleaseDate": "2025.04.29",
+      "productType": "dlc",
+      "title": "Baldur's Gate: Reflections Of Myth & Valor",
+      "coverHorizontal": "https://images.gog-statics.com/5460eb24159b31566455b0074847d8144af0280e58854696f0dade74755ac70f.png",
+      "coverVertical": "https://images.gog-statics.com/42c9f6403043d25e62e225cabafd9e56a1aebc7c350379a072295ff6dc8888fb.jpg",
+      "logo": "https://images.gog-statics.com/87231b140f70e4a07cfe348abf96be9dafb782542e636a12eeec36b8cc9369f7.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/f462460a724864383bbb224d62258017393c179d7187d88722fa9f43e6fe1a58.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$4.99",
+        "base": "$4.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "4.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "4.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Римейк",
+          "slug": "remake"
+        }
+      ],
+      "reviewsRating": 19,
+      "reviewsCount": 23,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_reflections_of_myth_valor"
+    },
+    {
+      "id": "1157299235",
+      "slug": "baldurs_gate_3_digital_deluxe_edition_upgrade",
+      "features": [
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "galaxy_multiplayer"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [],
+      "userPreferredLanguage": null,
+      "releaseDate": "2023.08.03",
+      "storeReleaseDate": "2023.08.03",
+      "productType": "dlc",
+      "title": "Baldur's Gate 3 - Digital Deluxe Edition upgrade",
+      "coverHorizontal": "https://images.gog-statics.com/16e3c5aa011290247f89d3026a321e4b8a706a5dee3675796ab7a29ac664faf4.png",
+      "coverVertical": "https://images.gog-statics.com/6e81084330e9f65e69c81442b54c64a94251f78b08921b5550706443d1709965.jpg",
+      "logo": "https://images.gog-statics.com/633aa6508c374c1b3ac2ca09c8111c764f150b61e7bc679e98878790c5074422.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/ba8bfdf6bad55592b6ddc8e2014f9d6e6de31d91513df18c6b4dc41031a34672.jpg",
+      "developers": [
+        "Larian Studios"
+      ],
+      "publishers": [
+        "Larian Studios"
+      ],
+      "operatingSystems": [
+        "windows",
+        "osx"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "Пошаговая",
+          "slug": "turnbased"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Исследовательские",
+          "slug": "exploration"
+        },
+        {
+          "name": "Пошаговая стратегия",
+          "slug": "turn-based"
+        },
+        {
+          "name": "Мрачная",
+          "slug": "dark"
+        },
+        {
+          "name": "Решения с последствиями",
+          "slug": "choices-matter"
+        },
+        {
+          "name": "От третьего лица",
+          "slug": "third-person"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "OST",
+          "slug": "ost"
+        },
+        {
+          "name": "Для взрослых",
+          "slug": "mature"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Средневековье",
+          "slug": "medieval"
+        },
+        {
+          "name": "Artbook",
+          "slug": "artbook"
+        },
+        {
+          "name": "Романтическая",
+          "slug": "romance"
+        },
+        {
+          "name": "Тактическая ролевая игра",
+          "slug": "tactical-rpg"
+        },
+        {
+          "name": "Локальный мультиплеер",
+          "slug": "local-multiplayer"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Файтинг",
+          "slug": "fighting"
+        },
+        {
+          "name": "Котики",
+          "slug": "cats"
+        },
+        {
+          "name": "Собаки",
+          "slug": "dog"
+        },
+        {
+          "name": "Crossplay",
+          "slug": "crossplay"
+        }
+      ],
+      "reviewsRating": 39,
+      "reviewsCount": 233,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_3_digital_deluxe_edition_upgrade"
+    },
+    {
+      "id": "1207666373",
+      "slug": "baldurs_gate_2_enhanced_edition",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/b670c13f916ad9f2ee62c6e935aef2fff49bbe0a02385c87f0cb06aad963b818_{formatter}.jpg",
+        "https://images.gog-statics.com/4c0bbdfb9660fb09ea88f3da7713544a0de90f1e43cf37c17b31d55fd56891b9_{formatter}.jpg",
+        "https://images.gog-statics.com/213d51053f504151a4253da8f17eb0ed6f1fb066037ef210652f5aff2f1a76b6_{formatter}.jpg",
+        "https://images.gog-statics.com/e8900cb11b0e7c97933830fb3a7c18630a9813248af762e7f155cb695ae08c6e_{formatter}.jpg",
+        "https://images.gog-statics.com/2ab0b84da93e0bcf46b36b718bc77940b640ef399f35c23b00d3d28474d113b6_{formatter}.jpg",
+        "https://images.gog-statics.com/6b9af940b9f3bc10d3f78623240dc9af71a3b54c1e71b8e3d4891c33a1fd130c_{formatter}.jpg",
+        "https://images.gog-statics.com/4921e8da8dcfc3a789f044c6bf07ef380a1a8223198b3dde2c42bf3f27e721a2_{formatter}.jpg",
+        "https://images.gog-statics.com/59e7098a5a98d7ab4c756a638aff822c70d177dbe9707ddea947ab1c8809f129_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2013.11.15",
+      "storeReleaseDate": "1991.12.24",
+      "productType": "game",
+      "title": "Baldur's Gate II: Enhanced Edition",
+      "coverHorizontal": "https://images.gog-statics.com/865e412024677b4594a91ea7cc3da75077ce8114adc26d5b92cb82c7f9b4509f.png",
+      "coverVertical": "https://images.gog-statics.com/179b0289f220b8d3fd4b338a235200252249746898400c35304889fddd0dfdd2.jpg",
+      "logo": "https://images.gog-statics.com/ffc7b35ec88f942ed19e44aa7353ce80a6d5954a819a5cb10abf14e6c2f930fc.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/828fed9bb5ee67b9897c72895bb37f6796d88ab34653460484becba2bb820f5e.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$19.99",
+        "base": "$19.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "19.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "19.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Решения с последствиями",
+          "slug": "choices-matter"
+        },
+        {
+          "name": "Открытый мир",
+          "slug": "open-world"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Настольная игра",
+          "slug": "tabletop"
+        }
+      ],
+      "reviewsRating": 41,
+      "reviewsCount": 1747,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "uskRating",
+          "ageRating": "12"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_2_enhanced_edition"
+    },
+    {
+      "id": "1207666353",
+      "slug": "baldurs_gate_enhanced_edition",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/77a3d5151b16385f85204560ef27af4843fca43a6c7643b58f5e4e352dc06527_{formatter}.jpg",
+        "https://images.gog-statics.com/0ae5dfa1e854d619db5bcc444199fb506dce32affe6b62f9faf3e7e3ea972b39_{formatter}.jpg",
+        "https://images.gog-statics.com/bebde0c41c89460388b0bca600f453da1094c5465ae8043809ff68e15df160b6_{formatter}.jpg",
+        "https://images.gog-statics.com/c83fce39b0f5747fffca02a5610b10899d8a69285527f7712bc625113819ea3f_{formatter}.jpg",
+        "https://images.gog-statics.com/034f0eae05da9b4cd8752ec049caf482300c184d0aa35e9b3a8c3a5da1270098_{formatter}.jpg",
+        "https://images.gog-statics.com/cd694ca4c186b50ddecc510b9b9b7bfb6925c1b67631e985c2d7a3ca10312885_{formatter}.jpg",
+        "https://images.gog-statics.com/fa15dac5df1c465816bf9e5a315cd70fbaa8fd8931335188a212c25d7a1620bd_{formatter}.jpg",
+        "https://images.gog-statics.com/14f88e03c647f9a8e1c4c5f3ceeb5ad2d2ceab527678bee9c94c090e170263e6_{formatter}.jpg",
+        "https://images.gog-statics.com/23930f211b736e9580cbcba8478456bf2e138a29f7f90a0bc03e06ec4c7a9ae6_{formatter}.jpg",
+        "https://images.gog-statics.com/32b811764375639831f1fb2ca3519c91a0220f656c139162ced8814d86fe93f0_{formatter}.jpg",
+        "https://images.gog-statics.com/8e3183d9b516b9366c6b2236963464a772085925d2a57ef279bd8f9b85e14b4c_{formatter}.jpg",
+        "https://images.gog-statics.com/87533c4e93b8f712181b422e684703600c612f88c6ff6d4752c6769b6f775fc1_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2013.01.16",
+      "storeReleaseDate": "2014.10.16",
+      "productType": "game",
+      "title": "Baldur's Gate: Enhanced Edition",
+      "coverHorizontal": "https://images.gog-statics.com/90ba7463dae94110fd495957a6311648a6e1999bab1a0fcc2d5176b3f46141e8.png",
+      "coverVertical": "https://images.gog-statics.com/855573122ad636464037105f92145e943e43704875076c7f3648116fda5f18f3.jpg",
+      "logo": "https://images.gog-statics.com/270abb6fc698d7c4353c314230672cdfb71a9b6911bc033218d5b5d56fc30e53.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/2becba3c7f36749ce085b9e0420bee163fd17f701e97687968731e97728cf710.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$19.99",
+        "base": "$19.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "19.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "19.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Римейк",
+          "slug": "remake"
+        }
+      ],
+      "reviewsRating": 41,
+      "reviewsCount": 2223,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "12"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "12"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_enhanced_edition"
+    },
+    {
+      "id": "2119788107",
+      "slug": "baldurs_gate_ii_reflections_of_myth_valor",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/fe9ac163aa76054e248963de7ab5e75e680cd17562bc456a977eaeb25f78f55e_{formatter}.jpg",
+        "https://images.gog-statics.com/575f9dffb3cae0e9d80ae1578acf97842f72ea2a3e54d254ab1dbbc4ce268ca7_{formatter}.jpg",
+        "https://images.gog-statics.com/e0f8422d51db4638925ea35858344cee1d52e17fc7a7951f652597a2787a58dc_{formatter}.jpg",
+        "https://images.gog-statics.com/5730b8f0907cd3def9219f69b3325045cac7e77dcebaa5b2d1a57f30106f1bbe_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2025.04.29",
+      "storeReleaseDate": "2025.04.29",
+      "productType": "dlc",
+      "title": "Baldur's Gate II: Reflections Of Myth & Valor",
+      "coverHorizontal": "https://images.gog-statics.com/b7336474d68fe516c92cdedb33e78ddc7d52c250e06af0b3de4490653a8a3226.png",
+      "coverVertical": "https://images.gog-statics.com/577d59b78a2e9d4e162ea6784118fbc51f6183133d61b3b2daf8686528d78c65.jpg",
+      "logo": "https://images.gog-statics.com/a177eaa9cf2630c4d55e072db172aa3475d9762f16a2e944d908b22545dd637c.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/ddce0d98710229da96cc893b3457b80526b2ef793089a0a0393b05b571931717.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$4.99",
+        "base": "$4.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "4.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "4.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Решения с последствиями",
+          "slug": "choices-matter"
+        },
+        {
+          "name": "Открытый мир",
+          "slug": "open-world"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Настольная игра",
+          "slug": "tabletop"
+        }
+      ],
+      "reviewsRating": 19,
+      "reviewsCount": 23,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_ii_reflections_of_myth_valor"
+    },
+    {
+      "id": "2100574330",
+      "slug": "baldurs_gate_3_toolkit",
+      "features": [
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/ee24d60de49d667fca77671732a5401b0f45fbd46afe9bbf66f8241f98c73f93_{formatter}.jpg",
+        "https://images.gog-statics.com/c48a80dfecf1f5f424f56f2e0093be6561caec6369fc96e94a98daf572d96fda_{formatter}.jpg",
+        "https://images.gog-statics.com/704fc09acd4ec41afcc659f3c78941b78a05129e77dc0b0ceadd37bdbcfdfb7c_{formatter}.jpg",
+        "https://images.gog-statics.com/96cb4d80c0fb52be646f35dbdc9705a729e97706d1f9123ccc8b8aa12da2c527_{formatter}.jpg",
+        "https://images.gog-statics.com/647eb73d7d0df585be31a2db35dc14befeee7968a0861bbf4fdd7204fe4da14d_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2024.09.05",
+      "storeReleaseDate": "2024.09.05",
+      "productType": "pack",
+      "title": "Baldur's Gate 3 Toolkit",
+      "coverHorizontal": "https://images.gog-statics.com/35bb51be78b5b3f8735d01ce49fe81d6426528f57a84b5e7e13c34a3838441ad.png",
+      "coverVertical": "https://images.gog-statics.com/d11a921bb657f111460194c713a51165a801c20a93965c4f192fd3d679dbdee2.jpg",
+      "logo": "https://images.gog-statics.com/895fe3941129960cfdc2eb8517a6bc09ec98b960bcc5cd6c0acfa3a93b827a5f.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/564ccbc37702957f10629904da158562b872ac12479098f5ef41d0e834ec1bc1.jpg",
+      "developers": [
+        "Larian Studios"
+      ],
+      "publishers": [
+        "Larian Studios"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$0.00",
+        "base": "$0.00",
+        "discount": null,
+        "finalMoney": {
+          "amount": "0.00",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "0.00",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "Пошаговая",
+          "slug": "turnbased"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Исследовательские",
+          "slug": "exploration"
+        },
+        {
+          "name": "Пошаговая стратегия",
+          "slug": "turn-based"
+        },
+        {
+          "name": "Мрачная",
+          "slug": "dark"
+        },
+        {
+          "name": "Для взрослых",
+          "slug": "mature"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Средневековье",
+          "slug": "medieval"
+        }
+      ],
+      "reviewsRating": 26,
+      "reviewsCount": 13,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_3_toolkit"
+    },
+    {
+      "id": "1745438757",
+      "slug": "baldurs_gate_dark_alliance_ii",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/ffd2fe7c428068ece26fc769e5d4e3f8b2b147792367be9c8030c87d96660b8d_{formatter}.jpg",
+        "https://images.gog-statics.com/2ae25e85d5ece41835a900e02be253e0907bc06adf13a11bbd4bf67c78bb70d9_{formatter}.jpg",
+        "https://images.gog-statics.com/60653ad9a1cc35ad7fc707ff34b9b7e648f9ddde35c6900c5f29defaf607b10d_{formatter}.jpg",
+        "https://images.gog-statics.com/eb24c4ad8f89b52426804cc95563d90091f21bd5b1589920c51f724401c80cb2_{formatter}.jpg",
+        "https://images.gog-statics.com/797497aa4226292c83cd4fed936cec27689c0263746b1a90bda2839579a8e696_{formatter}.jpg",
+        "https://images.gog-statics.com/8dadeef2adc976a21dddcf188801959ee88550a05c94daf1c09c8ed4fb6291fb_{formatter}.jpg",
+        "https://images.gog-statics.com/105a6df8b0fbd7eb14f2656708d915bab0e3535bd50f2aa2fdbefa752c2e5079_{formatter}.jpg",
+        "https://images.gog-statics.com/28de032bc2ddb1cfcae127415c2f55dfb5d6468e727be35d2af10a991f63f1c7_{formatter}.jpg",
+        "https://images.gog-statics.com/2934a148e10116faaabec0ea2b34c170bfd45739eda71e4dbe3c45300b4aa7e9_{formatter}.jpg",
+        "https://images.gog-statics.com/d47ca3e3107bbfb5352b2f91a2b4dcb6146066572050fed00ba59bb283552b5b_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2022.07.20",
+      "storeReleaseDate": "2022.07.20",
+      "productType": "game",
+      "title": "Baldur's Gate: Dark Alliance II",
+      "coverHorizontal": "https://images.gog-statics.com/09c4d39ba5434c529d0c8cce0a36c3cd4fbe70dfbbbcd49d513c2f5f3f23d2af.png",
+      "coverVertical": "https://images.gog-statics.com/2db92100928ba50411da03685d34fb274c13980516cdef94c90db7cd487312c3.jpg",
+      "logo": "https://images.gog-statics.com/0f604d40b0c67f51e00162ab8ce2e39c6d1704f29421663e43349257606624cc.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/dfabf3e1afd604e60fc05bb5d4e804a8928f14ff2269cc617fda57d02b5f680f.jpg",
+      "developers": [
+        "Black Isle Studios"
+      ],
+      "publishers": [
+        "Interplay"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$39.99",
+        "base": "$39.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "39.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "39.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Слэшер",
+          "slug": "hack-and-slash"
+        },
+        {
+          "name": "Локальный кооператив",
+          "slug": "local-co-op"
+        },
+        {
+          "name": "Подземелья",
+          "slug": "dungeon-crawler"
+        },
+        {
+          "name": "Локальный мультиплеер",
+          "slug": "local-multiplayer"
+        }
+      ],
+      "reviewsRating": 32,
+      "reviewsCount": 115,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_dark_alliance_ii"
+    },
+    {
+      "id": "1760702251",
+      "slug": "baldurs_gate_dark_alliance",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/1ec99e8f4d4d4de8eab8f601ef5b0891df8822593d1b5568cc428c3d3e283f5e_{formatter}.jpg",
+        "https://images.gog-statics.com/8e1da9db34c9a434c491ba1f16ee136b47fe1b8c9b51e3d0a23a60e42a2f814d_{formatter}.jpg",
+        "https://images.gog-statics.com/eaf845be453b04acd23253e9247a0d4e4439fdb005651c5f51a0254054ed1889_{formatter}.jpg",
+        "https://images.gog-statics.com/86dade042c5f2ba4f278aeda82dc9de8374441bb9b35ea04d62f7f6270c0cb9c_{formatter}.jpg",
+        "https://images.gog-statics.com/6f0740a6541157bb569e16702bed1764c81fbc093af12971f4ad681697f70a21_{formatter}.jpg",
+        "https://images.gog-statics.com/0b142a64a60258e5e828931a30bd18619ab99acd2b00d1b65fec3dcd7975f071_{formatter}.jpg",
+        "https://images.gog-statics.com/08c6420f11aa016f5af108a840d243d08d137c1b4f3208ccb69e0da759ba9632_{formatter}.jpg",
+        "https://images.gog-statics.com/6699d9ae2cafe2d2fff94f387f61a62a2002dd40af1b0b37b75c5f01f38b9462_{formatter}.jpg",
+        "https://images.gog-statics.com/1ac86359155cc38bdfafc82ac792f3029a07e28b461a680f218b0824366cf6ef_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2021.12.17",
+      "storeReleaseDate": "2021.12.17",
+      "productType": "game",
+      "title": "Baldur's Gate: Dark Alliance",
+      "coverHorizontal": "https://images.gog-statics.com/92c0a2f7845b9ca0c2fe427ec7564e530da80e40693cdf6c711c7817d2417aac.png",
+      "coverVertical": "https://images.gog-statics.com/9316421c608b7e34ea77e5e6fa857c1763caf596e8e56fe85569effda333f5ff.jpg",
+      "logo": "https://images.gog-statics.com/8e7342c32296c92480772dd09b45538dd69e2b8082eedc1379d36b383f89c37a.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/8496e53778d23caedcabd6a353c86a47585a3010488b06845e28852e87ada3a8.jpg",
+      "developers": [
+        "Black Isle Studios"
+      ],
+      "publishers": [
+        "Interplay"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$39.99",
+        "base": "$39.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "39.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "39.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Слэшер",
+          "slug": "hack-and-slash"
+        },
+        {
+          "name": "Локальный кооператив",
+          "slug": "local-co-op"
+        },
+        {
+          "name": "Подземелья",
+          "slug": "dungeon-crawler"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        }
+      ],
+      "reviewsRating": 32,
+      "reviewsCount": 173,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_dark_alliance"
+    },
+    {
+      "id": "1915136134",
+      "slug": "baldurs_gate_faces_of_good_and_evil",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/089ed859a1aaa52d7688959e70dbafb950c0d98619c855cadbd70a76d6d41b93_{formatter}.jpg",
+        "https://images.gog-statics.com/dc9d3a95e81346e2aa2a367b5d6682e2e25409f7860c85bd323090d2d8f05079_{formatter}.jpg",
+        "https://images.gog-statics.com/78c94eb9e4be7601572dbd5921460da0ee5758c08884302c1096ae8c91b2b59d_{formatter}.jpg",
+        "https://images.gog-statics.com/1d5787df863bf1268b542bfaf24901653afccec4b6958d1c0aac943ca65757fd_{formatter}.jpg",
+        "https://images.gog-statics.com/6bbdd0e249319b0a919eba53699db57dd5d51213b0e4b3d2feb6f78be58b98a9_{formatter}.jpg",
+        "https://images.gog-statics.com/4f422c1f045c1787c499344b84ce0e998232115d7adaa8b505d9b971f80bc238_{formatter}.jpg",
+        "https://images.gog-statics.com/fc2f0ae3e94c98104ab396260dc2f738d057d6a027c92ed2bcc8e2a0e77578dc_{formatter}.jpg",
+        "https://images.gog-statics.com/232c06cfba7ff75b1fe49dbbaf1bd2ba683f0f1431ae46a0c5bd1e86771d074d_{formatter}.jpg",
+        "https://images.gog-statics.com/1e40ce46db87ac824457b4d82613a2dcbd429494fc971b79b2abde4fd0c8057e_{formatter}.jpg",
+        "https://images.gog-statics.com/86132723a5503fdd2ca8ea29f8f6072d7a82779d66259ec13678807a6cf69006_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2018.04.14",
+      "storeReleaseDate": "2018.04.20",
+      "productType": "dlc",
+      "title": "Baldur's Gate: Faces of Good and Evil",
+      "coverHorizontal": "https://images.gog-statics.com/b0019d1a95c931b2586d4a9bb494f070a3554c38ee098ba8cc4c4dfe1fcbb8f8.png",
+      "coverVertical": "https://images.gog-statics.com/bdbbdfc3b4db52532c0d0c1025916baccedf6a16d5d8d90efeda59f9dc9317a4.jpg",
+      "logo": "https://images.gog-statics.com/6fbeb034ec73fca2ca84173013a8cc6ee66ac25c5550aef8255737d8f7fb41f4.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/45391d783a1c24a606385508186547a0d92e5775fa41b094debc2076dc7a6945.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$1.99",
+        "base": "$1.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "1.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "1.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        }
+      ],
+      "reviewsRating": 13,
+      "reviewsCount": 432,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_faces_of_good_and_evil"
+    },
+    {
+      "id": "2129826400",
+      "slug": "baldurs_gate_ii_enhanced_edition_official_soundtrack",
+      "features": [
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/cc8fe198110dca46b4747634bf672b7bcac283987885d0f3d186116ccbfc1948_{formatter}.jpg",
+        "https://images.gog-statics.com/70270625f413c252c8bf9b30d3e569b777e8763479fbd44b591ec094eacecddc_{formatter}.jpg",
+        "https://images.gog-statics.com/611d3b33ef11c56438ee8b62f3607b49974bbb6b336082341b11897976c3a45c_{formatter}.jpg",
+        "https://images.gog-statics.com/7f01c5ff6026dc1dc98f3df2e551d5db9722b574398277898e404a441d0482da_{formatter}.jpg",
+        "https://images.gog-statics.com/9d7b157b328f70a816b945a402a67d10ce92271381cb9998ad65806415ea1321_{formatter}.jpg",
+        "https://images.gog-statics.com/4b2144a2c5dc135ca88f593b3632f362d110e973a87b6958aaf14628d0b65fc4_{formatter}.jpg",
+        "https://images.gog-statics.com/98be1417bea4bce81b4f3a66dbd44dc65ae02f1b53dc4dfb6eb4d0660fa1e1a9_{formatter}.jpg",
+        "https://images.gog-statics.com/bfdefd0f4b940fe27025d2d91441cdb35b34669392cdc7f5cf56860cabc534c2_{formatter}.jpg",
+        "https://images.gog-statics.com/7b9307ebebafe46f109148eba308da61a52374c66d3a79954f0e5a2e21ccec0e_{formatter}.jpg",
+        "https://images.gog-statics.com/2f97b247783085bdd38eea5dc067e4c4b7a1cf99e4455ae8f12dd5871c9cb028_{formatter}.jpg",
+        "https://images.gog-statics.com/c43810bfc9fc0e6754df4637075f180ee25513088c89c69016fe7fbe6ee7f8ed_{formatter}.jpg",
+        "https://images.gog-statics.com/b8e86796a454b95764e3f7c1a4d0cd5ffcb88fabc227f5e493bffe091e4557a7_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2016.06.23",
+      "storeReleaseDate": "2017.06.27",
+      "productType": "dlc",
+      "title": "Baldur's Gate II Enhanced Edition Official Soundtrack",
+      "coverHorizontal": "https://images.gog-statics.com/71337b322a59334ca474a35cfa3731e6a3cf1bf14816eac9e060a1821f47883e.png",
+      "coverVertical": "https://images.gog-statics.com/0cf91b118c2f7fc2c94ccbf5d6abe9a0f50c784b06336fb8d35eddce472ed1ed.jpg",
+      "logo": "https://images.gog-statics.com/81e4dca2a41651af6ee8ec87aabc62542c6424a9b62ed729ae05f621abd97190.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/745a35553e233feb23fc138989a3e600bc7d70d99ea8e54e3163c97a4249e7ca.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        }
+      ],
+      "reviewsRating": 18,
+      "reviewsCount": 104,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_ii_enhanced_edition_official_soundtrack"
+    },
+    {
+      "id": "1092899832",
+      "slug": "baldurs_gate_enhanced_edition_official_soundtrack",
+      "features": [
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/35afa422ebcb87b22e612a50d41a9e35995c7a7831baf0e5f21d04b63310a3bb_{formatter}.jpg",
+        "https://images.gog-statics.com/f7d9fc050e340483d54286a7374a0e06e076ca597d925cf922d96dbc9ec22fd3_{formatter}.jpg",
+        "https://images.gog-statics.com/da906c80f5cffa77ef8d1ec15510f66c88c2baa968cb0e959e62ad1201f502a3_{formatter}.jpg",
+        "https://images.gog-statics.com/831f8bd1b0dce53bbc75bcdec6614d75b3f59706dbbf81cf62bff4963baa75b5_{formatter}.jpg",
+        "https://images.gog-statics.com/6c02e04730318bdfd8a2da456a774686ba81ecffaa0a48db6eefcc1f5bcd264d_{formatter}.jpg",
+        "https://images.gog-statics.com/529d06e4a1c7e798803050160232a6b34741794c7d9346e0878ea43944a965fc_{formatter}.jpg",
+        "https://images.gog-statics.com/44f4b83384222176a13ff125331f1bfdf4619e9410634026cd43f83561f205dc_{formatter}.jpg",
+        "https://images.gog-statics.com/6197cb48df0cc3296b2e08616b25ca7bf4aa88a6eef44d80b638a4b94f67366c_{formatter}.jpg",
+        "https://images.gog-statics.com/63ac0bc593c9e84ecde7615a6b6159360fe1f59edc8a6fc91cf027056e2dc713_{formatter}.jpg",
+        "https://images.gog-statics.com/1a28196f801242f21252c1642969590c45881c595a5371ad94d03e5fd2d7e5d0_{formatter}.jpg",
+        "https://images.gog-statics.com/c5d1d5bc75f421e8a27f0d006fe7032dbbf2358f11b30fddb4083a3e2259391b_{formatter}.jpg",
+        "https://images.gog-statics.com/5304ecf1e1d2b144dece42510900038ac1eb2fdb2a2c622435268e8afe94e633_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2016.04.07",
+      "storeReleaseDate": "2017.06.27",
+      "productType": "dlc",
+      "title": "Baldur's Gate Enhanced Edition Official Soundtrack",
+      "coverHorizontal": "https://images.gog-statics.com/8701ee565c1cff40327d504f7f2b9fc33659bd60ecda0ffdda7682a8d1d4ad90.png",
+      "coverVertical": "https://images.gog-statics.com/c4457ea5c947b9c57f907cc375fe8ce79f07c5d748172c9895e391288cc41da7.jpg",
+      "logo": "https://images.gog-statics.com/900150f8dff05513b66ee3cc89479c2eedd756f9ff1c57b3955c7cc71c3f638d.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/dcd7c8d93f08da4e4c4e6c1df917798b81e42754aae58a7adae987114f8fd756.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "OST",
+          "slug": "ost"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        }
+      ],
+      "reviewsRating": 16,
+      "reviewsCount": 121,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_enhanced_edition_official_soundtrack"
+    },
+    {
+      "id": "1488384694",
+      "slug": "siege_of_dragonspear_enhanced_edition_official_soundtrack",
+      "features": [
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/0228c26b5a5dfa4d003087264052ef751cc29eb2592239cf48c2fa5e28e42ee0_{formatter}.jpg",
+        "https://images.gog-statics.com/658b7c774781acb5c535715401b113dc8bb477168e32e97f295b48b22bf3ed21_{formatter}.jpg",
+        "https://images.gog-statics.com/6112a57d3da24f4ba65eaad6de179b3744f5c97bfe655488a6e7dcd98b30b9cd_{formatter}.jpg",
+        "https://images.gog-statics.com/674257a61974a0cf91f15dbb4737e8d91e91a851ecf3d580bd5ff8d29f90e348_{formatter}.jpg",
+        "https://images.gog-statics.com/5e79cb2e3552eb9b35bc52455e7e4bf92391d3c94d224b38b4fbcb4b67079dd8_{formatter}.jpg",
+        "https://images.gog-statics.com/3a00dbc3dd46cd55e3d686c9f79568096f81bca81c5acc7304acb784f9efdb1d_{formatter}.jpg",
+        "https://images.gog-statics.com/b32b9d390554c70c40e669b6199d5e28edf9bebd0172fb8daf5800cc2086ca9b_{formatter}.jpg",
+        "https://images.gog-statics.com/3b3bc346657c65f95b6329253e5d9a0ed44b154f8184d9fc9bc2432ce2941daf_{formatter}.jpg",
+        "https://images.gog-statics.com/520a71e7ebba89edfee836f03dc1dba64e1f060827f8cd654d608b05a3c00c75_{formatter}.jpg",
+        "https://images.gog-statics.com/4648cb520c88f092d70f4504ecd9731bc002468f66b6641936fdec0bab8ec6c4_{formatter}.jpg",
+        "https://images.gog-statics.com/ca5b5f9d955850e31df5427a856605b6788656d97df0ad4f72b21edb9bf836d2_{formatter}.jpg",
+        "https://images.gog-statics.com/b0d6261bc56f51dc6f7ad55e5d0da665f1bacc8bf7a280f9dbb77906843770bf_{formatter}.jpg",
+        "https://images.gog-statics.com/45b9fc3691f1d37a6a44d5cb9e8388b69b877294f0ac900cf50bb420f5c319ad_{formatter}.jpg",
+        "https://images.gog-statics.com/f84928f1cf9007481d9294e26c790b1b4769c3af4419775eeede09565a7fc4a7_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2016.04.07",
+      "storeReleaseDate": "2017.06.27",
+      "productType": "dlc",
+      "title": "Baldur's Gate: Siege of Dragonspear Enhanced Edition Official Soundtrack",
+      "coverHorizontal": "https://images.gog-statics.com/94b9db46a378b4a28d9d79a53f88446e857c10b86a40ab71d5225e2088abb336.png",
+      "coverVertical": "https://images.gog-statics.com/458805170d3d77942b7cd835bcb8610aceaf38c0e031f96824eb10ccb4dfa8a9.jpg",
+      "logo": "https://images.gog-statics.com/9d34a3dbf71f536fd704f7643aa934cd76b1ce9ec30148fa88e8a67341c989bc.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/f4df7365017524bc5cc0814c005e7e8b4afa2056cfc9d99d0a1dff3355d2ef01.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        }
+      ],
+      "reviewsRating": 19,
+      "reviewsCount": 93,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/siege_of_dragonspear_enhanced_edition_official_soundtrack"
+    },
+    {
+      "id": "1459335293",
+      "slug": "baldurs_gate_siege_of_dragonspear",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/aa9f5e18788194e59c2f2b1cbf67793fb35d6ab878d2fb41b1b57bc4d8726794_{formatter}.jpg",
+        "https://images.gog-statics.com/e8284178ec87328fa7d16fdb890d73f78575a3b943a3352207d23b074494af0c_{formatter}.jpg",
+        "https://images.gog-statics.com/e71e72daf99d43d85cddc2df4346e7bf009bfb1388887462eeeb667daf262bf3_{formatter}.jpg",
+        "https://images.gog-statics.com/4d8db313878c6ad07ca7abd24fb1e1f6ea4153804ad56a95cfeddd293597c7b5_{formatter}.jpg",
+        "https://images.gog-statics.com/23d161abdd94ffbcf57bc510893e18d1882a54405a082b71b34a02f89fc40f3e_{formatter}.jpg",
+        "https://images.gog-statics.com/93c758f5618f05310e66800588a03523c4f7fc138cc7b2fccc7a841b1a0f0ce7_{formatter}.jpg",
+        "https://images.gog-statics.com/c7cd1ff866fd762ee5fd2af8c3966932e093a57309f24711195b9b0f51ace215_{formatter}.jpg",
+        "https://images.gog-statics.com/046c1325a2a820b0b50d5e83680b049047668406d14df91003632443715253d6_{formatter}.jpg",
+        "https://images.gog-statics.com/11c529aeb8192eb4827f5af0c6064865868689392ee7973d9208259310fd6d1d_{formatter}.jpg",
+        "https://images.gog-statics.com/4bc197ff4b98c8665d4fc81d4f0183be2023923dce1ebff2bc8d138b241c0422_{formatter}.jpg",
+        "https://images.gog-statics.com/e8fb31f9bb4b24e05f63b368e162bdf9b7f87d67c59c4c17a1a92a8a9546a5c6_{formatter}.jpg",
+        "https://images.gog-statics.com/b4b299fe341bd2b763f810399239f40546a71f84dfb5d7516ff3f1d76fc1465f_{formatter}.jpg",
+        "https://images.gog-statics.com/df1130b39a473ffe477e5a15ed742e257bdc99b9b7b7b59257b7b2f5b5af9667_{formatter}.jpg",
+        "https://images.gog-statics.com/d11bff48daf210a551656ac5f158afcea2710d352dca6bb57f632b55ab2b3e61_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2016.04.01",
+      "storeReleaseDate": "2016.04.01",
+      "productType": "dlc",
+      "title": "Baldur's Gate: Siege of Dragonspear",
+      "coverHorizontal": "https://images.gog-statics.com/7855873c39ccdd9839a79d4a33305083f29b30584f2e52b6d36c4d3cd9a02a74.png",
+      "coverVertical": "https://images.gog-statics.com/198bd771f37cf94ecea61aff033b1ec131253dc88d71f515b4a1cab6c715abbf.jpg",
+      "logo": "https://images.gog-statics.com/ec22e579463b251e93d3a0ae9f235096bbbc04e5beaa1a2d46da54ff16fc8603.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/1d632c3fad003b65ec224342a5721c30aaad8d8a35c32b450678f08549997dbf.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "ЛГБТК+",
+          "slug": "lgbtq-plus"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        }
+      ],
+      "reviewsRating": 26,
+      "reviewsCount": 1799,
+      "editions": [
+        {
+          "id": 1459335293,
+          "name": "Standard Edition",
+          "isRootEdition": true
+        }
+      ],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "12"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "12"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_siege_of_dragonspear"
+    }
+  ],
+  "dreamlistGames": [],
+  "filters": {
+    "releaseDateRange": {
+      "min": 2013,
+      "max": 2025
+    },
+    "priceRange": {
+      "min": 0,
+      "max": 59.99,
+      "currency": "USD",
+      "decimalPlaces": 2
+    },
+    "genres": [
+      {
+        "name": "Гонки",
+        "slug": "racing"
+      },
+      {
+        "name": "Приключение",
+        "slug": "adventure"
+      },
+      {
+        "name": "Ролевая игра",
+        "slug": "rpg"
+      },
+      {
+        "name": "Симулятор",
+        "slug": "simulation"
+      },
+      {
+        "name": "Спорт",
+        "slug": "sports"
+      },
+      {
+        "name": "Стратегия",
+        "slug": "strategy"
+      },
+      {
+        "name": "Шутер",
+        "slug": "shooter"
+      },
+      {
+        "name": "Экшн",
+        "slug": "action"
+      }
+    ],
+    "languages": [
+      {
+        "slug": "ar",
+        "name": "العربية"
+      },
+      {
+        "slug": "br",
+        "name": "Português do Brasil"
+      },
+      {
+        "slug": "cn",
+        "name": "中文(简体)"
+      },
+      {
+        "slug": "cz",
+        "name": "český"
+      },
+      {
+        "slug": "da",
+        "name": "Dansk"
+      },
+      {
+        "slug": "de",
+        "name": "Deutsch"
+      },
+      {
+        "slug": "en",
+        "name": "English"
+      },
+      {
+        "slug": "es",
+        "name": "español"
+      },
+      {
+        "slug": "es_mx",
+        "name": "Español (AL)"
+      },
+      {
+        "slug": "fi",
+        "name": "Suomi"
+      },
+      {
+        "slug": "fr",
+        "name": "français"
+      },
+      {
+        "slug": "gk",
+        "name": "Ελληνικά"
+      },
+      {
+        "slug": "hu",
+        "name": "magyar"
+      },
+      {
+        "slug": "hr",
+        "name": "hrvatski"
+      },
+      {
+        "slug": "id",
+        "name": "bahasa Indonesia"
+      },
+      {
+        "slug": "it",
+        "name": "italiano"
+      },
+      {
+        "slug": "jp",
+        "name": "日本語"
+      },
+      {
+        "slug": "ko",
+        "name": "한국어"
+      },
+      {
+        "slug": "nl",
+        "name": "nederlands"
+      },
+      {
+        "slug": "no",
+        "name": "norsk"
+      },
+      {
+        "slug": "pl",
+        "name": "polski"
+      },
+      {
+        "slug": "pt",
+        "name": "português"
+      },
+      {
+        "slug": "ro",
+        "name": "română"
+      },
+      {
+        "slug": "ru",
+        "name": "русский"
+      },
+      {
+        "slug": "sv",
+        "name": "svenska"
+      },
+      {
+        "slug": "th",
+        "name": "ไทย"
+      },
+      {
+        "slug": "tr",
+        "name": "Türkçe"
+      },
+      {
+        "slug": "uk",
+        "name": "Українська"
+      },
+      {
+        "slug": "vi",
+        "name": "Tiếng Việt"
+      },
+      {
+        "slug": "zh",
+        "name": "中文(繁體)"
+      }
+    ],
+    "systems": [
+      {
+        "slug": "windows",
+        "name": "Windows"
+      },
+      {
+        "slug": "osx",
+        "name": "macOS"
+      },
+      {
+        "slug": "linux",
+        "name": "Linux"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Приключение",
+        "slug": "adventure"
+      },
+      {
+        "name": "Экшн",
+        "slug": "action"
+      },
+      {
+        "name": "Инди",
+        "slug": "indie"
+      },
+      {
+        "name": "Насыщенный сюжет",
+        "slug": "story-rich"
+      },
+      {
+        "name": "Атмосферные",
+        "slug": "atmospheric"
+      },
+      {
+        "name": "Фэнтези",
+        "slug": "fantasy"
+      },
+      {
+        "name": "Стратегия",
+        "slug": "strategy"
+      },
+      {
+        "name": "2D",
+        "slug": "two-dimensional"
+      },
+      {
+        "name": "Ролевая игра",
+        "slug": "role-playing"
+      },
+      {
+        "name": "Классика",
+        "slug": "classic"
+      }
+    ],
+    "discounted": false,
+    "features": [
+      {
+        "slug": "single",
+        "name": "Одиночная игра"
+      },
+      {
+        "slug": "multi",
+        "name": "сетевая игра"
+      },
+      {
+        "slug": "coop",
+        "name": "Кооперативный режим"
+      },
+      {
+        "slug": "achievements",
+        "name": "Достижения"
+      },
+      {
+        "slug": "leaderboards",
+        "name": "Таблицы лидеров"
+      },
+      {
+        "slug": "controller_support",
+        "name": "Поддержка контроллера"
+      },
+      {
+        "slug": "cloud_saves",
+        "name": "Облачные сохранения"
+      },
+      {
+        "slug": "overlay",
+        "name": "Оверлей"
+      },
+      {
+        "slug": "galaxy_multiplayer",
+        "name": "сетевая игра"
+      }
+    ],
+    "releaseStatuses": [
+      {
+        "slug": "new-arrival",
+        "name": "New Arrivals"
+      },
+      {
+        "slug": "upcoming",
+        "name": "Upcoming"
+      },
+      {
+        "slug": "early-access",
+        "name": "Early Access"
+      }
+    ],
+    "types": [
+      "game",
+      "dlc",
+      "extras",
+      "pack"
+    ],
+    "fullGenresList": [
+      {
+        "name": "Гонки",
+        "slug": "racing",
+        "level": 1
+      },
+      {
+        "name": "Приключение",
+        "slug": "adventure",
+        "level": 1
+      },
+      {
+        "name": "Ролевая игра",
+        "slug": "rpg",
+        "level": 1
+      },
+      {
+        "name": "Симулятор",
+        "slug": "simulation",
+        "level": 1
+      },
+      {
+        "name": "Спорт",
+        "slug": "sports",
+        "level": 1
+      },
+      {
+        "name": "Стратегия",
+        "slug": "strategy",
+        "level": 1
+      },
+      {
+        "name": "Шутер",
+        "slug": "shooter",
+        "level": 1
+      },
+      {
+        "name": "Экшн",
+        "slug": "action",
+        "level": 1
+      },
+      {
+        "name": "Metroidvania",
+        "slug": "metroidvania",
+        "level": 2
+      },
+      {
+        "name": "Survival",
+        "slug": "survival",
+        "level": 2
+      },
+      {
+        "name": "Аркада",
+        "slug": "arcade",
+        "level": 2
+      },
+      {
+        "name": "В реальном времени",
+        "slug": "realtime",
+        "level": 2
+      },
+      {
+        "name": "Визуальные новеллы",
+        "slug": "visual-novel",
+        "level": 2
+      },
+      {
+        "name": "Головоломка",
+        "slug": "puzzle",
+        "level": 2
+      },
+      {
+        "name": "Карточная игра",
+        "slug": "card-game",
+        "level": 2
+      },
+      {
+        "name": "Квест",
+        "slug": "pointandclick",
+        "level": 2
+      },
+      {
+        "name": "Командный спорт",
+        "slug": "teamsport",
+        "level": 2
+      },
+      {
+        "name": "Обучающая",
+        "slug": "educational",
+        "level": 2
+      },
+      {
+        "name": "От первого лица",
+        "slug": "fpp",
+        "level": 2
+      },
+      {
+        "name": "От третьего лица",
+        "slug": "tpp",
+        "level": 2
+      },
+      {
+        "name": "Пошаговая",
+        "slug": "turnbased",
+        "level": 2
+      },
+      {
+        "name": "Приключение",
+        "slug": "adventure",
+        "level": 2
+      },
+      {
+        "name": "Ролевая игра",
+        "slug": "rpg",
+        "level": 2
+      },
+      {
+        "name": "Симулятор",
+        "slug": "simulation",
+        "level": 2
+      },
+      {
+        "name": "Сражения",
+        "slug": "combat",
+        "level": 2
+      },
+      {
+        "name": "Стратегия",
+        "slug": "strategy",
+        "level": 2
+      },
+      {
+        "name": "Строительство",
+        "slug": "building",
+        "level": 2
+      },
+      {
+        "name": "Экономика",
+        "slug": "economic",
+        "level": 2
+      },
+      {
+        "name": "Экшн",
+        "slug": "action",
+        "level": 2
+      },
+      {
+        "name": "Exploration",
+        "slug": "exploration",
+        "level": 3
+      },
+      {
+        "name": "FPP",
+        "slug": "fpp",
+        "level": 3
+      },
+      {
+        "name": "JRPG",
+        "slug": "jrpg",
+        "level": 3
+      },
+      {
+        "name": "Metroidvania",
+        "slug": "metroidvania",
+        "level": 3
+      },
+      {
+        "name": "Open World",
+        "slug": "open-world",
+        "level": 3
+      },
+      {
+        "name": "Roguelike",
+        "slug": "rougelike",
+        "level": 3
+      },
+      {
+        "name": "Sandbox",
+        "slug": "sandbox",
+        "level": 3
+      },
+      {
+        "name": "Shoot 'em Up",
+        "slug": "shoot-em-up",
+        "level": 3
+      },
+      {
+        "name": "Виртуальная жизнь",
+        "slug": "virtuallife",
+        "level": 3
+      },
+      {
+        "name": "Внедорожники",
+        "slug": "offroad",
+        "level": 3
+      },
+      {
+        "name": "Выживание",
+        "slug": "survival",
+        "level": 3
+      },
+      {
+        "name": "Головоломка",
+        "slug": "puzzle",
+        "level": 3
+      },
+      {
+        "name": "Детектив",
+        "slug": "detective",
+        "level": 3
+      },
+      {
+        "name": "Драма",
+        "slug": "narrative",
+        "level": 3
+      },
+      {
+        "name": "Историческая",
+        "slug": "historical",
+        "level": 3
+      },
+      {
+        "name": "Комедия",
+        "slug": "comedy",
+        "level": 3
+      },
+      {
+        "name": "Менеджмент",
+        "slug": "managerial",
+        "level": 3
+      },
+      {
+        "name": "Мистика",
+        "slug": "mystery",
+        "level": 3
+      },
+      {
+        "name": "Пинбол",
+        "slug": "pinball",
+        "level": 3
+      },
+      {
+        "name": "Платформер",
+        "slug": "platformer",
+        "level": 3
+      },
+      {
+        "name": "Поиск предметов",
+        "slug": "hidden-object",
+        "level": 3
+      },
+      {
+        "name": "Про море",
+        "slug": "naval",
+        "level": 3
+      },
+      {
+        "name": "Программирование",
+        "slug": "programming",
+        "level": 3
+      },
+      {
+        "name": "Ралли",
+        "slug": "rally",
+        "level": 3
+      },
+      {
+        "name": "Современность",
+        "slug": "modern",
+        "level": 3
+      },
+      {
+        "name": "Стелс",
+        "slug": "stealth",
+        "level": 3
+      },
+      {
+        "name": "Тактическая",
+        "slug": "tactical",
+        "level": 3
+      },
+      {
+        "name": "Турне",
+        "slug": "touring",
+        "level": 3
+      },
+      {
+        "name": "Файтинг",
+        "slug": "fighting",
+        "level": 3
+      },
+      {
+        "name": "Фантастика",
+        "slug": "scifi",
+        "level": 3
+      },
+      {
+        "name": "Футбол",
+        "slug": "soccer",
+        "level": 3
+      },
+      {
+        "name": "Фэнтези",
+        "slug": "fantasy",
+        "level": 3
+      },
+      {
+        "name": "Хоррор",
+        "slug": "horror",
+        "level": 3
+      },
+      {
+        "name": "Шахматы",
+        "slug": "chess",
+        "level": 3
+      },
+      {
+        "name": "Шпионаж",
+        "slug": "espionage",
+        "level": 3
+      }
+    ],
+    "fullTagsList": [
+      {
+        "name": "Приключение",
+        "slug": "adventure"
+      },
+      {
+        "name": "Экшн",
+        "slug": "action"
+      },
+      {
+        "name": "Инди",
+        "slug": "indie"
+      },
+      {
+        "name": "Насыщенный сюжет",
+        "slug": "story-rich"
+      },
+      {
+        "name": "Атмосферные",
+        "slug": "atmospheric"
+      },
+      {
+        "name": "Фэнтези",
+        "slug": "fantasy"
+      },
+      {
+        "name": "Стратегия",
+        "slug": "strategy"
+      },
+      {
+        "name": "2D",
+        "slug": "two-dimensional"
+      },
+      {
+        "name": "Ролевая игра",
+        "slug": "role-playing"
+      },
+      {
+        "name": "Классика",
+        "slug": "classic"
+      },
+      {
+        "name": "Исследовательские",
+        "slug": "exploration"
+      },
+      {
+        "name": "Научная фантастика",
+        "slug": "sci-fi"
+      },
+      {
+        "name": "Головоломка",
+        "slug": "puzzle"
+      },
+      {
+        "name": "Симулятор",
+        "slug": "simulation"
+      },
+      {
+        "name": "Пошаговая стратегия",
+        "slug": "turn-based"
+      },
+      {
+        "name": "Казуальная",
+        "slug": "casual"
+      },
+      {
+        "name": "Протагонистка",
+        "slug": "female-protagonist"
+      },
+      {
+        "name": "Пиксельная графика",
+        "slug": "pixel-graphics"
+      },
+      {
+        "name": "Наука",
+        "slug": "science"
+      },
+      {
+        "name": "От первого лица",
+        "slug": "first-person"
+      },
+      {
+        "name": "Мрачная",
+        "slug": "dark"
+      },
+      {
+        "name": "Отличный саундтрек",
+        "slug": "great-soundtrack"
+      },
+      {
+        "name": "Решения с последствиями",
+        "slug": "choices-matter"
+      },
+      {
+        "name": "Хоррор",
+        "slug": "horror"
+      },
+      {
+        "name": "Смешная",
+        "slug": "funny"
+      },
+      {
+        "name": "Тактика",
+        "slug": "tactical"
+      },
+      {
+        "name": "Управление",
+        "slug": "management"
+      },
+      {
+        "name": "Визуальная новелла",
+        "slug": "visual-novel"
+      },
+      {
+        "name": "Тайна",
+        "slug": "mystery"
+      },
+      {
+        "name": "От третьего лица",
+        "slug": "third-person"
+      },
+      {
+        "name": "Открытый мир",
+        "slug": "open-world"
+      },
+      {
+        "name": "Многопользовательская игра",
+        "slug": "multiplayer"
+      },
+      {
+        "name": "Для взрослых",
+        "slug": "mature"
+      },
+      {
+        "name": "Сексуальный контент",
+        "slug": "sexual-content"
+      },
+      {
+        "name": "OST",
+        "slug": "ost"
+      },
+      {
+        "name": "Песочница",
+        "slug": "sandbox"
+      },
+      {
+        "name": "Нагота",
+        "slug": "nudity"
+      },
+      {
+        "name": "Платформер",
+        "slug": "platformer"
+      },
+      {
+        "name": "Point&Click",
+        "slug": "point-and-click"
+      },
+      {
+        "name": "История",
+        "slug": "historical"
+      },
+      {
+        "name": "Управление ресурсами",
+        "slug": "resource-management"
+      },
+      {
+        "name": "Выживание",
+        "slug": "survival"
+      },
+      {
+        "name": "Сложная",
+        "slug": "difficult"
+      },
+      {
+        "name": "Насилие",
+        "slug": "violent"
+      },
+      {
+        "name": "Несколько концовок",
+        "slug": "multiple-endings"
+      },
+      {
+        "name": "В реальном времени",
+        "slug": "real-time"
+      },
+      {
+        "name": "NSFW",
+        "slug": "nsfw"
+      },
+      {
+        "name": "Семейная",
+        "slug": "family-friendly"
+      },
+      {
+        "name": "Мясо",
+        "slug": "gore"
+      },
+      {
+        "name": "Японская ролевая игра",
+        "slug": "jrpg"
+      },
+      {
+        "name": "Рогалик",
+        "slug": "roguelike"
+      },
+      {
+        "name": "Изометрия",
+        "slug": "isometric"
+      },
+      {
+        "name": "Ретро",
+        "slug": "retro"
+      },
+      {
+        "name": "Магия",
+        "slug": "magic"
+      },
+      {
+        "name": "Расслабляющая",
+        "slug": "relaxing"
+      },
+      {
+        "name": "Вид сверху вних",
+        "slug": "top-down"
+      },
+      {
+        "name": "Космос",
+        "slug": "space"
+      },
+      {
+        "name": "Строительство",
+        "slug": "building"
+      },
+      {
+        "name": "Логическая",
+        "slug": "logic"
+      },
+      {
+        "name": "Шутер от первого лица",
+        "slug": "fps"
+      },
+      {
+        "name": "Мультипликация",
+        "slug": "cartoony"
+      },
+      {
+        "name": "Война",
+        "slug": "war"
+      },
+      {
+        "name": "Средневековье",
+        "slug": "medieval"
+      },
+      {
+        "name": "Драма",
+        "slug": "narrative"
+      },
+      {
+        "name": "Упрощенный рогалик",
+        "slug": "roguelite"
+      },
+      {
+        "name": "Слэшер",
+        "slug": "hack-and-slash"
+      },
+      {
+        "name": "Эмоциональная",
+        "slug": "emotional"
+      },
+      {
+        "name": "Крафтинг",
+        "slug": "crafting"
+      },
+      {
+        "name": "Шутер",
+        "slug": "shooter"
+      },
+      {
+        "name": "Строительство базы",
+        "slug": "base-building"
+      },
+      {
+        "name": "Реалистичная",
+        "slug": "realistic"
+      },
+      {
+        "name": "Менеджмент",
+        "slug": "managerial"
+      },
+      {
+        "name": "Градостроение",
+        "slug": "city-builder"
+      },
+      {
+        "name": "Процедурная генерация",
+        "slug": "procedural-generation"
+      },
+      {
+        "name": "Постапокалипсис",
+        "slug": "post-apocalyptic"
+      },
+      {
+        "name": "Расследование",
+        "slug": "investigation"
+      },
+      {
+        "name": "Стратегия в реальном времени",
+        "slug": "rts"
+      },
+      {
+        "name": "Локальный кооператив",
+        "slug": "local-co-op"
+      },
+      {
+        "name": "Выбери себе приключение",
+        "slug": "choose-your-own-adventure"
+      },
+      {
+        "name": "Романтическая",
+        "slug": "romance"
+      },
+      {
+        "name": "Психологический хоррор",
+        "slug": "psychological-horror"
+      },
+      {
+        "name": "Стелс",
+        "slug": "stealth"
+      },
+      {
+        "name": "Военная",
+        "slug": "military"
+      },
+      {
+        "name": "Хоррор на выживание",
+        "slug": "survival-horror"
+      },
+      {
+        "name": "Подземелья",
+        "slug": "dungeon-crawler"
+      },
+      {
+        "name": "Artbook",
+        "slug": "artbook"
+      },
+      {
+        "name": "Тактическая ролевая игра",
+        "slug": "tactical-rpg"
+      },
+      {
+        "name": "Глобальная стратегия",
+        "slug": "grand-strategy"
+      },
+      {
+        "name": "Аркада",
+        "slug": "arcade"
+      },
+      {
+        "name": "Сюрреалистичная",
+        "slug": "surreal"
+      },
+      {
+        "name": "ЛГБТК+",
+        "slug": "lgbtq-plus"
+      },
+      {
+        "name": "Сражения",
+        "slug": "combat"
+      },
+      {
+        "name": "Киберпанк",
+        "slug": "cyberpunk"
+      },
+      {
+        "name": "Локальный мультиплеер",
+        "slug": "local-multiplayer"
+      },
+      {
+        "name": "Симулятор свиданий",
+        "slug": "dating-sim"
+      },
+      {
+        "name": "Компьютерная ролевая игра",
+        "slug": "crpg"
+      },
+      {
+        "name": "Головоломка-платформер",
+        "slug": "puzzle-platformer"
+      },
+      {
+        "name": "Современность",
+        "slug": "modern"
+      },
+      {
+        "name": "Файтинг",
+        "slug": "fighting"
+      },
+      {
+        "name": "Комедия",
+        "slug": "comedy"
+      },
+      {
+        "name": "Метроидвания",
+        "slug": "metroidvania"
+      },
+      {
+        "name": "Хентай",
+        "slug": "hentai"
+      },
+      {
+        "name": "Симультор ходьбы",
+        "slug": "walking-simulator"
+      },
+      {
+        "name": "Физика",
+        "slug": "physics"
+      },
+      {
+        "name": "Сверхъестественное",
+        "slug": "supernatural"
+      },
+      {
+        "name": "Карточная игра",
+        "slug": "card-game"
+      },
+      {
+        "name": "Детектив",
+        "slug": "detective"
+      },
+      {
+        "name": "Психология",
+        "slug": "psychological"
+      },
+      {
+        "name": "Черная комедия",
+        "slug": "dark-comedy"
+      },
+      {
+        "name": "Лавкрафт",
+        "slug": "lovecraftian"
+      },
+      {
+        "name": "Природа",
+        "slug": "nature"
+      },
+      {
+        "name": "Политическая",
+        "slug": "politics"
+      },
+      {
+        "name": "Shoot'EmUp",
+        "slug": "shoot-em-up"
+      },
+      {
+        "name": "Cozy",
+        "slug": "cozy"
+      },
+      {
+        "name": "Триллер",
+        "slug": "thriller"
+      },
+      {
+        "name": "Дистопия",
+        "slug": "dystopian"
+      },
+      {
+        "name": "Скролл-шутер",
+        "slug": "bullet-hell"
+      },
+      {
+        "name": "4X",
+        "slug": "four-x"
+      },
+      {
+        "name": "Роботы",
+        "slug": "robots"
+      },
+      {
+        "name": "Good Old Game",
+        "slug": "good-old-game"
+      },
+      {
+        "name": "Похожа на Dark Souls",
+        "slug": "souls-like"
+      },
+      {
+        "name": "Demoware",
+        "slug": "demo"
+      },
+      {
+        "name": "Перманентная смерть",
+        "slug": "perma-death"
+      },
+      {
+        "name": "Текстовая",
+        "slug": "text-based"
+      },
+      {
+        "name": "Криминал",
+        "slug": "crime"
+      },
+      {
+        "name": "Быстрая игра",
+        "slug": "short"
+      },
+      {
+        "name": "Нуар",
+        "slug": "noir"
+      },
+      {
+        "name": "Мифология",
+        "slug": "mythology"
+      },
+      {
+        "name": "Поиск предметов",
+        "slug": "hidden-object"
+      },
+      {
+        "name": "Beat 'em up",
+        "slug": "beat-em-up"
+      },
+      {
+        "name": "Карточная",
+        "slug": "deckbuilding"
+      },
+      {
+        "name": "Котики",
+        "slug": "cats"
+      },
+      {
+        "name": "Вторая мировая войны",
+        "slug": "world-war-ii"
+      },
+      {
+        "name": "Римейк",
+        "slug": "remake"
+      },
+      {
+        "name": "Симулятор жизни",
+        "slug": "lifesim"
+      },
+      {
+        "name": "Настольная с полем",
+        "slug": "board-game"
+      },
+      {
+        "name": "Образование",
+        "slug": "education"
+      },
+      {
+        "name": "Полеты",
+        "slug": "flight"
+      },
+      {
+        "name": "Зомби",
+        "slug": "zombies"
+      },
+      {
+        "name": "Стимпанк",
+        "slug": "steampunk"
+      },
+      {
+        "name": "Башенная защита",
+        "slug": "tower-defense"
+      },
+      {
+        "name": "Философская",
+        "slug": "philosophical"
+      },
+      {
+        "name": "Торговля",
+        "slug": "trading"
+      },
+      {
+        "name": "Настольная игра",
+        "slug": "tabletop"
+      },
+      {
+        "name": "Экономика",
+        "slug": "economic"
+      },
+      {
+        "name": "Твин-стик шутер",
+        "slug": "twin-stick-shooter"
+      },
+      {
+        "name": "Гонки",
+        "slug": "racing"
+      },
+      {
+        "name": "Только на GOG",
+        "slug": "only-on-gog"
+      },
+      {
+        "name": "Редактор уровней",
+        "slug": "leveleditor"
+      },
+      {
+        "name": "Вампир",
+        "slug": "vampire"
+      },
+      {
+        "name": "FMV-игра",
+        "slug": "fmv"
+      },
+      {
+        "name": "Спорт",
+        "slug": "sports"
+      },
+      {
+        "name": "Рыбалка",
+        "slug": "fishing"
+      },
+      {
+        "name": "Пираты",
+        "slug": "pirates"
+      },
+      {
+        "name": "Контроль времени",
+        "slug": "time-manipulation"
+      },
+      {
+        "name": "Поезда",
+        "slug": "trains"
+      },
+      {
+        "name": "Фермерство",
+        "slug": "farming"
+      },
+      {
+        "name": "Транспорт",
+        "slug": "transportation"
+      },
+      {
+        "name": "Танки",
+        "slug": "tanks"
+      },
+      {
+        "name": "Мореплавание",
+        "slug": "naval"
+      },
+      {
+        "name": "Пародия",
+        "slug": "parody"
+      },
+      {
+        "name": "Без насилия",
+        "slug": "non-violent"
+      },
+      {
+        "name": "Вестерн",
+        "slug": "western"
+      },
+      {
+        "name": "Боевые искусства",
+        "slug": "martial-arts"
+      },
+      {
+        "name": "Собаки",
+        "slug": "dog"
+      },
+      {
+        "name": "Ритм",
+        "slug": "rhythm"
+      },
+      {
+        "name": "Кулинария",
+        "slug": "cooking"
+      },
+      {
+        "name": "Разделение экрана",
+        "slug": "split-screen"
+      },
+      {
+        "name": "Автобатлер",
+        "slug": "auto-battler"
+      },
+      {
+        "name": "Подводный мир",
+        "slug": "underwater"
+      },
+      {
+        "name": "Супергерои",
+        "slug": "superhero"
+      },
+      {
+        "name": "VR",
+        "slug": "vr"
+      },
+      {
+        "name": "Free Game",
+        "slug": "freegame"
+      },
+      {
+        "name": "Подземный мир",
+        "slug": "underground"
+      },
+      {
+        "name": "Лутер-шутер",
+        "slug": "looter-shooter"
+      },
+      {
+        "name": "Ниндзя",
+        "slug": "ninja"
+      },
+      {
+        "name": "Виртуальная жизнь",
+        "slug": "virtual-life"
+      },
+      {
+        "name": "Динозавры",
+        "slug": "dinosaurs"
+      },
+      {
+        "name": "Викинги",
+        "slug": "vikings"
+      },
+      {
+        "name": "Ралли",
+        "slug": "rally"
+      },
+      {
+        "name": "Побег из комнаты",
+        "slug": "escape-room"
+      },
+      {
+        "name": "Партийная игра",
+        "slug": "party-game"
+      },
+      {
+        "name": "Программирование",
+        "slug": "programming"
+      },
+      {
+        "name": "Первая мировая война",
+        "slug": "world-war-i"
+      },
+      {
+        "name": "Печатание",
+        "slug": "typing"
+      },
+      {
+        "name": "educational",
+        "slug": "educational"
+      },
+      {
+        "name": "Гладить собак",
+        "slug": "petting-dogs"
+      },
+      {
+        "name": "Футбол",
+        "slug": "football"
+      },
+      {
+        "name": "Для совершеннолетних",
+        "slug": "coming-of-age"
+      },
+      {
+        "name": "Оборотни",
+        "slug": "werewolves"
+      },
+      {
+        "name": "Внедорожники",
+        "slug": "offroad"
+      },
+      {
+        "name": "Американский футбол",
+        "slug": "soccer"
+      },
+      {
+        "name": "Mod",
+        "slug": "mod"
+      },
+      {
+        "name": "Кино",
+        "slug": "movie"
+      },
+      {
+        "name": "Шпионаж",
+        "slug": "espionage"
+      },
+      {
+        "name": "Пинболл",
+        "slug": "pinball"
+      },
+      {
+        "name": "Три в ряд",
+        "slug": "match-three"
+      },
+      {
+        "name": "Crossplay",
+        "slug": "crossplay"
+      },
+      {
+        "name": "Командный спорт",
+        "slug": "team-sport"
+      },
+      {
+        "name": "Шахматы",
+        "slug": "chess"
+      },
+      {
+        "name": "Снайпер",
+        "slug": "sniper"
+      },
+      {
+        "name": "Турне",
+        "slug": "touring"
+      },
+      {
+        "name": "Online-only",
+        "slug": "online-only"
+      }
+    ]
+  },
+  "searchAlgo": "default"
+}

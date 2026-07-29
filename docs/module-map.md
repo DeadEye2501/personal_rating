@@ -304,7 +304,7 @@
 - `def upgrade() -> None` (29)
 - `def downgrade() -> None` (5)
 
-## scripts — 3 модулей
+## scripts — 4 модулей
 
 ### `scripts/collect_game_genres.py` — 78 строк
 
@@ -349,6 +349,21 @@
 - `def lonely_block(found: list[tuple]) -> str` (9)
 - `def render() -> str` (16)
 - `def main() -> int` (12)
+
+### `scripts/record_fixtures.py` — 187 строк
+
+Разовая запись живых ответов источников в tests/fixtures/.
+
+Зависит от: `backend.config`, `backend.sources.http`
+
+- `def save(source: str, case: str, response: httpx.Response) -> None` (23)
+- `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (24)
+- `async def record_steam(client: httpx.AsyncClient) -> None` (24)
+- `async def record_gog(client: httpx.AsyncClient) -> None` (9)
+- `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
+- `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
+- `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
+- `async def main() -> None` (20)
 
 ## tests — 19 модулей
 

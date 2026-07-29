@@ -1,0 +1,173 @@
+{
+  "response": {
+    "store_items": [
+      {
+        "item_type": 0,
+        "id": 292030,
+        "success": 1,
+        "visible": true,
+        "name": "Ведьмак 3: Дикая Охота",
+        "store_url_path": "app/292030/_3",
+        "appid": 292030,
+        "type": 0,
+        "content_descriptorids": [
+          1,
+          5
+        ],
+        "tagids": [
+          1695,
+          122,
+          1742,
+          4166,
+          1684,
+          21,
+          4182,
+          6650,
+          6426,
+          1756,
+          1697,
+          4172,
+          19,
+          6971,
+          4231,
+          4604,
+          4057,
+          4342,
+          3810,
+          12095
+        ],
+        "categories": {
+          "supported_player_categoryids": [
+            2
+          ],
+          "feature_categoryids": [
+            22,
+            29,
+            30,
+            64,
+            66,
+            67,
+            68,
+            69,
+            70,
+            74,
+            78,
+            79,
+            23,
+            42,
+            43,
+            61,
+            62
+          ],
+          "controller_categoryids": [
+            18
+          ]
+        },
+        "tags": [
+          {
+            "tagid": 1695,
+            "weight": 1158
+          },
+          {
+            "tagid": 122,
+            "weight": 976
+          },
+          {
+            "tagid": 1742,
+            "weight": 905
+          },
+          {
+            "tagid": 4166,
+            "weight": 617
+          },
+          {
+            "tagid": 1684,
+            "weight": 597
+          },
+          {
+            "tagid": 21,
+            "weight": 584
+          },
+          {
+            "tagid": 4182,
+            "weight": 572
+          },
+          {
+            "tagid": 6650,
+            "weight": 566
+          },
+          {
+            "tagid": 6426,
+            "weight": 523
+          },
+          {
+            "tagid": 1756,
+            "weight": 425
+          },
+          {
+            "tagid": 1697,
+            "weight": 424
+          },
+          {
+            "tagid": 4172,
+            "weight": 418
+          },
+          {
+            "tagid": 19,
+            "weight": 399
+          },
+          {
+            "tagid": 6971,
+            "weight": 358
+          },
+          {
+            "tagid": 4231,
+            "weight": 356
+          },
+          {
+            "tagid": 4604,
+            "weight": 341
+          },
+          {
+            "tagid": 4057,
+            "weight": 336
+          },
+          {
+            "tagid": 4342,
+            "weight": 202
+          },
+          {
+            "tagid": 3810,
+            "weight": 123
+          },
+          {
+            "tagid": 12095,
+            "weight": 109
+          }
+        ],
+        "best_purchase_option": {
+          "packageid": 68476,
+          "purchase_option_name": "The Witcher 3: Wild Hunt",
+          "final_price_in_cents": "799",
+          "original_price_in_cents": "3999",
+          "formatted_final_price": "$7.99",
+          "formatted_original_price": "$39.99",
+          "discount_pct": 80,
+          "active_discounts": [
+            {
+              "discount_amount": "3200",
+              "discount_description": "#discount_desc_preset_special",
+              "discount_end_date": 1786381200
+            }
+          ],
+          "user_can_purchase_as_gift": true,
+          "hide_discount_pct_for_compliance": false,
+          "included_game_count": 1,
+          "must_purchase_as_set": false,
+          "package_group": "default",
+          "price_cannot_be_displayed_as_discount": false
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/5XNQBqnBwPA9yT0jZ0p3s8bbLh0.jpg",
+      "genre_ids": [
+        12,
+        18,
+        878
+      ],
+      "id": 157336,
+      "title": "Интерстеллар",
+      "original_language": "en",
+      "original_title": "Interstellar",
+      "overview": "Когда засуха, пыльные бури и вымирание растений приводят человечество к продовольственному кризису, коллектив исследователей и учёных отправляется сквозь червоточину в путешествие, чтобы превзойти прежние ограничения для космических путешествий человека и найти планету с подходящими для человечества условиями.",
+      "popularity": 80.8917,
+      "poster_path": "/vReLRjDV9XPhiOSEW7QWow4DXwf.jpg",
+      "release_date": "2014-11-05",
+      "softcore": false,
+      "video": false,
+      "vote_average": 8.483,
+      "vote_count": 40480
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/8C32MMrMYT5gON7nXgEGeM4puH4.jpg",
+      "genre_ids": [
+        99
+      ],
+      "id": 336592,
+      "title": "Изучение «Интерстеллар»",
+      "original_language": "en",
+      "original_title": "The Science of Interstellar",
+      "overview": "Фильм о ленте «Интерстеллар» режиссера Кристофера Нолана, фантастическое путешествие далеко за пределы Солнечной системы.",
+      "popularity": 3.4125,
+      "poster_path": "/pUvbuOTHKQWrLuGY1x2pHd1evPL.jpg",
+      "release_date": "2014-11-13",
+      "softcore": false,
+      "video": false,
+      "vote_average": 6.9,
+      "vote_count": 35
+    }
+  ],
+  "total_pages": 1,
+  "total_results": 2
+}

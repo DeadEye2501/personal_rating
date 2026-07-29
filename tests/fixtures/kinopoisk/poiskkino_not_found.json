@@ -1,0 +1,5 @@
+{
+  "statusCode": 404,
+  "message": "Фильм не найден",
+  "error": "Not Found"
+}

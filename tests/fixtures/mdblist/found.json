@@ -1,0 +1,203 @@
+{
+  "title": "Interstellar",
+  "year": 2014,
+  "released": "2014-11-05",
+  "released_digital": "2014-11-07",
+  "description": "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+  "tagline": "Mankind was born on Earth. It was never meant to die here.",
+  "runtime": 169,
+  "budget": 165000000,
+  "revenue": 746606706,
+  "score": 83,
+  "score_average": 83,
+  "ids": {
+    "imdb": "tt0816692",
+    "trakt": 102156,
+    "tmdb": 157336,
+    "tvdb": 131079,
+    "mal": null,
+    "mdblist": "8r"
+  },
+  "type": "movie",
+  "updated": "2026-07-28T00:01:14.000Z",
+  "ratings": [
+    {
+      "source": "imdb",
+      "value": 8.7,
+      "score": 87,
+      "votes": 2557594,
+      "url": 19
+    },
+    {
+      "source": "metacritic",
+      "value": 74,
+      "score": 74,
+      "votes": 46,
+      "url": "/interstellar"
+    },
+    {
+      "source": "metacriticuser",
+      "value": 8.7,
+      "score": 87.0,
+      "votes": 5772,
+      "url": null
+    },
+    {
+      "source": "trakt",
+      "value": 88,
+      "score": 88,
+      "votes": 80110,
+      "url": null
+    },
+    {
+      "source": "tomatoes",
+      "value": 73,
+      "score": 73,
+      "votes": 373,
+      "url": "/m/interstellar_2014",
+      "fresh": 1
+    },
+    {
+      "source": "popcorn",
+      "value": 87,
+      "score": 87,
+      "votes": 14212,
+      "url": "/m/interstellar_2014"
+    },
+    {
+      "source": "tmdb",
+      "value": 84,
+      "score": 84,
+      "votes": 40475,
+      "url": null
+    },
+    {
+      "source": "letterboxd",
+      "value": 4.5,
+      "score": 90,
+      "votes": 6069124,
+      "url": "/film/interstellar/"
+    },
+    {
+      "source": "rogerebert",
+      "value": 3.5,
+      "score": null,
+      "votes": null,
+      "url": "interstellar-2014"
+    },
+    {
+      "source": "myanimelist",
+      "value": null,
+      "score": null,
+      "votes": null,
+      "url": null
+    }
+  ],
+  "genres": [
+    {
+      "id": 25,
+      "title": "Adventure"
+    },
+    {
+      "id": 6,
+      "title": "Drama"
+    },
+    {
+      "id": 67,
+      "title": "Sci-Fi"
+    },
+    {
+      "id": 16,
+      "title": "Science Fiction"
+    }
+  ],
+  "streams": [],
+  "watch_providers": [
+    {
+      "id": 2,
+      "name": "Apple TV Store"
+    },
+    {
+      "id": 3,
+      "name": "Google Play Movies"
+    },
+    {
+      "id": 7,
+      "name": "Fandango At Home"
+    },
+    {
+      "id": 10,
+      "name": "Amazon Video"
+    },
+    {
+      "id": 15,
+      "name": "Hulu"
+    },
+    {
+      "id": 192,
+      "name": "YouTube"
+    },
+    {
+      "id": 331,
+      "name": "FlixFling"
+    },
+    {
+      "id": 538,
+      "name": "Plex"
+    },
+    {
+      "id": 582,
+      "name": "Paramount+ Amazon Channel"
+    },
+    {
+      "id": 633,
+      "name": "Paramount+ Roku Premium Channel"
+    },
+    {
+      "id": 2285,
+      "name": "JustWatch TV"
+    },
+    {
+      "id": 2303,
+      "name": "Paramount Plus Premium"
+    },
+    {
+      "id": 2616,
+      "name": "Paramount Plus Essential"
+    }
+  ],
+  "production_companies": [
+    {
+      "id": 9996,
+      "name": "Syncopy"
+    },
+    {
+      "id": 13769,
+      "name": "Lynda Obst Productions"
+    },
+    {
+      "id": 923,
+      "name": "Legendary Entertainment"
+    }
+  ],
+  "language": "en",
+  "spoken_language": "en",
+  "country": "US",
+  "certification": "PG-13",
+  "commonsense": true,
+  "age_rating": 11,
+  "commonsense_media": {
+    "common_sense": 11,
+    "common_sense_selection": false,
+    "parental_source": 1,
+    "parental_violence": 4,
+    "parental_nudity": 1,
+    "parental_language": 3,
+    "parental_drinking": 0
+  },
+  "awards": "Won: Best Achievement in Visual Effects (Oscars, 2015). Plus 4 Oscar nominations, 1 win & 3 nominations.",
+  "status": "Released",
+  "trailer": "https://youtube.com/watch?v=LY19rHKAaAg",
+  "poster": "https://image.tmdb.org/t/p/original/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg",
+  "backdrop": "https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/5XNQBqnBwPA9yT0jZ0p3s8bbLh0.jpg"
+}
