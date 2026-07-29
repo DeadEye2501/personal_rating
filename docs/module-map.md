@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 17 модулей
+## backend — 19 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 33 строк
+### `backend/model/__init__.py` — 35 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Source`, `average_score`
+Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Source`, `average_score`
 
 
 ### `backend/model/credit.py` — 18 строк
@@ -61,7 +61,7 @@
 
 - `class Item` (16)
 
-### `backend/model/kinds.py` — 58 строк
+### `backend/model/kinds.py` — 70 строк
 
 Закрытые наборы значений, которыми описывается карточка.
 
@@ -69,6 +69,7 @@
 
 - `class Kind(StrEnum)` (4)
 - `class Source(StrEnum)` (7)
+- `class GenreSource(StrEnum)` (10)
 - `class IdSource(StrEnum)` (7)
 - `class RatingSource(StrEnum)` (11)
 - `class PersonRole(StrEnum)` (4)
@@ -84,13 +85,26 @@
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
 
-### `backend/storage/repository/base.py` — 27 строк
+### `backend/storage/repository/base.py` — 36 строк
 
 Общее у репозиториев: сессия и три способа с ней обойтись.
 
 Зависит от: —
 
-- `class Repository` (21)
+- `class Repository` (28)
+
+### `backend/storage/repository/genres.py` — 84 строк
+
+Жанры карточки и разрешение чужих идентификаторов в свои.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
+
+- `def _to_genre(row) -> Genre` (2)
+- `class GenresRepository(Repository)` (64)
+  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (28)
+  - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (16)
+  - `async def genres_of(self, item_id: int) -> list[Genre]` (7)
+  - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (6)
 
 ### `backend/storage/repository/library.py` — 117 строк
 
@@ -121,7 +135,7 @@
   - `async def get(self, item_id: int) -> Rating | None` (14)
   - `async def clear(self, item_id: int) -> None` (5)
 
-### `backend/storage/repository/tags.py` — 111 строк
+### `backend/storage/repository/tags.py` — 109 строк
 
 Мои теги: наборы по типам содержимого и их развеска по карточкам.
 
@@ -129,15 +143,27 @@
 
 - `class WrongTagKind(Exception)` (2)
 - `class TagExists(Exception)` (2)
-- `class TagsRepository(Repository)` (90)
+- `class TagsRepository(Repository)` (88)
   - `async def create(self, kind: Kind, name: str) -> int` (21)
   - `async def list_for_kind(self, kind: Kind) -> list[tuple[int, str]]` (6)
-  - `async def reorder(self, kind: Kind, tag_ids: list[int]) -> None` (12)
+  - `async def reorder(self, kind: Kind, tag_ids: list[int]) -> None` (10)
   - `async def rename(self, tag_id: int, name: str) -> None` (4)
   - `async def delete(self, tag_id: int) -> None` (2)
   - `async def assign(self, item_id: int, tag_id: int) -> None` (20)
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (7)
+
+### `backend/storage/repository/wishlist.py` — 42 строк
+
+Список запланированного.
+
+Зависит от: `backend.storage.repository.base`, `backend.storage.tables`
+
+- `class WishlistRepository(Repository)` (31)
+  - `async def add(self, item_id: int, now: datetime) -> None` (7)
+  - `async def remove(self, item_id: int) -> None` (4)
+  - `async def contains(self, item_id: int) -> bool` (6)
+  - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
 ### `backend/storage/session.py` — 44 строк
 

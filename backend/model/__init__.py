@@ -7,6 +7,7 @@ from backend.model.item import Item
 from backend.model.kinds import (
     CompanyRole,
     GenreKind,
+    GenreSource,
     IdSource,
     Kind,
     PersonRole,
@@ -22,6 +23,7 @@ __all__ = [
     "ExternalRating",
     "Genre",
     "GenreKind",
+    "GenreSource",
     "IdSource",
     "Item",
     "Kind",

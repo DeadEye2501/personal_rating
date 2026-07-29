@@ -58,7 +58,7 @@ class LibraryRepository(Repository):
         return _to_item(row) if row else None
 
     async def _many(self, statement: Select) -> list[Item]:
-        return [_to_item(row) for row in await self._rows(statement)]
+        return await self._mapped(statement, _to_item)
 
     async def create(self, item: Item) -> int:
         async with self._sessions() as session:
@@ -95,7 +95,7 @@ class LibraryRepository(Repository):
         return await self._many(
             select(item_table)
             .where(item_table.c.kind == kind)
-            .order_by(item_table.c.title)
+            .order_by(item_table.c.title, item_table.c.id)
             .limit(limit)
             .offset(offset)
         )

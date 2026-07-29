@@ -1,6 +1,6 @@
 """Мои теги: наборы по типам содержимого и их развеска по карточкам."""
 
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import Select, delete, func, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.exc import IntegrityError
 
@@ -20,8 +20,8 @@ class TagExists(Exception):
 
 
 class TagsRepository(Repository):
-    async def _named(self, statement) -> list[tuple[int, str]]:
-        return [(row.id, row.name) for row in await self._rows(statement)]
+    async def _named(self, statement: Select) -> list[tuple[int, str]]:
+        return await self._mapped(statement, lambda row: (row.id, row.name))
 
     async def create(self, kind: Kind, name: str) -> int:
         """Новый тег встаёт в конец своего набора."""
@@ -56,14 +56,12 @@ class TagsRepository(Repository):
         """Порядок ручной: строки переставляют перетаскиванием, и пережить
         перезапуск он обязан. Набор в условии — чтобы перестановка в одном не
         перенумеровала соседний."""
-        async with self._sessions() as session:
-            for position, tag_id in enumerate(tag_ids):
-                await session.execute(
-                    update(tag_table)
-                    .where(tag_table.c.id == tag_id, tag_table.c.kind == kind)
-                    .values(position=position)
-                )
-            await session.commit()
+        await self._run(*[
+            update(tag_table)
+            .where(tag_table.c.id == tag_id, tag_table.c.kind == kind)
+            .values(position=position)
+            for position, tag_id in enumerate(tag_ids)
+        ])
 
     async def rename(self, tag_id: int, name: str) -> None:
         await self._run(

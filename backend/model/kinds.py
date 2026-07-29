@@ -18,6 +18,18 @@ class Source(StrEnum):
     GOG = "gog"
 
 
+class GenreSource(StrEnum):
+    """Чей справочник жанров. Магазин даёт два: жанр и тег нумеруются у него
+    порознь, и у Steam `9` — это жанр «Гонки» и тег «Стратегия» одновременно.
+    Слитые в один источник, они выдали бы стратегии гонки."""
+
+    TMDB = "tmdb"
+    STEAM = "steam"
+    STEAM_TAG = "steam_tag"
+    GOG = "gog"
+    GOG_TAG = "gog_tag"
+
+
 class IdSource(StrEnum):
     """Всё, что не основной источник карточки."""
 
