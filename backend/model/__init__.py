@@ -5,6 +5,7 @@ from backend.model.credit import Credit
 from backend.model.external import ExternalId, ExternalRating
 from backend.model.genre import Genre
 from backend.model.item import Item, new_manual_item, new_source_id
+from backend.model.link import ExternalLink, parse_link
 from backend.model.kinds import (
     CompanyRole,
     GenreKind,
@@ -24,6 +25,7 @@ __all__ = [
     "CompanyRole",
     "Credit",
     "ExternalId",
+    "ExternalLink",
     "ExternalRating",
     "Genre",
     "GenreKind",
@@ -42,4 +44,5 @@ __all__ = [
     "average_score",
     "new_manual_item",
     "new_source_id",
+    "parse_link",
 ]

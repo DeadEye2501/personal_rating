@@ -113,6 +113,19 @@
   - `FILM` = `'film'`
   - `GAME` = `'game'`
 
+### `backend/model/link.py`
+
+- `class ExternalLink`
+  - `source: Source`
+  - `source_id: str`
+  - `kind: Kind`
+- `_TMDB` = `re.compile('themoviedb\\.org/(movie|tv)/(\\d+)',…`
+- `_STEAM` = `re.compile('store\\.steampowered\\.com/(?:ageche…`
+- `_GOG` = `re.compile('gog\\.com/(?:[a-z-]+/)?game/([a-z0-9…`
+- `_BARE` = `re.compile('^\\d+$')`
+- `_TMDB_KINDS` = `словарь из 2`
+- `_FILMS` = `набор из 2`
+
 ### `backend/model/rating.py`
 
 - `class Rating`
@@ -450,6 +463,12 @@
 - `BANNED_IN_CLIENT` = `набор из 5`
 - `BANNED_IN_BACKEND` = `набор из 2`
 - `ALLOWED_FROM_BACKEND` = `набор из 2`
+
+### `tests/backend/test_links.py`
+
+- `ADDRESSES` = `набор из 6`
+- `SHOUTED` = `набор из 5`
+- `NONSENSE` = `набор из 7`
 
 ### `tests/backend/test_migrations.py`
 

@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 51 модулей
+## backend — 52 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 45 строк
+### `backend/model/__init__.py` — 48 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Source`, `SourceCard`, `Suggestion`, `average_score`, `new_manual_item`, `new_source_id`
+Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Source`, `SourceCard`, `Suggestion`, `average_score`, `new_manual_item`, `new_source_id`, `parse_link`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -85,6 +85,15 @@
 - `class PersonRole(StrEnum)` (4)
 - `class CompanyRole(StrEnum)` (3)
 - `class GenreKind(StrEnum)` (5)
+
+### `backend/model/link.py` — 66 строк
+
+Разобранная ссылка на страницу во внешней базе.
+
+Зависит от: `backend.model.kinds`
+
+- `class ExternalLink` (4)
+- `def parse_link(raw: str, kind: Kind | None=None) -> ExternalLink | None` (34)
 
 ### `backend/model/rating.py` — 23 строк
 
@@ -751,7 +760,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 41 модулей
+## tests — 42 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1028,6 +1037,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def make_item(**overrides) -> Item` (12)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
+
+### `tests/backend/test_links.py` — 130 строк
+
+
+
+Зависит от: `backend.model`, `backend.model.link`
+
+Тестов: 14
+
 
 ### `tests/backend/test_manual_cards.py` — 210 строк
 
