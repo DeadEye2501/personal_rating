@@ -61,7 +61,6 @@ personal_rating/
 │  │  ├─ credits.py              люди и студии одной реализацией
 │  │  └─ external.py             external_id и external_rating
 │  └─ service/
-│     ├─ __init__.py
 │     ├─ images.py               чистая обрезка байтов, без сети и базы
 │     ├─ posters.py              скачать и сохранить обложку
 │     ├─ links.py                чистый разбор ссылки, без сети и базы
@@ -1386,7 +1385,7 @@ JPEG теряет качество на ровном месте и обнуля�
 
 **Файлы:**
 - Изменить: `Pipfile`, `Pipfile.lock`
-- Создать: `backend/service/__init__.py`, `backend/service/images.py`
+- Создать: `backend/service/images.py`
 - Создать: `tests/backend/test_images.py`
 
 **Интерфейсы:**
@@ -1494,7 +1493,7 @@ def test_empty_bytes_are_a_named_error():
 
 - [ ] **Шаг 4: Реализовать**
 
-Создать `backend/service/__init__.py` пустым и `backend/service/images.py`:
+Создать `backend/service/images.py`:
 
 ```python
 import io

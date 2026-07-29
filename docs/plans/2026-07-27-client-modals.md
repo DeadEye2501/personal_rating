@@ -1487,7 +1487,7 @@ git commit -m "feat: перетаскивание строк списка"
 игр независимы; жанров наборов два, кино и игры.
 
 **Файлы:**
-- Создать: `client/modals/__init__.py` (пустой), `client/modals/filters.py`,
+- Создать: `client/modals/filters.py`,
   `client/widgets/newrow.py`
 - Создать: `tests/client/test_filters.py`
 

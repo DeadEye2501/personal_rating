@@ -111,9 +111,7 @@ personal_rating/
 плана 1 проверял только `backend`; теперь появляется вторая половина правила.
 
 **Файлы:**
-- Создать: `client/theme/__init__.py`, `client/widgets/__init__.py`,
-  `client/pages/__init__.py`
-- Создать: `tests/client/__init__.py`, `tests/client/conftest.py`
+- Создать: `tests/client/conftest.py`
 - Изменить: `tests/backend/test_layers.py`, `pytest.ini`, `Pipfile`
 
 **Интерфейсы:**
@@ -157,10 +155,11 @@ def test_backend_does_not_import_qt():
 
 - [ ] **Шаг 3: Завести пакеты и общую фикстуру**
 
-Создать пустыми: `client/theme/__init__.py`, `client/widgets/__init__.py`,
-`client/pages/__init__.py`. `client/__init__.py` уже создан планом 1.
+Маркеры пакета не заводим: с PEP 420 папка с `.py` и так пакет.
+`client/__init__.py` план 1 завёл по другой причине — пустую папку git не
+хранит, а тест границы слоёв требует, чтобы пакет существовал.
 
-Создать `tests/client/__init__.py` пустым и `tests/client/conftest.py`:
+Создать `tests/client/conftest.py`:
 
 ```python
 import pytest
@@ -788,7 +787,7 @@ git commit -m "feat: типографика и размеры из макета"
 **Файлы:**
 - Создать: `scripts/probe_fill_axis.py`
 - Создать: `client/theme/assets/` со шрифтами
-- Создать: `client/theme/icons.py`, `client/theme/__init__.py`
+- Создать: `client/theme/icons.py`, `client/theme/__init__.py` (с реэкспортом)
 - Создать: `tests/client/test_icons.py`
 
 **Интерфейсы:**
