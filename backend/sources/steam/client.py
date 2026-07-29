@@ -1,0 +1,145 @@
+"""Разговор со Steam по сети."""
+
+import json
+import logging
+from dataclasses import replace
+from datetime import timedelta
+from urllib.parse import quote
+
+import httpx
+
+from backend.model import GenreSource, Kind
+from backend.sources.errors import (
+    BROKEN_BY_PARSING,
+    Found,
+    Missing,
+    Outcome,
+    Reason,
+    Refusal,
+    broken,
+)
+from backend.sources.http import SourceHttp
+from backend.sources.steam.parse import parse_card, parse_search, parse_tags
+
+logger = logging.getLogger(__name__)
+
+SEARCH = "https://steamcommunity.com/actions/SearchApps"
+DETAILS = "https://store.steampowered.com/api/appdetails"
+# Теги живут отдельно от карточки: в `appdetails` их нет вовсе.
+TAGS = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
+
+# `country_code: RU` отдаёт пустой ответ — `visible: false`,
+# `unvailable_for_country_restriction: true`, проверено живьём. Нужен `US`.
+TAGS_CONTEXT = {"language": "russian", "country_code": "US", "steam_realm": 1}
+TAGS_WANTED = {"include_tag_count": 20}
+
+# Документации у Steam нет вовсе; 220 запросов подряд прошли без троттлинга.
+# Откат свой, на случай если он всё-таки появится.
+RATE_BACKOFF = timedelta(minutes=5)
+
+
+class SteamClient:
+    """Аргумент `kind` есть ради общего контракта каталожных клиентов и
+    игнорируется: у Steam содержимое одного типа."""
+
+    def __init__(self, http: SourceHttp) -> None:
+        self._http = http
+
+    def _fail(self, response: httpx.Response) -> Refusal:
+        if response.status_code == 429:
+            self._http.breaker.trip(RATE_BACKOFF, Reason.RATE)
+            return Refusal(
+                source="steam", reason=Reason.RATE, retry_after=RATE_BACKOFF
+            )
+        return Refusal(
+            source="steam",
+            reason=Reason.BROKEN,
+            detail=f"HTTP {response.status_code}",
+        )
+
+    async def search(self, query: str, kind: Kind) -> Outcome:
+        # Строка поиска идёт частью пути, поэтому её надо экранировать: `?` и
+        # `#` для URL структурные, и «Who's Your Daddy?!» уедет обрезанным до
+        # «Who's Your Daddy». Steam при этом ответит 200 и найдёт не то, что
+        # просили, — то есть тихо неверная выдача, а не отказ.
+        response = await self._http.get(f"{SEARCH}/{quote(query, safe='')}")
+        if not isinstance(response, httpx.Response):
+            return response
+        if response.status_code != 200:
+            return self._fail(response)
+        try:
+            return Found(parse_search(response.json()))
+        except BROKEN_BY_PARSING as error:
+            logger.warning("steam: выдача поиска не разобралась — %s", error)
+            return broken("steam", error)
+
+    async def card(self, source_id: str, kind: Kind) -> Outcome:
+        response = await self._http.get(
+            DETAILS, params={"appids": source_id, "l": "russian"}
+        )
+        if not isinstance(response, httpx.Response):
+            return response
+        # Битый или отсутствующий appids даёт 400 и тело `null`.
+        if response.status_code != 200:
+            return self._fail(response)
+
+        try:
+            payload = response.json()
+            block = payload.get(source_id)
+            if block is None:
+                # Ответ про другую игру. Молча подставить его — значит записать
+                # чужую карточку под видом запрошенной.
+                logger.warning(
+                    "steam: ответ не про %s, а про %s", source_id, list(payload)
+                )
+                return Refusal(
+                    source="steam",
+                    reason=Reason.BROKEN,
+                    detail="ответ про другой appid",
+                )
+            if not block.get("success"):
+                # Ответ, а не отказ: не различает «нет» и «скрыта из витрины».
+                return Missing()
+            card = parse_card(block["data"])
+        except BROKEN_BY_PARSING as error:
+            logger.warning("steam: карточка %s не разобралась — %s", source_id, error)
+            return broken("steam", error)
+
+        # Теги добираются вне общего `try`: карточка уже собрана и годится, и
+        # уронить её из-за них было бы обменом целого на украшение.
+        return Found(
+            replace(
+                card, genre_ext_ids=card.genre_ext_ids + await self._tags(source_id)
+            )
+        )
+
+    async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]:
+        """Теги отдельным запросом: в `appdetails` их нет вовсе.
+
+        Отказ здесь карточку не роняет — жанров у Steam всего двенадцать на
+        весь магазин, так что без тегов карточка беднее, а не сломана."""
+        try:
+            wanted = {
+                "ids": [{"appid": int(source_id)}],
+                "context": TAGS_CONTEXT,
+                "data_request": TAGS_WANTED,
+            }
+            response = await self._http.get(
+                TAGS, params={"input_json": json.dumps(wanted)}
+            )
+            if not isinstance(response, httpx.Response):
+                return ()
+            if response.status_code != 200:
+                logger.warning(
+                    "steam: теги %s не приехали, код %s",
+                    source_id,
+                    response.status_code,
+                )
+                return ()
+            return parse_tags(response.json())
+        except BROKEN_BY_PARSING as error:
+            logger.warning("steam: теги %s не разобрались — %s", source_id, error)
+            return ()
+
+    async def aclose(self) -> None:
+        await self._http.aclose()

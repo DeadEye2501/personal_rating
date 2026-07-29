@@ -16,6 +16,7 @@ from backend.model import (
     Source,
     SourceCard,
 )
+from backend.sources.convert import genres, rating
 
 POSTER_BASE = "https://image.tmdb.org/t/p/w500"
 
@@ -48,19 +49,11 @@ def _poster(payload: dict) -> str:
 
 
 def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]:
-    """В детальном ответе жанр — объект с именем, а не голое число."""
-    return tuple(
-        (GenreSource.TMDB, str(genre["id"])) for genre in payload.get("genres", [])
-    )
+    return genres(GenreSource.TMDB, payload.get("genres", []))
 
 
 def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]:
-    value = payload.get("vote_average") or None
-    if value is None:
-        return ()
-    return (
-        ExternalRating(source=RatingSource.TMDB, value=float(value), fetched_at=now),
-    )
+    return rating(RatingSource.TMDB, payload.get("vote_average"), now)
 
 
 def _imdb(value: str | None) -> tuple[ExternalId, ...]:

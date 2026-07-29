@@ -18,5 +18,8 @@ class SourceCard:
     # `SearchHit`: у Steam и GOG жанры и теги нумеруются порознь.
     genre_ext_ids: tuple[tuple[GenreSource, str], ...] = field(default_factory=tuple)
     people: tuple[Credit, ...] = field(default_factory=tuple)
+    # Люди приходят только от TMDB, студии — только от магазинов, и пусто у
+    # каждого из них своё, а не общее «данных нет».
+    companies: tuple[Credit, ...] = field(default_factory=tuple)
     external_ids: tuple[ExternalId, ...] = field(default_factory=tuple)
     ratings: tuple[ExternalRating, ...] = field(default_factory=tuple)

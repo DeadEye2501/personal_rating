@@ -39,6 +39,18 @@ class Refusal:
 Outcome: TypeAlias = Found | Missing | Refusal
 
 
+# Чем падает разбор чужого ответа. Не только `ValueError`: на словаре вместо
+# списка приезжает `TypeError`, на отсутствующем ключе — `KeyError`, на `None`
+# вместо тела — `AttributeError`.
+BROKEN_BY_PARSING = (ValueError, TypeError, KeyError, AttributeError)
+
+
+def broken(source: str, error: Exception) -> Refusal:
+    """Отказ по неразобранному ответу. Запись в лог остаётся на месте вызова:
+    сообщение у каждого своё, и по нему потом ищут причину."""
+    return Refusal(source=source, reason=Reason.BROKEN, detail=str(error))
+
+
 def is_answer(outcome: Outcome) -> bool:
     """Источник ответил: нашёл или честно сказал, что не знает. Отказ ответом не
     считается никогда, а можно ли записать ответ — решает пишущий: у поиска GOG,

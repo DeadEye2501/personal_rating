@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 26 модулей
+## backend — 29 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -28,13 +28,13 @@
 Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `SearchHit`, `Source`, `SourceCard`, `average_score`, `new_manual_item`, `new_source_id`
 
 
-### `backend/model/card.py` — 22 строк
+### `backend/model/card.py` — 25 строк
 
 Всё, что источник отдал о карточке, в наших типах.
 
 Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.item`, `backend.model.kinds`
 
-- `class SourceCard` (11)
+- `class SourceCard` (14)
 
 ### `backend/model/credit.py` — 18 строк
 
@@ -103,7 +103,16 @@
 
 - `class SearchHit` (19)
 
-### `backend/sources/errors.py` — 46 строк
+### `backend/sources/convert.py` — 23 строк
+
+Куски чужого ответа, которые все источники переводят одинаково.
+
+Зависит от: `backend.model`
+
+- `def genres(space: GenreSource, rows: list[dict]) -> tuple[tuple[GenreSource, str], ...]` (4)
+- `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
+
+### `backend/sources/errors.py` — 58 строк
 
 Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
 
@@ -114,6 +123,7 @@
 - `class Missing` (3)
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
+- `def broken(source: str, error: Exception) -> Refusal` (4)
 - `def is_answer(outcome: Outcome) -> bool` (5)
 
 ### `backend/sources/http.py` — 87 строк
@@ -130,7 +140,34 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/client.py` — 112 строк
+### `backend/sources/steam/client.py` — 145 строк
+
+Разговор со Steam по сети.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`
+
+- `class SteamClient` (105)
+  - `def _fail(self, response: httpx.Response) -> Refusal` (11)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (39)
+  - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
+  - `async def aclose(self) -> None` (2)
+
+### `backend/sources/steam/parse.py` — 102 строк
+
+Перевод ответов Steam в наши типы.
+
+Зависит от: `backend.model`, `backend.sources.convert`
+
+- `def poster_url(appid: str) -> str` (4)
+- `def parse_search(payload: list[dict]) -> list[SearchHit]` (11)
+- `def _year(value: str | None) -> int | None` (7)
+- `def _companies(data: dict) -> tuple[Credit, ...]` (11)
+- `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
+- `def parse_card(data: dict) -> SourceCard` (21)
+- `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
+
+### `backend/sources/tmdb/client.py` — 118 строк
 
 Разговор с TMDB по сети.
 
@@ -144,18 +181,18 @@
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 191 строк
+### `backend/sources/tmdb/parse.py` — 184 строк
 
 Перевод ответов TMDB в наши типы.
 
-Зависит от: `backend.model`
+Зависит от: `backend.model`, `backend.sources.convert`
 
 - `class Incomplete(Exception)` (5)
 - `def _year(value: str | None) -> int | None` (4)
 - `def _released(value: str | None) -> date | None` (7)
 - `def _poster(payload: dict) -> str` (3)
-- `def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (5)
-- `def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]` (7)
+- `def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (2)
+- `def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]` (2)
 - `def _imdb(value: str | None) -> tuple[ExternalId, ...]` (4)
 - `def _person(row: dict, role: PersonRole, position: int | None=None) -> Credit` (10)
 - `def _cast(rows: list[dict]) -> list[Credit]` (5)
@@ -452,7 +489,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 26 модулей
+## tests — 27 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -462,7 +499,7 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 67 строк
+### `tests/backend/sources/conftest.py` — 82 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
@@ -475,9 +512,9 @@
 - `def _meta(relative: str) -> dict` (3)
 - `def fixture()` (3)
 - `def meta()` (2)
-- `def replay()` (18)
-  - `def build(relative: str) -> httpx.MockTransport` (11)
-    - `def handler(request: httpx.Request) -> httpx.Response` (4)
+- `def replay()` (33)
+  - `def build(*relatives: str) -> httpx.MockTransport` (21)
+    - `def handler(request: httpx.Request) -> httpx.Response` (7)
 
 ### `tests/backend/sources/test_errors.py` — 93 строк
 
@@ -499,13 +536,23 @@
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)
 
-### `tests/backend/sources/test_tmdb_card.py` — 280 строк
+### `tests/backend/sources/test_steam.py` — 332 строк ⚠ подошёл к 300
+
+Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
+
+Тестов: 25
+
+- `def block_of(payload: dict) -> dict` (2)
+
+### `tests/backend/sources/test_tmdb_card.py` — 292 строк
 
 Второй круг загрузки: карточка, которую уже можно записать.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
-Тестов: 24
+Тестов: 25
 
 
 ### `tests/backend/sources/test_tmdb_failures.py` — 207 строк

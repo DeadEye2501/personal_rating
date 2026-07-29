@@ -24,6 +24,7 @@
   - `item: Item`
   - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
   - `people: tuple[Credit, ...]` = `field(default_factory=tuple)`
+  - `companies: tuple[Credit, ...]` = `field(default_factory=tuple)`
   - `external_ids: tuple[ExternalId, ...]` = `field(default_factory=tuple)`
   - `ratings: tuple[ExternalRating, ...]` = `field(default_factory=tuple)`
 
@@ -152,6 +153,7 @@
   - `retry_after: timedelta | None` = `None`
   - `detail: str` = `''`
 - `Outcome: TypeAlias` = `Found | Missing | Refusal`
+- `BROKEN_BY_PARSING` = `набор из 4`
 
 ### `backend/sources/http.py`
 
@@ -159,12 +161,26 @@
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
 
+### `backend/sources/steam/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `SEARCH` = `'https://steamcommunity.com/actions/SearchApps'`
+- `DETAILS` = `'https://store.steampowered.com/api/appdetails'`
+- `TAGS` = `'https://api.steampowered.com/IStoreBrowseServic…`
+- `TAGS_CONTEXT` = `словарь из 3`
+- `TAGS_WANTED` = `словарь из 1`
+- `RATE_BACKOFF` = `timedelta(minutes=5)`
+
+### `backend/sources/steam/parse.py`
+
+- `ASSETS` = `'https://shared.akamai.steamstatic.com/store_ite…`
+- `YEAR` = `re.compile('(?:19|20)\\d{2}')`
+
 ### `backend/sources/tmdb/client.py`
 
 - `logger` = `logging.getLogger(__name__)`
 - `BASE` = `'https://api.themoviedb.org/3'`
 - `LANGUAGE` = `'ru-RU'`
-- `BROKEN_BY_PARSING` = `набор из 4`
 - `RATE_BACKOFF` = `timedelta(minutes=1)`
 - `_ABSENT` = `набор из 2`
 - `class TmdbClient`

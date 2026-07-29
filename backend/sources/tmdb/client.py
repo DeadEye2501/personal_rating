@@ -6,7 +6,15 @@ from datetime import timedelta
 import httpx
 
 from backend.model import Kind
-from backend.sources.errors import Found, Missing, Outcome, Reason, Refusal
+from backend.sources.errors import (
+    BROKEN_BY_PARSING,
+    Found,
+    Missing,
+    Outcome,
+    Reason,
+    Refusal,
+    broken,
+)
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.parse import (
     Incomplete,
@@ -19,8 +27,6 @@ logger = logging.getLogger(__name__)
 
 BASE = "https://api.themoviedb.org/3"
 LANGUAGE = "ru-RU"
-
-BROKEN_BY_PARSING = (ValueError, TypeError, KeyError, AttributeError)
 
 # Суточной квоты у TMDB нет, `Retry-After` он не отдаёт — откат свой.
 RATE_BACKOFF = timedelta(minutes=1)
@@ -87,7 +93,7 @@ class TmdbClient:
             return Found(parse_search(response.json(), kind))
         except BROKEN_BY_PARSING as error:
             logger.warning("tmdb: выдача поиска не разобралась — %s", error)
-            return Refusal(source="tmdb", reason=Reason.BROKEN, detail=str(error))
+            return broken("tmdb", error)
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         path = "tv" if kind is Kind.SERIES else "movie"
@@ -106,7 +112,7 @@ class TmdbClient:
             return Found(parse(response.json()))
         except (Incomplete, *BROKEN_BY_PARSING) as error:
             logger.warning("tmdb: карточка %s не разобралась — %s", source_id, error)
-            return Refusal(source="tmdb", reason=Reason.BROKEN, detail=str(error))
+            return broken("tmdb", error)
 
     async def aclose(self) -> None:
         await self._http.aclose()

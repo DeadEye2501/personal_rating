@@ -5,7 +5,7 @@ from datetime import date
 import httpx
 import pytest
 
-from backend.model import Kind, PersonRole, RatingSource, Source
+from backend.model import GenreSource, Kind, PersonRole, RatingSource, Source
 from backend.sources.errors import Found, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
@@ -43,6 +43,18 @@ def test_genres_come_from_the_named_block_not_the_search_one(fixture):
     card = parse_movie(fixture("tmdb/movie_detail.json"))
 
     assert [ext_id for _space, ext_id in card.genre_ext_ids] == ["12", "18", "878"]
+    # Пространство едет вместе с номером: `18` — это драма у TMDB и что угодно
+    # другое у Steam, а справочник переводит номер по пространству.
+    assert {space for space, _ in card.genre_ext_ids} == {GenreSource.TMDB}
+
+
+def test_a_film_nobody_rated_has_no_rating():
+    """У неоценённого `vote_average` приходит нулём, и записать его значило бы
+    объявить, что фильм оценили в ноль."""
+    payload = {"id": 1, "title": "Никем не смотрено", "vote_average": 0,
+               "credits": {"cast": [], "crew": []}}
+
+    assert parse_movie(payload).ratings == ()
 
 
 def test_movie_imdb_id_is_taken_from_the_top_level(fixture):
