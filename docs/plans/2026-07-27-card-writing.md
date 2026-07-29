@@ -1867,6 +1867,7 @@ from backend.model import (
     Credit,
     ExternalId,
     ExternalRating,
+    GenreSource,
     IdSource,
     Item,
     Kind,
@@ -1902,7 +1903,9 @@ def source_card(**overrides) -> SourceCard:
         item=Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
                   title="Интерстеллар", synced_at=WHEN, year=2014,
                   poster_url="https://example.com/poster.jpg", runtime=169),
-        genre_ext_ids=("878", "12"),
+        genre_ext_ids=(
+            (GenreSource.TMDB, "878"), (GenreSource.TMDB, "12"),
+        ),
         people=(
             Credit("Кристофер Нолан", PersonRole.DIRECTOR,
                    source=Source.TMDB, source_id="525"),
@@ -2095,7 +2098,9 @@ async def test_an_unknown_genre_does_not_stop_the_card(writer, sessions, caplog)
     """Источник добавил жанр, которого в миграции нет: карточка
     показывается без него, случай попадает в лог."""
     with caplog.at_level(logging.WARNING):
-        item_id = await writer.save(source_card(genre_ext_ids=("878", "99999")))
+        item_id = await writer.save(source_card(genre_ext_ids=(
+            (GenreSource.TMDB, "878"), (GenreSource.TMDB, "99999"),
+        )))
 
     names = {g.name for g in await GenresRepository(sessions).genres_of(item_id)}
     assert names == {"фантастика"}
@@ -2127,7 +2132,7 @@ async def test_companies_are_written_for_a_game(writer, sessions):
 ```python
 import logging
 
-from backend.model import Credit, SourceCard
+from backend.model import Credit, GenreSource, SourceCard
 from backend.service.posters import PosterService
 from backend.sources.errors import Reason, Refusal
 from backend.storage.repository.credits import CreditRepository
@@ -2199,11 +2204,27 @@ class CardWriter:
 
         return item_id
 
+    async def _resolved(self, card: SourceCard) -> list[int]:
+        """Жанры карточки по нашему справочнику.
+
+        Идентификаторы приезжают из разных пространств: жанры магазина и его
+        теги нумеруются порознь, и `9` у Steam — это жанр «Гонки» и тег
+        «Стратегия». Справочник спрашивается по каждому пространству отдельно,
+        а дубли снимаются: два разных тега нередко ведут в один наш жанр."""
+        spaces: dict[GenreSource, list[str]] = {}
+        for space, ext_id in card.genre_ext_ids:
+            spaces.setdefault(space, []).append(ext_id)
+
+        found: list[int] = []
+        for space, ext_ids in spaces.items():
+            for genre_id in await self._genres.resolve(space, ext_ids):
+                if genre_id not in found:
+                    found.append(genre_id)
+        return found
+
     async def _write_the_rest(self, item_id: int, card: SourceCard,
                               poster: bytes | None) -> None:
-        genre_ids = await self._genres.resolve(card.item.source,
-                                               list(card.genre_ext_ids))
-        await self._genres.set_for_item(item_id, genre_ids)
+        await self._genres.set_for_item(item_id, await self._resolved(card))
 
         await self._attach(self._people, item_id, card.people)
         await self._attach(self._companies, item_id, card.companies)
@@ -2500,6 +2521,7 @@ from sqlalchemy import text
 from backend.model import (
     CompanyRole,
     Credit,
+    GenreSource,
     Item,
     Kind,
     PersonRole,
@@ -2534,7 +2556,7 @@ def incoming(**overrides) -> SourceCard:
                   title="Interstellar", synced_at=WHEN, year=2014,
                   synopsis="официальный синопсис", runtime=169,
                   poster_url="https://example.com/poster.jpg"),
-        genre_ext_ids=("878",),
+        genre_ext_ids=((GenreSource.TMDB, "878"),),
         people=(Credit("Кристофер Нолан", PersonRole.DIRECTOR,
                        source=Source.TMDB, source_id="525"),),
         companies=(), external_ids=(), ratings=(),
@@ -2687,7 +2709,7 @@ async def test_a_chosen_genre_is_not_topped_up(linker, sessions):
     item_id = await manual_card(sessions)
     await GenresRepository(sessions).set_for_item(item_id, [1])
 
-    await linker.link(item_id, incoming(genre_ext_ids=("12",)))
+    await linker.link(item_id, incoming(genre_ext_ids=((GenreSource.TMDB, "12"),)))
 
     names = [g.name for g in await GenresRepository(sessions).genres_of(item_id)]
     assert names == ["фантастика"]
@@ -2743,7 +2765,9 @@ async def test_overwrite_does_replace_the_genres_the_source_gave(linker, session
     item_id = await manual_card(sessions)
     await GenresRepository(sessions).set_for_item(item_id, [1])
 
-    await linker.link(item_id, incoming(genre_ext_ids=("12",)), overwrite=True)
+    await linker.link(
+        item_id, incoming(genre_ext_ids=((GenreSource.TMDB, "12"),)), overwrite=True
+    )
 
     names = [g.name for g in await GenresRepository(sessions).genres_of(item_id)]
     assert names == ["приключения"]
