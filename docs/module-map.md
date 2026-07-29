@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 54 модулей
+## backend — 56 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 48 строк
+### `backend/model/__init__.py` — 60 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Source`, `SourceCard`, `Suggestion`, `average_score`, `new_manual_item`, `new_source_id`, `parse_link`
+Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -95,6 +95,19 @@
 - `class ExternalLink` (4)
 - `def parse_link(raw: str, kind: Kind | None=None) -> ExternalLink | None` (34)
 
+### `backend/model/query.py` — 72 строк
+
+Язык, которым лента разговаривает с базой о разделах.
+
+Зависит от: —
+
+- `class Section(StrEnum)` (6)
+- `class Sort(StrEnum)` (10)
+- `class Order` (6)
+- `class Filters` (15)
+- `class Bucket` (5)
+- `class Histogram` (10)
+
 ### `backend/model/rating.py` — 23 строк
 
 Своя оценка карточки.
@@ -127,6 +140,17 @@
 Зависит от: —
 
 - `class Suggestion` (9)
+
+### `backend/model/view.py` — 106 строк
+
+Карточка в том виде, в каком её показывает лента.
+
+Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`
+
+- `class Tag` (5)
+- `class CardView` (32)
+- `def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...]=()) -> CardView` (21)
+- `def view_from_item(item: Item) -> CardView` (18)
 
 ### `backend/service/card_parts.py` — 52 строк
 
@@ -784,7 +808,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 43 модулей
+## tests — 44 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1182,6 +1206,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 26
 
+
+### `tests/backend/test_view_types.py` — 160 строк
+
+
+
+Зависит от: `backend.model`
+
+Тестов: 15
+
+- `def hit(**fields) -> SearchHit` (4)
 
 ### `tests/backend/test_wishlist.py` — 117 строк
 

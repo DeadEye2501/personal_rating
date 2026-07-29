@@ -16,33 +16,45 @@ from backend.model.kinds import (
     RatingSource,
     Source,
 )
+from backend.model.query import Bucket, Filters, Histogram, Order, Section, Sort
 from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.search import SearchHit
 from backend.model.suggestion import Suggestion
+from backend.model.view import CardView, Tag, view_from_hit, view_from_item
 
 __all__ = [
+    "Bucket",
+    "CardView",
     "CompanyRole",
     "Credit",
     "ExternalId",
     "ExternalLink",
     "ExternalRating",
+    "Filters",
     "Genre",
     "GenreKind",
     "GenreSource",
+    "Histogram",
     "IdSource",
     "Item",
     "Kind",
+    "Order",
     "PersonRole",
     "Rating",
     "RatingSource",
     "Ratings",
     "SearchHit",
+    "Section",
+    "Sort",
     "Source",
     "SourceCard",
     "Suggestion",
+    "Tag",
     "average_score",
     "new_manual_item",
     "new_source_id",
     "parse_link",
+    "view_from_hit",
+    "view_from_item",
 ]

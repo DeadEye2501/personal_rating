@@ -126,6 +126,35 @@
 - `_TMDB_KINDS` = `словарь из 2`
 - `_FILMS` = `набор из 2`
 
+### `backend/model/query.py`
+
+- `class Section(StrEnum)`
+  - `RATED` = `'rated'`
+  - `WISHLIST` = `'wishlist'`
+- `class Sort(StrEnum)`
+  - `SCORE` = `'score'`
+  - `RATED_AT` = `'rated_at'`
+  - `YEAR` = `'year'`
+  - `TITLE` = `'title'`
+  - `ADDED_AT` = `'added_at'`
+- `class Order`
+  - `key: Sort`
+  - `descending: bool` = `True`
+- `class Filters`
+  - `tag_ids: tuple[int, ...]` = `набор из 0`
+  - `genre_ids: tuple[int, ...]` = `набор из 0`
+  - `scores: tuple[int, ...]` = `набор из 0`
+  - `excluded_tag_ids: tuple[int, ...]` = `набор из 0`
+  - `excluded_genre_ids: tuple[int, ...]` = `набор из 0`
+  - `excluded_scores: tuple[int, ...]` = `набор из 0`
+- `class Bucket`
+  - `score: int`
+  - `count: int`
+- `class Histogram`
+  - `buckets: tuple[Bucket, ...]`
+  - `total: int`
+  - `average: float | None`
+
 ### `backend/model/rating.py`
 
 - `class Rating`
@@ -163,6 +192,35 @@
   - `name: str`
   - `hint: str`
   - `hint_item_id: int | None`
+
+### `backend/model/view.py`
+
+- `class Tag`
+  - `id: int`
+  - `name: str`
+- `class CardView`
+  - `kind: Kind`
+  - `source: Source`
+  - `source_id: str`
+  - `title: str`
+  - `item_id: int | None` = `None`
+  - `original_title: str` = `''`
+  - `year: int | None` = `None`
+  - `synopsis: str` = `''`
+  - `poster_url: str` = `''`
+  - `runtime: int | None` = `None`
+  - `seasons_count: int | None` = `None`
+  - `episodes_count: int | None` = `None`
+  - `synced_at: datetime | None` = `None`
+  - `genres: tuple[Genre, ...]` = `набор из 0`
+  - `tags: tuple[Tag, ...]` = `набор из 0`
+  - `people: tuple[Credit, ...]` = `набор из 0`
+  - `companies: tuple[Credit, ...]` = `набор из 0`
+  - `external: tuple[ExternalRating, ...]` = `набор из 0`
+  - `external_ids: tuple[ExternalId, ...]` = `набор из 0`
+  - `rating: Rating | None` = `None`
+  - `in_wishlist: bool` = `False`
+- `_OWN_RATING` = `словарь из 2`
 
 ### `backend/service/cards.py`
 
@@ -512,6 +570,10 @@
 - `UNIQUE` = `набор из 4`
 - `COMPOSITE` = `набор из 7`
 - `PARENTS` = `набор из 5`
+
+### `tests/backend/test_view_types.py`
+
+- `DRAMA` = `Genre(id=1, name='Драма', kind=GenreKind.FILM)`
 
 ### `tests/conftest.py`
 
