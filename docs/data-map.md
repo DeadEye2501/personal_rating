@@ -113,6 +113,20 @@
   - `gameplay: int | None` = `None`
   - `review: str` = `''`
 
+### `backend/model/search.py`
+
+- `class SearchHit`
+  - `kind: Kind`
+  - `source: Source`
+  - `source_id: str`
+  - `title: str`
+  - `original_title: str` = `''`
+  - `year: int | None` = `None`
+  - `synopsis: str` = `''`
+  - `poster_url: str` = `''`
+  - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
+  - `source_rating: float | None` = `None`
+
 ### `backend/sources/errors.py`
 
 - `class Reason(StrEnum)`
@@ -135,6 +149,16 @@
 - `logger` = `logging.getLogger(__name__)`
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
+
+### `backend/sources/tmdb/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE` = `'https://api.themoviedb.org/3'`
+- `LANGUAGE` = `'ru-RU'`
+
+### `backend/sources/tmdb/parse.py`
+
+- `POSTER_BASE` = `'https://image.tmdb.org/t/p/w500'`
 
 ### `backend/storage/posters.py`
 
@@ -243,6 +267,10 @@
 ### `tests/alembic_runner.py`
 
 - `ROOT` = `Path(__file__).resolve().parents[1]`
+
+### `tests/backend/sources/conftest.py`
+
+- `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
 
 ### `tests/backend/test_config.py`
 
