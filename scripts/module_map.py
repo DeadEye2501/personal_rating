@@ -12,15 +12,34 @@
 фикстуры, а сами тесты только считаются: их имена говорят сами за себя, а
 общее прячется не в них.
 
-    pipenv run python scripts/module_map.py           пересобрать docs/module-map.md
-    pipenv run python scripts/module_map.py --check   упасть, если карта устарела
+    python <путь до этого файла>           пересобрать docs/module-map.md
+    python <путь до этого файла> --check   упасть, если карта устарела
+
+Файл один на все проекты: копия в проекте и образец в скилле совпадают
+побайтно. Корень ищется сам — от текущей папки вверх до `.git`, — и своего пути в карту
+не пишет: иначе её содержимое зависело бы от того, как её запустили, и
+`--check` расходился бы на ровном месте.
 """
 
 import ast
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+
+def project_root() -> Path:
+    """Корень проекта: ближайшая папка с `.git` от текущей вверх.
+
+    Считается от того, где стоишь, а не от того, где лежит файл: тот же файл
+    живёт копией в проекте и образцом в скилле, и по его пути нашёлся бы
+    репозиторий скилла, а не разбираемый проект."""
+    here = Path.cwd().resolve()
+    for folder in (here, *here.parents):
+        if (folder / ".git").exists():
+            return folder
+    return here
+
+
+ROOT = project_root()
 MAP = ROOT / "docs/module-map.md"
 SKIP = {
     ".git", ".venv", "venv", "env", "__pycache__", "node_modules", "build",
@@ -193,7 +212,7 @@ def render() -> str:
     parts = [
         "# Карта модулей",
         "",
-        "Собирается из кода: `pipenv run python scripts/module_map.py`.",
+        "Собирается из кода, а не ведётся руками.",
         "Править руками нельзя — правки затрёт следующая сборка.",
         "Число в скобках — сколько строк занимает объявление.",
         "",
@@ -213,7 +232,7 @@ def main() -> int:
         if stored == fresh:
             print("карта свежая")
             return 0
-        print("карта устарела: пересобери pipenv run python scripts/module_map.py")
+        print(f"карта устарела: пересобери python {Path(sys.argv[0]).as_posix()}")
         return 1
     MAP.write_text(fresh, encoding="utf-8")
     print(f"карта пересобрана: {len(modules())} модулей")

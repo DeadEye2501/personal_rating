@@ -1,6 +1,6 @@
 # Карта модулей
 
-Собирается из кода: `pipenv run python scripts/module_map.py`.
+Собирается из кода, а не ведётся руками.
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
@@ -301,12 +301,13 @@
 - `def differences(spec: dict, code: dict) -> list[str]` (8)
 - `def main() -> int` (9)
 
-### `scripts/module_map.py` — 224 строк
+### `scripts/module_map.py` — 243 строк
 
 Карта модулей: кто за что отвечает, что объявляет и от кого зависит.
 
 Зависит от: —
 
+- `def project_root() -> Path` (11)
 - `def roots() -> list[str]` (10)
 - `def modules() -> list[tuple[str, ast.Module, int]]` (22)
 - `def signature(node: ast.AST) -> str` (7)
