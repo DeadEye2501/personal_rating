@@ -37,6 +37,7 @@
 - `backend/storage/repository/credits.py:CreditRepository.attach` `f6ddadb4` ≠ `backend/storage/repository/tags.py:TagsRepository.assign` `964e54df` — общего одно выражение `insert(...).on_conflict_do_nothing()`. `assign` до вставки сверяет тип содержимого тега с типом карточки в одной сессии, `attach` собирает набор значений с необязательной позицией
 - `backend/storage/repository/credits.py:IdentityTaken` `2fa82a88` ≠ `backend/storage/repository/library.py:ItemExists` `f94e192e` — пустые наследники `Exception` с разными докстрингами, и в этом смысл: вызывающий различает, какой ключ уникальности занят. Слитые, они это различение стёрли бы
 - `backend/storage/repository/credits.py:companies` `447c5757` ≠ `backend/sources/convert.py:companies` `503e3424` — совпало имя: первая отдаёт репозиторий студий, вторая переводит блок чужого ответа в `Credit`. Ни одна о другой не знает
+- `backend/model/suggestion.py:Suggestion` `89cf839b` ≠ `backend/model/search.py:SearchHit` `41a5effa` — оба несут строку для показа человеку, и на этом сходство кончается: `SearchHit` — кандидат из чужой базы, который ещё не карточка, `Suggestion` — своя строка людей или студий с названием карточки, по которой её узнают. Общего поля нет ни одного
 
 ## Один глагол над разными предметами
 
@@ -44,7 +45,7 @@
 - `backend/storage/repository/tags.py:TagsRepository.list_for_kind` `b0916f5a` ≠ `backend/storage/repository/genres.py:GenresRepository.list_for_kind` `4a9010a7` — разные таблицы и разные наборы значений `kind`; общее уже вынесено в `Repository._mapped`
 - `backend/storage/repository/tags.py:TagsRepository.tags_of` `294ca5f1` ≠ `backend/storage/repository/genres.py:GenresRepository.genres_of` `77d87e9a` — одинаковая форма запроса, разные таблицы, соединения и порядок
 - `backend/storage/repository/credits.py:CreditRepository.credits_of` `07b19ac3` ≠ `backend/storage/repository/tags.py:TagsRepository.tags_of` `294ca5f1` — та же семья, что парой выше, плюс своё: у `credits_of` и набор колонок, и порядок зависят от `Entity.position`, которого у тегов нет
-- `backend/storage/repository/credits.py:CreditRepository.find_by_name` `cd684aa5` ≠ `backend/storage/repository/library.py:LibraryRepository.find_by_title` `6ba1ab68` — общая только идиома сравнения регистра: у названия сравниваются две колонки через `|` и добавлен фильтр по типу содержимого, у имени — одна колонка с порядком по номеру
+- `backend/storage/repository/credits.py:CreditRepository.find_by_name` `cd684aa5` ≠ `backend/storage/repository/library.py:LibraryRepository.find_by_title` `6d17ab66` — общей была идиома сравнения регистра, и её больше нет: она вынесена в `session.folded`. Осталось разное — у названия сравниваются две колонки через `|` и добавлен фильтр по типу содержимого, у имени одна колонка с порядком по номеру
 - `backend/storage/repository/credits.py:CreditRepository._to_credit` `bde6ae7c` ≠ `backend/storage/repository/genres.py:_to_genre` `ae074f0e` — по преобразователю строки на репозиторий; `_to_credit` сделан методом, а не функцией модуля, потому что ему нужен `Entity.roles`
 - `backend/storage/repository/genres.py:_to_genre` `ae074f0e` ≠ `backend/storage/repository/library.py:_to_item` `52c03399` — по одному преобразователю строки на репозиторий, каждый знает свои колонки: ровно тот случай, ради которого заведён `Repository._mapped`
 - `backend/storage/repository/library.py:LibraryRepository.refresh_series_counts` `880542f8` ≠ `backend/storage/repository/library.py:LibraryRepository.replace_fields` `a68829f1` — два пути обновления заведены нарочно: первый обновляет единственное, что тянется из источника, второй пишет поля человека и намеренно не трогает привязку
@@ -53,7 +54,7 @@
 
 - `tests/backend/test_tables.py:counted` `90eaa387` ≠ `tests/backend/test_genre_reference.py:counted` `e5824e9c` — совпало имя: первый асинхронно считает все строки таблицы в базе из объявлений, второй синхронно — `genre_map` с произвольным `JOIN` в базе из миграций
 - `tests/backend/test_tables.py:put` `ee996cab` ≠ `tests/conftest.py:stored.put` `8ffa8012` — фикстура подставляет умолчания и отдаёт ключ, помощник кладёт ровно переданное и ничего не возвращает: ему нужна неполная строка, чтобы проверить отказ ограничения
-- `tests/backend/test_library.py:make_item` `a6bef63e` ≠ `tests/conftest.py:card` `acc7b9c8` — `card` отдаёт идентификатор уже вставленной карточки, `make_item` — незаписанный `Item` с богатыми полями, который и есть предмет проверки
+- `tests/backend/test_library.py:make_item` `a6bef63e` ≠ `tests/conftest.py:card` `586388f2` — `card` отдаёт идентификатор уже вставленной карточки, `make_item` — незаписанный `Item` с богатыми полями, который и есть предмет проверки. Разобрано повторно: у `card` появился параметр `title`, довод не изменился
 - `tests/backend/test_migrations.py:declared` `b2093d76` ≠ `tests/conftest.py:engine` `91ad94d9` — обе поднимают базу из `metadata`, но одна синхронным драйвером (иначе не сравнить через `inspect`), другая асинхронным (иначе с ней не работают репозитории)
 
 ## Инструмент карт: похоже внутри одного дела

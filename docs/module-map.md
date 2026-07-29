@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 44 модулей
+## backend — 45 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 43 строк
+### `backend/model/__init__.py` — 45 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Source`, `SourceCard`, `average_score`, `new_manual_item`, `new_source_id`
+Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Source`, `SourceCard`, `Suggestion`, `average_score`, `new_manual_item`, `new_source_id`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -110,6 +110,14 @@
 Зависит от: `backend.model.kinds`
 
 - `class SearchHit` (19)
+
+### `backend/model/suggestion.py` — 15 строк
+
+Строка подсказки при вводе имени человека или студии.
+
+Зависит от: —
+
+- `class Suggestion` (9)
 
 ### `backend/sources/convert.py` — 52 строк
 
@@ -368,34 +376,37 @@
   - `async def has(self, item_id: int) -> bool` (5)
   - `async def delete(self, item_id: int) -> None` (2)
 
-### `backend/storage/repository/base.py` — 79 строк
+### `backend/storage/repository/base.py` — 86 строк
 
 Общее у репозиториев: сессия и способы с ней обойтись.
 
 Зависит от: —
 
-- `class Repository` (70)
+- `class Repository` (77)
   - `async def _row(self, statement: Executable) -> Row | None` (3)
   - `async def _rows(self, statement: Executable) -> list[Row]` (3)
   - `async def _mapped(self, statement: Executable, make: Callable[[Row], object])` (3)
+  - `async def _maybe(self, statement: Executable, make: Callable[[Row], object])` (6)
   - `async def _has_item(self, table: Table, item_id: int) -> bool` (8)
   - `def _clearing(table: Table, item_id: int) -> Delete` (7)
   - `async def _created(self, statement: Executable, taken: Exception) -> int` (15)
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (7)
 
-### `backend/storage/repository/credits.py` — 165 строк
+### `backend/storage/repository/credits.py` — 236 строк
 
-Люди и студии в ролях на карточке.
+Всё, что приложение делает в базе с человеком или студией как с
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
 
 - `class IdentityTaken(Exception)` (2)
 - `class Entity` (8)
-- `class CreditRepository(Repository)` (123)
+- `class CreditRepository(Repository)` (178)
   - `def _link(self) -> Column` (2)
-  - `def _same_name(self, name: str) -> ColumnElement[bool]` (4)
-  - `async def _found_id(self, statement: Select) -> int | None` (3)
+  - `def _folded_name(self) -> ColumnElement[str]` (2)
+  - `def _same_name(self, name: str) -> ColumnElement[bool]` (2)
+  - `def _name_starts_with(self, name: str) -> ColumnElement[bool]` (4)
+  - `async def _found_id(self, statement: Select) -> int | None` (2)
   - `async def create(self, name: str, source: Source | None=None, source_id: str | None=None) -> int` (9)
   - `async def create_manual(self, name: str) -> int` (5)
   - `async def find_by_source(self, source: Source, source_id: str) -> int | None` (7)
@@ -405,6 +416,9 @@
   - `async def attach(self, item_id: int, entity_id: int, role: PersonRole | CompanyRole, position: int | None=None) -> None` (13)
   - `async def detach_all(self, item_id: int) -> None` (2)
   - `async def credits_of(self, item_id: int) -> list[Credit]` (14)
+  - `async def suggest(self, name: str, limit: int=10) -> list[Suggestion]` (15)
+  - `def _linked(self, entity_id: int) -> Select` (10)
+  - `async def _hint(self, entity_id: int) -> tuple[str, int | None]` (21)
   - `def _to_credit(self, row: Row) -> Credit` (11)
 - `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 - `def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
@@ -422,7 +436,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 178 строк
+### `backend/storage/repository/library.py` — 177 строк
 
 Карточки библиотеки.
 
@@ -431,8 +445,8 @@
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
 - `def _to_item(row: Row) -> Item` (22)
-- `class LibraryRepository(Repository)` (119)
-  - `async def _one(self, statement: Select) -> Item | None` (3)
+- `class LibraryRepository(Repository)` (118)
+  - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
@@ -445,18 +459,19 @@
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
-### `backend/storage/repository/ratings.py` — 67 строк
+### `backend/storage/repository/ratings.py` — 71 строк
 
 Моя оценка карточки.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
-- `class RatingsRepository(Repository)` (55)
+- `def _to_rating(row) -> Rating` (11)
+- `class RatingsRepository(Repository)` (46)
   - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (11)
   - `async def set_score(self, item_id: int, score: float | None, now: datetime) -> None` (3)
   - `async def set_aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None, now: datetime) -> float | None` (16)
   - `async def set_review(self, item_id: int, review: str, now: datetime) -> None` (2)
-  - `async def get(self, item_id: int) -> Rating | None` (14)
+  - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
 ### `backend/storage/repository/tags.py` — 109 строк
@@ -490,13 +505,14 @@
   - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
-### `backend/storage/session.py` — 44 строк
+### `backend/storage/session.py` — 50 строк
 
 Доступ к основной базе.
 
 Зависит от: —
 
 - `def fold(value: str | None) -> str | None` (5)
+- `def folded(column: ColumnElement) -> ColumnElement[str]` (4)
 - `def prepare_connection(dbapi_connection) -> None` (9)
 - `def create_engine(path: Path) -> AsyncEngine` (9)
   - `def prepare(dbapi_connection, _record)` (2)
@@ -666,7 +682,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 34 модулей
+## tests — 35 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -694,11 +710,11 @@
   - `def build(*relatives: str) -> httpx.MockTransport` (21)
     - `def handler(request: httpx.Request) -> httpx.Response` (7)
 
-### `tests/backend/sources/test_convert.py` — 94 строк
+### `tests/backend/sources/test_convert.py` — 91 строк
 
 Общее у разборов: перевод чужих кусков ответа в наши типы.
 
-Зависит от: `backend.model`, `backend.sources.convert`
+Зависит от: `backend.model`, `backend.sources.convert`, `tests.conftest`
 
 Тестов: 11
 
@@ -948,6 +964,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Base(DeclarativeBase)` (2)
 - `class Note(Base)` (5)
 
+### `tests/backend/test_suggestions.py` — 204 строк
+
+Подсказка при вводе имени: тёзок различают по узнаваемой карточке.
+
+Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.ratings`, `backend.storage.repository.wishlist`, `backend.storage.tables`, `tests.conftest`
+
+Тестов: 14
+
+- `async def person_with(sessions, name: str, item_ids: list[int]) -> int` (6)
+
 ### `tests/backend/test_tables.py` — 196 строк
 
 
@@ -977,7 +1003,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 119 строк
+### `tests/conftest.py` — 120 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -987,8 +1013,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def engine(tmp_path)` (8)
 - `async def sessions(engine)` (4)
 - `async def posters(tmp_path)` (6)
-- `async def card(sessions)` (11)
-  - `async def make(kind: Kind=Kind.MOVIE, source_id: str='1') -> int` (5)
+- `async def card(sessions)` (12)
+  - `async def make(kind: Kind=Kind.MOVIE, source_id: str='1', title: str='карточка') -> int` (6)
 - `async def stored(engine)` (12)
   - `async def put(name: str, **values) -> int` (7)
 

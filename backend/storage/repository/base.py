@@ -28,6 +28,13 @@ class Repository:
         """Строки сразу в свои типы: наружу репозиторий отдаёт их, а не `Row`."""
         return [make(row) for row in await self._rows(statement)]
 
+    async def _maybe(self, statement: Executable, make: Callable[[Row], object]):
+        """Одна строка в свой тип или `None`, если её нет. То же, что
+        `_mapped`, для единственной: репозитории отличаются преобразователем,
+        а не тем, как проверить пустоту."""
+        row = await self._row(statement)
+        return make(row) if row is not None else None
+
     async def _has_item(self, table: Table, item_id: int) -> bool:
         """Есть ли в таблице строка про эту карточку.
 

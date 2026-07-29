@@ -95,10 +95,11 @@ async def card(sessions):
     """Заводит карточку через репозиторий и отдаёт её идентификатор: всему,
     что вешается на карточку, сперва нужна она сама."""
 
-    async def make(kind: Kind = Kind.MOVIE, source_id: str = "1") -> int:
+    async def make(kind: Kind = Kind.MOVIE, source_id: str = "1",
+                   title: str = "карточка") -> int:
         return await LibraryRepository(sessions).create(
             Item(id=0, kind=kind, source=Source.TMDB, source_id=source_id,
-                 title="карточка", synced_at=MOMENT)
+                 title=title, synced_at=MOMENT)
         )
 
     return make

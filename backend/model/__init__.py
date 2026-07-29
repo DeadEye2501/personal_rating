@@ -18,6 +18,7 @@ from backend.model.kinds import (
 from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.search import SearchHit
+from backend.model.suggestion import Suggestion
 
 __all__ = [
     "CompanyRole",
@@ -37,6 +38,7 @@ __all__ = [
     "SearchHit",
     "Source",
     "SourceCard",
+    "Suggestion",
     "average_score",
     "new_manual_item",
     "new_source_id",

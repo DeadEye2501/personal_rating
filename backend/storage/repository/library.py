@@ -7,7 +7,7 @@ from sqlalchemy import Row, Select, delete, func, select, update
 from backend.model import Item, Kind, Source, new_source_id
 from backend.storage.posters import PosterStore
 from backend.storage.repository.base import Repository
-from backend.storage.session import fold
+from backend.storage.session import fold, folded
 from backend.storage.tables import item as item_table
 from backend.storage.tables import item_tag as item_tag_table
 from backend.storage.tables import rating as rating_table
@@ -59,8 +59,7 @@ def _to_item(row: Row) -> Item:
 
 class LibraryRepository(Repository):
     async def _one(self, statement: Select) -> Item | None:
-        row = await self._row(statement)
-        return _to_item(row) if row else None
+        return await self._maybe(statement, _to_item)
 
     async def create(self, item: Item) -> int:
         return await self._created(
@@ -103,8 +102,8 @@ class LibraryRepository(Repository):
         return await self._mapped(
             select(item_table).where(
                 item_table.c.kind == kind,
-                (func.py_lower(item_table.c.title) == needle)
-                | (func.py_lower(item_table.c.original_title) == needle),
+                (folded(item_table.c.title) == needle)
+                | (folded(item_table.c.original_title) == needle),
             ),
             _to_item,
         )

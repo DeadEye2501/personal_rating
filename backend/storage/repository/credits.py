@@ -1,16 +1,32 @@
-"""Люди и студии в ролях на карточке."""
+"""Всё, что приложение делает в базе с человеком или студией как с
+сущностью: их строки, их роли на карточках и подсказка при вводе имени."""
 
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from sqlalchemy import Column, ColumnElement, Row, Select, Table, func, select
+from sqlalchemy import Column, ColumnElement, Row, Select, Table, select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from backend.model import CompanyRole, Credit, PersonRole, Source, new_source_id
+from backend.model import (
+    CompanyRole,
+    Credit,
+    PersonRole,
+    Source,
+    Suggestion,
+    new_source_id,
+)
 from backend.storage.repository.base import Repository
-from backend.storage.session import fold
-from backend.storage.tables import company, company_credit, person, person_credit
+from backend.storage.session import fold, folded
+from backend.storage.tables import (
+    company,
+    company_credit,
+    item,
+    person,
+    person_credit,
+    rating,
+    wishlist,
+)
 
 
 class IdentityTaken(Exception):
@@ -46,14 +62,20 @@ class CreditRepository(Repository):
     def _link(self) -> Column:
         return self._entity.credit.c[f"{self._entity.table.name}_id"]
 
+    @property
+    def _folded_name(self) -> ColumnElement[str]:
+        return folded(self._entity.table.c.name)
+
     def _same_name(self, name: str) -> ColumnElement[bool]:
-        """Регистр приводится нашей функцией с обеих сторон: встроенный в
-        SQLite `lower()` кириллицу не трогает."""
-        return func.py_lower(self._entity.table.c.name) == fold(name.strip())
+        return self._folded_name == fold(name.strip())
+
+    def _name_starts_with(self, name: str) -> ColumnElement[bool]:
+        # autoescape: подчёркивание и процент в имени — обычные знаки, а не
+        # подстановки LIKE.
+        return self._folded_name.startswith(fold(name.strip()), autoescape=True)
 
     async def _found_id(self, statement: Select) -> int | None:
-        row = await self._row(statement)
-        return row.id if row is not None else None
+        return await self._maybe(statement, lambda row: row.id)
 
     async def create(
         self, name: str, source: Source | None = None, source_id: str | None = None
@@ -143,6 +165,55 @@ class CreditRepository(Repository):
                       if self._entity.position is not None else table.c.name),
             self._to_credit,
         )
+
+    async def suggest(self, name: str, limit: int = 10) -> list[Suggestion]:
+        """Строки подсказки при вводе имени. Тёзки различаются не
+        метаданными, а тем, чем каждый из них известен в твоей библиотеке."""
+        rows = await self._rows(
+            select(self._entity.table.c.id, self._entity.table.c.name)
+            .where(self._name_starts_with(name))
+            .order_by(self._entity.table.c.name, self._entity.table.c.id)
+            .limit(limit)
+        )
+
+        found = []
+        for row in rows:
+            title, item_id = await self._hint(row.id)
+            found.append(Suggestion(row.id, row.name, title, item_id))
+        return found
+
+    def _linked(self, entity_id: int) -> Select:
+        """Общее у трёх ступеней подсказки. Вынесено не ради краткости:
+        потерять здесь отбор по человеку в одной ступени из трёх — значит
+        показать в подсказке чужую карточку."""
+        return (
+            select(item.c.title, item.c.id)
+            .join_from(self._entity.credit, item,
+                       self._entity.credit.c.item_id == item.c.id)
+            .where(self._link == entity_id)
+        )
+
+    async def _hint(self, entity_id: int) -> tuple[str, int | None]:
+        """Чем он известен в твоей библиотеке: сперва самое высоко оценённое
+        тобой, потом самое свежее из отложенного, потом любая связанная
+        карточка. Третья ступень не для красоты — человек, снявшийся только в
+        неоценённых и неотложенных карточках, обычное дело."""
+        linked = self._linked(entity_id)
+        steps = (
+            linked.join(rating, rating.c.item_id == item.c.id)
+            .where(rating.c.score.is_not(None))
+            .order_by(rating.c.score.desc())
+            .limit(1),
+            linked.join(wishlist, wishlist.c.item_id == item.c.id)
+            .order_by(wishlist.c.added_at.desc())
+            .limit(1),
+            linked.limit(1),
+        )
+        for statement in steps:
+            row = await self._row(statement)
+            if row is not None:
+                return row.title, row.id
+        return "", None
 
     def _to_credit(self, row: Row) -> Credit:
         return Credit(

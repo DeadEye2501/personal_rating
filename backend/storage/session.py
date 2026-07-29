@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from sqlalchemy import event
+from sqlalchemy import ColumnElement, event, func
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -16,6 +16,12 @@ def fold(value: str | None) -> str | None:
     только ASCII и «Ведьмак» оставляет как есть — а Python приводит его
     правильно. Поэтому сравниваем обе стороны одними правилами."""
     return value.lower() if value is not None else None
+
+
+def folded(column: ColumnElement) -> ColumnElement[str]:
+    """Та же `fold`, но на стороне базы. Сравнивать надо обе стороны одними
+    правилами, поэтому и живут они рядом."""
+    return func.py_lower(column)
 
 
 def prepare_connection(dbapi_connection) -> None:

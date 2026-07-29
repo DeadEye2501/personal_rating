@@ -1,13 +1,10 @@
 """Общее у разборов: перевод чужих кусков ответа в наши типы."""
 
-from datetime import datetime
-
 import pytest
 
 from backend.model import CompanyRole, GenreSource, RatingSource
 from backend.sources.convert import companies, genres, rating, year
-
-NOW = datetime(2026, 7, 29, 12, 0)
+from tests.conftest import MOMENT
 
 
 def test_the_developer_is_not_the_publisher():
@@ -78,17 +75,17 @@ def test_a_date_that_is_not_a_date_leaves_the_year_empty():
 
 
 def test_a_rating_keeps_the_owner_it_was_given():
-    made = rating(RatingSource.METACRITIC, 93, NOW)
+    made = rating(RatingSource.METACRITIC, 93, MOMENT)
 
     assert [(one.source, one.value) for one in made] == [
         (RatingSource.METACRITIC, 93.0)
     ]
-    assert made[0].fetched_at == NOW
+    assert made[0].fetched_at == MOMENT
 
 
 def test_nothing_and_zero_are_both_an_absence_here():
     """Ноль у TMDB означает «никто не оценил», и записать его значило бы
     объявить, что фильм оценили в ноль. У Кинопоиска правило другое, и разбор
     там свой — общим этот случай не считается."""
-    assert rating(RatingSource.TMDB, None, NOW) == ()
-    assert rating(RatingSource.TMDB, 0, NOW) == ()
+    assert rating(RatingSource.TMDB, None, MOMENT) == ()
+    assert rating(RatingSource.TMDB, 0, MOMENT) == ()

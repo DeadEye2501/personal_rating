@@ -10,6 +10,19 @@ from backend.storage.repository.base import Repository
 from backend.storage.tables import rating as rating_table
 
 
+def _to_rating(row) -> Rating:
+    """Пустая рецензия отдаётся пустой строкой, а не `None`: в интерфейс она
+    уехала бы словом «None»."""
+    return Rating(
+        item_id=row.item_id,
+        score=row.score,
+        visual=row.visual,
+        narrative=row.narrative,
+        gameplay=row.gameplay,
+        review=row.review or "",
+    )
+
+
 class RatingsRepository(Repository):
     async def _write(self, item_id: int, values: dict, now: datetime) -> None:
         statement = insert(rating_table).values(
@@ -48,19 +61,10 @@ class RatingsRepository(Repository):
         await self._write(item_id, {"review": review}, now)
 
     async def get(self, item_id: int) -> Rating | None:
-        row = await self._row(
-            select(rating_table).where(rating_table.c.item_id == item_id)
+        return await self._maybe(
+            select(rating_table).where(rating_table.c.item_id == item_id),
+            _to_rating,
         )
-        if row is None:
-            return None
-        return Rating(
-                item_id=row.item_id,
-                score=row.score,
-                visual=row.visual,
-                narrative=row.narrative,
-                gameplay=row.gameplay,
-                review=row.review or "",
-            )
 
     async def clear(self, item_id: int) -> None:
         """Снять оценку. Карточка остаётся — она уже загружена."""

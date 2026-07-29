@@ -143,6 +143,14 @@
   - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
   - `source_rating: float | None` = `None`
 
+### `backend/model/suggestion.py`
+
+- `class Suggestion`
+  - `entity_id: int`
+  - `name: str`
+  - `hint: str`
+  - `hint_item_id: int | None`
+
 ### `backend/sources/errors.py`
 
 - `class Reason(StrEnum)`
@@ -376,10 +384,6 @@
 ### `tests/backend/sources/conftest.py`
 
 - `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
-
-### `tests/backend/sources/test_convert.py`
-
-- `NOW` = `datetime(2026, 7, 29, 12, 0)`
 
 ### `tests/backend/sources/test_registry.py`
 
