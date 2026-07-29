@@ -1,0 +1,22 @@
+"""Всё, что источник отдал о карточке, в наших типах."""
+
+from dataclasses import dataclass, field
+
+from backend.model.credit import Credit
+from backend.model.external import ExternalId, ExternalRating
+from backend.model.item import Item
+from backend.model.kinds import GenreSource
+
+
+@dataclass(frozen=True, slots=True)
+class SourceCard:
+    """У `item` поле `id` равно нулю: строки в базе ещё нет. Тот же уговор,
+    что у `new_manual_item`."""
+
+    item: Item
+    # Пары «пространство и идентификатор» — по той же причине, что у
+    # `SearchHit`: у Steam и GOG жанры и теги нумеруются порознь.
+    genre_ext_ids: tuple[tuple[GenreSource, str], ...] = field(default_factory=tuple)
+    people: tuple[Credit, ...] = field(default_factory=tuple)
+    external_ids: tuple[ExternalId, ...] = field(default_factory=tuple)
+    ratings: tuple[ExternalRating, ...] = field(default_factory=tuple)

@@ -18,6 +18,15 @@
   - `kinopoisk_unofficial_key: str`
   - `log_level: str`
 
+### `backend/model/card.py`
+
+- `class SourceCard`
+  - `item: Item`
+  - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
+  - `people: tuple[Credit, ...]` = `field(default_factory=tuple)`
+  - `external_ids: tuple[ExternalId, ...]` = `field(default_factory=tuple)`
+  - `ratings: tuple[ExternalRating, ...]` = `field(default_factory=tuple)`
+
 ### `backend/model/credit.py`
 
 - `class Credit`
@@ -155,6 +164,9 @@
 - `logger` = `logging.getLogger(__name__)`
 - `BASE` = `'https://api.themoviedb.org/3'`
 - `LANGUAGE` = `'ru-RU'`
+- `BROKEN_BY_PARSING` = `набор из 4`
+- `class TmdbClient`
+  - `_APPEND` = `словарь из 2`
 
 ### `backend/sources/tmdb/parse.py`
 

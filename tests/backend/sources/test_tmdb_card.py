@@ -1,0 +1,280 @@
+"""Второй круг загрузки: карточка, которую уже можно записать."""
+
+from datetime import date
+
+import httpx
+import pytest
+
+from backend.model import Kind, PersonRole, RatingSource, Source
+from backend.sources.errors import Found, Reason, Refusal
+from backend.sources.http import SourceHttp
+from backend.sources.tmdb.client import TmdbClient
+from backend.sources.tmdb.parse import Incomplete, parse_movie, parse_series
+
+
+def test_movie_card_carries_what_the_search_could_not(fixture):
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    assert card.item.source is Source.TMDB
+    assert card.item.kind is Kind.MOVIE
+    assert card.item.runtime and card.item.runtime > 0
+    assert card.item.title
+    assert card.item.original_title != card.item.title
+    assert card.item.synopsis
+    assert card.item.poster_url.startswith("https://")
+    assert "w500" in card.item.poster_url
+    assert card.genre_ext_ids
+    # Строки в базе ещё нет — тот же уговор, что у ручной карточки.
+    assert card.item.id == 0
+
+
+def test_the_full_release_date_survives_not_only_the_year(fixture):
+    """Год нужен ленте, полная дата — карточке; и раз источник отдал обе,
+    терять вторую значило бы идти за ней вторым запросом."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    assert card.item.released_at == date(2014, 11, 5)
+    assert card.item.year == 2014
+
+
+def test_genres_come_from_the_named_block_not_the_search_one(fixture):
+    """В детальном ответе жанры — объекты с именами, а не голые числа, и
+    идентификатор лежит внутри объекта."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    assert [ext_id for _space, ext_id in card.genre_ext_ids] == ["12", "18", "878"]
+
+
+def test_movie_imdb_id_is_taken_from_the_top_level(fixture):
+    """Довесок external_ids фильму не нужен — id лежит прямо в ответе."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    imdb = [one for one in card.external_ids if one.source == "imdb"]
+    assert imdb and imdb[0].value.startswith("tt")
+
+
+def test_tmdb_own_rating_survives_into_the_card(fixture):
+    """В SearchHit она попадала, а после сохранения карточки исчезала бы до
+    приезда MDBList — при том что приходит в этом же ответе даром."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    own = [one for one in card.ratings if one.source is RatingSource.TMDB]
+    assert own and 0 < own[0].value <= 10
+
+
+def test_every_person_carries_the_tmdb_identity(fixture):
+    """Без идентификатора два разных актёра-тёзки склеились бы в одну строку
+    молча — человек в этом даже не участвует."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    assert card.people
+    for credit in card.people:
+        assert credit.source is Source.TMDB, credit.name
+        assert credit.source_id and credit.source_id.isdigit(), credit.name
+
+
+def test_two_namesakes_from_tmdb_stay_apart(fixture):
+    payload = dict(fixture("tmdb/movie_detail.json"))
+    payload["credits"] = {
+        "cast": [{"id": 1, "name": "Василий Пупкин", "order": 0},
+                 {"id": 2, "name": "Василий Пупкин", "order": 1}],
+        "crew": [],
+    }
+
+    identities = {credit.source_id for credit in parse_movie(payload).people}
+
+    assert identities == {"1", "2"}
+
+
+def test_director_is_pulled_from_the_crew(fixture):
+    """Именно режиссёр, а не «кто-то из титров»: в них 512 человек, и отбор по
+    роли легко перевернуть — тогда режиссёром станет каждый, кроме него."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    directors = [one for one in card.people if one.role is PersonRole.DIRECTOR]
+    assert [one.name for one in directors] == ["Кристофер Нолан"]
+
+
+def test_the_rest_of_the_crew_stays_out(fixture):
+    """В титрах «Интерстеллара» полторы сотни человек, и роли для них у нас
+    нет: взяв всех, карточка получила бы гримёров вперемешку с актёрами."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    roles = {credit.role for credit in card.people}
+    assert roles == {PersonRole.ACTOR, PersonRole.DIRECTOR}
+
+
+def test_actors_keep_the_order_from_the_credits(fixture):
+    """Без порядка главные роли не отличить от эпизодических."""
+    card = parse_movie(fixture("tmdb/movie_detail.json"))
+
+    actors = [one for one in card.people if one.role is PersonRole.ACTOR]
+    assert len(actors) > 5
+    positions = [one.position for one in actors]
+    assert positions == sorted(positions)
+    assert positions[0] == 0
+
+
+def test_series_card_has_seasons_and_episodes(fixture):
+    """В карточке показывается «2 сезона, 24 серии» — оба числа отсюда."""
+    card = parse_series(fixture("tmdb/tv_detail.json"))
+
+    assert card.item.source_id == "83867"
+    assert card.item.seasons_count == 2
+    assert card.item.episodes_count == 24
+    assert card.item.synopsis
+    assert card.item.poster_url.startswith("https://")
+    # Длительность серии в ответе не приходит вовсе: `episode_run_time` пуст
+    # и у «Andor», и у «Чернобыля», а средняя стоит запроса на каждый сезон.
+    assert card.item.runtime is None
+
+
+def test_series_cast_comes_from_aggregate_credits(fixture):
+    """Обычный credits отдал бы последний сезон: один актёр против 302."""
+    card = parse_series(fixture("tmdb/tv_detail.json"))
+
+    actors = [one for one in card.people if one.role is PersonRole.ACTOR]
+    assert len(actors) > 50
+
+
+def test_showrunner_comes_from_created_by(fixture):
+    card = parse_series(fixture("tmdb/tv_detail.json"))
+
+    assert [one for one in card.people if one.role is PersonRole.SHOWRUNNER]
+
+
+def test_series_people_carry_the_identity_too(fixture):
+    """У сериала состав приходит из другого блока ответа, чем у фильма, —
+    сторожить заполнение идентичности надо отдельно."""
+    card = parse_series(fixture("tmdb/tv_detail.json"))
+
+    assert card.people
+    for credit in card.people:
+        assert credit.source is Source.TMDB, credit.name
+        assert credit.source_id and credit.source_id.isdigit(), credit.name
+
+
+def test_series_imdb_id_comes_from_the_appended_block(fixture):
+    """У сериала на верхнем уровне `imdb_id` нет вовсе — он в external_ids, и
+    без него не спросить ни MDBList, ни OMDB, ни Кинопоиск."""
+    card = parse_series(fixture("tmdb/tv_detail.json"))
+
+    imdb = [one for one in card.external_ids if one.source == "imdb"]
+    assert imdb and imdb[0].value.startswith("tt")
+
+
+def test_series_titles_come_from_their_own_fields(fixture):
+    card = parse_series(fixture("tmdb/tv_detail.json"))
+
+    assert card.item.title
+    assert card.item.original_title
+    assert card.item.year == 2022
+
+
+def test_the_series_original_title_is_not_the_translated_one():
+    """У «Andor» оба названия совпадают, и на нём перепутанные местами поля
+    ненаблюдаемы вовсе — отсюда выдуманное тело с разными названиями."""
+    payload = {
+        "id": 1, "name": "Тьма", "original_name": "Dark",
+        "aggregate_credits": {"cast": []},
+    }
+
+    card = parse_series(payload)
+
+    assert card.item.title == "Тьма"
+    assert card.item.original_title == "Dark"
+
+
+def test_typo_in_append_to_response_is_caught_by_content(fixture):
+    """Ответ приходит с 200 и просто без блока. Не поймать это здесь —
+    значит записать карточку без состава и не узнать об этом никогда."""
+    with pytest.raises(Incomplete):
+        parse_movie(fixture("tmdb/movie_detail_typo_append.json"))
+
+
+def test_a_series_without_its_appended_block_is_incomplete_too(fixture):
+    """Довесок у сериала другой, и опечатка в нём — такая же тихая."""
+    payload = {
+        key: value
+        for key, value in fixture("tmdb/tv_detail.json").items()
+        if key != "aggregate_credits"
+    }
+
+    with pytest.raises(Incomplete):
+        parse_series(payload)
+
+
+def test_a_block_that_came_without_its_cast_is_incomplete(fixture):
+    """Блок может приехать и обрезанным — с одними титрами и без актёров.
+    Проверять только его наличие значит записать карточку без состава."""
+    payload = dict(fixture("tmdb/movie_detail.json"))
+    payload["credits"] = {"crew": []}
+
+    with pytest.raises(Incomplete):
+        parse_movie(payload)
+
+
+def test_a_genuinely_empty_cast_is_not_incomplete(fixture):
+    """Блок есть, он пуст — источник отдал всё, что имел. У документалки так
+    и бывает, и такая карточка обязана сохраниться, а не застрять навсегда."""
+    payload = dict(fixture("tmdb/movie_detail.json"))
+    payload["credits"] = {"cast": [], "crew": []}
+
+    assert parse_movie(payload).people == ()
+
+
+async def test_client_requests_credits_for_a_movie(fixture):
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        return httpx.Response(200, json=fixture("tmdb/movie_detail.json"))
+
+    client = TmdbClient(
+        SourceHttp("tmdb", transport=httpx.MockTransport(handler)), api_key="k"
+    )
+    result = await client.card("157336", Kind.MOVIE)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value.item.source_id == "157336"
+    assert "/movie/157336" in seen["url"]
+    assert "credits" in seen["url"]
+    assert "aggregate_credits" not in seen["url"]
+
+
+async def test_client_requests_aggregate_credits_for_a_series(fixture):
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        return httpx.Response(200, json=fixture("tmdb/tv_detail.json"))
+
+    client = TmdbClient(
+        SourceHttp("tmdb", transport=httpx.MockTransport(handler)), api_key="k"
+    )
+    result = await client.card("83867", Kind.SERIES)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value.item.kind is Kind.SERIES
+    assert "/tv/83867" in seen["url"]
+    assert "aggregate_credits" in seen["url"]
+    assert "external_ids" in seen["url"]
+
+
+async def test_incomplete_answer_is_a_refusal_not_a_card(fixture):
+    """Неполный ответ нельзя записать: карточка осталась бы «полной» без
+    состава. Возвращаем отказ и повторим при следующем показе."""
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200, json=fixture("tmdb/movie_detail_typo_append.json")
+        )
+    )
+    client = TmdbClient(SourceHttp("tmdb", transport=transport), api_key="k")
+
+    result = await client.card("157336", Kind.MOVIE)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN

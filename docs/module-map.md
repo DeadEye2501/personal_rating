@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 25 модулей
+## backend — 26 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,14 +19,22 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 39 строк
+### `backend/model/__init__.py` — 41 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `SearchHit`, `Source`, `average_score`, `new_manual_item`, `new_source_id`
+Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `SearchHit`, `Source`, `SourceCard`, `average_score`, `new_manual_item`, `new_source_id`
 
+
+### `backend/model/card.py` — 22 строк
+
+Всё, что источник отдал о карточке, в наших типах.
+
+Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.item`, `backend.model.kinds`
+
+- `class SourceCard` (11)
 
 ### `backend/model/credit.py` — 18 строк
 
@@ -122,25 +130,37 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/client.py` — 40 строк
+### `backend/sources/tmdb/client.py` — 69 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
-- `class TmdbClient` (23)
+- `class TmdbClient` (45)
   - `def _params(self, **extra: object) -> dict` (2)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (12)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 41 строк
+### `backend/sources/tmdb/parse.py` — 191 строк
 
 Перевод ответов TMDB в наши типы.
 
 Зависит от: `backend.model`
 
+- `class Incomplete(Exception)` (5)
 - `def _year(value: str | None) -> int | None` (4)
-- `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (28)
+- `def _released(value: str | None) -> date | None` (7)
+- `def _poster(payload: dict) -> str` (3)
+- `def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (5)
+- `def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]` (7)
+- `def _imdb(value: str | None) -> tuple[ExternalId, ...]` (4)
+- `def _person(row: dict, role: PersonRole, position: int | None=None) -> Credit` (10)
+- `def _cast(rows: list[dict]) -> list[Credit]` (5)
+- `def _required(payload: dict, block: str) -> dict` (9)
+- `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (27)
+- `def parse_movie(payload: dict) -> SourceCard` (30)
+- `def parse_series(payload: dict) -> SourceCard` (29)
 
 ### `backend/storage/posters.py` — 89 строк
 
@@ -430,7 +450,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 24 модулей
+## tests — 25 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -471,6 +491,15 @@
   - `def advance(self, delta: timedelta) -> None` (2)
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)
+
+### `tests/backend/sources/test_tmdb_card.py` — 280 строк
+
+Второй круг загрузки: карточка, которую уже можно записать.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
+
+Тестов: 24
+
 
 ### `tests/backend/sources/test_tmdb_search.py` — 183 строк
 

@@ -1,5 +1,6 @@
 """Поверхность модели: отсюда типы границы слоёв импортирует клиент."""
 
+from backend.model.card import SourceCard
 from backend.model.credit import Credit
 from backend.model.external import ExternalId, ExternalRating
 from backend.model.genre import Genre
@@ -33,6 +34,7 @@ __all__ = [
     "RatingSource",
     "SearchHit",
     "Source",
+    "SourceCard",
     "average_score",
     "new_manual_item",
     "new_source_id",
