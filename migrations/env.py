@@ -1,3 +1,5 @@
+"""Точка входа Alembic: адрес базы и соединение под миграции."""
+
 import os
 from logging.config import fileConfig
 from pathlib import Path

@@ -7,6 +7,11 @@
 
 Карта собирается из кода, а не ведётся руками: забыть дописать функцию нельзя.
 
+Охват — весь свой код, а не только боевой: тесты, скрипты и миграции пишем мы
+же, и повторы там заводятся ровно так же. Из тестов в карту идут помощники и
+фикстуры, а сами тесты только считаются: их имена говорят сами за себя, а
+общее прячется не в них.
+
     pipenv run python scripts/module_map.py           пересобрать docs/module-map.md
     pipenv run python scripts/module_map.py --check   упасть, если карта устарела
 """
@@ -17,31 +22,43 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP = ROOT / "docs/module-map.md"
-PACKAGES = ("backend", "client")
-SKIP = {"__pycache__"}
+SKIP = {
+    ".git", ".venv", "venv", "env", "__pycache__", "node_modules", "build",
+    ".claude", ".pytest_cache", ".ruff_cache", ".mypy_cache", "docs",
+}
 DEFINITIONS = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+FUNCTIONS = (ast.FunctionDef, ast.AsyncFunctionDef)
+
+
+def roots() -> list[str]:
+    """Папки верхнего уровня, в которых лежит наш код."""
+    found = sorted(
+        path.name
+        for path in ROOT.iterdir()
+        if path.is_dir() and path.name not in SKIP and any(path.rglob("*.py"))
+    )
+    # Пустой ответ — поломка карты, а не проект без кода.
+    assert found, f"в {ROOT} не найдено ни одной папки с кодом"
+    return found
 
 
 def modules() -> list[tuple[str, ast.Module, int]]:
     """Модули проекта: путь от корня, разобранное дерево и число строк.
 
-    `__init__.py` не пропускается: в `backend/model` он и есть та поверхность,
-    которую клиенту разрешено импортировать, — спрятать её значило бы соврать."""
+    `__init__.py` не пропускается: у пакета с реэкспортом он и есть поверхность
+    наружу, и спрятать её значило бы соврать. Пустой пропускается: маркер
+    пакета называть нечем."""
     found = []
-    for package in PACKAGES:
-        # Пустой ответ — поломка карты, а не чистый пакет: и отсутствующая
-        # папка, и сломанная маска отдают пустоту, а не исключение.
-        assert (ROOT / package).is_dir(), f"нет пакета {package}"
+    for root in roots():
         inside = [
             path
-            for path in sorted((ROOT / package).rglob("*.py"))
+            for path in sorted((ROOT / root).rglob("*.py"))
             if not SKIP.intersection(path.parts)
         ]
-        assert inside, f"в пакете {package} не найдено ни одного файла"
+        assert inside, f"в {root} не найдено ни одного файла"
         for path in inside:
             text = path.read_text(encoding="utf-8")
             tree = ast.parse(text)
-            # Пустой `__init__.py` — маркер пакета, называть в нём нечего.
             if path.name == "__init__.py" and not tree.body:
                 continue
             here = path.relative_to(ROOT).as_posix()
@@ -67,27 +84,41 @@ def depends_on(tree: ast.Module) -> list[str]:
     found = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module:
-            if node.module.split(".")[0] in PACKAGES:
+            if node.module.split(".")[0] in roots():
                 found.add(node.module)
         elif isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name.split(".")[0] in PACKAGES:
+                if alias.name.split(".")[0] in roots():
                     found.add(alias.name)
     return sorted(found)
 
 
-def members(node: ast.ClassDef) -> list[str]:
-    """Методы класса, включая приватные. Поля датакласса не в счёт: они в спеке.
+def declared(body: list, depth: int = 0) -> tuple[list[str], int]:
+    """Объявления тела и число тестов в нём.
 
-    Приватные показываются намеренно: карту читают, когда ищут повторы, а
-    общее выносят как раз в приватные помощники — спрятав их, карта слепнет
-    ровно к тому, ради чего её и завели. `__init__` пропущен: он есть у всех и
-    ничего не говорит."""
-    return [
-        f"  - `{signature(child)}` ({size(child)})"
-        for child in node.body
-        if isinstance(child, DEFINITIONS) and child.name != "__init__"
-    ]
+    Показывается всё, до чего можно дотянуться именем: приватные методы,
+    вложенные функции, классы. Общее выносят как раз в приватные помощники, а
+    фикстуры возвращают замыкания — спрятав их, карта слепнет ровно к тому,
+    ради чего её и завели.
+
+    Не показываются двое. `__init__` есть у всех и ничего не говорит. Тесты
+    только считаются: их имя и есть их описание, а повтор прячется не в них, а
+    в помощниках рядом."""
+    lines: list[str] = []
+    tests = 0
+    for node in body:
+        if not isinstance(node, DEFINITIONS):
+            continue
+        if isinstance(node, FUNCTIONS) and node.name.startswith("test_"):
+            tests += 1
+            continue
+        if node.name == "__init__":
+            continue
+        lines.append(f"{'  ' * depth}- `{signature(node)}` ({size(node)})")
+        inside, counted = declared(node.body, depth + 1)
+        lines += inside
+        tests += counted
+    return lines, tests
 
 
 def exported(tree: ast.Module) -> list[str]:
@@ -103,7 +134,14 @@ def exported(tree: ast.Module) -> list[str]:
 
 def module_block(path: str, tree: ast.Module, lines_total: int) -> str:
     doc = ast.get_docstring(tree)
-    said = doc.split("\n")[0].strip() if doc else "**ответственность не названа**"
+    # У файла с тестами ответственность названа его именем, и требовать от него
+    # докстринг значит разводить шум. У остальных безымянная ответственность —
+    # это и есть находка: правило 6 иначе не проверить.
+    unnamed = (
+        "" if Path(path).name.startswith("test_")
+        else "**ответственность не названа**"
+    )
+    said = doc.split("\n")[0].strip() if doc else unnamed
     uses = ", ".join(f"`{one}`" for one in depends_on(tree)) or "—"
     warn = " ⚠ за пределом 500" if lines_total > 500 else (
         " ⚠ подошёл к 300" if lines_total > 300 else ""
@@ -113,12 +151,10 @@ def module_block(path: str, tree: ast.Module, lines_total: int) -> str:
     names = exported(tree)
     if names:
         lines += [f"Отдаёт наружу: {', '.join(f'`{one}`' for one in names)}", ""]
-    for node in tree.body:
-        if not isinstance(node, DEFINITIONS):
-            continue
-        lines.append(f"- `{signature(node)}` ({size(node)})")
-        if isinstance(node, ast.ClassDef):
-            lines += members(node)
+    inside, tests = declared(tree.body)
+    if tests:
+        lines += [f"Тестов: {tests}", ""]
+    lines += inside
     return "\n".join([*lines, ""])
 
 
@@ -162,9 +198,9 @@ def render() -> str:
         "Число в скобках — сколько строк занимает объявление.",
         "",
     ]
-    for package in PACKAGES:
-        inside = [one for one in found if one[0].startswith(package)]
-        parts.append(f"## {package} — {len(inside)} модулей\n")
+    for root in roots():
+        inside = [one for one in found if one[0].startswith(root)]
+        parts.append(f"## {root} — {len(inside)} модулей\n")
         parts += [module_block(*one) for one in inside]
     parts.append(lonely_block(found))
     return "\n".join(parts)

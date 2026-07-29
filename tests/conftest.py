@@ -1,3 +1,5 @@
+"""Общее для тестов: временные база и хранилище, фикстуры и минимальные строки."""
+
 from datetime import datetime
 
 import pytest
