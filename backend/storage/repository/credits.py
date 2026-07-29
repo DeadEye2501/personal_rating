@@ -44,9 +44,33 @@ class Entity:
     roles: Callable[[str], PersonRole | CompanyRole]
     position: Column | None = None
 
+    @property
+    def link(self) -> Column:
+        """Колонка связи зовётся по имени своей таблицы: `person_id`,
+        `company_id`."""
+        return self.credit.c[f"{self.table.name}_id"]
+
 
 PEOPLE = Entity(person, person_credit, PersonRole, person_credit.c.position)
 COMPANIES = Entity(company, company_credit, CompanyRole)
+
+
+def to_credit(row: Row, entity: Entity) -> Credit:
+    """Строка титров в тип границы слоёв.
+
+    Лежит здесь, а не рядом с остальными такими же в `rows.py`: ей нужен
+    `Entity`, а он объявлен тут, и `rows.py` тогда пришлось бы импортировать из
+    репозитория, который сам импортирует его."""
+    return Credit(
+        name=row.name,
+        # Роль возвращается перечислением, а не сырой строкой из базы:
+        # `==` у StrEnum истинно и для строки, а `is` и `isinstance` —
+        # нет, и два пути чтения разошлись бы молча.
+        role=entity.roles(row.role),
+        position=row.position if entity.position is not None else None,
+        source=Source(row.source) if row.source else None,
+        source_id=row.source_id,
+    )
 
 
 class CreditRepository(Repository):
@@ -61,7 +85,7 @@ class CreditRepository(Repository):
 
     @property
     def _link(self) -> Column:
-        return self._entity.credit.c[f"{self._entity.table.name}_id"]
+        return self._entity.link
 
     @property
     def _folded_name(self) -> ColumnElement[str]:
@@ -164,7 +188,7 @@ class CreditRepository(Repository):
             .where(credit.c.item_id == item_id)
             .order_by(self._entity.position
                       if self._entity.position is not None else table.c.name),
-            self._to_credit,
+            lambda row: to_credit(row, self._entity),
         )
 
     async def suggest(self, name: str, limit: int = 10) -> list[Suggestion]:
@@ -215,19 +239,6 @@ class CreditRepository(Repository):
             if row is not None:
                 return row.title, row.id
         return "", None
-
-    def _to_credit(self, row: Row) -> Credit:
-        return Credit(
-            name=row.name,
-            # Роль возвращается перечислением, а не сырой строкой из базы:
-            # `==` у StrEnum истинно и для строки, а `is` и `isinstance` —
-            # нет, и два пути чтения разошлись бы молча.
-            role=self._entity.roles(row.role),
-            position=row.position if self._entity.position is not None else None,
-            source=Source(row.source) if row.source else None,
-            source_id=row.source_id,
-        )
-
 
 def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository:
     return CreditRepository(sessions, PEOPLE)

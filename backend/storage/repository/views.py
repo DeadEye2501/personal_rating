@@ -1,0 +1,162 @@
+"""Пачечное чтение карточек для показа."""
+
+from collections import defaultdict
+from dataclasses import replace
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.model import CardView, Tag, view_from_item
+from backend.storage.repository.base import Repository
+from backend.storage.repository.credits import COMPANIES, PEOPLE, Entity, to_credit
+from backend.storage.rows import (
+    to_external_id,
+    to_external_rating,
+    to_genre,
+    to_item,
+    to_rating,
+)
+from backend.storage.tables import (
+    external_id,
+    external_rating,
+    genre,
+    item,
+    item_genre,
+    item_tag,
+    rating,
+    tag,
+    wishlist,
+)
+
+
+class ViewsRepository(Repository):
+    """Собирает карточки для показа пачкой: по запросу на признак, а не на
+    карточку. Порция ленты — 50 строк, и разница тут не косметическая."""
+
+    async def views_for(self, item_ids: list[int]) -> dict[int, CardView]:
+        if not item_ids:
+            return {}
+        async with self._sessions() as session:
+            return await self._fetch_all(session, item_ids)
+
+    async def _fetch_all(
+        self, session: AsyncSession, item_ids: list[int]
+    ) -> dict[int, CardView]:
+        views = {
+            row.id: view_from_item(to_item(row))
+            for row in (
+                await session.execute(select(item).where(item.c.id.in_(item_ids)))
+            ).all()
+        }
+        if not views:
+            return {}
+
+        known = list(views)
+        genres = await self._genres(session, known)
+        tags = await self._tags(session, known)
+        cast = await self._credits(session, known, PEOPLE)
+        studios = await self._credits(session, known, COMPANIES)
+        external = await self._external(session, known)
+        identifiers = await self._identifiers(session, known)
+        ratings = await self._ratings(session, known)
+        bookmarked = await self._wishlist(session, known)
+
+        for item_id, view in views.items():
+            views[item_id] = replace(
+                view,
+                genres=tuple(genres[item_id]),
+                tags=tuple(tags[item_id]),
+                people=tuple(cast[item_id]),
+                companies=tuple(studios[item_id]),
+                external=tuple(external[item_id]),
+                external_ids=tuple(identifiers[item_id]),
+                rating=ratings.get(item_id),
+                in_wishlist=item_id in bookmarked,
+            )
+        return views
+
+    async def _genres(self, session, item_ids):
+        rows = await self._read(
+            session,
+            select(item_genre.c.item_id, genre)
+            .join(genre, genre.c.id == item_genre.c.genre_id)
+            .where(item_genre.c.item_id.in_(item_ids))
+            .order_by(genre.c.name),
+        )
+        return self._by_card(rows, to_genre)
+
+    async def _tags(self, session, item_ids):
+        rows = await self._read(
+            session,
+            select(item_tag.c.item_id, tag.c.id, tag.c.name)
+            .join(tag, tag.c.id == item_tag.c.tag_id)
+            .where(item_tag.c.item_id.in_(item_ids))
+            .order_by(tag.c.position),
+        )
+        return self._by_card(rows, lambda row: Tag(id=row.id, name=row.name))
+
+    async def _credits(self, session, item_ids, entity: Entity):
+        """Люди и студии читаются одним кодом: для приложения эти две сущности
+        различаются только тем, что у людей есть порядок в титрах."""
+        columns = [entity.credit.c.item_id, entity.table.c.name,
+                   entity.credit.c.role, entity.table.c.source,
+                   entity.table.c.source_id]
+        if entity.position is not None:
+            columns.append(entity.position)
+
+        # У студий порядка в титрах нет, но устойчивый нужен и им: без него
+        # они перетасовывались бы между показами одной и той же карточки.
+        rows = await self._read(
+            session,
+            select(*columns)
+            .join(entity.table, entity.table.c.id == entity.link)
+            .where(entity.credit.c.item_id.in_(item_ids))
+            .order_by(entity.position if entity.position is not None
+                      else entity.table.c.id),
+        )
+        return self._by_card(rows, lambda row: to_credit(row, entity))
+
+    async def _external(self, session, item_ids):
+        rows = await self._read(
+            session,
+            select(external_rating)
+            .where(external_rating.c.item_id.in_(item_ids))
+            .order_by(external_rating.c.source),
+        )
+        return self._by_card(rows, to_external_rating)
+
+    async def _identifiers(self, session, item_ids):
+        rows = await self._read(
+            session,
+            select(external_id)
+            .where(external_id.c.item_id.in_(item_ids))
+            .order_by(external_id.c.source),
+        )
+        return self._by_card(rows, to_external_id)
+
+    async def _ratings(self, session, item_ids):
+        rows = await self._read(
+            session, select(rating).where(rating.c.item_id.in_(item_ids))
+        )
+        return {row.item_id: to_rating(row) for row in rows}
+
+    async def _wishlist(self, session, item_ids):
+        rows = await self._read(
+            session,
+            select(wishlist.c.item_id).where(wishlist.c.item_id.in_(item_ids)),
+        )
+        return {row.item_id for row in rows}
+
+    async def _read(self, session, statement):
+        """Одна сессия на все девять запросов: иначе каждый признак открывал бы
+        свою, и «пачкой» осталось бы только на словах."""
+        return (await session.execute(statement)).all()
+
+    @staticmethod
+    def _by_card(rows, make):
+        """Строки, разложенные по карточкам. Ключ — `item_id` из самой строки:
+        порядок он сохраняет, а карточку не путает."""
+        found = defaultdict(list)
+        for row in rows:
+            found[row.item_id].append(make(row))
+        return found

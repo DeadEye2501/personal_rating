@@ -7,21 +7,9 @@ from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Rating, average_score
 from backend.storage.repository.base import Repository
+from backend.storage.rows import to_rating
 from backend.storage.statements import clearing
 from backend.storage.tables import rating as rating_table
-
-
-def _to_rating(row) -> Rating:
-    """Пустая рецензия отдаётся пустой строкой, а не `None`: в интерфейс она
-    уехала бы словом «None»."""
-    return Rating(
-        item_id=row.item_id,
-        score=row.score,
-        visual=row.visual,
-        narrative=row.narrative,
-        gameplay=row.gameplay,
-        review=row.review or "",
-    )
 
 
 class RatingsRepository(Repository):
@@ -64,7 +52,7 @@ class RatingsRepository(Repository):
     async def get(self, item_id: int) -> Rating | None:
         return await self._maybe(
             select(rating_table).where(rating_table.c.item_id == item_id),
-            _to_rating,
+            to_rating,
         )
 
     async def clear(self, item_id: int) -> None:

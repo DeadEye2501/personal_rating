@@ -2,11 +2,12 @@
 
 from datetime import datetime
 
-from sqlalchemy import Row, Select, delete, func, select, update
+from sqlalchemy import Select, delete, func, select, update
 
 from backend.model import Item, Kind, Source, new_source_id
 from backend.storage.posters import PosterStore
 from backend.storage.repository.base import Repository
+from backend.storage.rows import to_item
 from backend.storage.session import fold, folded
 from backend.storage.tables import item as item_table
 from backend.storage.tables import item_tag as item_tag_table
@@ -33,33 +34,9 @@ def _values(item: Item) -> dict:
     return {name: getattr(item, name) for name in _FIELDS}
 
 
-def _to_item(row: Row) -> Item:
-    """Строка базы в тип границы слоёв.
-
-    Пустой текст отдаётся пустой строкой, а не `None`: карточку правит и
-    человек, и в его строке колонка бывает пустой — а в интерфейс `None`
-    уехало бы словом «None»."""
-    return Item(
-        id=row.id,
-        kind=Kind(row.kind),
-        source=Source(row.source),
-        source_id=row.source_id,
-        title=row.title,
-        synced_at=row.synced_at,
-        original_title=row.original_title or "",
-        year=row.year,
-        released_at=row.released_at,
-        synopsis=row.synopsis or "",
-        poster_url=row.poster_url or "",
-        runtime=row.runtime,
-        seasons_count=row.seasons_count,
-        episodes_count=row.episodes_count,
-    )
-
-
 class LibraryRepository(Repository):
     async def _one(self, statement: Select) -> Item | None:
-        return await self._maybe(statement, _to_item)
+        return await self._maybe(statement, to_item)
 
     async def create(self, item: Item) -> int:
         return await self._created(
@@ -88,7 +65,7 @@ class LibraryRepository(Repository):
             .order_by(item_table.c.title, item_table.c.id)
             .limit(limit)
             .offset(offset),
-            _to_item,
+            to_item,
         )
 
     async def find_by_title(self, kind: Kind, title: str) -> list[Item]:
@@ -105,7 +82,7 @@ class LibraryRepository(Repository):
                 (folded(item_table.c.title) == needle)
                 | (folded(item_table.c.original_title) == needle),
             ),
-            _to_item,
+            to_item,
         )
 
     async def deletion_summary(self, item_id: int) -> dict[str, int | bool]:

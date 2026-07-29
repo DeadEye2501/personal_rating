@@ -4,24 +4,7 @@ import pytest
 
 from backend.model import GenreKind, GenreSource, Kind
 from backend.storage.repository.genres import GenresRepository
-from tests.conftest import ours, seed
-
-
-@pytest.fixture
-async def reference(engine):
-    """Справочник кладётся руками, а не миграцией: проверяется разрешение
-    идентификаторов, а не содержимое справочника — его сторожит
-    `test_genre_reference.py`."""
-    await seed(
-        engine,
-        "INSERT INTO genre (id, name, kind) VALUES "
-        "(1, 'Боевик', 'film'), (2, 'Приключения', 'film'), "
-        "(3, 'Драма', 'film'), (4, 'ролевая', 'game')",
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('tmdb', '28', 1), ('tmdb', '12', 2), ('tmdb', '18', 3), "
-        "('tmdb', '10759', 1), ('tmdb', '10759', 2), "
-        "('steam', '3', 4)",
-    )
+from tests.conftest import ours
 
 
 async def test_plain_identifier_resolves_to_one_genre(sessions, reference):

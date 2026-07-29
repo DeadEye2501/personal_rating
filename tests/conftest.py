@@ -158,6 +158,26 @@ async def engine(tmp_path):
 
 
 @pytest.fixture
+async def reference(engine):
+    """Справочник жанров, засеянный руками.
+
+    Тесты не зависят от миграции: проверяется разрешение идентификаторов, а не
+    содержимое справочника — его сторожит `test_genre_reference.py`. Набор
+    маленький и нарочно включает сборный 10759 — один внешний идентификатор,
+    разворачивающийся в два наших жанра."""
+    await seed(
+        engine,
+        "INSERT INTO genre (id, name, kind) VALUES "
+        "(1, 'Боевик', 'film'), (2, 'Приключения', 'film'), "
+        "(3, 'Драма', 'film'), (4, 'ролевая', 'game')",
+        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
+        "('tmdb', '28', 1), ('tmdb', '12', 2), ('tmdb', '18', 3), "
+        "('tmdb', '10759', 1), ('tmdb', '10759', 2), "
+        "('steam', '3', 4)",
+    )
+
+
+@pytest.fixture
 async def sessions(engine):
     """Фабрика сессий поверх тестовой базы: репозитории принимают её, а не
     движок."""

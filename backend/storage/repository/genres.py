@@ -5,14 +5,11 @@ from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Genre, GenreKind, GenreSource
 from backend.storage.repository.base import Repository
+from backend.storage.rows import to_genre
 from backend.storage.statements import clearing
 from backend.storage.tables import genre as genre_table
 from backend.storage.tables import genre_map as genre_map_table
 from backend.storage.tables import item_genre as item_genre_table
-
-
-def _to_genre(row) -> Genre:
-    return Genre(id=row.id, name=row.name, kind=GenreKind(row.kind))
 
 
 class GenresRepository(Repository):
@@ -58,7 +55,7 @@ class GenresRepository(Repository):
             .join(item_genre_table, item_genre_table.c.genre_id == genre_table.c.id)
             .where(item_genre_table.c.item_id == item_id)
             .order_by(genre_table.c.name),
-            _to_genre,
+            to_genre,
         )
 
     async def list_for_kind(self, kind: GenreKind) -> list[Genre]:
@@ -69,5 +66,5 @@ class GenresRepository(Repository):
             select(genre_table)
             .where(genre_table.c.kind == kind)
             .order_by(genre_table.c.name),
-            _to_genre,
+            to_genre,
         )

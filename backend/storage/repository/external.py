@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from backend.model import ExternalId, ExternalRating, IdSource, RatingSource
 from backend.storage.repository.base import Repository
+from backend.storage.rows import to_external_id, to_external_rating
 from backend.storage.statements import upserting
 from backend.storage.tables import external_id as external_id_table
 from backend.storage.tables import external_rating as external_rating_table
@@ -18,16 +19,6 @@ EMPTY_TTL = timedelta(days=7)
 
 class ExternalIdTaken(Exception):
     """Такой внешний идентификатор уже принадлежит другой карточке."""
-
-
-def _to_external_id(row) -> ExternalId:
-    return ExternalId(source=IdSource(row.source), value=row.value)
-
-
-def _to_external_rating(row) -> ExternalRating:
-    return ExternalRating(
-        source=RatingSource(row.source), value=row.value, fetched_at=row.fetched_at
-    )
 
 
 class ExternalIdsRepository(Repository):
@@ -50,7 +41,7 @@ class ExternalIdsRepository(Repository):
             select(external_id_table)
             .where(external_id_table.c.item_id == item_id)
             .order_by(external_id_table.c.source),
-            _to_external_id,
+            to_external_id,
         )
 
     async def find_item(self, source: IdSource, value: str) -> int | None:
@@ -83,7 +74,7 @@ class ExternalRatingsRepository(Repository):
             select(external_rating_table)
             .where(external_rating_table.c.item_id == item_id)
             .order_by(external_rating_table.c.source),
-            _to_external_rating,
+            to_external_rating,
         )
 
     async def stale_sources(self, item_id: int, wanted: list[RatingSource],
