@@ -94,6 +94,21 @@ def signature(node: ast.AST) -> str:
     return f"{kind}{node.name}({ast.unparse(node.args)}){result}"
 
 
+def alias(node: ast.AST) -> str | None:
+    """Псевдоним типа, если это он. Такое же имя поверхности, как класс: его
+    импортируют и им аннотируют. Прочие присваивания в карту не идут — констант
+    в модуле десятки, а имён типов единицы."""
+    if isinstance(node, ast.TypeAlias):
+        return f"type {ast.unparse(node.name)} = {ast.unparse(node.value)}"
+    named = (
+        isinstance(node, ast.AnnAssign)
+        and isinstance(node.target, ast.Name)
+        and ast.unparse(node.annotation) == "TypeAlias"
+        and node.value is not None
+    )
+    return f"{node.target.id}: TypeAlias = {ast.unparse(node.value)}" if named else None
+
+
 def size(node: ast.AST) -> int:
     return (node.end_lineno or node.lineno) - node.lineno + 1
 
@@ -126,6 +141,10 @@ def declared(body: list, depth: int = 0) -> tuple[list[str], int]:
     lines: list[str] = []
     tests = 0
     for node in body:
+        named = alias(node)
+        if named:
+            lines.append(f"{'  ' * depth}- `{named}`")
+            continue
         if not isinstance(node, DEFINITIONS):
             continue
         if isinstance(node, FUNCTIONS) and node.name.startswith("test_"):

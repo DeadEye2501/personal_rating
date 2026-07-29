@@ -97,6 +97,7 @@
 - `class Found` (2)
 - `class Missing` (3)
 - `class Refusal` (8)
+- `Outcome: TypeAlias = Found | Missing | Refusal`
 - `def is_answer(outcome: Outcome) -> bool` (2)
 - `def writable(outcome: Outcome) -> bool` (3)
 
@@ -314,7 +315,7 @@
 - `def differences(spec: dict, code: dict) -> list[str]` (8)
 - `def main() -> int` (9)
 
-### `scripts/module_map.py` — 243 строк
+### `scripts/module_map.py` — 262 строк
 
 Карта модулей: кто за что отвечает, что объявляет и от кого зависит.
 
@@ -324,9 +325,10 @@
 - `def roots() -> list[str]` (10)
 - `def modules() -> list[tuple[str, ast.Module, int]]` (22)
 - `def signature(node: ast.AST) -> str` (7)
+- `def alias(node: ast.AST) -> str | None` (13)
 - `def size(node: ast.AST) -> int` (2)
 - `def depends_on(tree: ast.Module) -> list[str]` (12)
-- `def declared(body: list, depth: int=0) -> tuple[list[str], int]` (26)
+- `def declared(body: list, depth: int=0) -> tuple[list[str], int]` (30)
 - `def exported(tree: ast.Module) -> list[str]` (9)
 - `def module_block(path: str, tree: ast.Module, lines_total: int) -> str` (24)
 - `def implementations(found: list[tuple]) -> dict[str, list[str]]` (17)
