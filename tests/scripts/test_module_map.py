@@ -8,7 +8,7 @@
 
 import ast
 
-from scripts.module_map import assigned, contents
+from module_map import assigned, contents
 
 
 def shown(source: str) -> list[str]:

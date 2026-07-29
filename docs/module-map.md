@@ -303,7 +303,7 @@
 - `def upgrade() -> None` (29)
 - `def downgrade() -> None` (5)
 
-## scripts — 4 модулей
+## scripts — 6 модулей
 
 ### `scripts/collect_game_genres.py` — 80 строк
 
@@ -328,36 +328,63 @@
 - `def differences(spec: dict, code: dict) -> list[str]` (8)
 - `def main() -> int` (9)
 
-### `scripts/module_map.py` — 391 строк ⚠ подошёл к 300
+### `scripts/module_map.py` — 298 строк
 
-Карты проекта, собираемые из кода.
+Две карты проекта, собираемые из кода.
 
-Зависит от: —
+Зависит от: `not_duplicates`, `project_ast`
 
-- `def project_root() -> Path` (11)
-- `def roots() -> list[str]` (10)
-- `def modules() -> list[tuple[str, ast.Module, int]]` (22)
-- `def signature(node: ast.AST) -> str` (7)
-- `def alias(node: ast.AST) -> str | None` (13)
-- `def size(node: ast.AST) -> int` (2)
-- `def depends_on(tree: ast.Module) -> list[str]` (12)
+- `def alias(node: ast.AST) -> str | None` (17)
 - `def declared(body: list, depth: int=0) -> tuple[list[str], int]` (30)
-- `def exported(tree: ast.Module) -> list[str]` (9)
 - `def module_block(path: str, tree: ast.Module, lines_total: int) -> str` (24)
-- `def _size(kind: str, counted: int, spread: bool) -> str` (2)
+- `def _counted(kind: str, amount: int, spread: bool) -> str` (4)
 - `def brief(value: ast.AST | None) -> str` (17)
-- `def assigned(node: ast.AST) -> list[tuple[str, str]]` (17)
+- `def assigned(node: ast.AST) -> list[tuple[str, str]]` (11)
 - `def _data_nodes(body: list) -> list[ast.AST]` (11)
 - `def _class_lines(node: ast.ClassDef) -> list[str]` (11)
 - `def contents(tree: ast.Module) -> list[str]` (20)
 - `def data_block(path: str, tree: ast.Module) -> list[str]` (4)
-- `def implementations(found: list[tuple]) -> dict[str, list[str]]` (17)
 - `def lonely_block(found: list[tuple]) -> str` (9)
 - `def within(found: list[tuple], root: str) -> list[tuple]` (4)
 - `def heading(title: str, note: str) -> list[str]` (5)
 - `def render(found: list[tuple]) -> str` (9)
 - `def render_data(found: list[tuple]) -> str` (11)
-- `def main() -> int` (16)
+- `def main() -> int` (23)
+
+### `scripts/not_duplicates.py` — 103 строк
+
+Вердикты «это не повтор того» и их срок годности.
+
+Зависит от: `project_ast`
+
+- `def verdict_lines() -> list[str]` (5)
+- `def is_verdict(line: str) -> bool` (4)
+- `def places(line: str) -> list[tuple[str, str]]` (10)
+- `def stamped(token: str) -> bool` (2)
+- `def sealed(line: str, index: dict[str, str]) -> str` (11)
+- `def seal(index: dict[str, str]) -> None` (5)
+- `def malformed(line: str) -> str` (16)
+- `def expired(lines: list[str], index: dict[str, str]) -> list[str]` (18)
+
+### `scripts/project_ast.py` — 192 строк
+
+Свой код проекта как дерево разбора.
+
+Зависит от: —
+
+- `def project_root() -> Path` (7)
+- `def roots() -> list[str]` (10)
+- `def modules() -> list[tuple[str, ast.Module, int]]` (26)
+- `def signature(node: ast.AST) -> str` (7)
+- `def size(node: ast.AST) -> int` (2)
+- `def _siblings(path: str) -> set[str]` (9)
+- `def depends_on(tree: ast.Module, path: str='') -> list[str]` (13)
+- `def exported(tree: ast.Module) -> list[str]` (9)
+- `def implementations(found: list[tuple]) -> dict[str, list[str]]` (17)
+- `def bound_names(node: ast.AST) -> list[str]` (14)
+- `def _stamp(node: ast.AST | None) -> str` (2)
+- `def declarations(found: list[tuple]) -> dict[str, str]` (24)
+  - `def walk(body: list, path: str, prefix: str) -> None` (9)
 
 ### `scripts/record_fixtures.py` — 198 строк
 
@@ -375,7 +402,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 20 модулей
+## tests — 22 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -582,12 +609,31 @@
 
 Карта данных проверяется тем, что она показывает по данному ей коду.
 
-Зависит от: `scripts.module_map`
+Зависит от: —
 
 Тестов: 10
 
 - `def shown(source: str) -> list[str]` (2)
 - `def only(source: str) -> str` (4)
+
+### `tests/scripts/test_not_duplicates.py` — 103 строк
+
+Вердикт живёт, пока живо то, что он сравнивал.
+
+Зависит от: —
+
+Тестов: 11
+
+
+### `tests/scripts/test_project_ast.py` — 39 строк
+
+Разбор проекта проверяется тем, что он вычитывает из данного ему кода.
+
+Зависит от: —
+
+Тестов: 4
+
+- `def indexed(source: str, path: str='a.py') -> dict[str, str]` (2)
 
 ## Абстракции с одной реализацией
 

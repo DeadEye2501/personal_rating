@@ -211,13 +211,21 @@
 
 ### `scripts/module_map.py`
 
-- `ROOT` = `project_root()`
 - `MAP` = `ROOT / 'docs/module-map.md'`
 - `DATA_MAP` = `ROOT / 'docs/data-map.md'`
 - `SHORT_VALUE` = `48`
+
+### `scripts/not_duplicates.py`
+
+- `VERDICTS` = `ROOT / 'docs/not-duplicates.md'`
+
+### `scripts/project_ast.py`
+
+- `STAMP` = `8`
 - `SKIP` = `набор из 12`
 - `DEFINITIONS` = `набор из 3`
 - `FUNCTIONS` = `набор из 2`
+- `ROOT` = `project_root()`
 
 ### `scripts/record_fixtures.py`
 
@@ -297,3 +305,8 @@
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`
+
+### `tests/scripts/test_not_duplicates.py`
+
+- `LINE` = `'- `a.py:one` `11111111` ≠ `b.py:two` `22222222`…`
+- `INDEX` = `словарь из 2`
