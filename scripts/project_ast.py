@@ -162,8 +162,8 @@ def bound_names(node: ast.AST) -> list[str]:
     return names
 
 
-def _stamp(node: ast.AST | None) -> str:
-    return sha1(ast.dump(node).encode("utf-8")).hexdigest()[:STAMP] if node else ""
+def _stamp(node: ast.AST) -> str:
+    return sha1(ast.dump(node).encode("utf-8")).hexdigest()[:STAMP]
 
 
 def declarations(found: list[tuple]) -> dict[str, str]:
@@ -180,7 +180,11 @@ def declarations(found: list[tuple]) -> dict[str, str]:
     def walk(body: list, path: str, prefix: str) -> None:
         for node in body:
             for name in bound_names(node):
-                index[f"{path}:{prefix}{name}"] = _stamp(node.value)
+                # Отпечаток снимается с присваивания целиком, а не со значения:
+                # у поля датакласса значения нет вовсе, и по нему отпечаток
+                # выходил пустым. Пустой не отличить от «ещё не заверено», и
+                # сборка дописывала пустые кавычки при каждом прогоне.
+                index[f"{path}:{prefix}{name}"] = _stamp(node)
             if not isinstance(node, DEFINITIONS):
                 continue
             name = f"{prefix}{node.name}"

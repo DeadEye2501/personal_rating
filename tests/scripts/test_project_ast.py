@@ -37,3 +37,21 @@ def test_same_code_gives_the_same_stamp():
     source = "def one():\n    return 1\n"
 
     assert indexed(source) == indexed(source)
+
+
+def test_a_field_without_a_value_still_gets_a_stamp():
+    """У поля датакласса значения нет вовсе, а отпечаток нужен: пустой не
+    отличить от «ещё не заверено», и сборка дописывала бы пустые кавычки при
+    каждом прогоне, пока не разломает строку вердикта."""
+    index = indexed("class Rating:\n    score: float | None\n    review: str = ''\n")
+
+    assert index["a.py:Rating.score"]
+    assert index["a.py:Rating.review"]
+
+
+def test_a_field_of_another_type_is_another_field():
+    """Сменившийся тип поля меняет дело так же, как переписанное тело."""
+    before = indexed("class Rating:\n    score: float\n")
+    after = indexed("class Rating:\n    score: int\n")
+
+    assert before["a.py:Rating.score"] != after["a.py:Rating.score"]

@@ -81,6 +81,21 @@ def test_sealing_writes_the_file(tmp_path, monkeypatch):
     assert "`b.py:two` `22222222`" in verdicts.read_text(encoding="utf-8")
 
 
+def test_second_build_does_not_touch_the_file_again(tmp_path, monkeypatch):
+    """Так и проскочила поломка: заверение выглядело верным с первого раза, а
+    ломалось со второго — дописывало ещё одну метку и разбивало строку."""
+    verdicts = tmp_path / "not-duplicates.md"
+    verdicts.write_text("- `a.py:one` ≠ `b.py:two` — причина\n", encoding="utf-8")
+    monkeypatch.setattr(not_duplicates, "VERDICTS", verdicts)
+
+    not_duplicates.seal(INDEX)
+    once = verdicts.read_bytes()
+    not_duplicates.seal(INDEX)
+
+    assert verdicts.read_bytes() == once
+    assert not_duplicates.expired(not_duplicates.verdict_lines(), INDEX) == []
+
+
 def test_sealing_a_sealed_file_changes_nothing(tmp_path, monkeypatch):
     """Иначе каждая сборка правила бы файл, и `--check` расходился бы сам с
     собой на ровном месте."""

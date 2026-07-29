@@ -366,7 +366,7 @@
 - `def malformed(line: str) -> str` (16)
 - `def expired(lines: list[str], index: dict[str, str]) -> list[str]` (18)
 
-### `scripts/project_ast.py` — 192 строк
+### `scripts/project_ast.py` — 196 строк
 
 Свой код проекта как дерево разбора.
 
@@ -382,9 +382,9 @@
 - `def exported(tree: ast.Module) -> list[str]` (9)
 - `def implementations(found: list[tuple]) -> dict[str, list[str]]` (17)
 - `def bound_names(node: ast.AST) -> list[str]` (14)
-- `def _stamp(node: ast.AST | None) -> str` (2)
-- `def declarations(found: list[tuple]) -> dict[str, str]` (24)
-  - `def walk(body: list, path: str, prefix: str) -> None` (9)
+- `def _stamp(node: ast.AST) -> str` (2)
+- `def declarations(found: list[tuple]) -> dict[str, str]` (28)
+  - `def walk(body: list, path: str, prefix: str) -> None` (13)
 
 ### `scripts/record_fixtures.py` — 198 строк
 
@@ -616,22 +616,22 @@
 - `def shown(source: str) -> list[str]` (2)
 - `def only(source: str) -> str` (4)
 
-### `tests/scripts/test_not_duplicates.py` — 103 строк
+### `tests/scripts/test_not_duplicates.py` — 118 строк
 
 Вердикт живёт, пока живо то, что он сравнивал.
 
 Зависит от: —
 
-Тестов: 11
+Тестов: 12
 
 
-### `tests/scripts/test_project_ast.py` — 39 строк
+### `tests/scripts/test_project_ast.py` — 57 строк
 
 Разбор проекта проверяется тем, что он вычитывает из данного ему кода.
 
 Зависит от: —
 
-Тестов: 4
+Тестов: 6
 
 - `def indexed(source: str, path: str='a.py') -> dict[str, str]` (2)
 
