@@ -323,7 +323,7 @@ GOG_TAG = {
     "trains": ["Simulator"],  # Поезда
     "farming": ["Simulator"],  # Фермерство
     "football": ["Sport"],  # Футбол
-    "martial-arts": ["Sport"],  # Боевые искусства
+    "martial-arts": ["Fighting"],  # Боевые искусства
     "fishing": ["Sport"],  # Рыбалка
     "team-sport": ["Sport"],  # Командный спорт
     "fps": ["Shooter"],  # Шутер от первого лица
@@ -332,7 +332,7 @@ GOG_TAG = {
     "looter-shooter": ["Shooter"],  # Лутер-шутер
     "sniper": ["Shooter"],  # Снайпер
     "platformer": ["Platformer"],  # Платформер
-    "metroidvania": ["Platformer"],  # Метроидвания
+    "metroidvania": ["Metroidvania"],  # Метроидвания
     "puzzle-platformer": ["Platformer", "Puzzle"],  # Головоломка-платформер
     "logic": ["Puzzle"],  # Логическая
     "match-three": ["Puzzle"],  # Три в ряд

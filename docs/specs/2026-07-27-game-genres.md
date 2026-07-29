@@ -357,7 +357,7 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `trains` | Поезда | Simulator |
 | `farming` | Фермерство | Simulator |
 | `football` | Футбол | Sport |
-| `martial-arts` | Боевые искусства | Sport |
+| `martial-arts` | Боевые искусства | Fighting |
 | `fishing` | Рыбалка | Sport |
 | `team-sport` | Командный спорт | Sport |
 | `fps` | Шутер от первого лица | Shooter |
@@ -366,7 +366,7 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `looter-shooter` | Лутер-шутер | Shooter |
 | `sniper` | Снайпер | Shooter |
 | `platformer` | Платформер | Platformer |
-| `metroidvania` | Метроидвания | Platformer |
+| `metroidvania` | Метроидвания | Metroidvania |
 | `puzzle-platformer` | Головоломка-платформер | Platformer + Puzzle |
 | `logic` | Логическая | Puzzle |
 | `match-three` | Три в ряд | Puzzle |
