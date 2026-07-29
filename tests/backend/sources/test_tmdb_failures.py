@@ -8,11 +8,7 @@ from backend.model import Kind
 from backend.sources.errors import Missing, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
-from tests.backend.sources.conftest import FakeClock
-
-
-def responding(status: int, body: dict) -> httpx.MockTransport:
-    return httpx.MockTransport(lambda request: httpx.Response(status, json=body))
+from tests.backend.sources.conftest import FakeClock, responding
 
 
 async def ask(transport: httpx.MockTransport):
@@ -40,11 +36,11 @@ async def test_recorded_bad_key_is_a_refusal(replay, meta):
 
 async def test_broken_identifier_is_also_an_answer():
     """Код 6 — «идентификатор битый». Для нас это то же «такого нет»."""
-    assert isinstance(await ask(responding(404, {"status_code": 6})), Missing)
+    assert isinstance(await ask(responding(404, json={"status_code": 6})), Missing)
 
 
 async def test_rate_limit_is_a_refusal():
-    result = await ask(responding(429, {"status_code": 25}))
+    result = await ask(responding(429, json={"status_code": 25}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.RATE
@@ -52,7 +48,7 @@ async def test_rate_limit_is_a_refusal():
 
 
 async def test_revoked_key_is_a_refusal():
-    result = await ask(responding(401, {"status_code": 10}))
+    result = await ask(responding(401, json={"status_code": 10}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.KEY
@@ -60,7 +56,7 @@ async def test_revoked_key_is_a_refusal():
 
 async def test_server_failures_are_refusals():
     for status in (500, 502, 503, 504):
-        result = await ask(responding(status, {"status_code": 11}))
+        result = await ask(responding(status, json={"status_code": 11}))
 
         assert isinstance(result, Refusal), status
         assert result.reason is Reason.BROKEN, status
@@ -75,7 +71,7 @@ async def test_a_bad_key_beats_a_missing_object():
     Утверждается исход, а не его отрицание: «не Missing» верно и для `Found` с
     мусором, и для любого неверного отказа, поэтому такой тест зеленел бы при
     полностью отсутствующей классификации."""
-    result = await ask(responding(401, {"status_code": 34}))
+    result = await ask(responding(401, json={"status_code": 34}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.KEY
@@ -96,7 +92,7 @@ async def test_a_404_without_json_is_not_a_negative_fact():
 
 
 async def test_a_404_with_an_unknown_status_code_is_not_a_negative_fact():
-    result = await ask(responding(404, {"status_code": 999}))
+    result = await ask(responding(404, json={"status_code": 999}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
@@ -106,7 +102,7 @@ async def test_the_absence_code_alone_is_not_a_negative_fact():
     """«Не найдено» — это пара «404 и код в теле». Один код в теле под чужим
     HTTP-кодом отрицательным фактом не делает: поломка сервера записалась бы
     как «такого фильма нет» и прожила бы неделю."""
-    result = await ask(responding(500, {"status_code": 34}))
+    result = await ask(responding(500, json={"status_code": 34}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
@@ -162,7 +158,7 @@ async def test_the_breaker_lets_go_when_the_backoff_has_passed():
 async def test_the_tripped_breaker_keeps_the_reason_it_was_tripped_for():
     """Взводит частота, а не квота, и человеку показывается именно это."""
     client = TmdbClient(
-        SourceHttp("tmdb", transport=responding(429, {"status_code": 25})),
+        SourceHttp("tmdb", transport=responding(429, json={"status_code": 25})),
         api_key="k",
     )
     await client.card("157336", Kind.MOVIE)
@@ -196,7 +192,7 @@ async def test_search_classifies_the_same_way():
     """Классификация живёт в одном месте на оба метода: разойдясь, они дали бы
     «ключ протух» на карточке и «ничего не нашлось» в поиске одновременно."""
     client = TmdbClient(
-        SourceHttp("tmdb", transport=responding(401, {"status_code": 7})),
+        SourceHttp("tmdb", transport=responding(401, json={"status_code": 7})),
         api_key="k",
     )
 

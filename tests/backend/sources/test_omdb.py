@@ -10,11 +10,7 @@ from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.client import OmdbClient, until_midnight
 from backend.sources.ratings.omdb.parse import parse_ratings
-from tests.backend.sources.conftest import FakeClock
-
-
-def responding(status, body):
-    return httpx.MockTransport(lambda request: httpx.Response(status, json=body))
+from tests.backend.sources.conftest import FakeClock, responding
 
 
 async def ask(transport):
@@ -129,7 +125,7 @@ async def test_recorded_missing_object_arrives_under_two_hundred(replay, meta):
 
 async def test_all_three_texts_under_two_hundred_mean_the_same():
     for text in ("Movie not found!", "Error getting data.", "Incorrect IMDb ID."):
-        result = await ask(responding(200, {"Response": "False", "Error": text}))
+        result = await ask(responding(200, json={"Response": "False", "Error": text}))
 
         assert isinstance(result, Missing), text
 
@@ -146,7 +142,7 @@ async def test_an_unexpected_status_is_a_refusal():
     """Кроме 200 и 401 у OMDB кодов не видели, но сервер вправе прислать
     любой: без этой ветки ответ ушёл бы в разбор и стал бы `Found` с пустотой
     или исключением."""
-    result = await ask(responding(503, {"Response": "False"}))
+    result = await ask(responding(503, json={"Response": "False"}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
@@ -177,7 +173,7 @@ async def test_a_request_without_a_key_is_a_key_refusal(replay):
 async def test_substring_match_is_loose():
     """Точный текст взят из issue-трекера, а не из документации: полного
     списка значений `Error` не существует."""
-    result = await ask(responding(401, {"Error": "Daily request limit exceeded"}))
+    result = await ask(responding(401, json={"Error": "Daily request limit exceeded"}))
 
     assert result.reason is Reason.QUOTA
 
@@ -185,14 +181,14 @@ async def test_substring_match_is_loose():
 async def test_the_text_is_matched_regardless_of_case():
     """Формулировки известны из issue-трекера, а не из документации, и регистр
     в них не обещан никем: «Limit» с большой буквы уехало бы в поломку."""
-    result = await ask(responding(401, {"Error": "Request LIMIT reached!"}))
+    result = await ask(responding(401, json={"Error": "Request LIMIT reached!"}))
 
     assert result.reason is Reason.QUOTA
 
 
 async def test_unknown_four_oh_one_is_treated_as_temporary():
     """Ошибаемся в сторону «повторим позже», а не «ключ битый навсегда»."""
-    result = await ask(responding(401, {"Error": "нечто новое"}))
+    result = await ask(responding(401, json={"Error": "нечто новое"}))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
@@ -206,7 +202,7 @@ async def test_quota_waits_until_the_next_day():
     http = SourceHttp(
         "omdb",
         clock=clock,
-        transport=responding(401, {"Error": "Request limit reached!"}),
+        transport=responding(401, json={"Error": "Request limit reached!"}),
     )
     client = OmdbClient(http, api_key="k")
 
@@ -269,7 +265,7 @@ async def test_the_key_and_the_identifier_are_sent():
 
 
 async def test_unexpected_shape_does_not_crash():
-    result = await ask(responding(200, {"Response": "True", "Ratings": "не список"}))
+    result = await ask(responding(200, json={"Response": "True", "Ratings": "не список"}))
 
     assert isinstance(result, Refusal)
 
@@ -277,7 +273,7 @@ async def test_unexpected_shape_does_not_crash():
 async def test_a_json_array_does_not_crash():
     """Тело разобралось — ещё не значит объект. У массива нет `.get`, и без
     проверки `AttributeError` улетает из клиента наружу."""
-    result = await ask(responding(200, [1, 2]))
+    result = await ask(responding(200, json=[1, 2]))
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN

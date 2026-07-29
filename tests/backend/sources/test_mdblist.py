@@ -9,13 +9,7 @@ from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.mdblist.parse import parse_ratings
-
-
-def responding(status, *, json=None, text=None, headers=None):
-    def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(status, json=json, text=text, headers=headers or {})
-
-    return httpx.MockTransport(handler)
+from tests.backend.sources.conftest import responding
 
 
 async def ask(transport, kind=Kind.MOVIE):

@@ -35,6 +35,19 @@ def _meta(relative: str) -> dict:
     return _load(f"{relative.rsplit('.', 1)[0]}.meta.json")
 
 
+def responding(status: int = 200, *, json=None, text=None, headers=None):
+    """Транспорт, отвечающий одним и тем же ответом на любой запрос.
+
+    Тело здесь сочиняется, и это законно ровно там, где записать его нечем:
+    квоту и частоту ни у одного источника не выбирали. Записанные ответы
+    отдаёт `replay`, и он же ставит их настоящий код."""
+    return httpx.MockTransport(
+        lambda request: httpx.Response(
+            status, json=json, text=text, headers=headers or {}
+        )
+    )
+
+
 @pytest.fixture
 def fixture():
     """Тело записанного ответа. JSON разбирается, всё прочее идёт текстом."""

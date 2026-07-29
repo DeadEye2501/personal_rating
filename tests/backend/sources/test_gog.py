@@ -8,13 +8,12 @@ from backend.sources.errors import Found, Reason, Refusal
 from backend.sources.gog.client import GogClient
 from backend.sources.gog.parse import parse_catalog, to_hit
 from backend.sources.http import SourceHttp
+from tests.backend.sources.conftest import responding
 
 
 def answering(body) -> SourceHttp:
-    return SourceHttp(
-        "gog",
-        transport=httpx.MockTransport(lambda request: httpx.Response(200, json=body)),
-    )
+    """Каталог GOG отвечает всегда — отсюда обёртка вокруг общей заготовки."""
+    return SourceHttp("gog", transport=responding(json=body))
 
 
 def test_catalog_row_is_already_a_card(fixture):

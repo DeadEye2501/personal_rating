@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 41 модулей
+## backend — 42 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -272,6 +272,20 @@
 
 - `def _number(raw: str | None) -> float | None` (10)
 - `def parse_ratings(payload: dict) -> Ratings` (21)
+
+### `backend/sources/registry.py` — 85 строк
+
+Кто отвечает за какой тип содержимого.
+
+Зависит от: `backend.config`, `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
+
+- `class Sources` (35)
+  - `def catalog_for(self, kind: Kind) -> list` (6)
+  - `def rating_sources(self, kind: Kind) -> list` (6)
+  - `def breakers(self) -> list[Breaker]` (2)
+  - `async def aclose(self) -> None` (3)
+- `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
+  - `def http(name: str) -> SourceHttp` (7)
 
 ### `backend/sources/steam/client.py` — 128 строк
 
@@ -619,7 +633,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 31 модулей
+## tests — 32 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -629,7 +643,7 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 82 строк
+### `tests/backend/sources/conftest.py` — 95 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
@@ -640,6 +654,7 @@
   - `def advance(self, delta: timedelta) -> None` (2)
 - `def _load(relative: str)` (4)
 - `def _meta(relative: str) -> dict` (3)
+- `def responding(status: int=200, *, json=None, text=None, headers=None)` (11)
 - `def fixture()` (3)
 - `def meta()` (2)
 - `def replay()` (33)
@@ -655,15 +670,15 @@
 Тестов: 12
 
 
-### `tests/backend/sources/test_gog.py` — 250 строк
+### `tests/backend/sources/test_gog.py` — 249 строк
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.backend.sources.conftest`
 
 Тестов: 20
 
-- `def answering(body) -> SourceHttp` (5)
+- `def answering(body) -> SourceHttp` (3)
 
 ### `tests/backend/sources/test_http.py` — 335 строк ⚠ подошёл к 300
 
@@ -676,7 +691,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)
 
-### `tests/backend/sources/test_kinopoisk.py` — 421 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 415 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
@@ -686,21 +701,18 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)
-- `def answering(status: int, body) -> httpx.MockTransport` (4)
 
-### `tests/backend/sources/test_mdblist.py` — 232 строк
+### `tests/backend/sources/test_mdblist.py` — 226 строк
 
 MDBList: квота, битый ключ и чужой периметр — три разные беды.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`, `tests.backend.sources.conftest`
 
 Тестов: 19
 
-- `def responding(status, *, json=None, text=None, headers=None)` (5)
-  - `def handler(request: httpx.Request) -> httpx.Response` (2)
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
-### `tests/backend/sources/test_omdb.py` — 301 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_omdb.py` — 297 строк
 
 OMDB: единственный источник, у которого отказ приходит под кодом 401, а
 
@@ -708,8 +720,18 @@ OMDB: единственный источник, у которого отказ 
 
 Тестов: 28
 
-- `def responding(status, body)` (2)
 - `async def ask(transport)` (5)
+
+### `tests/backend/sources/test_registry.py` — 205 строк
+
+Реестр держится на том, что контракт у всех клиентов один.
+
+Зависит от: `backend.config`, `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
+
+Тестов: 11
+
+- `def sources()` (4)
+- `def keyed()` (12)
 
 ### `tests/backend/sources/test_steam.py` — 332 строк ⚠ подошёл к 300
 
@@ -730,7 +752,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 25
 
 
-### `tests/backend/sources/test_tmdb_failures.py` — 207 строк
+### `tests/backend/sources/test_tmdb_failures.py` — 203 строк
 
 Отказ TMDB отличается от «такого у меня нет» — и то, и другое от успеха.
 
@@ -738,7 +760,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 15
 
-- `def responding(status: int, body: dict) -> httpx.MockTransport` (2)
 - `async def ask(transport: httpx.MockTransport)` (5)
 
 ### `tests/backend/sources/test_tmdb_search.py` — 183 строк

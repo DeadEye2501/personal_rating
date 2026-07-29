@@ -10,7 +10,7 @@ from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
-from tests.backend.sources.conftest import FakeClock
+from tests.backend.sources.conftest import FakeClock, responding
 
 
 def primary(transport) -> PoiskkinoClient:
@@ -19,12 +19,6 @@ def primary(transport) -> PoiskkinoClient:
 
 def fallback(transport) -> UnofficialClient:
     return UnofficialClient(SourceHttp("kinopoisk", transport=transport), api_key="k")
-
-
-def answering(status: int, body) -> httpx.MockTransport:
-    return httpx.MockTransport(
-        lambda request: httpx.Response(status, json=body)
-    )
 
 
 async def test_primary_reads_the_rating(replay):
@@ -63,7 +57,7 @@ async def test_primary_is_classified_by_http_code_not_by_the_body(replay, meta):
 async def test_a_quota_body_under_a_404_is_still_an_absence():
     """Ровно тот случай, ради которого правило и заведено: тело говорит про
     лимит, код — про отсутствие, и прав код."""
-    transport = answering(404, {"statusCode": 403, "message": "Превышен дневной лимит!"})
+    transport = responding(404, json={"statusCode": 403, "message": "Превышен дневной лимит!"})
 
     result = await primary(transport).ratings("tt0000000", Kind.MOVIE)
 
@@ -86,8 +80,8 @@ async def test_primary_quota_is_a_refusal_and_trips_the_breaker(replay, meta):
 
 
 async def test_primary_bad_key_is_a_refusal():
-    transport = answering(
-        401, {"statusCode": 401, "message": "Пользователь не найден!"}
+    transport = responding(
+        401, json={"statusCode": 401, "message": "Пользователь не найден!"}
     )
 
     result = await primary(transport).ratings("tt0816692", Kind.MOVIE)
@@ -145,7 +139,7 @@ async def test_primary_survives_a_message_that_came_as_a_list(replay):
 
 
 async def test_primary_survives_a_json_array():
-    result = await primary(answering(200, [1, 2])).ratings("tt0816692", Kind.MOVIE)
+    result = await primary(responding(200, json=[1, 2])).ratings("tt0816692", Kind.MOVIE)
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
@@ -155,7 +149,7 @@ async def test_the_identifier_survives_a_film_without_a_rating():
     """Фильм нашёлся, оценки у него нет — это ответ, а не «не знаю». Вернуть
     отсюда Missing значит выбросить добытый идентификатор Кинопоиска, ради
     которого мы сюда и ходим."""
-    transport = answering(200, {"docs": [{"id": 258687, "rating": {"kp": None}}]})
+    transport = responding(200, json={"docs": [{"id": 258687, "rating": {"kp": None}}]})
 
     result = await primary(transport).ratings("tt0816692", Kind.MOVIE)
 
@@ -165,7 +159,7 @@ async def test_the_identifier_survives_a_film_without_a_rating():
 
 
 async def test_an_empty_answer_from_the_primary_is_an_absence():
-    result = await primary(answering(200, {"docs": []})).ratings(
+    result = await primary(responding(200, json={"docs": []})).ratings(
         "tt0000000", Kind.MOVIE
     )
 
@@ -272,7 +266,7 @@ async def test_the_quota_closes_the_mirror_for_six_hours():
     запросов в сутки, и минутный откат сжёг бы её на повторных отказах."""
     clock = FakeClock()
     http = SourceHttp(
-        "kinopoisk", clock=clock, transport=answering(403, {"statusCode": 403})
+        "kinopoisk", clock=clock, transport=responding(403, json={"statusCode": 403})
     )
     client = PoiskkinoClient(http, api_key="k")
 
@@ -316,8 +310,8 @@ async def test_fallback_sends_the_key_in_the_header_and_keeps_the_tt_prefix():
 async def test_an_honest_zero_is_not_an_absence():
     """Весь план стоит на различии «нет ответа» и «ответ пустой». Ноль — это
     значение, а не молчание."""
-    transport = answering(
-        200, {"total": 1, "items": [{"ratingKinopoisk": 0, "kinopoiskId": 1}]}
+    transport = responding(
+        200, json={"total": 1, "items": [{"ratingKinopoisk": 0, "kinopoiskId": 1}]}
     )
 
     result = await fallback(transport).ratings("tt0816692", Kind.MOVIE)
@@ -397,8 +391,8 @@ async def test_a_found_answer_does_not_cost_a_second_request():
 async def test_both_mirrors_refusing_leaves_a_refusal():
     """Отказ запасного и есть итог: выдумывать вместо него ответ нельзя."""
     client = KinopoiskClient(
-        primary(answering(403, {"statusCode": 403})),
-        fallback(answering(402, {"message": "Превышен лимит запросов"})),
+        primary(responding(403, json={"statusCode": 403})),
+        fallback(responding(402, json={"message": "Превышен лимит запросов"})),
     )
 
     result = await client.ratings("tt0816692", Kind.MOVIE)

@@ -213,6 +213,17 @@
 
 - `OWNERS` = `словарь из 3`
 
+### `backend/sources/registry.py`
+
+- `class Sources`
+  - `tmdb: TmdbClient`
+  - `steam: SteamClient`
+  - `gog: GogClient`
+  - `mdblist: MdbListClient`
+  - `omdb: OmdbClient`
+  - `kinopoisk: KinopoiskClient`
+  - `connections: tuple[SourceHttp, ...]`
+
 ### `backend/sources/steam/client.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -352,6 +363,10 @@
 ### `tests/backend/sources/conftest.py`
 
 - `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
+
+### `tests/backend/sources/test_registry.py`
+
+- `SILENT` = `httpx.MockTransport(lambda request: httpx.Respon…`
 
 ### `tests/backend/test_config.py`
 
