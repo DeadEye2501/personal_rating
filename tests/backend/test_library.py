@@ -1,5 +1,5 @@
 from dataclasses import replace
-from datetime import date, datetime
+from datetime import date
 
 import pytest
 from sqlalchemy import text
@@ -9,9 +9,7 @@ from backend.storage.repository.library import ItemExists, LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-
-WHEN = datetime(2026, 7, 27, 12, 0)
-LATER = datetime(2026, 8, 27, 12, 0)
+from tests.conftest import LATER, MOMENT as WHEN
 
 
 def make_item(**overrides) -> Item:

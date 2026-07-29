@@ -262,23 +262,12 @@
 - `BANNED_IN_BACKEND` = `набор из 2`
 - `ALLOWED_FROM_BACKEND` = `набор из 2`
 
-### `tests/backend/test_library.py`
-
-- `WHEN` = `datetime(2026, 7, 27, 12, 0)`
-- `LATER` = `datetime(2026, 8, 27, 12, 0)`
-
-### `tests/backend/test_manual_cards.py`
-
-- `WHEN` = `datetime(2026, 1, 15, 12, 0)`
-- `LATER` = `datetime(2026, 7, 29, 12, 0)`
-
 ### `tests/backend/test_migrations.py`
 
 - `STAMP` = `'alembic_version'`
 
 ### `tests/backend/test_model.py`
 
-- `MOMENT` = `datetime(2026, 7, 27)`
 - `FROZEN` = `набор из 6`
 - `SCHEMA` = `набор из 8`
 
@@ -286,11 +275,6 @@
 
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `OTHER` = `'другая обложка'.encode()`
-
-### `tests/backend/test_ratings.py`
-
-- `WHEN` = `datetime(2026, 7, 27, 12, 0)`
-- `LATER` = `datetime(2026, 7, 28, 12, 0)`
 
 ### `tests/backend/test_session.py`
 
@@ -310,5 +294,6 @@
 ### `tests/conftest.py`
 
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
+- `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`

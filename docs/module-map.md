@@ -87,7 +87,7 @@
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
 
-### `backend/sources/errors.py` — 48 строк
+### `backend/sources/errors.py` — 46 строк
 
 Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
 
@@ -98,8 +98,7 @@
 - `class Missing` (3)
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
-- `def is_answer(outcome: Outcome) -> bool` (2)
-- `def writable(outcome: Outcome) -> bool` (3)
+- `def is_answer(outcome: Outcome) -> bool` (5)
 
 ### `backend/sources/http.py` — 87 строк
 
@@ -306,11 +305,11 @@
 
 ## scripts — 4 модулей
 
-### `scripts/collect_game_genres.py` — 78 строк
+### `scripts/collect_game_genres.py` — 80 строк
 
 Разовый сбор игровых жанров: справочника в документации нет ни у Steam, ни у
 
-Зависит от: —
+Зависит от: `backend.sources.http`
 
 - `def example_appids(menu: list[dict]) -> list[int]` (8)
 - `async def app_genres(client: httpx.AsyncClient, appid: int) -> list[dict]` (11)
@@ -386,7 +385,7 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/test_errors.py` — 104 строк
+### `tests/backend/sources/test_errors.py` — 93 строк
 
 
 
@@ -463,22 +462,22 @@
 - `def python_files(package: str) -> list[Path]` (7)
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
 
-### `tests/backend/test_library.py` — 382 строк ⚠ подошёл к 300
+### `tests/backend/test_library.py` — 380 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`
+Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
 Тестов: 25
 
 - `def make_item(**overrides) -> Item` (12)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
 
-### `tests/backend/test_manual_cards.py` — 212 строк
+### `tests/backend/test_manual_cards.py` — 210 строк
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`
+Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `tests.conftest`
 
 Тестов: 14
 
@@ -496,11 +495,11 @@
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 110 строк
+### `tests/backend/test_model.py` — 108 строк
 
 
 
-Зависит от: `backend.model`
+Зависит от: `backend.model`, `tests.conftest`
 
 Тестов: 9
 
@@ -514,11 +513,11 @@
 Тестов: 16
 
 
-### `tests/backend/test_ratings.py` — 190 строк
+### `tests/backend/test_ratings.py` — 186 строк
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.tables`, `tests.conftest`
 
 Тестов: 16
 
@@ -564,7 +563,7 @@
 Тестов: 10
 
 
-### `tests/conftest.py` — 114 строк
+### `tests/conftest.py` — 119 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 

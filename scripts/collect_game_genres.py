@@ -1,7 +1,7 @@
 """Разовый сбор игровых жанров: справочника в документации нет ни у Steam, ни у
 GOG, но каждый отдаёт свой список отдельной ручкой.
 
-Запуск: pipenv run python scripts/collect_game_genres.py
+Запуск: pipenv run python -m scripts.collect_game_genres
 """
 
 import asyncio
@@ -9,7 +9,9 @@ import json
 
 import httpx
 
-HEADERS = {"User-Agent": "PersonalRating/0.1 (personal library app)"}
+from backend.sources.http import USER_AGENT
+
+HEADERS = {"User-Agent": USER_AGENT}
 
 # Витрина отдаёт имена без числовых идентификаторов, а карточка игры — с ними.
 # Поэтому список берётся из витрины, а номера добираются по играм-примерам.

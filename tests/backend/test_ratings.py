@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pytest
 from sqlalchemy import select
 
@@ -7,9 +5,7 @@ from backend.model import Kind
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.tables import rating as rating_table
-
-WHEN = datetime(2026, 7, 27, 12, 0)
-LATER = datetime(2026, 7, 28, 12, 0)
+from tests.conftest import LATER, MOMENT as WHEN
 
 
 async def test_score_of_a_film_is_what_was_set(sessions, card):

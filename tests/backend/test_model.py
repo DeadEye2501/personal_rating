@@ -1,5 +1,4 @@
 from dataclasses import FrozenInstanceError
-from datetime import datetime
 
 import pytest
 
@@ -20,6 +19,7 @@ from backend.model import (
     Source,
     average_score,
 )
+from tests.conftest import MOMENT
 
 
 def test_average_of_three_aspects_is_not_rounded():
@@ -44,8 +44,6 @@ def test_zero_counts_as_a_filled_aspect():
     # отличает выставленное от невыставленного по `is None`, а не по ложности.
     assert average_score(0, 10, None) == 5.0
 
-
-MOMENT = datetime(2026, 7, 27)
 
 FROZEN = [
     (Item(id=1, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
@@ -77,7 +75,7 @@ def test_optional_fields_have_sane_defaults():
         source=Source.STEAM,
         source_id="292030",
         title="The Witcher 3",
-        synced_at=datetime(2026, 7, 27),
+        synced_at=MOMENT,
     )
     assert (item.original_title, item.synopsis, item.poster_url) == ("", "", "")
     assert (item.year, item.released_at, item.runtime) == (None, None, None)

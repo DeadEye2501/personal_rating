@@ -3,14 +3,7 @@ from datetime import timedelta
 
 import pytest
 
-from backend.sources.errors import (
-    Found,
-    Missing,
-    Reason,
-    Refusal,
-    is_answer,
-    writable,
-)
+from backend.sources.errors import Found, Missing, Reason, Refusal, is_answer
 
 
 def test_found_carries_the_value():
@@ -21,18 +14,14 @@ def test_missing_is_an_answer_not_a_silence():
     """«У источника такого нет» — это ответ, и его надо записать пустым
     значением, иначе фильм будет перезапрашиваться при каждом показе."""
     assert is_answer(Missing()) is True
-    assert writable(Missing()) is True
 
 
-def test_refusal_is_not_an_answer_and_is_not_written():
-    refusal = Refusal(source="omdb", reason=Reason.QUOTA)
-    assert is_answer(refusal) is False
-    assert writable(refusal) is False
+def test_refusal_is_not_an_answer():
+    assert is_answer(Refusal(source="omdb", reason=Reason.QUOTA)) is False
 
 
-def test_found_is_both():
+def test_found_is_an_answer_too():
     assert is_answer(Found(1.0)) is True
-    assert writable(Found(1.0)) is True
 
 
 def test_refusal_may_name_its_own_retry_delay():

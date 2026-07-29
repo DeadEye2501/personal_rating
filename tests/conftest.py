@@ -16,7 +16,12 @@ from backend.storage.session import (
 from backend.storage.tables import metadata
 from tests.alembic_runner import alembic
 
+# Момент и момент позже. Заведённые в каждом модуле заново, они расходились
+# значениями, ничего этим не проверяя. Важен только порядок: где нужен
+# определённый промежуток, тест берёт `MOMENT + timedelta(...)` и говорит это
+# вслух.
 MOMENT = datetime(2026, 7, 29, 12, 0)
+LATER = datetime(2026, 7, 30, 12, 0)
 
 # Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он
 # совпал бы с ним при любой пропаже таблицы.

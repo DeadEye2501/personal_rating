@@ -5,9 +5,7 @@ import pytest
 from backend.model import Kind, Source, new_manual_item
 from backend.storage.repository.library import ItemExists, LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
-
-WHEN = datetime(2026, 1, 15, 12, 0)
-LATER = datetime(2026, 7, 29, 12, 0)
+from tests.conftest import LATER, MOMENT as WHEN
 
 
 def test_manual_item_gets_its_own_identity():
@@ -123,8 +121,8 @@ async def test_link_takes_only_the_asked_card(sessions):
 
 
 async def test_link_refreshes_synced_at(sessions):
-    """Иначе карточка, заведённая полгода назад, в момент привязки сразу
-    окажется просроченной и уедет на перезапрос — а там нечего запрашивать."""
+    """Иначе карточка, заведённая давно, в момент привязки сразу окажется
+    просроченной и уедет на перезапрос — а там нечего запрашивать."""
     repository = LibraryRepository(sessions)
     item_id = await repository.create(
         new_manual_item(Kind.MOVIE, "Интерстеллар", synced_at=WHEN)
