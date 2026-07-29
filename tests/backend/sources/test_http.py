@@ -7,18 +7,7 @@ import pytest
 from backend.sources.errors import Reason, Refusal
 from backend.sources.http import USER_AGENT, Breaker, SourceHttp
 from backend.sources.undocumented import refuse_undocumented
-from tests.backend.sources.conftest import FakeClock
-
-
-def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]:
-    """Запоминает ушедшее на провод: проверять надо запрос, а не намерение."""
-    seen: list[httpx.Request] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
-        return httpx.Response(200, json={})
-
-    return httpx.MockTransport(handler), seen
+from tests.backend.sources.conftest import FakeClock, capture
 
 
 async def test_user_agent_is_always_sent():

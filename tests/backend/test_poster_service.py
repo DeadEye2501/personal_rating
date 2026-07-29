@@ -1,0 +1,204 @@
+import io
+
+import httpx
+import pytest
+from PIL import Image
+
+from backend.model import Source
+from backend.service.images import TARGET_SIZE, BadImage
+from backend.service.posters import PosterService
+from backend.sources.errors import Reason, Refusal
+from backend.sources.http import SourceHttp
+from backend.storage.posters import PosterStore
+from tests.backend.sources.conftest import capture, responding
+from tests.conftest import MOMENT as WHEN
+from tests.conftest import picture
+
+POSTER = picture(600, 900, fmt="JPEG")
+SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
+
+
+def service_with(store, transport: httpx.MockTransport) -> PosterService:
+    clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
+               for source in SOURCES}
+    return PosterService(clients, store)
+
+
+@pytest.fixture
+async def service(posters):
+    built = service_with(posters, responding(content=POSTER))
+    yield built
+    await built.aclose()
+
+
+async def test_a_downloaded_poster_is_not_re_encoded(service):
+    """Скачанный уже 2:3. Перекодировать его — потерять качество и запас под
+    высокую плотность экрана, который спека держит сознательно."""
+    data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+
+    assert data == POSTER
+    assert Image.open(io.BytesIO(data)).size == (600, 900)
+
+
+async def test_no_url_means_nothing_to_wait_for(service):
+    """Обложки нет в самом источнике — он отдал всё, что имел."""
+    assert await service.fetch(Source.TMDB, "") is None
+
+
+async def test_a_failed_download_is_a_refusal(posters):
+    """В теле настоящая картинка, и отказ всё равно отказ: под кодом 404 CDN
+    отдаёт и заглушку-картинку, а сохранить её значило бы поселить в карточке
+    чужую обложку насовсем. С телом-текстом эта проверка сторожила бы подпись
+    формата, а не код ответа."""
+    service = service_with(posters, responding(404, content=POSTER))
+    result = await service.fetch(Source.TMDB, "https://example.com/missing.jpg")
+    await service.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+    assert result.source == "poster:tmdb"
+
+
+async def test_an_empty_body_is_a_refusal(posters):
+    """Пустоту ловит проверка подписи: подписи у неё нет."""
+    service = service_with(posters, responding(content=b""))
+    result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+    await service.aclose()
+
+    assert isinstance(result, Refusal)
+
+
+async def test_a_page_instead_of_a_picture_is_a_refusal(posters):
+    """CDN отдал заглушку или капчу под кодом 200. Проверку кода и непустоты она
+    проходит насквозь, и HTML лёг бы в хранилище как обложка — а карточка
+    считалась бы при этом полной."""
+    service = service_with(posters, responding(text="<html>404 not found</html>"))
+    result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+    await service.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+
+
+async def test_a_refusal_of_the_client_passes_through_as_it_was(posters):
+    """Сеть не отозвалась — это отказ клиента, и подменять его причину нельзя:
+    по ней наверху решают, ждать или сказать человеку «нет связи»."""
+    def failing(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("не дозвонились")
+
+    service = service_with(posters, httpx.MockTransport(failing))
+    result = await service.fetch(Source.GOG, "https://example.com/poster.jpg")
+    await service.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.NETWORK
+    assert result.source == "cdn:gog"
+
+
+async def test_png_is_a_picture_too(posters):
+    """Форматов у обложек три, и подпись проверяется у всех: у GOG приезжает
+    PNG, и отказ на нём означал бы, что карточка не пишется никогда."""
+    body = picture(600, 900)
+    service = service_with(posters, responding(content=body))
+    result = await service.fetch(Source.GOG, "https://example.com/cover.png")
+    await service.aclose()
+
+    assert result == body
+
+
+async def test_webp_is_a_picture_too(posters):
+    """Третий формат из набора подписей. Без проверки его подпись снимается
+    безнаказанно, а с ней уходит и весь webp — CDN отдаёт его охотно."""
+    body = picture(600, 900, fmt="WEBP")
+    service = service_with(posters, responding(content=body))
+    result = await service.fetch(Source.STEAM, "https://example.com/cover.webp")
+    await service.aclose()
+
+    assert result == body
+
+
+async def test_the_poster_is_asked_at_the_address_it_was_given(posters):
+    """На провод уходит переданный адрес, а не собранный по дороге: лишний слэш
+    или чужой хост неотличимы от «обложки нет»."""
+    transport, seen = capture(content=POSTER)
+    service = service_with(posters, transport)
+    await service.fetch(Source.TMDB, "https://cdn.example.com/w500/poster.jpg")
+    await service.aclose()
+
+    assert [str(request.url) for request in seen] == [
+        "https://cdn.example.com/w500/poster.jpg"
+    ]
+
+
+async def test_each_source_is_asked_through_its_own_client(posters):
+    """Молчание одного CDN не должно выключать обложки остальных, а спрашивать
+    надо того, у кого карточка: с общим клиентом на всех этого не видно."""
+    bodies = {source: picture(600, 900 + number, fmt="JPEG")
+              for number, source in enumerate(SOURCES)}
+    clients = {
+        source: SourceHttp(f"cdn:{source}", transport=responding(content=body))
+        for source, body in bodies.items()
+    }
+    service = PosterService(clients, posters)
+
+    for source, body in bodies.items():
+        assert await service.fetch(source, "https://example.com/p.jpg") == body
+    assert len({id(client.breaker) for client in service.clients.values()}) == 3
+    await service.aclose()
+
+
+async def test_an_unknown_source_is_a_refusal(service):
+    """Ручная карточка обложку не скачивает: адреса у неё нет, и клиента тоже."""
+    result = await service.fetch(Source.MANUAL, "https://example.com/p.jpg")
+
+    assert isinstance(result, Refusal)
+    assert result.source == "poster:manual"
+
+
+async def test_a_downloaded_poster_is_stored_byte_for_byte(service):
+    """Обрезается только залитое с диска: скачанное ложится как приехало."""
+    data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+    await service.save(1, data, now=WHEN)
+
+    assert await service.store.get(1) == data
+
+
+async def test_an_upload_is_cropped(service):
+    """Залитая с диска — единственное, что обрезается."""
+    await service.store_upload(1, picture(4000, 1000), now=WHEN)
+
+    stored = await service.store.get(1)
+    assert Image.open(io.BytesIO(stored)).size == TARGET_SIZE
+
+
+async def test_a_bad_upload_is_a_named_error(service):
+    with pytest.raises(BadImage):
+        await service.store_upload(1, "не картинка".encode(), now=WHEN)
+
+    assert await service.store.get(1) is None, "в хранилище лёг мусор"
+
+
+async def test_closing_the_service_closes_the_store(tmp_path):
+    """Хранилище — второй файл базы, и его тоже закрывает сервис. Проверяется
+    удалением файла: открытую базу Windows удалить не даёт, и именно об этот
+    отказ спотыкается прогон, если файл кто-то держит."""
+    path = tmp_path / "posters.db"
+    store = PosterStore(path)
+    await store.open()
+    service = service_with(store, responding(content=POSTER))
+    await service.save(1, POSTER, now=WHEN)
+
+    await service.aclose()
+
+    path.unlink()
+
+
+async def test_closing_the_service_closes_every_client(posters):
+    """Клиентов у сервиса три, и закрыть надо каждого: незакрытый держит
+    соединение до конца работы приложения."""
+    service = service_with(posters, responding(content=POSTER))
+    await service.aclose()
+
+    for source in SOURCES:
+        with pytest.raises(RuntimeError):
+            await service.fetch(source, "https://example.com/poster.jpg")

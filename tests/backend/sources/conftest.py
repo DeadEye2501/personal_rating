@@ -35,17 +35,36 @@ def _meta(relative: str) -> dict:
     return _load(f"{relative.rsplit('.', 1)[0]}.meta.json")
 
 
-def responding(status: int = 200, *, json=None, text=None, headers=None):
+def responding(status: int = 200, *, json=None, text=None, content=None,
+               headers=None):
     """Транспорт, отвечающий одним и тем же ответом на любой запрос.
 
     Тело здесь сочиняется, и это законно ровно там, где записать его нечем:
     квоту и частоту ни у одного источника не выбирали. Записанные ответы
-    отдаёт `replay`, и он же ставит их настоящий код."""
+    отдаёт `replay`, и он же ставит их настоящий код.
+
+    `content` — тело байтами: у обложки оно картинка, а не текст."""
     return httpx.MockTransport(
         lambda request: httpx.Response(
-            status, json=json, text=text, headers=headers or {}
+            status, json=json, text=text, content=content, headers=headers or {}
         )
     )
+
+
+def capture(*, content: bytes | None = None):
+    """Запоминает ушедшее на провод: проверять надо запрос, а не намерение.
+
+    `content` — тело ответа байтами, когда запрашивают картинку: пустой JSON
+    вместо неё сам стал бы отказом, и проверка адреса на него не добралась бы."""
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if content is None:
+            return httpx.Response(200, json={})
+        return httpx.Response(200, content=content)
+
+    return httpx.MockTransport(handler), seen
 
 
 @pytest.fixture

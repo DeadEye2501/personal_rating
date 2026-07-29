@@ -4,12 +4,7 @@ import pytest
 from PIL import Image
 
 from backend.service.images import TARGET_SIZE, BadImage, crop_to_cover
-
-
-def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
-    buffer = io.BytesIO()
-    Image.new("RGB", (width, height), (10, 20, 30)).save(buffer, format=fmt)
-    return buffer.getvalue()
+from tests.conftest import picture
 
 
 def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes:

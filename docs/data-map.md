@@ -157,6 +157,11 @@
 - `TARGET_SIZE` = `набор из 2`
 - `_QUALITY` = `88`
 
+### `backend/service/posters.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `_SIGNATURES` = `набор из 3`
+
 ### `backend/sources/errors.py`
 
 - `class Reason(StrEnum)`
@@ -441,6 +446,11 @@
 
 - `FROZEN` = `набор из 6`
 - `SCHEMA` = `набор из 8`
+
+### `tests/backend/test_poster_service.py`
+
+- `POSTER` = `picture(600, 900, fmt='JPEG')`
+- `SOURCES` = `набор из 3`
 
 ### `tests/backend/test_posters.py`
 

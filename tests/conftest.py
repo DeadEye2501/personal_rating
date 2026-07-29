@@ -1,9 +1,11 @@
 """Общее для тестов: временные база и хранилище, фикстуры и минимальные строки."""
 
+import io
 from datetime import datetime
 
 import pytest
 import sqlalchemy
+from PIL import Image
 
 from backend.model import Item, Kind, Source
 from backend.storage.posters import PosterStore
@@ -26,6 +28,15 @@ LATER = datetime(2026, 7, 30, 12, 0)
 # Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
 # хранилищу постеров важно только то, что байты вернулись теми же.
 PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 512
+
+
+def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
+    """Настоящая картинка заданного размера. Размер обязателен: там, где эта
+    картинка нужна, он и есть предмет проверки."""
+    buffer = io.BytesIO()
+    Image.new("RGB", (width, height), (10, 20, 30)).save(buffer, format=fmt)
+    return buffer.getvalue()
+
 
 # Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он
 # совпал бы с ним при любой пропаже таблицы.

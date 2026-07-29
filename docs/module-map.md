@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 48 модулей
+## backend — 49 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -128,6 +128,20 @@
 - `class BadImage(Exception)` (2)
 - `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
 - `def crop_to_cover(data: bytes) -> bytes` (20)
+
+### `backend/service/posters.py` — 84 строк
+
+Путь обложки от источника до хранилища.
+
+Зависит от: `backend.model`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
+
+- `class PosterService` (64)
+  - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (16)
+  - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | Refusal` (18)
+  - `def _refuse(self, source: Source, detail: str) -> Refusal` (5)
+  - `async def save(self, item_id: int, data: bytes, now: datetime) -> None` (2)
+  - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
+  - `async def aclose(self) -> None` (4)
 
 ### `backend/sources/convert.py` — 52 строк
 
@@ -718,7 +732,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 38 модулей
+## tests — 39 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -728,7 +742,7 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 95 строк
+### `tests/backend/sources/conftest.py` — 114 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
@@ -739,7 +753,9 @@
   - `def advance(self, delta: timedelta) -> None` (2)
 - `def _load(relative: str)` (4)
 - `def _meta(relative: str) -> dict` (3)
-- `def responding(status: int=200, *, json=None, text=None, headers=None)` (11)
+- `def responding(status: int=200, *, json=None, text=None, content=None, headers=None)` (14)
+- `def capture(*, content: bytes | None=None)` (14)
+  - `def handler(request: httpx.Request) -> httpx.Response` (5)
 - `def fixture()` (3)
 - `def meta()` (2)
 - `def replay()` (33)
@@ -774,7 +790,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def answering(body) -> SourceHttp` (3)
 
-### `tests/backend/sources/test_http.py` — 331 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 320 строк ⚠ подошёл к 300
 
 
 
@@ -782,8 +798,6 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 Тестов: 21
 
-- `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
-  - `def handler(request: httpx.Request) -> httpx.Response` (3)
 
 ### `tests/backend/sources/test_kinopoisk.py` — 415 строк ⚠ подошёл к 300
 
@@ -933,15 +947,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def ours(caplog) -> list[str]` (8)
 - `async def reference(engine)` (16)
 
-### `tests/backend/test_images.py` — 131 строк
+### `tests/backend/test_images.py` — 126 строк
 
 
 
-Зависит от: `backend.service.images`
+Зависит от: `backend.service.images`, `tests.conftest`
 
 Тестов: 14
 
-- `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (4)
 - `def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes` (7)
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
@@ -1000,6 +1013,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 9
 
+
+### `tests/backend/test_poster_service.py` — 204 строк
+
+
+
+Зависит от: `backend.model`, `backend.service.images`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`, `tests.backend.sources.conftest`, `tests.conftest`
+
+Тестов: 16
+
+- `def service_with(store, transport: httpx.MockTransport) -> PosterService` (4)
+- `async def service(posters)` (4)
 
 ### `tests/backend/test_posters.py` — 173 строк
 
@@ -1070,12 +1094,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 124 строк
+### `tests/conftest.py` — 135 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
 Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
 
+- `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def migrated(tmp_path)` (16)
 - `async def engine(tmp_path)` (8)
 - `async def sessions(engine)` (4)
