@@ -182,6 +182,15 @@
 
 - `OWNERS` = `словарь из 4`
 
+### `backend/sources/ratings/omdb/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE` = `'https://www.omdbapi.com/'`
+
+### `backend/sources/ratings/omdb/parse.py`
+
+- `OWNERS` = `словарь из 3`
+
 ### `backend/sources/steam/client.py`
 
 - `logger` = `logging.getLogger(__name__)`

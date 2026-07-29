@@ -59,6 +59,9 @@ class SourceHttp:
         timeout: float = DEFAULT_TIMEOUT,
     ) -> None:
         self.name = name
+        # Часы держатся полем, а не только внутри предохранителя: у OMDB срок
+        # отката считается до полуночи, и без общих часов его не проверить.
+        self.clock = clock
         self.breaker = Breaker(clock)
         self._client = httpx.AsyncClient(
             transport=transport,

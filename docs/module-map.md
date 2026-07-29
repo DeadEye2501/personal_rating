@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 34 модулей
+## backend — 36 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -158,7 +158,7 @@
 - `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
 - `def to_hit(card: SourceCard) -> SearchHit` (12)
 
-### `backend/sources/http.py` — 109 строк
+### `backend/sources/http.py` — 112 строк
 
 Общая дверь в сеть для всех источников.
 
@@ -168,7 +168,7 @@
   - `def is_open(self) -> bool` (7)
   - `def trip(self, delay: timedelta, reason: Reason=Reason.QUOTA) -> None` (7)
   - `def reason(self) -> Reason` (2)
-- `class SourceHttp` (38)
+- `class SourceHttp` (41)
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 - `def refuse_undocumented(http: SourceHttp, response: httpx.Response) -> Refusal` (14)
@@ -193,6 +193,28 @@
 Зависит от: `backend.model`
 
 - `def parse_ratings(payload: dict) -> Ratings` (18)
+
+### `backend/sources/ratings/omdb/client.py` — 100 строк
+
+Разговор с OMDB по сети.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.parse`
+
+- `def until_midnight(now: datetime) -> timedelta` (7)
+- `class OmdbClient` (66)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (28)
+  - `def _answer(self, payload: dict) -> Outcome` (11)
+  - `def _denied(self, payload: dict) -> Refusal` (17)
+  - `async def aclose(self) -> None` (2)
+
+### `backend/sources/ratings/omdb/parse.py` — 46 строк
+
+Перевод ответов OMDB в наши типы.
+
+Зависит от: `backend.model`
+
+- `def _number(raw: str | None) -> float | None` (10)
+- `def parse_ratings(payload: dict) -> Ratings` (21)
 
 ### `backend/sources/steam/client.py` — 128 строк
 
@@ -540,7 +562,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 29 модулей
+## tests — 30 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -608,6 +630,17 @@ MDBList: квота, битый ключ и чужой периметр — тр
 - `def responding(status, *, json=None, text=None, headers=None)` (5)
   - `def handler(request: httpx.Request) -> httpx.Response` (2)
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
+
+### `tests/backend/sources/test_omdb.py` — 301 строк ⚠ подошёл к 300
+
+OMDB: единственный источник, у которого отказ приходит под кодом 401, а
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.client`, `backend.sources.ratings.omdb.parse`, `tests.backend.sources.conftest`
+
+Тестов: 28
+
+- `def responding(status, body)` (2)
+- `async def ask(transport)` (5)
 
 ### `tests/backend/sources/test_steam.py` — 332 строк ⚠ подошёл к 300
 
