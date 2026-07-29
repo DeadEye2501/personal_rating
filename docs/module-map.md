@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 21 модулей
+## backend — 22 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -100,6 +100,20 @@
 - `Outcome: TypeAlias = Found | Missing | Refusal`
 - `def is_answer(outcome: Outcome) -> bool` (2)
 - `def writable(outcome: Outcome) -> bool` (3)
+
+### `backend/sources/http.py` — 87 строк
+
+Общая дверь в сеть для всех источников.
+
+Зависит от: `backend.sources.errors`
+
+- `class Breaker` (28)
+  - `def is_open(self) -> bool` (7)
+  - `def trip(self, delay: timedelta, reason: Reason=Reason.QUOTA) -> None` (7)
+  - `def reason(self) -> Reason` (2)
+- `class SourceHttp` (38)
+  - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
+  - `async def aclose(self) -> None` (2)
 
 ### `backend/storage/posters.py` — 89 строк
 
@@ -336,7 +350,7 @@
 - `def render() -> str` (16)
 - `def main() -> int` (12)
 
-## tests — 18 модулей
+## tests — 19 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -354,6 +368,20 @@
 
 Тестов: 12
 
+
+### `tests/backend/sources/test_http.py` — 305 строк ⚠ подошёл к 300
+
+
+
+Зависит от: `backend.sources.errors`, `backend.sources.http`
+
+Тестов: 19
+
+- `class FakeClock` (9)
+  - `def __call__(self) -> datetime` (2)
+  - `def advance(self, delta: timedelta) -> None` (2)
+- `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
+  - `def handler(request: httpx.Request) -> httpx.Response` (3)
 
 ### `tests/backend/test_config.py` — 66 строк
 
