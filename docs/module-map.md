@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 20 модулей
+## backend — 21 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -86,6 +86,19 @@
 
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
+
+### `backend/sources/errors.py` — 48 строк
+
+Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
+
+Зависит от: —
+
+- `class Reason(StrEnum)` (6)
+- `class Found` (2)
+- `class Missing` (3)
+- `class Refusal` (8)
+- `def is_answer(outcome: Outcome) -> bool` (2)
+- `def writable(outcome: Outcome) -> bool` (3)
 
 ### `backend/storage/posters.py` — 89 строк
 
@@ -321,7 +334,7 @@
 - `def render() -> str` (16)
 - `def main() -> int` (12)
 
-## tests — 17 модулей
+## tests — 18 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -330,6 +343,15 @@
 Зависит от: —
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
+
+### `tests/backend/sources/test_errors.py` — 104 строк
+
+
+
+Зависит от: `backend.sources.errors`
+
+Тестов: 12
+
 
 ### `tests/backend/test_config.py` — 66 строк
 
