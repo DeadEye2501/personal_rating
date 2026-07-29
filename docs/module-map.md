@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 35 строк
+### `backend/model/__init__.py` — 37 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`
 
-Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Source`, `average_score`
+Отдаёт наружу: `CompanyRole`, `Credit`, `ExternalId`, `ExternalRating`, `Genre`, `GenreKind`, `GenreSource`, `IdSource`, `Item`, `Kind`, `PersonRole`, `Rating`, `RatingSource`, `Source`, `average_score`, `new_manual_item`, `new_source_id`
 
 
 ### `backend/model/credit.py` — 18 строк
@@ -53,13 +53,15 @@
 
 - `class Genre` (4)
 
-### `backend/model/item.py` — 25 строк
+### `backend/model/item.py` — 48 строк
 
 Карточка любого типа содержимого на границе слоёв.
 
 Зависит от: `backend.model.kinds`
 
 - `class Item` (16)
+- `def new_source_id() -> str` (5)
+- `def new_manual_item(kind: Kind, title: str, **fields) -> Item` (13)
 
 ### `backend/model/kinds.py` — 70 строк
 
@@ -120,7 +122,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (7)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (9)
 
-### `backend/storage/repository/library.py` — 173 строк
+### `backend/storage/repository/library.py` — 200 строк
 
 Карточки библиотеки.
 
@@ -129,7 +131,7 @@
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
 - `def _to_item(row: Row) -> Item` (22)
-- `class LibraryRepository(Repository)` (113)
+- `class LibraryRepository(Repository)` (140)
   - `async def create(self, item: Item) -> int` (16)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
@@ -139,6 +141,8 @@
   - `async def delete(self, item_id: int, posters: PosterStore) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
   - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
+  - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (17)
+  - `async def unlink(self, item_id: int) -> None` (8)
 
 ### `backend/storage/repository/ratings.py` — 69 строк
 

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import Row, Select, delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 
-from backend.model import Item, Kind, Source
+from backend.model import Item, Kind, Source, new_source_id
 from backend.storage.posters import PosterStore
 from backend.storage.repository.base import Repository
 from backend.storage.session import fold
@@ -170,4 +170,31 @@ class LibraryRepository(Repository):
         del values["source"], values["source_id"]
         await self._run(
             update(item_table).where(item_table.c.id == item_id).values(**values)
+        )
+
+    async def link(self, item_id: int, source: Source, source_id: str,
+                   now: datetime) -> None:
+        """Привязка — правка двух полей. Оценка, теги и закладка держатся за
+        `item.id`, а он не меняется.
+
+        `synced_at` ставится заново: иначе карточка, заведённая полгода назад,
+        сразу окажется просроченной и уедет на перезапрос, которому нечего
+        запрашивать. Время приходит параметром, как во всех записях проекта:
+        читай его функция сама, проверить записанное было бы нечем."""
+        try:
+            await self._run(
+                update(item_table)
+                .where(item_table.c.id == item_id)
+                .values(source=source, source_id=source_id, synced_at=now)
+            )
+        except IntegrityError as error:
+            raise ItemExists(f"{source}:{source_id} уже в библиотеке") from error
+
+    async def unlink(self, item_id: int) -> None:
+        """Источник снимается, карточка становится ручной. Данные остаются:
+        они уже твои."""
+        await self._run(
+            update(item_table)
+            .where(item_table.c.id == item_id)
+            .values(source=Source.MANUAL, source_id=new_source_id())
         )
