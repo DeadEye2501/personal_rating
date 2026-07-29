@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 29 модулей
+## backend — 31 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -103,13 +103,15 @@
 
 - `class SearchHit` (19)
 
-### `backend/sources/convert.py` — 23 строк
+### `backend/sources/convert.py` — 52 строк
 
 Куски чужого ответа, которые все источники переводят одинаково.
 
 Зависит от: `backend.model`
 
-- `def genres(space: GenreSource, rows: list[dict]) -> tuple[tuple[GenreSource, str], ...]` (4)
+- `def genres(space: GenreSource, rows: list[dict], key: str='id') -> tuple[tuple[GenreSource, str], ...]` (7)
+- `def year(value: str | None) -> int | None` (5)
+- `def companies(payload: dict) -> tuple[Credit, ...]` (11)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
 
 ### `backend/sources/errors.py` — 58 строк
@@ -126,7 +128,29 @@
 - `def broken(source: str, error: Exception) -> Refusal` (4)
 - `def is_answer(outcome: Outcome) -> bool` (5)
 
-### `backend/sources/http.py` — 87 строк
+### `backend/sources/gog/client.py` — 78 строк
+
+Разговор с GOG по сети.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`
+
+- `class GogClient` (55)
+  - `async def _catalog(self, query: str) -> list | Refusal` (13)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
+  - `async def aclose(self) -> None` (2)
+
+### `backend/sources/gog/parse.py` — 64 строк
+
+Перевод ответов GOG в наши типы.
+
+Зависит от: `backend.model`, `backend.sources.convert`
+
+- `def _marks(row: dict) -> tuple[tuple[GenreSource, str], ...]` (8)
+- `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
+- `def to_hit(card: SourceCard) -> SearchHit` (12)
+
+### `backend/sources/http.py` — 109 строк
 
 Общая дверь в сеть для всех источников.
 
@@ -139,21 +163,21 @@
 - `class SourceHttp` (38)
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
+- `def refuse_undocumented(http: SourceHttp, response: httpx.Response) -> Refusal` (14)
 
-### `backend/sources/steam/client.py` — 145 строк
+### `backend/sources/steam/client.py` — 128 строк
 
 Разговор со Steam по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`
 
-- `class SteamClient` (105)
-  - `def _fail(self, response: httpx.Response) -> Refusal` (11)
+- `class SteamClient` (93)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (39)
   - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 102 строк
+### `backend/sources/steam/parse.py` — 87 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -162,7 +186,6 @@
 - `def poster_url(appid: str) -> str` (4)
 - `def parse_search(payload: list[dict]) -> list[SearchHit]` (11)
 - `def _year(value: str | None) -> int | None` (7)
-- `def _companies(data: dict) -> tuple[Credit, ...]` (11)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
@@ -181,14 +204,13 @@
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 184 строк
+### `backend/sources/tmdb/parse.py` — 178 строк
 
 Перевод ответов TMDB в наши типы.
 
 Зависит от: `backend.model`, `backend.sources.convert`
 
 - `class Incomplete(Exception)` (5)
-- `def _year(value: str | None) -> int | None` (4)
 - `def _released(value: str | None) -> date | None` (7)
 - `def _poster(payload: dict) -> str` (3)
 - `def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (2)
@@ -489,7 +511,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 27 модулей
+## tests — 28 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -525,13 +547,23 @@
 Тестов: 12
 
 
-### `tests/backend/sources/test_http.py` — 295 строк
+### `tests/backend/sources/test_gog.py` — 250 строк
+
+GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
+
+Тестов: 20
+
+- `def answering(body) -> SourceHttp` (5)
+
+### `tests/backend/sources/test_http.py` — 335 строк ⚠ подошёл к 300
 
 
 
 Зависит от: `backend.sources.errors`, `backend.sources.http`, `tests.backend.sources.conftest`
 
-Тестов: 19
+Тестов: 21
 
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)

@@ -155,11 +155,17 @@
 - `Outcome: TypeAlias` = `Found | Missing | Refusal`
 - `BROKEN_BY_PARSING` = `набор из 4`
 
+### `backend/sources/gog/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `CATALOG` = `'https://catalog.gog.com/v1/catalog'`
+
 ### `backend/sources/http.py`
 
 - `logger` = `logging.getLogger(__name__)`
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
+- `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
 
 ### `backend/sources/steam/client.py`
 
@@ -169,7 +175,6 @@
 - `TAGS` = `'https://api.steampowered.com/IStoreBrowseServic…`
 - `TAGS_CONTEXT` = `словарь из 3`
 - `TAGS_WANTED` = `словарь из 1`
-- `RATE_BACKOFF` = `timedelta(minutes=5)`
 
 ### `backend/sources/steam/parse.py`
 

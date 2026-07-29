@@ -3,7 +3,6 @@
 import json
 import logging
 from dataclasses import replace
-from datetime import timedelta
 from urllib.parse import quote
 
 import httpx
@@ -18,7 +17,7 @@ from backend.sources.errors import (
     Refusal,
     broken,
 )
-from backend.sources.http import SourceHttp
+from backend.sources.http import SourceHttp, refuse_undocumented
 from backend.sources.steam.parse import parse_card, parse_search, parse_tags
 
 logger = logging.getLogger(__name__)
@@ -33,10 +32,6 @@ TAGS = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 TAGS_CONTEXT = {"language": "russian", "country_code": "US", "steam_realm": 1}
 TAGS_WANTED = {"include_tag_count": 20}
 
-# Документации у Steam нет вовсе; 220 запросов подряд прошли без троттлинга.
-# Откат свой, на случай если он всё-таки появится.
-RATE_BACKOFF = timedelta(minutes=5)
-
 
 class SteamClient:
     """Аргумент `kind` есть ради общего контракта каталожных клиентов и
@@ -44,18 +39,6 @@ class SteamClient:
 
     def __init__(self, http: SourceHttp) -> None:
         self._http = http
-
-    def _fail(self, response: httpx.Response) -> Refusal:
-        if response.status_code == 429:
-            self._http.breaker.trip(RATE_BACKOFF, Reason.RATE)
-            return Refusal(
-                source="steam", reason=Reason.RATE, retry_after=RATE_BACKOFF
-            )
-        return Refusal(
-            source="steam",
-            reason=Reason.BROKEN,
-            detail=f"HTTP {response.status_code}",
-        )
 
     async def search(self, query: str, kind: Kind) -> Outcome:
         # Строка поиска идёт частью пути, поэтому её надо экранировать: `?` и
@@ -66,7 +49,7 @@ class SteamClient:
         if not isinstance(response, httpx.Response):
             return response
         if response.status_code != 200:
-            return self._fail(response)
+            return refuse_undocumented(self._http, response)
         try:
             return Found(parse_search(response.json()))
         except BROKEN_BY_PARSING as error:
@@ -81,7 +64,7 @@ class SteamClient:
             return response
         # Битый или отсутствующий appids даёт 400 и тело `null`.
         if response.status_code != 200:
-            return self._fail(response)
+            return refuse_undocumented(self._http, response)
 
         try:
             payload = response.json()

@@ -5,7 +5,12 @@ import httpx
 import pytest
 
 from backend.sources.errors import Reason, Refusal
-from backend.sources.http import USER_AGENT, Breaker, SourceHttp
+from backend.sources.http import (
+    USER_AGENT,
+    Breaker,
+    SourceHttp,
+    refuse_undocumented,
+)
 from tests.backend.sources.conftest import FakeClock
 
 
@@ -280,6 +285,41 @@ async def test_closing_really_closes_the_connections():
     with pytest.raises(RuntimeError):
         await http.get("https://store.steampowered.com/api/appdetails")
     assert seen == []
+
+
+async def test_an_undocumented_rate_limit_closes_the_source_for_five_minutes():
+    """Steam и GOG своих лимитов не объявляют, и откат у них общий — догадка.
+    Срок при этом настоящий: поставь секунду, и мы продолжим долбиться в
+    закрытую дверь; поставь час, и источник промолчит впустую."""
+    clock = FakeClock()
+    http = SourceHttp("gog", clock=clock)
+
+    result = refuse_undocumented(http, httpx.Response(429))
+
+    assert result.reason is Reason.RATE
+    assert result.source == "gog"
+    assert http.breaker.is_open()
+
+    clock.advance(timedelta(minutes=4))
+    assert http.breaker.is_open(), "предохранитель отпустил раньше срока"
+
+    clock.advance(timedelta(minutes=2))
+    assert not http.breaker.is_open(), "предохранитель не отпустил через пять минут"
+    await http.aclose()
+
+
+async def test_any_other_code_from_an_undocumented_source_is_a_breakage():
+    """Отказ, но не по частоте: закрывать источник на пять минут из-за одного
+    500 значило бы наказывать себя за чужую икоту."""
+    http = SourceHttp("steam")
+
+    result = refuse_undocumented(http, httpx.Response(503))
+
+    assert result.reason is Reason.BROKEN
+    assert result.source == "steam", "отказ приписан не тому источнику"
+    assert "503" in result.detail
+    assert not http.breaker.is_open()
+    await http.aclose()
 
 
 async def test_error_codes_are_not_swallowed_here():

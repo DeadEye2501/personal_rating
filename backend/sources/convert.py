@@ -2,13 +2,42 @@
 
 from datetime import datetime
 
-from backend.model import ExternalRating, GenreSource, RatingSource
+from backend.model import (
+    CompanyRole,
+    Credit,
+    ExternalRating,
+    GenreSource,
+    RatingSource,
+)
 
 
-def genres(space: GenreSource, rows: list[dict]) -> tuple[tuple[GenreSource, str], ...]:
-    """Жанры в детальном ответе — объекты с именем, а номер лежит внутри. Имя
-    нам не нужно: справочник переводит чужой номер в наш жанр сам."""
-    return tuple((space, str(row["id"])) for row in rows)
+def genres(
+    space: GenreSource, rows: list[dict], key: str = "id"
+) -> tuple[tuple[GenreSource, str], ...]:
+    """Жанры в детальном ответе — объекты с именем, а идентификатор лежит
+    внутри. Имя нам не нужно: справочник переводит чужой идентификатор в наш
+    жанр сам. У GOG идентификатор — слаг, а не число, отсюда `key`."""
+    return tuple((space, str(row[key])) for row in rows)
+
+
+def year(value: str | None) -> int | None:
+    """Год из даты, которая с него начинается: `2014-11-05` у TMDB,
+    `2023.08.03` у GOG. У необъявленного к выходу дата приходит пустой."""
+    head = (value or "")[:4]
+    return int(head) if head.isdigit() else None
+
+
+def companies(payload: dict) -> tuple[Credit, ...]:
+    """Магазины отдают студии голыми строками: идентичности у них нет, и
+    выдумывать суррогат незачем — таких склеивают по имени."""
+    return tuple(
+        Credit(name=name, role=role)
+        for role, key in (
+            (CompanyRole.DEVELOPER, "developers"),
+            (CompanyRole.PUBLISHER, "publishers"),
+        )
+        for name in payload.get(key, [])
+    )
 
 
 def rating(

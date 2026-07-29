@@ -16,7 +16,7 @@ from backend.model import (
     Source,
     SourceCard,
 )
-from backend.sources.convert import genres, rating
+from backend.sources.convert import genres, rating, year
 
 POSTER_BASE = "https://image.tmdb.org/t/p/w500"
 
@@ -26,12 +26,6 @@ class Incomplete(Exception):
 
     Опечатка в `append_to_response` ошибки не даёт: приходит 200 и просто без
     блока. Поэтому полнота проверяется по содержимому, а не по коду."""
-
-
-def _year(value: str | None) -> int | None:
-    """У необъявленного к выходу дата приходит пустой строкой."""
-    head = (value or "")[:4]
-    return int(head) if head.isdigit() else None
 
 
 def _released(value: str | None) -> date | None:
@@ -108,7 +102,7 @@ def parse_search(payload: dict, kind: Kind) -> list[SearchHit]:
                 source_id=str(row["id"]),
                 title=row.get(title_key) or "",
                 original_title=row.get(original_key) or "",
-                year=_year(row.get(date_key)),
+                year=year(row.get(date_key)),
                 synopsis=row.get("overview") or "",
                 poster_url=_poster(row),
                 genre_ext_ids=tuple(
@@ -140,7 +134,7 @@ def parse_movie(payload: dict) -> SourceCard:
             title=payload.get("title") or "",
             synced_at=now,
             original_title=payload.get("original_title") or "",
-            year=_year(payload.get("release_date")),
+            year=year(payload.get("release_date")),
             released_at=_released(payload.get("release_date")),
             synopsis=payload.get("overview") or "",
             poster_url=_poster(payload),
@@ -169,7 +163,7 @@ def parse_series(payload: dict) -> SourceCard:
             title=payload.get("name") or "",
             synced_at=now,
             original_title=payload.get("original_name") or "",
-            year=_year(payload.get("first_air_date")),
+            year=year(payload.get("first_air_date")),
             released_at=_released(payload.get("first_air_date")),
             synopsis=payload.get("overview") or "",
             poster_url=_poster(payload),

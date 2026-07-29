@@ -4,8 +4,6 @@ import re
 from datetime import datetime
 
 from backend.model import (
-    CompanyRole,
-    Credit,
     ExternalRating,
     GenreSource,
     Item,
@@ -15,7 +13,7 @@ from backend.model import (
     Source,
     SourceCard,
 )
-from backend.sources.convert import genres, rating
+from backend.sources.convert import companies, genres, rating
 
 ASSETS = "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps"
 
@@ -50,19 +48,6 @@ def _year(value: str | None) -> int | None:
     return int(found.group()) if found else None
 
 
-def _companies(data: dict) -> tuple[Credit, ...]:
-    """Steam отдаёт студии голыми строками — идентичности у них нет, и
-    выдумывать суррогат незачем: таких склеивают по имени."""
-    return tuple(
-        Credit(name=name, role=role)
-        for role, key in (
-            (CompanyRole.DEVELOPER, "developers"),
-            (CompanyRole.PUBLISHER, "publishers"),
-        )
-        for name in data.get(key, [])
-    )
-
-
 def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]:
     """Metascore принадлежит Metacritic, а не Steam: у Valve с ними лицензия."""
     return rating(
@@ -88,7 +73,7 @@ def parse_card(data: dict) -> SourceCard:
             year=_year((data.get("release_date") or {}).get("date")),
         ),
         genre_ext_ids=genres(GenreSource.STEAM, data.get("genres", [])),
-        companies=_companies(data),
+        companies=companies(data),
         ratings=_metascore(data, now),
     )
 
