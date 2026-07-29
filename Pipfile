@@ -11,6 +11,7 @@ alembic = "*"
 greenlet = "*"
 httpx = "*"
 python-dotenv = "*"
+pillow = "*"
 
 [dev-packages]
 pytest = "*"

@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 47 модулей
+## backend — 48 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -118,6 +118,16 @@
 Зависит от: —
 
 - `class Suggestion` (9)
+
+### `backend/service/images.py` — 51 строк
+
+Приведение залитой с диска картинки к виду обложки.
+
+Зависит от: —
+
+- `class BadImage(Exception)` (2)
+- `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
+- `def crop_to_cover(data: bytes) -> bytes` (20)
 
 ### `backend/sources/convert.py` — 52 строк
 
@@ -708,7 +718,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 37 модулей
+## tests — 38 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -922,6 +932,19 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def ours(caplog) -> list[str]` (8)
 - `async def reference(engine)` (16)
+
+### `tests/backend/test_images.py` — 131 строк
+
+
+
+Зависит от: `backend.service.images`
+
+Тестов: 14
+
+- `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (4)
+- `def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes` (7)
+- `def size_of(data: bytes) -> tuple[int, int]` (2)
+- `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
 ### `tests/backend/test_layers.py` — 82 строк
 

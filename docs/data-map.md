@@ -151,6 +151,12 @@
   - `hint: str`
   - `hint_item_id: int | None`
 
+### `backend/service/images.py`
+
+- `TARGET_RATIO` = `2 / 3`
+- `TARGET_SIZE` = `набор из 2`
+- `_QUALITY` = `88`
+
 ### `backend/sources/errors.py`
 
 - `class Reason(StrEnum)`
@@ -415,6 +421,10 @@
 ### `tests/backend/test_genres.py`
 
 - `SILENT` = `набор из 4`
+
+### `tests/backend/test_images.py`
+
+- `DEGENERATE` = `набор из 3`
 
 ### `tests/backend/test_layers.py`
 
