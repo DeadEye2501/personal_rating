@@ -57,6 +57,15 @@ def test_null_score_is_reported_as_an_empty_value():
     assert by_owner == {RatingSource.IMDB: None, RatingSource.METACRITIC: 74.0}
 
 
+def test_an_honest_zero_is_not_an_empty_value():
+    """Пустое значение означает «у источника такой оценки нет», и ноль от него
+    надо отличать: это оценка, просто самая низкая. Проверка на ложность их
+    сливает, проверка на `None` — нет."""
+    payload = {"ratings": [{"source": "imdb", "value": 0}]}
+
+    assert [one.value for one in parse_ratings(payload).values] == [0.0]
+
+
 def test_unknown_owner_is_ignored():
     payload = {"ratings": [{"source": "letterboxd", "value": 4.2}]}
 

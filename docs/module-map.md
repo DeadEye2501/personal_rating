@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 42 модулей
+## backend — 43 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -136,11 +136,11 @@
 - `def broken(source: str, error: Exception) -> Refusal` (4)
 - `def is_answer(outcome: Outcome) -> bool` (5)
 
-### `backend/sources/gog/client.py` — 78 строк
+### `backend/sources/gog/client.py` — 79 строк
 
 Разговор с GOG по сети.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
 - `class GogClient` (55)
   - `async def _catalog(self, query: str) -> list | Refusal` (13)
@@ -158,7 +158,7 @@
 - `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
 - `def to_hit(card: SourceCard) -> SearchHit` (12)
 
-### `backend/sources/http.py` — 112 строк
+### `backend/sources/http.py` — 90 строк
 
 Общая дверь в сеть для всех источников.
 
@@ -171,7 +171,6 @@
 - `class SourceHttp` (41)
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
-- `def refuse_undocumented(http: SourceHttp, response: httpx.Response) -> Refusal` (14)
 
 ### `backend/sources/ratings/kinopoisk/client.py` — 35 строк
 
@@ -287,11 +286,11 @@
 - `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
   - `def http(name: str) -> SourceHttp` (7)
 
-### `backend/sources/steam/client.py` — 128 строк
+### `backend/sources/steam/client.py` — 129 строк
 
 Разговор со Steam по сети.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`, `backend.sources.undocumented`
 
 - `class SteamClient` (93)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
@@ -344,6 +343,14 @@
 - `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (27)
 - `def parse_movie(payload: dict) -> SourceCard` (30)
 - `def parse_series(payload: dict) -> SourceCard` (29)
+
+### `backend/sources/undocumented.py` — 22 строк
+
+Отказ источника, который своих лимитов не объявляет.
+
+Зависит от: `backend.sources.errors`, `backend.sources.http`
+
+- `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (9)
 
 ### `backend/storage/posters.py` — 89 строк
 
@@ -633,7 +640,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 32 модулей
+## tests — 33 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -661,6 +668,15 @@
   - `def build(*relatives: str) -> httpx.MockTransport` (21)
     - `def handler(request: httpx.Request) -> httpx.Response` (7)
 
+### `tests/backend/sources/test_convert.py` — 94 строк
+
+Общее у разборов: перевод чужих кусков ответа в наши типы.
+
+Зависит от: `backend.model`, `backend.sources.convert`
+
+Тестов: 11
+
+
 ### `tests/backend/sources/test_errors.py` — 93 строк
 
 
@@ -670,21 +686,21 @@
 Тестов: 12
 
 
-### `tests/backend/sources/test_gog.py` — 249 строк
+### `tests/backend/sources/test_gog.py` — 269 строк
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.backend.sources.conftest`
 
-Тестов: 20
+Тестов: 21
 
 - `def answering(body) -> SourceHttp` (3)
 
-### `tests/backend/sources/test_http.py` — 335 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 331 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.sources.errors`, `backend.sources.http`, `tests.backend.sources.conftest`
+Зависит от: `backend.sources.errors`, `backend.sources.http`, `backend.sources.undocumented`, `tests.backend.sources.conftest`
 
 Тестов: 21
 
@@ -702,13 +718,13 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)
 
-### `tests/backend/sources/test_mdblist.py` — 226 строк
+### `tests/backend/sources/test_mdblist.py` — 235 строк
 
 MDBList: квота, битый ключ и чужой периметр — три разные беды.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`, `tests.backend.sources.conftest`
 
-Тестов: 19
+Тестов: 20
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
@@ -722,7 +738,7 @@ OMDB: единственный источник, у которого отказ 
 
 - `async def ask(transport)` (5)
 
-### `tests/backend/sources/test_registry.py` — 205 строк
+### `tests/backend/sources/test_registry.py` — 210 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
@@ -733,13 +749,13 @@ OMDB: единственный источник, у которого отказ 
 - `def sources()` (4)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 332 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam.py` — 341 строк ⚠ подошёл к 300
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
 
-Тестов: 25
+Тестов: 26
 
 - `def block_of(payload: dict) -> dict` (2)
 

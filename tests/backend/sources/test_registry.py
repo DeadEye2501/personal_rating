@@ -131,6 +131,11 @@ async def test_every_source_has_its_own_breaker():
     breakers = registry.breakers()
 
     assert all(isinstance(one, Breaker) for one in breakers)
+    # Оба зеркала Кинопоиска заведены под одним именем: наружу источник один, и
+    # в `Refusal.source` человек должен увидеть «kinopoisk», а не имя зеркала.
+    assert sorted(one.name for one in registry.connections) == [
+        "gog", "kinopoisk", "kinopoisk", "mdblist", "omdb", "steam", "tmdb",
+    ]
     assert len(breakers) == len({id(one) for one in breakers})
     # Шесть источников, но соединений семь: у Кинопоиска два зеркала.
     assert len(breakers) == 7

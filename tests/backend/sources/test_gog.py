@@ -67,6 +67,26 @@ def test_a_genre_and_a_tag_with_the_same_slug_stay_apart(fixture):
     assert (GenreSource.GOG_TAG, "fantasy") in card.genre_ext_ids
 
 
+def test_a_genre_is_not_labelled_as_a_tag():
+    """На `fantasy` перестановка пространств незаметна — он и жанр, и тег.
+    Проверять надо на метках, которые есть только с одной стороны: иначе
+    справочник переведёт жанр по теговой строке и молча выдаст другой."""
+    payload = {
+        "products": [
+            {
+                "id": 1,
+                "title": "Baldur's Gate 3",
+                "genres": [{"slug": "rpg"}],
+                "tags": [{"slug": "story-rich"}],
+            }
+        ]
+    }
+
+    marked = parse_catalog(payload)[0].genre_ext_ids
+
+    assert marked == ((GenreSource.GOG, "rpg"), (GenreSource.GOG_TAG, "story-rich"))
+
+
 def test_developers_and_publishers_are_companies(fixture):
     cards = parse_catalog(fixture("gog/catalog.json"))
 

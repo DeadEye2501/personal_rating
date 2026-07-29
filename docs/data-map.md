@@ -171,7 +171,6 @@
 - `logger` = `logging.getLogger(__name__)`
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
-- `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
 
 ### `backend/sources/ratings/kinopoisk/client.py`
 
@@ -251,6 +250,10 @@
 ### `backend/sources/tmdb/parse.py`
 
 - `POSTER_BASE` = `'https://image.tmdb.org/t/p/w500'`
+
+### `backend/sources/undocumented.py`
+
+- `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
 
 ### `backend/storage/posters.py`
 
@@ -363,6 +366,10 @@
 ### `tests/backend/sources/conftest.py`
 
 - `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
+
+### `tests/backend/sources/test_convert.py`
+
+- `NOW` = `datetime(2026, 7, 29, 12, 0)`
 
 ### `tests/backend/sources/test_registry.py`
 

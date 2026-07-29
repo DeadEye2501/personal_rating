@@ -5,12 +5,8 @@ import httpx
 import pytest
 
 from backend.sources.errors import Reason, Refusal
-from backend.sources.http import (
-    USER_AGENT,
-    Breaker,
-    SourceHttp,
-    refuse_undocumented,
-)
+from backend.sources.http import USER_AGENT, Breaker, SourceHttp
+from backend.sources.undocumented import refuse_undocumented
 from tests.backend.sources.conftest import FakeClock
 
 
@@ -294,7 +290,7 @@ async def test_an_undocumented_rate_limit_closes_the_source_for_five_minutes():
     clock = FakeClock()
     http = SourceHttp("gog", clock=clock)
 
-    result = refuse_undocumented(http, httpx.Response(429))
+    result = refuse_undocumented(http, 429)
 
     assert result.reason is Reason.RATE
     assert result.source == "gog"
@@ -313,7 +309,7 @@ async def test_any_other_code_from_an_undocumented_source_is_a_breakage():
     500 значило бы наказывать себя за чужую икоту."""
     http = SourceHttp("steam")
 
-    result = refuse_undocumented(http, httpx.Response(503))
+    result = refuse_undocumented(http, 503)
 
     assert result.reason is Reason.BROKEN
     assert result.source == "steam", "отказ приписан не тому источнику"

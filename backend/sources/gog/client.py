@@ -14,7 +14,8 @@ from backend.sources.errors import (
     broken,
 )
 from backend.sources.gog.parse import parse_catalog, to_hit
-from backend.sources.http import SourceHttp, refuse_undocumented
+from backend.sources.http import SourceHttp
+from backend.sources.undocumented import refuse_undocumented
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class GogClient:
         if not isinstance(response, httpx.Response):
             return response
         if response.status_code != 200:
-            return refuse_undocumented(self._http, response)
+            return refuse_undocumented(self._http, response.status_code)
         try:
             return parse_catalog(response.json())
         except BROKEN_BY_PARSING as error:

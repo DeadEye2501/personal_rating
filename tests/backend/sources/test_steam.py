@@ -90,6 +90,15 @@ def test_a_game_not_yet_released_has_no_year():
     assert parse_card(data).item.year is None
 
 
+def test_a_game_from_the_last_century_keeps_its_year():
+    """Ретро — половина причины, по которой магазина два: заметная часть его в
+    Steam не продаётся. Год, отобранный только по двадцатым, потерял бы всё,
+    что вышло до двухтысячного."""
+    data = {"steam_appid": 1, "name": "Fallout", "release_date": {"date": "30 сен. 1997 г."}}
+
+    assert parse_card(data).item.year == 1997
+
+
 def test_genres_arrive_with_identifiers(fixture):
     card = parse_card(block_of(fixture("steam/appdetails.json")))
 

@@ -17,7 +17,8 @@ from backend.sources.errors import (
     Refusal,
     broken,
 )
-from backend.sources.http import SourceHttp, refuse_undocumented
+from backend.sources.http import SourceHttp
+from backend.sources.undocumented import refuse_undocumented
 from backend.sources.steam.parse import parse_card, parse_search, parse_tags
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,7 @@ class SteamClient:
         if not isinstance(response, httpx.Response):
             return response
         if response.status_code != 200:
-            return refuse_undocumented(self._http, response)
+            return refuse_undocumented(self._http, response.status_code)
         try:
             return Found(parse_search(response.json()))
         except BROKEN_BY_PARSING as error:
@@ -64,7 +65,7 @@ class SteamClient:
             return response
         # Битый или отсутствующий appids даёт 400 и тело `null`.
         if response.status_code != 200:
-            return refuse_undocumented(self._http, response)
+            return refuse_undocumented(self._http, response.status_code)
 
         try:
             payload = response.json()
