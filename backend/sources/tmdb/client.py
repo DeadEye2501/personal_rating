@@ -1,11 +1,12 @@
 """Разговор с TMDB по сети."""
 
 import logging
+from datetime import timedelta
 
 import httpx
 
 from backend.model import Kind
-from backend.sources.errors import Found, Outcome, Reason, Refusal
+from backend.sources.errors import Found, Missing, Outcome, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.parse import (
     Incomplete,
@@ -20,6 +21,34 @@ BASE = "https://api.themoviedb.org/3"
 LANGUAGE = "ru-RU"
 
 BROKEN_BY_PARSING = (ValueError, TypeError, KeyError, AttributeError)
+
+# Суточной квоты у TMDB нет, `Retry-After` он не отдаёт — откат свой.
+RATE_BACKOFF = timedelta(minutes=1)
+
+# Объекта нет: 34 — не найдено, 6 — битый идентификатор.
+_ABSENT = {6, 34}
+
+
+def classify(response: httpx.Response) -> Missing | Refusal | None:
+    """`None` — ответ успешный, разбирать дальше."""
+    if response.status_code == 200:
+        return None
+
+    try:
+        status = response.json().get("status_code")
+    except (ValueError, AttributeError):
+        status = None
+
+    # Отрицательный факт — только по разобранному телу с известным кодом:
+    # страница от прокси под 404 неделю выдавала бы себя за «такого нет».
+    if response.status_code == 404 and status in _ABSENT:
+        return Missing()
+    if response.status_code == 429:
+        return Refusal(source="tmdb", reason=Reason.RATE, retry_after=RATE_BACKOFF)
+    if response.status_code == 401:
+        return Refusal(source="tmdb", reason=Reason.KEY)
+    return Refusal(source="tmdb", reason=Reason.BROKEN,
+                   detail=f"HTTP {response.status_code}, status_code {status}")
 
 
 class TmdbClient:
@@ -36,6 +65,14 @@ class TmdbClient:
     def _params(self, **extra: object) -> dict:
         return {"api_key": self._key, "language": LANGUAGE, **extra}
 
+    def _verdict(self, response: httpx.Response) -> Missing | Refusal | None:
+        """Разобранный отказ, а заодно взведённый предохранитель: без него
+        следующий показ ленты упрётся в тот же 429."""
+        verdict = classify(response)
+        if isinstance(verdict, Refusal) and verdict.reason is Reason.RATE:
+            self._http.breaker.trip(RATE_BACKOFF, Reason.RATE)
+        return verdict
+
     async def search(self, query: str, kind: Kind) -> Outcome:
         path = "/search/tv" if kind is Kind.SERIES else "/search/movie"
         response = await self._http.get(
@@ -43,6 +80,9 @@ class TmdbClient:
         )
         if not isinstance(response, httpx.Response):
             return response
+        verdict = self._verdict(response)
+        if verdict is not None:
+            return verdict
         try:
             return Found(parse_search(response.json(), kind))
         except BROKEN_BY_PARSING as error:
@@ -57,6 +97,9 @@ class TmdbClient:
         )
         if not isinstance(response, httpx.Response):
             return response
+        verdict = self._verdict(response)
+        if verdict is not None:
+            return verdict
 
         parse = parse_series if kind is Kind.SERIES else parse_movie
         try:

@@ -130,16 +130,18 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/client.py` — 69 строк
+### `backend/sources/tmdb/client.py` — 112 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
-- `class TmdbClient` (45)
+- `def classify(response: httpx.Response) -> Missing | Refusal | None` (20)
+- `class TmdbClient` (59)
   - `def _params(self, **extra: object) -> dict` (2)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (12)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (15)
+  - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (7)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
   - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/tmdb/parse.py` — 191 строк
@@ -450,7 +452,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 25 модулей
+## tests — 26 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -460,14 +462,22 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 20 строк
+### `tests/backend/sources/conftest.py` — 67 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
 Зависит от: —
 
+- `class FakeClock` (12)
+  - `def __call__(self) -> datetime` (2)
+  - `def advance(self, delta: timedelta) -> None` (2)
 - `def _load(relative: str)` (4)
+- `def _meta(relative: str) -> dict` (3)
 - `def fixture()` (3)
+- `def meta()` (2)
+- `def replay()` (18)
+  - `def build(relative: str) -> httpx.MockTransport` (11)
+    - `def handler(request: httpx.Request) -> httpx.Response` (4)
 
 ### `tests/backend/sources/test_errors.py` — 93 строк
 
@@ -478,17 +488,14 @@
 Тестов: 12
 
 
-### `tests/backend/sources/test_http.py` — 305 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 295 строк
 
 
 
-Зависит от: `backend.sources.errors`, `backend.sources.http`
+Зависит от: `backend.sources.errors`, `backend.sources.http`, `tests.backend.sources.conftest`
 
 Тестов: 19
 
-- `class FakeClock` (9)
-  - `def __call__(self) -> datetime` (2)
-  - `def advance(self, delta: timedelta) -> None` (2)
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)
 
@@ -500,6 +507,17 @@
 
 Тестов: 24
 
+
+### `tests/backend/sources/test_tmdb_failures.py` — 207 строк
+
+Отказ TMDB отличается от «такого у меня нет» — и то, и другое от успеха.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `tests.backend.sources.conftest`
+
+Тестов: 15
+
+- `def responding(status: int, body: dict) -> httpx.MockTransport` (2)
+- `async def ask(transport: httpx.MockTransport)` (5)
 
 ### `tests/backend/sources/test_tmdb_search.py` — 183 строк
 

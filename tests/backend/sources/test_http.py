@@ -1,22 +1,12 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import httpx
 import pytest
 
 from backend.sources.errors import Reason, Refusal
 from backend.sources.http import USER_AGENT, Breaker, SourceHttp
-
-
-class FakeClock:
-    def __init__(self) -> None:
-        self.now = datetime(2026, 7, 27, 12, 0)
-
-    def __call__(self) -> datetime:
-        return self.now
-
-    def advance(self, delta: timedelta) -> None:
-        self.now += delta
+from tests.backend.sources.conftest import FakeClock
 
 
 def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]:

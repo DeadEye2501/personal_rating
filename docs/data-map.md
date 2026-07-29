@@ -165,6 +165,8 @@
 - `BASE` = `'https://api.themoviedb.org/3'`
 - `LANGUAGE` = `'ru-RU'`
 - `BROKEN_BY_PARSING` = `набор из 4`
+- `RATE_BACKOFF` = `timedelta(minutes=1)`
+- `_ABSENT` = `набор из 2`
 - `class TmdbClient`
   - `_APPEND` = `словарь из 2`
 
