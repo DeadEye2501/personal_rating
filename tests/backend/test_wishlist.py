@@ -90,5 +90,28 @@ async def test_the_window_moves_and_never_repeats_a_card(sessions, card):
     assert await repository.list_ids(limit=2, offset=2) == newest[2:]
 
 
+async def test_the_list_gives_out_numbers_and_not_rows(sessions, card):
+    """Наружу едут номера карточек, а не строки базы."""
+    repository = WishlistRepository(sessions)
+    await repository.add(await card(), now=WHEN)
+
+    assert [type(one) for one in await repository.list_ids(limit=50, offset=0)] == [int]
+
+
+async def test_the_order_holds_when_dates_repeat(sessions, card):
+    """Закладки, поставленные одной датой, — обычное дело: список наполняют
+    пачкой. Без второго ключа сортировки страницы на них разъезжаются."""
+    repository = WishlistRepository(sessions)
+    identifiers = []
+    for number in range(4):
+        item_id = await card(source_id=str(number))
+        await repository.add(item_id, now=WHEN)
+        identifiers.append(item_id)
+
+    first = await repository.list_ids(limit=2, offset=0)
+    second = await repository.list_ids(limit=2, offset=2)
+    assert first + second == identifiers
+
+
 async def test_an_empty_wishlist_is_not_an_error(sessions):
     assert await WishlistRepository(sessions).list_ids(limit=50, offset=0) == []

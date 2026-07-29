@@ -3,7 +3,6 @@
 from datetime import datetime
 
 from sqlalchemy import Row, Select, delete, func, select, update
-from sqlalchemy.exc import IntegrityError
 
 from backend.model import Item, Kind, Source, new_source_id
 from backend.storage.posters import PosterStore
@@ -63,25 +62,11 @@ class LibraryRepository(Repository):
         row = await self._row(statement)
         return _to_item(row) if row else None
 
-    async def _many(self, statement: Select) -> list[Item]:
-        return await self._mapped(statement, _to_item)
-
     async def create(self, item: Item) -> int:
-        async with self._sessions() as session:
-            try:
-                result = await session.execute(
-                    item_table.insert()
-                    .values(**_values(item))
-                    .returning(item_table.c.id)
-                )
-                await session.commit()
-            except IntegrityError as error:
-                # Откат делает выход из `async with`: сессия закрывается и
-                # незавершённую транзакцию отматывает сама.
-                raise ItemExists(
-                    f"{item.source}:{item.source_id} уже в библиотеке"
-                ) from error
-            return result.scalar_one()
+        return await self._created(
+            item_table.insert().values(**_values(item)).returning(item_table.c.id),
+            ItemExists(f"{item.source}:{item.source_id} уже в библиотеке"),
+        )
 
     async def get(self, item_id: int) -> Item | None:
         return await self._one(select(item_table).where(item_table.c.id == item_id))
@@ -98,12 +83,13 @@ class LibraryRepository(Repository):
         """Порядок по названию — решение этого плана, а не спеки: у разделов
         свои порядки, и они лягут в запросы сервисного слоя. Здесь нужен
         любой устойчивый, чтобы порции не перемешивались между запросами."""
-        return await self._many(
+        return await self._mapped(
             select(item_table)
             .where(item_table.c.kind == kind)
             .order_by(item_table.c.title, item_table.c.id)
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
+            _to_item,
         )
 
     async def find_by_title(self, kind: Kind, title: str) -> list[Item]:
@@ -114,32 +100,32 @@ class LibraryRepository(Repository):
         lower() умеет только ASCII, и с ним русские названия не совпали бы
         никогда."""
         needle = fold(title.strip())
-        return await self._many(
+        return await self._mapped(
             select(item_table).where(
                 item_table.c.kind == kind,
                 (func.py_lower(item_table.c.title) == needle)
                 | (func.py_lower(item_table.c.original_title) == needle),
-            )
+            ),
+            _to_item,
         )
 
     async def deletion_summary(self, item_id: int) -> dict[str, int | bool]:
         """Что именно пропадёт вместе с карточкой — для подтверждения."""
-        marked = await self._row(
-            select(wishlist_table.c.item_id)
-            .where(wishlist_table.c.item_id == item_id)
-        )
-        rated = await self._row(
-            select(rating_table.c.item_id).where(rating_table.c.item_id == item_id)
-        )
         tags = await self._row(
             select(func.count())
             .select_from(item_tag_table)
             .where(item_tag_table.c.item_id == item_id)
         )
         return {
-            "has_rating": rated is not None,
+            "has_rating": await self._exists(
+                select(rating_table.c.item_id)
+                .where(rating_table.c.item_id == item_id)
+            ),
             "tags": tags.count,
-            "in_wishlist": marked is not None,
+            "in_wishlist": await self._exists(
+                select(wishlist_table.c.item_id)
+                .where(wishlist_table.c.item_id == item_id)
+            ),
         }
 
     async def delete(self, item_id: int, posters: PosterStore) -> None:
@@ -181,14 +167,12 @@ class LibraryRepository(Repository):
         сразу окажется просроченной и уедет на перезапрос, которому нечего
         запрашивать. Время приходит параметром, как во всех записях проекта:
         читай его функция сама, проверить записанное было бы нечем."""
-        try:
-            await self._run(
-                update(item_table)
-                .where(item_table.c.id == item_id)
-                .values(source=source, source_id=source_id, synced_at=now)
-            )
-        except IntegrityError as error:
-            raise ItemExists(f"{source}:{source_id} уже в библиотеке") from error
+        await self._written(
+            update(item_table)
+            .where(item_table.c.id == item_id)
+            .values(source=source, source_id=source_id, synced_at=now),
+            ItemExists(f"{source}:{source_id} уже в библиотеке"),
+        )
 
     async def unlink(self, item_id: int) -> None:
         """Источник снимается, карточка становится ручной. Данные остаются:

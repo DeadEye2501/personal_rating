@@ -172,6 +172,35 @@ async def test_find_by_source(sessions):
     assert await repository.find_by_source(Source.TMDB, "1") is None
 
 
+async def test_lists_give_out_cards_and_not_rows(sessions):
+    """Наружу едет `Item`, а не строка базы. Поймать это можно только типом:
+    `Row` притворяется и кортежем, и объектом с полями, поэтому сравнение имён
+    и значений сходится и на нём."""
+    repository = LibraryRepository(sessions)
+    await repository.create(make_item(title="Ведьмак"))
+
+    for found in (
+        await repository.list_by_kind(Kind.MOVIE, limit=50, offset=0),
+        await repository.find_by_title(Kind.MOVIE, "ведьмак"),
+    ):
+        assert [type(one) for one in found] == [Item]
+
+
+async def test_the_window_keeps_its_order_when_titles_repeat(sessions):
+    """Одинаковые названия проект разрешает прямо, и на них порядок держится
+    вторым ключом. Без него страницы разъезжаются, а лента показывает карточку
+    дважды: сортировка по одному названию оставляет ничью на усмотрение базы."""
+    repository = LibraryRepository(sessions)
+    identifiers = [
+        await repository.create(make_item(source_id=str(number), title="Одиссея"))
+        for number in range(4)
+    ]
+
+    first = await repository.list_by_kind(Kind.MOVIE, limit=2, offset=0)
+    second = await repository.list_by_kind(Kind.MOVIE, limit=2, offset=2)
+    assert [one.id for one in first] + [one.id for one in second] == identifiers
+
+
 async def test_list_by_kind_ignores_other_kinds(sessions):
     repository = LibraryRepository(sessions)
     await repository.create(make_item())

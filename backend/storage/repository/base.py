@@ -2,7 +2,8 @@
 
 from collections.abc import Callable
 
-from sqlalchemy import Executable, Row
+from sqlalchemy import Executable, Row, Select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 
@@ -26,6 +27,35 @@ class Repository:
     async def _mapped(self, statement: Executable, make: Callable[[Row], object]):
         """Строки сразу в свои типы: наружу репозиторий отдаёт их, а не `Row`."""
         return [make(row) for row in await self._rows(statement)]
+
+    async def _exists(self, statement: Select) -> bool:
+        """Есть ли такая строка. Спрашивают об этом закладка и сводка перед
+        удалением, каждая про свою таблицу."""
+        return await self._row(statement) is not None
+
+    async def _created(self, statement: Executable, taken: Exception) -> int:
+        """Вставка, возвращающая выданный базой номер.
+
+        Занятый ключ уникальности переводится в своё исключение:
+        `IntegrityError` живёт в SQLAlchemy, и пробрось мы его — знание о ней
+        поехало бы вверх по слоям до самого клиента, которому туда нельзя."""
+        async with self._sessions() as session:
+            try:
+                result = await session.execute(statement)
+                await session.commit()
+            except IntegrityError as error:
+                # Откат делает выход из `async with`: сессия закрывается и
+                # незавершённую транзакцию отматывает сама.
+                raise taken from error
+            return result.scalar_one()
+
+    async def _written(self, statement: Executable, taken: Exception) -> None:
+        """Правка, у которой занятый ключ уникальности — не поломка, а отказ.
+        Своё исключение вместо чужого — по той же причине, что и в `_created`."""
+        try:
+            await self._run(statement)
+        except IntegrityError as error:
+            raise taken from error
 
     async def _run(self, *statements: Executable) -> None:
         """Всё переданное — одной транзакцией: замена набора это удаление и

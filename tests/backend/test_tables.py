@@ -59,8 +59,10 @@ TYPES = [
 
 @pytest.mark.parametrize(("name", "column", "kind"), TYPES)
 def test_column_types_match_the_spec(name, column, kind):
-    # Тип колонки виден только на границе: оценка 7.5 в Integer молча станет
-    # семёркой, а дата в Text перестанет сортироваться.
+    # Объявление, а не следствие: SQLite типы колонок не навязывает, и
+    # проверить их поведением нельзя — 7.5 он положит в Integer как есть.
+    # Следствие видно на границе: `Item.released_at` приезжает датой, а не
+    # строкой, и это сторожит `test_library.py`.
     assert isinstance(metadata.tables[name].c[column].type, kind)
 
 

@@ -87,42 +87,43 @@
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
 
-### `backend/storage/posters.py` — 85 строк
+### `backend/storage/posters.py` — 89 строк
 
 Второй файл базы: картинка по карточке.
 
 Зависит от: `backend.storage.session`
 
-- `class PosterStore` (53)
+- `class PosterStore` (56)
   - `async def open(self) -> None` (7)
   - `async def close(self) -> None` (4)
   - `async def put(self, item_id: int, data: bytes, now: datetime) -> None` (11)
-  - `async def get(self, item_id: int) -> bytes | None` (6)
-  - `async def has(self, item_id: int) -> bool` (6)
-  - `async def delete(self, item_id: int) -> None` (5)
+  - `async def get(self, item_id: int) -> bytes | None` (5)
+  - `async def has(self, item_id: int) -> bool` (5)
+  - `async def delete(self, item_id: int) -> None` (2)
 
-### `backend/storage/repository/base.py` — 36 строк
+### `backend/storage/repository/base.py` — 66 строк
 
 Общее у репозиториев: сессия и три способа с ней обойтись.
 
 Зависит от: —
 
-- `class Repository` (28)
+- `class Repository` (57)
 
-### `backend/storage/repository/genres.py` — 87 строк
+### `backend/storage/repository/genres.py` — 114 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
+- `def _is_news(source: GenreSource, ext_id: str) -> bool` (5)
 - `def _to_genre(row) -> Genre` (2)
 - `class GenresRepository(Repository)` (67)
-  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (28)
+  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (29)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (16)
-  - `async def genres_of(self, item_id: int) -> list[Genre]` (7)
-  - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (9)
+  - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
+  - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 200 строк
+### `backend/storage/repository/library.py` — 184 строк
 
 Карточки библиотеки.
 
@@ -131,17 +132,17 @@
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
 - `def _to_item(row: Row) -> Item` (22)
-- `class LibraryRepository(Repository)` (140)
-  - `async def create(self, item: Item) -> int` (16)
+- `class LibraryRepository(Repository)` (125)
+  - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
-  - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (11)
-  - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (15)
-  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (19)
+  - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (12)
+  - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
+  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (18)
   - `async def delete(self, item_id: int, posters: PosterStore) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
   - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
-  - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (17)
+  - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
 ### `backend/storage/repository/ratings.py` — 69 строк
@@ -165,26 +166,27 @@
 
 - `class WrongTagKind(Exception)` (2)
 - `class TagExists(Exception)` (2)
-- `class TagsRepository(Repository)` (88)
-  - `async def create(self, kind: Kind, name: str) -> int` (21)
-  - `async def list_for_kind(self, kind: Kind) -> list[tuple[int, str]]` (6)
+- `def _named(row) -> tuple[int, str]` (2)
+- `class TagsRepository(Repository)` (85)
+  - `async def create(self, kind: Kind, name: str) -> int` (17)
+  - `async def list_for_kind(self, kind: Kind) -> list[tuple[int, str]]` (7)
   - `async def reorder(self, kind: Kind, tag_ids: list[int]) -> None` (10)
-  - `async def rename(self, tag_id: int, name: str) -> None` (4)
+  - `async def rename(self, tag_id: int, name: str) -> None` (6)
   - `async def delete(self, tag_id: int) -> None` (2)
   - `async def assign(self, item_id: int, tag_id: int) -> None` (20)
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
-  - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (7)
+  - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (8)
 
-### `backend/storage/repository/wishlist.py` — 42 строк
+### `backend/storage/repository/wishlist.py` — 41 строк
 
 Список запланированного.
 
 Зависит от: `backend.storage.repository.base`, `backend.storage.tables`
 
-- `class WishlistRepository(Repository)` (31)
+- `class WishlistRepository(Repository)` (30)
   - `async def add(self, item_id: int, now: datetime) -> None` (7)
   - `async def remove(self, item_id: int) -> None` (4)
-  - `async def contains(self, item_id: int) -> bool` (6)
+  - `async def contains(self, item_id: int) -> bool` (5)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
 ### `backend/storage/session.py` — 44 строк

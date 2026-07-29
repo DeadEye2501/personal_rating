@@ -336,7 +336,7 @@ GET https://api.steampowered.com/IStoreBrowseService/GetItems/v1/
 | `point-and-click` | Point&Click | Quest |
 | `text-based` | Текстовая | Quest |
 | `choose-your-own-adventure` | Выбери себе приключение | Quest |
-| `walking-simulator` | Симультор ходьбы | Quest |
+| `walking-simulator` | Симулятор ходьбы | Quest |
 | `visual-novel` | Визуальная новелла | Quest |
 | `crpg` | Компьютерная ролевая игра | RPG |
 | `dungeon-crawler` | Подземелья | RPG |

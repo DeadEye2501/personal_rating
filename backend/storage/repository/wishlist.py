@@ -24,19 +24,18 @@ class WishlistRepository(Repository):
         )
 
     async def contains(self, item_id: int) -> bool:
-        row = await self._row(
+        return await self._exists(
             select(wishlist_table.c.item_id)
             .where(wishlist_table.c.item_id == item_id)
         )
-        return row is not None
 
     async def list_ids(self, limit: int, offset: int) -> list[int]:
         """Новые сверху: порядок раздела «Хочу посмотреть» — по дате добавления
         от свежих к старым."""
-        rows = await self._rows(
+        return await self._mapped(
             select(wishlist_table.c.item_id)
             .order_by(wishlist_table.c.added_at.desc(), wishlist_table.c.item_id)
             .limit(limit)
-            .offset(offset)
+            .offset(offset),
+            lambda row: row.item_id,
         )
-        return [row.item_id for row in rows]

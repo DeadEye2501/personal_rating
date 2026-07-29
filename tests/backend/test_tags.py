@@ -103,6 +103,20 @@ async def test_reorder_does_not_touch_tags_of_another_set(sessions):
     assert names == ["игровой", "второй игровой"]
 
 
+async def test_lists_give_out_pairs_and_not_rows(sessions, card):
+    """Наружу едут пары «номер и имя», а не строки базы: `Row` сравнивается с
+    кортежем как равный, и проверка по значениям подмену пропускает."""
+    repository = TagsRepository(sessions)
+    item_id = await card(Kind.MOVIE)
+    await repository.assign(item_id, await repository.create(Kind.MOVIE, "тег"))
+
+    for found in (
+        await repository.list_for_kind(Kind.MOVIE),
+        await repository.tags_of(item_id),
+    ):
+        assert [type(one) for one in found] == [tuple]
+
+
 async def test_manual_order_survives(sessions):
     repository = TagsRepository(sessions)
     first = await repository.create(Kind.MOVIE, "первый")

@@ -6,7 +6,11 @@ import sqlalchemy
 from backend.model import Item, Kind, Source
 from backend.storage.posters import PosterStore
 from backend.storage.repository.library import LibraryRepository
-from backend.storage.session import create_engine, session_factory
+from backend.storage.session import (
+    create_engine,
+    prepare_connection,
+    session_factory,
+)
 from backend.storage.tables import metadata
 from tests.alembic_runner import alembic
 
@@ -37,10 +41,16 @@ MINIMAL = {
 def migrated(tmp_path):
     """Соединение с базой, поднятой миграциями. Синхронное: миграции идут
     синхронным драйвером, и проверяется здесь их результат, а не работа
-    приложения с базой."""
+    приложения с базой.
+
+    Соединение готовится так же, как у приложения, — с внешними ключами:
+    иначе тесты смотрели бы на базу, которой в работе не бывает."""
     db_path = tmp_path / "library.db"
     alembic(db_path, "upgrade", "head")
     engine = sqlalchemy.create_engine(f"sqlite:///{db_path}")
+    sqlalchemy.event.listen(
+        engine, "connect", lambda dbapi, _record: prepare_connection(dbapi)
+    )
     with engine.connect() as connection:
         yield connection
     engine.dispose()

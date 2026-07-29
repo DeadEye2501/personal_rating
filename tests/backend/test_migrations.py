@@ -25,8 +25,12 @@ def table_shape(inspector, name: str) -> dict:
             for column in inspector.get_columns(name)
         ],
         "primary_key": inspector.get_pk_constraint(name)["constrained_columns"],
+        # Имена ограничений — часть схемы, а не украшение: SQLite меняет её
+        # пересозданием таблицы, и Alembic ищет ограничение по имени.
+        "primary_key_name": inspector.get_pk_constraint(name)["name"],
         "unique": sorted(
-            tuple(one["column_names"]) for one in inspector.get_unique_constraints(name)
+            (one["name"], tuple(one["column_names"]))
+            for one in inspector.get_unique_constraints(name)
         ),
         "indexes": sorted(
             (one["name"], tuple(one["column_names"]), one["unique"])
@@ -34,6 +38,7 @@ def table_shape(inspector, name: str) -> dict:
         ),
         "foreign_keys": sorted(
             (
+                one["name"],
                 tuple(one["constrained_columns"]),
                 one["referred_table"],
                 (one.get("options") or {}).get("ondelete"),

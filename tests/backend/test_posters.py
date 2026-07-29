@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy import select
 
@@ -73,6 +73,30 @@ async def test_second_put_moves_the_fetch_time(posters, tmp_path):
         )
         assert stored.scalar() == later
     await engine.dispose()
+
+
+async def test_the_fetch_time_comes_back_a_time(posters, tmp_path):
+    """Колонка объявлена временем, а не текстом: строкой она бы вернулась
+    строкой, и сравнение с датой перестало бы что-либо значить."""
+    await posters.put(1, PICTURE, now=WHEN)
+
+    engine = create_engine(tmp_path / "posters.db")
+    async with engine.connect() as connection:
+        stored = await connection.execute(
+            select(poster.c.fetched_at).where(poster.c.item_id == 1)
+        )
+        assert isinstance(stored.scalar(), datetime)
+    await engine.dispose()
+
+
+async def test_the_store_makes_its_folder(tmp_path):
+    """Каталога данных при первом запуске ещё нет. Заводит его общий движок —
+    и хранилище постеров обязано ходить через него, а не заводить свой."""
+    store = PosterStore(tmp_path / "data" / "картинки" / "posters.db")
+    await store.open()
+    await store.put(1, PICTURE, now=WHEN)
+    assert await store.get(1) == PICTURE
+    await store.close()
 
 
 async def test_delete(posters):

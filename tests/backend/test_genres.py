@@ -62,6 +62,38 @@ async def test_nothing_asked_is_nothing_resolved(sessions, reference, caplog):
     assert caplog.text == ""
 
 
+async def test_an_unmarked_tag_is_not_news(sessions, reference, caplog):
+    """Спека запрещает писать неразмеченные теги в лог: словарь у тегов
+    открытый, 432 метки у Steam и 203 у GOG, и большинство жанрами не являются
+    вовсе. Пиши мы их — на каждой карточке в лог сыпалось бы полтора десятка
+    строк, и настоящее расширение справочника в этом шуме потерялось бы."""
+    repository = GenresRepository(sessions)
+    with caplog.at_level(logging.WARNING):
+        assert await repository.resolve(GenreSource.STEAM_TAG, ["19", "4106"]) == []
+        assert await repository.resolve(GenreSource.GOG_TAG, ["atmospheric"]) == []
+    assert caplog.text == ""
+
+
+async def test_a_rejected_gog_slug_is_not_news(sessions, reference, caplog):
+    """Шестнадцать слагов приезжают у GOG в поле `genres`, но жанрами не
+    являются: камера, ход времени, эпоха и темы. Это известное и отвергнутое, а
+    не незнакомое, и путать одно с другим нельзя — иначе правило перестанет
+    ловить настоящее."""
+    repository = GenresRepository(sessions)
+    with caplog.at_level(logging.WARNING):
+        assert await repository.resolve(GenreSource.GOG, ["fpp", "fantasy"]) == []
+    assert caplog.text == ""
+
+
+async def test_an_unknown_gog_slug_is_still_news(sessions, reference, caplog):
+    """Обратная половина: словарь жанров у магазина закрытый, и незнакомый
+    слаг означает, что магазин его расширил. Это стоит увидеть."""
+    repository = GenresRepository(sessions)
+    with caplog.at_level(logging.WARNING):
+        await repository.resolve(GenreSource.GOG, ["совсем-новый-жанр"])
+    assert "совсем-новый-жанр" in caplog.text
+
+
 async def test_sources_do_not_leak_into_each_other(sessions, reference):
     # У Steam свой словарь: id 3 у него ролевая, а не драма.
     assert await GenresRepository(sessions).resolve(GenreSource.STEAM, ["3"]) == [4]

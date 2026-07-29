@@ -7,6 +7,7 @@ from sqlalchemy import (
     BLOB,
     Column,
     DateTime,
+    Executable,
     Integer,
     MetaData,
     Table,
@@ -52,34 +53,37 @@ class PosterStore:
             await self._engine.dispose()
             self._engine = None
 
+    async def _read(self, statement: Executable):
+        async with self._engine.connect() as connection:
+            return await connection.execute(statement)
+
+    async def _write(self, statement: Executable) -> None:
+        async with self._engine.begin() as connection:
+            await connection.execute(statement)
+
     async def put(self, item_id: int, data: bytes, now: datetime) -> None:
         statement = insert(poster).values(
             item_id=item_id, data=data, fetched_at=now
         )
-        statement = statement.on_conflict_do_update(
-            index_elements=[poster.c.item_id],
-            set_={"data": statement.excluded.data,
-                  "fetched_at": statement.excluded.fetched_at},
+        await self._write(
+            statement.on_conflict_do_update(
+                index_elements=[poster.c.item_id],
+                set_={"data": statement.excluded.data,
+                      "fetched_at": statement.excluded.fetched_at},
+            )
         )
-        async with self._engine.begin() as connection:
-            await connection.execute(statement)
 
     async def get(self, item_id: int) -> bytes | None:
-        async with self._engine.connect() as connection:
-            result = await connection.execute(
-                select(poster.c.data).where(poster.c.item_id == item_id)
-            )
-            return result.scalar_one_or_none()
+        found = await self._read(
+            select(poster.c.data).where(poster.c.item_id == item_id)
+        )
+        return found.scalar_one_or_none()
 
     async def has(self, item_id: int) -> bool:
-        async with self._engine.connect() as connection:
-            result = await connection.execute(
-                select(poster.c.item_id).where(poster.c.item_id == item_id)
-            )
-            return result.one_or_none() is not None
+        found = await self._read(
+            select(poster.c.item_id).where(poster.c.item_id == item_id)
+        )
+        return found.one_or_none() is not None
 
     async def delete(self, item_id: int) -> None:
-        async with self._engine.begin() as connection:
-            await connection.execute(
-                delete(poster).where(poster.c.item_id == item_id)
-            )
+        await self._write(delete(poster).where(poster.c.item_id == item_id))

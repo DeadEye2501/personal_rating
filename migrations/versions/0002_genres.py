@@ -302,7 +302,7 @@ GOG_TAG = {
     "point-and-click": ["Quest"],  # Point&Click
     "text-based": ["Quest"],  # Текстовая
     "choose-your-own-adventure": ["Quest"],  # Выбери себе приключение
-    "walking-simulator": ["Quest"],  # Симультор ходьбы
+    "walking-simulator": ["Quest"],  # Симулятор ходьбы
     "visual-novel": ["Quest"],  # Визуальная новелла
     "crpg": ["RPG"],  # Компьютерная ролевая игра
     "dungeon-crawler": ["RPG"],  # Подземелья

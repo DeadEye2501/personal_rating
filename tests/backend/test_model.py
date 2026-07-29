@@ -10,6 +10,7 @@ from backend.model import (
     ExternalRating,
     Genre,
     GenreKind,
+    GenreSource,
     IdSource,
     Item,
     Kind,
@@ -99,6 +100,7 @@ SCHEMA = [
     (PersonRole, {"director", "actor", "showrunner"}),
     (CompanyRole, {"developer", "publisher"}),
     (GenreKind, {"film", "game"}),
+    (GenreSource, {"tmdb", "steam", "steam_tag", "gog", "gog_tag"}),
 ]
 
 
