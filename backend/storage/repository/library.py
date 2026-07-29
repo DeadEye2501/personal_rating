@@ -2,9 +2,9 @@
 
 from sqlalchemy import Row, Select, func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from backend.model import Item, Kind, Source
+from backend.storage.repository.base import Repository
 from backend.storage.session import fold
 from backend.storage.tables import item as item_table
 
@@ -52,18 +52,13 @@ def _to_item(row: Row) -> Item:
     )
 
 
-class LibraryRepository:
-    def __init__(self, sessions: async_sessionmaker[AsyncSession]) -> None:
-        self._sessions = sessions
-
+class LibraryRepository(Repository):
     async def _one(self, statement: Select) -> Item | None:
-        async with self._sessions() as session:
-            row = (await session.execute(statement)).one_or_none()
-            return _to_item(row) if row else None
+        row = await self._row(statement)
+        return _to_item(row) if row else None
 
     async def _many(self, statement: Select) -> list[Item]:
-        async with self._sessions() as session:
-            return [_to_item(row) for row in (await session.execute(statement)).all()]
+        return [_to_item(row) for row in await self._rows(statement)]
 
     async def create(self, item: Item) -> int:
         async with self._sessions() as session:

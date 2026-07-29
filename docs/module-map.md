@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 14 модулей
+## backend — 17 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -84,21 +84,60 @@
 - `def average_score(*aspects: int | None) -> float | None` (7)
 - `class Rating` (8)
 
-### `backend/storage/repository/library.py` — 122 строк
+### `backend/storage/repository/base.py` — 27 строк
+
+Общее у репозиториев: сессия и три способа с ней обойтись.
+
+Зависит от: —
+
+- `class Repository` (21)
+
+### `backend/storage/repository/library.py` — 117 строк
 
 Карточки библиотеки.
 
-Зависит от: `backend.model`, `backend.storage.session`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
 
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
 - `def _to_item(row: Row) -> Item` (22)
-- `class LibraryRepository` (68)
+- `class LibraryRepository(Repository)` (63)
   - `async def create(self, item: Item) -> int` (16)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (11)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (15)
+
+### `backend/storage/repository/ratings.py` — 69 строк
+
+Моя оценка карточки.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
+
+- `class RatingsRepository(Repository)` (57)
+  - `async def set_score(self, item_id: int, score: float | None, now: datetime) -> None` (3)
+  - `async def set_aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None, now: datetime) -> float | None` (16)
+  - `async def set_review(self, item_id: int, review: str, now: datetime) -> None` (2)
+  - `async def get(self, item_id: int) -> Rating | None` (14)
+  - `async def clear(self, item_id: int) -> None` (5)
+
+### `backend/storage/repository/tags.py` — 111 строк
+
+Мои теги: наборы по типам содержимого и их развеска по карточкам.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
+
+- `class WrongTagKind(Exception)` (2)
+- `class TagExists(Exception)` (2)
+- `class TagsRepository(Repository)` (90)
+  - `async def create(self, kind: Kind, name: str) -> int` (21)
+  - `async def list_for_kind(self, kind: Kind) -> list[tuple[int, str]]` (6)
+  - `async def reorder(self, kind: Kind, tag_ids: list[int]) -> None` (12)
+  - `async def rename(self, tag_id: int, name: str) -> None` (4)
+  - `async def delete(self, tag_id: int) -> None` (2)
+  - `async def assign(self, item_id: int, tag_id: int) -> None` (20)
+  - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
+  - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (7)
 
 ### `backend/storage/session.py` — 44 строк
 

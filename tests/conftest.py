@@ -3,6 +3,8 @@ from datetime import datetime
 import pytest
 import sqlalchemy
 
+from backend.model import Item, Kind, Source
+from backend.storage.repository.library import LibraryRepository
 from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
 from tests.alembic_runner import alembic
@@ -59,6 +61,20 @@ async def sessions(engine):
     """Фабрика сессий поверх тестовой базы: репозитории принимают её, а не
     движок."""
     return session_factory(engine)
+
+
+@pytest.fixture
+async def card(sessions):
+    """Заводит карточку через репозиторий и отдаёт её идентификатор: всему,
+    что вешается на карточку, сперва нужна она сама."""
+
+    async def make(kind: Kind = Kind.MOVIE, source_id: str = "1") -> int:
+        return await LibraryRepository(sessions).create(
+            Item(id=0, kind=kind, source=Source.TMDB, source_id=source_id,
+                 title="карточка", synced_at=MOMENT)
+        )
+
+    return make
 
 
 @pytest.fixture
