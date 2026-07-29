@@ -7,6 +7,16 @@ from backend.model import GenreKind, GenreSource, Kind
 from backend.storage.repository.genres import GenresRepository
 
 
+def ours(caplog) -> list[str]:
+    """Записи в лог, сделанные нашим кодом. Чужие не в счёт: драйвер базы на
+    уровне отладки говорит за каждый запрос."""
+    return [
+        record.getMessage()
+        for record in caplog.records
+        if record.name.startswith("backend")
+    ]
+
+
 @pytest.fixture
 async def reference(engine):
     """Справочник кладётся руками, а не миграцией: проверяется разрешение
@@ -40,58 +50,38 @@ async def test_overlapping_identifiers_do_not_duplicate(sessions, reference):
     assert sorted(resolved) == [1, 2]
 
 
-async def test_unknown_identifier_is_logged_and_skipped(sessions, reference, caplog):
-    with caplog.at_level(logging.WARNING):
+SILENT = [
+    ("незнакомый жанр", GenreSource.GOG, "совсем-новый-жанр"),
+    ("отвергнутый слаг", GenreSource.GOG, "fpp"),
+    ("незнакомый тег", GenreSource.GOG_TAG, "atmospheric"),
+    ("незнакомый номер", GenreSource.TMDB, "99999"),
+]
+
+
+@pytest.mark.parametrize(("case", "source", "ext_id"), SILENT,
+                         ids=[one[0] for one in SILENT])
+async def test_what_is_not_in_the_reference_is_dropped_without_a_word(
+    sessions, reference, caplog, case, source, ext_id
+):
+    """Чего нет в таблице соответствий — то молча отбрасывается, откуда бы оно
+    ни пришло. Лог не ведём: читать его никто не будет, а справочник пополняют
+    руками, когда владелец сам этого захочет.
+
+    Смотрим на свои записи, а не на весь лог: на уровне отладки в него сыпет
+    сам драйвер базы."""
+    with caplog.at_level(logging.DEBUG):
+        assert await GenresRepository(sessions).resolve(source, [ext_id]) == []
+    assert ours(caplog) == []
+
+
+async def test_the_known_part_survives_the_unknown(sessions, reference, caplog):
+    """Незнакомое рядом со знакомым не мешает знакомому доехать."""
+    with caplog.at_level(logging.DEBUG):
         resolved = await GenresRepository(sessions).resolve(
             GenreSource.TMDB, ["18", "99999"]
         )
     assert resolved == [3]
-    assert "99999" in caplog.text
-
-
-async def test_a_known_identifier_is_not_logged(sessions, reference, caplog):
-    """Обратная половина: в лог попадает незнакомое, а не всё подряд."""
-    with caplog.at_level(logging.WARNING):
-        await GenresRepository(sessions).resolve(GenreSource.TMDB, ["18"])
-    assert caplog.text == ""
-
-
-async def test_nothing_asked_is_nothing_resolved(sessions, reference, caplog):
-    with caplog.at_level(logging.WARNING):
-        assert await GenresRepository(sessions).resolve(GenreSource.TMDB, []) == []
-    assert caplog.text == ""
-
-
-async def test_an_unmarked_tag_is_not_news(sessions, reference, caplog):
-    """Спека запрещает писать неразмеченные теги в лог: словарь у тегов
-    открытый, 432 метки у Steam и 203 у GOG, и большинство жанрами не являются
-    вовсе. Пиши мы их — на каждой карточке в лог сыпалось бы полтора десятка
-    строк, и настоящее расширение справочника в этом шуме потерялось бы."""
-    repository = GenresRepository(sessions)
-    with caplog.at_level(logging.WARNING):
-        assert await repository.resolve(GenreSource.STEAM_TAG, ["19", "4106"]) == []
-        assert await repository.resolve(GenreSource.GOG_TAG, ["atmospheric"]) == []
-    assert caplog.text == ""
-
-
-async def test_a_rejected_gog_slug_is_not_news(sessions, reference, caplog):
-    """Шестнадцать слагов приезжают у GOG в поле `genres`, но жанрами не
-    являются: камера, ход времени, эпоха и темы. Это известное и отвергнутое, а
-    не незнакомое, и путать одно с другим нельзя — иначе правило перестанет
-    ловить настоящее."""
-    repository = GenresRepository(sessions)
-    with caplog.at_level(logging.WARNING):
-        assert await repository.resolve(GenreSource.GOG, ["fpp", "fantasy"]) == []
-    assert caplog.text == ""
-
-
-async def test_an_unknown_gog_slug_is_still_news(sessions, reference, caplog):
-    """Обратная половина: словарь жанров у магазина закрытый, и незнакомый
-    слаг означает, что магазин его расширил. Это стоит увидеть."""
-    repository = GenresRepository(sessions)
-    with caplog.at_level(logging.WARNING):
-        await repository.resolve(GenreSource.GOG, ["совсем-новый-жанр"])
-    assert "совсем-новый-жанр" in caplog.text
+    assert ours(caplog) == []
 
 
 async def test_sources_do_not_leak_into_each_other(sessions, reference):

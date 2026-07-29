@@ -109,16 +109,15 @@
 
 - `class Repository` (57)
 
-### `backend/storage/repository/genres.py` — 114 строк
+### `backend/storage/repository/genres.py` — 76 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
-- `def _is_news(source: GenreSource, ext_id: str) -> bool` (5)
 - `def _to_genre(row) -> Genre` (2)
-- `class GenresRepository(Repository)` (67)
-  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (29)
+- `class GenresRepository(Repository)` (60)
+  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (22)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (16)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)

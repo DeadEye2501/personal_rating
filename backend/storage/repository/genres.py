@@ -1,7 +1,5 @@
 """Жанры карточки и разрешение чужих идентификаторов в свои."""
 
-import logging
-
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.sqlite import insert
 
@@ -11,35 +9,6 @@ from backend.storage.tables import genre as genre_table
 from backend.storage.tables import genre_map as genre_map_table
 from backend.storage.tables import item_genre as item_genre_table
 
-logger = logging.getLogger(__name__)
-
-# Теговые пространства. Словарь у них открытый и огромный — 432 метки у Steam,
-# 203 у GOG, — и большинство жанрами не являются вовсе. Неразмеченный тег это
-# норма, а не новость, и в лог он не идёт: иначе на каждой карточке сыпалось бы
-# по полтора десятка строк, и настоящее расширение справочника в этом шуме
-# никто не заметил бы.
-_TAG_SOURCES = frozenset({GenreSource.STEAM_TAG, GenreSource.GOG_TAG})
-
-# Шестнадцать слагов приезжают у GOG в поле `genres`, но жанрами не являются:
-# камера, ход времени, эпоха и темы. Это не незнакомое, а известное и
-# отвергнутое; не отличив одно от другого, правило перестанет ловить настоящее.
-# Список сверяется со спекой машинно — `scripts/genre_map.py`, поэтому он и
-# открыт наружу: сверять нечего, если не с чем.
-REJECTED_SLUGS = {
-    GenreSource.GOG: frozenset({
-        "fpp", "tpp", "turnbased", "realtime", "open-world", "exploration",
-        "narrative", "fantasy", "scifi", "historical", "modern", "detective",
-        "mystery", "comedy", "naval", "educational",
-    }),
-}
-
-
-def _is_news(source: GenreSource, ext_id: str) -> bool:
-    """Стоит ли говорить об идентификаторе, которого нет в справочнике."""
-    if source in _TAG_SOURCES:
-        return False
-    return ext_id not in REJECTED_SLUGS.get(source, frozenset())
-
 
 def _to_genre(row) -> Genre:
     return Genre(id=row.id, name=row.name, kind=GenreKind(row.kind))
@@ -47,33 +16,26 @@ def _to_genre(row) -> Genre:
 
 class GenresRepository(Repository):
     async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]:
-        """Внешние идентификаторы в свои. Сборный разворачивается в два,
-        незнакомый жанр попадает в лог: имена в справочнике наши, а заводить
-        жанр на лету нельзя. Незнакомый тег в лог не идёт — почему, сказано
-        у `_TAG_SOURCES`."""
+        """Внешние идентификаторы в свои.
+
+        Сборный разворачивается в два. Незнакомый молча отбрасывается: имена в
+        справочнике наши, сборный жанр автоматически не разложить, а пополняют
+        справочник руками. Карточка приезжает без этого жанра, и всё."""
         if not ext_ids:
             return []
 
         rows = await self._rows(
-            select(genre_map_table.c.ext_id, genre_map_table.c.genre_id)
+            select(genre_map_table.c.genre_id)
             .where(
                 genre_map_table.c.source == source,
                 genre_map_table.c.ext_id.in_(ext_ids),
             )
         )
 
-        known: set[str] = set()
         resolved: list[int] = []
         for row in rows:
-            known.add(row.ext_id)
             if row.genre_id not in resolved:
                 resolved.append(row.genre_id)
-
-        for ext_id in ext_ids:
-            if ext_id not in known and _is_news(source, ext_id):
-                logger.warning(
-                    "неизвестный жанр: источник %s, идентификатор %s", source, ext_id
-                )
         return resolved
 
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:

@@ -2094,17 +2094,15 @@ async def test_a_card_without_a_poster_url_is_still_written(writer, sessions):
     assert not await writer.posters.store.has(item_id)
 
 
-async def test_an_unknown_genre_does_not_stop_the_card(writer, sessions, caplog):
-    """Источник добавил жанр, которого в миграции нет: карточка
-    показывается без него, случай попадает в лог."""
-    with caplog.at_level(logging.WARNING):
-        item_id = await writer.save(source_card(genre_ext_ids=(
-            (GenreSource.TMDB, "878"), (GenreSource.TMDB, "99999"),
-        )))
+async def test_an_unknown_genre_does_not_stop_the_card(writer, sessions):
+    """Источник добавил жанр, которого в миграции нет: карточка показывается
+    без него, и всё — незнакомое молча отбрасывается."""
+    item_id = await writer.save(source_card(genre_ext_ids=(
+        (GenreSource.TMDB, "878"), (GenreSource.TMDB, "99999"),
+    )))
 
     names = {g.name for g in await GenresRepository(sessions).genres_of(item_id)}
     assert names == {"фантастика"}
-    assert "99999" in caplog.text
 
 
 async def test_companies_are_written_for_a_game(writer, sessions):

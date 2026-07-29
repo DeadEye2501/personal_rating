@@ -11,7 +11,6 @@
 Возвращает 1 при расхождении, поэтому годится и для хука, и для теста.
 """
 
-import re
 import sys
 from pathlib import Path
 
@@ -59,26 +58,6 @@ def from_migration() -> dict[str, dict[str, list[str]]]:
     return {name: scope[name] for name in SPECS}
 
 
-def rejected_from_spec() -> set[str]:
-    """Слаги GOG, которые спека объявляет известными и отвергнутыми.
-
-    Живут они в отдельном разделе, а не в таблицах соответствий, и в коде им
-    отвечает `_REJECTED`: без сверки константа разъедется со спекой молча, а
-    следствие тихое — отвергнутое поедет в лог наравне с незнакомым."""
-    inside = False
-    found: set[str] = set()
-    for line in SPECS["GOG"].read_text(encoding="utf-8").splitlines():
-        if line.startswith("## "):
-            inside = line.startswith("## Что не переводится")
-            continue
-        # Пять тегов Steam отвергнуты в том же разделе, но у их таблицы четыре
-        # колонки против трёх — по числу ячеек они и отличаются.
-        cells = line.split("|")
-        if inside and len(cells) == 5:
-            found.update(re.findall(r"`([^`]+)`", cells[1]))
-    return found
-
-
 def differences(spec: dict, code: dict) -> list[str]:
     found = []
     for name in SPECS:
@@ -94,24 +73,9 @@ def main() -> int:
     rows = sum(len(ours) for book in books.values() for ours in book.values())
     found = differences(books, from_migration())
 
-    # Импорт здесь, а не наверху: до вставки пути пакет `backend` не виден,
-    # а вставка пути — код, после которого импорты уже не ставят.
-    sys.path.insert(0, str(ROOT))
-    from backend.model import GenreSource
-    from backend.storage.repository.genres import REJECTED_SLUGS
-
-    spec_rejected = rejected_from_spec()
-    code_rejected = set(REJECTED_SLUGS[GenreSource.GOG])
-    for slug in sorted(spec_rejected ^ code_rejected):
-        where = "спеке" if slug in spec_rejected else "коде"
-        found.append(f"отвергнутый слаг {slug}: есть только в {where}")
-
     for line in found:
         print(line)
-    print(
-        f"{'разошлись' if found else 'сходятся'}: {rows} строк genre_map, "
-        f"{len(spec_rejected)} отвергнутых слагов"
-    )
+    print(f"{'разошлись' if found else 'сходятся'}: {rows} строк genre_map")
     return 1 if found else 0
 
 
