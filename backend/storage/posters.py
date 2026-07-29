@@ -11,13 +11,12 @@ from sqlalchemy import (
     Integer,
     MetaData,
     Table,
-    delete,
     select,
 )
-from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from backend.storage.session import create_engine
+from backend.storage.statements import clearing, upserting
 
 metadata = MetaData()
 
@@ -62,14 +61,11 @@ class PosterStore:
             await connection.execute(statement)
 
     async def put(self, item_id: int, data: bytes, now: datetime) -> None:
-        statement = insert(poster).values(
-            item_id=item_id, data=data, fetched_at=now
-        )
         await self._write(
-            statement.on_conflict_do_update(
-                index_elements=[poster.c.item_id],
-                set_={"data": statement.excluded.data,
-                      "fetched_at": statement.excluded.fetched_at},
+            upserting(
+                poster,
+                {"item_id": item_id, "data": data, "fetched_at": now},
+                [poster.c.item_id],
             )
         )
 
@@ -86,4 +82,4 @@ class PosterStore:
         return found.one_or_none() is not None
 
     async def delete(self, item_id: int) -> None:
-        await self._write(delete(poster).where(poster.c.item_id == item_id))
+        await self._write(clearing(poster, item_id))

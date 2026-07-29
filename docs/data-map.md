@@ -278,6 +278,11 @@
 - `PEOPLE` = `Entity(person, person_credit, PersonRole, person…`
 - `COMPANIES` = `Entity(company, company_credit, CompanyRole)`
 
+### `backend/storage/repository/external.py`
+
+- `VALUE_TTL` = `timedelta(days=30)`
+- `EMPTY_TTL` = `timedelta(days=7)`
+
 ### `backend/storage/repository/library.py`
 
 - `_FIELDS` = `набор из 13`
@@ -395,8 +400,11 @@
 
 ### `tests/backend/test_delete.py`
 
-- `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 128`
 - `ALONE` = `набор из 3`
+
+### `tests/backend/test_external_ratings.py`
+
+- `WANTED` = `набор из 3`
 
 ### `tests/backend/test_genre_reference.py`
 
@@ -426,7 +434,6 @@
 
 ### `tests/backend/test_posters.py`
 
-- `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `OTHER` = `'другая обложка'.encode()`
 
 ### `tests/backend/test_session.py`
@@ -448,6 +455,7 @@
 
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
+- `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`
 

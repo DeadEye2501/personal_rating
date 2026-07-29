@@ -5,9 +5,8 @@ from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
+from tests.conftest import PICTURE
 from tests.conftest import MOMENT as WHEN
-
-PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 128
 
 
 async def furnished(sessions, posters, item_id: int, tag: str = "пересмотреть") -> int:

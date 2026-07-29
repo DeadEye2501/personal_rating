@@ -4,9 +4,9 @@ from sqlalchemy import select
 
 from backend.storage.posters import PosterStore, poster
 from backend.storage.session import create_engine
+from tests.conftest import PICTURE
 from tests.conftest import MOMENT as WHEN
 
-PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 512
 # Байтовый литерал не держит кириллицу — только через encode().
 OTHER = "другая обложка".encode()
 

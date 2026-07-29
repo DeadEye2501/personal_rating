@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 45 модулей
+## backend — 47 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -360,44 +360,43 @@
 
 - `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (9)
 
-### `backend/storage/posters.py` — 89 строк
+### `backend/storage/posters.py` — 85 строк
 
 Второй файл базы: картинка по карточке.
 
-Зависит от: `backend.storage.session`
+Зависит от: `backend.storage.session`, `backend.storage.statements`
 
-- `class PosterStore` (56)
+- `class PosterStore` (53)
   - `async def open(self) -> None` (7)
   - `async def close(self) -> None` (4)
   - `async def _read(self, statement: Executable)` (3)
   - `async def _write(self, statement: Executable) -> None` (3)
-  - `async def put(self, item_id: int, data: bytes, now: datetime) -> None` (11)
+  - `async def put(self, item_id: int, data: bytes, now: datetime) -> None` (8)
   - `async def get(self, item_id: int) -> bytes | None` (5)
   - `async def has(self, item_id: int) -> bool` (5)
   - `async def delete(self, item_id: int) -> None` (2)
 
-### `backend/storage/repository/base.py` — 86 строк
+### `backend/storage/repository/base.py` — 77 строк
 
 Общее у репозиториев: сессия и способы с ней обойтись.
 
 Зависит от: —
 
-- `class Repository` (77)
+- `class Repository` (68)
   - `async def _row(self, statement: Executable) -> Row | None` (3)
   - `async def _rows(self, statement: Executable) -> list[Row]` (3)
   - `async def _mapped(self, statement: Executable, make: Callable[[Row], object])` (3)
   - `async def _maybe(self, statement: Executable, make: Callable[[Row], object])` (6)
   - `async def _has_item(self, table: Table, item_id: int) -> bool` (8)
-  - `def _clearing(table: Table, item_id: int) -> Delete` (7)
   - `async def _created(self, statement: Executable, taken: Exception) -> int` (15)
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (7)
 
-### `backend/storage/repository/credits.py` — 236 строк
+### `backend/storage/repository/credits.py` — 237 строк
 
 Всё, что приложение делает в базе с человеком или студией как с
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
 
 - `class IdentityTaken(Exception)` (2)
 - `class Entity` (8)
@@ -423,11 +422,29 @@
 - `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 - `def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 
-### `backend/storage/repository/genres.py` — 74 строк
+### `backend/storage/repository/external.py` — 104 строк
+
+Чем карточка известна чужим источникам.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.statements`, `backend.storage.tables`
+
+- `class ExternalIdTaken(Exception)` (2)
+- `def _to_external_id(row) -> ExternalId` (2)
+- `def _to_external_rating(row) -> ExternalRating` (4)
+- `class ExternalIdsRepository(Repository)` (31)
+  - `async def put(self, item_id: int, external: ExternalId) -> None` (13)
+  - `async def ids_of(self, item_id: int) -> list[ExternalId]` (7)
+  - `async def find_item(self, source: IdSource, value: str) -> int | None` (8)
+- `class ExternalRatingsRepository(Repository)` (39)
+  - `async def record(self, item_id: int, rating: ExternalRating) -> None` (13)
+  - `async def ratings_of(self, item_id: int) -> list[ExternalRating]` (7)
+  - `async def stale_sources(self, item_id: int, wanted: list[RatingSource], now: datetime) -> list[RatingSource]` (16)
+
+### `backend/storage/repository/genres.py` — 75 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.statements`, `backend.storage.tables`
 
 - `def _to_genre(row) -> Genre` (2)
 - `class GenresRepository(Repository)` (58)
@@ -459,11 +476,11 @@
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
-### `backend/storage/repository/ratings.py` — 71 строк
+### `backend/storage/repository/ratings.py` — 72 строк
 
 Моя оценка карточки.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.statements`, `backend.storage.tables`
 
 - `def _to_rating(row) -> Rating` (11)
 - `class RatingsRepository(Repository)` (46)
@@ -493,11 +510,11 @@
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (8)
 
-### `backend/storage/repository/wishlist.py` — 36 строк
+### `backend/storage/repository/wishlist.py` — 37 строк
 
 Список запланированного.
 
-Зависит от: `backend.storage.repository.base`, `backend.storage.tables`
+Зависит от: `backend.storage.repository.base`, `backend.storage.statements`, `backend.storage.tables`
 
 - `class WishlistRepository(Repository)` (25)
   - `async def add(self, item_id: int, now: datetime) -> None` (7)
@@ -517,6 +534,15 @@
 - `def create_engine(path: Path) -> AsyncEngine` (9)
   - `def prepare(dbapi_connection, _record)` (2)
 - `def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]` (2)
+
+### `backend/storage/statements.py` — 28 строк
+
+Операторы над таблицами, которые в проекте собираются одинаково.
+
+Зависит от: —
+
+- `def clearing(table: Table, item_id: int) -> Delete` (6)
+- `def upserting(table: Table, values: dict, key: list[Column]) -> Insert` (14)
 
 ### `backend/storage/tables/__init__.py` — 34 строк
 
@@ -682,7 +708,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 35 модулей
+## tests — 37 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -847,7 +873,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 24
 
 
-### `tests/backend/test_delete.py` — 117 строк
+### `tests/backend/test_delete.py` — 116 строк
 
 
 
@@ -856,6 +882,24 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 8
 
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
+
+### `tests/backend/test_external_ids.py` — 118 строк
+
+Внешние идентификаторы: всё, что не основной источник карточки.
+
+Зависит от: `backend.model`, `backend.storage.repository.external`, `backend.storage.repository.library`
+
+Тестов: 8
+
+
+### `tests/backend/test_external_ratings.py` — 195 строк
+
+Оценки агрегаторов: три состояния и сроки годности.
+
+Зависит от: `backend.model`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+
+Тестов: 12
+
 
 ### `tests/backend/test_genre_reference.py` — 171 строк
 
@@ -1003,7 +1047,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 120 строк
+### `tests/conftest.py` — 124 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 

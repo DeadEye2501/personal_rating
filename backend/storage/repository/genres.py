@@ -5,6 +5,7 @@ from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Genre, GenreKind, GenreSource
 from backend.storage.repository.base import Repository
+from backend.storage.statements import clearing
 from backend.storage.tables import genre as genre_table
 from backend.storage.tables import genre_map as genre_map_table
 from backend.storage.tables import item_genre as item_genre_table
@@ -41,7 +42,7 @@ class GenresRepository(Repository):
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:
         """Набор жанров заменяется целиком: пришедшее из источника — это весь
         список, а не добавка к прежнему."""
-        cleared = self._clearing(item_genre_table, item_id)
+        cleared = clearing(item_genre_table, item_id)
         if not genre_ids:
             await self._run(cleared)
             return

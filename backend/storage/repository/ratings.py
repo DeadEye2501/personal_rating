@@ -7,6 +7,7 @@ from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Rating, average_score
 from backend.storage.repository.base import Repository
+from backend.storage.statements import clearing
 from backend.storage.tables import rating as rating_table
 
 
@@ -68,4 +69,4 @@ class RatingsRepository(Repository):
 
     async def clear(self, item_id: int) -> None:
         """Снять оценку. Карточка остаётся — она уже загружена."""
-        await self._run(self._clearing(rating_table, item_id))
+        await self._run(clearing(rating_table, item_id))

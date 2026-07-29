@@ -18,6 +18,7 @@ from backend.model import (
 )
 from backend.storage.repository.base import Repository
 from backend.storage.session import fold, folded
+from backend.storage.statements import clearing
 from backend.storage.tables import (
     company,
     company_credit,
@@ -149,7 +150,7 @@ class CreditRepository(Repository):
         )
 
     async def detach_all(self, item_id: int) -> None:
-        await self._run(self._clearing(self._entity.credit, item_id))
+        await self._run(clearing(self._entity.credit, item_id))
 
     async def credits_of(self, item_id: int) -> list[Credit]:
         table, credit = self._entity.table, self._entity.credit

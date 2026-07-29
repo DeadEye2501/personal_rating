@@ -2,7 +2,7 @@
 
 from collections.abc import Callable
 
-from sqlalchemy import Delete, Executable, Row, Table, delete, select
+from sqlalchemy import Executable, Row, Table, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -43,15 +43,6 @@ class Repository:
         return await self._row(
             select(table.c.item_id).where(table.c.item_id == item_id)
         ) is not None
-
-    @staticmethod
-    def _clearing(table: Table, item_id: int) -> Delete:
-        """Оператор «снести всё, что в этой таблице числится за карточкой».
-
-        Возвращается, а не выполняется: замена набора жанров кладёт его в одну
-        транзакцию со вставкой, и половина такой замены хуже, чем ничего.
-        Остальные трое зовут поверх `_run`."""
-        return delete(table).where(table.c.item_id == item_id)
 
     async def _created(self, statement: Executable, taken: Exception) -> int:
         """Вставка, возвращающая выданный базой номер.

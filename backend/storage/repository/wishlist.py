@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.storage.repository.base import Repository
+from backend.storage.statements import clearing
 from backend.storage.tables import wishlist as wishlist_table
 
 
@@ -19,7 +20,7 @@ class WishlistRepository(Repository):
         )
 
     async def remove(self, item_id: int) -> None:
-        await self._run(self._clearing(wishlist_table, item_id))
+        await self._run(clearing(wishlist_table, item_id))
 
     async def contains(self, item_id: int) -> bool:
         return await self._has_item(wishlist_table, item_id)
