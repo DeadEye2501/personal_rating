@@ -2,15 +2,15 @@
 
 from dataclasses import dataclass, field
 
-from backend.model.external import ExternalRating
+from backend.model.external import ExternalId, ExternalRating
 
 
 @dataclass(frozen=True, slots=True)
 class Ratings:
-    """Оценки, которые источник знает об этой карточке.
-
-    Идентификаторов здесь нет: MDBList не сообщает ни одного, которого мы не
-    знали бы сами, — мы его по идентификатору и спрашиваем. Заведёт их тот
-    источник, который отдаёт свой собственный, — у Кинопоиска это его id."""
+    """`external_ids` непуст там, где источник заодно сообщил идентификатор, по
+    которому дальше ходить дешевле: у Кинопоиска это его собственный id. У
+    MDBList и OMDB он пуст — мы их спрашиваем по тому же `imdb_id`, который и
+    так знаем."""
 
     values: tuple[ExternalRating, ...] = field(default_factory=tuple)
+    external_ids: tuple[ExternalId, ...] = field(default_factory=tuple)

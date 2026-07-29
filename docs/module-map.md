@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 36 модулей
+## backend — 41 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -172,6 +172,63 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 - `def refuse_undocumented(http: SourceHttp, response: httpx.Response) -> Refusal` (14)
+
+### `backend/sources/ratings/kinopoisk/client.py` — 35 строк
+
+Кинопоиск снаружи: одно имя над двумя зеркалами.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`
+
+- `class KinopoiskClient` (23)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (11)
+  - `async def aclose(self) -> None` (3)
+
+### `backend/sources/ratings/kinopoisk/mirror.py` — 50 строк
+
+Общее у двух зеркал Кинопоиска.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`
+
+- `def refuse_quota(http: SourceHttp) -> Refusal` (3)
+- `def refuse_rate(http: SourceHttp) -> Refusal` (5)
+- `def refuse_key() -> Refusal` (3)
+- `def refuse_code(status: int) -> Refusal` (2)
+- `def answered(answer: Ratings) -> Outcome` (7)
+
+### `backend/sources/ratings/kinopoisk/parse.py` — 47 строк
+
+Перевод ответов обоих зеркал Кинопоиска в наши типы.
+
+Зависит от: `backend.model`
+
+- `def _rating(value, now: datetime) -> tuple[ExternalRating, ...]` (8)
+- `def _ident(value) -> tuple[ExternalId, ...]` (4)
+- `def parse_poiskkino(payload: dict) -> Ratings` (11)
+- `def parse_unofficial(payload: dict) -> Ratings` (11)
+
+### `backend/sources/ratings/kinopoisk/poiskkino.py` — 93 строк
+
+Основное зеркало Кинопоиска.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.parse`
+
+- `class PoiskkinoClient` (60)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (9)
+  - `def _verdict(self, response: httpx.Response) -> Outcome` (16)
+  - `def _absent(self, response: httpx.Response) -> Outcome` (14)
+  - `def _answer(self, response: httpx.Response) -> Outcome` (6)
+  - `async def aclose(self) -> None` (2)
+
+### `backend/sources/ratings/kinopoisk/unofficial.py` — 61 строк
+
+Запасное зеркало Кинопоиска.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.parse`
+
+- `class UnofficialClient` (35)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (9)
+  - `def _verdict(self, response: httpx.Response) -> Outcome` (17)
+  - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/ratings/mdblist/client.py` — 94 строк
 
@@ -562,7 +619,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 30 модулей
+## tests — 31 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -618,6 +675,18 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def capture() -> tuple[httpx.MockTransport, list[httpx.Request]]` (9)
   - `def handler(request: httpx.Request) -> httpx.Response` (3)
+
+### `tests/backend/sources/test_kinopoisk.py` — 421 строк ⚠ подошёл к 300
+
+Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`
+
+Тестов: 28
+
+- `def primary(transport) -> PoiskkinoClient` (2)
+- `def fallback(transport) -> UnofficialClient` (2)
+- `def answering(status: int, body) -> httpx.MockTransport` (4)
 
 ### `tests/backend/sources/test_mdblist.py` — 232 строк
 

@@ -127,6 +127,7 @@
 
 - `class Ratings`
   - `values: tuple[ExternalRating, ...]` = `field(default_factory=tuple)`
+  - `external_ids: tuple[ExternalId, ...]` = `field(default_factory=tuple)`
 
 ### `backend/model/search.py`
 
@@ -171,6 +172,27 @@
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
 - `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
+
+### `backend/sources/ratings/kinopoisk/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+
+### `backend/sources/ratings/kinopoisk/mirror.py`
+
+- `SOURCE` = `'kinopoisk'`
+- `QUOTA_BACKOFF` = `timedelta(hours=6)`
+- `RATE_BACKOFF` = `timedelta(minutes=1)`
+
+### `backend/sources/ratings/kinopoisk/poiskkino.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE` = `'https://api.poiskkino.dev/v1.4/movie'`
+- `FIELDS` = `набор из 3`
+
+### `backend/sources/ratings/kinopoisk/unofficial.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE` = `'https://kinopoiskapiunofficial.tech/api/v2.2/fi…`
 
 ### `backend/sources/ratings/mdblist/client.py`
 
