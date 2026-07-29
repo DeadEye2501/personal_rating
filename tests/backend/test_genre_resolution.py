@@ -33,12 +33,25 @@ async def genres(engine, sessions):
 
 async def test_spaces_are_asked_apart(genres):
     """Спрошенные вместе, жанр и тег с номером `9` дали бы карточке чужой
-    жанр — или один вместо двух."""
+    жанр — или один вместо двух.
+
+    Порядок сверяется, а не набор: пространства спрашиваются в том порядке, в
+    каком пришли, и первым в списке оказывается жанр магазина, а не его тег."""
     found = await resolved_genres(genres, (
         (GenreSource.STEAM, "9"), (GenreSource.STEAM_TAG, "9"),
     ))
 
-    assert sorted(found) == [1, 2]
+    assert found == [1, 2]
+
+
+async def test_the_order_of_the_spaces_is_the_order_of_the_answer(genres):
+    """Обратный порядок на входе — обратный на выходе. Снятие повторов порядок
+    не меняет: `set` его не помнит, а словарь помнит."""
+    found = await resolved_genres(genres, (
+        (GenreSource.STEAM_TAG, "9"), (GenreSource.STEAM, "9"),
+    ))
+
+    assert found == [2, 1]
 
 
 async def test_one_genre_from_two_tags_is_returned_once(genres):

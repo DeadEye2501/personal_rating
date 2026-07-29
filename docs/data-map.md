@@ -473,12 +473,13 @@
 ### `tests/backend/test_linking.py`
 
 - `POSTER` = `picture(600, 900, fmt='JPEG')`
+- `FULL` = `Item(id=0, kind=Kind.SERIES, source=Source.TMDB,…`
 
 ### `tests/backend/test_links.py`
 
 - `ADDRESSES` = `набор из 6`
 - `SHOUTED` = `набор из 5`
-- `NONSENSE` = `набор из 7`
+- `NONSENSE` = `набор из 9`
 
 ### `tests/backend/test_migrations.py`
 

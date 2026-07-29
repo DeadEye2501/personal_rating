@@ -45,9 +45,7 @@ class CardParts:
                                     credit.position)
 
     async def _write_external(self, item_id: int, card: SourceCard) -> None:
-        """Чем карточка известна чужим базам. Идентификаторы вперёд оценок: на
-        занятом идентификаторе запись прерывается, и оценки в этом случае
-        писать некуда."""
+        """Чем карточка известна чужим базам."""
         for external in card.external_ids:
             await self._ids.put(item_id, external)
         for rating in card.ratings:

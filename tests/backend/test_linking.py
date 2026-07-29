@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 import pytest
 
@@ -64,6 +65,28 @@ def test_merge_fills_only_the_empty():
 
     assert merged.year == 2014
     assert merged.runtime == 169
+
+
+FULL = Item(
+    id=0, kind=Kind.SERIES, source=Source.TMDB, source_id="83867",
+    title="Andor", synced_at=MOMENT, original_title="Andor",
+    year=2022, released_at=date(2022, 9, 21), synopsis="официальный синопсис",
+    poster_url="https://example.com/andor.jpg", runtime=48,
+    seasons_count=2, episodes_count=24,
+)
+
+
+def test_every_field_a_source_may_fill_is_filled():
+    """Все девять полей поимённо: проверка на трёх из них молчит, когда из набора
+    выпадает четвёртое — а выпасть может любое, набор задан списком."""
+    merged = merge_fields(mine(), FULL)
+
+    assert (merged.title, merged.original_title) == ("Интерстеллар", "Andor")
+    assert (merged.year, merged.released_at) == (2022, date(2022, 9, 21))
+    assert merged.synopsis == "официальный синопсис"
+    assert merged.poster_url == "https://example.com/andor.jpg"
+    assert merged.runtime == 48
+    assert (merged.seasons_count, merged.episodes_count) == (2, 24)
 
 
 def test_merge_never_moves_identity_or_the_sync_mark():

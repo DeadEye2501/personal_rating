@@ -104,6 +104,21 @@ async def test_an_empty_answer_lives_a_week(sessions, card):
     assert RatingSource.ROTTEN in expired
 
 
+async def test_a_zero_is_a_value_and_lives_a_month(sessions, card):
+    """Ноль — это оценка, а не пустой ответ. Отличать их надо по наличию строки,
+    а не по правдивости числа: у Rotten Tomatoes нулевой рейтинг бывает, и по
+    короткому сроку он перезапрашивался бы вчетверо чаще нужного."""
+    item_id = await card()
+    repository = ExternalRatingsRepository(sessions)
+    await repository.record(item_id, ExternalRating(RatingSource.ROTTEN, 0.0, MOMENT))
+
+    stale = await repository.stale_sources(
+        item_id, WANTED, now=MOMENT + timedelta(days=8)
+    )
+
+    assert RatingSource.ROTTEN not in stale
+
+
 async def test_the_empty_answer_expires_sooner_than_a_value(sessions, card):
     """Проверяются не константы, а поведение: в один и тот же момент пустой
     ответ уже протух, а значение рядом с ним ещё нет."""

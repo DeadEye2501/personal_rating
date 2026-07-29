@@ -128,15 +128,15 @@
 
 - `class Suggestion` (9)
 
-### `backend/service/card_parts.py` — 54 строк
+### `backend/service/card_parts.py` — 52 строк
 
 Общая основа записи карточки в базу.
 
 Зависит от: `backend.model`, `backend.service.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`
 
-- `class CardParts` (41)
+- `class CardParts` (39)
   - `async def _attach_credits(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...]) -> None` (6)
-  - `async def _write_external(self, item_id: int, card: SourceCard) -> None` (8)
+  - `async def _write_external(self, item_id: int, card: SourceCard) -> None` (6)
 
 ### `backend/service/cards.py` — 62 строк
 
@@ -984,13 +984,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 8
 
 
-### `tests/backend/test_external_ratings.py` — 195 строк
+### `tests/backend/test_external_ratings.py` — 210 строк
 
 Оценки агрегаторов: три состояния и сроки годности.
 
 Зависит от: `backend.model`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
 
-Тестов: 12
+Тестов: 13
 
 
 ### `tests/backend/test_genre_reference.py` — 171 строк
@@ -1004,13 +1004,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def named(connection, source: str, ext_id: str) -> set[str]` (10)
 - `def counted(connection, where: str) -> int` (4)
 
-### `tests/backend/test_genre_resolution.py` — 65 строк
+### `tests/backend/test_genre_resolution.py` — 78 строк
 
 Разрешение чужих меток жанров: то, что видно в самом списке наших номеров.
 
 Зависит от: `backend.model`, `backend.service.genres`, `backend.storage.repository.genres`, `tests.conftest`
 
-Тестов: 4
+Тестов: 5
 
 - `async def genres(engine, sessions)` (3)
 
@@ -1060,20 +1060,20 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def make_item(**overrides) -> Item` (12)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
 
-### `tests/backend/test_linking.py` — 386 строк ⚠ подошёл к 300
+### `tests/backend/test_linking.py` — 409 строк ⚠ подошёл к 300
 
 
 
 Зависит от: `backend.model`, `backend.service.linking`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 26
+Тестов: 27
 
 - `def incoming(**overrides) -> SourceCard` (13)
 - `def mine(**fields) -> Item` (4)
 - `async def linker(sessions, engine, posters)` (5)
 - `async def manual_card(sessions, **fields) -> int` (5)
 
-### `tests/backend/test_links.py` — 130 строк
+### `tests/backend/test_links.py` — 134 строк
 
 
 
