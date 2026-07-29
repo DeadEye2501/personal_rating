@@ -1854,7 +1854,6 @@ git commit -m "feat: загрузка обложки со своим клиен�
 
 ```python
 import io
-import logging
 from datetime import datetime
 
 import httpx
@@ -2125,12 +2124,49 @@ async def test_companies_are_written_for_a_game(writer, sessions):
 
 - [ ] **Шаг 3: Реализовать**
 
+Создать `backend/service/genres.py`:
+
+```python
+from backend.model import GenreSource
+from backend.storage.repository.genres import GenresRepository
+
+
+async def resolved_genres(
+    genres: GenresRepository,
+    marked: tuple[tuple[GenreSource, str], ...],
+) -> list[int]:
+    """Пары «пространство и идентификатор» в наши `genre.id`.
+
+    Пространств у одной карточки бывает два — жанры магазина и его теги, — и
+    нумеруются они порознь: `9` у Steam это жанр «Гонки» и тег «Стратегия».
+    Поэтому справочник спрашивается по каждому пространству отдельно. Дубли
+    снимаются: два разных тега нередко ведут в один наш жанр, и `Action RPG`
+    вместе с `Ролевая игра` дадут `RPG` дважды.
+
+    Дальше происхождение не помнит никто: наружу едут только наши жанры."""
+    spaces: dict[GenreSource, list[str]] = {}
+    for space, ext_id in marked:
+        spaces.setdefault(space, []).append(ext_id)
+
+    found: list[int] = []
+    for space, ext_ids in spaces.items():
+        for genre_id in await genres.resolve(space, ext_ids):
+            if genre_id not in found:
+                found.append(genre_id)
+    return found
+```
+
+Зовут её двое — запись карточки и привязка, — а в плане 4 к ним добавится
+третий, разбор выдачи поиска. Поэтому она и лежит отдельно, а не методом одного
+из них.
+
 Создать `backend/service/cards.py`:
 
 ```python
 import logging
 
-from backend.model import Credit, GenreSource, SourceCard
+from backend.model import Credit, SourceCard
+from backend.service.genres import resolved_genres
 from backend.service.posters import PosterService
 from backend.sources.errors import Reason, Refusal
 from backend.storage.repository.credits import CreditRepository
@@ -2202,27 +2238,11 @@ class CardWriter:
 
         return item_id
 
-    async def _resolved(self, card: SourceCard) -> list[int]:
-        """Жанры карточки по нашему справочнику.
-
-        Идентификаторы приезжают из разных пространств: жанры магазина и его
-        теги нумеруются порознь, и `9` у Steam — это жанр «Гонки» и тег
-        «Стратегия». Справочник спрашивается по каждому пространству отдельно,
-        а дубли снимаются: два разных тега нередко ведут в один наш жанр."""
-        spaces: dict[GenreSource, list[str]] = {}
-        for space, ext_id in card.genre_ext_ids:
-            spaces.setdefault(space, []).append(ext_id)
-
-        found: list[int] = []
-        for space, ext_ids in spaces.items():
-            for genre_id in await self._genres.resolve(space, ext_ids):
-                if genre_id not in found:
-                    found.append(genre_id)
-        return found
-
     async def _write_the_rest(self, item_id: int, card: SourceCard,
                               poster: bytes | None) -> None:
-        await self._genres.set_for_item(item_id, await self._resolved(card))
+        await self._genres.set_for_item(
+            item_id, await resolved_genres(self._genres, card.genre_ext_ids)
+        )
 
         await self._attach(self._people, item_id, card.people)
         await self._attach(self._companies, item_id, card.companies)
@@ -2487,7 +2507,7 @@ git commit -m "feat: разбор ссылки на страницу во вне
 момент привязки сразу окажется просроченной.
 
 **Файлы:**
-- Создать: `backend/service/linking.py`
+- Создать: `backend/service/genres.py`, `backend/service/linking.py`
 - Создать: `tests/backend/test_linking.py`
 
 **Интерфейсы:**
@@ -2528,6 +2548,7 @@ from backend.model import (
     new_manual_item,
 )
 from backend.service.linking import Linker, merge_fields
+from backend.service.genres import resolved_genres
 from backend.service.posters import PosterService
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
@@ -2926,8 +2947,7 @@ class Linker:
         if not overwrite and await self._genres.genres_of(item_id):
             # Выбрал один жанр — набор считается заполненным целиком.
             return
-        resolved = await self._genres.resolve(card.item.source,
-                                              list(card.genre_ext_ids))
+        resolved = await resolved_genres(self._genres, card.genre_ext_ids)
         if resolved:
             await self._genres.set_for_item(item_id, resolved)
 
