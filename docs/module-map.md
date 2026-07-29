@@ -350,7 +350,7 @@
 - `def render() -> str` (16)
 - `def main() -> int` (12)
 
-### `scripts/record_fixtures.py` — 187 строк
+### `scripts/record_fixtures.py` — 198 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -358,7 +358,8 @@
 
 - `def save(source: str, case: str, response: httpx.Response) -> None` (23)
 - `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (24)
-- `async def record_steam(client: httpx.AsyncClient) -> None` (24)
+- `async def record_steam(client: httpx.AsyncClient) -> None` (35)
+  - `def ask(ids: list[dict]) -> str` (7)
 - `async def record_gog(client: httpx.AsyncClient) -> None` (9)
 - `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
 - `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)

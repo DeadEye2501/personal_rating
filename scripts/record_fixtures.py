@@ -40,9 +40,9 @@ def save(source: str, case: str, response: httpx.Response) -> None:
             encoding="utf-8",
         )
     except ValueError:
-        # Ни один из ответов 29.07.2026 сюда не попал — все шесть источников
-        # отдали JSON, даже Steam под 400. Ветка остаётся, чтобы страница
-        # ошибки от чужого прокси не обрывала запись на середине.
+        # Сюда попадает один ответ из тридцати восьми: битый `input_json` у
+        # тегов Steam отдаёт страницу ошибки HTML. Остальные пять источников
+        # отвечают JSON даже на отказ.
         body = folder / f"{case}.txt"
         body.write_text(response.text, encoding="utf-8")
 
@@ -97,14 +97,25 @@ async def record_steam(client: httpx.AsyncClient) -> None:
         "https://store.steampowered.com/api/appdetails", params={"l": "russian"}))
     # Теги живут отдельно: в appdetails их нет вовсе. `country_code` только US —
     # с RU ответ приходит пустым, с `visible: false`.
-    save("steam", "store_items", await client.get(
-        "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/",
-        params={"input_json": json.dumps({
-            "ids": [{"appid": WITCHER_APPID}],
+    tags = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
+
+    def ask(ids: list[dict]) -> str:
+        return json.dumps({
+            "ids": ids,
             "context": {"language": "russian", "country_code": "US",
                         "steam_realm": 1},
             "data_request": {"include_tag_count": 20},
-        })}))
+        })
+
+    save("steam", "store_items", await client.get(
+        tags, params={"input_json": ask([{"appid": WITCHER_APPID}])}))
+    save("steam", "store_items_missing", await client.get(
+        tags, params={"input_json": ask([{"appid": 999999999}])}))
+    save("steam", "store_items_empty", await client.get(
+        tags, params={"input_json": ask([])}))
+    # Единственный ответ за весь прогон, который не JSON: страница ошибки.
+    save("steam", "store_items_broken", await client.get(
+        tags, params={"input_json": "{не json"}))
 
 
 async def record_gog(client: httpx.AsyncClient) -> None:

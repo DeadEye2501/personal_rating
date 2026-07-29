@@ -33,6 +33,9 @@
 | `steam/appdetails_missing` | игры нет: `200` и `success: false` |
 | `steam/appdetails_broken` | битый запрос: `400` и тело `null` |
 | `steam/store_items` | теги игры — в карточке их нет вовсе |
+| `steam/store_items_missing` | игры нет: `200` и `success: 15` числом, а не флагом |
+| `steam/store_items_empty` | пустой `ids`: `200` и `{"response":{}}` без `store_items` |
+| `steam/store_items_broken` | битый `input_json`: `400` и HTML вместо JSON |
 | `gog/catalog` | поиск в каталоге |
 | `gog/catalog_nonsense` | бессмыслица в запросе: `200` и полсотни несвязанных игр |
 | `mdblist/found` | оценки найдены |
@@ -73,6 +76,11 @@
 перевод прямой: у «Ведьмака 3» из двадцати тегов пять известны справочнику и
 дают `Action`, `Quest`, `RPG`, `Sandbox`, остальные пятнадцать отбрасываются
 молча.
+
+**У тегов `success` — число, а не флаг.** `1` при удаче, `15` когда игры нет,
+и `15` же приходит на существующую игру при неверном `country_code`. У карточки
+(`appdetails`) то же поле булево. Проверка «если success» посчитает
+несуществующую игру найденной: `15` истинно.
 
 **У MDBList счётчик квоты виден на успешном ответе.** В `mdblist/found` приехали
 `x-ratelimit-limit: 1000`, `x-ratelimit-remaining: 998` и `x-ratelimit-reset`.
