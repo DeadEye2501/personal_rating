@@ -884,7 +884,118 @@
 
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 
-## client — 0 модулей
+## client — 10 модулей
+
+### `client/runtime.py` — 196 строк
+
+Стык asyncio с циклом Qt.
+
+Зависит от: —
+
+- `class Call(QObject)` (38)
+  - `def cancel(self) -> None` (9)
+  - `def _deliver(self, result) -> None` (3)
+  - `def _deliver_failure(self, error) -> None` (3)
+- `class Calls` (15)
+  - `def add(self, call: Call) -> Call` (3)
+  - `def cancel_all(self) -> None` (4)
+- `class _Worker(QThread)` (9)
+  - `def run(self) -> None` (2)
+- `class Runtime(QObject)` (109)
+  - `def start(self) -> None` (7)
+  - `def call(self, work: Work) -> Call` (32)
+    - `async def run() -> None` (10)
+    - `def launch() -> None` (7)
+  - `def close(self) -> None` (12)
+  - `async def _serve(self) -> None` (39)
+
+### `client/theme/__init__.py` — 24 строк
+
+Поверхность оформления: отсюда его берут окно и виджеты.
+
+Зависит от: `client.theme`, `client.theme.icons`, `client.theme.qss`, `client.theme.typography`
+
+Отдаёт наружу: `GLYPHS`, `apply_theme`, `font`, `fonts`, `icon_font`, `icons`, `load_styles`, `metrics`, `palette`, `qss`, `typography`
+
+- `def apply_theme(app: QApplication) -> None` (9)
+
+### `client/theme/fonts.py` — 54 строк
+
+Регистрация файлов шрифтов в Qt.
+
+Зависит от: —
+
+- `def load_fonts() -> None` (8)
+- `def icon_family() -> str` (4)
+- `def loaded_families() -> set[str]` (4)
+- `def _register(name: str) -> str` (9)
+
+### `client/theme/icons.py` — 58 строк
+
+Material Symbols: контур в покое, заливка во включённом состоянии.
+
+Зависит от: `client.theme`
+
+- `def icon_font(size: int, filled: bool=False) -> QFont` (11)
+
+### `client/theme/metrics.py` — 42 строк
+
+Радиусы, отступы и размеры элементов. Единственное место, где они есть.
+
+Зависит от: —
+
+
+### `client/theme/palette.py` — 123 строк
+
+Цвета приложения. Единственное место, где они есть.
+
+Зависит от: —
+
+- `def white(alpha: float) -> str` (4)
+- `def score_color(step: float) -> str` (8)
+- `def scale_color(value: float, maximum: float) -> str` (6)
+- `def mix(color: str, percent: int) -> str` (5)
+- `def qcolor(color: str) -> QColor` (22)
+
+### `client/theme/qss.py` — 67 строк
+
+Стили с подстановкой токенов.
+
+Зависит от: `client.theme`
+
+- `def tokens() -> dict[str, str]` (24)
+- `def substitute(text: str) -> str` (16)
+  - `def swap(match: 're.Match[str]') -> str` (5)
+- `def load_styles() -> str` (8)
+
+### `client/theme/typography.py` — 43 строк
+
+Начертания приложения. Запись повторяет CSS: вес, размер, межстрочный.
+
+Зависит от: —
+
+- `class Face` (7)
+- `def font(face: Face) -> QFont` (7)
+
+### `client/widgets/neon.py` — 44 строк
+
+Неоновая кромка: нить в один пиксель и разлив света под ней.
+
+Зависит от: `client.theme`
+
+- `class NeonEdge(QWidget)` (25)
+  - `def paintEvent(self, event) -> None` (16)
+
+### `client/window.py` — 61 строк
+
+Окно приложения. Рамка системная: перетаскивание, размер и прилипание к
+
+Зависит от: `client.theme`, `client.widgets.neon`
+
+- `class MainWindow(QWidget)` (44)
+  - `def resizeEvent(self, event) -> None` (5)
+  - `def paintEvent(self, event) -> None` (10)
+  - `def closeEvent(self, event) -> None` (3)
 
 ## migrations — 3 модулей
 
@@ -908,7 +1019,7 @@
 - `def upgrade() -> None` (131)
 - `def downgrade() -> None` (24)
 
-### `migrations/versions/0002_genres.py` — 403 строк ⚠ подошёл к 300
+### `migrations/versions/0002_genres.py` — 401 строк ⚠ подошёл к 300
 
 Справочник жанров и соответствия к нему.
 
@@ -917,13 +1028,13 @@
 - `def upgrade() -> None` (29)
 - `def downgrade() -> None` (5)
 
-## scripts — 6 модулей
+## scripts — 2 модулей
 
-### `scripts/collect_game_genres.py` — 80 строк
+### `scripts/collect_game_genres.py` — 81 строк
 
 Разовый сбор игровых жанров: справочника в документации нет ни у Steam, ни у
 
-Зависит от: `backend.sources.http`
+Зависит от: `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.steam.client`, `backend.unique`
 
 - `def example_appids(menu: list[dict]) -> list[int]` (8)
 - `async def app_genres(client: httpx.AsyncClient, appid: int) -> list[dict]` (11)
@@ -931,92 +1042,23 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
-### `scripts/genre_map.py` — 83 строк
-
-Сверка соответствий жанров: спека против миграции.
-
-Зависит от: —
-
-- `def from_spec() -> dict[str, dict[str, list[str]]]` (18)
-- `def from_migration() -> dict[str, dict[str, list[str]]]` (9)
-- `def differences(spec: dict, code: dict) -> list[str]` (8)
-- `def main() -> int` (9)
-
-### `scripts/module_map.py` — 298 строк
-
-Две карты проекта, собираемые из кода.
-
-Зависит от: `not_duplicates`, `project_ast`
-
-- `def alias(node: ast.AST) -> str | None` (17)
-- `def declared(body: list, depth: int=0) -> tuple[list[str], int]` (30)
-- `def module_block(path: str, tree: ast.Module, lines_total: int) -> str` (24)
-- `def _counted(kind: str, amount: int, spread: bool) -> str` (4)
-- `def brief(value: ast.AST | None) -> str` (17)
-- `def assigned(node: ast.AST) -> list[tuple[str, str]]` (11)
-- `def _data_nodes(body: list) -> list[ast.AST]` (11)
-- `def _class_lines(node: ast.ClassDef) -> list[str]` (11)
-- `def contents(tree: ast.Module) -> list[str]` (20)
-- `def data_block(path: str, tree: ast.Module) -> list[str]` (4)
-- `def lonely_block(found: list[tuple]) -> str` (9)
-- `def within(found: list[tuple], root: str) -> list[tuple]` (4)
-- `def heading(title: str, note: str) -> list[str]` (5)
-- `def render(found: list[tuple]) -> str` (9)
-- `def render_data(found: list[tuple]) -> str` (11)
-- `def main() -> int` (23)
-
-### `scripts/not_duplicates.py` — 103 строк
-
-Вердикты «это не повтор того» и их срок годности.
-
-Зависит от: `project_ast`
-
-- `def verdict_lines() -> list[str]` (5)
-- `def is_verdict(line: str) -> bool` (4)
-- `def places(line: str) -> list[tuple[str, str]]` (10)
-- `def stamped(token: str) -> bool` (2)
-- `def sealed(line: str, index: dict[str, str]) -> str` (11)
-- `def seal(index: dict[str, str]) -> None` (5)
-- `def malformed(line: str) -> str` (16)
-- `def expired(lines: list[str], index: dict[str, str]) -> list[str]` (18)
-
-### `scripts/project_ast.py` — 196 строк
-
-Свой код проекта как дерево разбора.
-
-Зависит от: —
-
-- `def project_root() -> Path` (7)
-- `def roots() -> list[str]` (10)
-- `def modules() -> list[tuple[str, ast.Module, int]]` (26)
-- `def signature(node: ast.AST) -> str` (7)
-- `def size(node: ast.AST) -> int` (2)
-- `def _siblings(path: str) -> set[str]` (9)
-- `def depends_on(tree: ast.Module, path: str='') -> list[str]` (13)
-- `def exported(tree: ast.Module) -> list[str]` (9)
-- `def implementations(found: list[tuple]) -> dict[str, list[str]]` (17)
-- `def bound_names(node: ast.AST) -> list[str]` (14)
-- `def _stamp(node: ast.AST) -> str` (2)
-- `def declarations(found: list[tuple]) -> dict[str, str]` (28)
-  - `def walk(body: list, path: str, prefix: str) -> None` (13)
-
-### `scripts/record_fixtures.py` — 198 строк
+### `scripts/record_fixtures.py` — 202 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
-Зависит от: `backend.config`, `backend.sources.http`
+Зависит от: `backend.config`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
 - `def save(source: str, case: str, response: httpx.Response) -> None` (23)
 - `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (24)
-- `async def record_steam(client: httpx.AsyncClient) -> None` (35)
-  - `def ask(ids: list[dict]) -> str` (7)
-- `async def record_gog(client: httpx.AsyncClient) -> None` (9)
-- `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
-- `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
+- `async def record_steam(client: httpx.AsyncClient) -> None` (32)
+  - `def ask(ids: list[dict]) -> str` (10)
+- `async def record_gog(client: httpx.AsyncClient) -> None` (7)
+- `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (9)
+- `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (12)
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 63 модулей
+## tests — 70 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1293,9 +1335,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
-### `tests/backend/test_genre_reference.py` — 220 строк
+### `tests/backend/test_genre_reference.py` — 241 строк
 
-Справочник жанров из миграции против спеки.
+Справочник жанров из миграции против записанного эталона.
 
 Зависит от: `tests.alembic_runner`
 
@@ -1303,6 +1345,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def named(connection, source: str, ext_id: str) -> set[str]` (10)
 - `def counted(connection, where: str) -> int` (4)
+- `def declared_in_migration() -> dict[str, dict[str, list[str]]]` (4)
+- `def differences(reference: dict, declared: dict) -> list[str]` (8)
 
 ### `tests/backend/test_genre_resolution.py` — 78 строк
 
@@ -1345,7 +1389,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
-### `tests/backend/test_layers.py` — 105 строк
+### `tests/backend/test_layers.py` — 103 строк
 
 Граница слоёв: кто кого имеет право импортировать.
 
@@ -1357,6 +1401,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def imported_roots(path: Path)` (4)
 - `def python_files(package: str) -> list[Path]` (7)
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
+- `def outsiders(package: str, allowed: set[str]) -> list[str]` (16)
 
 ### `tests/backend/test_library.py` — 360 строк ⚠ подошёл к 300
 
@@ -1628,6 +1673,113 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
 
+### `tests/client/conftest.py` — 63 строк
+
+Тема на весь прогон и снятие краски с нарисованного.
+
+Зависит от: `client.theme`
+
+- `def theme(qapp)` (9)
+- `def drawn(font: QFont, text: str, side: int=64) -> QImage` (13)
+- `def rendered(widget) -> QImage` (15)
+- `def ink(image: QImage) -> int` (9)
+
+### `tests/client/test_fonts.py` — 28 строк
+
+Регистрация файлов шрифтов: что Qt из них получил.
+
+Зависит от: `client.theme`
+
+Тестов: 3
+
+
+### `tests/client/test_icons.py` — 62 строк
+
+Иконочный шрифт: ось заливки и настоящие ли лигатуры в таблице имён.
+
+Зависит от: `client.theme`, `tests.client.conftest`
+
+Тестов: 5
+
+
+### `tests/client/test_metrics.py` — 51 строк
+
+Размеры элементов: связи между ними и целость набора.
+
+Зависит от: `client.theme`
+
+Тестов: 5
+
+
+### `tests/client/test_palette.py` — 222 строк
+
+Цвета приложения: шкала оценок, приведение чужих шкал и путь в QColor.
+
+Зависит от: `client.theme`
+
+Тестов: 21
+
+- `def named_colours()` (18)
+- `def alpha_of(name: str) -> int` (3)
+
+### `tests/client/test_qss.py` — 122 строк
+
+Стили: подстановка токенов и запрет цвета где бы то ни было, кроме палитры.
+
+Зависит от: `client`, `client.theme`, `tests.client.conftest`
+
+Тестов: 9
+
+- `def placeholders() -> set[str]` (11)
+
+### `tests/client/test_runtime.py` — 335 строк ⚠ подошёл к 300
+
+Одна дверь между потоками: задача уходит в свой цикл, ответ приходит в Qt.
+
+Зависит от: `client.runtime`
+
+Тестов: 15
+
+- `class FakeBackend` (47)
+  - `async def echo(self, value)` (3)
+  - `async def boom(self)` (2)
+  - `async def slow_boom(self)` (5)
+  - `async def quick(self)` (7)
+  - `async def where(self)` (2)
+  - `async def together(self)` (10)
+  - `async def aclose(self)` (2)
+- `def runtime(qtbot)` (15)
+  - `async def build()` (4)
+
+### `tests/client/test_theme.py` — 44 строк
+
+Тема, применённая к приложению: что после неё получают все виджеты.
+
+Зависит от: `client.theme`, `client.theme.qss`, `tests.client.conftest`
+
+Тестов: 5
+
+
+### `tests/client/test_typography.py` — 91 строк
+
+Начертания: три числа объявления шрифта и перевод их в QFont.
+
+Зависит от: `client.theme`
+
+Тестов: 9
+
+
+### `tests/client/test_window.py` — 145 строк
+
+Окно и неоновая кромка: геометрия накладки, её прозрачность и отрисовка.
+
+Зависит от: `client.theme`, `client.widgets.neon`, `client.window`, `tests.client.conftest`
+
+Тестов: 9
+
+- `class StubRuntime` (9)
+  - `def close(self)` (2)
+
 ### `tests/conftest.py` — 239 строк
 
 Фикстуры тестов и поверхность общего.
@@ -1671,36 +1823,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `def handler(request: httpx.Request) -> httpx.Response` (2)
 - `def capture(*, content: bytes | None=None, status: int=200)` (16)
   - `def handler(request: httpx.Request) -> httpx.Response` (5)
-
-### `tests/scripts/test_module_map.py` — 82 строк
-
-Карта данных проверяется тем, что она показывает по данному ей коду.
-
-Зависит от: —
-
-Тестов: 10
-
-- `def shown(source: str) -> list[str]` (2)
-- `def only(source: str) -> str` (4)
-
-### `tests/scripts/test_not_duplicates.py` — 118 строк
-
-Вердикт живёт, пока живо то, что он сравнивал.
-
-Зависит от: —
-
-Тестов: 12
-
-
-### `tests/scripts/test_project_ast.py` — 57 строк
-
-Разбор проекта проверяется тем, что он вычитывает из данного ему кода.
-
-Зависит от: —
-
-Тестов: 6
-
-- `def indexed(source: str, path: str='a.py') -> dict[str, str]` (2)
 
 ### `tests/wiring.py` — 30 строк
 

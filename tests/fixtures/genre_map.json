@@ -1,0 +1,958 @@
+{
+ "GOG": {
+  "action": [
+   "Action"
+  ],
+  "adventure": [
+   "Quest"
+  ],
+  "arcade": [
+   "Arcade"
+  ],
+  "building": [
+   "Sandbox"
+  ],
+  "card-game": [
+   "Tabletop"
+  ],
+  "chess": [
+   "Tabletop"
+  ],
+  "combat": [
+   "Action"
+  ],
+  "economic": [
+   "Strategy"
+  ],
+  "espionage": [
+   "Stealth"
+  ],
+  "fighting": [
+   "Fighting"
+  ],
+  "hidden-object": [
+   "Puzzle"
+  ],
+  "horror": [
+   "Horror"
+  ],
+  "jrpg": [
+   "RPG",
+   "JRPG"
+  ],
+  "managerial": [
+   "Strategy"
+  ],
+  "metroidvania": [
+   "Metroidvania"
+  ],
+  "offroad": [
+   "Racing"
+  ],
+  "pinball": [
+   "Arcade"
+  ],
+  "platformer": [
+   "Platformer"
+  ],
+  "pointandclick": [
+   "Quest"
+  ],
+  "programming": [
+   "Puzzle"
+  ],
+  "puzzle": [
+   "Puzzle"
+  ],
+  "racing": [
+   "Racing"
+  ],
+  "rally": [
+   "Racing"
+  ],
+  "rougelike": [
+   "Roguelike"
+  ],
+  "rpg": [
+   "RPG"
+  ],
+  "sandbox": [
+   "Sandbox"
+  ],
+  "shoot-em-up": [
+   "Shooter"
+  ],
+  "shooter": [
+   "Shooter"
+  ],
+  "simulation": [
+   "Simulator"
+  ],
+  "soccer": [
+   "Sport"
+  ],
+  "sports": [
+   "Sport"
+  ],
+  "stealth": [
+   "Stealth"
+  ],
+  "strategy": [
+   "Strategy"
+  ],
+  "survival": [
+   "Survival"
+  ],
+  "tactical": [
+   "Tactical"
+  ],
+  "teamsport": [
+   "Sport"
+  ],
+  "touring": [
+   "Racing"
+  ],
+  "virtuallife": [
+   "Simulator"
+  ],
+  "visual-novel": [
+   "Quest"
+  ]
+ },
+ "GOG_TAG": {
+  "arcade": [
+   "Arcade"
+  ],
+  "base-building": [
+   "Sandbox"
+  ],
+  "beat-em-up": [
+   "Action"
+  ],
+  "board-game": [
+   "Tabletop"
+  ],
+  "building": [
+   "Sandbox"
+  ],
+  "bullet-hell": [
+   "Shooter"
+  ],
+  "choose-your-own-adventure": [
+   "Quest"
+  ],
+  "city-builder": [
+   "Sandbox"
+  ],
+  "combat": [
+   "Action"
+  ],
+  "crafting": [
+   "Survival"
+  ],
+  "crossplay": [
+   "Multiplayer"
+  ],
+  "crpg": [
+   "RPG"
+  ],
+  "dating-sim": [
+   "Simulator"
+  ],
+  "deckbuilding": [
+   "Tabletop"
+  ],
+  "dungeon-crawler": [
+   "RPG"
+  ],
+  "escape-room": [
+   "Puzzle"
+  ],
+  "farming": [
+   "Simulator"
+  ],
+  "fishing": [
+   "Sport"
+  ],
+  "flight": [
+   "Simulator"
+  ],
+  "football": [
+   "Sport"
+  ],
+  "four-x": [
+   "Strategy"
+  ],
+  "fps": [
+   "Shooter"
+  ],
+  "grand-strategy": [
+   "Strategy"
+  ],
+  "hack-and-slash": [
+   "Action"
+  ],
+  "hidden-object": [
+   "Puzzle"
+  ],
+  "lifesim": [
+   "Simulator"
+  ],
+  "local-co-op": [
+   "Multiplayer"
+  ],
+  "local-multiplayer": [
+   "Multiplayer"
+  ],
+  "logic": [
+   "Puzzle"
+  ],
+  "looter-shooter": [
+   "Shooter"
+  ],
+  "lovecraftian": [
+   "Horror"
+  ],
+  "management": [
+   "Strategy"
+  ],
+  "martial-arts": [
+   "Fighting"
+  ],
+  "match-three": [
+   "Puzzle"
+  ],
+  "metroidvania": [
+   "Metroidvania"
+  ],
+  "multiplayer": [
+   "Multiplayer"
+  ],
+  "online-only": [
+   "Multiplayer"
+  ],
+  "party-game": [
+   "Multiplayer"
+  ],
+  "perma-death": [
+   "Roguelike"
+  ],
+  "pinball": [
+   "Arcade"
+  ],
+  "platformer": [
+   "Platformer"
+  ],
+  "point-and-click": [
+   "Quest"
+  ],
+  "programming": [
+   "Puzzle"
+  ],
+  "psychological-horror": [
+   "Horror"
+  ],
+  "puzzle-platformer": [
+   "Platformer",
+   "Puzzle"
+  ],
+  "resource-management": [
+   "Strategy"
+  ],
+  "rhythm": [
+   "Arcade"
+  ],
+  "roguelike": [
+   "Roguelike"
+  ],
+  "roguelite": [
+   "Roguelike"
+  ],
+  "rts": [
+   "Strategy"
+  ],
+  "sandbox": [
+   "Sandbox"
+  ],
+  "sniper": [
+   "Shooter"
+  ],
+  "souls-like": [
+   "Action",
+   "RPG"
+  ],
+  "split-screen": [
+   "Multiplayer"
+  ],
+  "survival": [
+   "Survival"
+  ],
+  "survival-horror": [
+   "Horror"
+  ],
+  "tabletop": [
+   "Tabletop"
+  ],
+  "tactical-rpg": [
+   "RPG",
+   "Tactical"
+  ],
+  "team-sport": [
+   "Sport"
+  ],
+  "text-based": [
+   "Quest"
+  ],
+  "tower-defense": [
+   "Strategy"
+  ],
+  "trading": [
+   "Strategy"
+  ],
+  "trains": [
+   "Simulator"
+  ],
+  "twin-stick-shooter": [
+   "Shooter"
+  ],
+  "vampire": [
+   "Horror"
+  ],
+  "visual-novel": [
+   "Quest"
+  ],
+  "walking-simulator": [
+   "Quest"
+  ],
+  "zombies": [
+   "Horror"
+  ]
+ },
+ "STEAM": {
+  "1": [
+   "Action"
+  ],
+  "18": [
+   "Sport"
+  ],
+  "2": [
+   "Strategy"
+  ],
+  "25": [
+   "Quest"
+  ],
+  "28": [
+   "Simulator"
+  ],
+  "29": [
+   "Multiplayer"
+  ],
+  "3": [
+   "RPG"
+  ],
+  "9": [
+   "Racing"
+  ]
+ },
+ "STEAM_TAG": {
+  "10235": [
+   "Simulator"
+  ],
+  "1023537": [
+   "Shooter"
+  ],
+  "10437": [
+   "Puzzle"
+  ],
+  "10695": [
+   "RPG"
+  ],
+  "10816": [
+   "Multiplayer"
+  ],
+  "1091588": [
+   "Tabletop",
+   "Roguelike"
+  ],
+  "1100686": [
+   "Simulator"
+  ],
+  "1100687": [
+   "Racing"
+  ],
+  "1100688": [
+   "Simulator"
+  ],
+  "1100689": [
+   "Survival"
+  ],
+  "11014": [
+   "Quest"
+  ],
+  "11104": [
+   "Action"
+  ],
+  "1199779": [
+   "Shooter"
+  ],
+  "12190": [
+   "Sport"
+  ],
+  "122": [
+   "RPG"
+  ],
+  "1220528": [
+   "Simulator"
+  ],
+  "12472": [
+   "Strategy"
+  ],
+  "1254546": [
+   "Sport"
+  ],
+  "1254552": [
+   "Sport"
+  ],
+  "128": [
+   "Multiplayer"
+  ],
+  "129761": [
+   "Racing"
+  ],
+  "13070": [
+   "Tabletop"
+  ],
+  "14139": [
+   "Tactical"
+  ],
+  "15045": [
+   "Simulator"
+  ],
+  "158638": [
+   "Sport"
+  ],
+  "15868": [
+   "Racing"
+  ],
+  "1616": [
+   "Simulator"
+  ],
+  "1625": [
+   "Platformer"
+  ],
+  "1628": [
+   "Metroidvania"
+  ],
+  "1643": [
+   "Sandbox"
+  ],
+  "1644": [
+   "Racing"
+  ],
+  "1645": [
+   "Strategy"
+  ],
+  "1646": [
+   "Action"
+  ],
+  "1659": [
+   "Horror"
+  ],
+  "16598": [
+   "Simulator"
+  ],
+  "1662": [
+   "Survival"
+  ],
+  "1663": [
+   "Shooter"
+  ],
+  "1664": [
+   "Puzzle"
+  ],
+  "1665": [
+   "Puzzle"
+  ],
+  "1666": [
+   "Tabletop"
+  ],
+  "1667": [
+   "Horror"
+  ],
+  "1670": [
+   "Strategy"
+  ],
+  "1676": [
+   "Strategy"
+  ],
+  "1685": [
+   "Multiplayer"
+  ],
+  "1687": [
+   "Stealth"
+  ],
+  "1698": [
+   "Quest"
+  ],
+  "1708": [
+   "Tactical"
+  ],
+  "1716": [
+   "Roguelike"
+  ],
+  "1718": [
+   "Multiplayer"
+  ],
+  "1720": [
+   "RPG"
+  ],
+  "1721": [
+   "Horror"
+  ],
+  "1723": [
+   "Strategy"
+  ],
+  "1730": [
+   "Puzzle"
+  ],
+  "17305": [
+   "RPG",
+   "Strategy"
+  ],
+  "1738": [
+   "Puzzle"
+  ],
+  "17389": [
+   "Tabletop"
+  ],
+  "1741": [
+   "Strategy"
+  ],
+  "1743": [
+   "Fighting"
+  ],
+  "1746": [
+   "Sport"
+  ],
+  "1752": [
+   "Arcade"
+  ],
+  "1753": [
+   "Sport"
+  ],
+  "1754": [
+   "RPG",
+   "Multiplayer"
+  ],
+  "176981": [
+   "Multiplayer"
+  ],
+  "1770": [
+   "Tabletop"
+  ],
+  "1773": [
+   "Arcade"
+  ],
+  "1774": [
+   "Shooter"
+  ],
+  "1775": [
+   "Multiplayer"
+  ],
+  "1776": [
+   "Stealth"
+  ],
+  "17770": [
+   "Multiplayer"
+  ],
+  "19": [
+   "Action"
+  ],
+  "198631": [
+   "Roguelike"
+  ],
+  "198913": [
+   "Racing"
+  ],
+  "21": [
+   "Quest"
+  ],
+  "21725": [
+   "RPG",
+   "Tactical"
+  ],
+  "220585": [
+   "Sandbox"
+  ],
+  "255534": [
+   "Sandbox"
+  ],
+  "28444": [
+   "Sport"
+  ],
+  "29482": [
+   "Action",
+   "RPG"
+  ],
+  "31275": [
+   "Quest"
+  ],
+  "31579": [
+   "Quest"
+  ],
+  "32322": [
+   "Tabletop"
+  ],
+  "323922": [
+   "Action"
+  ],
+  "324176": [
+   "Sport"
+  ],
+  "33572": [
+   "Tabletop"
+  ],
+  "35079": [
+   "Simulator"
+  ],
+  "353880": [
+   "Shooter"
+  ],
+  "37376": [
+   "Puzzle"
+  ],
+  "3799": [
+   "Quest"
+  ],
+  "3810": [
+   "Sandbox"
+  ],
+  "3813": [
+   "Tactical"
+  ],
+  "3814": [
+   "Shooter"
+  ],
+  "3841": [
+   "Multiplayer"
+  ],
+  "3843": [
+   "Multiplayer"
+  ],
+  "3859": [
+   "Multiplayer"
+  ],
+  "3877": [
+   "Platformer"
+  ],
+  "3959": [
+   "Roguelike"
+  ],
+  "3978": [
+   "Horror"
+  ],
+  "3993": [
+   "Action"
+  ],
+  "4102": [
+   "Racing"
+  ],
+  "4106": [
+   "Action",
+   "Quest"
+  ],
+  "4158": [
+   "Action"
+  ],
+  "4184": [
+   "Tabletop"
+  ],
+  "42089": [
+   "Horror"
+  ],
+  "4231": [
+   "Action",
+   "RPG"
+  ],
+  "4255": [
+   "Shooter"
+  ],
+  "42804": [
+   "Action",
+   "Roguelike"
+  ],
+  "4328": [
+   "Sandbox"
+  ],
+  "4364": [
+   "Strategy"
+  ],
+  "4434": [
+   "JRPG"
+  ],
+  "4474": [
+   "RPG"
+  ],
+  "4486": [
+   "Quest"
+  ],
+  "4508": [
+   "Multiplayer"
+  ],
+  "454187": [
+   "Roguelike"
+  ],
+  "4608": [
+   "Action"
+  ],
+  "4637": [
+   "Shooter"
+  ],
+  "4695": [
+   "Strategy"
+  ],
+  "4736": [
+   "Fighting"
+  ],
+  "4758": [
+   "Shooter"
+  ],
+  "47827": [
+   "Sport"
+  ],
+  "4840": [
+   "Multiplayer"
+  ],
+  "4845": [
+   "Strategy"
+  ],
+  "4852": [
+   "Tabletop"
+  ],
+  "4885": [
+   "Shooter"
+  ],
+  "49213": [
+   "Sport"
+  ],
+  "5154": [
+   "Arcade"
+  ],
+  "5300": [
+   "Sandbox"
+  ],
+  "5379": [
+   "Platformer"
+  ],
+  "5395": [
+   "Platformer"
+  ],
+  "5432": [
+   "Puzzle"
+  ],
+  "5537": [
+   "Platformer",
+   "Puzzle"
+  ],
+  "5547": [
+   "Shooter"
+  ],
+  "56690": [
+   "Shooter"
+  ],
+  "5727": [
+   "Sport"
+  ],
+  "5900": [
+   "Quest"
+  ],
+  "5914": [
+   "Sport"
+  ],
+  "5981": [
+   "Sandbox"
+  ],
+  "599": [
+   "Simulator"
+  ],
+  "6129": [
+   "Puzzle"
+  ],
+  "620519": [
+   "Shooter"
+  ],
+  "6310": [
+   "Strategy"
+  ],
+  "6506": [
+   "Fighting"
+  ],
+  "6621": [
+   "Arcade"
+  ],
+  "6835": [
+   "Tabletop"
+  ],
+  "6915": [
+   "Fighting"
+  ],
+  "699": [
+   "Racing"
+  ],
+  "701": [
+   "Sport"
+  ],
+  "7038": [
+   "Sport"
+  ],
+  "7178": [
+   "Multiplayer"
+  ],
+  "723991": [
+   "Shooter"
+  ],
+  "7309": [
+   "Sport"
+  ],
+  "7332": [
+   "Sandbox"
+  ],
+  "7368": [
+   "Multiplayer"
+  ],
+  "7423": [
+   "Shooter"
+  ],
+  "7432": [
+   "Horror"
+  ],
+  "7556": [
+   "Tabletop"
+  ],
+  "7622": [
+   "Racing"
+  ],
+  "769306": [
+   "Puzzle"
+  ],
+  "791774": [
+   "Tabletop"
+  ],
+  "847164": [
+   "Sport"
+  ],
+  "8666": [
+   "Arcade"
+  ],
+  "87918": [
+   "Simulator"
+  ],
+  "8945": [
+   "Strategy"
+  ],
+  "9": [
+   "Strategy"
+  ],
+  "91114": [
+   "Simulator"
+  ],
+  "9271": [
+   "Tabletop"
+  ],
+  "9551": [
+   "Simulator"
+  ],
+  "9564": [
+   "Simulator"
+  ],
+  "97070": [
+   "Stealth"
+  ]
+ },
+ "TMDB": {
+  "10402": [
+   "Музыка"
+  ],
+  "10749": [
+   "Мелодрама"
+  ],
+  "10751": [
+   "Семейный"
+  ],
+  "10752": [
+   "Военный"
+  ],
+  "10759": [
+   "Боевик",
+   "Приключения"
+  ],
+  "10762": [
+   "Детский"
+  ],
+  "10763": [
+   "Новости"
+  ],
+  "10764": [
+   "Реалити-шоу"
+  ],
+  "10765": [
+   "Фантастика",
+   "Фэнтези"
+  ],
+  "10766": [
+   "Мыльная опера"
+  ],
+  "10767": [
+   "Ток-шоу"
+  ],
+  "10768": [
+   "Военный",
+   "Политика"
+  ],
+  "10770": [
+   "Телевизионный фильм"
+  ],
+  "12": [
+   "Приключения"
+  ],
+  "14": [
+   "Фэнтези"
+  ],
+  "16": [
+   "Мультфильм"
+  ],
+  "18": [
+   "Драма"
+  ],
+  "27": [
+   "Ужасы"
+  ],
+  "28": [
+   "Боевик"
+  ],
+  "35": [
+   "Комедия"
+  ],
+  "36": [
+   "История"
+  ],
+  "37": [
+   "Вестерн"
+  ],
+  "53": [
+   "Триллер"
+  ],
+  "80": [
+   "Криминал"
+  ],
+  "878": [
+   "Фантастика"
+  ],
+  "9648": [
+   "Детектив"
+  ],
+  "99": [
+   "Документальный"
+  ]
+ }
+}

@@ -523,30 +523,6 @@
 - `GOG_CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `EXAMPLES_PER_GENRE` = `2`
 
-### `scripts/genre_map.py`
-
-- `ROOT` = `Path(__file__).resolve().parents[1]`
-- `MIGRATION` = `ROOT / 'migrations/versions/0002_genres.py'`
-- `SPECS` = `словарь из 5`
-
-### `scripts/module_map.py`
-
-- `MAP` = `ROOT / 'docs/module-map.md'`
-- `DATA_MAP` = `ROOT / 'docs/data-map.md'`
-- `SHORT_VALUE` = `48`
-
-### `scripts/not_duplicates.py`
-
-- `VERDICTS` = `ROOT / 'docs/not-duplicates.md'`
-
-### `scripts/project_ast.py`
-
-- `STAMP` = `8`
-- `SKIP` = `набор из 12`
-- `DEFINITIONS` = `набор из 3`
-- `FUNCTIONS` = `набор из 2`
-- `ROOT` = `project_root()`
-
 ### `scripts/record_fixtures.py`
 
 - `ROOT` = `Path(__file__).resolve().parents[1]`
@@ -598,6 +574,9 @@
 
 ### `tests/backend/test_genre_reference.py`
 
+- `MIGRATION` = `'migrations.versions.0002_genres'`
+- `REFERENCE` = `Path(__file__).resolve().parents[1] / 'fixtures/…`
+- `BOOKS` = `набор из 5`
 - `FILM_GENRES` = `набор из 25`
 - `GAME_GENRES` = `набор из 22`
 - `COMPOSITE` = `словарь из 3`
@@ -691,8 +670,3 @@
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`
-
-### `tests/scripts/test_not_duplicates.py`
-
-- `LINE` = `'- `a.py:one` `11111111` ≠ `b.py:two` `22222222`…`
-- `INDEX` = `словарь из 2`

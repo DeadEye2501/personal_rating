@@ -1,13 +1,21 @@
-"""Справочник жанров из миграции против спеки."""
+"""Справочник жанров из миграции против записанного эталона."""
 
-import subprocess
-import sys
+import json
 from importlib import import_module
+from pathlib import Path
 
 import sqlalchemy
 from sqlalchemy import text
 
-from tests.alembic_runner import ROOT, alembic
+from tests.alembic_runner import alembic
+
+MIGRATION = "migrations.versions.0002_genres"
+
+# Эталон соответствий: 326 строк, снятых с согласованных наборов жанров. Лежит
+# данными, а не выводится из кода, — иначе сверять было бы не с чем.
+REFERENCE = Path(__file__).resolve().parents[1] / "fixtures/genre_map.json"
+
+BOOKS = ("TMDB", "STEAM", "STEAM_TAG", "GOG", "GOG_TAG")
 
 FILM_GENRES = {
     "Боевик", "Вестерн", "Военный", "Детектив", "Детский", "Документальный",
@@ -121,22 +129,34 @@ def counted(connection, where: str) -> int:
     ).scalar()
 
 
-def test_every_mapping_matches_the_spec():
-    """Поимённо соответствия сторожит только сверка со спекой.
+def declared_in_migration() -> dict[str, dict[str, list[str]]]:
+    """Пять словарей соответствий, как их объявила миграция."""
+    module = import_module(MIGRATION)
+    return {book: getattr(module, book) for book in BOOKS}
+
+
+def differences(reference: dict, declared: dict) -> list[str]:
+    found = []
+    for book in BOOKS:
+        for key in sorted(reference[book].keys() | declared[book].keys()):
+            mine, other = reference[book].get(key), declared[book].get(key)
+            if mine != other:
+                found.append(f"{book} {key}: эталон {mine}, миграция {other}")
+    return found
+
+
+def test_every_mapping_matches_the_reference():
+    """Поимённо соответствия сторожит только эта сверка.
 
     Тестами проверены числа, ловушки и границы наборов — но подмена жанра у
-    одного идентификатора чисел не меняет, и таких строк 326. Сверку делает
-    `scripts/genre_map.py`, и запускается она здесь, иначе не запускается
-    нигде.
+    одного идентификатора чисел не меняет, и таких строк 326.
 
-    Сверяются два объявления — спека против исходника миграции, — и до базы эта
-    проверка не доходит. Что объявленное в неё доехало, сторожит соседний
+    Сверяются два объявления, до базы проверка не доходит. Что объявленное в неё
+    доехало, сторожит соседний
     `test_the_declared_mappings_all_reached_the_database`."""
-    done = subprocess.run(
-        [sys.executable, "scripts/genre_map.py"],
-        cwd=ROOT, capture_output=True, text=True,
-    )
-    assert done.returncode == 0, done.stdout + done.stderr
+    reference = json.loads(REFERENCE.read_text(encoding="utf-8"))
+
+    assert differences(reference, declared_in_migration()) == []
 
 
 def test_the_declared_mappings_all_reached_the_database(migrated):
@@ -152,9 +172,10 @@ def test_the_declared_mappings_all_reached_the_database(migrated):
     Чего он не ловит и ловить не должен: опечатку в объявленном имени жанра —
     `upgrade` разрешает имя через `ids[(kind, name)]` и роняет саму миграцию, — и
     неверно выбранный жанр для чужой метки: обе стороны сравнения приходят из
-    одного объявления. Второе сторожит соседний `test_every_mapping_matches_the_spec`
-    сверкой со спекой; глазами остаётся только промах, повторённый и в спеке."""
-    module = import_module("migrations.versions.0002_genres")
+    одного объявления. Второе сторожит соседний
+    `test_every_mapping_matches_the_reference`; глазами остаётся только промах,
+    повторённый и в эталоне."""
+    module = import_module(MIGRATION)
     declared = {
         (source, ext_id, name)
         for source, mapping in (

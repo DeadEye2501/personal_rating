@@ -34,7 +34,7 @@ class LibraryService:
 
         Отсюда её берёт `page`. Сам `ViewsRepository` на поверхности `Backend` не
         лежит, но правила «клиент репозиториев не видит» у проекта нет — семь
-        других лежат; разбор этой развилки в `docs/deferred.md`."""
+        других лежат."""
         return await self._views.in_order(item_ids)
 
     async def histogram(self, kind: Kind, filters: Filters) -> Histogram:
