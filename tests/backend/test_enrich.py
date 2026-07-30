@@ -156,11 +156,14 @@ async def test_a_broken_client_writes_nothing_either(sessions, item_id, enrich,
     assert await stored_ratings(sessions, item_id) == {}
     # Запись обязательна: `caplog` тут был и раньше, но про лог ничего не
     # утверждалось, и замена `logger.exception` на `logger.debug` в
-    # `service/asking.py` прошла бы молча. Текст исключения в сообщение не идёт —
-    # он в трассировке, — поэтому сверяется имя сорвавшегося источника.
+    # `service/asking.py` прошла бы молча.
     assert [r.levelname for r in caplog.records if r.name.startswith("backend")]         == ["ERROR"]
-    assert any(message.endswith("запрос сорвался")
-               for message in ours(caplog))
+    # Имя сорвавшегося — присутствием своего и отсутствием чужого: у MDBList и
+    # OMDB в `PROVIDES` одно и то же `imdb`, и подмена `client.name` на
+    # `client.PROVIDES[0]` показала бы в логе оба источника одним. Проект эту
+    # регрессию уже имел один раз.
+    assert any(message.startswith("mdblist:") for message in ours(caplog))
+    assert not any(message.startswith("imdb:") for message in ours(caplog))
 
 
 async def test_one_refusal_does_not_let_another_source_write_an_empty_row(

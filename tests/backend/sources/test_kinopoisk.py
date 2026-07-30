@@ -10,7 +10,6 @@ from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
 from tests.backend.sources.conftest import FakeClock, responding
-from tests.conftest import ours
 
 
 def primary(transport) -> PoiskkinoClient:
@@ -125,6 +124,11 @@ async def test_primary_rate_limit_trips_the_breaker_too():
     assert first.source == "kinopoisk"
     assert first.retry_after == timedelta(minutes=1)
     assert calls == 1
+    # Второй ответ собирает уже предохранитель, из запомненной причины: без
+    # `Reason.RATE` при взводе он сказал бы «кончилась суточная квота» — а квота у
+    # Кинопоиска шесть часов против минуты, и человек ждал бы напрасно.
+    second = await client.ratings("tt0068646", Kind.MOVIE)
+    assert (second.reason, second.detail) == (Reason.RATE, "предохранитель взведён")
 
 
 async def test_the_verdict_on_a_refusal_does_not_look_into_the_body(replay):
@@ -434,8 +438,12 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
         assert isinstance(await fallback(body).ratings("tt0816692", Kind.MOVIE),
                           Refusal)
 
-    said = ours(caplog)
-    assert any("основного зеркала" in message for message in said)
-    assert any("запасного зеркала" in message for message in said)
+    # Фраза привязывается к модулю, а не ищется в общем логе: логгеры у зеркал
+    # разные, и обмен фраз местами набор в `caplog` не изменил бы — а свойство
+    # («в каком из двух модулей искать неисправность») потерялось бы целиком.
+    said = {record.name.rsplit(".", 1)[-1]: record.getMessage()
+            for record in caplog.records if record.name.startswith("backend")}
+    assert "основного зеркала" in said["poiskkino"]
+    assert "запасного зеркала" in said["unofficial"]
 
 

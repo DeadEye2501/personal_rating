@@ -13,6 +13,7 @@ from backend.model import (
     Kind,
     PersonRole,
     RatingSource,
+    Source,
 )
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.external import (
@@ -55,13 +56,17 @@ async def test_nothing_is_asked_for_an_empty_list(sessions):
 
 
 async def test_genres_come_with_the_card(sessions, reference, item_id):
+    """Жанров два, и по алфавиту они идут не в том порядке, в каком записаны: с
+    одним жанром на карточке порядок по имени не наблюдался бы вовсе, а в карточке
+    жанры стоят в ряд и перетасовываться между показами не должны."""
     genres = GenresRepository(sessions)
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
-    await genres.set_for_item(item_id, genre_ids)
+    # 28 — «Боевик», 18 — «Драма»: записываем обратно алфавиту.
+    genre_ids = await genres.resolve(GenreSource.TMDB, ["18", "28"])
+    await genres.set_for_item(item_id, sorted(genre_ids, reverse=True))
 
     views = await ViewsRepository(sessions).views_for([item_id])
 
-    assert [g.name for g in views[item_id].genres] == ["Драма"]
+    assert [g.name for g in views[item_id].genres] == ["Боевик", "Драма"]
     assert views[item_id].genres[0].kind is GenreKind.FILM
 
 
@@ -119,6 +124,37 @@ async def test_studios_come_in_a_stable_order(sessions, item_id):
     assert [c.name for c in views[item_id].companies] == [
         "Warner Bros.", "Legendary", "Syncopy"
     ]
+
+
+async def test_the_identity_of_a_credit_survives_the_page(sessions, item_id):
+    """На пути страницы идентичность титров не сторожил никто, только на пути
+    репозитория. Перепутанные местами колонки `source` и `source_id` уронили бы
+    `Source("525")` на **каждой** карточке ленты с человеком из TMDB — и это
+    видно лишь тогда, когда идентичность у человека есть.
+
+    Значения нарочно непохожие: с одинаковыми обмен колонок сошёлся бы."""
+    repository = people(sessions)
+    entity_id = await repository.create("Кристофер Нолан", Source.TMDB, "525")
+    await repository.attach(item_id, entity_id, PersonRole.DIRECTOR)
+
+    credit = (await ViewsRepository(sessions).views_for([item_id]))[item_id].people[0]
+
+    assert (credit.source, credit.source_id) == (Source.TMDB, "525")
+
+
+async def test_a_studio_without_identity_comes_back_empty_and_not_broken(
+    sessions, item_id
+):
+    """У студий из магазинов идентичности нет вовсе, и обе колонки пусты. Без
+    этой проверки ветка `Source(row.source) if row.source else None` держалась бы
+    на честном слове."""
+    repository = companies(sessions)
+    await repository.attach(item_id, await repository.create("CD Projekt RED"),
+                            CompanyRole.DEVELOPER)
+
+    credit = (await ViewsRepository(sessions).views_for([item_id]))[item_id].companies[0]
+
+    assert (credit.source, credit.source_id) == (None, None)
 
 
 async def test_companies_are_kept_apart_from_people(sessions, item_id):

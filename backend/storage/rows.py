@@ -6,7 +6,7 @@
 
 from sqlalchemy import Row
 
-from backend.storage.repository.entity import Entity
+from backend.storage.entity import Entity
 
 from backend.model import (
     Credit,

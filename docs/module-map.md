@@ -488,16 +488,16 @@
 
 - `def parse_ratings(payload: dict) -> Ratings` (18)
 
-### `backend/sources/ratings/omdb/client.py` — 102 строк
+### `backend/sources/ratings/omdb/client.py` — 98 строк
 
 Разговор с OMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.parse`
 
 - `def until_midnight(now: datetime) -> timedelta` (7)
-- `class OmdbClient` (75)
+- `class OmdbClient` (71)
   - `def name(self) -> str` (4)
-  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (28)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (24)
   - `def _answer(self, payload: dict) -> Outcome` (8)
   - `def _denied(self, payload: dict) -> Refusal` (17)
   - `async def aclose(self) -> None` (2)
@@ -593,6 +593,15 @@
 
 - `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (9)
 
+### `backend/storage/entity.py` — 34 строк
+
+Чем человек отличается от студии в схеме.
+
+Зависит от: `backend.model`, `backend.storage.tables`
+
+- `class Entity` (14)
+  - `def link(self) -> Column` (4)
+
 ### `backend/storage/posters.py` — 98 строк
 
 Второй файл базы: картинка по карточке.
@@ -631,7 +640,7 @@
 
 Один репозиторий на людей и на студий — различает их только описатель.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.repository.entity`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
 
 - `class IdentityTaken(Exception)` (2)
 - `class CreditRepository(Repository)` (189)
@@ -655,15 +664,6 @@
   - `async def _hint(self, entity_id: int) -> tuple[str, int | None]` (21)
 - `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 - `def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
-
-### `backend/storage/repository/entity.py` — 30 строк
-
-Чем человек отличается от студии в схеме.
-
-Зависит от: `backend.model`, `backend.storage.tables`
-
-- `class Entity` (14)
-  - `def link(self) -> Column` (4)
 
 ### `backend/storage/repository/external.py` — 95 строк
 
@@ -767,7 +767,7 @@
 
 Пачечное чтение карточек для показа.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.repository.entity`, `backend.storage.rows`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.tables`
 
 - `class ViewsRepository(Repository)` (151)
   - `async def views_for(self, item_ids: list[int]) -> dict[int, CardView]` (5)
@@ -800,7 +800,7 @@
 
 Строки базы в типы границы слоёв.
 
-Зависит от: `backend.model`, `backend.storage.repository.entity`
+Зависит от: `backend.model`, `backend.storage.entity`
 
 - `def to_item(row: Row) -> Item` (20)
 - `def to_genre(row: Row) -> Genre` (2)
@@ -1072,7 +1072,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def client(handler) -> GogClient` (2)
 
-### `tests/backend/sources/test_http.py` — 387 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 394 строк ⚠ подошёл к 300
 
 Общая дверь в сеть: заголовок, таймауты и предохранитель.
 
@@ -1081,11 +1081,11 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 441 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 449 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
-Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`, `tests.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`
 
 Тестов: 29
 
@@ -1125,13 +1125,13 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 238 строк
+### `tests/backend/sources/test_registry.py` — 264 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
 Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-Тестов: 13
+Тестов: 14
 
 - `def sources()` (4)
 - `def keyed()` (12)
@@ -1248,7 +1248,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(posters)` (6)
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
-### `tests/backend/test_enrich.py` — 443 строк ⚠ подошёл к 300
+### `tests/backend/test_enrich.py` — 446 строк ⚠ подошёл к 300
 
 Третий круг: оценки агрегаторов и сроки их годности.
 
@@ -1284,7 +1284,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 13
 
 
-### `tests/backend/test_feed.py` — 131 строк
+### `tests/backend/test_feed.py` — 132 строк
 
 Страница раздела и перерисовка одной карточки.
 
@@ -1296,7 +1296,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
-### `tests/backend/test_genre_reference.py` — 204 строк
+### `tests/backend/test_genre_reference.py` — 214 строк
 
 Справочник жанров из миграции против спеки.
 
@@ -1348,13 +1348,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
-### `tests/backend/test_layers.py` — 84 строк
+### `tests/backend/test_layers.py` — 105 строк
 
 Граница слоёв: кто кого имеет право импортировать.
 
 Зависит от: —
 
-Тестов: 3
+Тестов: 4
 
 - `def imported_modules(path: Path)` (10)
 - `def imported_roots(path: Path)` (4)
@@ -1508,7 +1508,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(sessions)` (8)
   - `def build(*clients) -> SearchService` (6)
 
-### `tests/backend/test_search_local.py` — 147 строк
+### `tests/backend/test_search_local.py` — 148 строк
 
 Поиск по своей базе — единственный, который работает без сети.
 
@@ -1593,13 +1593,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_views.py` — 320 строк ⚠ подошёл к 300
+### `tests/backend/test_views.py` — 356 строк ⚠ подошёл к 300
 
 Пачечное чтение страницы: девять запросов на любое число карточек.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 17
+Тестов: 19
 
 - `async def item_id(sessions)` (4)
 

@@ -142,27 +142,37 @@ def test_every_mapping_matches_the_spec():
 def test_the_declared_mappings_all_reached_the_database(migrated):
     """Объявленное в миграции против того, что легло в базу.
 
-    Числа этого не показывают: `upgrade` кладёт строки в трёх вложенных циклах,
-    и промах в имени жанра дал бы ту же 326 при другом соответствии. Здесь
-    сравниваются пары «источник и чужая метка» — их 326 против 326, но уже
-    поимённо."""
+    Числа этого не показывают: `upgrade` кладёт строки в трёх вложенных циклах, и
+    промах в имени жанра дал бы ту же 326 при другом соответствии. Сравниваются
+    тройки «источник, чужая метка, имя нашего жанра» — с парой «источник и метка»
+    подмена жанра у метки прошла бы молча, а она и есть самая вероятная опечатка:
+    сборный идентификатор разворачивается в два жанра, и промахнуться можно
+    одним."""
     module = import_module("migrations.versions.0002_genres")
     declared = {
-        (source, ext_id)
+        (source, ext_id, name)
         for source, mapping in (
             ("tmdb", module.TMDB), ("steam", module.STEAM),
             ("steam_tag", module.STEAM_TAG), ("gog", module.GOG),
             ("gog_tag", module.GOG_TAG),
         )
-        for ext_id in mapping
+        for ext_id, names in mapping.items()
+        for name in names
     }
 
     stored = {
-        (row.source, row.ext_id)
-        for row in migrated.execute(text("SELECT source, ext_id FROM genre_map"))
+        (row.source, row.ext_id, row.name)
+        for row in migrated.execute(text(
+            "SELECT m.source, m.ext_id, g.name "
+            "FROM genre_map m JOIN genre g ON g.id = m.genre_id"
+        ))
     }
 
     assert stored == declared
+    # Множеств меньше, чем строк: одна метка ведёт в два жанра у сборных
+    # идентификаторов, и кратность строк множество не показывает. Её сторожит
+    # соседний тест числом 326.
+    assert len(declared) == counted(migrated, "")
 
 
 def test_every_mapping_leads_to_an_existing_genre(migrated):

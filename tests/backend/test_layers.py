@@ -60,6 +60,27 @@ def test_backend_does_not_import_client_or_qt():
     assert offenders("backend", BANNED_IN_BACKEND) == []
 
 
+def test_the_model_depends_on_nothing_of_ours():
+    """Модель — самый нижний слой, и на этом стоит переезд типов исхода в
+    `backend/model/outcome.py`: клиенту открыта только она, значит она не вправе
+    тянуть за собой ни хранилище, ни источники, ни сервисы.
+
+    Раньше довод держался на одном докстринге. Импортируй `model/link.py`
+    что-нибудь из `sources/` ради регулярок адресов — и клиент, взявший
+    `parse_link`, получил бы вместе с ним `httpx`, а проверка выше этого не
+    видит: она смотрит на `client/`, а не на `backend/model/`."""
+    found = []
+    for path in python_files("backend/model"):
+        for module in imported_modules(path):
+            if not module.startswith("backend"):
+                continue
+            if module == "backend.model" or module.startswith("backend.model."):
+                continue
+            found.append(f"{path.relative_to(ROOT)} → {module}")
+
+    assert found == []
+
+
 def test_client_does_not_import_storage_libraries():
     assert offenders("client", BANNED_IN_CLIENT) == []
 

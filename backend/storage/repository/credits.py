@@ -17,7 +17,7 @@ from backend.model import (
     new_source_id,
 )
 from backend.storage.repository.base import Repository
-from backend.storage.repository.entity import COMPANIES, PEOPLE, Entity
+from backend.storage.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.rows import to_credit
 from backend.storage.session import fold, folded
 from backend.storage.statements import clearing

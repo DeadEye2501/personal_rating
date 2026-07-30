@@ -53,10 +53,12 @@ async def test_games_come_from_two_equal_stores():
     """Заметная часть ретро в Steam не продаётся — магазина два."""
     registry = sources()
 
-    assert {type(one) for one in registry.catalog_for(Kind.GAME)} == {
+    # Список, а не множество: порядок задаёт, чью выдачу человек увидит первой
+    # при равном числе кандидатов, а множество обмен магазинов местами скрывает.
+    assert [type(one) for one in registry.catalog_for(Kind.GAME)] == [
         SteamClient,
         GogClient,
-    }
+    ]
 
     await registry.aclose()
 
@@ -111,10 +113,34 @@ async def test_every_catalog_client_takes_the_same_arguments():
                 "source_id",
                 "kind",
             ], type(client)
-            # Вторая половина контракта: сервисы зовут `client.name`, собирая
-            # отказ. Снятие свойства оставило бы реестр зелёным, а `answered(...)`
-            # упало бы на `AttributeError` уже в сервисе.
-            assert isinstance(client.name, str) and client.name, type(client)
+
+    await registry.aclose()
+
+
+@pytest.mark.parametrize("name", ["tmdb", "steam", "gog"])
+async def test_each_catalog_client_sits_on_the_connection_of_its_own_name(name):
+    """Привязка «имя соединения — клиент» проверяется следствием, а не чтением
+    `client.name`: имя в отказе клиенты подставляют литералом, поэтому
+    перепутанные местами `http("steam")` и `http("gog")` в сборке молчали бы и
+    там, и в сравнении набора имён.
+
+    Взводим предохранитель на соединении с этим именем и спрашиваем каждого из
+    трёх: замолчать обязан ровно один, и это должен быть тот, чьё имя мы взвели.
+    Обменяй соединения — замолчит не тот, и тест покраснеет."""
+    registry = sources()
+    clients = {"tmdb": registry.tmdb, "steam": registry.steam, "gog": registry.gog}
+    for connection in registry.connections:
+        if connection.name == name:
+            connection.breaker.trip(timedelta(hours=1))
+
+    silent = set()
+    for owner, client in clients.items():
+        result = await client.search("что угодно", Kind.MOVIE
+                                    if owner == "tmdb" else Kind.GAME)
+        if isinstance(result, Refusal) and result.detail == "предохранитель взведён":
+            silent.add(owner)
+
+    assert silent == {name}
 
     await registry.aclose()
 

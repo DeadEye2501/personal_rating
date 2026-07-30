@@ -5,7 +5,7 @@ from datetime import timedelta
 import pytest
 
 from backend.model import Kind
-from backend.service.search import SEARCH_SIZE, SearchService
+from backend.service.search import SearchService
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.tags import TagsRepository
@@ -118,15 +118,16 @@ async def test_the_alphabet_orders_the_found(sessions, search):
 
 
 async def test_no_more_than_a_portion_comes_back(sessions, search):
-    """Ровно страница выдачи TMDB: одна порция стоит одного запроса. Константу
-    мало объявить — без проверки, что её применяют, её можно поменять на любую,
-    и никто не заметит."""
-    for number in range(SEARCH_SIZE + 5):
+    """Ровно страница выдачи TMDB: одна порция стоит одного запроса.
+
+    Двадцать литералом, а не через `SEARCH_SIZE`: константа по обе стороны
+    проверки переезжает вместе с ней и смены числа не заметит."""
+    for number in range(25):
         await rated(sessions, str(number), None, title=f"Фильм {number}")
 
     found = await search.local(Kind.MOVIE, "Фильм")
 
-    assert len(found) == SEARCH_SIZE
+    assert len(found) == 20
 
 
 async def test_the_search_does_not_touch_the_clock(sessions, search):

@@ -5911,7 +5911,7 @@ class FeedPage(QWidget):
         )
         if kind is Kind.SERIES:
             self._ask(
-                lambda backend: backend.loader.refresh(item_id),
+                lambda backend: backend.series.refresh(item_id),
                 lambda _: None,
             )
 
@@ -5965,7 +5965,7 @@ class FeedPage(QWidget):
 `self._kind`, иначе догрузка следующей порции спрашивать нечем.
 
 **Про `_row_shown` — почему второй и третий круги висят именно здесь.** План 4
-построил `Loader.ensure`, `Loader.refresh` и `Enricher.enrich` и вызов отдал
+построил `Loader.ensure`, `SeriesRefresh.refresh` и `Enricher.enrich` и вызов отдал
 клиенту: только он знает, что видно на экране. Пока их никто не звал, из двух
 путей наполнения библиотеки — найти во внешней базе или завести руками —
 работал лишь второй: у кандидата выдачи `item_id` пуст, а оценка, закладка и

@@ -37,8 +37,8 @@
 
 **Что на поверхности `Backend` осталось из репозиториев** (`backend/app.py`):
 `library`, `ratings`, `tags`, `wishlist`, `genres`, `people`, `companies` — семь.
-Плюс семь сервисов: `search`, `feed`, `loader`, `enricher`, `linker`, `posters` и
-метод `delete_card`.
+Плюс сервисы: `search`, `feed`, `loader`, `series`, `enricher`, `linker`,
+`posters` — и метод `delete_card`.
 
 **Кто их зовёт в планах** — чтобы не искать заново:
 

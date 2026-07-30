@@ -1,4 +1,8 @@
-"""Чем человек отличается от студии в схеме."""
+"""Чем человек отличается от студии в схеме.
+
+Лежит рядом с `statements.py`, а не в `repository/`: это описание схемы, и его
+читает `rows.py`, который сам импортируют все репозитории. Внутри `repository/`
+получался бы цикл на уровне пакетов."""
 
 from collections.abc import Callable
 from dataclasses import dataclass

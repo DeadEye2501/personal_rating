@@ -350,7 +350,14 @@ async def test_an_undocumented_rate_limit_closes_the_source_for_five_minutes():
 
     assert result.reason is Reason.RATE
     assert result.source == "gog"
+    # Срок в отказе, а не только в предохранителе: по нему плашка говорит
+    # человеку, когда пробовать снова.
+    assert result.retry_after == timedelta(minutes=5)
     assert http.breaker.is_open()
+    # Причина, которую предохранитель запомнил: следующий отказ собирает уже он,
+    # и без `Reason.RATE` при взводе человек увидел бы «кончилась суточная квота»
+    # там, где на деле «слишком часто».
+    assert http.breaker.reason is Reason.RATE
 
     clock.advance(timedelta(minutes=4))
     assert http.breaker.is_open(), "предохранитель отпустил раньше срока"

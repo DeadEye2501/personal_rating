@@ -14,20 +14,29 @@ personal_rating/
 │  ├─ app.py              единственное место, где бэкенд собран целиком
 │  ├─ config.py           ключи из .env и пути к файлам
 │  ├─ unique.py           снятие повторов с сохранением порядка
-│  ├─ model/              типы границы: Item, Rating, SearchHit, Credit…
+│  ├─ model/              типы границы: Item, Rating, SearchHit, Credit,
+│  │                      и исход запроса — Found, Missing, Refusal, Reason
 │  ├─ storage/
 │  │  ├─ session.py       движок и фабрика сессий
 │  │  ├─ tables/          объявления таблиц
-│  │  ├─ repository/      library, ratings, tags, wishlist, genres
+│  │  ├─ repository/      library, ratings, tags, wishlist, genres, credits,
+│  │  │                   external, sections, views
+│  │  ├─ entity.py        чем человек отличается от студии в схеме
+│  │  ├─ rows.py          строки базы в типы границы
+│  │  ├─ statements.py    общие выражения записи
 │  │  └─ posters.py       вторая база: картинка по item_id
 │  ├─ sources/
 │  │  ├─ http.py          общий клиент: таймауты, откат, предохранитель
-│  │  ├─ errors.py        единая классификация отказов
+│  │  ├─ errors.py        как источник сообщает, что ответ не разобрался
+│  │  ├─ build.py         шесть клиентов, поднятых из настроек
+│  │  ├─ registry.py      кто отвечает за какой тип содержимого
+│  │  ├─ convert.py       куски ответа, переводимые всеми одинаково
 │  │  ├─ tmdb/            client.py + parse.py
 │  │  ├─ steam/
 │  │  ├─ gog/
 │  │  └─ ratings/         mdblist, omdb, kinopoisk
-│  └─ service/            search, library, rate, enrich
+│  └─ service/            search, library, loading, series, cards, linking,
+│                         enrich, posters, removal, genres, asking
 ├─ client/
 │  ├─ theme/              палитра, шкала оценок, типографика, отступы, иконки, qss
 │  ├─ widgets/            карточка, лента, звёзды, чип, каркас модалки

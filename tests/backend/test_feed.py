@@ -5,7 +5,7 @@ from dataclasses import replace
 import pytest
 
 from backend.model import Filters, Kind
-from backend.service.library import PAGE_SIZE, LibraryService
+from backend.service.library import LibraryService
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.views import ViewsRepository
 from tests.conftest import RATED, rated
@@ -45,14 +45,15 @@ async def test_an_empty_section_is_an_empty_page(sessions, feed):
 async def test_a_portion_is_fifty_and_it_is_applied(sessions, feed):
     """Лента читается с диска и стоит дёшево — порция больше, чем у поиска.
 
-    Константу мало объявить: без проверки, что page() её действительно
-    применяет, умолчание можно поменять на любое, и никто не заметит."""
-    for number in range(PAGE_SIZE + 1):
+    Пятьдесят литералом, а не через `PAGE_SIZE`: константа по обе стороны
+    проверки делает её нечувствительной к смене числа, а имя теста обещает именно
+    пятьдесят. Заводим на одну карточку больше, чтобы порция была видна."""
+    for number in range(51):
         await rated(sessions, str(number), 8.0)
 
     page = await feed.page(RATED)
 
-    assert len(page) == PAGE_SIZE
+    assert len(page) == 50
 
 
 async def test_the_next_portion_continues_the_previous(sessions, feed):

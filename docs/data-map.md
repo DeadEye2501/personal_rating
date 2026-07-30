@@ -432,12 +432,7 @@
 
 - `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
 
-### `backend/storage/posters.py`
-
-- `metadata` = `MetaData()`
-- `poster` = `Table('poster', metadata, Column('item_id', Inte…`
-
-### `backend/storage/repository/entity.py`
+### `backend/storage/entity.py`
 
 - `class Entity`
   - `table: Table`
@@ -446,6 +441,11 @@
   - `position: Column | None` = `None`
 - `PEOPLE` = `Entity(person, person_credit, PersonRole, person…`
 - `COMPANIES` = `Entity(company, company_credit, CompanyRole)`
+
+### `backend/storage/posters.py`
+
+- `metadata` = `MetaData()`
+- `poster` = `Table('poster', metadata, Column('item_id', Inte…`
 
 ### `backend/storage/repository/external.py`
 

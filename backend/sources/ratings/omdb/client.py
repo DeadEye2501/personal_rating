@@ -7,7 +7,7 @@ from typing import ClassVar
 import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, RatingSource, Reason, Refusal
-from backend.sources.errors import broken, parsed
+from backend.sources.errors import parsed, refuse_code
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.parse import parse_ratings
 
@@ -49,10 +49,10 @@ class OmdbClient:
         if not isinstance(response, httpx.Response):
             return response
 
-        try:
-            payload = response.json()
-        except ValueError as error:
-            return broken("omdb", error)
+        payload = parsed(logger, "omdb", "тело ответа не разобралось",
+                         response.json)
+        if isinstance(payload, Refusal):
+            return payload
 
         # Разобралось — ещё не значит объект: массив, число и строка тоже
         # валидный JSON, а `.get` есть только у словаря.
@@ -65,11 +65,7 @@ class OmdbClient:
             return self._answer(payload)
         if response.status_code == 401:
             return self._denied(payload)
-        return Refusal(
-            source="omdb",
-            reason=Reason.BROKEN,
-            detail=f"HTTP {response.status_code}",
-        )
+        return refuse_code("omdb", response.status_code)
 
     def _answer(self, payload: dict) -> Outcome:
         """Сначала код, потом текст: под 200 текст `Error` бывает трёх видов —
