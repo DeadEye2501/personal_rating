@@ -8,6 +8,7 @@ from backend.model import (
     ExternalRating,
     GenreSource,
     RatingSource,
+    Source,
 )
 
 
@@ -38,6 +39,22 @@ def companies(payload: dict) -> tuple[Credit, ...]:
         )
         for name in payload.get(key, [])
     )
+
+
+# У кого оценка приезжает даром вместе с выдачей поиска. У Steam в поиске оценки
+# нет вовсе, поэтому его тут и нет. Знание об источниках, поэтому лежит здесь:
+# седьмой источник добавляется новой папкой и этой таблицей, а не типом границы.
+FREE_IN_SEARCH = {
+    Source.TMDB: RatingSource.TMDB,
+    Source.GOG: RatingSource.GOG,
+}
+
+
+def from_search(source: Source, value: float | None,
+                now: datetime) -> tuple[ExternalRating, ...]:
+    """Оценка кандидата выдачи — или ни одной, если этот источник её не даёт."""
+    own = FREE_IN_SEARCH.get(source)
+    return () if own is None else rating(own, value, now)
 
 
 def rating(

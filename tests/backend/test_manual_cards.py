@@ -1,3 +1,5 @@
+"""Ручная карточка: заведение, правка и отвязка от источника."""
+
 from datetime import datetime
 
 import pytest

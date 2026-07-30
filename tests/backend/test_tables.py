@@ -1,3 +1,5 @@
+"""Объявленная схема: таблицы, индексы, ключи и ограничения."""
+
 import pytest
 from sqlalchemy import Date, DateTime, Float, Integer, Text, func, inspect, select
 from sqlalchemy.exc import IntegrityError

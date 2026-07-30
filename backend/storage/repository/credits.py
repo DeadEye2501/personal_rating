@@ -1,10 +1,10 @@
-"""Всё, что приложение делает в базе с человеком или студией как с
-сущностью: их строки, их роли на карточках и подсказка при вводе имени."""
+"""Один репозиторий на людей и на студий — различает их только описатель.
 
-from collections.abc import Callable
-from dataclasses import dataclass
+Подсказка при вводе имени живёт здесь же, а не отдельным модулем: она делит с
+«всё с этим человеком» запрос `_linked`, и вынос потребовал бы третьего модуля
+ради одного объявления. Отклонение измеренное, а не незамеченное."""
 
-from sqlalchemy import Column, ColumnElement, Row, Select, Table, select
+from sqlalchemy import Column, ColumnElement, Select, select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -17,14 +17,12 @@ from backend.model import (
     new_source_id,
 )
 from backend.storage.repository.base import Repository
+from backend.storage.repository.entity import COMPANIES, PEOPLE, Entity
+from backend.storage.rows import to_credit
 from backend.storage.session import fold, folded
 from backend.storage.statements import clearing
 from backend.storage.tables import (
-    company,
-    company_credit,
     item,
-    person,
-    person_credit,
     rating,
     wishlist,
 )
@@ -32,45 +30,6 @@ from backend.storage.tables import (
 
 class IdentityTaken(Exception):
     """Пара (source, source_id) уже принадлежит другому человеку или студии."""
-
-
-@dataclass(frozen=True, slots=True)
-class Entity:
-    """Чем люди отличаются от студий: своими таблицами, своим набором ролей и
-    порядком в титрах, которого у студий нет."""
-
-    table: Table
-    credit: Table
-    roles: Callable[[str], PersonRole | CompanyRole]
-    position: Column | None = None
-
-    @property
-    def link(self) -> Column:
-        """Колонка связи зовётся по имени своей таблицы: `person_id`,
-        `company_id`."""
-        return self.credit.c[f"{self.table.name}_id"]
-
-
-PEOPLE = Entity(person, person_credit, PersonRole, person_credit.c.position)
-COMPANIES = Entity(company, company_credit, CompanyRole)
-
-
-def to_credit(row: Row, entity: Entity) -> Credit:
-    """Строка титров в тип границы слоёв.
-
-    Лежит здесь, а не рядом с остальными такими же в `rows.py`: ей нужен
-    `Entity`, а он объявлен тут, и `rows.py` тогда пришлось бы импортировать из
-    репозитория, который сам импортирует его."""
-    return Credit(
-        name=row.name,
-        # Роль возвращается перечислением, а не сырой строкой из базы:
-        # `==` у StrEnum истинно и для строки, а `is` и `isinstance` —
-        # нет, и два пути чтения разошлись бы молча.
-        role=entity.roles(row.role),
-        position=row.position if entity.position is not None else None,
-        source=Source(row.source) if row.source else None,
-        source_id=row.source_id,
-    )
 
 
 class CreditRepository(Repository):

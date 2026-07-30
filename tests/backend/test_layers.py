@@ -1,3 +1,5 @@
+"""Граница слоёв: кто кого имеет право импортировать."""
+
 import ast
 from pathlib import Path
 

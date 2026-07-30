@@ -7,7 +7,7 @@ from backend.model.credit import Credit
 from backend.model.external import ExternalId, ExternalRating
 from backend.model.genre import Genre
 from backend.model.item import Item
-from backend.model.kinds import Kind, RatingSource, Source
+from backend.model.kinds import Kind, Source
 from backend.model.rating import Rating
 from backend.model.search import SearchHit
 
@@ -55,23 +55,13 @@ class CardView:
     in_wishlist: bool = False
 
 
-# Бесплатная оценка из выдачи принадлежит тому, кто её отдал. У Steam в поиске
-# оценки нет вовсе, поэтому его тут и нет.
-_OWN_RATING = {
-    Source.TMDB: RatingSource.TMDB,
-    Source.GOG: RatingSource.GOG,
-}
+def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...] = (),
+                  external: tuple[ExternalRating, ...] = ()) -> CardView:
+    """Кандидат в выдаче. Жанры разворачивает справочник — в самом ответе поиска
+    приходят голые идентификаторы; оценку собирает тот, кто знает источники.
 
-
-def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...] = ()) -> CardView:
-    """Кандидат в выдаче. Жанры разворачивает справочник — в самом ответе
-    поиска приходят голые идентификаторы."""
-    own = _OWN_RATING.get(hit.source)
-    external: tuple[ExternalRating, ...] = ()
-    if own is not None and hit.source_rating is not None:
-        external = (ExternalRating(source=own, value=hit.source_rating,
-                                   fetched_at=datetime.now()),)
-
+    Ни то, ни другое здесь не считается нарочно: и справочник жанров, и таблица
+    «у кого оценка приезжает даром» — знание вне типов границы слоёв."""
     return CardView(
         kind=hit.kind,
         source=hit.source,

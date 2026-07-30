@@ -1,3 +1,5 @@
+"""Поиск по чужим базам: выдача, отказы и склейка со своей."""
+
 import pytest
 
 from backend.model import (
@@ -6,6 +8,7 @@ from backend.model import (
     GenreSource,
     Kind,
     Missing,
+    RatingSource,
     Reason,
     Refusal,
     Source,
@@ -16,7 +19,7 @@ from backend.service.search import SEARCH_SIZE, SearchService
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
-from tests.conftest import FakeClient, FakeSources, hit, seed
+from tests.conftest import MOMENT, FakeClient, FakeSources, hit, seed
 
 
 class FakeSearch(FakeClient):
@@ -102,7 +105,8 @@ async def service(sessions):
         return SearchService(LibraryRepository(sessions),
                             ViewsRepository(sessions),
                             FakeSources(*clients),
-                            GenresRepository(sessions))
+                            GenresRepository(sessions),
+                            clock=lambda: MOMENT)
     return build
 
 
@@ -114,6 +118,24 @@ async def test_the_external_answer_becomes_candidates(sessions, service):
     assert [v.title for v in result.views] == ["Интерстеллар"]
     assert result.views[0].item_id is None
     assert result.refusals == ()
+
+
+async def test_the_free_rating_reaches_the_candidate(sessions, service):
+    """Оценка приезжает даром вместе с выдачей, и до карточки она обязана
+    доехать: собирает её `sources/convert.py`, а сервис только передаёт — потеряй
+    он этот вызов, кандидаты показывались бы без оценки источника, и заметить это
+    было бы негде.
+
+    Отметка времени берётся у внедрённых часов, а не у настоящих: своё время
+    внутри модели однажды уехало бы в базу непроверяемым."""
+    search = service(FakeSearch(Found([hit(source_rating=8.4)])))
+
+    result = await search.external(Kind.MOVIE, "интерстеллар")
+
+    external = result.views[0].external
+    assert [(r.source, r.value, r.fetched_at) for r in external] == [
+        (RatingSource.TMDB, 8.4, MOMENT)
+    ]
 
 
 async def test_the_query_and_the_kind_reach_the_source(sessions, service):

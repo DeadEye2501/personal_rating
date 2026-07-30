@@ -1,3 +1,5 @@
+"""Разбор вставленной ссылки на карточку источника."""
+
 import pytest
 
 from backend.model import Kind, Source

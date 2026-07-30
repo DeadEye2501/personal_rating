@@ -1,3 +1,5 @@
+"""Запросы разделов: фильтры, сортировки и порции."""
+
 from dataclasses import replace
 from datetime import timedelta
 

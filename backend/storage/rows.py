@@ -6,7 +6,10 @@
 
 from sqlalchemy import Row
 
+from backend.storage.repository.entity import Entity
+
 from backend.model import (
+    Credit,
     ExternalId,
     ExternalRating,
     Genre,
@@ -66,4 +69,21 @@ def to_rating(row: Row) -> Rating:
         narrative=row.narrative,
         gameplay=row.gameplay,
         review=row.review or "",
+    )
+
+
+def to_credit(row: Row, entity: Entity) -> Credit:
+    """Строка титров в тип границы слоёв.
+
+    `Entity` приходит параметром: у людей и студий разные таблицы и разные
+    наборы ролей, а порядок в титрах есть только у людей."""
+    return Credit(
+        name=row.name,
+        # Роль возвращается перечислением, а не сырой строкой из базы:
+        # `==` у StrEnum истинно и для строки, а `is` и `isinstance` —
+        # нет, и два пути чтения разошлись бы молча.
+        role=entity.roles(row.role),
+        position=row.position if entity.position is not None else None,
+        source=Source(row.source) if row.source else None,
+        source_id=row.source_id,
     )

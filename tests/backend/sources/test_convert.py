@@ -2,8 +2,20 @@
 
 import pytest
 
-from backend.model import CompanyRole, GenreSource, RatingSource
-from backend.sources.convert import companies, genres, rating, year
+from backend.model import (
+    CompanyRole,
+    ExternalRating,
+    GenreSource,
+    RatingSource,
+    Source,
+)
+from backend.sources.convert import (
+    companies,
+    from_search,
+    genres,
+    rating,
+    year,
+)
 from tests.conftest import MOMENT
 
 
@@ -89,3 +101,24 @@ def test_nothing_and_zero_are_both_an_absence_here():
     там свой — общим этот случай не считается."""
     assert rating(RatingSource.TMDB, None, MOMENT) == ()
     assert rating(RatingSource.TMDB, 0, MOMENT) == ()
+
+
+def test_the_free_rating_of_the_source_belongs_to_its_owner():
+    """Оценка TMDB приходит в том же ответе поиска — она бесплатна, и владелец у
+    неё тот, кто её отдал."""
+    assert from_search(Source.TMDB, 8.4, MOMENT) == (
+        ExternalRating(RatingSource.TMDB, 8.4, MOMENT),
+    )
+    assert from_search(Source.GOG, 4.5, MOMENT) == (
+        ExternalRating(RatingSource.GOG, 4.5, MOMENT),
+    )
+
+
+def test_a_source_that_does_not_give_a_rating_in_search_brings_none():
+    """У Steam в выдаче оценки нет вовсе, и строки быть не должно даже тогда,
+    когда число в кандидате есть: оно означало бы не то."""
+    assert from_search(Source.STEAM, 0.94, MOMENT) == ()
+
+
+def test_a_free_rating_that_did_not_come_brings_none():
+    assert from_search(Source.TMDB, None, MOMENT) == ()

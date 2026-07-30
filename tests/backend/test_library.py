@@ -1,3 +1,5 @@
+"""Репозиторий библиотеки: карточка, окна и поиск по названию."""
+
 from dataclasses import replace
 from datetime import date
 

@@ -1,3 +1,5 @@
+"""Пачечное чтение страницы: девять запросов на любое число карточек."""
+
 import pytest
 from sqlalchemy import event
 

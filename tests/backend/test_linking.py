@@ -1,3 +1,5 @@
+"""Привязка ручной карточки к внешней базе и правила слияния."""
+
 import logging
 from datetime import date
 

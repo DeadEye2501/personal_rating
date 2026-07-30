@@ -1,3 +1,5 @@
+"""Общая дверь в сеть: заголовок, таймауты и предохранитель."""
+
 import logging
 from datetime import timedelta
 

@@ -1,3 +1,5 @@
+"""Типы границы слоёв: их поля, значения и неизменность."""
+
 from dataclasses import FrozenInstanceError
 
 import pytest

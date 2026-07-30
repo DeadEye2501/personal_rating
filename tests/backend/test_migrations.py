@@ -1,3 +1,5 @@
+"""Схема из миграций против схемы из объявлений."""
+
 from pathlib import Path
 
 from sqlalchemy import create_engine, inspect, text

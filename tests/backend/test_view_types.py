@@ -1,3 +1,5 @@
+"""Карточка для показа: сборка из кандидата и из строки базы."""
+
 from dataclasses import FrozenInstanceError
 from datetime import date, datetime
 
@@ -8,6 +10,7 @@ from backend.model import (
     Genre,
     GenreKind,
     GenreSource,
+    ExternalRating,
     Item,
     Kind,
     RatingSource,
@@ -15,7 +18,7 @@ from backend.model import (
     view_from_hit,
     view_from_item,
 )
-from tests.conftest import hit
+from tests.conftest import MOMENT, hit
 
 DRAMA = Genre(id=1, name="Драма", kind=GenreKind.FILM)
 
@@ -62,33 +65,21 @@ def test_genres_are_given_from_outside():
     assert view.genres == (DRAMA,)
 
 
-def test_the_free_rating_of_the_source_becomes_an_external_one():
-    """Оценка TMDB приходит в том же ответе поиска — она бесплатна."""
-    view = view_from_hit(hit(source_rating=8.4))
-    assert [(r.source, r.value) for r in view.external] == [
-        (RatingSource.TMDB, 8.4)
-    ]
+def test_the_external_ratings_are_carried_through_as_given():
+    """Кандидат несёт оценку, а собирает её тот, кто знает источники: таблица
+    «у кого она приезжает даром» — знание об источниках, и живёт она в
+    `sources/convert.py`, где её и проверяют."""
+    given = (ExternalRating(RatingSource.TMDB, 8.4, MOMENT),)
+
+    view = view_from_hit(hit(source_rating=8.4), external=given)
+
+    assert view.external == given
 
 
-def test_a_store_rating_belongs_to_its_store():
-    view = view_from_hit(hit(source=Source.GOG, source_id="1207658930",
-                             kind=Kind.GAME, source_rating=4.5))
-    assert view.external[0].source is RatingSource.GOG
-
-
-def test_a_source_outside_the_map_brings_no_rating():
-    """У Steam в выдаче оценки нет вовсе, и строки быть не должно даже тогда,
-    когда число в кандидате есть."""
-    view = view_from_hit(hit(source=Source.STEAM, kind=Kind.GAME,
-                             source_rating=0.94))
-    assert view.external == ()
-
-
-def test_a_source_in_the_map_without_a_number_brings_no_rating():
+def test_a_candidate_without_a_rating_has_none():
     """Пустая строка external_rating означает «спрашивали, у источника нет».
     Кандидата никто не спрашивал — фабриковать этот ответ нельзя."""
-    view = view_from_hit(hit())
-    assert view.external == ()
+    assert view_from_hit(hit()).external == ()
 
 
 def test_a_view_is_frozen():

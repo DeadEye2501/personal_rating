@@ -270,7 +270,6 @@
   - `external_ids: tuple[ExternalId, ...]` = `набор из 0`
   - `rating: Rating | None` = `None`
   - `in_wishlist: bool` = `False`
-- `_OWN_RATING` = `словарь из 2`
 
 ### `backend/service/asking.py`
 
@@ -317,6 +316,10 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `SEARCH_SIZE` = `20`
+
+### `backend/sources/convert.py`
+
+- `FREE_IN_SEARCH` = `словарь из 2`
 
 ### `backend/sources/errors.py`
 
@@ -429,7 +432,7 @@
 - `metadata` = `MetaData()`
 - `poster` = `Table('poster', metadata, Column('item_id', Inte…`
 
-### `backend/storage/repository/credits.py`
+### `backend/storage/repository/entity.py`
 
 - `class Entity`
   - `table: Table`

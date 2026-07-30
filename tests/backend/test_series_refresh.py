@@ -1,3 +1,5 @@
+"""Дешёвый перезапрос сериала: сезоны и серии по сроку."""
+
 from datetime import timedelta
 
 import pytest

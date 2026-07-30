@@ -8,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.model import CardView, Tag, view_from_item
 from backend.storage.repository.base import Repository
-from backend.storage.repository.credits import COMPANIES, PEOPLE, Entity, to_credit
+from backend.storage.repository.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.rows import (
+    to_credit,
     to_external_id,
     to_external_rating,
     to_genre,

@@ -1,3 +1,5 @@
+"""Хранилище постеров вторым файлом базы."""
+
 from datetime import datetime, timedelta
 
 from sqlalchemy import select

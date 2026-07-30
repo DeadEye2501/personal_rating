@@ -1,3 +1,5 @@
+"""Чтение настроек из окружения и путей к файлам данных."""
+
 from pathlib import Path
 
 from backend.config import load_config

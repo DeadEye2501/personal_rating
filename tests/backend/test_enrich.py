@@ -1,3 +1,5 @@
+"""Третий круг: оценки агрегаторов и сроки их годности."""
+
 from datetime import timedelta
 
 import pytest

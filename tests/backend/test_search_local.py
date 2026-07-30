@@ -1,3 +1,5 @@
+"""Поиск по своей базе — единственный, который работает без сети."""
+
 from datetime import timedelta
 
 import pytest

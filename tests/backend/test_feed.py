@@ -1,3 +1,5 @@
+"""Страница раздела и перерисовка одной карточки."""
+
 from dataclasses import replace
 
 import pytest

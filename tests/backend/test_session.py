@@ -1,3 +1,5 @@
+"""Движок базы, сессии и настройки соединения."""
+
 import pytest
 from sqlalchemy import text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column

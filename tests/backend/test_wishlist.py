@@ -1,3 +1,5 @@
+"""Список запланированного: закладка, порядок и порции."""
+
 from datetime import timedelta
 
 from sqlalchemy import select

@@ -1,3 +1,5 @@
+"""Своя оценка карточки и её пересчёт."""
+
 import pytest
 from sqlalchemy import select
 

@@ -1,3 +1,5 @@
+"""Три круга загрузки: кандидат становится карточкой в базе."""
+
 import asyncio
 from dataclasses import dataclass
 

@@ -1,3 +1,5 @@
+"""Три исхода запроса к источнику и отказ по неразобранному ответу."""
+
 from dataclasses import FrozenInstanceError
 from datetime import timedelta
 

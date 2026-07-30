@@ -2,6 +2,8 @@
 
 import asyncio
 import logging
+from collections.abc import Callable
+from datetime import datetime
 
 from backend.model import (
     CardView,
@@ -15,6 +17,7 @@ from backend.model import (
     view_from_hit,
 )
 from backend.service.asking import answered
+from backend.sources.convert import from_search
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
@@ -51,11 +54,16 @@ class SearchService:
     первым и работает без сети, внешнее доливается по готовности."""
 
     def __init__(self, library: LibraryRepository, views: ViewsRepository,
-                 sources: Sources, genres: GenresRepository) -> None:
+                 sources: Sources, genres: GenresRepository,
+                 clock: Callable[[], datetime] = datetime.now) -> None:
         self._library = library
         self._views = views
         self._sources = sources
         self._genres = genres
+        # Часы внедряются, как во всех записях проекта: отметка бесплатной оценки
+        # кандидата в базу не попадает, но брать время изнутри — путь к тому, что
+        # однажды попадёт и проверить это будет нечем.
+        self._clock = clock
 
     async def local(self, kind: Kind, query: str) -> list[CardView]:
         item_ids = await self._library.search(kind, query, limit=SEARCH_SIZE)
@@ -89,7 +97,12 @@ class SearchService:
             for space, _ in hit.genre_ext_ids:
                 if space not in index:
                     index[space] = await self._genres.index(space)
-            views.append(view_from_hit(hit, _genres_of(hit, index)))
+            views.append(view_from_hit(
+                hit,
+                _genres_of(hit, index),
+                from_search(hit.source, hit.source_rating,
+                            self._clock()),
+            ))
         return views
 
 

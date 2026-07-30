@@ -1,3 +1,5 @@
+"""Обложка видимой карточки: лежащая отдаётся, недостающая скачивается."""
+
 import pytest
 
 from backend.model import Refusal, Source

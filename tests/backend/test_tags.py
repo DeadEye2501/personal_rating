@@ -1,3 +1,5 @@
+"""Свои теги: заведение, привязка к карточке и порядок."""
+
 import pytest
 
 from backend.model import Kind

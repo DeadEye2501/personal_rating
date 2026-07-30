@@ -1,3 +1,5 @@
+"""Гистограмма своих оценок по отфильтрованному набору."""
+
 import pytest
 
 from backend.model import Filters, GenreSource, Kind, Source
