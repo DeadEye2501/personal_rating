@@ -3,27 +3,13 @@ from datetime import timedelta
 
 import pytest
 
-from backend.model import (
-    Feed,
-    Filters,
-    GenreSource,
-    Kind,
-    Order,
-    Section,
-    Sort,
-    Source,
-)
+from backend.model import Filters, GenreSource, Kind, Order, Sort, Source
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT, RATED, an_item
-
-# Второй вопрос ленты рядом с общим `RATED`: в «Хочу посмотреть» порядок по
-# времени закладки. Что именно проверяет тест, он меняет через `replace`, и в
-# вызове видно только это.
-WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
+from tests.conftest import MOMENT, RATED, WANTED, an_item
 
 
 @pytest.fixture

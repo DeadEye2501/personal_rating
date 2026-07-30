@@ -43,6 +43,7 @@ POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
 # убыванию оценки. Что именно проверяет тест, он меняет через `replace`, и в
 # вызове видно только это.
 RATED = Feed(Section.RATED, Kind.MOVIE, Filters(), Order(Sort.SCORE))
+WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
 
 # Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
 # хранилищу постеров важно только то, что байты вернулись теми же.

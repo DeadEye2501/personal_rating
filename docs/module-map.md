@@ -4,7 +4,17 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 66 модулей
+## backend — 67 модулей
+
+### `backend/app.py` — 142 строк
+
+Бэкенд, собранный целиком.
+
+Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.posters`, `backend.service.search`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
+
+- `class Backend` (35)
+  - `async def aclose(self) -> None` (8)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (71)
 
 ### `backend/config.py` — 49 строк
 
@@ -941,7 +951,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 56 модулей
+## tests — 57 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1356,6 +1366,19 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
+### `tests/backend/test_offline.py` — 248 строк
+
+Главное обещание приложения: без сети работает всё, кроме поиска чужого.
+
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.sources.errors`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+
+Тестов: 17
+
+- `def unplugged(request: httpx.Request) -> httpx.Response` (2)
+- `def mine(title: str, **fields)` (4)
+- `async def assemble(tmp_path)` (9)
+- `async def offline(tmp_path)` (4)
+
 ### `tests/backend/test_poster_service.py` — 194 строк
 
 
@@ -1409,7 +1432,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def search(sessions)` (5)
 
-### `tests/backend/test_sections.py` — 434 строк ⚠ подошёл к 300
+### `tests/backend/test_sections.py` — 420 строк ⚠ подошёл к 300
 
 
 
@@ -1504,7 +1527,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 324 строк ⚠ подошёл к 300
+### `tests/conftest.py` — 325 строк ⚠ подошёл к 300
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 

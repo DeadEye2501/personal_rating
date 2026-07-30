@@ -6,6 +6,28 @@
 
 ## backend
 
+### `backend/app.py`
+
+- `class Backend`
+  - `library: LibraryRepository`
+  - `ratings: RatingsRepository`
+  - `tags: TagsRepository`
+  - `wishlist: WishlistRepository`
+  - `genres: GenresRepository`
+  - `people: CreditRepository`
+  - `companies: CreditRepository`
+  - `ids: ExternalIdsRepository`
+  - `external_ratings: ExternalRatingsRepository`
+  - `views: ViewsRepository`
+  - `search: SearchService`
+  - `feed: LibraryService`
+  - `loader: Loader`
+  - `enricher: Enricher`
+  - `linker: Linker`
+  - `posters: PosterService`
+  - `sources: Sources`
+  - `_engine: object`
+
 ### `backend/config.py`
 
 - `DEFAULT_DATA_DIR` = `'data'`
@@ -619,10 +641,6 @@
 
 - `OTHER` = `'другая обложка'.encode()`
 
-### `tests/backend/test_sections.py`
-
-- `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
-
 ### `tests/backend/test_series_refresh.py`
 
 - `LONG_AGO` = `MOMENT - timedelta(days=40)`
@@ -652,6 +670,7 @@
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `POSTER_SOURCES` = `набор из 3`
 - `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
+- `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`

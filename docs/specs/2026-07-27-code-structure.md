@@ -11,7 +11,9 @@ personal_rating/
 ├─ main.py                собирает зависимости и поднимает окно
 ├─ migrations/            alembic
 ├─ backend/
+│  ├─ app.py              единственное место, где бэкенд собран целиком
 │  ├─ config.py           ключи из .env и пути к файлам
+│  ├─ unique.py           снятие повторов с сохранением порядка
 │  ├─ model/              типы границы: Item, Rating, SearchHit, Credit…
 │  ├─ storage/
 │  │  ├─ session.py       движок и фабрика сессий
