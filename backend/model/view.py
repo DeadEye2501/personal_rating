@@ -10,14 +10,7 @@ from backend.model.item import Item
 from backend.model.kinds import Kind, Source
 from backend.model.rating import Rating
 from backend.model.search import SearchHit
-
-
-@dataclass(frozen=True, slots=True)
-class Tag:
-    """Своя метка. В отличие от жанра, снаружи не приходит никогда."""
-
-    id: int
-    name: str
+from backend.model.tag import Tag
 
 
 @dataclass(frozen=True, slots=True)

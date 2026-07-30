@@ -211,6 +211,25 @@ async def test_a_cover_from_the_network_is_a_refusal_and_not_a_hang(offline):
     assert result.reason is Reason.NETWORK
 
 
+async def test_a_failed_cover_says_which_source_failed(offline):
+    """Отказ постерного клиента называет свой источник, и у трёх источников три
+    разных имени.
+
+    Иначе сорвавшуюся обложку не отличить от чужой в логе — то же, чем однажды
+    обернулось общее `imdb` у двух оценочных клиентов. Проверяется собранный
+    бэкенд: своя ветка на источник живёт в сборке, и тесты сервиса обложек, у
+    которых клиенты свои, до неё не добираются."""
+    named = set()
+    for source in (Source.TMDB, Source.STEAM, Source.GOG):
+        result = await offline.posters.poster_for(
+            None, source, "https://example.com/p.jpg", MOMENT
+        )
+        assert str(source) in result.source
+        named.add(result.source)
+
+    assert len(named) == 3
+
+
 async def test_the_data_folder_is_made_if_it_is_not_there(tmp_path):
     """Первый запуск на чистой машине: папки данных ещё нет. Хранилище постеров
     само её не создаёт — sqlite просто не откроется."""

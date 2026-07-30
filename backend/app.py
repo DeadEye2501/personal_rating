@@ -6,13 +6,12 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from backend.config import Config
-from backend.model import Source
 from backend.service.cards import CardWriter
 from backend.service.enrich import Enricher
 from backend.service.library import LibraryService
 from backend.service.linking import Linker
 from backend.service.loading import Loader
-from backend.service.posters import PosterService
+from backend.service.posters import POSTER_SOURCES, PosterService
 from backend.service.removal import remove_card
 from backend.service.series import SeriesRefresh
 from backend.service.search import SearchService
@@ -77,6 +76,21 @@ class Backend:
         await self._engine.dispose()
 
 
+def card_parts(sessions, posters: PosterService) -> dict:
+    """Семь частей одной карточки. Писатель и привязка собираются из одного и
+    того же — у них общая основа `CardParts`, — и набор имён у них обязан
+    совпадать буквально, поэтому перечислен он здесь, а не у каждого сборщика."""
+    return {
+        "library": LibraryRepository(sessions),
+        "genres": GenresRepository(sessions),
+        "people": people(sessions),
+        "companies": companies(sessions),
+        "ids": ExternalIdsRepository(sessions),
+        "ratings": ExternalRatingsRepository(sessions),
+        "posters": posters,
+    }
+
+
 async def build_backend(
     config: Config, transport: httpx.AsyncBaseTransport | None = None
 ) -> Backend:
@@ -98,33 +112,20 @@ async def build_backend(
     sources = build_sources(config, transport=transport)
     # Своя ветка на источник: у каждого свой предохранитель и свой заголовок.
     posters = PosterService(
-        {
-            Source.TMDB: SourceHttp("tmdb-poster", transport=transport),
-            Source.STEAM: SourceHttp("steam-poster", transport=transport),
-            Source.GOG: SourceHttp("gog-poster", transport=transport),
-        },
+        {source: SourceHttp(f"{source}-poster", transport=transport)
+         for source in POSTER_SOURCES},
         store,
     )
 
-    library = LibraryRepository(sessions)
-    genres = GenresRepository(sessions)
-    person_repository = people(sessions)
-    company_repository = companies(sessions)
-    ids = ExternalIdsRepository(sessions)
-    external_ratings = ExternalRatingsRepository(sessions)
+    parts = card_parts(sessions, posters)
+    # `library` и `genres` дальше нужны и `Backend`, и сервисам, два последних —
+    # только обогащению. Второе называется вслух потому, что имена совпали, а
+    # предметы разные: у `parts` это оценки агрегаторов, у `Backend.ratings` — свои.
+    library = parts["library"]
+    genres = parts["genres"]
+    ids = parts["ids"]
+    external_ratings = parts["ratings"]
     views = ViewsRepository(sessions)
-
-    # Писатель и привязка собираются из одного и того же: у них общая основа
-    # `CardParts`, и набор из семи имён должен совпадать у обоих буквально.
-    parts = {
-        "library": library,
-        "genres": genres,
-        "people": person_repository,
-        "companies": company_repository,
-        "ids": ids,
-        "ratings": external_ratings,
-        "posters": posters,
-    }
 
     return Backend(
         library=library,
@@ -132,8 +133,8 @@ async def build_backend(
         tags=TagsRepository(sessions),
         wishlist=WishlistRepository(sessions),
         genres=genres,
-        people=person_repository,
-        companies=company_repository,
+        people=parts["people"],
+        companies=parts["companies"],
         search=SearchService(library=library, views=views, sources=sources,
                              genres=genres),
         feed=LibraryService(SectionsRepository(sessions), views),

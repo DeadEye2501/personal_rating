@@ -1,8 +1,9 @@
 """Фикстуры тестов и поверхность общего.
 
 Подставные клиенты живут в `tests/fakes.py`, строители данных — в
-`tests/builders.py`. Отсюда они переэкспортируются: `conftest` и так читают все
-тесты, и второй адрес того же помощника означал бы два способа его найти."""
+`tests/builders.py`, сборка объектов бэкенда — в `tests/wiring.py`. Отсюда они
+переэкспортируются: `conftest` и так читают все тесты, и второй адрес того же
+помощника означал бы два способа его найти."""
 
 
 import httpx
@@ -33,15 +34,13 @@ from tests.builders import (
     MOMENT,
     PICTURE,
     POSTER,
-    POSTER_SOURCES,
     an_item,
-    card_parts,
     hit,
     picture,
-    poster_service,
     rated,
 )
 from tests.fakes import FakeCatalog, FakeClient, FakeSources
+from tests.wiring import POSTER_SOURCES, card_parts, poster_service
 
 __all__ = [
     "LATER",

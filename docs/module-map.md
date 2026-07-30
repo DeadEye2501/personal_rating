@@ -4,18 +4,19 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 72 модулей
+## backend — 73 модулей
 
-### `backend/app.py` — 148 строк
+### `backend/app.py` — 149 строк
 
 Бэкенд, собранный целиком.
 
-Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
+Зависит от: `backend.config`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
 
 - `class Backend` (39)
   - `async def delete_card(self, item_id: int) -> None` (7)
   - `async def aclose(self) -> None` (8)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (69)
+- `def card_parts(sessions, posters: PosterService) -> dict` (13)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (56)
 
 ### `backend/config.py` — 49 строк
 
@@ -30,11 +31,11 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 92 строк
+### `backend/model/__init__.py` — 93 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.tag`, `backend.model.view`
 
 Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `is_answer`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
@@ -176,13 +177,20 @@
 
 - `class Suggestion` (9)
 
-### `backend/model/view.py` — 96 строк
+### `backend/model/tag.py` — 11 строк
+
+Свой тег на границе слоёв.
+
+Зависит от: —
+
+- `class Tag` (5)
+
+### `backend/model/view.py` — 89 строк
 
 Карточка в том виде, в каком её показывает лента.
 
-Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`
+Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`, `backend.model.tag`
 
-- `class Tag` (5)
 - `class CardView` (32)
 - `def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...]=(), external: tuple[ExternalRating, ...]=()) -> CardView` (19)
 - `def view_from_item(item: Item) -> CardView` (18)
@@ -286,7 +294,7 @@
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/posters.py` — 130 строк
+### `backend/service/posters.py` — 136 строк
 
 Путь обложки от источника до хранилища.
 
@@ -1008,7 +1016,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 62 модулей
+## tests — 63 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1045,15 +1053,6 @@
 Зависит от: `backend.model`, `backend.sources.convert`, `tests.conftest`
 
 Тестов: 14
-
-
-### `tests/backend/sources/test_errors.py` — 53 строк
-
-Три исхода запроса к источнику и отказ по неразобранному ответу.
-
-Зависит от: `backend.model`
-
-Тестов: 6
 
 
 ### `tests/backend/sources/test_gog.py` — 283 строк
@@ -1457,18 +1456,27 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_offline.py` — 279 строк
+### `tests/backend/test_offline.py` — 298 строк
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
 Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 17
+Тестов: 18
 
 - `def unplugged(request: httpx.Request) -> httpx.Response` (2)
 - `def mine(title: str, **fields)` (4)
 - `async def assemble(tmp_path)` (9)
 - `async def offline(tmp_path)` (4)
+
+### `tests/backend/test_outcome.py` — 57 строк
+
+Три исхода запроса к источнику: что считается ответом, что обязательно, что
+
+Зависит от: `backend.model`
+
+Тестов: 6
+
 
 ### `tests/backend/test_poster_service.py` — 227 строк
 
@@ -1616,24 +1624,22 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/builders.py` — 107 строк
+### `tests/builders.py` — 72 строк
 
-Строители данных для тестов: карточки, кандидаты, картинки, части писателя.
+Строители данных для тестов: карточки, кандидаты, картинки.
 
-Зависит от: `backend.model`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`
+Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`
 
-- `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
-- `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
 
-### `tests/conftest.py` — 249 строк
+### `tests/conftest.py` — 248 строк
 
 Фикстуры тестов и поверхность общего.
 
-Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`
+Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
 
 Отдаёт наружу: `LATER`, `MINIMAL`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `RATED`, `TABLES`, `WANTED`, `FakeCatalog`, `FakeClient`, `FakeSources`, `an_item`, `card_parts`, `film_genres`, `hit`, `ours`, `picture`, `poster_service`, `rated`, `seed`
 
@@ -1696,6 +1702,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 6
 
 - `def indexed(source: str, path: str='a.py') -> dict[str, str]` (2)
+
+### `tests/wiring.py` — 30 строк
+
+Части карточки и сервис обложек, собранные для теста на подставном транспорте.
+
+Зависит от: `backend.app`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`
+
+- `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
+- `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (8)
 
 ## Абстракции с одной реализацией
 

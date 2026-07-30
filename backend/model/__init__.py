@@ -42,8 +42,9 @@ from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.search import SearchHit
 from backend.model.suggestion import Suggestion
+from backend.model.tag import Tag
 from backend.model.results import ExternalSearch, merge_results
-from backend.model.view import CardView, Tag, view_from_hit, view_from_item
+from backend.model.view import CardView, view_from_hit, view_from_item
 
 __all__ = [
     "Bucket",

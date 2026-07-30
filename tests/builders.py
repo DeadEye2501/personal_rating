@@ -1,21 +1,11 @@
-"""Строители данных для тестов: карточки, кандидаты, картинки, части писателя."""
+"""Строители данных для тестов: карточки, кандидаты, картинки."""
 
 import io
 from datetime import datetime
 
-import httpx
 from PIL import Image
 
 from backend.model import Item, Kind, SearchHit, Source
-from backend.service.posters import PosterService
-from backend.sources.http import SourceHttp
-from backend.storage.posters import PosterStore
-from backend.storage.repository.credits import companies, people
-from backend.storage.repository.external import (
-    ExternalIdsRepository,
-    ExternalRatingsRepository,
-)
-from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 
@@ -25,27 +15,10 @@ from backend.storage.repository.ratings import RatingsRepository
 MOMENT = datetime(2026, 7, 29, 12, 0)
 LATER = datetime(2026, 7, 30, 12, 0)
 
-# Источники, у которых бывает обложка: у ручной карточки её скачивать негде.
-POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
-
 # Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
 # хранилищу постеров важно только то, что байты вернулись теми же.
 PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 512
 
-
-def card_parts(sessions, store: PosterStore,
-               transport: httpx.MockTransport) -> dict:
-    """Репозитории одной карточки и сервис обложек: и писателя, и привязку
-    собирают из одного и того же — они наследники `CardParts`."""
-    return {
-        "library": LibraryRepository(sessions),
-        "genres": GenresRepository(sessions),
-        "people": people(sessions),
-        "companies": companies(sessions),
-        "ids": ExternalIdsRepository(sessions),
-        "ratings": ExternalRatingsRepository(sessions),
-        "posters": poster_service(store, transport),
-    }
 
 def an_item(source_id: str, title: str, **fields) -> Item:
     """Незаписанная карточка: опознание аргументами, остальное по вкусу теста.
@@ -75,14 +48,6 @@ async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
     if score is not None:
         await RatingsRepository(sessions).set_score(item_id, score, now=MOMENT)
     return item_id
-
-def poster_service(store: PosterStore,
-                   transport: httpx.MockTransport) -> PosterService:
-    """Сервис обложек с одним транспортом на все три источника. Где важно, кого
-    именно спросили, тест собирает клиентов сам."""
-    clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
-               for source in POSTER_SOURCES}
-    return PosterService(clients, store)
 
 def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
     """Настоящая картинка заданного размера. Размер обязателен: там, где эта

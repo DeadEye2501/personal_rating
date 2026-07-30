@@ -244,11 +244,14 @@
   - `hint: str`
   - `hint_item_id: int | None`
 
-### `backend/model/view.py`
+### `backend/model/tag.py`
 
 - `class Tag`
   - `id: int`
   - `name: str`
+
+### `backend/model/view.py`
+
 - `class CardView`
   - `kind: Kind`
   - `source: Source`
@@ -311,6 +314,7 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `_SIGNATURES` = `набор из 3`
+- `POSTER_SOURCES` = `набор из 3`
 
 ### `backend/service/search.py`
 
@@ -678,7 +682,6 @@
 
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
-- `POSTER_SOURCES` = `набор из 3`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `POSTER` = `picture(600, 900, fmt='JPEG')`
 
