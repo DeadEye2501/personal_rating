@@ -27,12 +27,7 @@ class LibraryService:
     async def page(self, feed: Feed, offset: int = 0,
                    limit: int = PAGE_SIZE) -> list[CardView]:
         item_ids = await self._sections.ids(feed, limit=limit, offset=offset)
-        found = await self._views.views_for(item_ids)
-        # Порядок принадлежит запросу раздела: словарь его не хранит. Пропавшая
-        # между двумя запросами карточка тихо выпадает из страницы: удалить её
-        # человек мог ровно в этот промежуток, и ронять из-за этого всю ленту
-        # незачем.
-        return [found[item_id] for item_id in item_ids if item_id in found]
+        return await self._views.in_order(item_ids)
 
     async def histogram(self, kind: Kind, filters: Filters) -> Histogram:
         return await self._sections.histogram(kind, filters)

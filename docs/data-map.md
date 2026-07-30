@@ -252,6 +252,10 @@
 - `logger` = `logging.getLogger(__name__)`
 - `_SIGNATURES` = `набор из 3`
 
+### `backend/service/search.py`
+
+- `SEARCH_SIZE` = `20`
+
 ### `backend/sources/errors.py`
 
 - `class Reason(StrEnum)`

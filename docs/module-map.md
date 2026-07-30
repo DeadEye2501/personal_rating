@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 60 модулей
+## backend — 61 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -191,14 +191,14 @@
 - `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
 - `def crop_to_cover(data: bytes) -> bytes` (20)
 
-### `backend/service/library.py` — 38 строк
+### `backend/service/library.py` — 33 строк
 
 Страницы разделов и гистограмма для показа.
 
 Зависит от: `backend.model`, `backend.storage.repository.sections`, `backend.storage.repository.views`
 
-- `class LibraryService` (27)
-  - `async def page(self, feed: Feed, offset: int=0, limit: int=PAGE_SIZE) -> list[CardView]` (9)
+- `class LibraryService` (22)
+  - `async def page(self, feed: Feed, offset: int=0, limit: int=PAGE_SIZE) -> list[CardView]` (4)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (2)
 
 ### `backend/service/linking.py` — 127 строк
@@ -229,6 +229,15 @@
   - `async def save(self, item_id: int, data: bytes, now: datetime) -> None` (2)
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
+
+### `backend/service/search.py` — 23 строк
+
+Поиск карточек — по своей библиотеке и по чужим базам.
+
+Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.views`
+
+- `class SearchService` (12)
+  - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
 
 ### `backend/sources/convert.py` — 52 строк
 
@@ -562,7 +571,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 154 строк
+### `backend/storage/repository/library.py` — 178 строк
 
 Карточки библиотеки.
 
@@ -570,13 +579,14 @@
 
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (118)
+- `class LibraryRepository(Repository)` (142)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (12)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
+  - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (23)
   - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
   - `async def delete(self, item_id: int, posters: PosterStore) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
@@ -631,14 +641,15 @@
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[tuple[int, str]]` (8)
 
-### `backend/storage/repository/views.py` — 162 строк
+### `backend/storage/repository/views.py` — 172 строк
 
 Пачечное чтение карточек для показа.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.repository.credits`, `backend.storage.rows`, `backend.storage.tables`
 
-- `class ViewsRepository(Repository)` (131)
+- `class ViewsRepository(Repository)` (141)
   - `async def views_for(self, item_ids: list[int]) -> dict[int, CardView]` (5)
+  - `async def in_order(self, item_ids: list[int]) -> list[CardView]` (9)
   - `async def _fetch_all(self, session: AsyncSession, item_ids: list[int]) -> dict[int, CardView]` (35)
   - `async def _genres(self, session, item_ids)` (9)
   - `async def _tags(self, session, item_ids)` (9)
@@ -860,7 +871,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 48 модулей
+## tests — 49 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1078,7 +1089,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 - `async def feed(sessions, sections)` (2)
-- `class Forgetful` (13)
+- `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
 ### `tests/backend/test_genre_reference.py` — 171 строк
@@ -1238,6 +1249,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
+### `tests/backend/test_search_local.py` — 133 строк
+
+
+
+Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
+
+Тестов: 12
+
+- `async def search(sessions)` (4)
+
 ### `tests/backend/test_sections.py` — 434 строк ⚠ подошёл к 300
 
 
@@ -1377,3 +1398,4 @@ Steam: отсутствие игры приходит под кодом 200, а 
 ## Абстракции с одной реализацией
 
 - `Base` — наследник один: `Note`
+- `ViewsRepository` — наследник один: `Forgetful`

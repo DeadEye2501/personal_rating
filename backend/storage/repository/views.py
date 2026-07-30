@@ -39,6 +39,16 @@ class ViewsRepository(Repository):
         async with self._sessions() as session:
             return await self._fetch_all(session, item_ids)
 
+    async def in_order(self, item_ids: list[int]) -> list[CardView]:
+        """Карточки в порядке спрошенных номеров: порядок принадлежит тому
+        запросу, который их выбрал, а словарь его не хранит.
+
+        Пропавшая между двумя запросами карточка тихо выпадает: удалить её
+        человек мог ровно в этот промежуток, и ронять из-за неё всю выдачу
+        незачем."""
+        found = await self.views_for(item_ids)
+        return [found[item_id] for item_id in item_ids if item_id in found]
+
     async def _fetch_all(
         self, session: AsyncSession, item_ids: list[int]
     ) -> dict[int, CardView]:

@@ -85,6 +85,30 @@ class LibraryRepository(Repository):
             to_item,
         )
 
+    async def search(self, kind: Kind, query: str, limit: int) -> list[int]:
+        """Поиск по своей библиотеке: вхождение в любое из двух названий.
+
+        В отличие от `find_by_title`, который сравнивает названия целиком ради
+        предупреждения о совпадении, здесь нужна подстрока. `autoescape` гасит
+        `%` и `_` в самом запросе: иначе «%» вывалил бы всю библиотеку."""
+        needle = fold(query.strip())
+        if not needle:
+            return []
+
+        rows = await self._rows(
+            select(item_table.c.id)
+            .where(
+                item_table.c.kind == kind,
+                folded(item_table.c.title).contains(needle, autoescape=True)
+                | folded(item_table.c.original_title).contains(
+                    needle, autoescape=True
+                ),
+            )
+            .order_by(item_table.c.title)
+            .limit(limit)
+        )
+        return [row.id for row in rows]
+
     async def deletion_summary(self, item_id: int) -> dict[str, int | bool]:
         """Что именно пропадёт вместе с карточкой — для подтверждения."""
         tags = await self._row(

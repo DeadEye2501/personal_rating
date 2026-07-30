@@ -65,17 +65,17 @@ async def test_the_next_portion_continues_the_previous(sessions, feed):
     assert [v.title for v in second] == ["Фильм 2", "Фильм 3"]
 
 
-class Forgetful:
+class Forgetful(ViewsRepository):
     """Сборка карточек, потерявшая одну. Так бывает по-настоящему: между
     запросом номеров и сборкой карточек человек успел удалить карточку, а
     запросы эти идут разными сессиями."""
 
-    def __init__(self, views: ViewsRepository, lost: int) -> None:
-        self._views = views
+    def __init__(self, sessions, lost: int) -> None:
+        super().__init__(sessions)
         self._lost = lost
 
     async def views_for(self, item_ids: list[int]) -> dict:
-        found = await self._views.views_for(item_ids)
+        found = await super().views_for(item_ids)
         found.pop(self._lost, None)
         return found
 
@@ -85,7 +85,7 @@ async def test_a_card_lost_between_the_two_queries_drops_out(sessions, sections)
     исчезнувшей карточки незачем."""
     lost_id = await rated(sessions, "1", 10.0, title="Удалённый")
     await rated(sessions, "2", 9.0, title="Оставшийся")
-    feed = LibraryService(sections, Forgetful(ViewsRepository(sessions), lost_id))
+    feed = LibraryService(sections, Forgetful(sessions, lost_id))
 
     page = await feed.page(RATED)
 
