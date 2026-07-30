@@ -23,7 +23,6 @@ async def test_user_agent_is_always_sent():
 
     # httpx приводит имена заголовков к нижнему регистру.
     assert seen[0].headers["user-agent"] == USER_AGENT
-    assert seen[0].headers["user-agent"], "пустое представление Cloudflare не примет"
 
 
 async def test_request_goes_by_get_to_the_address_it_was_given():
@@ -63,6 +62,8 @@ async def test_unnamed_timeout_is_the_generous_one():
     await http.get("https://catalog.gog.com/v1/catalog")
     await http.aclose()
 
+    # Двадцать литералом, а не через `DEFAULT_TIMEOUT`: сверка с объявлением
+    # переезжает вместе с ним и не проверяет ничего.
     assert seen[0].extensions["timeout"]["read"] == 20.0
 
 

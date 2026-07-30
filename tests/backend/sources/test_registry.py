@@ -5,15 +5,15 @@ from datetime import timedelta
 from pathlib import Path
 
 import httpx
+import pytest
 
 from backend.config import load_config
 from backend.model import Found, Kind, Refusal, Source
 from backend.sources.gog.client import GogClient
-from backend.sources.http import Breaker
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.omdb.client import OmdbClient
-from backend.sources.registry import build_sources
+from backend.sources.build import build_sources
 from backend.sources.steam.client import SteamClient
 from backend.sources.tmdb.client import TmdbClient
 
@@ -73,11 +73,15 @@ async def test_films_ask_three_aggregators():
     await registry.aclose()
 
 
-async def test_series_ask_the_same_three():
+@pytest.mark.parametrize("kind", [Kind.MOVIE, Kind.SERIES])
+async def test_films_and_series_ask_the_same_three(kind):
+    """Список задан явно, а не сравнением двух вызовов между собой: у кино и
+    сериалов в реестре один и тот же `return`, и такое сравнение сходилось бы при
+    любой реализации, включая пустую."""
     registry = sources()
 
-    assert [type(one) for one in registry.rating_sources(Kind.SERIES)] == [
-        type(one) for one in registry.rating_sources(Kind.MOVIE)
+    assert [type(one) for one in registry.rating_sources(kind)] == [
+        MdbListClient, OmdbClient, KinopoiskClient
     ]
 
     await registry.aclose()
@@ -107,6 +111,10 @@ async def test_every_catalog_client_takes_the_same_arguments():
                 "source_id",
                 "kind",
             ], type(client)
+            # Вторая половина контракта: сервисы зовут `client.name`, собирая
+            # отказ. Снятие свойства оставило бы реестр зелёным, а `answered(...)`
+            # упало бы на `AttributeError` уже в сервисе.
+            assert isinstance(client.name, str) and client.name, type(client)
 
     await registry.aclose()
 
@@ -119,6 +127,7 @@ async def test_every_rating_client_takes_the_same_arguments():
             "imdb_id",
             "kind",
         ], type(client)
+        assert isinstance(client.name, str) and client.name, type(client)
 
     await registry.aclose()
 
@@ -127,9 +136,8 @@ async def test_every_source_has_its_own_breaker():
     """Иначе исчерпанная квота OMDB выключила бы и TMDB."""
     registry = sources()
 
-    breakers = registry.breakers()
+    breakers = [one.breaker for one in registry.connections]
 
-    assert all(isinstance(one, Breaker) for one in breakers)
     # Оба зеркала Кинопоиска заведены под одним именем: наружу источник один, и
     # в `Refusal.source` человек должен увидеть «kinopoisk», а не имя зеркала.
     assert sorted(one.name for one in registry.connections) == [

@@ -1,10 +1,11 @@
-"""Мои теги: наборы по типам содержимого и их развеска по карточкам."""
+"""Мои теги в базе."""
 
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.sqlite import insert
 
-from backend.model import Kind
+from backend.model import Kind, Tag
 from backend.storage.repository.base import Repository
+from backend.storage.rows import to_tag
 from backend.storage.tables import item as item_table
 from backend.storage.tables import item_tag as item_tag_table
 from backend.storage.tables import tag as tag_table
@@ -16,10 +17,6 @@ class WrongTagKind(Exception):
 
 class TagExists(Exception):
     """Тег с таким именем в этом наборе уже есть."""
-
-
-def _named(row) -> tuple[int, str]:
-    return row.id, row.name
 
 
 class TagsRepository(Repository):
@@ -41,12 +38,12 @@ class TagsRepository(Repository):
             TagExists(f"{kind}:{name} уже заведён"),
         )
 
-    async def list_for_kind(self, kind: Kind) -> list[tuple[int, str]]:
+    async def list_for_kind(self, kind: Kind) -> list[Tag]:
         return await self._mapped(
             select(tag_table.c.id, tag_table.c.name)
             .where(tag_table.c.kind == kind)
             .order_by(tag_table.c.position),
-            _named,
+            to_tag,
         )
 
     async def reorder(self, kind: Kind, tag_ids: list[int]) -> None:
@@ -99,11 +96,11 @@ class TagsRepository(Repository):
             )
         )
 
-    async def tags_of(self, item_id: int) -> list[tuple[int, str]]:
+    async def tags_of(self, item_id: int) -> list[Tag]:
         return await self._mapped(
             select(tag_table.c.id, tag_table.c.name)
             .join(item_tag_table, item_tag_table.c.tag_id == tag_table.c.id)
             .where(item_tag_table.c.item_id == item_id)
             .order_by(tag_table.c.position),
-            _named,
+            to_tag,
         )

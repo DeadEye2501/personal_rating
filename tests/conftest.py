@@ -1,35 +1,24 @@
-"""Общее для тестов: временные база и хранилище, фикстуры и минимальные строки."""
+"""Фикстуры тестов и поверхность общего.
 
-import io
-from datetime import datetime
+Подставные клиенты живут в `tests/fakes.py`, строители данных — в
+`tests/builders.py`. Отсюда они переэкспортируются: `conftest` и так читают все
+тесты, и второй адрес того же помощника означал бы два способа его найти."""
+
 
 import httpx
 import pytest
 import sqlalchemy
-from PIL import Image
 
 from backend.model import (
     Feed,
     Filters,
-    Item,
     Kind,
     Order,
-    SearchHit,
     Section,
     Sort,
-    Source,
 )
-from backend.service.posters import PosterService
-from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
-from backend.storage.repository.credits import companies, people
-from backend.storage.repository.external import (
-    ExternalIdsRepository,
-    ExternalRatingsRepository,
-)
-from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
-from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.sections import SectionsRepository
 from backend.storage.session import (
     create_engine,
@@ -39,25 +28,50 @@ from backend.storage.session import (
 from backend.storage.tables import metadata
 from tests.alembic_runner import alembic
 
-# Момент и момент позже. Заведённые в каждом модуле заново, они расходились
-# значениями, ничего этим не проверяя. Важен только порядок: где нужен
-# определённый промежуток, тест берёт `MOMENT + timedelta(...)` и говорит это
-# вслух.
-MOMENT = datetime(2026, 7, 29, 12, 0)
-LATER = datetime(2026, 7, 30, 12, 0)
+from tests.builders import (
+    LATER,
+    MOMENT,
+    PICTURE,
+    POSTER,
+    POSTER_SOURCES,
+    an_item,
+    card_parts,
+    hit,
+    picture,
+    poster_service,
+    rated,
+)
+from tests.fakes import FakeCatalog, FakeClient, FakeSources
 
-# Источники, у которых бывает обложка: у ручной карточки её скачивать негде.
-POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
+__all__ = [
+    "LATER",
+    "MINIMAL",
+    "MOMENT",
+    "PICTURE",
+    "POSTER",
+    "POSTER_SOURCES",
+    "RATED",
+    "TABLES",
+    "WANTED",
+    "FakeCatalog",
+    "FakeClient",
+    "FakeSources",
+    "an_item",
+    "card_parts",
+    "film_genres",
+    "hit",
+    "ours",
+    "picture",
+    "poster_service",
+    "rated",
+    "seed",
+]
 
 # Вопрос ленты, от которого отталкиваются проверки разделов: оценённое кино по
 # убыванию оценки. Что именно проверяет тест, он меняет через `replace`, и в
 # вызове видно только это.
 RATED = Feed(Section.RATED, Kind.MOVIE, Filters(), Order(Sort.SCORE))
 WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
-
-# Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
-# хранилищу постеров важно только то, что байты вернулись теми же.
-PICTURE = b"\x89PNG\r\n\x1a\n" + b"0" * 512
 
 
 def ours(caplog) -> list[str]:
@@ -68,100 +82,6 @@ def ours(caplog) -> list[str]:
         for record in caplog.records
         if record.name.startswith("backend")
     ]
-
-
-def card_parts(sessions, store: PosterStore,
-               transport: httpx.MockTransport) -> dict:
-    """Репозитории одной карточки и сервис обложек: и писателя, и привязку
-    собирают из одного и того же — они наследники `CardParts`."""
-    return {
-        "library": LibraryRepository(sessions),
-        "genres": GenresRepository(sessions),
-        "people": people(sessions),
-        "companies": companies(sessions),
-        "ids": ExternalIdsRepository(sessions),
-        "ratings": ExternalRatingsRepository(sessions),
-        "posters": poster_service(store, transport),
-    }
-
-
-def an_item(source_id: str, title: str, **fields) -> Item:
-    """Незаписанная карточка: опознание аргументами, остальное по вкусу теста.
-
-    Умолчания — фильм от TMDB: таких проверок больше всего, а `Item` требует
-    шесть полей, и повторять их в каждом тесте значит спрятать среди них то
-    одно, ради которого тест написан."""
-    return Item(
-        id=0,
-        kind=fields.pop("kind", Kind.MOVIE),
-        source=fields.pop("source", Source.TMDB),
-        source_id=source_id,
-        title=title,
-        synced_at=fields.pop("synced_at", MOMENT),
-        **fields,
-    )
-
-
-class FakeClient:
-    """Клиент источника с заданным ответом.
-
-    Что у него спрашивают, дописывают наследники: у каталожного это выдача
-    поиска и детальная карточка, у перезапроса — сезоны с сериями. Общее у всех
-    трёх одно: заданный исход, имя источника для отказа и список того, о чём
-    спросили."""
-
-    def __init__(self, outcome, name: str = "tmdb") -> None:
-        self.outcome = outcome
-        self.name = name
-        self.asked = []
-
-
-class FakeCatalog(FakeClient):
-    """Спрашивают у него детальную карточку. Наследники дописывают остальное:
-    у GOG к ней добавляется номер по слагу."""
-
-    async def card(self, source_id: str, kind: Kind):
-        self.asked.append((source_id, kind))
-        return self.outcome
-
-
-class FakeSources:
-    """Реестр с заданными каталожными клиентами. Настоящий поднимает шесть
-    клиентов, у каждого свой SSL-контекст, — а сервису поиска нужен от него
-    только список тех, кого спрашивать."""
-
-    def __init__(self, *clients) -> None:
-        self._clients = list(clients)
-
-    def catalog_for(self, _kind: Kind) -> list:
-        """Тип содержимого настоящий реестр разбирает сам, и проверяется он в
-        его собственных тестах: здесь важно только, кого он вернул."""
-        return self._clients
-
-    def client_for(self, _source: Source):
-        """Тот же довод про источник: подмену клиента источнику сторожат тесты
-        самого реестра. Без клиентов — `None`, как у ручной карточки."""
-        return self._clients[0] if self._clients else None
-
-    def rating_sources(self, kind: Kind) -> list:
-        """Единственное правило настоящего реестра, которое здесь повторяется:
-        у игр оценочных источников нет. Без него сервис не проверить на пустом
-        списке, а сам список — предмет его работы."""
-        return [] if kind is Kind.GAME else self._clients
-
-
-async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
-    """Записанная карточка со своей оценкой — или без неё, если оценки нет.
-
-    Оценка ставится отдельным вызовом, как в приложении: карточка приезжает из
-    источника, оценку выставляет человек."""
-    fields.setdefault("year", 2014)
-    item_id = await LibraryRepository(sessions).create(
-        an_item(source_id, fields.pop("title", f"Фильм {source_id}"), **fields)
-    )
-    if score is not None:
-        await RatingsRepository(sessions).set_score(item_id, score, now=MOMENT)
-    return item_id
 
 
 async def film_genres(engine) -> None:
@@ -202,38 +122,6 @@ def capture(*, content: bytes | None = None, status: int = 200):
         return httpx.Response(status, content=content)
 
     return httpx.MockTransport(handler), seen
-
-
-def poster_service(store: PosterStore,
-                   transport: httpx.MockTransport) -> PosterService:
-    """Сервис обложек с одним транспортом на все три источника. Где важно, кого
-    именно спросили, тест собирает клиентов сам."""
-    clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
-               for source in POSTER_SOURCES}
-    return PosterService(clients, store)
-
-
-def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
-    """Настоящая картинка заданного размера. Размер обязателен: там, где эта
-    картинка нужна, он и есть предмет проверки."""
-    buffer = io.BytesIO()
-    Image.new("RGB", (width, height), (10, 20, 30)).save(buffer, format=fmt)
-    return buffer.getvalue()
-
-
-# Готовая обложка: 2:3 — форма постера, а не случайные числа, и объявлена она
-# один раз. Здесь же, чтобы три модуля не рисовали по картинке на импорте.
-POSTER = picture(600, 900, fmt="JPEG")
-
-
-def hit(source_id: str = "157336", title: str = "Интерстеллар",
-        **fields) -> SearchHit:
-    """Короткий кандидат выдачи: опознание аргументами, остальное по вкусу теста.
-
-    Умолчания уезжают в `base`, а не в подпись: иначе вызов `hit(kind=Kind.GAME)`
-    даёт «got multiple values for keyword argument»."""
-    base = dict(kind=Kind.MOVIE, source=Source.TMDB)
-    return SearchHit(source_id=source_id, title=title, **(base | fields))
 
 
 # Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он
@@ -300,7 +188,10 @@ async def reference(engine):
     Тесты не зависят от миграции: проверяется разрешение идентификаторов, а не
     содержимое справочника — его сторожит `test_genre_reference.py`. Набор
     маленький и нарочно включает сборный 10759 — один внешний идентификатор,
-    разворачивающийся в два наших жанра."""
+    разворачивающийся в два наших жанра, — и по одной строке на каждое чужое
+    пространство: без строки `gog` «отвергнутый слаг» и «совсем новый жанр»
+    оказались бы одним и тем же случаем, потому что самого пространства в
+    справочнике не было бы вовсе."""
     await seed(
         engine,
         "INSERT INTO genre (id, name, kind) VALUES "
@@ -309,7 +200,7 @@ async def reference(engine):
         "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
         "('tmdb', '28', 1), ('tmdb', '12', 2), ('tmdb', '18', 3), "
         "('tmdb', '10759', 1), ('tmdb', '10759', 2), "
-        "('steam', '3', 4)",
+        "('steam', '3', 4), ('gog', 'rpg', 4), ('gog_tag', 'story-rich', 3)",
     )
 
 

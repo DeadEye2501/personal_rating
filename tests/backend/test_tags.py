@@ -2,7 +2,7 @@
 
 import pytest
 
-from backend.model import Kind
+from backend.model import Kind, Tag
 from backend.storage.repository.tags import TagExists, TagsRepository, WrongTagKind
 
 
@@ -32,7 +32,7 @@ async def test_a_refused_duplicate_leaves_the_set_as_it_was(sessions):
         await repository.create(Kind.MOVIE, "пересмотреть")
 
     await repository.create(Kind.MOVIE, "переслушать")
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["пересмотреть", "переслушать"]
 
 
@@ -40,7 +40,7 @@ async def test_list_shows_only_the_current_kind(sessions):
     repository = TagsRepository(sessions)
     await repository.create(Kind.MOVIE, "фильмовый")
     await repository.create(Kind.GAME, "игровой")
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["фильмовый"]
 
 
@@ -52,7 +52,7 @@ async def test_a_new_tag_goes_to_the_end_of_its_set(sessions):
     await repository.create(Kind.MOVIE, "второй")
     await repository.create(Kind.MOVIE, "третий")
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["первый", "второй", "третий"]
 
 
@@ -71,7 +71,7 @@ async def test_a_new_tag_goes_after_the_reordered_ones(sessions):
 
     await repository.create(Kind.MOVIE, "четвёртый")
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["третий", "первый", "второй", "четвёртый"]
 
 
@@ -88,7 +88,7 @@ async def test_a_new_tag_goes_last_even_after_deletions(sessions):
 
     await repository.create(Kind.MOVIE, "четвёртый")
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["третий", "четвёртый"]
 
 
@@ -101,13 +101,14 @@ async def test_reorder_does_not_touch_tags_of_another_set(sessions):
 
     await repository.reorder(Kind.MOVIE, [game_second, game_first])
 
-    names = [name for _, name in await repository.list_for_kind(Kind.GAME)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.GAME)]
     assert names == ["игровой", "второй игровой"]
 
 
-async def test_lists_give_out_pairs_and_not_rows(sessions, card):
-    """Наружу едут пары «номер и имя», а не строки базы: `Row` сравнивается с
-    кортежем как равный, и проверка по значениям подмену пропускает."""
+async def test_lists_give_out_boundary_tags_and_not_rows(sessions, card):
+    """Наружу едет `Tag`, а не строка базы и не пара чисел со строкой: `Row`
+    сравнивается с кортежем как равный, и проверка по значениям подмену
+    пропускает. Тип один на оба пути — список набора и состав карточки."""
     repository = TagsRepository(sessions)
     item_id = await card(Kind.MOVIE)
     await repository.assign(item_id, await repository.create(Kind.MOVIE, "тег"))
@@ -116,7 +117,7 @@ async def test_lists_give_out_pairs_and_not_rows(sessions, card):
         await repository.list_for_kind(Kind.MOVIE),
         await repository.tags_of(item_id),
     ):
-        assert [type(one) for one in found] == [tuple]
+        assert [type(one) for one in found] == [Tag]
 
 
 async def test_manual_order_survives(sessions):
@@ -127,7 +128,7 @@ async def test_manual_order_survives(sessions):
 
     await repository.reorder(Kind.MOVIE, [third, first, second])
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["третий", "первый", "второй"]
 
 
@@ -143,8 +144,8 @@ async def test_order_is_independent_per_kind(sessions):
 
     await repository.reorder(Kind.MOVIE, [second, first])
 
-    movies = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
-    games = [name for _, name in await repository.list_for_kind(Kind.GAME)]
+    movies = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
+    games = [tag.name for tag in await repository.list_for_kind(Kind.GAME)]
     assert movies == ["второй фильмовый", "фильмовый"]
     assert games == ["игровой", "второй игровой"]
 
@@ -155,7 +156,7 @@ async def test_assign_and_unassign(sessions, card):
     tag_id = await repository.create(Kind.MOVIE, "пересмотреть")
 
     await repository.assign(item_id, tag_id)
-    assert [name for _, name in await repository.tags_of(item_id)] == ["пересмотреть"]
+    assert [tag.name for tag in await repository.tags_of(item_id)] == ["пересмотреть"]
 
     await repository.unassign(item_id, tag_id)
     assert await repository.tags_of(item_id) == []
@@ -175,7 +176,7 @@ async def test_unassign_takes_only_the_asked_pair(sessions, card):
 
     await repository.unassign(mine, first)
 
-    assert [name for _, name in await repository.tags_of(mine)] == ["второй"]
+    assert [tag.name for tag in await repository.tags_of(mine)] == ["второй"]
     assert len(await repository.tags_of(other)) == 2
 
 
@@ -186,7 +187,7 @@ async def test_tags_of_a_card_are_only_its_own(sessions, card):
     await repository.assign(mine, await repository.create(Kind.MOVIE, "мой"))
     await repository.assign(other, await repository.create(Kind.MOVIE, "чужой"))
 
-    assert [name for _, name in await repository.tags_of(mine)] == ["мой"]
+    assert [tag.name for tag in await repository.tags_of(mine)] == ["мой"]
 
 
 async def test_tags_of_a_card_keep_the_manual_order(sessions, card):
@@ -203,7 +204,7 @@ async def test_tags_of_a_card_keep_the_manual_order(sessions, card):
 
     await repository.reorder(Kind.MOVIE, [third, first, second])
 
-    assert [name for _, name in await repository.tags_of(item_id)] == [
+    assert [tag.name for tag in await repository.tags_of(item_id)] == [
         "третий", "первый", "второй",
     ]
 
@@ -263,7 +264,7 @@ async def test_rename_keeps_the_tag_on_its_cards(sessions, card):
 
     await repository.rename(tag_id, "переслушать")
 
-    assert [name for _, name in await repository.tags_of(item_id)] == ["переслушать"]
+    assert [tag.name for tag in await repository.tags_of(item_id)] == ["переслушать"]
 
 
 async def test_rename_into_an_occupied_name_is_refused(sessions):
@@ -276,7 +277,7 @@ async def test_rename_into_an_occupied_name_is_refused(sessions):
     with pytest.raises(TagExists):
         await repository.rename(first, "второй")
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["первый", "второй"]
 
 
@@ -288,7 +289,7 @@ async def test_renaming_into_a_name_from_another_set_is_allowed(sessions):
 
     await repository.rename(movie_tag, "игровой")
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["игровой"]
 
 
@@ -299,7 +300,7 @@ async def test_rename_touches_only_the_asked_tag(sessions):
 
     await repository.rename(first, "переименованный")
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["переименованный", "второй"]
 
 
@@ -325,5 +326,5 @@ async def test_deleting_a_tag_takes_only_that_tag(sessions):
 
     await repository.delete(first)
 
-    names = [name for _, name in await repository.list_for_kind(Kind.MOVIE)]
+    names = [tag.name for tag in await repository.list_for_kind(Kind.MOVIE)]
     assert names == ["второй"]

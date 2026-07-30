@@ -52,12 +52,16 @@ async def test_a_failed_download_is_a_refusal(posters):
 
 
 async def test_an_empty_body_is_a_refusal(posters):
-    """Пустоту ловит проверка подписи: подписи у неё нет."""
+    """Пустоту ловит проверка подписи: подписи у неё нет.
+
+    Причина здесь `BROKEN`, а не `NETWORK`: CDN ответил, просто ответил ничем, —
+    и подмена причины заставила бы вызывающего считать это временным обрывом."""
     service = poster_service(posters, responding(content=b""))
     result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
     await service.aclose()
 
     assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
 
 
 async def test_a_page_instead_of_a_picture_is_a_refusal(posters):

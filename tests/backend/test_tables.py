@@ -37,16 +37,23 @@ async def test_every_index_from_the_spec_exists_in_the_database(engine):
     async with engine.connect() as connection:
         built = await connection.run_sync(
             lambda sync: {
-                index["name"]
+                # Имя вместе со столбцами: по одному имени индекс, переставленный
+                # на другую колонку, неотличим от нужного.
+                (index["name"], tuple(index["column_names"]))
                 for name in TABLES
                 for index in inspect(sync).get_indexes(name)
             }
         )
     assert {
-        "ix_item_kind", "ix_item_kind_year", "ix_rating_score",
-        "ix_rating_updated_at", "ix_wishlist_added_at", "ix_item_genre_genre_id",
-        "ix_item_tag_tag_id", "ix_person_credit_person_id",
-        "ix_company_credit_company_id",
+        ("ix_item_kind", ("kind",)),
+        ("ix_item_kind_year", ("kind", "year")),
+        ("ix_rating_score", ("score",)),
+        ("ix_rating_updated_at", ("updated_at",)),
+        ("ix_wishlist_added_at", ("added_at",)),
+        ("ix_item_genre_genre_id", ("genre_id",)),
+        ("ix_item_tag_tag_id", ("tag_id",)),
+        ("ix_person_credit_person_id", ("person_id",)),
+        ("ix_company_credit_company_id", ("company_id",)),
     } <= built
 
 

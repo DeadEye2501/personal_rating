@@ -5,11 +5,27 @@ from datetime import datetime
 from backend.model import (
     CompanyRole,
     Credit,
+    ExternalId,
     ExternalRating,
     GenreSource,
+    IdSource,
     RatingSource,
     Source,
 )
+
+
+def identifier(source: IdSource, value) -> tuple[ExternalId, ...]:
+    """Один чужой идентификатор или ни одного.
+
+    Отбрасывается по `is None`, а не по ложности: у Кинопоиска номер приезжает
+    числом, и ноль идентификатором не бывает — а вот пустая строка от TMDB
+    означает ровно «не дал», поэтому её здесь тоже нет.
+
+    Число приводится к строке: в базе колонка текстовая, и два пути записи
+    разошлись бы типом."""
+    if value is None or value == "":
+        return ()
+    return (ExternalId(source=source, value=str(value)),)
 
 
 def genres(

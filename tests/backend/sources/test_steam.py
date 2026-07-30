@@ -52,7 +52,12 @@ def test_empty_search_is_an_empty_list(fixture):
     assert parse_search(fixture("steam/search_empty.json")) == []
 
 
-def test_card_carries_developers_and_publishers(fixture):
+def test_card_carries_both_studio_roles(fixture):
+    """Обе роли доезжают до карточки. Привязка роли к студии здесь не
+    проверяется и проверена быть не может: в записанном ответе разработчик и
+    издатель — одна и та же студия, и обмен ключей местами набор пар не изменит.
+    Сторожит привязку `test_convert.py:test_the_developer_is_not_the_publisher`,
+    где имена нарочно разные."""
     card = parse_card(block_of(fixture("steam/appdetails.json")))
 
     roles = {company.role for company in card.companies}
@@ -267,6 +272,7 @@ async def test_success_without_data_is_a_refusal_not_a_crash():
     await client.aclose()
 
     assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
 
 
 async def test_search_answering_with_an_object_does_not_crash():

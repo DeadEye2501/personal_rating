@@ -1,4 +1,4 @@
-"""Страницы разделов и гистограмма для показа."""
+"""Что показывает раздел."""
 
 from backend.model import CardView, Feed, Filters, Histogram, Kind
 from backend.storage.repository.sections import SectionsRepository

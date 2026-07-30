@@ -79,6 +79,17 @@ def test_movie_imdb_id_is_taken_from_the_top_level(fixture):
     assert imdb and imdb[0].value.startswith("tt")
 
 
+def test_an_empty_imdb_id_is_not_an_identifier(fixture):
+    """TMDB кладёт в `imdb_id` пустую строку, когда его не знает. Записать её
+    значит завести в базе идентификатор, по которому не спросить ни MDBList, ни
+    OMDB, ни Кинопоиск, — а строка займёт пару уникальности."""
+    payload = fixture("tmdb/movie_detail.json") | {"imdb_id": ""}
+
+    card = parse_movie(payload)
+
+    assert card.external_ids == ()
+
+
 def test_tmdb_own_rating_survives_into_the_card(fixture):
     """В SearchHit она попадала, а после сохранения карточки исчезала бы до
     приезда MDBList — при том что приходит в этом же ответе даром."""
@@ -310,8 +321,9 @@ def test_the_cheap_request_brings_only_the_counts(fixture):
     """167 КБ довеска ради двух чисел — это и есть причина отдельного метода."""
     counts = parse_series_counts(fixture("tmdb/tv_detail.json"))
 
-    assert counts.seasons is not None
-    assert counts.episodes is not None
+    # Значения, а не «не пусто»: у «Andor» их два и двадцать четыре, и обмен
+    # сезонов с сериями местами проверку на непустоту прошёл бы насквозь.
+    assert (counts.seasons, counts.episodes) == (2, 24)
 
 
 async def test_the_cheap_request_asks_without_appendages():

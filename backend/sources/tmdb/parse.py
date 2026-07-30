@@ -4,7 +4,6 @@ from datetime import date, datetime
 
 from backend.model import (
     Credit,
-    ExternalId,
     ExternalRating,
     GenreSource,
     IdSource,
@@ -17,7 +16,7 @@ from backend.model import (
     Source,
     SourceCard,
 )
-from backend.sources.convert import genres, rating, year
+from backend.sources.convert import genres, identifier, rating, year
 
 POSTER_BASE = "https://image.tmdb.org/t/p/w500"
 
@@ -53,12 +52,6 @@ def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]:
 
 def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]:
     return rating(RatingSource.TMDB, payload.get("vote_average"), now)
-
-
-def _imdb(value: str | None) -> tuple[ExternalId, ...]:
-    """Пусто, если источник его не дал: без `imdb_id` не спросить ни MDBList,
-    ни OMDB, ни Кинопоиск, но и записывать в связку нечего."""
-    return (ExternalId(source=IdSource.IMDB, value=value),) if value else ()
 
 
 def _person(row: dict, role: PersonRole, position: int | None = None) -> Credit:
@@ -161,7 +154,7 @@ def parse_movie(payload: dict) -> SourceCard:
                    runtime=payload.get("runtime") or None),
         genre_ext_ids=_genres(payload),
         people=tuple(people),
-        external_ids=_imdb(payload.get("imdb_id")),
+        external_ids=identifier(IdSource.IMDB, payload.get("imdb_id")),
         ratings=_own_rating(payload, now),
     )
 
@@ -190,7 +183,8 @@ def parse_series(payload: dict) -> SourceCard:
         genre_ext_ids=_genres(payload),
         people=tuple(people),
         # У сериала на верхнем уровне `imdb_id` нет вовсе — он в довеске.
-        external_ids=_imdb((payload.get("external_ids") or {}).get("imdb_id")),
+        external_ids=identifier(IdSource.IMDB,
+                              (payload.get("external_ids") or {}).get("imdb_id")),
         ratings=_own_rating(payload, now),
     )
 

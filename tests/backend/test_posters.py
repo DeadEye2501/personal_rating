@@ -1,6 +1,7 @@
 """Хранилище постеров вторым файлом базы."""
 
-from datetime import datetime, timedelta
+import sqlite3
+from datetime import timedelta
 
 from sqlalchemy import select
 
@@ -14,19 +15,10 @@ OTHER = "другая обложка".encode()
 
 
 async def test_put_and_get(posters):
+    """Байты возвращаются теми же: пройди картинка через кодировку, PNG перестал
+    бы открываться."""
     await posters.put(1, PICTURE, now=WHEN)
     assert await posters.get(1) == PICTURE
-
-
-async def test_bytes_come_back_exactly_as_written(posters):
-    """Картинка — байты, а не текст: пройди она через кодировку, PNG перестал
-    бы открываться, а длина осталась бы похожей."""
-    await posters.put(1, PICTURE, now=WHEN)
-
-    stored = await posters.get(1)
-    assert isinstance(stored, bytes)
-    assert stored[:8] == b"\x89PNG\r\n\x1a\n"
-    assert len(stored) == len(PICTURE)
 
 
 async def test_pictures_of_different_cards_do_not_mix(posters):
@@ -77,18 +69,27 @@ async def test_second_put_moves_the_fetch_time(posters, tmp_path):
     await engine.dispose()
 
 
-async def test_the_fetch_time_comes_back_a_time(posters, tmp_path):
-    """Колонка объявлена временем, а не текстом: строкой она бы вернулась
-    строкой, и сравнение с датой перестало бы что-либо значить."""
+async def test_the_fetch_time_is_stored_as_a_time_and_not_as_text(posters,
+                                                                  tmp_path):
+    """Колонка объявлена временем. Читается сырым `sqlite3`, а не через ту же
+    типизированную колонку: SQLAlchemy применил бы обратное превращение и отдал
+    `datetime` даже из текста, то есть скрыл бы ровно ту подмену, ради которой
+    проверка написана."""
     await posters.put(1, PICTURE, now=WHEN)
+    await posters.close()
 
-    engine = create_engine(tmp_path / "posters.db")
-    async with engine.connect() as connection:
-        stored = await connection.execute(
-            select(poster.c.fetched_at).where(poster.c.item_id == 1)
-        )
-        assert isinstance(stored.scalar(), datetime)
-    await engine.dispose()
+    connection = sqlite3.connect(tmp_path / "posters.db")
+    try:
+        stored = connection.execute(
+            "SELECT fetched_at FROM poster WHERE item_id = 1"
+        ).fetchone()[0]
+    finally:
+        connection.close()
+
+    # Драйвер кладёт время строкой ISO с пробелом вместо «T» и с микросекундами.
+    # Это и есть отпечаток объявленного типа: `isoformat()` без них дал бы другую
+    # строку, а сам `WHEN` — вообще не строку.
+    assert stored == "2026-07-29 12:00:00.000000"
 
 
 async def test_the_store_makes_its_folder(tmp_path):

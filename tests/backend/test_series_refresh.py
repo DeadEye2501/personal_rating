@@ -14,7 +14,7 @@ from backend.model import (
     SeriesCounts,
     Source,
 )
-from backend.service.loading import REFRESH_TTL, Loader
+from backend.service.series import REFRESH_TTL, SeriesRefresh
 from backend.storage.repository.library import LibraryRepository
 from tests.conftest import MOMENT, FakeClient, FakeSources, an_item
 
@@ -36,24 +36,23 @@ def series(synced_at, seasons=1, episodes=12) -> Item:
 
 @pytest.fixture
 async def refresher(sessions):
-    """Загрузчик с остановленными часами: срок годности — предмет проверки, и
+    """Перезапрос с остановленными часами: срок годности — предмет проверки, и
     зависеть она от настоящего времени не должна."""
 
     def build(outcome):
         tmdb = FakeTmdb(outcome)
-        loader = Loader(library=LibraryRepository(sessions), writer=None,
-                        sources=FakeSources(tmdb), posters=None,
-                        clock=lambda: MOMENT)
-        return loader, tmdb
+        service = SeriesRefresh(library=LibraryRepository(sessions),
+                                sources=FakeSources(tmdb), clock=lambda: MOMENT)
+        return service, tmdb
 
     return build
 
 
 async def test_a_stale_series_gets_new_counts(sessions, refresher):
     item_id = await LibraryRepository(sessions).create(series(LONG_AGO))
-    loader, _ = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, _ = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.seasons_count, stored.episodes_count) == (2, 24)
@@ -62,9 +61,9 @@ async def test_a_stale_series_gets_new_counts(sessions, refresher):
 async def test_the_refreshed_card_gets_a_new_moment(sessions, refresher):
     """Иначе следующий показ пойдёт за теми же числами опять."""
     item_id = await LibraryRepository(sessions).create(series(LONG_AGO))
-    loader, _ = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, _ = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert stored.synced_at == MOMENT
@@ -77,9 +76,9 @@ async def test_a_half_empty_answer_does_not_erase_what_was_known(sessions,
     item_id = await LibraryRepository(sessions).create(
         series(LONG_AGO, seasons=1, episodes=12)
     )
-    loader, _ = refresher(Found(SeriesCounts(seasons=2, episodes=None)))
+    service, _ = refresher(Found(SeriesCounts(seasons=2, episodes=None)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.seasons_count, stored.episodes_count) == (2, 12)
@@ -87,9 +86,9 @@ async def test_a_half_empty_answer_does_not_erase_what_was_known(sessions,
 
 async def test_a_fresh_series_is_not_asked_about(sessions, refresher):
     item_id = await LibraryRepository(sessions).create(series(MOMENT))
-    loader, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     assert tmdb.asked == []
 
@@ -104,9 +103,9 @@ async def test_the_edge_of_the_term_is_not_stale_yet(sessions, refresher):
     item_id = await LibraryRepository(sessions).create(
         series(MOMENT - REFRESH_TTL)
     )
-    loader, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     assert tmdb.asked == []
 
@@ -115,9 +114,9 @@ async def test_a_day_past_the_term_is_stale(sessions, refresher):
     item_id = await LibraryRepository(sessions).create(
         series(MOMENT - REFRESH_TTL - timedelta(days=1))
     )
-    loader, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     assert tmdb.asked == ["83867"]
 
@@ -128,9 +127,9 @@ async def test_a_film_is_never_re_asked(sessions, refresher):
         Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
              title="Интерстеллар", synced_at=LONG_AGO)
     )
-    loader, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     assert tmdb.asked == []
 
@@ -141,18 +140,18 @@ async def test_a_manual_card_is_never_re_asked(sessions, refresher):
         Item(id=0, kind=Kind.SERIES, source=Source.MANUAL,
              source_id="9f1c-своя", title="Своё", synced_at=LONG_AGO)
     )
-    loader, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     assert tmdb.asked == []
 
 
 async def test_a_refusal_leaves_the_card_as_it_was(sessions, refresher):
     item_id = await LibraryRepository(sessions).create(series(LONG_AGO))
-    loader, _ = refresher(Refusal(source="tmdb", reason=Reason.NETWORK))
+    service, _ = refresher(Refusal(source="tmdb", reason=Reason.NETWORK))
 
-    await loader.refresh(item_id)
+    await service.refresh(item_id)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.seasons_count, stored.synced_at) == (1, LONG_AGO)
@@ -163,14 +162,14 @@ async def test_a_broken_client_leaves_the_card_as_it_was(sessions, refresher,
     """Сорвавшийся клиент — тот же отказ: карточка остаётся прежней, а наружу
     исключение не летит."""
     item_id = await LibraryRepository(sessions).create(series(LONG_AGO))
-    loader, tmdb = refresher(None)
+    service, tmdb = refresher(None)
 
     async def broken(source_id):
         raise RuntimeError("разбор не удался")
 
     tmdb.series_counts = broken
     with caplog.at_level("ERROR"):
-        await loader.refresh(item_id)
+        await service.refresh(item_id)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.seasons_count, stored.synced_at) == (1, LONG_AGO)
@@ -179,10 +178,10 @@ async def test_a_broken_client_leaves_the_card_as_it_was(sessions, refresher,
 async def test_a_vanished_series_is_logged_and_kept(sessions, refresher, caplog):
     """Карточка твоя: из TMDB пропала — у тебя осталась."""
     item_id = await LibraryRepository(sessions).create(series(LONG_AGO))
-    loader, _ = refresher(Missing())
+    service, _ = refresher(Missing())
 
     with caplog.at_level("WARNING"):
-        await loader.refresh(item_id)
+        await service.refresh(item_id)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.seasons_count, stored.synced_at) == (1, LONG_AGO)
@@ -190,8 +189,8 @@ async def test_a_vanished_series_is_logged_and_kept(sessions, refresher, caplog)
 
 
 async def test_an_unknown_card_is_simply_skipped(sessions, refresher):
-    loader, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
+    service, tmdb = refresher(Found(SeriesCounts(seasons=2, episodes=24)))
 
-    await loader.refresh(999999)
+    await service.refresh(999999)
 
     assert tmdb.asked == []

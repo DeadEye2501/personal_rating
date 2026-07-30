@@ -7,7 +7,7 @@ from typing import ClassVar
 import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, RatingSource, Reason, Refusal
-from backend.sources.errors import parsed
+from backend.sources.errors import is_json, parsed, refuse_code
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.parse import parse_ratings
 
@@ -74,17 +74,13 @@ class MdbListClient:
             return Refusal(source="mdblist", reason=Reason.QUOTA, retry_after=delay)
         if status in (401, 403):
             return self._denied(response)
-        return Refusal(
-            source="mdblist", reason=Reason.BROKEN, detail=f"HTTP {status}"
-        )
+        return refuse_code("mdblist", status)
 
     def _denied(self, response: httpx.Response) -> Refusal:
         """403 бывает и от Cloudflare с телом «error code: 1010» — тогда запрос
         до MDBList вообще не дошёл, и ключ тут ни при чём. Отличает их не код, а
         тело: у чужого периметра оно не JSON."""
-        try:
-            response.json()
-        except ValueError:
+        if not is_json(response):
             logger.warning("mdblist: чужой периметр — %s", response.text[:80])
             return Refusal(
                 source="mdblist",

@@ -30,6 +30,13 @@ def red_box(data: bytes) -> tuple[int, int, int, int] | None:
     return red.point(lambda value: 255 if value > 200 else 0).getbbox()
 
 
+def test_the_target_size_is_five_hundred_by_seven_fifty():
+    """Единственное место, где размер написан литералом: остальные сверяют его с
+    `TARGET_SIZE`, то есть с самим объявлением, и переедут вместе с ним. А выбран
+    он не на глаз — это w500 у TMDB, из которого спека считает ~80 КБ на постер."""
+    assert size_of(crop_to_cover(picture(2000, 1000))) == (500, 750)
+
+
 def test_a_wide_picture_comes_out_the_target_size():
     assert size_of(crop_to_cover(picture(2000, 1000))) == TARGET_SIZE
 

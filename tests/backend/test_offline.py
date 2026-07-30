@@ -23,6 +23,7 @@ from backend.storage.repository.external import (
     ExternalIdsRepository,
     ExternalRatingsRepository,
 )
+from backend.storage.posters import NotOpened
 from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
 from tests.conftest import MOMENT, PICTURE, RATED, WANTED, an_item
@@ -130,7 +131,7 @@ async def test_tags_are_edited(offline):
 
     await offline.tags.assign(item_id, tag_id)
 
-    assert [name for _, name in await offline.tags.tags_of(item_id)] == [
+    assert [tag.name for tag in await offline.tags.tags_of(item_id)] == [
         "пересмотреть"
     ]
 
@@ -259,10 +260,11 @@ async def test_everything_closes_and_lets_go(tmp_path):
     await backend.aclose()
 
     assert backend._engine.pool.checkedin() == 0
-    # PosterStore.close() закрывает соединение, и обращение после этого падает.
-    # Если он окажется способен открыться заново, тест покраснеет — и это
-    # правильный сигнал: закрытие тогда не закрытие.
-    with pytest.raises(Exception):
+    # Закрытое хранилище отказывает своим отказом, а не любой ошибкой: широкий
+    # `Exception` поймал бы и опечатку в самом тесте, и закрытие осталось бы
+    # непроверенным. Окажись хранилище способно открыться заново — тест
+    # покраснеет, и это правильный сигнал: закрытие тогда не закрытие.
+    with pytest.raises(NotOpened):
         await backend.posters._store.get(1)
     for connection in backend._sources.connections:
         with pytest.raises(RuntimeError):

@@ -102,9 +102,13 @@ async def test_a_broken_answer_is_a_refusal():
 
 
 async def test_a_server_error_is_a_refusal():
+    """Причина проверяется вместе с типом: у неописанного кода магазина она
+    `BROKEN`, и подмена её на `KEY` в `sources/undocumented.py` заставила бы
+    человека искать несуществующий ключ GOG."""
     result = await client(lambda request: httpx.Response(500)).resolve_slug(SLUG)
 
     assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
 
 
 async def test_a_dead_network_is_a_refusal():

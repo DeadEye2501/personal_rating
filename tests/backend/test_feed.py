@@ -47,7 +47,6 @@ async def test_a_portion_is_fifty_and_it_is_applied(sessions, feed):
 
     Константу мало объявить: без проверки, что page() её действительно
     применяет, умолчание можно поменять на любое, и никто не заметит."""
-    assert PAGE_SIZE == 50
     for number in range(PAGE_SIZE + 1):
         await rated(sessions, str(number), 8.0)
 

@@ -58,7 +58,9 @@ async def test_the_known_part_survives_the_unknown(sessions, reference, caplog):
 
 
 async def test_nothing_asked_is_nothing_resolved(sessions, reference):
-    """Пустой список — не повод идти в базу и не повод падать."""
+    """Пустой список не повод падать. Про «не повод идти в базу» здесь не
+    утверждается: ранний выход не наблюдается — `in_([])` вернул бы ту же
+    пустоту, и проверить его можно было бы только счётчиком запросов."""
     assert await GenresRepository(sessions).resolve(GenreSource.TMDB, []) == []
 
 

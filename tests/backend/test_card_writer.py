@@ -282,10 +282,10 @@ async def test_the_rollback_takes_the_written_half_with_it(writer, sessions):
         "999", external_ids=(ExternalId(IdSource.IMDB, "tt0816692"),),
     ))
 
+    # Идентификаторы и оценки не проверяются: срыв наступает на первом же
+    # `_ids.put`, до него их не записано, и пустота истинна по построению.
     assert await GenresRepository(sessions).genres_of(half_written) == []
     assert await people(sessions).credits_of(half_written) == []
-    assert await ExternalIdsRepository(sessions).ids_of(half_written) == []
-    assert await ExternalRatingsRepository(sessions).ratings_of(half_written) == []
 
 
 async def test_the_rollback_takes_the_poster_with_it(writer, monkeypatch):

@@ -95,7 +95,12 @@ def test_a_genre_is_not_labelled_as_a_tag():
     assert marked == ((GenreSource.GOG, "rpg"), (GenreSource.GOG_TAG, "story-rich"))
 
 
-def test_developers_and_publishers_are_companies(fixture):
+def test_both_studio_roles_are_companies(fixture):
+    """Обе роли доезжают до карточки. Привязка роли к студии здесь не
+    проверяется и проверена быть не может: в записанном ответе разработчик и
+    издатель — одна и та же студия, и обмен ключей местами набор пар не изменит.
+    Сторожит привязку `test_convert.py:test_the_developer_is_not_the_publisher`,
+    где имена нарочно разные."""
     cards = parse_catalog(fixture("gog/catalog.json"))
 
     roles = {one.role for card in cards for one in card.companies}
@@ -275,3 +280,4 @@ async def test_unexpected_shape_does_not_crash_the_parser():
     await client.aclose()
 
     assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN

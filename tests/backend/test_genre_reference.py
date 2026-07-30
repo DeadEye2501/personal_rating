@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+from importlib import import_module
 
 import sqlalchemy
 from sqlalchemy import text
@@ -126,12 +127,42 @@ def test_every_mapping_matches_the_spec():
     Тестами проверены числа, ловушки и границы наборов — но подмена жанра у
     одного идентификатора чисел не меняет, и таких строк 326. Сверку делает
     `scripts/genre_map.py`, и запускается она здесь, иначе не запускается
-    нигде."""
+    нигде.
+
+    Сверяются два объявления — спека против исходника миграции, — и до базы эта
+    проверка не доходит. Что объявленное в неё доехало, сторожит соседний
+    `test_the_declared_mappings_all_reached_the_database`."""
     done = subprocess.run(
         [sys.executable, "scripts/genre_map.py"],
         cwd=ROOT, capture_output=True, text=True,
     )
     assert done.returncode == 0, done.stdout + done.stderr
+
+
+def test_the_declared_mappings_all_reached_the_database(migrated):
+    """Объявленное в миграции против того, что легло в базу.
+
+    Числа этого не показывают: `upgrade` кладёт строки в трёх вложенных циклах,
+    и промах в имени жанра дал бы ту же 326 при другом соответствии. Здесь
+    сравниваются пары «источник и чужая метка» — их 326 против 326, но уже
+    поимённо."""
+    module = import_module("migrations.versions.0002_genres")
+    declared = {
+        (source, ext_id)
+        for source, mapping in (
+            ("tmdb", module.TMDB), ("steam", module.STEAM),
+            ("steam_tag", module.STEAM_TAG), ("gog", module.GOG),
+            ("gog_tag", module.GOG_TAG),
+        )
+        for ext_id in mapping
+    }
+
+    stored = {
+        (row.source, row.ext_id)
+        for row in migrated.execute(text("SELECT source, ext_id FROM genre_map"))
+    }
+
+    assert stored == declared
 
 
 def test_every_mapping_leads_to_an_existing_genre(migrated):

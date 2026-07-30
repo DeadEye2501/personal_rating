@@ -5,7 +5,7 @@ import logging
 import httpx
 
 from backend.model import Kind, Missing, Outcome, Reason, Refusal
-from backend.sources.errors import parsed
+from backend.sources.errors import is_json, parsed
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.mirror import (
     SOURCE,
@@ -65,9 +65,7 @@ class PoiskkinoClient:
         стоит Envoy, и при падении апстрима он отдаёт свой 404 обычным текстом.
         Записать такую страницу как «Кинопоиск не знает этот фильм» значит
         поселить в базе ложь на неделю."""
-        try:
-            response.json()
-        except ValueError:
+        if not is_json(response):
             return Refusal(
                 source=SOURCE,
                 reason=Reason.BROKEN,

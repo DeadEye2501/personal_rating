@@ -134,187 +134,33 @@ rowid. Заводить индекс ради проверки не стоит.
 
 ---
 
-## Не сделано, решения нет
+## Сделано 30.07.2026
 
-Двадцать восемь находок уровня Minor из ревью 30.07.2026. Ни одна не портит данные
-и не прячет поломку — это чистка. Полные разборы — в отчётах
-`docs/reviews/2026-07-30-backend-full-*.md`.
+Двадцать восемь находок уровня Minor закрыты по просьбе пользователя. Что вышло
+сверх ожидаемого — записано здесь, потому что это уже не «мелочи», а решения:
 
-### Тесты: лишнее и слабое (17)
-
-**Проверки, которые не могут покраснеть:**
-
-- `test_user_agent_is_always_sent` (`tests/backend/sources/test_http.py`) — второй
-  `assert` проверяет непустоту строки, уже сверенной на равенство непустому
-  литералу. Удалить.
-- `test_link_refreshes_synced_at` (`tests/backend/test_manual_cards.py`) —
-  `assert LATER > before` сравнивает две константы `conftest.py`, к бэкенду
-  отношения не имеющие. Удалить.
-- `test_the_rollback_takes_the_written_half_with_it`
-  (`tests/backend/test_card_writer.py`) — проверки `ids_of` и `ratings_of` пусты по
-  построению: срыв наступает на первом же `_ids.put`. Убрать или навести срыв
-  позже.
-
-**Тест повторяет число, написанное в коде:**
-
-- `tests/backend/test_images.py` — размер сверяется с `TARGET_SIZE`, импортированной
-  из проверяемого модуля. Замена `TARGET_SIZE` на `(100, 150)` оставляет файл
-  зелёным, а обоснование «~80 КБ на постер» — невыполненным. Нужен один тест с
-  литералом.
-- `assert PAGE_SIZE == 50` в `test_feed.py` и `assert SEARCH_SIZE == 20` в
-  `test_no_more_than_a_portion_comes_back` (`test_search_local.py`) — величина
-  порции объявлена настройкой, а не свойством схемы; строку убрать, применение
-  константы в обоих тестах проверяется дальше. В `test_series_refresh.py` похожую
-  строку **оставить**: там она единственный сторож величины.
-- `test_unnamed_timeout_is_the_generous_one` (`test_http.py`) — читает
-  `DEFAULT_TIMEOUT` и сверяет с ним же. Либо снять, либо утверждать «не меньше 20».
-
-**Набор вместо привязки (сегодня безвредно):**
-
-- `tests/backend/sources/test_steam.py` и `test_gog.py` — множество ролей студий;
-  обмен ключей в `sources/convert.py:companies` множества не меняет. Дыру закрывает
-  `test_convert.py:test_the_developer_is_not_the_publisher`, но имя обещает больше.
-  Сверять пары «роль и имя».
-- `test_one_value_may_belong_to_two_different_sources` (`test_external_ids.py`) —
-  сравнивает множество источников; перестановка `source` и `value` в
-  `storage/repository/external.py` этим не различается.
-- `test_the_cheap_request_brings_only_the_counts` (`test_tmdb_card.py`) — проверяет,
-  что оба числа не `None`; обмен `seasons`/`episodes` не различает. Утверждать
-  значения.
-- `test_every_index_from_the_spec_exists_in_the_database` (`test_tables.py`) —
-  сверяет только имена индексов, столбцы нет. Косметика: перекрёстную сверку делает
-  `test_migrations.py`.
-
-**Отказ без причины или без источника:**
-
-- `tests/backend/sources/test_steam.py`, `test_gog.py`, `test_gog_slug.py` — только
-  `isinstance(result, Refusal)`. Подмена `Reason.BROKEN` на `Reason.KEY` в
-  `sources/undocumented.py` пройдёт мимо. Дописать `result.reason`.
-- `test_an_empty_body_is_a_refusal` (`test_poster_service.py`) — то же; подмена на
-  `Reason.NETWORK` в `service/posters.py` заставит вызывающего считать это
-  временным обрывом.
-- `test_a_broken_client_writes_nothing_either` (`test_enrich.py`) — берёт `caplog` и
-  оборачивает вызов в `at_level("ERROR")`, но про лог не утверждает ничего. Замена
-  `logger.exception` на `logger.debug` в `service/asking.py` пройдёт молча (ловит
-  только `test_asking.py`).
-
-**Чтение объявления там, где следствие доступно:**
-
-- `test_the_fetch_time_comes_back_a_time` (`test_posters.py`) — читает через ту же
-  типизированную колонку, которой писал; `now.isoformat()` в `storage/posters.py`
-  пройдёт молча. Читать сырым `sqlite3`, как сделано в `test_card_writer.py`.
-- `test_every_mapping_matches_the_spec` (`test_genre_reference.py`) — сверяет два
-  объявления: таблицы в markdown против словарей, вычитанных из исходника миграции
-  текстом. До базы не доходит. Читать `genre_map` из фикстуры `migrated`.
-- `test_reasons_cover_every_way_a_source_can_refuse`
-  (`tests/backend/sources/test_errors.py`) — читает `Reason` и сверяет со словарём в
-  тесте; упадёт на законном расширении перечня. Оставить только соседа, который
-  проверяет подстановку в текст.
-- `test_refusal_takes_its_fields_in_the_written_order` (там же) — докстринг
-  утверждает, что перепутанные местами имя с причиной разошлись бы молча, но
-  позиционно `Refusal` собирает единственный вызов — сам этот тест. Удалить.
-- четыре теста полей и умолчаний `Refusal` (там же) проверяют работу `@dataclass`.
-  Сократить, оставив `test_missing_is_an_answer_not_a_silence`,
-  `test_refusal_is_not_an_answer`, `test_found_is_an_answer_too` и
-  `test_outcome_cannot_be_changed_by_whoever_received_it`.
-
-**Дубли и мёртвые кейсы:**
-
-- `test_bytes_come_back_exactly_as_written` (`test_posters.py`) — строго слабее
-  соседа, который сравнивает байты целиком. Удалить.
-- `test_both_mirrors_report_the_same_owner` (`test_kinopoisk.py`) — то же, что уже
-  утверждают два теста выше, только по первому элементу.
-- `test_series_ask_the_same_three` (`test_registry.py`) — сравнивает ветку кода саму
-  с собой: `rating_sources(SERIES)` и `rating_sources(MOVIE)` — один `return`.
-- `test_what_is_not_in_the_reference_is_dropped_without_a_word` (`test_genres.py`) —
-  четыре кейса оказываются одним: фикстура `reference` содержит только `tmdb` и
-  `steam`, строк `gog` в ней нет вовсе, поэтому «отвергнутый слаг» неотличим от
-  «совсем нового жанра». Положить в фикстуру хотя бы одну строку `gog`.
-- `test_nothing_asked_is_nothing_resolved` (`test_genres.py`) — докстринг обещает,
-  что пустой список не повод идти в базу; ранний выход не наблюдается. Либо считать
-  запросы, либо убрать утверждение из докстринга.
-- `test_nothing_excluded_changes_nothing` (`test_sections.py`) — посылка докстринга
-  неверна: в SQLAlchemy 2.0.51 `x NOT IN ()` рендерится в истину для всех строк,
-  поэтому охраняющие `if` в `_excluded` наблюдаемого поведения не меняют.
-  Охраняются `if` в `_included`, где `IN ()` компилируется в ложь.
-- два теста `test_registry.py`, читающие `inspect.signature`, — ловят арность и
-  порядок, но **не** `client.name`, на который опираются три сервиса: снятие
-  свойства `name` у каталожного клиента оставит реестр зелёным, а `answered(...)`
-  упадёт на `AttributeError`.
-- `pytest.raises(Exception)` в `test_everything_closes_and_lets_go`
-  (`test_offline.py`) поймает и постороннюю поломку вместо ожидаемого отказа
-  закрытого хранилища. Сузить до типа, который бросает `PosterStore`.
-
-**Тесты, которым сегодня нечего проверять** — не долг, заготовки под план 5, но при
-подсчёте покрытия их считать нельзя:
-
-- `test_client_does_not_import_storage_libraries` и
-  `test_client_takes_only_the_boundary_types_from_the_backend` (`test_layers.py`) —
-  пакет `client/` состоит из одного пустого `__init__.py`.
-- две проверки `log_file` и `log_level` в `test_config.py` — потребителя у этих
-  настроек в бэкенде нет, `logging.basicConfig` появляется в плане 5.
-
-### Повторы: пять мест, где готовое заперто не там (5)
-
-- **`ViewsRepository._external` и `._identifiers`** — тела совпадают до имени
-  таблицы и сборщика. Вынести `_by_source(session, table, item_ids, make)`.
-  Остальные четыре `_*`-метода под него не подойдут: `_genres` и `_tags` соединяют
-  вторую таблицу, `_ratings` и `_wishlist` отдают не список.
-- **«Один чужой идентификатор или ни одного» написано дважды** — `_ident` в
-  `sources/ratings/kinopoisk/parse.py` и `_imdb` в `sources/tmdb/parse.py`. Место
-  для общего есть — `sources/convert.py`, где уже живёт `rating`. Копии разошлись
-  мелочью: `_imdb` отбрасывает по ложности, `_ident` по `is None`, и `_ident`
-  получает число. При выносе правило отбрасывания выбрать вслух: ноль
-  идентификатором не бывает, значит `is None`.
-- **Пролог `parse_poiskkino` и `parse_unofficial`** — четыре первые строки
-  совпадают до имени ключа. Общее у зеркал живёт в
-  `sources/ratings/kinopoisk/mirror.py`, туда и просится `_first_row(payload, key)`.
-- **«Незнакомый код → `HTTP {status}`» в четырёх местах** — `refuse_code` в
-  `mirror.py`, `MdbListClient._denied`, `refuse_undocumented`, `classify` у TMDB.
-  Функция уже есть, но заперта в модуле Кинопоиска и держит его `SOURCE` внутри.
-  Перенести `refuse_code(source, status)` в `sources/errors.py` к `broken`.
-  Формулировку TMDB не трогать: она несёт второе число.
-- **«Коду без JSON-тела не верим» написано дважды** — `PoiskkinoClient._absent` и
-  `MdbListClient._denied`. Выводы разные и правильно разные, общая только проверка:
-  `def is_json(response) -> bool` рядом с `SourceHttp` или в `errors.py`. Выигрыш
-  небольшой, зато приём получает имя и находится поиском.
-
-### Место кода (6)
-
-- **Докстринги с «и» при цельном модуле** — `storage/repository/genres.py`,
-  `storage/repository/tags.py`, `service/library.py`. Модули прочитаны, все три
-  цельные; проблема в формулировке: фраза с «и» ставит модуль в подозреваемые при
-  каждом ревью. Свести к одной фразе.
-- **`service/loading.py` объявлен уже, чем есть** — «Кандидат превращается в
-  карточку» это про `ensure`, а `refresh` с `REFRESH_TTL` и `_kept` — перезапрос
-  сезонов сериала, к выдаче поиска отношения не имеющий. Разделить:
-  `service/series.py` забирает `refresh`, `_kept`, `REFRESH_TTL`; в `loading.py`
-  остаются `ensure` и `card_for_link`.
-- **`tests/conftest.py` — около 360 строк и четыре сорта общего:** фикстуры базы и
-  хранилища, подставные клиенты, строители данных, константы. Разнести на
-  `tests/fakes.py` и `tests/builders.py`, оставив фикстуры и константы.
-- **`sources/registry.py` — маршрутизация вместе со сборкой.** Объявлен как «Кто
-  отвечает за какой тип содержимого», а вторая половина файла поднимает шесть
-  клиентов из `Config`. Сегодня цены у разделения нет (94 строки), но растут
-  половины от разных причин: роутинг от новых типов содержимого, сборка от новых
-  источников.
-- **`Sources.breakers()` без сегодняшнего потребителя** — единственный вызов во всём
-  проекте из `tests/backend/sources/test_registry.py`. Метод, существующий ради
-  теста, проверяющего его существование. Правило 8.
-- **`Backend._engine: object`** — аннотация не говорит ничего, при этом `aclose`
-  зовёт `.dispose()`, а тест `._engine.pool.checkedin()`. `app.py` — код бэкенда и
-  вправе назвать `AsyncEngine` своим именем; сейчас аннотация выключает проверку
-  типов на самом опасном поле сборки.
-
-### Порядок, а не утечка (1)
-
-- **Теги переезжают границу в двух видах:** `CardView.tags: tuple[Tag, ...]` против
-  `TagsRepository.tags_of() -> list[tuple[int, str]]`, который план 6 зовёт для
-  модалки тегов. Оба — простые данные, правило 10 не нарушено. Но клиент будет
-  держать одно и то же под двумя типами, а `Tag`, заведённый как тип границы, в
-  половине путей не используется.
-
----
+- **Целевой размер обложки оказался не тем, что помнил исполнитель.** Тест с
+  литералом (`test_the_target_size_is_five_hundred_by_seven_fifty`) немедленно
+  покраснел на выдуманных 600×900: настоящий размер — 500×750, w500 у TMDB.
+  Ровно то, ради чего литерал вместо сверки с константой и заводился.
+- **Привязку роли студии к её имени проверить нечем.** В записанных ответах Steam и
+  GOG разработчик и издатель — одна и та же студия, и обмен ключей местами набор
+  пар не изменит. Тесты переименованы в то, что они правда проверяют; привязку
+  сторожит `test_convert.py:test_the_developer_is_not_the_publisher`, где имена
+  нарочно разные.
+- **Закрытое хранилище постеров падало случайным `AttributeError` на `None`.**
+  Тест ловил широкий `Exception` и это прятал. Заведён свой отказ `NotOpened` — по
+  образцу `ItemExists` и `BadImage`.
+- **Порядок чужих оценок и идентификаторов в карточке ненаблюдаем.** У обеих таблиц
+  составной первичный ключ `(item_id, source)`, отбор идёт по нему же, и строки
+  приходят упорядоченными сами. Замерено: снятый `order_by` не роняет ни одного
+  теста. `order_by` оставлен, довод записан в докстринге `_by_source` — тот же
+  случай, что со вторым ключом сортировки библиотеки.
+- **Три модуля разделены:** перезапрос сериала уехал из `service/loading.py` в
+  `service/series.py`, сборка шести клиентов — из `sources/registry.py` в
+  `sources/build.py`, а `tests/conftest.py` отдал подставных клиентов в
+  `tests/fakes.py` и строителей данных в `tests/builders.py`, оставшись
+  единственной поверхностью импорта для тестов.
 
 ## Записано раньше и лежит в других местах
 

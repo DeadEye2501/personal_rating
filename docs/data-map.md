@@ -19,11 +19,12 @@
   - `search: SearchService`
   - `feed: LibraryService`
   - `loader: Loader`
+  - `series: SeriesRefresh`
   - `enricher: Enricher`
   - `linker: Linker`
   - `posters: PosterService`
   - `_sources: Sources`
-  - `_engine: object`
+  - `_engine: AsyncEngine`
 
 ### `backend/config.py`
 
@@ -305,7 +306,6 @@
 ### `backend/service/loading.py`
 
 - `logger` = `logging.getLogger(__name__)`
-- `REFRESH_TTL` = `timedelta(days=30)`
 
 ### `backend/service/posters.py`
 
@@ -316,6 +316,11 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `SEARCH_SIZE` = `20`
+
+### `backend/service/series.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `REFRESH_TTL` = `timedelta(days=30)`
 
 ### `backend/sources/convert.py`
 
@@ -667,15 +672,18 @@
 
 - `DRAMA` = `Genre(id=1, name='Драма', kind=GenreKind.FILM)`
 
-### `tests/conftest.py`
+### `tests/builders.py`
 
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `POSTER_SOURCES` = `набор из 3`
-- `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
-- `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `POSTER` = `picture(600, 900, fmt='JPEG')`
+
+### `tests/conftest.py`
+
+- `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
+- `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`
 

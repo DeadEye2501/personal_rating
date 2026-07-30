@@ -410,9 +410,13 @@ async def test_an_excluded_score_does_not_empty_the_wishlist(
     assert found == [item_id]
 
 
-async def test_nothing_excluded_changes_nothing(sessions, library, sections):
-    """Пустой набор исключений не должен превращаться в NOT IN () — такое
-    условие в SQL истинно не для всех строк, и лента опустела бы."""
+async def test_nothing_included_changes_nothing(sessions, library, sections):
+    """Пустой фильтр не должен превращаться в `IN ()`: такое условие в SQL ложно
+    для всех строк, и лента опустела бы. Охраняют это `if` в `_included`.
+
+    С исключениями наоборот, и потому они здесь не проверяются: `NOT IN ()`
+    истинно для всех строк, так что снятие охраняющих `if` в `_excluded`
+    наблюдаемого поведения не меняет вовсе."""
     ratings = RatingsRepository(sessions)
     item_id = await library.create(an_item("1", "Оценённый", year=2014))
     await ratings.set_score(item_id, 8.0, now=MOMENT)

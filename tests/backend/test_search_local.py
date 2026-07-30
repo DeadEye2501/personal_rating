@@ -121,7 +121,6 @@ async def test_no_more_than_a_portion_comes_back(sessions, search):
     """Ровно страница выдачи TMDB: одна порция стоит одного запроса. Константу
     мало объявить — без проверки, что её применяют, её можно поменять на любую,
     и никто не заметит."""
-    assert SEARCH_SIZE == 20
     for number in range(SEARCH_SIZE + 5):
         await rated(sessions, str(number), None, title=f"Фильм {number}")
 

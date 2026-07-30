@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 from backend.model import Found, Missing, Outcome, Ratings, Reason, Refusal
+from backend.sources.errors import refuse_code as code_refusal
 from backend.sources.http import SourceHttp
 
 # Наружу зеркала неразличимы: оба отдают один идентификатор и одну оценку, и в
@@ -37,7 +38,8 @@ def refuse_key() -> Refusal:
 
 
 def refuse_code(status: int) -> Refusal:
-    return Refusal(source=SOURCE, reason=Reason.BROKEN, detail=f"HTTP {status}")
+    """Обёртка над общей: имя источника у зеркал одно и подставляется здесь."""
+    return code_refusal(SOURCE, status)
 
 
 def answered(answer: Ratings) -> Outcome:

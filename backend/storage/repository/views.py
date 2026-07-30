@@ -6,10 +6,11 @@ from dataclasses import replace
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.model import CardView, Tag, view_from_item
+from backend.model import CardView, view_from_item
 from backend.storage.repository.base import Repository
 from backend.storage.repository.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.rows import (
+    to_tag,
     to_credit,
     to_external_id,
     to_external_rating,
@@ -104,7 +105,7 @@ class ViewsRepository(Repository):
             .where(item_tag.c.item_id.in_(item_ids))
             .order_by(tag.c.position),
         )
-        return self._by_card(rows, lambda row: Tag(id=row.id, name=row.name))
+        return self._by_card(rows, to_tag)
 
     async def _credits(self, session, item_ids, entity: Entity):
         """Люди и студии читаются одним кодом: для приложения эти две сущности
@@ -127,23 +128,33 @@ class ViewsRepository(Repository):
         )
         return self._by_card(rows, lambda row: to_credit(row, entity))
 
-    async def _external(self, session, item_ids):
+    async def _by_source(self, session, table, item_ids, make):
+        """Всё содержимое таблицы чужих значений, разложенное по карточкам.
+
+        Двое: чужие оценки и чужие идентификаторы. Остальные четыре `_*`-метода
+        под это не подходят — `_genres` и `_tags` соединяют вторую таблицу,
+        `_ratings` и `_wishlist` отдают не список.
+
+        Сортировка тестом не сторожится, и не может: у обеих таблиц составной
+        первичный ключ `(item_id, source)`, отбор по `item_id` идёт по нему же, и
+        строки приходят упорядоченными по источнику сами. Замерено — снятый
+        `order_by` не роняет ни одного теста. Держим потому, что порядок,
+        доставшийся от выбора индекса, документацией SQLite не обещан."""
         rows = await self._read(
             session,
-            select(external_rating)
-            .where(external_rating.c.item_id.in_(item_ids))
-            .order_by(external_rating.c.source),
+            select(table)
+            .where(table.c.item_id.in_(item_ids))
+            .order_by(table.c.source),
         )
-        return self._by_card(rows, to_external_rating)
+        return self._by_card(rows, make)
+
+    async def _external(self, session, item_ids):
+        return await self._by_source(session, external_rating, item_ids,
+                                     to_external_rating)
 
     async def _identifiers(self, session, item_ids):
-        rows = await self._read(
-            session,
-            select(external_id)
-            .where(external_id.c.item_id.in_(item_ids))
-            .order_by(external_id.c.source),
-        )
-        return self._by_card(rows, to_external_id)
+        return await self._by_source(session, external_id, item_ids,
+                                     to_external_id)
 
     async def _ratings(self, session, item_ids):
         rows = await self._read(

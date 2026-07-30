@@ -81,10 +81,12 @@ async def test_one_value_may_belong_to_two_different_sources(sessions, card):
     repository = ExternalIdsRepository(sessions)
 
     await repository.put(item_id, ExternalId(IdSource.STEAM, "292030"))
-    await repository.put(item_id, ExternalId(IdSource.GOG, "292030"))
+    await repository.put(item_id, ExternalId(IdSource.GOG, "1495134320"))
 
-    assert {i.source for i in await repository.ids_of(item_id)} == {
-        IdSource.STEAM, IdSource.GOG
+    # Пары, а не множество источников: с одним значением на двоих перестановка
+    # колонок `source` и `value` при записи прошла бы молча.
+    assert {(i.source, i.value) for i in await repository.ids_of(item_id)} == {
+        (IdSource.STEAM, "292030"), (IdSource.GOG, "1495134320"),
     }
 
 

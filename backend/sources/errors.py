@@ -3,6 +3,8 @@
 from collections.abc import Callable
 from logging import Logger
 
+import httpx
+
 from backend.model import Reason, Refusal
 
 # Чем падает разбор чужого ответа. Не только `ValueError`: на словаре вместо
@@ -15,6 +17,26 @@ def broken(source: str, error: Exception) -> Refusal:
     """Отказ по неразобранному ответу. Запись в лог остаётся на месте вызова:
     сообщение у каждого своё, и по нему потом ищут причину."""
     return Refusal(source=source, reason=Reason.BROKEN, detail=str(error))
+
+
+def refuse_code(source: str, status: int) -> Refusal:
+    """Код, которого у источника не описано. Была функцией у зеркал Кинопоиска и
+    держала их `SOURCE` внутри, поэтому остальные трое ею воспользоваться не
+    могли и писали то же выражение по месту."""
+    return Refusal(source=source, reason=Reason.BROKEN, detail=f"HTTP {status}")
+
+
+def is_json(response: httpx.Response) -> bool:
+    """Разобралось ли тело — не ради тела, а ради решения, верить ли коду.
+
+    Приём один у двоих: перед Кинопоиском стоит Envoy и отдаёт свой 404 текстом,
+    перед MDBList — Cloudflare со своим 403. Выводы у них разные и правильно
+    разные, общая только эта проверка."""
+    try:
+        response.json()
+    except ValueError:
+        return False
+    return True
 
 
 def parsed[T](log: Logger, source: str, note: str,

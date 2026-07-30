@@ -30,6 +30,13 @@ poster = Table(
 )
 
 
+class NotOpened(Exception):
+    """К хранилищу обратились до `open` или после `close`.
+
+    Своё имя, а не `AttributeError` на `None`: закрытие роняет движок, и без этой
+    ветки обращение к закрытому хранилищу выглядело бы опечаткой в коде."""
+
+
 class PosterStore:
     """Отдельный файл рядом с основной базой: основная маленькая и часто
     пишется, картинки большие и пишутся раз. Внешних ключей к основной здесь
@@ -52,12 +59,18 @@ class PosterStore:
             await self._engine.dispose()
             self._engine = None
 
+    @property
+    def _opened(self) -> AsyncEngine:
+        if self._engine is None:
+            raise NotOpened(f"хранилище постеров закрыто: {self._path}")
+        return self._engine
+
     async def _read(self, statement: Executable):
-        async with self._engine.connect() as connection:
+        async with self._opened.connect() as connection:
             return await connection.execute(statement)
 
     async def _write(self, statement: Executable) -> None:
-        async with self._engine.begin() as connection:
+        async with self._opened.begin() as connection:
             await connection.execute(statement)
 
     async def put(self, item_id: int, data: bytes, now: datetime) -> None:

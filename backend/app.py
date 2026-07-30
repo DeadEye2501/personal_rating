@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 import httpx
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from backend.config import Config
 from backend.model import Source
@@ -13,9 +14,11 @@ from backend.service.linking import Linker
 from backend.service.loading import Loader
 from backend.service.posters import PosterService
 from backend.service.removal import remove_card
+from backend.service.series import SeriesRefresh
 from backend.service.search import SearchService
 from backend.sources.http import SourceHttp
-from backend.sources.registry import Sources, build_sources
+from backend.sources.build import build_sources
+from backend.sources.registry import Sources
 from backend.storage.posters import PosterStore
 from backend.storage.repository.credits import CreditRepository, companies, people
 from backend.storage.repository.external import (
@@ -48,12 +51,13 @@ class Backend:
     search: SearchService
     feed: LibraryService
     loader: Loader
+    series: SeriesRefresh
     enricher: Enricher
     linker: Linker
     posters: PosterService
 
     _sources: Sources
-    _engine: object
+    _engine: AsyncEngine
 
     async def delete_card(self, item_id: int) -> None:
         """Карточка целиком, вместе с обложкой из второго файла базы.
@@ -135,6 +139,7 @@ async def build_backend(
         feed=LibraryService(SectionsRepository(sessions), views),
         loader=Loader(library=library, writer=CardWriter(**parts),
                       sources=sources, posters=posters),
+        series=SeriesRefresh(library=library, sources=sources),
         enricher=Enricher(sources=sources, ids=ids, ratings=external_ratings),
         linker=Linker(**parts),
         posters=posters,

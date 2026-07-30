@@ -106,7 +106,7 @@ async def test_the_tag_itself_survives_the_card(sessions, posters, service, card
     await remove_card(LibraryRepository(sessions), service, item_id)
 
     names = [
-        name for _, name in await TagsRepository(sessions).list_for_kind(Kind.MOVIE)
+        tag.name for tag in await TagsRepository(sessions).list_for_kind(Kind.MOVIE)
     ]
     assert names == ["пересмотреть"]
 

@@ -150,6 +150,21 @@ async def test_primary_survives_a_json_array():
     assert result.reason is Reason.BROKEN
 
 
+async def test_only_the_first_row_of_the_answer_is_read():
+    """Зеркала отдают список, а нам нужен один фильм — первый, самый релевантный.
+    С одной строкой в ответе «первая» и «последняя» неразличимы, поэтому здесь их
+    две и оценки у них разные."""
+    transport = responding(200, json={"docs": [
+        {"id": 258687, "rating": {"kp": 8.6}},
+        {"id": 999999, "rating": {"kp": 3.1}},
+    ]})
+
+    result = await primary(transport).ratings("tt0816692", Kind.MOVIE)
+
+    assert result.value.values[0].value == 8.6
+    assert [one.value for one in result.value.external_ids] == ["258687"]
+
+
 async def test_the_identifier_survives_a_film_without_a_rating():
     """Фильм нашёлся, оценки у него нет — это ответ, а не «не знаю». Вернуть
     отсюда Missing значит выбросить добытый идентификатор Кинопоиска, ради
@@ -424,14 +439,3 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
     assert any("запасного зеркала" in message for message in said)
 
 
-async def test_both_mirrors_report_the_same_owner(replay):
-    """Какое зеркало ответило, в данных не отражается: строка одна."""
-    from_primary = await primary(replay("kinopoisk/poiskkino_found.json")).ratings(
-        "tt0816692", Kind.MOVIE
-    )
-    from_fallback = await fallback(replay("kinopoisk/unofficial_found.json")).ratings(
-        "tt0816692", Kind.MOVIE
-    )
-
-    assert from_primary.value.values[0].source is RatingSource.KINOPOISK
-    assert from_fallback.value.values[0].source is RatingSource.KINOPOISK

@@ -154,6 +154,13 @@ async def test_a_broken_client_writes_nothing_either(sessions, item_id, enrich,
         await enrich(client).enrich(item_id, Kind.MOVIE)
 
     assert await stored_ratings(sessions, item_id) == {}
+    # Запись обязательна: `caplog` тут был и раньше, но про лог ничего не
+    # утверждалось, и замена `logger.exception` на `logger.debug` в
+    # `service/asking.py` прошла бы молча. Текст исключения в сообщение не идёт —
+    # он в трассировке, — поэтому сверяется имя сорвавшегося источника.
+    assert [r.levelname for r in caplog.records if r.name.startswith("backend")]         == ["ERROR"]
+    assert any(message.endswith("запрос сорвался")
+               for message in ours(caplog))
 
 
 async def test_one_refusal_does_not_let_another_source_write_an_empty_row(

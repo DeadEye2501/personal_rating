@@ -20,6 +20,7 @@ from backend.model import (
     Rating,
     RatingSource,
     Source,
+    Tag,
 )
 
 
@@ -70,6 +71,15 @@ def to_rating(row: Row) -> Rating:
         gameplay=row.gameplay,
         review=row.review or "",
     )
+
+
+def to_tag(row: Row) -> Tag:
+    """Тег в тип границы слоёв.
+
+    Отдаётся именно `Tag`, а не пара чисел и строк: тег уезжает к клиенту двумя
+    путями — списком набора и составом карточки, — и под двумя типами клиент
+    держал бы одно и то же."""
+    return Tag(id=row.id, name=row.name)
 
 
 def to_credit(row: Row, entity: Entity) -> Credit:
