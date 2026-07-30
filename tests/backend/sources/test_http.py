@@ -7,7 +7,7 @@ import pytest
 from backend.sources.errors import Reason, Refusal
 from backend.sources.http import USER_AGENT, Breaker, SourceHttp
 from backend.sources.undocumented import refuse_undocumented
-from tests.backend.sources.conftest import FakeClock
+from tests.backend.sources.conftest import FakeClock, unreachable
 from tests.conftest import capture
 
 
@@ -119,8 +119,8 @@ async def test_answer_behind_a_redirect_is_still_reached():
 
 
 async def test_network_failure_becomes_a_refusal_not_an_exception(caplog):
-    """Сбой не пишется в базу, и через минуту от него не останется ничего:
-    запись в лог — единственное место, где он вообще был."""
+    """Сбой не пишется в базу: он живёт только в логе и в предохранителе, а тот
+    отпускает через пятнадцать секунд — что проверено ниже отдельно."""
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("нет сети", request=request)
 
@@ -133,9 +133,72 @@ async def test_network_failure_becomes_a_refusal_not_an_exception(caplog):
     assert result.reason is Reason.NETWORK
     assert result.source == "tmdb"
     assert "нет сети" in result.detail
-    assert http.breaker.is_open() is False, "чужой чих — не повод молчать час"
     assert [record.levelno for record in caplog.records] == [logging.WARNING]
     assert "нет сети" in caplog.text
+
+
+async def test_a_dead_network_costs_one_wait_not_one_per_card():
+    """Пустая сеть — беда не этого запроса, а всех следующих: замерено, что
+    сеть, в которой пакеты уходят в никуда, досиживает весь таймаут, а прокрутка
+    ленты спрашивает источники на каждой видимой карточке.
+
+    Считаем ушедшее на провод: второй запрос не должен уйти вовсе."""
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        raise httpx.ConnectError("пакеты в никуда", request=request)
+
+    http = SourceHttp("mdblist", transport=httpx.MockTransport(handler),
+                      clock=FakeClock())
+
+    first = await http.get("https://api.mdblist.com/imdb/movie/tt0816692")
+    second = await http.get("https://api.mdblist.com/imdb/movie/tt0111161")
+    await http.aclose()
+
+    assert isinstance(first, Refusal) and isinstance(second, Refusal)
+    assert len(seen) == 1, "второй запрос всё равно ушёл и снова досидит таймаут"
+
+
+async def test_the_source_is_asked_again_once_the_network_may_be_back():
+    """Пятнадцать секунд, а не минуты: сеть возвращается сама и обычно быстро —
+    вышел из метро, доподнялся VPN. Срок настоящий: поставь час, и приложение
+    будет делать вид, что интернета нет, когда он уже есть."""
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        raise httpx.ConnectError("пакеты в никуда", request=request)
+
+    clock = FakeClock()
+    http = SourceHttp("mdblist", transport=httpx.MockTransport(handler),
+                      clock=clock)
+    await http.get("https://api.mdblist.com/imdb/movie/tt0816692")
+
+    clock.advance(timedelta(seconds=14))
+    await http.get("https://api.mdblist.com/imdb/movie/tt0111161")
+    assert len(seen) == 1, "предохранитель отпустил раньше срока"
+
+    clock.advance(timedelta(seconds=2))
+    await http.get("https://api.mdblist.com/imdb/movie/tt0111161")
+    await http.aclose()
+
+    assert len(seen) == 2, "предохранитель не отпустил через пятнадцать секунд"
+
+
+async def test_a_network_refusal_stays_a_network_refusal_while_it_waits():
+    """Причина переживает предохранитель: человеку показывают «нет сети», а не
+    «кончилась суточная квота» — второе он пошёл бы решать вписыванием ключа.
+
+    Свой транспорт здесь не нужен: считать ушедшее незачем, а «не дозвонились»
+    уже есть готовым. Двум тестам выше он не подошёл бы — им нужен свой `seen`."""
+    http = SourceHttp("mdblist", transport=unreachable(), clock=FakeClock())
+    await http.get("https://api.mdblist.com/imdb/movie/tt0816692")
+
+    waiting = await http.get("https://api.mdblist.com/imdb/movie/tt0111161")
+    await http.aclose()
+
+    assert waiting.reason is Reason.NETWORK
 
 
 async def test_a_broken_client_is_not_dressed_up_as_a_network_failure():

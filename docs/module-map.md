@@ -354,7 +354,7 @@
 - `def to_hit(card: SourceCard) -> SearchHit` (12)
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 
-### `backend/sources/http.py` — 90 строк
+### `backend/sources/http.py` — 97 строк
 
 Общая дверь в сеть для всех источников.
 
@@ -364,8 +364,8 @@
   - `def is_open(self) -> bool` (7)
   - `def trip(self, delay: timedelta, reason: Reason=Reason.QUOTA) -> None` (7)
   - `def reason(self) -> Reason` (2)
-- `class SourceHttp` (41)
-  - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
+- `class SourceHttp` (43)
+  - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (17)
   - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/ratings/kinopoisk/client.py` — 46 строк
@@ -1025,13 +1025,13 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def client(handler) -> GogClient` (2)
 
-### `tests/backend/sources/test_http.py` — 321 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 384 строк ⚠ подошёл к 300
 
 
 
 Зависит от: `backend.sources.errors`, `backend.sources.http`, `backend.sources.undocumented`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 21
+Тестов: 24
 
 
 ### `tests/backend/sources/test_kinopoisk.py` — 415 строк ⚠ подошёл к 300

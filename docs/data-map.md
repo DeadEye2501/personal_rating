@@ -328,6 +328,7 @@
 - `logger` = `logging.getLogger(__name__)`
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
+- `NETWORK_BACKOFF` = `timedelta(seconds=15)`
 
 ### `backend/sources/ratings/kinopoisk/client.py`
 

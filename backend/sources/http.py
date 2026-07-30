@@ -16,6 +16,11 @@ USER_AGENT = "PersonalRating/0.1 (personal library app)"
 
 DEFAULT_TIMEOUT = 20.0
 
+# Пауза после сетевого отказа. Замерено: выключенный Wi-Fi отвечает ошибкой
+# сразу, а сеть с пакетами в никуда досиживает весь таймаут — и так на каждой
+# карточке прокрутки. Пятнадцать секунд, а не минуты: сеть возвращается сама.
+NETWORK_BACKOFF = timedelta(seconds=15)
+
 
 class Breaker:
     """Источник отказал по квоте — не ходим к нему до срока. Одна переменная
@@ -83,6 +88,8 @@ class SourceHttp:
             return await self._client.get(url, params=params, headers=headers)
         except httpx.HTTPError as error:
             logger.warning("%s: сеть — %s", self.name, error)
+            # Пустая сеть — беда не этого запроса, а всех следующих.
+            self.breaker.trip(NETWORK_BACKOFF, Reason.NETWORK)
             return Refusal(source=self.name, reason=Reason.NETWORK,
                            detail=str(error))
 
