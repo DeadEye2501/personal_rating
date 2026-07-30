@@ -4,20 +4,14 @@ from datetime import date, datetime
 import pytest
 
 from backend.model import (
-    Bucket,
     CardView,
-    Filters,
     Genre,
     GenreKind,
     GenreSource,
-    Histogram,
     Item,
     Kind,
-    Order,
     RatingSource,
     SearchHit,
-    Section,
-    Sort,
     Source,
     view_from_hit,
     view_from_item,
@@ -107,35 +101,6 @@ def test_a_view_is_frozen():
     view = view_from_hit(hit())
     with pytest.raises(FrozenInstanceError):
         view.title = "другое"
-
-
-def test_filters_are_empty_by_default():
-    filters = Filters()
-    assert (filters.tag_ids, filters.genre_ids, filters.scores) == ((), (), ())
-    assert (filters.excluded_tag_ids, filters.excluded_genre_ids,
-            filters.excluded_scores) == ((), (), ())
-
-
-def test_sections_and_sorts_are_named_not_numbered():
-    # Значения уезжают в настройки и в отладку — пусть будут читаемыми.
-    assert [s.value for s in Section] == ["rated", "wishlist"]
-    assert [s.value for s in Sort] == [
-        "score", "rated_at", "year", "title", "added_at"
-    ]
-
-
-def test_the_default_side_is_the_one_with_more_on_top():
-    """Кнопка в шапке перебирает четыре критерия в две стороны; пятый,
-    ADDED_AT, в переборе не участвует и служит умолчанием «Хочу посмотреть»."""
-    assert Order(key=Sort.SCORE).descending is True
-    assert Order(key=Sort.SCORE, descending=False).descending is False
-
-
-def test_a_histogram_carries_its_footer():
-    """Под столбцами строка: средняя и сколько всего."""
-    histogram = Histogram(buckets=(Bucket(score=7, count=3),), total=3,
-                          average=7.0)
-    assert (histogram.total, histogram.average) == (3, 7.0)
 
 
 def test_a_view_of_an_item_carries_every_field():

@@ -234,15 +234,15 @@
 - `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
 - `def crop_to_cover(data: bytes) -> bytes` (20)
 
-### `backend/service/library.py` — 42 строк
+### `backend/service/library.py` — 41 строк
 
 Страницы разделов и гистограмма для показа.
 
 Зависит от: `backend.model`, `backend.storage.repository.sections`, `backend.storage.repository.views`
 
-- `class LibraryService` (31)
+- `class LibraryService` (30)
   - `async def page(self, feed: Feed, offset: int=0, limit: int=PAGE_SIZE) -> list[CardView]` (4)
-  - `async def views_of(self, item_ids: list[int]) -> list[CardView]` (8)
+  - `async def views_of(self, item_ids: list[int]) -> list[CardView]` (7)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (2)
 
 ### `backend/service/linking.py` — 127 строк
@@ -1142,13 +1142,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_cover_reads.py` — 78 строк
+### `tests/backend/test_cover_reads.py` — 92 строк
 
 
 
 Зависит от: `backend.model`, `backend.sources.errors`, `tests.conftest`
 
-Тестов: 6
+Тестов: 7
 
 - `async def covers(posters)` (5)
 
@@ -1509,13 +1509,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 26
 
 
-### `tests/backend/test_view_types.py` — 160 строк
+### `tests/backend/test_view_types.py` — 125 строк
 
 
 
 Зависит от: `backend.model`
 
-Тестов: 15
+Тестов: 11
 
 - `def hit(**fields) -> SearchHit` (4)
 
@@ -1538,7 +1538,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 325 строк ⚠ подошёл к 300
+### `tests/conftest.py` — 324 строк ⚠ подошёл к 300
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1565,8 +1565,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def reference(engine)` (17)
 - `async def sessions(engine)` (4)
 - `async def posters(tmp_path)` (6)
-- `async def card(sessions)` (12)
-  - `async def make(kind: Kind=Kind.MOVIE, source_id: str='1', title: str='карточка') -> int` (6)
+- `async def card(sessions)` (11)
+  - `async def make(kind: Kind=Kind.MOVIE, source_id: str='1', title: str='карточка') -> int` (5)
 - `async def stored(engine)` (12)
   - `async def put(name: str, **values) -> int` (7)
 

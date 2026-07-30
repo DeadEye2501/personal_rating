@@ -303,8 +303,7 @@ async def card(sessions):
     async def make(kind: Kind = Kind.MOVIE, source_id: str = "1",
                    title: str = "карточка") -> int:
         return await LibraryRepository(sessions).create(
-            Item(id=0, kind=kind, source=Source.TMDB, source_id=source_id,
-                 title=title, synced_at=MOMENT)
+            an_item(source_id, title, kind=kind)
         )
 
     return make

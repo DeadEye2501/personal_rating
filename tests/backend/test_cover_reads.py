@@ -27,6 +27,20 @@ async def test_a_stored_cover_comes_back_without_the_network(covers):
     assert asked == []
 
 
+async def test_empty_bytes_in_the_store_are_still_an_answer(covers):
+    """«Нет строки» и «строка пустая» — разные вещи, как у оценок агрегаторов.
+    Своим путём пустые байты в хранилище не попадут: скачанное проверяется по
+    подписи формата, залитое руками — обрезкой. А вот из старой версии или из
+    битого файла — попадут, и тогда лента полезет в сеть на каждый показ."""
+    service, asked = covers
+    await service.store.put(1, b"", MOMENT)
+
+    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
+
+    assert data == b""
+    assert asked == []
+
+
 async def test_a_missing_cover_is_downloaded_and_kept(covers):
     service, asked = covers
 
