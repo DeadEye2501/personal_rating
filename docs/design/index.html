@@ -1001,7 +1001,9 @@
   min-width:0;
   min-height:var(--field-h, 46px);
   padding:0 2px;
-  border-bottom:2px solid rgba(255,255,255,.08);
+  /* Черта проступает только под фокусом: в покое поле обозначает себя
+     подсказкой, а десяток линий разом превращает окно в бланк. */
+  border-bottom:2px solid transparent;
   transition:border-color .18s;
 }
 .field:focus-within{ border-bottom-color:var(--primary) }
@@ -1020,7 +1022,7 @@
 }
 .field__input::placeholder,
 .newtag__input::placeholder{
-  color:rgba(255,255,255,.32);
+  color:var(--text-dim);
   transition:color .16s;
 }
 .field:hover .field__input::placeholder,
@@ -1146,8 +1148,9 @@
 .picked__del:hover{ color:var(--error) }
 
 /* ─── Кнопки окна ────────────────────────────────────────────────── */
-/* Стекло то же, что у плашки сообщений, кромка и гало — из класса
-   neon; вариант neon--hover зажигает их только под курсором. */
+/* Ни подложки, ни рамки в покое — кнопка это надпись, и обе одинаково
+   блёклы. Под курсором проступает рамка и светлеет текст; разводит их
+   только цвет: отмена белым, сохранение акцентом. */
 
 .cardform__foot{
   margin-top:auto;
@@ -1157,31 +1160,28 @@
 }
 
 .btn{
-  position:relative;
   min-width:150px;
   padding:12px 26px;
-  border:none;
+  /* Рамка стоит всегда и только красится: заводить её под курсором
+     значило бы двигать соседей в момент наведения. */
+  border:1px solid transparent;
   border-radius:var(--r-full);
+  background:transparent;
   font:var(--label-l);
+  color:var(--text-dim);
   cursor:pointer;
-
-  background:var(--glass);
-  backdrop-filter:blur(14px) saturate(120%);
-  color:rgba(255,255,255,.7);
-  transition:color .16s, background .16s;
+  transition:color .16s, border-color .16s;
 }
 
-/* Обе кнопки в покое одинаковы и блёклы, цвет и неон приходят под
-   курсором. Различает их только он: отмена красная, сохранение
-   акцентное. */
-.btn--cancel{ --neon:var(--error) }
-.btn--cancel:hover{ background:var(--glass-error) }
-
-.btn--go{
-  --neon:var(--primary);
-  backdrop-filter:blur(14px) saturate(140%);
+.btn--cancel:hover{
+  border-color:var(--text-bright);
+  color:var(--text-bright);
 }
-.btn--go:hover{ background:var(--glass-primary) }
+
+.btn--go:hover{
+  border-color:var(--primary);
+  color:var(--primary);
+}
 
 /* ─── Список тегов ───────────────────────────────────────────────── */
 
@@ -1330,6 +1330,11 @@
   font-variation-settings:'wght' 600;
 }
 
+/* Реагирует только невыбранный: у включённого рамка уже цветная, и белая
+   поверх неё сказала бы не то. Состояние в селекторе, а не порядок правил
+   ниже, — иначе перестановка блоков молча сломала бы это. */
+.tagbox[data-state="off"]:hover{ border-color:rgba(255,255,255,.55) }
+
 .tagbox[data-state="on"]{
   border-color:var(--primary);
   background:var(--primary);
@@ -1348,11 +1353,12 @@
   height:28px;
   padding:0;
   border:none;
+  /* Подложки нет, но скругление держим: по нему идёт рамка фокуса. */
   border-radius:var(--r-full);
   background:transparent;
   color:rgba(255,255,255,.3);
   cursor:pointer;
-  transition:background .16s, color .16s;
+  transition:color .16s;
 }
 .tagrow__del .material-symbols-outlined{
   display:block;
@@ -1361,10 +1367,7 @@
   line-height:28px;
   text-align:center;
 }
-.tagrow__del:hover{
-  background:rgba(255,255,255,.08);
-  color:rgba(255,255,255,.85);
-}
+.tagrow__del:hover{ color:var(--error) }
 
 /* ─── Новый тег ──────────────────────────────────────────────────── */
 
@@ -1497,7 +1500,7 @@
             <span class="material-symbols-outlined" aria-hidden="true">star</span>
             <span class="material-symbols-outlined tools__dir" aria-hidden="true">arrow_downward</span>
           </button>
-          <button type="button" class="tools__btn" data-role="add"
+          <button type="button" class="tools__btn" data-role="add" aria-expanded="false"
                   aria-label="Добавить" title="Завести карточку">
             <span class="material-symbols-outlined" aria-hidden="true">add</span>
           </button>
@@ -1692,9 +1695,8 @@
         </div>
 
         <div class="cardform__foot">
-          <button type="button" class="btn btn--cancel neon neon--hover"
-                  id="cardCancel">Отмена</button>
-          <button type="button" class="btn btn--go neon neon--hover">Сохранить</button>
+          <button type="button" class="btn btn--cancel" id="cardCancel">Отмена</button>
+          <button type="button" class="btn btn--go">Сохранить</button>
         </div>
       </div>
     </div>
@@ -2792,6 +2794,18 @@ searchClear.addEventListener('click', () => {
 
 const kinds = document.getElementById('kinds');
 
+// Акцент закреплён за типом содержимого. Фильмам он достаётся объявленный,
+// поэтому в таблице только те два, что его перебивают: иначе лайм лежал бы
+// в двух местах и мог разойтись.
+const ACCENTS = { series:'#3b9eff', games:'#FFC107' };
+
+function paintAccent(kind){
+  const accent = ACCENTS[kind];
+  const root   = document.documentElement.style;
+
+  accent ? root.setProperty('--primary', accent) : root.removeProperty('--primary');
+}
+
 kinds.addEventListener('click', (event) => {
   const btn = event.target.closest('.seg__btn');
   if (!btn) return;
@@ -2808,6 +2822,7 @@ kinds.addEventListener('click', (event) => {
   wish.title = wish.ariaLabel = text;
 
   activeKind = btn.dataset.kind;
+  paintAccent(activeKind);
   renderFeed();
   drawChart();          // в подвале статистики свой тип содержимого
 });
@@ -2914,6 +2929,7 @@ const LINK_PATTERNS = [
 const cardWindow = (() => {
   const overlay   = document.getElementById('cardModal');
   const modal     = overlay.querySelector('.modal--card');
+  const add       = tools.querySelector('[data-role="add"]');
   const link      = document.getElementById('cardLink');
   const overwrite = document.getElementById('cardOverwrite');
   const valid     = document.getElementById('cardLinkValid');
@@ -2932,6 +2948,13 @@ const cardWindow = (() => {
     overwrite.dataset.state = overwrite.dataset.state === 'on' ? 'off' : 'on';
   });
 
+  // Кнопка «+» горит, пока окно открыто. Это единственное, что связывает
+  // затемнённый экран с тем местом, откуда окно пришло.
+  function markAdd(shown){
+    add.classList.toggle('is-active', shown);
+    add.setAttribute('aria-expanded', String(shown));
+  }
+
   // Поля, у которых есть data-for, показываются только своему типу
   // содержимого. Тип берётся из переключателя в шапке: он всегда на
   // виду, и спрашивать его отдельно незачем.
@@ -2941,9 +2964,13 @@ const cardWindow = (() => {
     });
 
     overlay.hidden = false;
+    markAdd(true);
     layoutSynopsis();      // высота известна только у показанного окна
   }
-  function close(){ overlay.hidden = true }
+  function close(){
+    overlay.hidden = true;
+    markAdd(false);
+  }
 
   document.getElementById('cardCancel').addEventListener('click', close);
 

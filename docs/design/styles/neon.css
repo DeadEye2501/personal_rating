@@ -9,16 +9,14 @@
 .neon{
   --halo-h:22px;
 
-  /* Свечение текста в два слоя: ближний держит контур, дальний
-     разливается. Отдельной переменной — чтобы вариант ниже гасил и
-     зажигал его, не переписывая. */
-  --neon-glow:
-    0 0 6px  color-mix(in srgb, var(--neon) 55%, transparent),
-    0 0 16px color-mix(in srgb, var(--neon) 30%, transparent);
-
   position:relative;
   color:var(--neon);
-  text-shadow:var(--neon-glow);
+
+  /* Свечение текста в два слоя: ближний держит контур, дальний
+     разливается. */
+  text-shadow:
+    0 0 6px  color-mix(in srgb, var(--neon) 55%, transparent),
+    0 0 16px color-mix(in srgb, var(--neon) 30%, transparent);
 }
 
 /* Кромка идёт по скруглению, а не прямой чертой поверх него: это
@@ -56,23 +54,3 @@
     color-mix(in srgb, var(--neon) 24%, transparent) 0%,
     transparent 72%);
 }
-
-/* Вариант «зажигается под курсором»: в покое цвет приглушён, кромки,
-   гало и свечения нет вовсе. */
-.neon--hover{
-  color:color-mix(in srgb, var(--neon) 55%, transparent);
-  text-shadow:none;
-  transition:color .16s, text-shadow .16s;
-}
-.neon--hover::before,
-.neon--hover::after{
-  opacity:0;
-  transition:opacity .16s;
-}
-
-.neon--hover:hover{
-  color:var(--neon);
-  text-shadow:var(--neon-glow);
-}
-.neon--hover:hover::before,
-.neon--hover:hover::after{ opacity:1 }
