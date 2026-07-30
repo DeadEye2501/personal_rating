@@ -3,8 +3,7 @@
 import logging
 from typing import ClassVar
 
-from backend.model import Kind, RatingSource
-from backend.sources.errors import Outcome, Refusal
+from backend.model import Kind, Outcome, RatingSource, Refusal
 from backend.sources.ratings.kinopoisk.mirror import SOURCE
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient

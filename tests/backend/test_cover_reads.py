@@ -1,7 +1,6 @@
 import pytest
 
-from backend.model import Source
-from backend.sources.errors import Refusal
+from backend.model import Refusal, Source
 from tests.conftest import MOMENT, PICTURE, capture, poster_service
 
 # Вторая картинка нужна, чтобы отличить «отдали лежащее» от «скачали заново»:
@@ -19,7 +18,7 @@ async def covers(posters):
 
 async def test_a_stored_cover_comes_back_without_the_network(covers):
     service, asked = covers
-    await service.store.put(1, STORED, MOMENT)
+    await service._store.put(1, STORED, MOMENT)
 
     data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
 
@@ -33,7 +32,7 @@ async def test_empty_bytes_in_the_store_are_still_an_answer(covers):
     подписи формата, залитое руками — обрезкой. А вот из старой версии или из
     битого файла — попадут, и тогда лента полезет в сеть на каждый показ."""
     service, asked = covers
-    await service.store.put(1, b"", MOMENT)
+    await service._store.put(1, b"", MOMENT)
 
     data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
 
@@ -47,7 +46,7 @@ async def test_a_missing_cover_is_downloaded_and_kept(covers):
     data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
 
     assert data == PICTURE
-    assert await service.store.get(1) == PICTURE
+    assert await service._store.get(1) == PICTURE
     assert [str(one.url) for one in asked] == ["https://e.com/p.jpg"]
 
 
@@ -60,7 +59,7 @@ async def test_a_candidate_gets_its_cover_but_nothing_is_stored(covers):
                                     MOMENT)
 
     assert data == PICTURE
-    assert not await service.store.has(1)
+    assert not await service._store.has(1)
 
 
 async def test_a_card_without_a_cover_asks_nobody(covers):
@@ -78,7 +77,7 @@ async def test_a_refusal_is_returned_and_nothing_is_stored(posters):
                                       MOMENT)
 
     assert isinstance(result, Refusal)
-    assert await service.store.get(1) is None
+    assert await service._store.get(1) is None
 
 
 async def test_the_second_show_of_the_same_card_costs_nothing(covers):

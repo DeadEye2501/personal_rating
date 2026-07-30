@@ -13,18 +13,19 @@ from backend.model import (
     IdSource,
     Kind,
     PersonRole,
+    Reason,
+    Refusal,
     Source,
     SourceCard,
     new_manual_item,
 )
-from backend.sources.errors import Reason, Refusal
 from backend.storage.repository.external import (
     ExternalIdsRepository,
     ExternalRatingsRepository,
 )
 from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
-from tests.conftest import MOMENT, RATED, WANTED, an_item
+from tests.conftest import MOMENT, PICTURE, RATED, WANTED, an_item
 
 
 def unplugged(request: httpx.Request) -> httpx.Response:
@@ -135,13 +136,18 @@ async def test_tags_are_edited(offline):
 
 
 async def test_a_card_is_deleted_with_everything_of_mine(offline):
+    """Обложка проверяется здесь же: она лежит во втором файле базы и каскадом
+    не уходит, а через собранный бэкенд это единственное место, где видно, что
+    удаление добралось до обоих файлов."""
     item_id = await offline.library.create(mine("Своё"))
     await offline.ratings.set_score(item_id, 8.0, now=MOMENT)
+    await offline.posters.save(item_id, PICTURE, now=MOMENT)
 
-    await offline.library.delete(item_id, offline.posters.store)
+    await offline.delete_card(item_id)
 
     assert await offline.library.get(item_id) is None
     assert await offline.ratings.get(item_id) is None
+    assert await offline.posters.has(item_id) is False
 
 
 async def test_a_single_card_can_be_redrawn(offline):
@@ -257,8 +263,8 @@ async def test_everything_closes_and_lets_go(tmp_path):
     # Если он окажется способен открыться заново, тест покраснеет — и это
     # правильный сигнал: закрытие тогда не закрытие.
     with pytest.raises(Exception):
-        await backend.posters.store.get(1)
-    for connection in backend.sources.connections:
+        await backend.posters._store.get(1)
+    for connection in backend._sources.connections:
         with pytest.raises(RuntimeError):
             await connection.get("https://example.invalid/")
 

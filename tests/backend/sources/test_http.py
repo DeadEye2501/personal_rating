@@ -4,7 +4,7 @@ from datetime import timedelta
 import httpx
 import pytest
 
-from backend.sources.errors import Reason, Refusal
+from backend.model import Reason, Refusal
 from backend.sources.http import USER_AGENT, Breaker, SourceHttp
 from backend.sources.undocumented import refuse_undocumented
 from tests.backend.sources.conftest import FakeClock, unreachable

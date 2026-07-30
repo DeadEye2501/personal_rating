@@ -6,14 +6,17 @@ from sqlalchemy import event
 from backend.model import (
     ExternalId,
     ExternalRating,
+    Found,
     IdSource,
     Kind,
-    Ratings,
+    Missing,
     RatingSource,
+    Ratings,
+    Reason,
+    Refusal,
     Source,
 )
 from backend.service.enrich import Enricher
-from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.external import (
     EMPTY_TTL,
     VALUE_TTL,

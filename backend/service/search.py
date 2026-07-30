@@ -2,18 +2,19 @@
 
 import asyncio
 import logging
-from dataclasses import dataclass
 
 from backend.model import (
     CardView,
+    ExternalSearch,
+    Found,
     Genre,
     GenreSource,
     Kind,
+    Refusal,
     SearchHit,
     view_from_hit,
 )
 from backend.service.asking import answered
-from backend.sources.errors import Found, Refusal
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
@@ -25,15 +26,6 @@ logger = logging.getLogger(__name__)
 # Ровно страница выдачи TMDB: одна порция стоит одного запроса. Величина —
 # настройка, а не свойство схемы.
 SEARCH_SIZE = 20
-
-
-@dataclass(frozen=True, slots=True)
-class ExternalSearch:
-    """Что ответила внешняя база. Отказ — поле в результате, а не исключение: у
-    границы потоков второго канала доставки нет."""
-
-    views: tuple[CardView, ...]
-    refusals: tuple[Refusal, ...]
 
 
 def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]:

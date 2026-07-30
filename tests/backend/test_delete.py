@@ -1,12 +1,24 @@
 import pytest
 
+import pytest_asyncio
+
 from backend.model import Kind
+from backend.service.removal import remove_card
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import PICTURE
+from tests.conftest import PICTURE, poster_service
 from tests.conftest import MOMENT as WHEN
+
+
+@pytest_asyncio.fixture
+async def service(posters):
+    """Сервис обложек поверх тестового хранилища: удаление карточки идёт через
+    него, потому что второй файл базы наружу не показывается.
+
+    Транспорта не нужно — за обложками здесь никто не ходит."""
+    return poster_service(posters, None)
 
 
 async def furnished(sessions, posters, item_id: int, tag: str = "пересмотреть") -> int:
@@ -71,10 +83,10 @@ async def test_summary_counts_every_tag(sessions, card):
     assert summary["tags"] == 3
 
 
-async def test_delete_takes_everything_with_it(sessions, posters, card):
+async def test_delete_takes_everything_with_it(sessions, posters, service, card):
     item_id = await furnished(sessions, posters, await card())
 
-    await LibraryRepository(sessions).delete(item_id, posters)
+    await remove_card(LibraryRepository(sessions), service, item_id)
 
     assert await LibraryRepository(sessions).get(item_id) is None
     assert await RatingsRepository(sessions).get(item_id) is None
@@ -85,11 +97,11 @@ async def test_delete_takes_everything_with_it(sessions, posters, card):
     assert await posters.has(item_id) is False
 
 
-async def test_the_tag_itself_survives_the_card(sessions, posters, card):
+async def test_the_tag_itself_survives_the_card(sessions, posters, service, card):
     """Уходит назначение тега, а не тег: он принадлежит набору, а не карточке."""
     item_id = await furnished(sessions, posters, await card())
 
-    await LibraryRepository(sessions).delete(item_id, posters)
+    await remove_card(LibraryRepository(sessions), service, item_id)
 
     names = [
         name for _, name in await TagsRepository(sessions).list_for_kind(Kind.MOVIE)
@@ -97,13 +109,13 @@ async def test_the_tag_itself_survives_the_card(sessions, posters, card):
     assert names == ["пересмотреть"]
 
 
-async def test_other_cards_are_untouched(sessions, posters, card):
+async def test_other_cards_are_untouched(sessions, posters, service, card):
     """Удаляется вторая, а не первая: снеси код постер по зашитому номеру —
     на паре, где удаляемая заведена первой, это прошло бы молча."""
     first = await furnished(sessions, posters, await card(source_id="1"))
     second = await furnished(sessions, posters, await card(source_id="2"), "чужой")
 
-    await LibraryRepository(sessions).delete(second, posters)
+    await remove_card(LibraryRepository(sessions), service, second)
 
     assert await LibraryRepository(sessions).get(first) is not None
     assert await posters.has(first) is True
@@ -112,12 +124,12 @@ async def test_other_cards_are_untouched(sessions, posters, card):
     assert await posters.has(second) is False
 
 
-async def test_deleting_a_card_that_is_not_there_is_quiet(sessions, posters):
-    await LibraryRepository(sessions).delete(404, posters)
+async def test_deleting_a_card_that_is_not_there_is_quiet(sessions, service):
+    await remove_card(LibraryRepository(sessions), service, 404)
 
 
 async def test_a_broken_deletion_leaves_the_card_not_the_poster(sessions, posters,
-                                                                card,
+                                                                service, card,
                                                                 monkeypatch):
     """Оборваться удаление может только между двумя файлами базы: общей транзакции
     на них не бывает. Из двух половин уцелеть должна карточка, а не постер.
@@ -134,7 +146,7 @@ async def test_a_broken_deletion_leaves_the_card_not_the_poster(sessions, poster
     monkeypatch.setattr(library, "_run", refuse)
 
     with pytest.raises(OSError):
-        await library.delete(item_id, posters)
+        await remove_card(library, service, item_id)
 
     assert await posters.has(item_id) is False, \
         "постер остался и достанется карточке с этим же номером"

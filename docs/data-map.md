@@ -16,15 +16,13 @@
   - `genres: GenresRepository`
   - `people: CreditRepository`
   - `companies: CreditRepository`
-  - `ids: ExternalIdsRepository`
-  - `external_ratings: ExternalRatingsRepository`
   - `search: SearchService`
   - `feed: LibraryService`
   - `loader: Loader`
   - `enricher: Enricher`
   - `linker: Linker`
   - `posters: PosterService`
-  - `sources: Sources`
+  - `_sources: Sources`
   - `_engine: object`
 
 ### `backend/config.py`
@@ -150,6 +148,23 @@
 - `_TMDB_KINDS` = `словарь из 2`
 - `_FILMS` = `набор из 2`
 
+### `backend/model/outcome.py`
+
+- `class Reason(StrEnum)`
+  - `QUOTA` = `'quota'`
+  - `RATE` = `'rate'`
+  - `KEY` = `'key'`
+  - `NETWORK` = `'network'`
+  - `BROKEN` = `'broken'`
+- `class Found`
+  - `value: T`
+- `class Refusal`
+  - `source: str`
+  - `reason: Reason`
+  - `retry_after: timedelta | None` = `None`
+  - `detail: str` = `''`
+- `Outcome: TypeAlias` = `Found | Missing | Refusal`
+
 ### `backend/model/query.py`
 
 - `class Section(StrEnum)`
@@ -199,6 +214,12 @@
 - `class Ratings`
   - `values: tuple[ExternalRating, ...]` = `field(default_factory=tuple)`
   - `external_ids: tuple[ExternalId, ...]` = `field(default_factory=tuple)`
+
+### `backend/model/results.py`
+
+- `class ExternalSearch`
+  - `views: tuple[CardView, ...]`
+  - `refusals: tuple[Refusal, ...]`
 
 ### `backend/model/search.py`
 
@@ -296,26 +317,9 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `SEARCH_SIZE` = `20`
-- `class ExternalSearch`
-  - `views: tuple[CardView, ...]`
-  - `refusals: tuple[Refusal, ...]`
 
 ### `backend/sources/errors.py`
 
-- `class Reason(StrEnum)`
-  - `QUOTA` = `'quota'`
-  - `RATE` = `'rate'`
-  - `KEY` = `'key'`
-  - `NETWORK` = `'network'`
-  - `BROKEN` = `'broken'`
-- `class Found`
-  - `value: T`
-- `class Refusal`
-  - `source: str`
-  - `reason: Reason`
-  - `retry_after: timedelta | None` = `None`
-  - `detail: str` = `''`
-- `Outcome: TypeAlias` = `Found | Missing | Refusal`
 - `BROKEN_BY_PARSING` = `набор из 4`
 
 ### `backend/sources/gog/client.py`

@@ -7,8 +7,7 @@ from pathlib import Path
 import httpx
 
 from backend.config import load_config
-from backend.model import Kind, Source
-from backend.sources.errors import Found, Refusal
+from backend.model import Found, Kind, Refusal, Source
 from backend.sources.gog.client import GogClient
 from backend.sources.http import Breaker
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient

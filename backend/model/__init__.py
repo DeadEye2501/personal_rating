@@ -11,6 +11,14 @@ from backend.model.item import (
     new_source_id,
 )
 from backend.model.link import ExternalLink, parse_link
+from backend.model.outcome import (
+    Found,
+    Missing,
+    Outcome,
+    Reason,
+    Refusal,
+    is_answer,
+)
 from backend.model.kinds import (
     CompanyRole,
     GenreKind,
@@ -34,7 +42,7 @@ from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.search import SearchHit
 from backend.model.suggestion import Suggestion
-from backend.model.results import merge_results
+from backend.model.results import ExternalSearch, merge_results
 from backend.model.view import CardView, Tag, view_from_hit, view_from_item
 
 __all__ = [
@@ -45,8 +53,10 @@ __all__ = [
     "ExternalId",
     "ExternalLink",
     "ExternalRating",
+    "ExternalSearch",
     "Feed",
     "Filters",
+    "Found",
     "Genre",
     "GenreKind",
     "GenreSource",
@@ -54,11 +64,15 @@ __all__ = [
     "IdSource",
     "Item",
     "Kind",
+    "Missing",
     "Order",
+    "Outcome",
     "PersonRole",
     "Rating",
     "RatingSource",
     "Ratings",
+    "Reason",
+    "Refusal",
     "SearchHit",
     "Section",
     "SeriesCounts",
@@ -68,6 +82,7 @@ __all__ = [
     "Suggestion",
     "Tag",
     "average_score",
+    "is_answer",
     "merge_results",
     "new_manual_item",
     "new_source_id",

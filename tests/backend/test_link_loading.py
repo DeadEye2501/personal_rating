@@ -2,9 +2,17 @@
 
 import pytest
 
-from backend.model import ExternalLink, Kind, Source, SourceCard
+from backend.model import (
+    ExternalLink,
+    Found,
+    Kind,
+    Missing,
+    Reason,
+    Refusal,
+    Source,
+    SourceCard,
+)
 from backend.service.loading import Loader
-from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.library import LibraryRepository
 from tests.conftest import FakeCatalog, FakeSources, an_item
 

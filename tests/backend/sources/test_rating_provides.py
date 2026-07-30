@@ -8,8 +8,7 @@
 
 import pytest
 
-from backend.model import Kind
-from backend.sources.errors import Found
+from backend.model import Found, Kind
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient

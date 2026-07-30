@@ -6,16 +6,8 @@ from typing import ClassVar
 
 import httpx
 
-from backend.model import Kind, RatingSource
-from backend.sources.errors import (
-    Found,
-    Missing,
-    Outcome,
-    Reason,
-    Refusal,
-    broken,
-    parsed,
-)
+from backend.model import Found, Kind, Missing, Outcome, RatingSource, Reason, Refusal
+from backend.sources.errors import broken, parsed
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.parse import parse_ratings
 

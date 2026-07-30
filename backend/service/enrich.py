@@ -6,9 +6,16 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from backend.model import ExternalId, ExternalRating, IdSource, Kind, RatingSource
+from backend.model import (
+    ExternalId,
+    ExternalRating,
+    Found,
+    IdSource,
+    Kind,
+    RatingSource,
+    Refusal,
+)
 from backend.service.asking import answered
-from backend.sources.errors import Found, Refusal
 from backend.sources.registry import Sources
 from backend.storage.repository.external import (
     ExternalIdsRepository,

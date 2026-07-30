@@ -309,7 +309,7 @@ async def test_deleting_the_card_takes_the_credits_but_not_the_person(
     person_id = await repository.create("Кристофер Нолан")
     await repository.attach(item_id, person_id, PersonRole.DIRECTOR)
 
-    await LibraryRepository(sessions).delete(item_id, posters)
+    await LibraryRepository(sessions).delete(item_id)
 
     assert await repository.credits_of(item_id) == []
     assert await repository.find_by_name("Кристофер Нолан") == [person_id]

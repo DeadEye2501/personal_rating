@@ -3,7 +3,7 @@ from datetime import timedelta
 
 import pytest
 
-from backend.sources.errors import Found, Missing, Reason, Refusal, is_answer
+from backend.model import Found, Missing, Reason, Refusal, is_answer
 
 
 def test_found_carries_the_value():

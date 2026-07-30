@@ -4,17 +4,18 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 67 модулей
+## backend — 69 модулей
 
-### `backend/app.py` — 138 строк
+### `backend/app.py` — 143 строк
 
 Бэкенд, собранный целиком.
 
-Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.posters`, `backend.service.search`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
+Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
 
-- `class Backend` (32)
+- `class Backend` (38)
+  - `async def delete_card(self, item_id: int) -> None` (7)
   - `async def aclose(self) -> None` (8)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (70)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (68)
 
 ### `backend/config.py` — 49 строк
 
@@ -29,13 +30,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 77 строк
+### `backend/model/__init__.py` — 92 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
 
-Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Feed`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `is_answer`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -106,6 +107,19 @@
 - `class ExternalLink` (4)
 - `def parse_link(raw: str, kind: Kind | None=None) -> ExternalLink | None` (34)
 
+### `backend/model/outcome.py` — 52 строк
+
+Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
+
+Зависит от: —
+
+- `class Reason(StrEnum)` (6)
+- `class Found` (2)
+- `class Missing` (3)
+- `class Refusal` (8)
+- `Outcome: TypeAlias = Found | Missing | Refusal`
+- `def is_answer(outcome: Outcome) -> bool` (5)
+
 ### `backend/model/query.py` — 88 строк
 
 Язык, которым лента разговаривает с базой о разделах.
@@ -137,12 +151,13 @@
 
 - `class Ratings` (8)
 
-### `backend/model/results.py` — 32 строк
+### `backend/model/results.py` — 45 строк
 
-Своя выдача и чужая, сложенные в одну.
+Что ответила чужая база и как её выдача складывается со своей.
 
-Зависит от: `backend.model.kinds`, `backend.model.view`
+Зависит от: `backend.model.kinds`, `backend.model.outcome`, `backend.model.view`
 
+- `class ExternalSearch` (6)
 - `def merge_results(local: list[CardView], external: list[CardView]) -> list[CardView]` (23)
 
 ### `backend/model/search.py` — 27 строк
@@ -190,21 +205,21 @@
   - `async def _attach_credits(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...]) -> None` (6)
   - `async def _write_external(self, item_id: int, card: SourceCard) -> None` (6)
 
-### `backend/service/cards.py` — 72 строк
+### `backend/service/cards.py` — 73 строк
 
 Карточка источника строками базы.
 
-Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.sources.errors`, `backend.storage.repository.library`
+Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.service.removal`, `backend.sources.errors`, `backend.storage.repository.library`
 
 - `class CardWriter(CardParts)` (58)
   - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (39)
   - `async def _write_the_rest(self, item_id: int, card: SourceCard, poster: bytes | None) -> None` (13)
 
-### `backend/service/enrich.py` — 149 строк
+### `backend/service/enrich.py` — 156 строк
 
 Чужие оценки у карточки.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.external`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.registry`, `backend.storage.repository.external`, `backend.unique`
 
 - `class _Harvest` (10)
 - `class Enricher` (114)
@@ -242,14 +257,14 @@
 
 - `class LibraryService` (30)
   - `async def page(self, feed: Feed, offset: int=0, limit: int=PAGE_SIZE) -> list[CardView]` (4)
-  - `async def views_of(self, item_ids: list[int]) -> list[CardView]` (7)
+  - `async def views_of(self, item_ids: list[int]) -> list[CardView]` (8)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (2)
 
-### `backend/service/linking.py` — 127 строк
+### `backend/service/linking.py` — 126 строк
 
 Привязка карточки к внешнему источнику: внешнее заполняет только пустое.
 
-Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.sources.errors`, `backend.storage.repository.credits`, `backend.storage.repository.library`
+Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
 - `def merge_fields(existing: Item, incoming: Item) -> Item` (7)
 - `def overwrite_fields(existing: Item, incoming: Item) -> Item` (14)
@@ -260,11 +275,11 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 136 строк
+### `backend/service/loading.py` — 145 строк
 
 Кандидат превращается в карточку.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.library`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.repository.library`
 
 - `def _kept(fresh: int | None, stored: int | None) -> int | None` (4)
 - `class Loader` (108)
@@ -273,29 +288,38 @@
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
   - `async def refresh(self, item_id: int) -> None` (28)
 
-### `backend/service/posters.py` — 113 строк
+### `backend/service/posters.py` — 122 строк
 
 Путь обложки от источника до хранилища.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.http`, `backend.storage.posters`
 
-- `class PosterService` (92)
+- `class PosterService` (102)
   - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (7)
   - `async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal` (16)
   - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | Refusal` (18)
   - `def _refuse(self, source: Source, detail: str) -> Refusal` (5)
   - `async def poster_for(self, item_id: int | None, source: Source, url: str, now: datetime) -> bytes | None | Refusal` (19)
   - `async def save(self, item_id: int, data: bytes, now: datetime) -> None` (2)
+  - `async def delete(self, item_id: int) -> None` (4)
+  - `async def has(self, item_id: int) -> bool` (4)
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
-### `backend/service/search.py` — 114 строк
+### `backend/service/removal.py` — 23 строк
+
+Удаление карточки из обоих файлов базы.
+
+Зависит от: `backend.service.posters`, `backend.storage.repository.library`
+
+- `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (17)
+
+### `backend/service/search.py` — 106 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `backend.unique`
 
-- `class ExternalSearch` (6)
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (16)
 - `class SearchService` (45)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
@@ -314,22 +338,16 @@
 - `def companies(payload: dict) -> tuple[Credit, ...]` (11)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
 
-### `backend/sources/errors.py` — 80 строк
+### `backend/sources/errors.py` — 37 строк
 
-Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
+Как источник сообщает, что ответ не разобрался.
 
-Зависит от: —
+Зависит от: `backend.model`
 
-- `class Reason(StrEnum)` (6)
-- `class Found` (2)
-- `class Missing` (3)
-- `class Refusal` (8)
-- `Outcome: TypeAlias = Found | Missing | Refusal`
 - `def broken(source: str, error: Exception) -> Refusal` (4)
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
-- `def is_answer(outcome: Outcome) -> bool` (5)
 
-### `backend/sources/gog/client.py` — 111 строк
+### `backend/sources/gog/client.py` — 104 строк
 
 Разговор с GOG по сети.
 
@@ -359,7 +377,7 @@
 
 Общая дверь в сеть для всех источников.
 
-Зависит от: `backend.sources.errors`
+Зависит от: `backend.model`
 
 - `class Breaker` (28)
   - `def is_open(self) -> bool` (7)
@@ -369,22 +387,22 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/kinopoisk/client.py` — 46 строк
+### `backend/sources/ratings/kinopoisk/client.py` — 45 строк
 
 Кинопоиск снаружи: одно имя над двумя зеркалами.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`
+Зависит от: `backend.model`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`
 
 - `class KinopoiskClient` (32)
   - `def name(self) -> str` (4)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (11)
   - `async def aclose(self) -> None` (3)
 
-### `backend/sources/ratings/kinopoisk/mirror.py` — 50 строк
+### `backend/sources/ratings/kinopoisk/mirror.py` — 49 строк
 
 Общее у двух зеркал Кинопоиска.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`
+Зависит от: `backend.model`, `backend.sources.http`
 
 - `def refuse_quota(http: SourceHttp) -> Refusal` (3)
 - `def refuse_rate(http: SourceHttp) -> Refusal` (5)
@@ -403,7 +421,7 @@
 - `def parse_poiskkino(payload: dict) -> Ratings` (11)
 - `def parse_unofficial(payload: dict) -> Ratings` (11)
 
-### `backend/sources/ratings/kinopoisk/poiskkino.py` — 89 строк
+### `backend/sources/ratings/kinopoisk/poiskkino.py` — 83 строк
 
 Основное зеркало Кинопоиска.
 
@@ -427,7 +445,7 @@
   - `def _verdict(self, response: httpx.Response) -> Outcome` (14)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/mdblist/client.py` — 106 строк
+### `backend/sources/ratings/mdblist/client.py` — 99 строк
 
 Разговор с MDBList по сети.
 
@@ -449,7 +467,7 @@
 
 - `def parse_ratings(payload: dict) -> Ratings` (18)
 
-### `backend/sources/ratings/omdb/client.py` — 110 строк
+### `backend/sources/ratings/omdb/client.py` — 102 строк
 
 Разговор с OMDB по сети.
 
@@ -487,7 +505,7 @@
 - `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
   - `def http(name: str) -> SourceHttp` (7)
 
-### `backend/sources/steam/client.py` — 133 строк
+### `backend/sources/steam/client.py` — 124 строк
 
 Разговор со Steam по сети.
 
@@ -513,7 +531,7 @@
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
 
-### `backend/sources/tmdb/client.py` — 130 строк
+### `backend/sources/tmdb/client.py` — 123 строк
 
 Разговор с TMDB по сети.
 
@@ -554,7 +572,7 @@
 
 Отказ источника, который своих лимитов не объявляет.
 
-Зависит от: `backend.sources.errors`, `backend.sources.http`
+Зависит от: `backend.model`, `backend.sources.http`
 
 - `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (9)
 
@@ -651,15 +669,15 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 191 строк
+### `backend/storage/repository/library.py` — 183 строк
 
 Карточки библиотеки.
 
-Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.tables`
 
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (155)
+- `class LibraryRepository(Repository)` (148)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
@@ -668,7 +686,7 @@
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
   - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (23)
   - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
-  - `async def delete(self, item_id: int, posters: PosterStore) -> None` (12)
+  - `async def delete(self, item_id: int) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
   - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
@@ -1002,16 +1020,16 @@
 
 
 
-Зависит от: `backend.sources.errors`
+Зависит от: `backend.model`
 
 Тестов: 12
 
 
-### `tests/backend/sources/test_gog.py` — 269 строк
+### `tests/backend/sources/test_gog.py` — 277 строк
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.backend.sources.conftest`
+Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.backend.sources.conftest`
 
 Тестов: 21
 
@@ -1021,7 +1039,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 Слаг из адреса GOG в номер каталога.
 
-Зависит от: `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
+Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
 
 Тестов: 13
 
@@ -1031,47 +1049,47 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 
 
-Зависит от: `backend.sources.errors`, `backend.sources.http`, `backend.sources.undocumented`, `tests.backend.sources.conftest`, `tests.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.undocumented`, `tests.backend.sources.conftest`, `tests.conftest`
 
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 438 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 437 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`, `tests.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`, `tests.conftest`
 
 Тестов: 29
 
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)
 
-### `tests/backend/sources/test_mdblist.py` — 238 строк
+### `tests/backend/sources/test_mdblist.py` — 237 строк
 
 MDBList: квота, битый ключ и чужой периметр — три разные беды.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`, `tests.backend.sources.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`, `tests.backend.sources.conftest`
 
 Тестов: 20
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
-### `tests/backend/sources/test_omdb.py` — 301 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_omdb.py` — 300 строк
 
 OMDB: единственный источник, у которого отказ приходит под кодом 401, а
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.client`, `backend.sources.ratings.omdb.parse`, `tests.backend.sources.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.omdb.client`, `backend.sources.ratings.omdb.parse`, `tests.backend.sources.conftest`
 
 Тестов: 28
 
 - `async def ask(transport)` (5)
 
-### `tests/backend/sources/test_rating_provides.py` — 72 строк
+### `tests/backend/sources/test_rating_provides.py` — 71 строк
 
 `PROVIDES` против того, что клиент действительно разбирает.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`
 
 Тестов: 2
 
@@ -1080,51 +1098,51 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 231 строк
+### `tests/backend/sources/test_registry.py` — 230 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
-Зависит от: `backend.config`, `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
+Зависит от: `backend.config`, `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
 Тестов: 13
 
 - `def sources()` (4)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 341 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam.py` — 350 строк ⚠ подошёл к 300
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
 
 Тестов: 26
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_tmdb_card.py` — 382 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_tmdb_card.py` — 384 строк ⚠ подошёл к 300
 
 Второй круг загрузки: карточка, которую уже можно записать.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
 Тестов: 30
 
 
-### `tests/backend/sources/test_tmdb_failures.py` — 203 строк
+### `tests/backend/sources/test_tmdb_failures.py` — 202 строк
 
 Отказ TMDB отличается от «такого у меня нет» — и то, и другое от успеха.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `tests.backend.sources.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `tests.backend.sources.conftest`
 
 Тестов: 15
 
 - `async def ask(transport: httpx.MockTransport)` (5)
 
-### `tests/backend/sources/test_tmdb_search.py` — 183 строк
+### `tests/backend/sources/test_tmdb_search.py` — 182 строк
 
 Первый круг загрузки: кандидат выдачи — ещё не карточка.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
 Тестов: 15
 
@@ -1133,7 +1151,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Что `answered` делает с сорвавшимся запросом и что — с отменой.
 
-Зависит от: `backend.service.asking`, `backend.sources.errors`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.asking`, `tests.conftest`
 
 Тестов: 6
 
@@ -1150,11 +1168,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_card_writer.py` — 395 строк ⚠ подошёл к 300
+### `tests/backend/test_card_writer.py` — 396 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.service.cards`, `backend.sources.errors`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.backend.sources.conftest`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.cards`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.backend.sources.conftest`, `tests.conftest`
 
 Тестов: 22
 
@@ -1173,11 +1191,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_cover_reads.py` — 92 строк
+### `tests/backend/test_cover_reads.py` — 91 строк
 
 
 
-Зависит от: `backend.model`, `backend.sources.errors`, `tests.conftest`
+Зависит от: `backend.model`, `tests.conftest`
 
 Тестов: 7
 
@@ -1192,21 +1210,22 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 25
 
 
-### `tests/backend/test_delete.py` — 141 строк
+### `tests/backend/test_delete.py` — 153 строк
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.removal`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
 Тестов: 9
 
+- `async def service(posters)` (6)
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
-### `tests/backend/test_enrich.py` — 431 строк ⚠ подошёл к 300
+### `tests/backend/test_enrich.py` — 434 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.service.enrich`, `backend.sources.errors`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
 
 Тестов: 24
 
@@ -1326,11 +1345,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def make_item(**overrides) -> Item` (4)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
 
-### `tests/backend/test_link_loading.py` — 140 строк
+### `tests/backend/test_link_loading.py` — 148 строк
 
 Вставленная ссылка в карточку источника, готовую для привязки.
 
-Зависит от: `backend.model`, `backend.service.loading`, `backend.sources.errors`, `backend.storage.repository.library`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.loading`, `backend.storage.repository.library`, `tests.conftest`
 
 Тестов: 7
 
@@ -1362,11 +1381,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 295 строк
+### `tests/backend/test_loading.py` — 298 строк
 
 
 
-Зависит от: `backend.model`, `backend.service.cards`, `backend.service.loading`, `backend.service.posters`, `backend.sources.errors`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.cards`, `backend.service.loading`, `backend.service.posters`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
 Тестов: 16
 
@@ -1407,11 +1426,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_offline.py` — 271 строк
+### `tests/backend/test_offline.py` — 277 строк
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
-Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.sources.errors`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
 Тестов: 17
 
@@ -1420,13 +1439,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def assemble(tmp_path)` (9)
 - `async def offline(tmp_path)` (4)
 
-### `tests/backend/test_poster_service.py` — 197 строк
+### `tests/backend/test_poster_service.py` — 221 строк
 
 
 
-Зависит от: `backend.model`, `backend.service.images`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`, `tests.backend.sources.conftest`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.images`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 16
+Тестов: 17
 
 - `async def service(posters)` (4)
 
@@ -1448,11 +1467,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search.py` — 422 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 425 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.service.search`, `backend.sources.errors`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
 Тестов: 30
 
@@ -1482,11 +1501,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def library(sessions)` (2)
 
-### `tests/backend/test_series_refresh.py` — 187 строк
+### `tests/backend/test_series_refresh.py` — 195 строк
 
 
 
-Зависит от: `backend.model`, `backend.service.loading`, `backend.sources.errors`, `backend.storage.repository.library`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.loading`, `backend.storage.repository.library`, `tests.conftest`
 
 Тестов: 12
 

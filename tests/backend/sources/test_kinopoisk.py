@@ -4,8 +4,7 @@ from datetime import timedelta
 
 import httpx
 
-from backend.model import IdSource, Kind, RatingSource
-from backend.sources.errors import Found, Missing, Reason, Refusal
+from backend.model import Found, IdSource, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import httpx
 
-from backend.sources.errors import Reason, Refusal
+from backend.model import Reason, Refusal
 
 logger = logging.getLogger(__name__)
 

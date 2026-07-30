@@ -5494,7 +5494,7 @@ from PySide6.QtCore import QAbstractAnimation
 from PySide6.QtWidgets import QGraphicsOpacityEffect
 
 from backend.model import CardView, Filters, Kind, Order, Section, Sort, Source
-from backend.service.search import ExternalSearch
+from backend.model import ExternalSearch
 from client.pages.feed import FeedPage
 from client.widgets.toolbar import View
 from client.window import MainWindow
@@ -5624,7 +5624,7 @@ def test_a_stale_answer_does_not_overwrite_a_fresh_one(qtbot, theme):
 def test_a_refusal_of_the_outside_reaches_the_snack(qtbot, theme):
     """Без внешней базы человек не получит того, что искал, и должен понимать
     причину. Пустая выдача — не событие, отказ — событие."""
-    from backend.sources.errors import Reason, Refusal
+    from backend.model import Reason, Refusal
 
     runtime = ready()
     page = FeedPage(runtime)

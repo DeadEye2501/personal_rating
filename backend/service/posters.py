@@ -6,10 +6,9 @@ from datetime import datetime
 
 import httpx
 
-from backend.model import Source
+from backend.model import Reason, Refusal, Source
 from backend.service.asking import answered
 from backend.service.images import crop_to_cover
-from backend.sources.errors import Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
 
@@ -25,8 +24,8 @@ class PosterService:
 
     def __init__(self, clients: Mapping[Source, SourceHttp],
                  store: PosterStore) -> None:
-        self.clients = dict(clients)
-        self.store = store
+        self._clients = dict(clients)
+        self._store = store
 
     async def fetch(self, source: Source, url: str) -> bytes | None | Refusal:
         """Обложка байтами, и исключения из этого пути не вылетает.
@@ -41,7 +40,7 @@ class PosterService:
             # Обложки нет в самом источнике — ждать нечего.
             return None
 
-        client = self.clients.get(source)
+        client = self._clients.get(source)
         if client is None:
             logger.warning("постер: нет клиента для источника %s", source)
             return self._refuse(source, f"нет клиента для {source}")
@@ -87,7 +86,7 @@ class PosterService:
         if item_id is None:
             return await self.fetch(source, url)
 
-        stored = await self.store.get(item_id)
+        stored = await self._store.get(item_id)
         if stored is not None:
             return stored
 
@@ -99,7 +98,17 @@ class PosterService:
         return data
 
     async def save(self, item_id: int, data: bytes, now: datetime) -> None:
-        await self.store.put(item_id, data, now)
+        await self._store.put(item_id, data, now)
+
+    async def delete(self, item_id: int) -> None:
+        """Обложку убирает владелец хранилища, а не тот, кто удаляет карточку:
+        второй файл базы наружу не показывается вовсе."""
+        await self._store.delete(item_id)
+
+    async def has(self, item_id: int) -> bool:
+        """Лежит ли обложка. Нужно привязке: заливший картинку руками не должен
+        получить поверх неё чужую."""
+        return await self._store.has(item_id)
 
     async def store_upload(self, item_id: int, data: bytes,
                            now: datetime) -> None:
@@ -108,6 +117,6 @@ class PosterService:
         await self.save(item_id, crop_to_cover(data), now)
 
     async def aclose(self) -> None:
-        for client in self.clients.values():
+        for client in self._clients.values():
             await client.aclose()
-        await self.store.close()
+        await self._store.close()

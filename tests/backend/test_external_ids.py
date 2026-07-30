@@ -113,6 +113,6 @@ async def test_identifiers_go_away_with_the_card(sessions, card, posters):
     repository = ExternalIdsRepository(sessions)
     await repository.put(item_id, ExternalId(IdSource.IMDB, "tt0816692"))
 
-    await LibraryRepository(sessions).delete(item_id, posters)
+    await LibraryRepository(sessions).delete(item_id)
 
     assert await repository.find_item(IdSource.IMDB, "tt0816692") is None

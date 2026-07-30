@@ -2,8 +2,7 @@
 
 from datetime import timedelta
 
-from backend.model import Ratings
-from backend.sources.errors import Found, Missing, Outcome, Reason, Refusal
+from backend.model import Found, Missing, Outcome, Ratings, Reason, Refusal
 from backend.sources.http import SourceHttp
 
 # Наружу зеркала неразличимы: оба отдают один идентификатор и одну оценку, и в

@@ -4,8 +4,8 @@ import asyncio
 
 import pytest
 
+from backend.model import Found, Reason, Refusal
 from backend.service.asking import answered
-from backend.sources.errors import Found, Reason, Refusal
 from tests.conftest import ours
 
 

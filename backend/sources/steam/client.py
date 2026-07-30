@@ -7,17 +7,8 @@ from urllib.parse import quote
 
 import httpx
 
-from backend.model import GenreSource, Kind
-from backend.sources.errors import (
-    BROKEN_BY_PARSING,
-    Found,
-    Missing,
-    Outcome,
-    Reason,
-    Refusal,
-    broken,
-    parsed,
-)
+from backend.model import Found, GenreSource, Kind, Missing, Outcome, Reason, Refusal
+from backend.sources.errors import BROKEN_BY_PARSING, broken, parsed
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import refuse_undocumented
 from backend.sources.steam.parse import parse_card, parse_search, parse_tags

@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-from backend.sources.errors import Reason, Refusal
+from backend.model import Reason, Refusal
 from backend.sources.http import SourceHttp
 
 # Ни Steam, ни GOG лимитов не объявляют: у Steam 220 запросов подряд прошли без

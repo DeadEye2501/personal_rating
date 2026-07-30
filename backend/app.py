@@ -12,6 +12,7 @@ from backend.service.library import LibraryService
 from backend.service.linking import Linker
 from backend.service.loading import Loader
 from backend.service.posters import PosterService
+from backend.service.removal import remove_card
 from backend.service.search import SearchService
 from backend.sources.http import SourceHttp
 from backend.sources.registry import Sources, build_sources
@@ -43,8 +44,6 @@ class Backend:
     genres: GenresRepository
     people: CreditRepository
     companies: CreditRepository
-    ids: ExternalIdsRepository
-    external_ratings: ExternalRatingsRepository
 
     search: SearchService
     feed: LibraryService
@@ -52,16 +51,24 @@ class Backend:
     enricher: Enricher
     linker: Linker
     posters: PosterService
-    sources: Sources
 
+    _sources: Sources
     _engine: object
+
+    async def delete_card(self, item_id: int) -> None:
+        """Карточка целиком, вместе с обложкой из второго файла базы.
+
+        Метод здесь, а не у репозитория: удаление — это две базы в строго
+        определённом порядке, и репозиторий одной из них не должен требовать от
+        клиента вторую. Порядок задан в `service/removal.py`."""
+        await remove_card(self.library, self.posters, item_id)
 
     async def aclose(self) -> None:
         """Закрыть могут и владелец, и фикстура теста — второй раз это тихо.
 
         Своего флага для этого нет: все трое закрываются повторно молча, и
         сторожит это проверка, а не ветка, которую нечем уронить."""
-        await self.sources.aclose()
+        await self._sources.aclose()
         await self.posters.aclose()
         await self._engine.dispose()
 
@@ -123,8 +130,6 @@ async def build_backend(
         genres=genres,
         people=person_repository,
         companies=company_repository,
-        ids=ids,
-        external_ratings=external_ratings,
         search=SearchService(library=library, views=views, sources=sources,
                              genres=genres),
         feed=LibraryService(SectionsRepository(sessions), views),
@@ -132,7 +137,7 @@ async def build_backend(
                       sources=sources, posters=posters),
         enricher=Enricher(sources=sources, ids=ids, ratings=external_ratings),
         linker=Linker(**parts),
-        sources=sources,
         posters=posters,
+        _sources=sources,
         _engine=engine,
     )

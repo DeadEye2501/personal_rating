@@ -4,10 +4,9 @@ import logging
 from dataclasses import replace
 from datetime import datetime
 
-from backend.model import Credit, Item, SourceCard
+from backend.model import Credit, Item, Refusal, SourceCard
 from backend.service.card_parts import CardParts
 from backend.service.genres import resolved_genres
-from backend.sources.errors import Refusal
 from backend.storage.repository.credits import CreditRepository
 from backend.storage.repository.library import ItemExists
 
@@ -116,7 +115,7 @@ class Linker(CardParts):
 
     async def _fill_poster(self, item_id: int, item: Item,
                            overwrite: bool) -> None:
-        if not overwrite and await self.posters.store.has(item_id):
+        if not overwrite and await self.posters.has(item_id):
             return
         poster = await self.posters.fetch(item.source, item.poster_url)
         if isinstance(poster, bytes):

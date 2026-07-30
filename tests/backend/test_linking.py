@@ -354,18 +354,18 @@ async def test_a_manual_card_gets_its_poster_on_linking(linker, sessions):
 
     await linker.link(item_id, incoming(), now=LATER)
 
-    assert await linker.posters.store.get(item_id) == POSTER
+    assert await linker.posters._store.get(item_id) == POSTER
 
 
 async def test_an_own_poster_is_not_replaced(linker, sessions):
     """Обложка — такое же поле: непустое значит занятое."""
     item_id = await manual_card(sessions)
     await linker.posters.store_upload(item_id, picture(400, 400), now=MOMENT)
-    ours = await linker.posters.store.get(item_id)
+    ours = await linker.posters._store.get(item_id)
 
     await linker.link(item_id, incoming(), now=LATER)
 
-    assert await linker.posters.store.get(item_id) == ours
+    assert await linker.posters._store.get(item_id) == ours
 
 
 async def test_overwrite_replaces_the_own_poster(linker, sessions):
@@ -375,7 +375,7 @@ async def test_overwrite_replaces_the_own_poster(linker, sessions):
 
     await linker.link(item_id, incoming(), now=LATER, overwrite=True)
 
-    assert await linker.posters.store.get(item_id) == POSTER
+    assert await linker.posters._store.get(item_id) == POSTER
 
 
 async def test_a_refused_poster_leaves_the_link_in_place(sessions, engine, posters,
@@ -391,7 +391,7 @@ async def test_a_refused_poster_leaves_the_link_in_place(sessions, engine, poste
         await linker.link(item_id, incoming(), now=LATER)
 
     assert (await LibraryRepository(sessions).get(item_id)).source is Source.TMDB
-    assert not await linker.posters.store.has(item_id)
+    assert not await linker.posters._store.has(item_id)
     assert [message for message in ours(caplog) if "обложка" in message]
     await linker.posters.aclose()
 
@@ -400,10 +400,10 @@ async def test_a_card_without_a_poster_url_keeps_its_own(linker, sessions):
     """Источник обложки не дал — стирать свою нечем и незачем."""
     item_id = await manual_card(sessions)
     await linker.posters.store_upload(item_id, picture(400, 400), now=MOMENT)
-    ours = await linker.posters.store.get(item_id)
+    ours = await linker.posters._store.get(item_id)
 
     await linker.link(item_id, incoming(item=an_item(
         "157336", "Interstellar",
     )), now=LATER, overwrite=True)
 
-    assert await linker.posters.store.get(item_id) == ours
+    assert await linker.posters._store.get(item_id) == ours

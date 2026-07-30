@@ -6,14 +6,16 @@ import httpx
 import pytest
 
 from backend.model import (
+    Found,
     GenreSource,
     Kind,
     PersonRole,
     RatingSource,
+    Reason,
+    Refusal,
     SeriesCounts,
     Source,
 )
-from backend.sources.errors import Found, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
 from backend.sources.tmdb.parse import (

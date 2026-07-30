@@ -205,6 +205,6 @@ async def test_ratings_go_away_with_the_card(sessions, card, posters):
     repository = ExternalRatingsRepository(sessions)
     await repository.record(item_id, ExternalRating(RatingSource.IMDB, 8.6, MOMENT))
 
-    await LibraryRepository(sessions).delete(item_id, posters)
+    await LibraryRepository(sessions).delete(item_id)
 
     assert await repository.ratings_of(item_id) == []

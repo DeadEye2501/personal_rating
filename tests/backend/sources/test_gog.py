@@ -3,8 +3,16 @@
 
 import httpx
 
-from backend.model import CompanyRole, GenreSource, Kind, RatingSource, Source
-from backend.sources.errors import Found, Reason, Refusal
+from backend.model import (
+    CompanyRole,
+    Found,
+    GenreSource,
+    Kind,
+    RatingSource,
+    Reason,
+    Refusal,
+    Source,
+)
 from backend.sources.gog.client import GogClient
 from backend.sources.gog.parse import parse_catalog, to_hit
 from backend.sources.http import SourceHttp

@@ -3,10 +3,11 @@
 import asyncio
 import logging
 
-from backend.model import SourceCard
+from backend.model import Refusal, SourceCard
 from backend.service.card_parts import CardParts
 from backend.service.genres import resolved_genres
-from backend.sources.errors import Refusal, broken
+from backend.service.removal import remove_card
+from backend.sources.errors import broken
 from backend.storage.repository.library import ItemExists
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class CardWriter(CardParts):
             # который утверждает, что на этот момент она была полной, — и
             # перезапроса не будет никогда. Отмену пробрасываем: гасят ею нас.
             logger.warning("запись карточки %s отменена, откатываю", item_id)
-            await self._library.delete(item_id, self.posters.store)
+            await remove_card(self._library, self.posters, item_id)
             raise
         except Exception as error:
             # Ловим всё, а не один `IdentityTaken`. Последний шаг записи —
@@ -52,7 +53,7 @@ class CardWriter(CardParts):
             # на этот момент карточка была полной, — и перезапроса не будет,
             # потому что она свежая.
             logger.exception("откатываю карточку %s", item_id)
-            await self._library.delete(item_id, self.posters.store)
+            await remove_card(self._library, self.posters, item_id)
             return broken(str(card.item.source), error)
 
         return item_id

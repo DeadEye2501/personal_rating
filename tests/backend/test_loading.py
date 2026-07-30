@@ -6,15 +6,18 @@ import pytest
 from backend.model import (
     CardView,
     Credit,
+    Found,
     Kind,
+    Missing,
     PersonRole,
+    Reason,
+    Refusal,
     Source,
     SourceCard,
 )
 from backend.service.cards import CardWriter
 from backend.service.loading import Loader
 from backend.service.posters import PosterService
-from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
 from tests.conftest import (

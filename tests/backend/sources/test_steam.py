@@ -4,8 +4,17 @@ import json
 
 import httpx
 
-from backend.model import CompanyRole, GenreSource, Kind, RatingSource, Source
-from backend.sources.errors import Found, Missing, Reason, Refusal
+from backend.model import (
+    CompanyRole,
+    Found,
+    GenreSource,
+    Kind,
+    Missing,
+    RatingSource,
+    Reason,
+    Refusal,
+    Source,
+)
 from backend.sources.http import SourceHttp
 from backend.sources.steam.client import SteamClient
 from backend.sources.steam.parse import (

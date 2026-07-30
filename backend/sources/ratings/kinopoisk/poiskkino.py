@@ -4,14 +4,8 @@ import logging
 
 import httpx
 
-from backend.model import Kind
-from backend.sources.errors import (
-    Missing,
-    Outcome,
-    Reason,
-    Refusal,
-    parsed,
-)
+from backend.model import Kind, Missing, Outcome, Reason, Refusal
+from backend.sources.errors import parsed
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.mirror import (
     SOURCE,

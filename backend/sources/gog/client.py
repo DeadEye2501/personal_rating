@@ -4,15 +4,8 @@ import logging
 
 import httpx
 
-from backend.model import Kind
-from backend.sources.errors import (
-    Found,
-    Missing,
-    Outcome,
-    Reason,
-    Refusal,
-    parsed,
-)
+from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
+from backend.sources.errors import parsed
 from backend.sources.gog.parse import find_slug, parse_catalog, to_hit
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import refuse_undocumented

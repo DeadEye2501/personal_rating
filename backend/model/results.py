@@ -1,10 +1,23 @@
-"""Своя выдача и чужая, сложенные в одну.
+"""Что ответила чужая база и как её выдача складывается со своей.
 
-Лежит в модели, а не в сервисе поиска: складывать приходится и клиенту — своё он
-уже показал, внешнее приехало потом."""
+Лежит в модели, а не в сервисе поиска, по двум причинам: складывать приходится и
+клиенту — своё он уже показал, внешнее приехало потом, — а сам ответ едет через
+границу слоёв, где разрешены только типы `backend/model/`."""
+
+from dataclasses import dataclass
 
 from backend.model.kinds import Source
+from backend.model.outcome import Refusal
 from backend.model.view import CardView
+
+
+@dataclass(frozen=True, slots=True)
+class ExternalSearch:
+    """Отказ — поле в результате, а не исключение: у границы потоков второго
+    канала доставки нет."""
+
+    views: tuple[CardView, ...]
+    refusals: tuple[Refusal, ...]
 
 
 def merge_results(local: list[CardView],

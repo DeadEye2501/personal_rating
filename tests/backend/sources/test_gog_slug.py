@@ -2,7 +2,7 @@
 
 import httpx
 
-from backend.sources.errors import Found, Missing, Reason, Refusal
+from backend.model import Found, Missing, Reason, Refusal
 from backend.sources.gog.client import GogClient
 from backend.sources.gog.parse import find_slug
 from backend.sources.http import SourceHttp

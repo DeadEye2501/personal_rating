@@ -3,10 +3,9 @@ import io
 import pytest
 from PIL import Image
 
-from backend.model import Source
+from backend.model import Reason, Refusal, Source
 from backend.service.images import TARGET_SIZE, BadImage
 from backend.service.posters import PosterService
-from backend.sources.errors import Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
 from tests.backend.sources.conftest import responding, unreachable
@@ -131,7 +130,32 @@ async def test_each_source_is_asked_through_its_own_client(posters):
 
     for source, body in bodies.items():
         assert await service.fetch(source, "https://example.com/p.jpg") == body
-    assert len({id(client.breaker) for client in service.clients.values()}) == 3
+    await service.aclose()
+
+
+async def test_a_dead_cdn_does_not_close_the_others(posters):
+    """Предохранитель у каждого источника свой. Один на всех выключил бы обложки
+    целиком из-за одного молчащего CDN — и на пятнадцать секунд, а не на запрос.
+
+    Раздельность проверяется следствием, а не устройством: сравнение `id`
+    предохранителей читало бы объекты, которые тест сам же и собрал, и один
+    `SourceHttp`, подставленный во все три ключа сборки, осталось бы
+    незамеченным."""
+    body = picture(600, 900, fmt="JPEG")
+    service = PosterService(
+        {
+            Source.TMDB: SourceHttp("cdn:tmdb", transport=unreachable()),
+            Source.STEAM: SourceHttp("cdn:steam",
+                                     transport=responding(content=body)),
+        },
+        posters,
+    )
+
+    refused = await service.fetch(Source.TMDB, "https://example.com/p.jpg")
+    assert isinstance(refused, Refusal)
+    assert refused.reason is Reason.NETWORK
+
+    assert await service.fetch(Source.STEAM, "https://example.com/p.jpg") == body
     await service.aclose()
 
 
@@ -148,14 +172,14 @@ async def test_a_downloaded_poster_is_stored_byte_for_byte(service):
     data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
     await service.save(1, data, now=WHEN)
 
-    assert await service.store.get(1) == data
+    assert await service._store.get(1) == data
 
 
 async def test_an_upload_is_cropped(service):
     """Залитая с диска — единственное, что обрезается."""
     await service.store_upload(1, picture(4000, 1000), now=WHEN)
 
-    stored = await service.store.get(1)
+    stored = await service._store.get(1)
     assert Image.open(io.BytesIO(stored)).size == TARGET_SIZE
 
 
@@ -163,7 +187,7 @@ async def test_a_bad_upload_is_a_named_error(service):
     with pytest.raises(BadImage):
         await service.store_upload(1, "не картинка".encode(), now=WHEN)
 
-    assert await service.store.get(1) is None, "в хранилище лёг мусор"
+    assert await service._store.get(1) is None, "в хранилище лёг мусор"
 
 
 async def test_closing_the_service_closes_the_store(tmp_path):

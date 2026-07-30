@@ -5,7 +5,6 @@ from datetime import datetime
 from sqlalchemy import Select, delete, func, select, update
 
 from backend.model import Item, Kind, Source, new_source_id
-from backend.storage.posters import PosterStore
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_item
 from backend.storage.session import fold, folded
@@ -128,17 +127,10 @@ class LibraryRepository(Repository):
             "in_wishlist": await self._has_item(wishlist_table, item_id),
         }
 
-    async def delete(self, item_id: int, posters: PosterStore) -> None:
-        """Оценка, теги, закладка и связи уходят каскадом; постер — кодом:
-        внешних ключей между двумя файлами SQLite не бывает.
-
-        Постер уходит первым, и порядок здесь не косметика. Оборвись удаление на
-        середине — у обратного порядка в хранилище остался бы постер без хозяина,
-        а `id` карточки SQLite выдаёт повторно: `item` заведён без
-        `AUTOINCREMENT`, и следующая карточка молча получила бы чужую обложку.
-        В этом порядке остаётся карточка без обложки, а её скачают заново по
-        `poster_url` при первом же показе."""
-        await posters.delete(item_id)
+    async def delete(self, item_id: int) -> None:
+        """Оценка, теги, закладка и связи уходят каскадом. Обложка лежит во втором
+        файле базы, внешних ключей между файлами не бывает, и убирает её
+        `service/removal.py` — он же задаёт порядок двух удалений."""
         await self._run(delete(item_table).where(item_table.c.id == item_id))
 
     async def refresh_series_counts(self, item_id: int,

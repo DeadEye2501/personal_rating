@@ -2,14 +2,17 @@ import pytest
 
 from backend.model import (
     CardView,
+    Found,
     GenreSource,
     Kind,
+    Missing,
+    Reason,
+    Refusal,
     Source,
     merge_results,
     view_from_hit,
 )
 from backend.service.search import SEARCH_SIZE, SearchService
-from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository

@@ -3154,7 +3154,7 @@ git commit -m "feat: разбор ссылки, обложка и сохране
 - Потребляет: `Modal`; `LibraryRepository.deletion_summary(item_id)` и
   `LibraryRepository.delete(item_id, posters)` — **второй аргумент
   обязателен**: постер лежит во втором файле базы и каскадом не удаляется.
-  Вызов целиком: `backend.library.delete(item_id, backend.posters.store)`.
+  Вызов целиком: `backend.delete_card(item_id)`. Хранилище постеров через границу не едет: порядок двух удалений — забота бэкенда.
 - Отдаёт: `summary_text(summary: dict) -> str`;
   `ConfirmDelete(Modal)` с `ask(item_id, title)` и сигналом `confirmed(int)`.
 
@@ -3226,7 +3226,7 @@ def test_confirming_deletes_and_reports(qtbot, theme):
     # `TypeError` на живом бэкенде, где единственное необратимое действие
     # приложения просто не сработает.
     deletes = [args for name, args, _ in runtime.asked
-               if name == "library.delete"]
+               if name == "delete_card"]
     assert deletes and deletes[0][0] == 42
     assert len(deletes[0]) == 2, "постер вторым аргументом"
     assert heard == [42]
@@ -3244,7 +3244,7 @@ def test_cancelling_deletes_nothing(qtbot, theme):
     qtbot.mouseClick(confirm.no, Qt.MouseButton.LeftButton)
     qtbot.wait(30)
 
-    assert not any(name == "library.delete" for name, _, _ in runtime.asked)
+    assert not any(name == "delete_card" for name, _, _ in runtime.asked)
     assert heard == []
 
 
@@ -3258,7 +3258,7 @@ def test_escape_is_the_same_as_cancel(qtbot, theme):
 
     qtbot.keyClick(confirm, Qt.Key.Key_Escape)
 
-    assert not any(name == "library.delete" for name, _, _ in runtime.asked)
+    assert not any(name == "delete_card" for name, _, _ in runtime.asked)
 ```
 
 - [ ] **Шаг 2: Убедиться, что тест падает**
@@ -3273,7 +3273,7 @@ def test_escape_is_the_same_as_cancel(qtbot, theme):
 и в `facts.py`. Пустая сводка — пустая строка: перечислять нечего, и строку в
 окне тогда не показываем вовсе.
 
-Подтверждение зовёт `backend.library.delete(item_id, backend.posters.store)` —
+Подтверждение зовёт `backend.delete_card(item_id)` —
 **с постером вторым аргументом**. Без него на живом бэкенде `TypeError`, и
 единственное необратимое действие приложения не работает вовсе.
 

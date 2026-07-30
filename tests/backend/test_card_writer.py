@@ -13,11 +13,12 @@ from backend.model import (
     Kind,
     PersonRole,
     RatingSource,
+    Reason,
+    Refusal,
     Source,
     SourceCard,
 )
 from backend.service.cards import CardWriter
-from backend.sources.errors import Reason, Refusal
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.external import (
     ExternalIdsRepository,
@@ -198,7 +199,7 @@ async def test_external_identifiers_and_ratings_are_written(writer, sessions):
 async def test_the_poster_is_stored(writer):
     item_id = await writer.save(source_card())
 
-    assert await writer.posters.store.get(item_id) == POSTER
+    assert await writer.posters._store.get(item_id) == POSTER
 
 
 async def test_a_prefetched_poster_is_not_downloaded_again(writer):
@@ -207,7 +208,7 @@ async def test_a_prefetched_poster_is_not_downloaded_again(writer):
 
     item_id = await writer.save(source_card(), poster=ready)
 
-    assert await writer.posters.store.get(item_id) == ready
+    assert await writer.posters._store.get(item_id) == ready
 
 
 async def test_a_card_without_a_poster_url_is_still_written(writer):
@@ -218,7 +219,7 @@ async def test_a_card_without_a_poster_url_is_still_written(writer):
     ))
 
     assert isinstance(item_id, int)
-    assert not await writer.posters.store.has(item_id)
+    assert not await writer.posters._store.has(item_id)
 
 
 async def test_nothing_is_written_when_the_poster_fails(sessions, engine, posters):
@@ -306,7 +307,7 @@ async def test_the_rollback_takes_the_poster_with_it(writer, monkeypatch):
 
     assert isinstance(result, Refusal)
     assert stored, "обложка до хранилища не дошла — тест проверяет не то"
-    assert await writer.posters.store.has(stored[0]) is False, \
+    assert await writer.posters._store.has(stored[0]) is False, \
         "постер откаченной карточки остался и достанется следующей"
 
 

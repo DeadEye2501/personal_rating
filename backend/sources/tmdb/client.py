@@ -5,15 +5,8 @@ from datetime import timedelta
 
 import httpx
 
-from backend.model import Kind
-from backend.sources.errors import (
-    Found,
-    Missing,
-    Outcome,
-    Reason,
-    Refusal,
-    parsed,
-)
+from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
+from backend.sources.errors import parsed
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.parse import (
     parse_movie,
