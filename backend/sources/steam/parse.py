@@ -82,6 +82,4 @@ def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]:
     """Теги игры из отдельного ответа. Приезжают номерами с весами; вес нам не
     нужен — нужен сам номер."""
     items = (payload.get("response") or {}).get("store_items") or [{}]
-    return tuple(
-        (GenreSource.STEAM_TAG, str(tag["tagid"])) for tag in items[0].get("tags", [])
-    )
+    return genres(GenreSource.STEAM_TAG, items[0].get("tags", []), key="tagid")

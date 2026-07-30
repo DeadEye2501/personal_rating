@@ -630,6 +630,8 @@
 
 ### `tests/backend/test_loading.py`
 
+- `SEARCH_COVER` = `'https://example.com/p.jpg'`
+- `DETAIL_COVER` = `'https://example.com/d.jpg'`
 - `class Rig`
   - `load: Loader`
   - `client: FakeCatalog`

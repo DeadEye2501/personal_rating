@@ -16,6 +16,7 @@ from backend.model import (
     Refusal,
     Source,
     SourceCard,
+    view_from_hit,
 )
 from backend.service.cards import CardWriter
 from backend.service.loading import Loader
@@ -29,16 +30,26 @@ from tests.conftest import (
     FakeSources,
     capture,
     card_parts,
+    hit,
 )
 
 
-def candidate(source_id="157336", poster="https://example.com/p.jpg") -> CardView:
-    return CardView(kind=Kind.MOVIE, source=Source.TMDB, source_id=source_id,
-                    title="Интерстеллар", poster_url=poster)
+# Адреса обложки у кандидата и в детальном ответе разные нарочно: за ней ходят
+# двое — загрузчик по адресу выдачи и писатель по адресу детального ответа, — и
+# при одном адресе список ушедших запросов у этих двух путей неразличим.
+SEARCH_COVER = "https://example.com/p.jpg"
+DETAIL_COVER = "https://example.com/d.jpg"
 
 
-def source_card(source_id="157336",
-                poster="https://example.com/p.jpg") -> SourceCard:
+def candidate(source_id="157336", poster=SEARCH_COVER) -> CardView:
+    """Кандидат собирается тем же путём, каким приезжает в работе: из выдачи
+    поиска через `view_from_hit`. Собранный руками расходился бы с ним молча —
+    полноту переноса полей сторожит `test_view_types.py`, а здесь важно, что
+    загрузчику достаётся ровно то, что даёт поиск."""
+    return view_from_hit(hit(source_id, poster_url=poster))
+
+
+def source_card(source_id="157336", poster=DETAIL_COVER) -> SourceCard:
     return SourceCard(
         item=an_item(source_id, "Интерстеллар", runtime=169,
                      poster_url=poster),
@@ -117,8 +128,8 @@ async def test_a_game_is_asked_about_as_a_game(sessions, loader):
     rig = loader(Found(source_card()))
 
     await rig.load.ensure(
-        CardView(kind=Kind.GAME, source=Source.STEAM, source_id="292030",
-                 title="Ведьмак")
+        view_from_hit(hit("292030", "Ведьмак", kind=Kind.GAME,
+                          source=Source.STEAM))
     )
 
     assert rig.client.asked == [("292030", Kind.GAME)]
@@ -239,17 +250,22 @@ async def test_a_cover_absent_from_the_search_but_present_in_the_detail(
 
     assert isinstance(item_id, int)
     assert await posters.get(item_id) == PICTURE
+    # Адреса у кандидата нет, значит единственный ушедший запрос — писательский.
+    assert [str(one.url) for one in rig.requests] == [DETAIL_COVER]
 
 
-async def test_the_cover_is_fetched_once(sessions, loader):
-    """Ради этого круги и идут разом: обложку скачивает загрузчик и передаёт
-    писателю готовой. Не передай — писатель полез бы за ней сам, и тот же файл
-    приехал бы дважды."""
+async def test_the_cover_is_fetched_once_and_by_the_loader(sessions, loader):
+    """Ради этого круги и идут разом: обложку скачивает загрузчик по адресу из
+    выдачи и передаёт писателю готовой. Не передай — писатель полез бы за ней
+    сам, уже по адресу детального ответа.
+
+    Проверяется и число запросов, и адрес: по одному числу эти два пути
+    неразличимы — запрос всё равно один, просто чужой."""
     rig = loader(Found(source_card()))
 
     await rig.load.ensure(candidate())
 
-    assert [str(one.url) for one in rig.requests] == ["https://example.com/p.jpg"]
+    assert [str(one.url) for one in rig.requests] == [SEARCH_COVER]
 
 
 async def test_the_two_rounds_go_together(sessions, loader, monkeypatch):

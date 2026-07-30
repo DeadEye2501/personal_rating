@@ -39,31 +39,41 @@ class SteamClient:
         который соберёт не он сам, а поймавший его исключение сервис."""
         return self._http.name
 
+    async def _asked(self, url: str,
+                     params: dict | None = None) -> httpx.Response | Refusal:
+        """Ответ, годный к разбору, — либо отказ, который уже всё решил.
+
+        Оба запроса магазина отличаются только адресом: отказ на обрыв и на
+        взведённый предохранитель собирает транспорт, а любой код кроме 200
+        Steam не описывает нигде — отсюда общий `refuse_undocumented`."""
+        response = await self._http.get(url, params=params)
+        if not isinstance(response, httpx.Response):
+            return response
+        if response.status_code != 200:
+            return refuse_undocumented(self._http, response.status_code)
+        return response
+
     async def search(self, query: str, kind: Kind) -> Outcome:
         # Строка поиска идёт частью пути, поэтому её надо экранировать: `?` и
         # `#` для URL структурные, и «Who's Your Daddy?!» уедет обрезанным до
         # «Who's Your Daddy». Steam при этом ответит 200 и найдёт не то, что
         # просили, — то есть тихо неверная выдача, а не отказ.
-        response = await self._http.get(f"{SEARCH}/{quote(query, safe='')}")
-        if not isinstance(response, httpx.Response):
-            return response
-        if response.status_code != 200:
-            return refuse_undocumented(self._http, response.status_code)
+        answer = await self._asked(f"{SEARCH}/{quote(query, safe='')}")
+        if not isinstance(answer, httpx.Response):
+            return answer
         return parsed(logger, "steam", "выдача поиска не разобралась",
-                      lambda: Found(parse_search(response.json())))
+                      lambda: Found(parse_search(answer.json())))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
-        response = await self._http.get(
-            DETAILS, params={"appids": source_id, "l": "russian"}
-        )
-        if not isinstance(response, httpx.Response):
-            return response
-        # Битый или отсутствующий appids даёт 400 и тело `null`.
-        if response.status_code != 200:
-            return refuse_undocumented(self._http, response.status_code)
+        # Отсутствия Steam кодом не выражает: битый или отсутствующий appids
+        # даёт 400 и тело `null`, поэтому «такого нет» читается ниже, из тела.
+        answer = await self._asked(DETAILS,
+                                   {"appids": source_id, "l": "russian"})
+        if not isinstance(answer, httpx.Response):
+            return answer
 
         try:
-            payload = response.json()
+            payload = answer.json()
             block = payload.get(source_id)
             if block is None:
                 # Ответ про другую игру. Молча подставить его — значит записать

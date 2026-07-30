@@ -286,17 +286,18 @@
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/posters.py` — 122 строк
+### `backend/service/posters.py` — 130 строк
 
 Путь обложки от источника до хранилища.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.http`, `backend.storage.posters`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
 
-- `class PosterService` (102)
+- `class PosterService` (109)
   - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (7)
   - `async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal` (16)
   - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | Refusal` (18)
-  - `def _refuse(self, source: Source, detail: str) -> Refusal` (5)
+  - `def _name(source: Source) -> str` (4)
+  - `def _refuse(self, source: Source, detail: str) -> Refusal` (6)
   - `async def poster_for(self, item_id: int | None, source: Source, url: str, now: datetime) -> bytes | None | Refusal` (19)
   - `async def save(self, item_id: int, data: bytes, now: datetime) -> None` (2)
   - `async def delete(self, item_id: int) -> None` (4)
@@ -523,20 +524,21 @@
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `async def aclose(self) -> None` (3)
 
-### `backend/sources/steam/client.py` — 124 строк
+### `backend/sources/steam/client.py` — 134 строк
 
 Разговор со Steam по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`, `backend.sources.undocumented`
 
-- `class SteamClient` (96)
+- `class SteamClient` (106)
   - `def name(self) -> str` (4)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (12)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (39)
+  - `async def _asked(self, url: str, params: dict | None=None) -> httpx.Response | Refusal` (13)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (10)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (37)
   - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 87 строк
+### `backend/sources/steam/parse.py` — 85 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -547,22 +549,23 @@
 - `def _year(value: str | None) -> int | None` (7)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def parse_card(data: dict) -> SourceCard` (21)
-- `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
+- `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (5)
 
-### `backend/sources/tmdb/client.py` — 123 строк
+### `backend/sources/tmdb/client.py` — 122 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
 - `def classify(response: httpx.Response) -> Missing | Refusal | None` (20)
-- `class TmdbClient` (72)
+- `class TmdbClient` (71)
   - `def name(self) -> str` (4)
   - `def _params(self, **extra: object) -> dict` (2)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (7)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (12)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (15)
-  - `async def series_counts(self, source_id: str) -> Outcome` (12)
+  - `async def _asked(self, url: str, **extra: object) -> httpx.Response | Missing | Refusal` (12)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (7)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (10)
+  - `async def series_counts(self, source_id: str) -> Outcome` (8)
   - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/tmdb/parse.py` — 190 строк
@@ -681,15 +684,15 @@
   - `async def ratings_of(self, item_id: int) -> list[ExternalRating]` (7)
   - `async def stale_sources(self, item_id: int, wanted: list[RatingSource], now: datetime) -> list[RatingSource]` (16)
 
-### `backend/storage/repository/genres.py` — 93 строк
+### `backend/storage/repository/genres.py` — 89 строк
 
 Жанры в базе: свои, и чужие метки, ведущие к ним.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`, `backend.unique`
 
-- `class GenresRepository(Repository)` (76)
+- `class GenresRepository(Repository)` (74)
   - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (20)
-  - `async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]` (19)
+  - `async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]` (17)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (14)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
@@ -763,13 +766,13 @@
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[Tag]` (8)
 
-### `backend/storage/repository/views.py` — 184 строк
+### `backend/storage/repository/views.py` — 181 строк
 
 Пачечное чтение карточек для показа.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.tables`
 
-- `class ViewsRepository(Repository)` (151)
+- `class ViewsRepository(Repository)` (148)
   - `async def views_for(self, item_ids: list[int]) -> dict[int, CardView]` (5)
   - `async def in_order(self, item_ids: list[int]) -> list[CardView]` (9)
   - `async def _fetch_all(self, session: AsyncSession, item_ids: list[int]) -> dict[int, CardView]` (35)
@@ -782,7 +785,7 @@
   - `async def _ratings(self, session, item_ids)` (5)
   - `async def _wishlist(self, session, item_ids)` (6)
   - `async def _read(self, session, statement)` (4)
-  - `def _by_card(rows, make)` (7)
+  - `def _by_card(rows, make)` (4)
 
 ### `backend/storage/repository/wishlist.py` — 37 строк
 
@@ -796,7 +799,7 @@
   - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
-### `backend/storage/rows.py` — 99 строк
+### `backend/storage/rows.py` — 116 строк
 
 Строки базы в типы границы слоёв.
 
@@ -808,6 +811,7 @@
 - `def to_external_rating(row: Row) -> ExternalRating` (4)
 - `def to_rating(row: Row) -> Rating` (11)
 - `def to_tag(row: Row) -> Tag` (7)
+- `def grouped(rows, column: str, make: Callable[[Row], object]) -> defaultdict[object, list]` (12)
 - `def to_credit(row: Row, entity: Entity) -> Credit` (15)
 
 ### `backend/storage/session.py` — 55 строк
@@ -1408,7 +1412,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 300 строк
+### `tests/backend/test_loading.py` — 316 строк ⚠ подошёл к 300
 
 Три круга загрузки: кандидат становится карточкой в базе.
 
@@ -1416,8 +1420,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 16
 
-- `def candidate(source_id='157336', poster='https://example.com/p.jpg') -> CardView` (3)
-- `def source_card(source_id='157336', poster='https://example.com/p.jpg') -> SourceCard` (8)
+- `def candidate(source_id='157336', poster=SEARCH_COVER) -> CardView` (6)
+- `def source_card(source_id='157336', poster=DETAIL_COVER) -> SourceCard` (7)
 - `class Rig` (8)
 - `async def loader(sessions, posters)` (19)
   - `def build(outcome, poster_status: int=200) -> Rig` (13)

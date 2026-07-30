@@ -77,47 +77,46 @@ class TmdbClient:
             self._http.breaker.trip(RATE_BACKOFF, Reason.RATE)
         return verdict
 
-    async def search(self, query: str, kind: Kind) -> Outcome:
-        path = "/search/tv" if kind is Kind.SERIES else "/search/movie"
-        response = await self._http.get(
-            f"{BASE}{path}", params=self._params(query=query)
-        )
+    async def _asked(self, url: str,
+                     **extra: object) -> httpx.Response | Missing | Refusal:
+        """Ответ, годный к разбору, — либо исход, который уже всё решил.
+
+        Три запроса клиента отличаются только адресом и параметрами: отказ на
+        обрыв и на взведённый предохранитель собирает транспорт, отказ по чужому
+        коду — `_verdict`, и разбирать после любого из них нечего."""
+        response = await self._http.get(url, params=self._params(**extra))
         if not isinstance(response, httpx.Response):
             return response
         verdict = self._verdict(response)
-        if verdict is not None:
-            return verdict
+        return response if verdict is None else verdict
+
+    async def search(self, query: str, kind: Kind) -> Outcome:
+        path = "/search/tv" if kind is Kind.SERIES else "/search/movie"
+        answer = await self._asked(f"{BASE}{path}", query=query)
+        if not isinstance(answer, httpx.Response):
+            return answer
         return parsed(logger, "tmdb", "выдача поиска не разобралась",
-                      lambda: Found(parse_search(response.json(), kind)))
+                      lambda: Found(parse_search(answer.json(), kind)))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         path = "tv" if kind is Kind.SERIES else "movie"
-        response = await self._http.get(
-            f"{BASE}/{path}/{source_id}",
-            params=self._params(append_to_response=self._APPEND[kind]),
-        )
-        if not isinstance(response, httpx.Response):
-            return response
-        verdict = self._verdict(response)
-        if verdict is not None:
-            return verdict
+        answer = await self._asked(f"{BASE}/{path}/{source_id}",
+                                   append_to_response=self._APPEND[kind])
+        if not isinstance(answer, httpx.Response):
+            return answer
 
         parse = parse_series if kind is Kind.SERIES else parse_movie
         return parsed(logger, "tmdb", f"карточка {source_id} не разобралась",
-                      lambda: Found(parse(response.json())))
+                      lambda: Found(parse(answer.json())))
 
     async def series_counts(self, source_id: str) -> Outcome:
         """Перезапрос по сроку. Без `append_to_response`: `aggregate_credits`
         тянет 167 КБ, а нужны два числа."""
-        response = await self._http.get(f"{BASE}/tv/{source_id}",
-                                        params=self._params())
-        if not isinstance(response, httpx.Response):
-            return response
-        verdict = self._verdict(response)
-        if verdict is not None:
-            return verdict
+        answer = await self._asked(f"{BASE}/tv/{source_id}")
+        if not isinstance(answer, httpx.Response):
+            return answer
         return parsed(logger, "tmdb", f"сезоны {source_id} не разобрались",
-                      lambda: Found(parse_series_counts(response.json())))
+                      lambda: Found(parse_series_counts(answer.json())))
 
     async def aclose(self) -> None:
         await self._http.aclose()

@@ -1,14 +1,12 @@
 """Жанры в базе: свои, и чужие метки, ведущие к ним."""
 
-from collections import defaultdict
-
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Genre, GenreKind, GenreSource
 from backend.storage.repository.base import Repository
 from backend.unique import unique
-from backend.storage.rows import to_genre
+from backend.storage.rows import grouped, to_genre
 from backend.storage.statements import clearing
 from backend.storage.tables import genre as genre_table
 from backend.storage.tables import genre_map as genre_map_table
@@ -52,9 +50,7 @@ class GenresRepository(Repository):
             .where(genre_map_table.c.source == source)
             .order_by(genre_table.c.name)
         )
-        found = defaultdict(list)
-        for row in rows:
-            found[row.ext_id].append(to_genre(row))
+        found = grouped(rows, "ext_id", to_genre)
         return {ext_id: tuple(genres) for ext_id, genres in found.items()}
 
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:

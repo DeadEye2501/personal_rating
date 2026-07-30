@@ -1,6 +1,5 @@
 """Пачечное чтение карточек для показа."""
 
-from collections import defaultdict
 from dataclasses import replace
 
 from sqlalchemy import select
@@ -10,6 +9,7 @@ from backend.model import CardView, view_from_item
 from backend.storage.repository.base import Repository
 from backend.storage.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.rows import (
+    grouped,
     to_tag,
     to_credit,
     to_external_id,
@@ -176,9 +176,6 @@ class ViewsRepository(Repository):
 
     @staticmethod
     def _by_card(rows, make):
-        """Строки, разложенные по карточкам. Ключ — `item_id` из самой строки:
-        порядок он сохраняет, а карточку не путает."""
-        found = defaultdict(list)
-        for row in rows:
-            found[row.item_id].append(make(row))
-        return found
+        """Ключ — `item_id` из самой строки: порядок он сохраняет, а карточку не
+        путает. Названа колонка здесь, а не в каждом из четырёх чтений."""
+        return grouped(rows, "item_id", make)

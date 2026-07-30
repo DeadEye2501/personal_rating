@@ -4,6 +4,9 @@
 своего признака отвечает про одну карточку, `ViewsRepository` — про страницу
 пачкой. Две копии сборки расходились бы полями молча."""
 
+from collections import defaultdict
+from collections.abc import Callable
+
 from sqlalchemy import Row
 
 from backend.storage.entity import Entity
@@ -80,6 +83,20 @@ def to_tag(row: Row) -> Tag:
     путями — списком набора и составом карточки, — и под двумя типами клиент
     держал бы одно и то же."""
     return Tag(id=row.id, name=row.name)
+
+
+def grouped(rows, column: str,
+            make: Callable[[Row], object]) -> defaultdict[object, list]:
+    """Строки, разложенные по значению колонки: то же превращение в свой тип, но
+    для пачки карточек сразу.
+
+    Отдаётся `defaultdict`, а не словарь: спрашивают у него и про карточку, у
+    которой признака нет вовсе, — она обязана дать пустой список, а не
+    `KeyError`."""
+    found = defaultdict(list)
+    for row in rows:
+        found[getattr(row, column)].append(make(row))
+    return found
 
 
 def to_credit(row: Row, entity: Entity) -> Credit:
