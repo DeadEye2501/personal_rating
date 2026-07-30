@@ -69,6 +69,26 @@ class PosterService:
         return Refusal(source=f"poster:{source}", reason=Reason.BROKEN,
                        detail=detail)
 
+    async def poster_for(self, item_id: int | None, source: Source, url: str,
+                         now: datetime) -> bytes | None | Refusal:
+        """Обложка видимой карточки. Лежащая в хранилище отдаётся сразу.
+
+        У кандидата `item_id` пуст: обложку показываем, но класть её некуда —
+        сохранит её загрузчик вместе с карточкой."""
+        if item_id is None:
+            return await self.fetch(source, url)
+
+        stored = await self.store.get(item_id)
+        if stored is not None:
+            return stored
+
+        data = await self.fetch(source, url)
+        if data is None or isinstance(data, Refusal):
+            return data
+
+        await self.save(item_id, data, now)
+        return data
+
     async def save(self, item_id: int, data: bytes, now: datetime) -> None:
         await self.store.put(item_id, data, now)
 
@@ -76,7 +96,7 @@ class PosterService:
                            now: datetime) -> None:
         """Единственное место, где картинка обрезается: у залитой с диска форма
         произвольная."""
-        await self.store.put(item_id, crop_to_cover(data), now)
+        await self.save(item_id, crop_to_cover(data), now)
 
     async def aclose(self) -> None:
         for client in self.clients.values():

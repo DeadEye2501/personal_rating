@@ -60,22 +60,6 @@ def unreachable() -> httpx.MockTransport:
     return httpx.MockTransport(handler)
 
 
-def capture(*, content: bytes | None = None):
-    """Запоминает ушедшее на провод: проверять надо запрос, а не намерение.
-
-    `content` — тело ответа байтами, когда запрашивают картинку: пустой JSON
-    вместо неё сам стал бы отказом, и проверка адреса на него не добралась бы."""
-    seen: list[httpx.Request] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
-        if content is None:
-            return httpx.Response(200, json={})
-        return httpx.Response(200, content=content)
-
-    return httpx.MockTransport(handler), seen
-
-
 @pytest.fixture
 def fixture():
     """Тело записанного ответа. JSON разбирается, всё прочее идёт текстом."""

@@ -541,6 +541,10 @@
 
 - `KEYS` = `словарь из 5`
 
+### `tests/backend/test_cover_reads.py`
+
+- `STORED` = `bytes.fromhex('ffd8ffe000104a46') + b'0' * 64`
+
 ### `tests/backend/test_delete.py`
 
 - `ALONE` = `набор из 3`

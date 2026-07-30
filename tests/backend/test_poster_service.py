@@ -9,7 +9,8 @@ from backend.service.posters import PosterService
 from backend.sources.errors import Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
-from tests.backend.sources.conftest import capture, responding, unreachable
+from tests.backend.sources.conftest import responding, unreachable
+from tests.conftest import capture
 from tests.conftest import MOMENT as WHEN
 from tests.conftest import POSTER_SOURCES, picture, poster_service
 

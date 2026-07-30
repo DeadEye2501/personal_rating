@@ -260,16 +260,17 @@
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (32)
   - `async def refresh(self, item_id: int) -> None` (28)
 
-### `backend/service/posters.py` — 84 строк
+### `backend/service/posters.py` — 104 строк
 
 Путь обложки от источника до хранилища.
 
 Зависит от: `backend.model`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
 
-- `class PosterService` (64)
+- `class PosterService` (84)
   - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (16)
   - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | Refusal` (18)
   - `def _refuse(self, source: Source, detail: str) -> Refusal` (5)
+  - `async def poster_for(self, item_id: int | None, source: Source, url: str, now: datetime) -> bytes | None | Refusal` (19)
   - `async def save(self, item_id: int, data: bytes, now: datetime) -> None` (2)
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
@@ -935,7 +936,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 53 модулей
+## tests — 54 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -945,7 +946,7 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 123 строк
+### `tests/backend/sources/conftest.py` — 107 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
@@ -959,8 +960,6 @@
 - `def responding(status: int=200, *, json=None, text=None, content=None, headers=None)` (14)
 - `def unreachable() -> httpx.MockTransport` (7)
   - `def handler(request: httpx.Request) -> httpx.Response` (2)
-- `def capture(*, content: bytes | None=None)` (14)
-  - `def handler(request: httpx.Request) -> httpx.Response` (5)
 - `def fixture()` (3)
 - `def meta()` (2)
 - `def replay()` (33)
@@ -995,11 +994,11 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def answering(body) -> SourceHttp` (3)
 
-### `tests/backend/sources/test_http.py` — 320 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 321 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.sources.errors`, `backend.sources.http`, `backend.sources.undocumented`, `tests.backend.sources.conftest`
+Зависит от: `backend.sources.errors`, `backend.sources.http`, `backend.sources.undocumented`, `tests.backend.sources.conftest`, `tests.conftest`
 
 Тестов: 21
 
@@ -1106,6 +1105,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 9
 
+
+### `tests/backend/test_cover_reads.py` — 78 строк
+
+
+
+Зависит от: `backend.model`, `backend.sources.errors`, `tests.conftest`
+
+Тестов: 6
+
+- `async def covers(posters)` (5)
 
 ### `tests/backend/test_credits.py` — 287 строк
 
@@ -1270,7 +1279,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 304 строк ⚠ подошёл к 300
+### `tests/backend/test_loading.py` — 299 строк
 
 
 
@@ -1283,9 +1292,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def candidate(source_id='157336', poster='https://example.com/p.jpg') -> CardView` (3)
 - `def source_card(source_id='157336', poster='https://example.com/p.jpg') -> SourceCard` (9)
 - `class Rig` (8)
-- `async def loader(sessions, posters)` (24)
-  - `def build(outcome, poster_status: int=200) -> Rig` (18)
-    - `def answer(request: httpx.Request) -> httpx.Response` (3)
+- `async def loader(sessions, posters)` (19)
+  - `def build(outcome, poster_status: int=200) -> Rig` (13)
 
 ### `tests/backend/test_manual_cards.py` — 210 строк
 
@@ -1318,7 +1326,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_poster_service.py` — 193 строк
+### `tests/backend/test_poster_service.py` — 194 строк
 
 
 
@@ -1466,7 +1474,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 306 строк ⚠ подошёл к 300
+### `tests/conftest.py` — 324 строк ⚠ подошёл к 300
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1483,6 +1491,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `async def film_genres(engine) -> None` (11)
 - `async def seed(engine, *statements: str) -> None` (7)
+- `def capture(*, content: bytes | None=None, status: int=200)` (16)
+  - `def handler(request: httpx.Request) -> httpx.Response` (5)
 - `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def migrated(tmp_path)` (16)

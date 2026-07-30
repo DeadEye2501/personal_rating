@@ -166,6 +166,24 @@ async def seed(engine, *statements: str) -> None:
             await connection.execute(sqlalchemy.text(statement))
 
 
+def capture(*, content: bytes | None = None, status: int = 200):
+    """Запоминает ушедшее на провод: проверять надо запрос, а не намерение.
+
+    `content` — тело ответа байтами, когда запрашивают картинку: пустой JSON
+    вместо неё сам стал бы отказом, и проверка адреса на него не добралась бы.
+    `status` нужен там, где проверяется отказ: тело при этом всё равно
+    возвращается, но до него дело не доходит."""
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if content is None:
+            return httpx.Response(status, json={})
+        return httpx.Response(status, content=content)
+
+    return httpx.MockTransport(handler), seen
+
+
 def poster_service(store: PosterStore,
                    transport: httpx.MockTransport) -> PosterService:
     """Сервис обложек с одним транспортом на все три источника. Где важно, кого

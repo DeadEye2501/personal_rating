@@ -1,7 +1,6 @@
 import asyncio
 from dataclasses import dataclass
 
-import httpx
 import pytest
 
 from backend.model import (
@@ -24,6 +23,7 @@ from tests.conftest import (
     PICTURE,
     FakeClient,
     FakeSources,
+    capture,
     card_parts,
 )
 
@@ -69,13 +69,8 @@ async def loader(sessions, posters):
     настоящей сети в тестах нет."""
 
     def build(outcome, poster_status: int = 200) -> Rig:
-        asked = []
-
-        def answer(request: httpx.Request) -> httpx.Response:
-            asked.append(str(request.url))
-            return httpx.Response(poster_status, content=PICTURE)
-
-        parts = card_parts(sessions, posters, httpx.MockTransport(answer))
+        transport, asked = capture(content=PICTURE, status=poster_status)
+        parts = card_parts(sessions, posters, transport)
         client = FakeCatalog(outcome)
         return Rig(
             load=Loader(library=LibraryRepository(sessions),
@@ -259,7 +254,7 @@ async def test_the_cover_is_fetched_once(sessions, loader):
 
     await rig.load.ensure(candidate())
 
-    assert rig.requests == ["https://example.com/p.jpg"]
+    assert [str(one.url) for one in rig.requests] == ["https://example.com/p.jpg"]
 
 
 async def test_the_two_rounds_go_together(sessions, loader, monkeypatch):
