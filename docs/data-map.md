@@ -71,6 +71,9 @@
   - `runtime: int | None` = `None`
   - `seasons_count: int | None` = `None`
   - `episodes_count: int | None` = `None`
+- `class SeriesCounts`
+  - `seasons: int | None`
+  - `episodes: int | None`
 
 ### `backend/model/kinds.py`
 
@@ -254,6 +257,7 @@
 ### `backend/service/loading.py`
 
 - `logger` = `logging.getLogger(__name__)`
+- `REFRESH_TTL` = `timedelta(days=30)`
 
 ### `backend/service/posters.py`
 
@@ -597,6 +601,10 @@
 ### `tests/backend/test_sections.py`
 
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
+
+### `tests/backend/test_series_refresh.py`
+
+- `LONG_AGO` = `MOMENT - timedelta(days=40)`
 
 ### `tests/backend/test_session.py`
 

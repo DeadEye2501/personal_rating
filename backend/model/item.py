@@ -26,6 +26,14 @@ class Item:
     episodes_count: int | None = None   # всего серий, только у сериала
 
 
+@dataclass(frozen=True, slots=True)
+class SeriesCounts:
+    """Единственное, что у карточки перезапрашивается: сезоны и серии растут."""
+
+    seasons: int | None
+    episodes: int | None
+
+
 def new_source_id() -> str:
     """Идентичность ручной карточки. Случайная, а не `item.id`: тот известен
     только после вставки, и строку пришлось бы писать дважды. Предсказуемый

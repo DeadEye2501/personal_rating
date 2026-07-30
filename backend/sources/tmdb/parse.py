@@ -13,6 +13,7 @@ from backend.model import (
     PersonRole,
     RatingSource,
     SearchHit,
+    SeriesCounts,
     Source,
     SourceCard,
 )
@@ -147,12 +148,22 @@ def parse_movie(payload: dict) -> SourceCard:
     )
 
 
+def parse_series_counts(payload: dict) -> SeriesCounts:
+    """Оба числа лежат в ответе /tv/{id} без единого довеска.
+
+    Считать сезоны по длине seasons[] нельзя: нулевой сезон — спецматериалы, и у
+    «Andor» вышло бы три вместо двух."""
+    return SeriesCounts(seasons=payload.get("number_of_seasons"),
+                        episodes=payload.get("number_of_episodes"))
+
+
 def parse_series(payload: dict) -> SourceCard:
     people = _cast(_required(payload, "aggregate_credits")["cast"])
     people += [
         _person(row, PersonRole.SHOWRUNNER) for row in payload.get("created_by", [])
     ]
 
+    counts = parse_series_counts(payload)
     now = datetime.now()
     return SourceCard(
         item=Item(
@@ -167,8 +178,8 @@ def parse_series(payload: dict) -> SourceCard:
             released_at=_released(payload.get("first_air_date")),
             synopsis=payload.get("overview") or "",
             poster_url=_poster(payload),
-            seasons_count=payload.get("number_of_seasons"),
-            episodes_count=payload.get("number_of_episodes"),
+            seasons_count=counts.seasons,
+            episodes_count=counts.episodes,
         ),
         genre_ext_ids=_genres(payload),
         people=tuple(people),
@@ -176,3 +187,4 @@ def parse_series(payload: dict) -> SourceCard:
         external_ids=_imdb((payload.get("external_ids") or {}).get("imdb_id")),
         ratings=_own_rating(payload, now),
     )
+

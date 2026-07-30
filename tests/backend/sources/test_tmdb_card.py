@@ -5,11 +5,23 @@ from datetime import date
 import httpx
 import pytest
 
-from backend.model import GenreSource, Kind, PersonRole, RatingSource, Source
+from backend.model import (
+    GenreSource,
+    Kind,
+    PersonRole,
+    RatingSource,
+    SeriesCounts,
+    Source,
+)
 from backend.sources.errors import Found, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
-from backend.sources.tmdb.parse import Incomplete, parse_movie, parse_series
+from backend.sources.tmdb.parse import (
+    Incomplete,
+    parse_movie,
+    parse_series,
+    parse_series_counts,
+)
 
 
 def test_movie_card_carries_what_the_search_could_not(fixture):
@@ -286,6 +298,84 @@ async def test_incomplete_answer_is_a_refusal_not_a_card(fixture):
     client = TmdbClient(SourceHttp("tmdb", transport=transport), api_key="k")
 
     result = await client.card("157336", Kind.MOVIE)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+
+
+def test_the_cheap_request_brings_only_the_counts(fixture):
+    """167 КБ довеска ради двух чисел — это и есть причина отдельного метода."""
+    counts = parse_series_counts(fixture("tmdb/tv_detail.json"))
+
+    assert counts.seasons is not None
+    assert counts.episodes is not None
+
+
+async def test_the_cheap_request_asks_without_appendages():
+    asked = []
+
+    def handler(request):
+        asked.append(str(request.url))
+        return httpx.Response(200, json={"number_of_seasons": 2,
+                                         "number_of_episodes": 24})
+
+    client = TmdbClient(
+        SourceHttp("tmdb", transport=httpx.MockTransport(handler)), api_key="k"
+    )
+
+    result = await client.series_counts("83867")
+    await client.aclose()
+
+    assert result.value == SeriesCounts(seasons=2, episodes=24)
+    assert "/tv/83867" in asked[0]
+    assert "append_to_response" not in asked[0]
+
+
+async def test_the_cheap_request_survives_a_dead_network():
+    """`SourceHttp.get` отдаёт отказ вместо ответа — ветка, до которой
+    `MockTransport` с готовым телом не доводит никогда."""
+
+    def dead(request):
+        raise httpx.ConnectError("сети нет", request=request)
+
+    client = TmdbClient(
+        SourceHttp("tmdb", transport=httpx.MockTransport(dead)), api_key="k"
+    )
+
+    result = await client.series_counts("83867")
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.NETWORK
+
+
+async def test_a_rate_limit_on_the_cheap_request_trips_the_breaker():
+    """Перезапрос идёт по видимым карточкам: без отката он будет долбиться в 429
+    на каждой прокрутке."""
+    http = SourceHttp("tmdb", transport=httpx.MockTransport(
+        lambda request: httpx.Response(429, json={"status_code": 25})
+    ))
+    client = TmdbClient(http, api_key="k")
+
+    result = await client.series_counts("83867")
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.RATE
+    assert http.breaker.is_open()
+
+
+async def test_a_broken_body_of_the_cheap_request_is_a_refusal():
+    """Ответ 200 с телом не тем, что обещано, — отказ, а не пустые числа."""
+    client = TmdbClient(
+        SourceHttp("tmdb", transport=httpx.MockTransport(
+            lambda request: httpx.Response(200, text="это не json")
+        )),
+        api_key="k",
+    )
+
+    result = await client.series_counts("83867")
     await client.aclose()
 
     assert isinstance(result, Refusal)

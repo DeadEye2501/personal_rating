@@ -14,17 +14,12 @@ from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
-from tests.conftest import FakeSources, seed
+from tests.conftest import FakeClient, FakeSources, seed
 
 
-class FakeCatalog:
-    """Каталожный клиент с заданным ответом. Реестр держит контракт, поэтому
-    сервису достаточно, чтобы у объекта были `search` и `name`."""
-
-    def __init__(self, outcome, name: str = "tmdb") -> None:
-        self.outcome = outcome
-        self.name = name
-        self.asked = []
+class FakeCatalog(FakeClient):
+    """Спрашивают у него только выдачу поиска. Заданное исключение он бросает, а
+    не возвращает: сервис обязан пережить и это."""
 
     async def search(self, query: str, kind: Kind):
         self.asked.append((query, kind))

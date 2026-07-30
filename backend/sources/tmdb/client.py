@@ -21,6 +21,7 @@ from backend.sources.tmdb.parse import (
     parse_movie,
     parse_search,
     parse_series,
+    parse_series_counts,
 )
 
 logger = logging.getLogger(__name__)
@@ -118,6 +119,22 @@ class TmdbClient:
             return Found(parse(response.json()))
         except (Incomplete, *BROKEN_BY_PARSING) as error:
             logger.warning("tmdb: карточка %s не разобралась — %s", source_id, error)
+            return broken("tmdb", error)
+
+    async def series_counts(self, source_id: str) -> Outcome:
+        """Перезапрос по сроку. Без `append_to_response`: `aggregate_credits`
+        тянет 167 КБ, а нужны два числа."""
+        response = await self._http.get(f"{BASE}/tv/{source_id}",
+                                        params=self._params())
+        if not isinstance(response, httpx.Response):
+            return response
+        verdict = self._verdict(response)
+        if verdict is not None:
+            return verdict
+        try:
+            return Found(parse_series_counts(response.json()))
+        except BROKEN_BY_PARSING as error:
+            logger.warning("tmdb: сезоны %s не разобрались — %s", source_id, error)
             return broken("tmdb", error)
 
     async def aclose(self) -> None:

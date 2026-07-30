@@ -4,7 +4,12 @@ from backend.model.card import SourceCard
 from backend.model.credit import Credit
 from backend.model.external import ExternalId, ExternalRating
 from backend.model.genre import Genre
-from backend.model.item import Item, new_manual_item, new_source_id
+from backend.model.item import (
+    Item,
+    SeriesCounts,
+    new_manual_item,
+    new_source_id,
+)
 from backend.model.link import ExternalLink, parse_link
 from backend.model.kinds import (
     CompanyRole,
@@ -56,6 +61,7 @@ __all__ = [
     "Ratings",
     "SearchHit",
     "Section",
+    "SeriesCounts",
     "Sort",
     "Source",
     "SourceCard",

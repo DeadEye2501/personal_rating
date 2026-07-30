@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 71 строк
+### `backend/model/__init__.py` — 77 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
 
-Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Feed`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Feed`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -61,13 +61,14 @@
 
 - `class Genre` (4)
 
-### `backend/model/item.py` — 48 строк
+### `backend/model/item.py` — 56 строк
 
 Карточка любого типа содержимого на границе слоёв.
 
 Зависит от: `backend.model.kinds`
 
 - `class Item` (16)
+- `class SeriesCounts` (5)
 - `def new_source_id() -> str` (5)
 - `def new_manual_item(kind: Kind, title: str, **fields) -> Item` (13)
 
@@ -232,14 +233,16 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 59 строк
+### `backend/service/loading.py` — 104 строк
 
 Кандидат превращается в карточку.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.library`
 
-- `class Loader` (43)
+- `def _kept(fresh: int | None, stored: int | None) -> int | None` (4)
+- `class Loader` (76)
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (32)
+  - `async def refresh(self, item_id: int) -> None` (28)
 
 ### `backend/service/posters.py` — 84 строк
 
@@ -472,22 +475,23 @@
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
 
-### `backend/sources/tmdb/client.py` — 124 строк
+### `backend/sources/tmdb/client.py` — 141 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
 - `def classify(response: httpx.Response) -> Missing | Refusal | None` (20)
-- `class TmdbClient` (65)
+- `class TmdbClient` (81)
   - `def name(self) -> str` (4)
   - `def _params(self, **extra: object) -> dict` (2)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (7)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
+  - `async def series_counts(self, source_id: str) -> Outcome` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 178 строк
+### `backend/sources/tmdb/parse.py` — 190 строк
 
 Перевод ответов TMDB в наши типы.
 
@@ -504,7 +508,8 @@
 - `def _required(payload: dict, block: str) -> dict` (9)
 - `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (27)
 - `def parse_movie(payload: dict) -> SourceCard` (30)
-- `def parse_series(payload: dict) -> SourceCard` (29)
+- `def parse_series_counts(payload: dict) -> SeriesCounts` (7)
+- `def parse_series(payload: dict) -> SourceCard` (30)
 
 ### `backend/sources/undocumented.py` — 22 строк
 
@@ -906,7 +911,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 51 модулей
+## tests — 52 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1027,13 +1032,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_tmdb_card.py` — 292 строк
+### `tests/backend/sources/test_tmdb_card.py` — 382 строк ⚠ подошёл к 300
 
 Второй круг загрузки: карточка, которую уже можно записать.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
-Тестов: 25
+Тестов: 30
 
 
 ### `tests/backend/sources/test_tmdb_failures.py` — 203 строк
@@ -1225,7 +1230,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 303 строк ⚠ подошёл к 300
+### `tests/backend/test_loading.py` — 304 строк ⚠ подошёл к 300
 
 
 
@@ -1233,7 +1238,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 16
 
-- `class FakeCatalog` (11)
+- `class FakeCatalog(FakeClient)` (6)
   - `async def card(self, source_id: str, kind: Kind)` (3)
 - `def candidate(source_id='157336', poster='https://example.com/p.jpg') -> CardView` (3)
 - `def source_card(source_id='157336', poster='https://example.com/p.jpg') -> SourceCard` (9)
@@ -1301,7 +1306,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search.py` — 437 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 432 строк ⚠ подошёл к 300
 
 
 
@@ -1309,7 +1314,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 30
 
-- `class FakeCatalog` (14)
+- `class FakeCatalog(FakeClient)` (9)
   - `async def search(self, query: str, kind: Kind)` (5)
 - `def hit(source_id='157336', title='Интерстеллар', source=Source.TMDB, kind=Kind.MOVIE, **fields) -> SearchHit` (7)
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
@@ -1335,6 +1340,20 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 23
 
 - `async def library(sessions)` (2)
+
+### `tests/backend/test_series_refresh.py` — 187 строк
+
+
+
+Зависит от: `backend.model`, `backend.service.loading`, `backend.sources.errors`, `backend.storage.repository.library`, `tests.conftest`
+
+Тестов: 12
+
+- `class FakeTmdb(FakeClient)` (6)
+  - `async def series_counts(self, source_id: str)` (3)
+- `def series(synced_at, seasons=1, episodes=12) -> Item` (3)
+- `async def refresher(sessions)` (12)
+  - `def build(outcome)` (6)
 
 ### `tests/backend/test_session.py` — 90 строк
 
@@ -1407,7 +1426,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 286 строк
+### `tests/conftest.py` — 300 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1416,6 +1435,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def ours(caplog) -> list[str]` (8)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
+- `class FakeClient` (12)
 - `class FakeSources` (17)
   - `def catalog_for(self, _kind: Kind) -> list` (4)
   - `def client_for(self, _source: Source)` (4)
