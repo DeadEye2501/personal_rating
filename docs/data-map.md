@@ -238,6 +238,13 @@
 
 - `logger` = `logging.getLogger(__name__)`
 
+### `backend/service/enrich.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `class _Harvest`
+  - `values: dict[RatingSource, float]` = `field(default_factory=dict)`
+  - `refused: set[RatingSource]` = `field(default_factory=set)`
+
 ### `backend/service/images.py`
 
 - `TARGET_RATIO` = `2 / 3`
@@ -304,6 +311,8 @@
 ### `backend/sources/ratings/kinopoisk/client.py`
 
 - `logger` = `logging.getLogger(__name__)`
+- `class KinopoiskClient`
+  - `PROVIDES: ClassVar[tuple[RatingSource, ...]]` = `набор из 1`
 
 ### `backend/sources/ratings/kinopoisk/mirror.py`
 
@@ -327,6 +336,8 @@
 - `logger` = `logging.getLogger(__name__)`
 - `BASE` = `'https://api.mdblist.com'`
 - `QUOTA_FALLBACK` = `timedelta(hours=1)`
+- `class MdbListClient`
+  - `PROVIDES: ClassVar[tuple[RatingSource, ...]]` = `набор из 4`
 
 ### `backend/sources/ratings/mdblist/parse.py`
 
@@ -336,6 +347,8 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `BASE` = `'https://www.omdbapi.com/'`
+- `class OmdbClient`
+  - `PROVIDES: ClassVar[tuple[RatingSource, ...]]` = `набор из 3`
 
 ### `backend/sources/ratings/omdb/parse.py`
 

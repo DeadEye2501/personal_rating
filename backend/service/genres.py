@@ -2,6 +2,7 @@
 
 from backend.model import GenreSource
 from backend.storage.repository.genres import GenresRepository
+from backend.unique import unique
 
 
 async def resolved_genres(
@@ -24,5 +25,4 @@ async def resolved_genres(
     found: list[int] = []
     for space, ext_ids in spaces.items():
         found.extend(await genres.resolve(space, ext_ids))
-    # Порядок сохраняется: словарь помнит его с 3.7, а `set` — нет.
-    return list(dict.fromkeys(found))
+    return unique(found)

@@ -123,6 +123,12 @@ class FakeSources:
         самого реестра. Без клиентов — `None`, как у ручной карточки."""
         return self._clients[0] if self._clients else None
 
+    def rating_sources(self, kind: Kind) -> list:
+        """Единственное правило настоящего реестра, которое здесь повторяется:
+        у игр оценочных источников нет. Без него сервис не проверить на пустом
+        списке, а сам список — предмет его работы."""
+        return [] if kind is Kind.GAME else self._clients
+
 
 async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
     """Записанная карточка со своей оценкой — или без неё, если оценки нет.

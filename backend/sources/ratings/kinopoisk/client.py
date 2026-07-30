@@ -1,8 +1,9 @@
 """Кинопоиск снаружи: одно имя над двумя зеркалами."""
 
 import logging
+from typing import ClassVar
 
-from backend.model import Kind
+from backend.model import Kind, RatingSource
 from backend.sources.errors import Outcome, Refusal
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
@@ -13,6 +14,9 @@ logger = logging.getLogger(__name__)
 class KinopoiskClient:
     """Зеркала отдают одни и те же данные под одним идентификатором — второе
     нужно на случай, когда первое закроется."""
+
+    # Наружу это один источник: какое зеркало ответило, в данных не отражается.
+    PROVIDES: ClassVar[tuple[RatingSource, ...]] = (RatingSource.KINOPOISK,)
 
     def __init__(self, primary: PoiskkinoClient, fallback: UnofficialClient) -> None:
         self._primary = primary

@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 64 модулей
+## backend — 66 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -190,13 +190,29 @@
   - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (30)
   - `async def _write_the_rest(self, item_id: int, card: SourceCard, poster: bytes | None) -> None` (13)
 
+### `backend/service/enrich.py` — 149 строк
+
+Чужие оценки у карточки.
+
+Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.external`, `backend.unique`
+
+- `class _Harvest` (10)
+- `class Enricher` (114)
+  - `async def enrich(self, item_id: int, kind: Kind) -> list[ExternalRating]` (28)
+  - `def expected(self, kind: Kind) -> list[RatingSource]` (9)
+  - `async def _imdb_id(self, item_id: int) -> str | None` (5)
+  - `async def _harvested(self, item_id: int, asked: list, outcomes: list) -> _Harvest` (16)
+  - `def _take(harvest: _Harvest, values: tuple[ExternalRating, ...], provides: tuple[RatingSource, ...]) -> None` (16)
+  - `async def _record(self, item_id: int, harvest: _Harvest, stale: list[RatingSource], now: datetime) -> None` (13)
+  - `async def _keep(self, item_id: int, external: ExternalId) -> None` (5)
+
 ### `backend/service/genres.py` — 28 строк
 
 Чужие метки жанров в наши идентификаторы.
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.unique`
 
-- `async def resolved_genres(genres: GenresRepository, marked: tuple[tuple[GenreSource, str], ...]) -> list[int]` (22)
+- `async def resolved_genres(genres: GenresRepository, marked: tuple[tuple[GenreSource, str], ...]) -> list[int]` (21)
 
 ### `backend/service/images.py` — 51 строк
 
@@ -262,7 +278,7 @@
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `backend.unique`
 
 - `class ExternalSearch` (6)
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (16)
@@ -270,7 +286,7 @@
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
   - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (20)
   - `async def _to_views(self, hits: list[SearchHit]) -> list[CardView]` (9)
-- `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (12)
+- `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (11)
 
 ### `backend/sources/convert.py` — 52 строк
 
@@ -334,13 +350,13 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/kinopoisk/client.py` — 35 строк
+### `backend/sources/ratings/kinopoisk/client.py` — 39 строк
 
 Кинопоиск снаружи: одно имя над двумя зеркалами.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`
 
-- `class KinopoiskClient` (23)
+- `class KinopoiskClient` (26)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (11)
   - `async def aclose(self) -> None` (3)
 
@@ -391,14 +407,14 @@
   - `def _verdict(self, response: httpx.Response) -> Outcome` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/mdblist/client.py` — 94 строк
+### `backend/sources/ratings/mdblist/client.py` — 104 строк
 
 Разговор с MDBList по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.parse`
 
 - `def _retry_after(response: httpx.Response) -> timedelta | None` (3)
-- `class MdbListClient` (60)
+- `class MdbListClient` (69)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (8)
   - `def _verdict(self, response: httpx.Response) -> Outcome` (26)
   - `def _denied(self, response: httpx.Response) -> Refusal` (16)
@@ -412,14 +428,14 @@
 
 - `def parse_ratings(payload: dict) -> Ratings` (18)
 
-### `backend/sources/ratings/omdb/client.py` — 100 строк
+### `backend/sources/ratings/omdb/client.py` — 107 строк
 
 Разговор с OMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.parse`
 
 - `def until_midnight(now: datetime) -> timedelta` (7)
-- `class OmdbClient` (66)
+- `class OmdbClient` (72)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (28)
   - `def _answer(self, payload: dict) -> Outcome` (11)
   - `def _denied(self, payload: dict) -> Refusal` (17)
@@ -598,11 +614,11 @@
   - `async def ratings_of(self, item_id: int) -> list[ExternalRating]` (7)
   - `async def stale_sources(self, item_id: int, wanted: list[RatingSource], now: datetime) -> list[RatingSource]` (16)
 
-### `backend/storage/repository/genres.py` — 92 строк
+### `backend/storage/repository/genres.py` — 93 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`, `backend.unique`
 
 - `class GenresRepository(Repository)` (76)
   - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (20)
@@ -779,6 +795,14 @@
 Зависит от: `backend.storage.tables.base`
 
 
+### `backend/unique.py` — 16 строк
+
+Снятие повторов с сохранением порядка.
+
+Зависит от: —
+
+- `def unique(items: Iterable[T]) -> list[T]` (11)
+
 ## client — 0 модулей
 
 ## migrations — 3 модулей
@@ -911,7 +935,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 52 модулей
+## tests — 53 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1101,6 +1125,22 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 8
 
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
+
+### `tests/backend/test_enrich.py` — 425 строк ⚠ подошёл к 300
+
+
+
+Зависит от: `backend.model`, `backend.service.enrich`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+
+Тестов: 24
+
+- `class FakeRatings(FakeClient)` (11)
+  - `async def ratings(self, imdb_id: str, _kind: Kind)` (3)
+- `async def item_id(sessions)` (8)
+- `async def enrich(sessions)` (12)
+  - `def build(*clients) -> Enricher` (7)
+- `def found(*pairs) -> Found` (4)
+- `async def stored_ratings(sessions, item_id) -> dict` (3)
 
 ### `tests/backend/test_external_ids.py` — 118 строк
 
@@ -1426,7 +1466,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 300 строк
+### `tests/conftest.py` — 306 строк ⚠ подошёл к 300
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1436,9 +1476,10 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
 - `class FakeClient` (12)
-- `class FakeSources` (17)
+- `class FakeSources` (23)
   - `def catalog_for(self, _kind: Kind) -> list` (4)
   - `def client_for(self, _source: Source)` (4)
+  - `def rating_sources(self, kind: Kind) -> list` (5)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `async def film_genres(engine) -> None` (11)
 - `async def seed(engine, *statements: str) -> None` (7)

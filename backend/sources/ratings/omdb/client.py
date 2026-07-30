@@ -2,10 +2,11 @@
 
 import logging
 from datetime import datetime, timedelta
+from typing import ClassVar
 
 import httpx
 
-from backend.model import Kind
+from backend.model import Kind, RatingSource
 from backend.sources.errors import (
     BROKEN_BY_PARSING,
     Found,
@@ -33,6 +34,12 @@ def until_midnight(now: datetime) -> timedelta:
 
 
 class OmdbClient:
+    PROVIDES: ClassVar[tuple[RatingSource, ...]] = (
+        RatingSource.IMDB,
+        RatingSource.ROTTEN,
+        RatingSource.METACRITIC,
+    )
+
     def __init__(self, http: SourceHttp, api_key: str) -> None:
         self._http = http
         self._key = api_key

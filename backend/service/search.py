@@ -18,6 +18,7 @@ from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
+from backend.unique import unique
 
 logger = logging.getLogger(__name__)
 
@@ -106,9 +107,8 @@ def _genres_of(
 ) -> tuple[Genre, ...]:
     """Незнакомое молча отбрасывается: заводить жанр на лету нельзя — имена в
     справочнике наши, а сборный жанр автоматически не разложить."""
-    found: list[Genre] = []
-    for space, ext_id in hit.genre_ext_ids:
-        for genre in index[space].get(ext_id, ()):
-            if genre not in found:
-                found.append(genre)
-    return tuple(found)
+    return tuple(unique(
+        genre
+        for space, ext_id in hit.genre_ext_ids
+        for genre in index[space].get(ext_id, ())
+    ))

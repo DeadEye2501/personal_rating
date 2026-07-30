@@ -7,6 +7,7 @@ from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Genre, GenreKind, GenreSource
 from backend.storage.repository.base import Repository
+from backend.unique import unique
 from backend.storage.rows import to_genre
 from backend.storage.statements import clearing
 from backend.storage.tables import genre as genre_table
@@ -34,7 +35,7 @@ class GenresRepository(Repository):
 
         # Порядок сохраняется: сборный жанр разворачивается в два, и оба должны
         # прийти в том порядке, в каком лежат в справочнике.
-        return list(dict.fromkeys(row.genre_id for row in rows))
+        return unique(row.genre_id for row in rows)
 
     async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]:
         """Соответствия одного пространства целиком.
