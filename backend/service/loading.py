@@ -5,7 +5,7 @@ import logging
 from collections.abc import Callable
 from datetime import datetime, timedelta
 
-from backend.model import CardView, Kind, Source
+from backend.model import CardView, ExternalLink, Kind, Source, SourceCard
 from backend.service.asking import answered
 from backend.service.cards import CardWriter
 from backend.service.posters import PosterService
@@ -29,8 +29,9 @@ def _kept(fresh: int | None, stored: int | None) -> int | None:
 class Loader:
     """Всё, что карточка получает от источника после выдачи поиска.
 
-    Это второй круг загрузки — детальный ответ и обложка разом, потом запись — и
-    он же единственный перезапрос: у сериала растут сезоны и серии."""
+    Это второй круг загрузки — детальный ответ и обложка разом, потом запись, —
+    единственный перезапрос по сроку, у сериала растут сезоны и серии, и путь по
+    вставленной ссылке, где карточку добывают не из выдачи, а из адреса."""
 
     def __init__(self, library: LibraryRepository, writer: CardWriter,
                  sources: Sources, posters: PosterService,
@@ -40,6 +41,19 @@ class Loader:
         self._sources = sources
         self._posters = posters
         self._clock = clock
+
+    def _catalog(self, source: Source, action: str):
+        """Каталожный клиент источника — или отказ вместо него.
+
+        У ручной карточки клиента нет и быть не может: она ниоткуда не
+        приезжала. `action` попадает в лог: спрашивают клиента двое, и по
+        сообщению должно быть видно, кто именно не смог."""
+        client = self._sources.client_for(source)
+        if client is not None:
+            return client
+        logger.warning("нечем %s: источник %s", action, source)
+        return Refusal(source=str(source), reason=Reason.BROKEN,
+                       detail=f"нет каталожного клиента для {source}")
 
     async def ensure(self, view: CardView) -> int | Missing | Refusal:
         """Идентификатор карточки в базе: уже лежавшей или только что
@@ -51,11 +65,9 @@ class Loader:
         if existing is not None:
             return existing.id
 
-        client = self._sources.client_for(view.source)
-        if client is None:
-            logger.warning("нечем загрузить карточку источника %s", view.source)
-            return Refusal(source=str(view.source), reason=Reason.BROKEN,
-                           detail=f"нет каталожного клиента для {view.source}")
+        client = self._catalog(view.source, "загрузить карточку")
+        if isinstance(client, Refusal):
+            return client
 
         # Круги 2а и 2б: адрес обложки пришёл ещё с выдачей поиска, поэтому
         # детальный ответ её не ждёт.
@@ -73,6 +85,27 @@ class Loader:
             return card
 
         return await self._writer.save(card.value, poster)
+
+    async def card_for_link(
+        self, link: ExternalLink
+    ) -> SourceCard | Missing | Refusal:
+        """Разобранная ссылка — в карточку источника, готовую для привязки.
+
+        Единственное место, где адрес не совпадает с идентичностью: у GOG в
+        ссылке слаг, а каталогу нужен номер."""
+        client = self._catalog(link.source, "сходить по ссылке")
+        if isinstance(client, Refusal):
+            return client
+
+        source_id = link.source_id
+        if link.source is Source.GOG:
+            resolved = await answered(client.resolve_slug(source_id), client.name)
+            if not isinstance(resolved, Found):
+                return resolved
+            source_id = resolved.value
+
+        outcome = await answered(client.card(source_id, link.kind), client.name)
+        return outcome.value if isinstance(outcome, Found) else outcome
 
     async def refresh(self, item_id: int) -> None:
         """Число сезонов и серий у сериала — единственное, что

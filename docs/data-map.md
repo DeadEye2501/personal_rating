@@ -529,6 +529,10 @@
 
 - `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
 
+### `tests/backend/sources/test_gog_slug.py`
+
+- `SLUG` = `'arcanum_of_steamworks_and_magick_obscura'`
+
 ### `tests/backend/sources/test_registry.py`
 
 - `SILENT` = `httpx.MockTransport(lambda request: httpx.Respon…`

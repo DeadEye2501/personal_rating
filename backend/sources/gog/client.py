@@ -8,12 +8,13 @@ from backend.model import Kind
 from backend.sources.errors import (
     BROKEN_BY_PARSING,
     Found,
+    Missing,
     Outcome,
     Reason,
     Refusal,
     broken,
 )
-from backend.sources.gog.parse import parse_catalog, to_hit
+from backend.sources.gog.parse import find_slug, parse_catalog, to_hit
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import refuse_undocumented
 
@@ -42,7 +43,9 @@ class GogClient:
         который соберёт не он сам, а поймавший его исключение сервис."""
         return self._http.name
 
-    async def _catalog(self, query: str) -> list | Refusal:
+    async def _payload(self, query: str) -> dict | Refusal:
+        """Тело ответа каталога. Разбирают его двое и по-разному: поиску нужны
+        кандидаты, привязке — номер по слагу."""
         response = await self._http.get(
             CATALOG, params={"query": f"like:{query}", "locale": "ru-RU"}
         )
@@ -51,7 +54,17 @@ class GogClient:
         if response.status_code != 200:
             return refuse_undocumented(self._http, response.status_code)
         try:
-            return parse_catalog(response.json())
+            return response.json()
+        except BROKEN_BY_PARSING as error:
+            logger.warning("gog: тело каталога не разобралось — %s", error)
+            return broken("gog", error)
+
+    async def _catalog(self, query: str) -> list | Refusal:
+        payload = await self._payload(query)
+        if isinstance(payload, Refusal):
+            return payload
+        try:
+            return parse_catalog(payload)
         except BROKEN_BY_PARSING as error:
             logger.warning("gog: каталог не разобрался — %s", error)
             return broken("gog", error)
@@ -80,6 +93,28 @@ class GogClient:
             reason=Reason.BROKEN,
             detail=f"каталог не вернул {source_id}",
         )
+
+    async def resolve_slug(self, slug: str) -> Outcome:
+        """В адресе у GOG слаг, а каталогу нужен номер. Спрашиваем каталог тем же
+        слагом, разобранным на слова, и берём только точное совпадение.
+
+        `Missing` тут возвращается, хотя из `search` и `card` — никогда: здесь
+        спрашивают не «что похоже на это название», а «есть ли ровно такой
+        слаг», и его отсутствие — честный ответ."""
+        payload = await self._payload(slug.replace("_", " "))
+        if isinstance(payload, Refusal):
+            return payload
+        try:
+            found = find_slug(payload, slug)
+        except BROKEN_BY_PARSING as error:
+            logger.warning("gog: каталог по слагу %s не разобрался — %s",
+                           slug, error)
+            return broken("gog", error)
+
+        if found is None:
+            logger.info("gog: слага %s в каталоге не нашлось", slug)
+            return Missing()
+        return Found(found)
 
     async def aclose(self) -> None:
         await self._http.aclose()

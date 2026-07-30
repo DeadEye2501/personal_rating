@@ -62,3 +62,13 @@ def to_hit(card: SourceCard) -> SearchHit:
         genre_ext_ids=card.genre_ext_ids,
         source_rating=card.ratings[0].value if card.ratings else None,
     )
+
+
+def find_slug(payload: dict, slug: str) -> str | None:
+    """Совпадение строгое. Поиск GOG никогда не отвечает «не найдено»: на
+    заведомую бессмыслицу приходит 200 и два десятка несвязанных игр. Брать
+    похожее по названию значит молча привязать не ту игру."""
+    for row in payload.get("products") or []:
+        if row.get("slug") == slug:
+            return str(row["id"])
+    return None

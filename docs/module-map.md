@@ -249,15 +249,17 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 104 строк
+### `backend/service/loading.py` — 137 строк
 
 Кандидат превращается в карточку.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.library`
 
 - `def _kept(fresh: int | None, stored: int | None) -> int | None` (4)
-- `class Loader` (76)
-  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (32)
+- `class Loader` (109)
+  - `def _catalog(self, source: Source, action: str)` (12)
+  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (30)
+  - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
   - `async def refresh(self, item_id: int) -> None` (28)
 
 ### `backend/service/posters.py` — 104 строк
@@ -314,20 +316,22 @@
 - `def broken(source: str, error: Exception) -> Refusal` (4)
 - `def is_answer(outcome: Outcome) -> bool` (5)
 
-### `backend/sources/gog/client.py` — 85 строк
+### `backend/sources/gog/client.py` — 120 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (61)
+- `class GogClient` (95)
   - `def name(self) -> str` (4)
-  - `async def _catalog(self, query: str) -> list | Refusal` (13)
+  - `async def _payload(self, query: str) -> dict | Refusal` (15)
+  - `async def _catalog(self, query: str) -> list | Refusal` (9)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
+  - `async def resolve_slug(self, slug: str) -> Outcome` (21)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/gog/parse.py` — 64 строк
+### `backend/sources/gog/parse.py` — 74 строк
 
 Перевод ответов GOG в наши типы.
 
@@ -336,6 +340,7 @@
 - `def _marks(row: dict) -> tuple[tuple[GenreSource, str], ...]` (8)
 - `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
 - `def to_hit(card: SourceCard) -> SearchHit` (12)
+- `def find_slug(payload: dict, slug: str) -> str | None` (8)
 
 ### `backend/sources/http.py` — 90 строк
 
@@ -936,7 +941,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 54 модулей
+## tests — 56 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -993,6 +998,16 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 21
 
 - `def answering(body) -> SourceHttp` (3)
+
+### `tests/backend/sources/test_gog_slug.py` — 120 строк
+
+Слаг из адреса GOG в номер каталога.
+
+Зависит от: `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
+
+Тестов: 13
+
+- `def client(handler) -> GogClient` (2)
 
 ### `tests/backend/sources/test_http.py` — 321 строк ⚠ подошёл к 300
 
@@ -1256,6 +1271,21 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def make_item(**overrides) -> Item` (12)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
+
+### `tests/backend/test_link_loading.py` — 140 строк
+
+Вставленная ссылка в карточку источника, готовую для привязки.
+
+Зависит от: `backend.model`, `backend.service.loading`, `backend.sources.errors`, `backend.storage.repository.library`, `tests.conftest`
+
+Тестов: 7
+
+- `def source_card(source: Source, source_id: str) -> SourceCard` (5)
+- `class FakeCatalog(FakeClient)` (16)
+  - `async def card(self, source_id: str, kind: Kind)` (3)
+  - `async def resolve_slug(self, slug: str)` (3)
+- `async def loader(sessions)` (6)
+  - `def build(client) -> Loader` (3)
 
 ### `tests/backend/test_linking.py` — 409 строк ⚠ подошёл к 300
 
