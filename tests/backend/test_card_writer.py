@@ -284,17 +284,28 @@ async def test_the_rollback_takes_the_written_half_with_it(writer, sessions):
     assert await ExternalRatingsRepository(sessions).ratings_of(half_written) == []
 
 
-async def test_the_rollback_takes_the_poster_with_it(writer):
+async def test_the_rollback_takes_the_poster_with_it(writer, monkeypatch):
     """Постер лежит во втором файле базы, и каскадом он не уходит: оставленный,
-    он достался бы следующей карточке с этим же номером."""
-    first = await writer.save(source_card())
+    он достался бы следующей карточке с этим же номером.
 
-    await writer.save(another_movie(
-        "999", external_ids=(ExternalId(IdSource.IMDB, "tt0816692"),),
-    ))
+    Срыв наводится после того, как обложка легла, — иначе проверять было бы
+    нечего: постер пишется последним шагом, и занятый идентификатор до него не
+    доходит вовсе."""
+    stored: list[int] = []
+    save = writer.posters.save
 
-    assert await writer.posters.store.has(first) is True
-    assert await writer.posters.store.has(first + 1) is False, \
+    async def save_then_break(item_id, data, now):
+        await save(item_id, data, now)
+        stored.append(item_id)
+        raise OSError("второй файл базы отвалился после записи")
+
+    monkeypatch.setattr(writer.posters, "save", save_then_break)
+
+    result = await writer.save(source_card())
+
+    assert isinstance(result, Refusal)
+    assert stored, "обложка до хранилища не дошла — тест проверяет не то"
+    assert await writer.posters.store.has(stored[0]) is False, \
         "постер откаченной карточки остался и достанется следующей"
 
 

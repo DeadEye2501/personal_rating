@@ -127,7 +127,11 @@ async def test_a_broken_client_on_the_way_by_link_is_a_refusal(loader, caplog):
 
 
 async def test_a_link_to_a_source_without_a_client_is_a_refusal(sessions, caplog):
-    """Ссылка на ручную карточку — бессмыслица: клиента у неё нет."""
+    """Ссылка на ручную карточку — бессмыслица: клиента у неё нет.
+
+    В сообщении проверяется само действие: клиента спрашивают двое, и загрузка
+    карточки от прохода по ссылке в логе должна отличаться — иначе непонятно, кто
+    именно не смог."""
     load = Loader(library=LibraryRepository(sessions), writer=None,
                   sources=FakeSources(), posters=None)
 
@@ -137,4 +141,5 @@ async def test_a_link_to_a_source_without_a_client_is_a_refusal(sessions, caplog
         )
 
     assert isinstance(result, Refusal)
-    assert "manual" in caplog.text
+    assert (result.source, result.reason) == ("manual", Reason.BROKEN)
+    assert "нечем сходить по ссылке" in caplog.text

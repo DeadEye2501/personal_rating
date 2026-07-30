@@ -145,29 +145,33 @@ async def test_an_unexpected_status_is_a_refusal():
     result = await ask(responding(503, json={"Response": "False"}))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.BROKEN
+    assert (result.source, result.reason) == ("omdb", Reason.BROKEN)
     assert "503" in result.detail
 
 
 async def test_recorded_quota_is_told_apart_from_a_bad_key(replay, meta):
-    """Под одним кодом 401 живут две разные беды, и различает их только текст."""
+    """Под одним кодом 401 живут две разные беды, и различает их только текст.
+
+    Имя источника проверяется вместе с причиной: клиенты MDBList и OMDB написаны
+    по одному шаблону и стоят рядом, имя в обоих — литерал, и подмена одного на
+    другой отправила бы человека править не тот ключ."""
     assert meta("omdb/quota.json")["status"] == 401
     assert meta("omdb/bad_key.json")["status"] == 401
 
     quota = await ask(replay("omdb/quota.json"))
     assert isinstance(quota, Refusal)
-    assert quota.reason is Reason.QUOTA
+    assert (quota.source, quota.reason) == ("omdb", Reason.QUOTA)
 
     key = await ask(replay("omdb/bad_key.json"))
     assert isinstance(key, Refusal)
-    assert key.reason is Reason.KEY
+    assert (key.source, key.reason) == ("omdb", Reason.KEY)
 
 
 async def test_a_request_without_a_key_is_a_key_refusal(replay):
     result = await ask(replay("omdb/no_key.json"))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.KEY
+    assert (result.source, result.reason) == ("omdb", Reason.KEY)
 
 
 async def test_substring_match_is_loose():
@@ -175,7 +179,7 @@ async def test_substring_match_is_loose():
     списка значений `Error` не существует."""
     result = await ask(responding(401, json={"Error": "Daily request limit exceeded"}))
 
-    assert result.reason is Reason.QUOTA
+    assert (result.source, result.reason) == ("omdb", Reason.QUOTA)
 
 
 async def test_the_text_is_matched_regardless_of_case():
@@ -183,7 +187,7 @@ async def test_the_text_is_matched_regardless_of_case():
     в них не обещан никем: «Limit» с большой буквы уехало бы в поломку."""
     result = await ask(responding(401, json={"Error": "Request LIMIT reached!"}))
 
-    assert result.reason is Reason.QUOTA
+    assert (result.source, result.reason) == ("omdb", Reason.QUOTA)
 
 
 async def test_unknown_four_oh_one_is_treated_as_temporary():
@@ -191,7 +195,7 @@ async def test_unknown_four_oh_one_is_treated_as_temporary():
     result = await ask(responding(401, json={"Error": "нечто новое"}))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.BROKEN
+    assert (result.source, result.reason) == ("omdb", Reason.BROKEN)
 
 
 async def test_quota_waits_until_the_next_day():
@@ -276,7 +280,7 @@ async def test_a_json_array_does_not_crash():
     result = await ask(responding(200, json=[1, 2]))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.BROKEN
+    assert (result.source, result.reason) == ("omdb", Reason.BROKEN)
 
 
 async def test_a_body_that_is_not_json_does_not_crash():
@@ -287,7 +291,7 @@ async def test_a_body_that_is_not_json_does_not_crash():
     result = await ask(transport)
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.BROKEN
+    assert (result.source, result.reason) == ("omdb", Reason.BROKEN)
 
 
 async def test_recorded_found_ratings_come_back(replay):

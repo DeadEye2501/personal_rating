@@ -649,7 +649,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 185 строк
+### `backend/storage/repository/library.py` — 191 строк
 
 Карточки библиотеки.
 
@@ -657,12 +657,12 @@
 
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (149)
+- `class LibraryRepository(Repository)` (155)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
-  - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (12)
+  - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (18)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
   - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (23)
   - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
@@ -1034,7 +1034,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 415 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 420 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
@@ -1045,7 +1045,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)
 
-### `tests/backend/sources/test_mdblist.py` — 235 строк
+### `tests/backend/sources/test_mdblist.py` — 238 строк
 
 MDBList: квота, битый ключ и чужой периметр — три разные беды.
 
@@ -1055,7 +1055,7 @@ MDBList: квота, битый ключ и чужой периметр — тр
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
-### `tests/backend/sources/test_omdb.py` — 297 строк
+### `tests/backend/sources/test_omdb.py` — 301 строк ⚠ подошёл к 300
 
 OMDB: единственный источник, у которого отказ приходит под кодом 401, а
 
@@ -1148,7 +1148,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_card_writer.py` — 383 строк ⚠ подошёл к 300
+### `tests/backend/test_card_writer.py` — 394 строк ⚠ подошёл к 300
 
 
 
@@ -1181,13 +1181,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def covers(posters)` (5)
 
-### `tests/backend/test_credits.py` — 287 строк
+### `tests/backend/test_credits.py` — 315 строк ⚠ подошёл к 300
 
 Люди и студии: одна реализация на две сущности, и различает их идентичность.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
-Тестов: 24
+Тестов: 25
 
 
 ### `tests/backend/test_delete.py` — 141 строк
@@ -1313,18 +1313,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def python_files(package: str) -> list[Path]` (7)
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
 
-### `tests/backend/test_library.py` — 380 строк ⚠ подошёл к 300
+### `tests/backend/test_library.py` — 365 строк ⚠ подошёл к 300
 
 
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 25
+Тестов: 24
 
 - `def make_item(**overrides) -> Item` (12)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
 
-### `tests/backend/test_link_loading.py` — 140 строк
+### `tests/backend/test_link_loading.py` — 145 строк
 
 Вставленная ссылка в карточку источника, готовую для привязки.
 
@@ -1361,7 +1361,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 299 строк
+### `tests/backend/test_loading.py` — 305 строк ⚠ подошёл к 300
 
 
 
@@ -1399,7 +1399,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 108 строк
+### `tests/backend/test_model.py` — 112 строк
 
 
 
@@ -1408,11 +1408,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_offline.py` — 248 строк
+### `tests/backend/test_offline.py` — 271 строк
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
-Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.sources.errors`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.sources.errors`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
 Тестов: 17
 
@@ -1464,7 +1464,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(sessions)` (7)
   - `def build(*clients) -> SearchService` (5)
 
-### `tests/backend/test_search_local.py` — 135 строк
+### `tests/backend/test_search_local.py` — 146 строк
 
 
 
@@ -1550,7 +1550,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def hit(**fields) -> SearchHit` (4)
 
-### `tests/backend/test_views.py` — 312 строк ⚠ подошёл к 300
+### `tests/backend/test_views.py` — 318 строк ⚠ подошёл к 300
 
 
 

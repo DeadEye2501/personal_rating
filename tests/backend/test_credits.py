@@ -1,10 +1,38 @@
 """Люди и студии: одна реализация на две сущности, и различает их идентичность."""
 
 import pytest
+from sqlalchemy import text
 
 from backend.model import CompanyRole, Credit, PersonRole, Source
 from backend.storage.repository.credits import IdentityTaken, companies, people
 from backend.storage.repository.library import LibraryRepository
+
+
+async def test_roles_are_stored_as_their_plain_values(sessions, engine, card):
+    """Роли ложатся в базу текстом и потому часть схемы. Обменяй `DIRECTOR` и
+    `ACTOR` местами в перечислении — набор значений не изменится, круговорот
+    «записали членом, прочитали членом» сойдётся, а в уже заполненной базе
+    режиссёры станут актёрами и раздел «всё с этим человеком» покажет не то.
+
+    Читается сырая колонка: обратное превращение при чтении вернуло бы
+    подменённое значение назад и скрыло подмену."""
+    item_id = await card()
+    person = people(sessions)
+    company = companies(sessions)
+    await person.attach(item_id, await person.create("Кристофер Нолан"),
+                        PersonRole.DIRECTOR)
+    await company.attach(item_id, await company.create("Syncopy"),
+                         CompanyRole.PUBLISHER)
+
+    async with engine.connect() as connection:
+        stored = (
+            (await connection.execute(text("SELECT role FROM person_credit"))
+             ).scalar_one(),
+            (await connection.execute(text("SELECT role FROM company_credit"))
+             ).scalar_one(),
+        )
+
+    assert stored == ("director", "publisher")
 
 
 async def test_a_studio_may_have_no_identity_at_all(sessions):

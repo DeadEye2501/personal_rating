@@ -285,7 +285,12 @@ async def test_the_two_rounds_go_together(sessions, loader, monkeypatch):
 
 async def test_an_unknown_source_is_a_refusal_and_a_log(sessions, caplog):
     """Ручную карточку загружать неоткуда: каталожного клиента у неё нет. До
-    писателя и обложек дело не доходит, поэтому их здесь и нет."""
+    писателя и обложек дело не доходит, поэтому их здесь и нет.
+
+    В сообщении проверяется само действие, а не только источник: клиента
+    спрашивают двое, и по логу должно быть видно, кто именно не смог, — иначе
+    оба пути называются в нём одинаково. Причина здесь `BROKEN`, а не `NETWORK`:
+    ждать нечего, ручная карточка не приедет ни через минуту, ни через час."""
     load = Loader(library=LibraryRepository(sessions), writer=None,
                   sources=FakeSources(), posters=None)
 
@@ -296,4 +301,5 @@ async def test_an_unknown_source_is_a_refusal_and_a_log(sessions, caplog):
         )
 
     assert isinstance(result, Refusal)
-    assert "manual" in caplog.text
+    assert (result.source, result.reason) == ("manual", Reason.BROKEN)
+    assert "нечем загрузить карточку" in caplog.text

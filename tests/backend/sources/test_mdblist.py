@@ -123,7 +123,7 @@ async def test_recorded_quota_is_a_refusal_with_the_named_delay(replay, meta):
     result = await ask(replay("mdblist/quota.json"))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.QUOTA
+    assert (result.source, result.reason) == ("mdblist", Reason.QUOTA)
     assert result.retry_after == timedelta(seconds=int(info["headers"]["retry-after"]))
 
 
@@ -131,7 +131,7 @@ async def test_quota_without_a_named_delay_falls_back_to_an_hour():
     result = await ask(responding(429, json={"error": "Daily API limit exceeded!"}))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.QUOTA
+    assert (result.source, result.reason) == ("mdblist", Reason.QUOTA)
     assert result.retry_after == timedelta(hours=1)
 
 
@@ -168,12 +168,15 @@ async def test_quota_trips_the_breaker():
 
 
 async def test_recorded_bad_key_is_a_refusal(replay, meta):
+    """Имя источника проверяется вместе с причиной: клиенты MDBList и OMDB
+    написаны по одному шаблону и стоят рядом, имя в обоих — литерал, и подмена
+    одного на другой отправила бы человека править не тот ключ."""
     assert meta("mdblist/bad_key.json")["status"] == 401
 
     result = await ask(replay("mdblist/bad_key.json"))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.KEY
+    assert (result.source, result.reason) == ("mdblist", Reason.KEY)
 
 
 async def test_a_request_without_a_key_is_the_same_refusal(replay, meta):
@@ -184,7 +187,7 @@ async def test_a_request_without_a_key_is_the_same_refusal(replay, meta):
     result = await ask(replay("mdblist/no_key.json"))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.KEY
+    assert (result.source, result.reason) == ("mdblist", Reason.KEY)
 
 
 async def test_cloudflare_wall_is_not_a_key_problem(replay, meta):
@@ -195,7 +198,7 @@ async def test_cloudflare_wall_is_not_a_key_problem(replay, meta):
     result = await ask(replay("mdblist/cloudflare_403.txt"))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.NETWORK
+    assert (result.source, result.reason) == ("mdblist", Reason.NETWORK)
 
 
 async def test_missing_object_is_an_answer():
@@ -210,7 +213,7 @@ async def test_cache_building_is_a_retry_not_an_absence():
     result = await ask(responding(202, json={}, headers={"Retry-After": "5"}))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.RATE
+    assert (result.source, result.reason) == ("mdblist", Reason.RATE)
     assert result.retry_after == timedelta(seconds=5)
 
 
@@ -218,14 +221,14 @@ async def test_server_error_is_a_refusal():
     result = await ask(responding(500, json={"error": "An error occurred"}))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.BROKEN
+    assert (result.source, result.reason) == ("mdblist", Reason.BROKEN)
 
 
 async def test_unexpected_shape_does_not_crash():
     result = await ask(responding(200, json={"ratings": "не список"}))
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.BROKEN
+    assert (result.source, result.reason) == ("mdblist", Reason.BROKEN)
 
 
 async def test_recorded_found_ratings_come_back(replay):

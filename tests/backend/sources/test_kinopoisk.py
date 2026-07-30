@@ -127,15 +127,20 @@ async def test_primary_rate_limit_trips_the_breaker_too():
     assert calls == 1
 
 
-async def test_primary_survives_a_message_that_came_as_a_list(replay):
-    """Поле message типизировано строкой, но приходит массивом. Ни в одну
-    ветку разбора оно попадать не должно."""
+async def test_the_verdict_on_a_refusal_does_not_look_into_the_body(replay):
+    """Записанный 403, у которого `message` приехало массивом, хотя схема
+    источника обещает строку.
+
+    Отсюда и проверка: код классифицируется кодом, в тело классификация не
+    смотрит. Начни она искать в `message` подстроку — на массиве сломалась бы, и
+    исчерпанная квота уехала бы в поломку либо исключением наружу. Второй
+    квотный тест берёт другую запись, с телом обычной формы."""
     result = await primary(replay("kinopoisk/poiskkino_message_list.json")).ratings(
         "tt0816692", Kind.MOVIE
     )
 
     assert isinstance(result, Refusal)
-    assert result.reason is Reason.QUOTA
+    assert (result.source, result.reason) == ("kinopoisk", Reason.QUOTA)
 
 
 async def test_primary_survives_a_json_array():

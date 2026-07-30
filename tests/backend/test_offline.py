@@ -8,7 +8,9 @@ from backend.config import load_config
 from backend.model import (
     CompanyRole,
     Credit,
+    ExternalId,
     Filters,
+    IdSource,
     Kind,
     PersonRole,
     Source,
@@ -16,7 +18,11 @@ from backend.model import (
     new_manual_item,
 )
 from backend.sources.errors import Reason, Refusal
-from backend.storage.session import create_engine
+from backend.storage.repository.external import (
+    ExternalIdsRepository,
+    ExternalRatingsRepository,
+)
+from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
 from tests.conftest import MOMENT, RATED, WANTED, an_item
 
@@ -77,11 +83,16 @@ async def test_the_external_search_reports_the_reason(offline):
     говорит, что внешняя база недоступна.
 
     Причина проверяется отдельно: плашка говорит человеку разное при обрыве сети
-    и при исчерпанной квоте, и спутать их нельзя."""
+    и при исчерпанной квоте, и спутать их нельзя.
+
+    Имя отказавшего — здесь же, и это единственное место, где сверяется привязка
+    имени соединения к клиенту: перепутай их местами в сборке, и человеку скажут
+    «Steam» про отказавший TMDB, а исчерпанная квота выключит не тот источник."""
     result = await offline.search.external(Kind.MOVIE, "интерстеллар")
 
     assert result.views == ()
     assert [r.reason for r in result.refusals] == [Reason.NETWORK]
+    assert [r.source for r in result.refusals] == ["tmdb"]
 
 
 async def test_the_feed_works(offline):
@@ -208,12 +219,24 @@ async def test_the_data_folder_is_made_if_it_is_not_there(tmp_path):
 
 async def test_the_enrichment_asks_nobody_without_the_network(offline):
     """Третий круг без сети не пишет в базу ничего: отказ — не «у источника
-    нет», и через неделю пустая строка не должна выдать себя за ответ."""
+    нет», и через неделю пустая строка не должна выдать себя за ответ.
+
+    Идентификатор карточке нужен обязательно: без него обогащение выходит до
+    первого вопроса, и оборванная сеть в проверке не участвует вовсе — а это
+    единственное место, где сходятся настоящие клиенты, реестр и мёртвая сеть.
+
+    Репозитории собираются здесь, а не берутся у `Backend`: на границе слоёв их
+    нет, клиенту они не нужны."""
+    sessions = session_factory(offline._engine)
     item_id = await offline.library.create(mine("Своё"))
+    await ExternalIdsRepository(sessions).put(
+        item_id, ExternalId(IdSource.IMDB, "tt0816692")
+    )
 
     ratings = await offline.enricher.enrich(item_id, Kind.MOVIE)
 
     assert ratings == []
+    assert await ExternalRatingsRepository(sessions).ratings_of(item_id) == []
 
 
 async def test_everything_closes_and_lets_go(tmp_path):

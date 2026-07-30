@@ -97,20 +97,26 @@ async def test_people_come_in_the_order_of_the_credits(sessions, item_id):
 
 
 async def test_studios_come_in_a_stable_order(sessions, item_id):
-    """У студий порядка в титрах нет — но и перетасовываться между показами
-    они не должны."""
+    """У студий порядка в титрах нет — но и перетасовываться между показами они
+    не должны, поэтому порядок задан их собственным номером.
+
+    Привязываем не в том порядке, в каком заводили, и ждём порядок заведения:
+    сравнение двух показов между собой сошлось бы при любой реализации, а
+    порядок привязки — это то, что вернула бы база и вовсе без сортировки. Имена
+    подобраны так, что ожидаемое не совпадает ни с алфавитом, ни с обратным:
+    подмена ключа на имя студии тоже краснеет."""
     repository = companies(sessions)
+    entities = {}
     for name in ["Warner Bros.", "Legendary", "Syncopy"]:
-        entity_id = await repository.create(name)
-        await repository.attach(item_id, entity_id, CompanyRole.PUBLISHER)
+        entities[name] = await repository.create(name)
+    for name in ["Syncopy", "Warner Bros.", "Legendary"]:
+        await repository.attach(item_id, entities[name], CompanyRole.PUBLISHER)
 
-    first = await ViewsRepository(sessions).views_for([item_id])
-    second = await ViewsRepository(sessions).views_for([item_id])
+    views = await ViewsRepository(sessions).views_for([item_id])
 
-    assert [c.name for c in first[item_id].companies] == [
-        c.name for c in second[item_id].companies
+    assert [c.name for c in views[item_id].companies] == [
+        "Warner Bros.", "Legendary", "Syncopy"
     ]
-    assert len(first[item_id].companies) == 3
 
 
 async def test_companies_are_kept_apart_from_people(sessions, item_id):

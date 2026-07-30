@@ -105,4 +105,8 @@ SCHEMA = [
 @pytest.mark.parametrize(("enum", "expected"), SCHEMA,
                          ids=lambda item: getattr(item, "__name__", ""))
 def test_enum_values_match_the_schema(enum, expected):
+    """Набор значений, а не привязка члена к значению: обмен двух членов местами
+    здесь не виден, и ловят его те тесты, что читают сырую колонку, —
+    `test_library.py` для `Kind` и `Source`, `test_credits.py` для ролей,
+    `test_tmdb_card.py` для `IdSource`, фикстура справочника для `GenreSource`."""
     assert {member.value for member in enum} == expected

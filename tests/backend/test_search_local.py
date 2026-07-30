@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import pytest
 
 from backend.model import Kind
@@ -128,8 +130,17 @@ async def test_no_more_than_a_portion_comes_back(sessions, search):
 
 async def test_the_search_does_not_touch_the_clock(sessions, search):
     """Своя выдача обходится без сети и без времени: `synced_at` карточки в
-    поиске не участвует вовсе."""
-    await rated(sessions, "157336", None, title="Интерстеллар",
-                synced_at=MOMENT)
+    поиске не участвует вовсе.
 
-    assert len(await search.local(Kind.MOVIE, "Интер")) == 1
+    Отметки разнесены на годы: с одной карточкой любой фильтр по свежести,
+    заведённый в запросе, прошёл бы молча — умолчание помощника и так свежее."""
+    await rated(sessions, "157336", None, title="Интерстеллар свежий",
+                synced_at=MOMENT)
+    await rated(sessions, "27205", None, title="Интерстеллар давний",
+                synced_at=MOMENT - timedelta(days=4000))
+
+    found = await search.local(Kind.MOVIE, "Интерстеллар")
+
+    assert [view.title for view in found] == [
+        "Интерстеллар давний", "Интерстеллар свежий"
+    ]
