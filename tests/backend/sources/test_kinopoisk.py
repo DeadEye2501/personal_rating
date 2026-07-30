@@ -11,6 +11,7 @@ from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
 from tests.backend.sources.conftest import FakeClock, responding
+from tests.conftest import ours
 
 
 def primary(transport) -> PoiskkinoClient:
@@ -405,6 +406,23 @@ async def test_both_mirrors_refusing_leaves_a_refusal():
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.QUOTA
+
+
+async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
+    """Наружу зеркала неразличимы нарочно — источник один, `kinopoisk`. Но в
+    логе они различаться обязаны: искать неисправность придётся в одном из двух
+    модулей, а по одинаковой записи не понять, в каком."""
+    body = responding(200, text="<html>не json</html>")
+
+    with caplog.at_level("WARNING"):
+        assert isinstance(await primary(body).ratings("tt0816692", Kind.MOVIE),
+                          Refusal)
+        assert isinstance(await fallback(body).ratings("tt0816692", Kind.MOVIE),
+                          Refusal)
+
+    said = ours(caplog)
+    assert any("основного зеркала" in message for message in said)
+    assert any("запасного зеркала" in message for message in said)
 
 
 async def test_both_mirrors_report_the_same_owner(replay):

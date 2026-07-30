@@ -5,7 +5,7 @@ import logging
 import httpx
 
 from backend.model import Kind
-from backend.sources.errors import BROKEN_BY_PARSING, Outcome, broken
+from backend.sources.errors import Outcome, parsed
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.mirror import (
     SOURCE,
@@ -51,11 +51,8 @@ class UnofficialClient:
         if status != 200:
             return refuse_code(status)
 
-        try:
-            return answered(parse_unofficial(response.json()))
-        except BROKEN_BY_PARSING as error:
-            logger.warning("kinopoisk unofficial: ответ не разобрался — %s", error)
-            return broken(SOURCE, error)
+        return parsed(logger, SOURCE, "ответ запасного зеркала не разобрался",
+                      lambda: answered(parse_unofficial(response.json())))
 
     async def aclose(self) -> None:
         await self._http.aclose()

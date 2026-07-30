@@ -7,17 +7,15 @@ import httpx
 
 from backend.model import Kind
 from backend.sources.errors import (
-    BROKEN_BY_PARSING,
     Found,
     Missing,
     Outcome,
     Reason,
     Refusal,
-    broken,
+    parsed,
 )
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.parse import (
-    Incomplete,
     parse_movie,
     parse_search,
     parse_series,
@@ -96,11 +94,8 @@ class TmdbClient:
         verdict = self._verdict(response)
         if verdict is not None:
             return verdict
-        try:
-            return Found(parse_search(response.json(), kind))
-        except BROKEN_BY_PARSING as error:
-            logger.warning("tmdb: выдача поиска не разобралась — %s", error)
-            return broken("tmdb", error)
+        return parsed(logger, "tmdb", "выдача поиска не разобралась",
+                      lambda: Found(parse_search(response.json(), kind)))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         path = "tv" if kind is Kind.SERIES else "movie"
@@ -115,11 +110,8 @@ class TmdbClient:
             return verdict
 
         parse = parse_series if kind is Kind.SERIES else parse_movie
-        try:
-            return Found(parse(response.json()))
-        except (Incomplete, *BROKEN_BY_PARSING) as error:
-            logger.warning("tmdb: карточка %s не разобралась — %s", source_id, error)
-            return broken("tmdb", error)
+        return parsed(logger, "tmdb", f"карточка {source_id} не разобралась",
+                      lambda: Found(parse(response.json())))
 
     async def series_counts(self, source_id: str) -> Outcome:
         """Перезапрос по сроку. Без `append_to_response`: `aggregate_credits`
@@ -131,11 +123,8 @@ class TmdbClient:
         verdict = self._verdict(response)
         if verdict is not None:
             return verdict
-        try:
-            return Found(parse_series_counts(response.json()))
-        except BROKEN_BY_PARSING as error:
-            logger.warning("tmdb: сезоны %s не разобрались — %s", source_id, error)
-            return broken("tmdb", error)
+        return parsed(logger, "tmdb", f"сезоны {source_id} не разобрались",
+                      lambda: Found(parse_series_counts(response.json())))
 
     async def aclose(self) -> None:
         await self._http.aclose()

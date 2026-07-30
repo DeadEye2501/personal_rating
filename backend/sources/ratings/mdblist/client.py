@@ -8,13 +8,12 @@ import httpx
 
 from backend.model import Kind, RatingSource
 from backend.sources.errors import (
-    BROKEN_BY_PARSING,
     Found,
     Missing,
     Outcome,
     Reason,
     Refusal,
-    broken,
+    parsed,
 )
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.parse import parse_ratings
@@ -65,11 +64,8 @@ class MdbListClient:
     def _verdict(self, response: httpx.Response) -> Outcome:
         status = response.status_code
         if status == 200:
-            try:
-                return Found(parse_ratings(response.json()))
-            except BROKEN_BY_PARSING as error:
-                logger.warning("mdblist: ответ не разобрался — %s", error)
-                return broken("mdblist", error)
+            return parsed(logger, "mdblist", "ответ не разобрался",
+                          lambda: Found(parse_ratings(response.json())))
         if status == 404:
             return Missing()
         if status == 202:

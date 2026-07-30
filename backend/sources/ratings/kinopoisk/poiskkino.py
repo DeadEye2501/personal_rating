@@ -6,12 +6,11 @@ import httpx
 
 from backend.model import Kind
 from backend.sources.errors import (
-    BROKEN_BY_PARSING,
     Missing,
     Outcome,
     Reason,
     Refusal,
-    broken,
+    parsed,
 )
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.mirror import (
@@ -83,11 +82,8 @@ class PoiskkinoClient:
         return Missing()
 
     def _answer(self, response: httpx.Response) -> Outcome:
-        try:
-            return answered(parse_poiskkino(response.json()))
-        except BROKEN_BY_PARSING as error:
-            logger.warning("poiskkino: ответ не разобрался — %s", error)
-            return broken(SOURCE, error)
+        return parsed(logger, SOURCE, "ответ основного зеркала не разобрался",
+                      lambda: answered(parse_poiskkino(response.json())))
 
     async def aclose(self) -> None:
         await self._http.aclose()

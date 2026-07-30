@@ -6,13 +6,12 @@ import httpx
 
 from backend.model import Kind
 from backend.sources.errors import (
-    BROKEN_BY_PARSING,
     Found,
     Missing,
     Outcome,
     Reason,
     Refusal,
-    broken,
+    parsed,
 )
 from backend.sources.gog.parse import find_slug, parse_catalog, to_hit
 from backend.sources.http import SourceHttp
@@ -53,21 +52,15 @@ class GogClient:
             return response
         if response.status_code != 200:
             return refuse_undocumented(self._http, response.status_code)
-        try:
-            return response.json()
-        except BROKEN_BY_PARSING as error:
-            logger.warning("gog: тело каталога не разобралось — %s", error)
-            return broken("gog", error)
+        return parsed(logger, "gog", "тело каталога не разобралось",
+                      response.json)
 
     async def _catalog(self, query: str) -> list | Refusal:
         payload = await self._payload(query)
         if isinstance(payload, Refusal):
             return payload
-        try:
-            return parse_catalog(payload)
-        except BROKEN_BY_PARSING as error:
-            logger.warning("gog: каталог не разобрался — %s", error)
-            return broken("gog", error)
+        return parsed(logger, "gog", "каталог не разобрался",
+                      lambda: parse_catalog(payload))
 
     async def search(self, query: str, kind: Kind) -> Outcome:
         cards = await self._catalog(query)
@@ -104,12 +97,10 @@ class GogClient:
         payload = await self._payload(slug.replace("_", " "))
         if isinstance(payload, Refusal):
             return payload
-        try:
-            found = find_slug(payload, slug)
-        except BROKEN_BY_PARSING as error:
-            logger.warning("gog: каталог по слагу %s не разобрался — %s",
-                           slug, error)
-            return broken("gog", error)
+        found = parsed(logger, "gog", f"каталог по слагу {slug} не разобрался",
+                       lambda: find_slug(payload, slug))
+        if isinstance(found, Refusal):
+            return found
 
         if found is None:
             logger.info("gog: слага %s в каталоге не нашлось", slug)

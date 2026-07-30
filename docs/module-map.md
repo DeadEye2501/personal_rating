@@ -314,7 +314,7 @@
 - `def companies(payload: dict) -> tuple[Credit, ...]` (11)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
 
-### `backend/sources/errors.py` — 58 строк
+### `backend/sources/errors.py` — 80 строк
 
 Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
 
@@ -326,21 +326,22 @@
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
 - `def broken(source: str, error: Exception) -> Refusal` (4)
+- `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 - `def is_answer(outcome: Outcome) -> bool` (5)
 
-### `backend/sources/gog/client.py` — 120 строк
+### `backend/sources/gog/client.py` — 111 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (95)
+- `class GogClient` (87)
   - `def name(self) -> str` (4)
-  - `async def _payload(self, query: str) -> dict | Refusal` (15)
-  - `async def _catalog(self, query: str) -> list | Refusal` (9)
+  - `async def _payload(self, query: str) -> dict | Refusal` (12)
+  - `async def _catalog(self, query: str) -> list | Refusal` (6)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
-  - `async def resolve_slug(self, slug: str) -> Outcome` (21)
+  - `async def resolve_slug(self, slug: str) -> Outcome` (19)
   - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/gog/parse.py` — 74 строк
@@ -402,41 +403,41 @@
 - `def parse_poiskkino(payload: dict) -> Ratings` (11)
 - `def parse_unofficial(payload: dict) -> Ratings` (11)
 
-### `backend/sources/ratings/kinopoisk/poiskkino.py` — 93 строк
+### `backend/sources/ratings/kinopoisk/poiskkino.py` — 89 строк
 
 Основное зеркало Кинопоиска.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.parse`
 
-- `class PoiskkinoClient` (60)
+- `class PoiskkinoClient` (57)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (9)
   - `def _verdict(self, response: httpx.Response) -> Outcome` (16)
   - `def _absent(self, response: httpx.Response) -> Outcome` (14)
-  - `def _answer(self, response: httpx.Response) -> Outcome` (6)
+  - `def _answer(self, response: httpx.Response) -> Outcome` (3)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/kinopoisk/unofficial.py` — 61 строк
+### `backend/sources/ratings/kinopoisk/unofficial.py` — 58 строк
 
 Запасное зеркало Кинопоиска.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.parse`
 
-- `class UnofficialClient` (35)
+- `class UnofficialClient` (32)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (9)
-  - `def _verdict(self, response: httpx.Response) -> Outcome` (17)
+  - `def _verdict(self, response: httpx.Response) -> Outcome` (14)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/mdblist/client.py` — 110 строк
+### `backend/sources/ratings/mdblist/client.py` — 106 строк
 
 Разговор с MDBList по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.parse`
 
 - `def _retry_after(response: httpx.Response) -> timedelta | None` (3)
-- `class MdbListClient` (75)
+- `class MdbListClient` (72)
   - `def name(self) -> str` (4)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (8)
-  - `def _verdict(self, response: httpx.Response) -> Outcome` (26)
+  - `def _verdict(self, response: httpx.Response) -> Outcome` (23)
   - `def _denied(self, response: httpx.Response) -> Refusal` (16)
   - `async def aclose(self) -> None` (2)
 
@@ -448,17 +449,17 @@
 
 - `def parse_ratings(payload: dict) -> Ratings` (18)
 
-### `backend/sources/ratings/omdb/client.py` — 113 строк
+### `backend/sources/ratings/omdb/client.py` — 110 строк
 
 Разговор с OMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.parse`
 
 - `def until_midnight(now: datetime) -> timedelta` (7)
-- `class OmdbClient` (78)
+- `class OmdbClient` (75)
   - `def name(self) -> str` (4)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (28)
-  - `def _answer(self, payload: dict) -> Outcome` (11)
+  - `def _answer(self, payload: dict) -> Outcome` (8)
   - `def _denied(self, payload: dict) -> Refusal` (17)
   - `async def aclose(self) -> None` (2)
 
@@ -486,15 +487,15 @@
 - `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
   - `def http(name: str) -> SourceHttp` (7)
 
-### `backend/sources/steam/client.py` — 135 строк
+### `backend/sources/steam/client.py` — 133 строк
 
 Разговор со Steam по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`, `backend.sources.undocumented`
 
-- `class SteamClient` (99)
+- `class SteamClient` (96)
   - `def name(self) -> str` (4)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (12)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (39)
   - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
   - `async def aclose(self) -> None` (2)
@@ -512,29 +513,29 @@
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
 
-### `backend/sources/tmdb/client.py` — 141 строк
+### `backend/sources/tmdb/client.py` — 130 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
 - `def classify(response: httpx.Response) -> Missing | Refusal | None` (20)
-- `class TmdbClient` (81)
+- `class TmdbClient` (72)
   - `def name(self) -> str` (4)
   - `def _params(self, **extra: object) -> dict` (2)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (7)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
-  - `async def series_counts(self, source_id: str) -> Outcome` (15)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (12)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (15)
+  - `async def series_counts(self, source_id: str) -> Outcome` (12)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 192 строк
+### `backend/sources/tmdb/parse.py` — 196 строк
 
 Перевод ответов TMDB в наши типы.
 
 Зависит от: `backend.model`, `backend.sources.convert`
 
-- `class Incomplete(Exception)` (5)
+- `class Incomplete(ValueError)` (9)
 - `def _released(value: str | None) -> date | None` (7)
 - `def _poster(payload: dict) -> str` (3)
 - `def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (2)
@@ -1035,13 +1036,13 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 420 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 438 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 28
+Тестов: 29
 
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)

@@ -16,6 +16,7 @@ from backend.sources.errors import (
     Reason,
     Refusal,
     broken,
+    parsed,
 )
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import refuse_undocumented
@@ -57,11 +58,8 @@ class SteamClient:
             return response
         if response.status_code != 200:
             return refuse_undocumented(self._http, response.status_code)
-        try:
-            return Found(parse_search(response.json()))
-        except BROKEN_BY_PARSING as error:
-            logger.warning("steam: выдача поиска не разобралась — %s", error)
-            return broken("steam", error)
+        return parsed(logger, "steam", "выдача поиска не разобралась",
+                      lambda: Found(parse_search(response.json())))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         response = await self._http.get(

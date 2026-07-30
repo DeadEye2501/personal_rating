@@ -8,13 +8,13 @@ import httpx
 
 from backend.model import Kind, RatingSource
 from backend.sources.errors import (
-    BROKEN_BY_PARSING,
     Found,
     Missing,
     Outcome,
     Reason,
     Refusal,
     broken,
+    parsed,
 )
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.parse import parse_ratings
@@ -85,11 +85,8 @@ class OmdbClient:
         три означают одно и то же."""
         if payload.get("Response") == "False":
             return Missing()
-        try:
-            return Found(parse_ratings(payload))
-        except BROKEN_BY_PARSING as error:
-            logger.warning("omdb: ответ не разобрался — %s", error)
-            return broken("omdb", error)
+        return parsed(logger, "omdb", "ответ не разобрался",
+                      lambda: Found(parse_ratings(payload)))
 
     def _denied(self, payload: dict) -> Refusal:
         """Под кодом 401 живут две разные беды, и различает их только текст.

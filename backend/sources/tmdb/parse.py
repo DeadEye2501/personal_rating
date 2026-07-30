@@ -22,11 +22,15 @@ from backend.sources.convert import genres, rating, year
 POSTER_BASE = "https://image.tmdb.org/t/p/w500"
 
 
-class Incomplete(Exception):
+class Incomplete(ValueError):
     """Источник ответил 200, но обещанного блока в ответе нет.
 
     Опечатка в `append_to_response` ошибки не даёт: приходит 200 и просто без
-    блока. Поэтому полнота проверяется по содержимому, а не по коду."""
+    блока. Поэтому полнота проверяется по содержимому, а не по коду.
+
+    Наследник `ValueError`, а не `Exception`: неполное тело — это то же
+    «ответил непонятно чем», и попадать оно должно в общий перечень
+    `BROKEN_BY_PARSING`, а не во вторую ветку рядом с ним."""
 
 
 def _released(value: str | None) -> date | None:
