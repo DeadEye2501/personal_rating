@@ -18,12 +18,11 @@ from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT, an_item
+from tests.conftest import MOMENT, RATED, an_item
 
-# Два вопроса ленты, от которых отталкиваются проверки: в «Оценённых»
-# порядок по оценке, в «Хочу посмотреть» — по времени закладки. Что именно
-# проверяет тест, он меняет через `replace`, и в вызове видно только это.
-RATED = Feed(Section.RATED, Kind.MOVIE, Filters(), Order(Sort.SCORE))
+# Второй вопрос ленты рядом с общим `RATED`: в «Хочу посмотреть» порядок по
+# времени закладки. Что именно проверяет тест, он меняет через `replace`, и в
+# вызове видно только это.
 WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
 
 

@@ -8,7 +8,7 @@ import pytest
 import sqlalchemy
 from PIL import Image
 
-from backend.model import Item, Kind, Source
+from backend.model import Feed, Filters, Item, Kind, Order, Section, Sort, Source
 from backend.service.posters import PosterService
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
@@ -19,6 +19,7 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.sections import SectionsRepository
 from backend.storage.session import (
     create_engine,
@@ -37,6 +38,11 @@ LATER = datetime(2026, 7, 30, 12, 0)
 
 # Источники, у которых бывает обложка: у ручной карточки её скачивать негде.
 POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
+
+# Вопрос ленты, от которого отталкиваются проверки разделов: оценённое кино по
+# убыванию оценки. Что именно проверяет тест, он меняет через `replace`, и в
+# вызове видно только это.
+RATED = Feed(Section.RATED, Kind.MOVIE, Filters(), Order(Sort.SCORE))
 
 # Байты «картинки»: подпись PNG и набивка. Обрабатывать её никто не пытается,
 # хранилищу постеров важно только то, что байты вернулись теми же.
@@ -83,6 +89,20 @@ def an_item(source_id: str, title: str, **fields) -> Item:
         synced_at=fields.pop("synced_at", MOMENT),
         **fields,
     )
+
+
+async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
+    """Записанная карточка со своей оценкой — или без неё, если оценки нет.
+
+    Оценка ставится отдельным вызовом, как в приложении: карточка приезжает из
+    источника, оценку выставляет человек."""
+    fields.setdefault("year", 2014)
+    item_id = await LibraryRepository(sessions).create(
+        an_item(source_id, fields.pop("title", f"Фильм {source_id}"), **fields)
+    )
+    if score is not None:
+        await RatingsRepository(sessions).set_score(item_id, score, now=MOMENT)
+    return item_id
 
 
 async def film_genres(engine) -> None:

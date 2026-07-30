@@ -237,6 +237,10 @@
 - `TARGET_SIZE` = `набор из 2`
 - `_QUALITY` = `88`
 
+### `backend/service/library.py`
+
+- `PAGE_SIZE` = `50`
+
 ### `backend/service/linking.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -568,7 +572,6 @@
 
 ### `tests/backend/test_sections.py`
 
-- `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 
 ### `tests/backend/test_session.py`
@@ -595,6 +598,7 @@
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `POSTER_SOURCES` = `набор из 3`
+- `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`

@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 59 модулей
+## backend — 60 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -190,6 +190,16 @@
 - `class BadImage(Exception)` (2)
 - `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
 - `def crop_to_cover(data: bytes) -> bytes` (20)
+
+### `backend/service/library.py` — 38 строк
+
+Страницы разделов и гистограмма для показа.
+
+Зависит от: `backend.model`, `backend.storage.repository.sections`, `backend.storage.repository.views`
+
+- `class LibraryService` (27)
+  - `async def page(self, feed: Feed, offset: int=0, limit: int=PAGE_SIZE) -> list[CardView]` (9)
+  - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (2)
 
 ### `backend/service/linking.py` — 127 строк
 
@@ -850,7 +860,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 47 модулей
+## tests — 48 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1059,6 +1069,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 13
 
 
+### `tests/backend/test_feed.py` — 130 строк
+
+
+
+Зависит от: `backend.model`, `backend.service.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
+
+Тестов: 9
+
+- `async def feed(sessions, sections)` (2)
+- `class Forgetful` (13)
+  - `async def views_for(self, item_ids: list[int]) -> dict` (4)
+
 ### `tests/backend/test_genre_reference.py` — 171 строк
 
 
@@ -1089,15 +1111,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_histogram.py` — 210 строк
+### `tests/backend/test_histogram.py` — 197 строк
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
 Тестов: 17
 
-- `async def make(sessions, source_id: str, score: float | None, **fields) -> int` (9)
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 
 ### `tests/backend/test_images.py` — 126 строк
@@ -1217,7 +1238,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_sections.py` — 435 строк ⚠ подошёл к 300
+### `tests/backend/test_sections.py` — 434 строк ⚠ подошёл к 300
 
 
 
@@ -1298,15 +1319,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 247 строк
+### `tests/conftest.py` — 267 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
-Зависит от: `backend.model`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
+Зависит от: `backend.model`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
 
 - `def ours(caplog) -> list[str]` (8)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
+- `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `async def film_genres(engine) -> None` (11)
 - `async def seed(engine, *statements: str) -> None` (7)
 - `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
