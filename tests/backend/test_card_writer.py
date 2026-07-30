@@ -28,7 +28,6 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
-from tests.backend.sources.conftest import responding, unreachable
 from tests.conftest import MOMENT as WHEN
 from tests.conftest import (
     POSTER,
@@ -36,7 +35,9 @@ from tests.conftest import (
     card_parts,
     film_genres,
     picture,
+    responding,
     seed,
+    unreachable,
 )
 
 

@@ -13,10 +13,10 @@ from backend.service.linking import Linker
 from backend.service.loading import Loader
 from backend.service.posters import POSTER_SOURCES, PosterService
 from backend.service.removal import remove_card
-from backend.service.series import SeriesRefresh
 from backend.service.search import SearchService
-from backend.sources.http import SourceHttp
+from backend.service.series import SeriesRefresh
 from backend.sources.build import build_sources
+from backend.sources.http import SourceHttp
 from backend.sources.registry import Sources
 from backend.storage.posters import PosterStore
 from backend.storage.repository.credits import CreditRepository, companies, people

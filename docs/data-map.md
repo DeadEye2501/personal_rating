@@ -578,7 +578,7 @@
 
 ### `tests/backend/sources/test_registry.py`
 
-- `SILENT` = `httpx.MockTransport(lambda request: httpx.Respon…`
+- `SILENT` = `responding(json={})`
 
 ### `tests/backend/test_config.py`
 

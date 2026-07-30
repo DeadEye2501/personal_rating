@@ -10,15 +10,6 @@ from backend.model.item import (
     new_manual_item,
     new_source_id,
 )
-from backend.model.link import ExternalLink, parse_link
-from backend.model.outcome import (
-    Found,
-    Missing,
-    Outcome,
-    Reason,
-    Refusal,
-    is_answer,
-)
 from backend.model.kinds import (
     CompanyRole,
     GenreKind,
@@ -28,6 +19,15 @@ from backend.model.kinds import (
     PersonRole,
     RatingSource,
     Source,
+)
+from backend.model.link import ExternalLink, parse_link
+from backend.model.outcome import (
+    Found,
+    Missing,
+    Outcome,
+    Reason,
+    Refusal,
+    is_answer,
 )
 from backend.model.query import (
     Bucket,
@@ -40,11 +40,12 @@ from backend.model.query import (
 )
 from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
+from backend.model.results import ExternalSearch, merge_results
 from backend.model.search import SearchHit
 from backend.model.suggestion import Suggestion
 from backend.model.tag import Tag
-from backend.model.results import ExternalSearch, merge_results
 from backend.model.view import CardView, view_from_hit, view_from_item
+
 
 __all__ = [
     "Bucket",

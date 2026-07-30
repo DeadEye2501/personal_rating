@@ -1,4 +1,13 @@
-"""Подставные клиенты источников и реестр над ними."""
+"""Подставные заменители внешнего мира: клиенты источников, транспорты, часы.
+
+Транспорты лежат здесь, а не у тестов источников: их берут четыре теста вне
+той папки, а второй адрес того же помощника означал бы два способа его найти.
+`FakeClock` переехал по другому доводу — он не транспорт и не про записанные
+ответы, а прежний его дом именно про них."""
+
+from datetime import datetime, timedelta
+
+import httpx
 
 from backend.model import Kind, Source
 
@@ -49,3 +58,60 @@ class FakeSources:
         у игр оценочных источников нет. Без него сервис не проверить на пустом
         списке, а сам список — предмет его работы."""
         return [] if kind is Kind.GAME else self._clients
+
+
+class FakeClock:
+    """Часы, которые двигают руками: иначе срок предохранителя проверяется
+    только `sleep`-ом на минуту."""
+
+    def __init__(self) -> None:
+        self.now = datetime(2026, 7, 27, 12, 0)
+
+    def __call__(self) -> datetime:
+        return self.now
+
+    def advance(self, delta: timedelta) -> None:
+        self.now += delta
+
+
+def responding(status: int = 200, *, json=None, text=None, content=None,
+               headers=None):
+    """Транспорт, отвечающий одним и тем же ответом на любой запрос.
+
+    Тело здесь сочиняется, и это законно ровно там, где записать его нечем:
+    квоту и частоту ни у одного источника не выбирали. Записанные ответы
+    отдаёт `replay`, и он же ставит их настоящий код.
+
+    `content` — тело байтами: у обложки оно картинка, а не текст."""
+    return httpx.MockTransport(
+        lambda request: httpx.Response(
+            status, json=json, text=text, content=content, headers=headers or {}
+        )
+    )
+
+
+def unreachable() -> httpx.MockTransport:
+    """Транспорт, до которого не дозвонились: сеть отвечает не кодом, а ничем, и
+    отказ по ней наверху решается иначе, чем непонятный ответ."""
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("не дозвонились")
+
+    return httpx.MockTransport(handler)
+
+
+def capture(*, content: bytes | None = None, status: int = 200):
+    """Запоминает ушедшее на провод: проверять надо запрос, а не намерение.
+
+    `content` — тело ответа байтами, когда запрашивают картинку: пустой JSON
+    вместо неё сам стал бы отказом, и проверка адреса на него не добралась бы.
+    `status` нужен там, где проверяется отказ: тело при этом всё равно
+    возвращается, но до него дело не доходит."""
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if content is None:
+            return httpx.Response(status, json={})
+        return httpx.Response(status, content=content)
+
+    return httpx.MockTransport(handler), seen

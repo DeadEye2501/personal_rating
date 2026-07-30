@@ -28,7 +28,6 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import ItemExists, LibraryRepository
-from tests.backend.sources.conftest import responding
 from tests.conftest import (
     LATER,
     MOMENT,
@@ -38,6 +37,7 @@ from tests.conftest import (
     film_genres,
     ours,
     picture,
+    responding,
 )
 
 

@@ -14,10 +14,11 @@ from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.omdb.client import OmdbClient
 from backend.sources.build import build_sources
+from tests.conftest import responding
 from backend.sources.steam.client import SteamClient
 from backend.sources.tmdb.client import TmdbClient
 
-SILENT = httpx.MockTransport(lambda request: httpx.Response(200, json={}))
+SILENT = responding(json={})
 
 
 def sources():

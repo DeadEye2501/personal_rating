@@ -1,27 +1,12 @@
 """Записанные ответы источников: живьём тесты не ходят никуда."""
 
 import json
-from datetime import datetime, timedelta
 from pathlib import Path
 
 import httpx
 import pytest
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures"
-
-
-class FakeClock:
-    """Часы, которые двигают руками: иначе срок предохранителя проверяется
-    только `sleep`-ом на минуту."""
-
-    def __init__(self) -> None:
-        self.now = datetime(2026, 7, 27, 12, 0)
-
-    def __call__(self) -> datetime:
-        return self.now
-
-    def advance(self, delta: timedelta) -> None:
-        self.now += delta
 
 
 def _load(relative: str):
@@ -33,31 +18,6 @@ def _load(relative: str):
 def _meta(relative: str) -> dict:
     """Код ответа и отобранные заголовки, записанные рядом с телом."""
     return _load(f"{relative.rsplit('.', 1)[0]}.meta.json")
-
-
-def responding(status: int = 200, *, json=None, text=None, content=None,
-               headers=None):
-    """Транспорт, отвечающий одним и тем же ответом на любой запрос.
-
-    Тело здесь сочиняется, и это законно ровно там, где записать его нечем:
-    квоту и частоту ни у одного источника не выбирали. Записанные ответы
-    отдаёт `replay`, и он же ставит их настоящий код.
-
-    `content` — тело байтами: у обложки оно картинка, а не текст."""
-    return httpx.MockTransport(
-        lambda request: httpx.Response(
-            status, json=json, text=text, content=content, headers=headers or {}
-        )
-    )
-
-
-def unreachable() -> httpx.MockTransport:
-    """Транспорт, до которого не дозвонились: сеть отвечает не кодом, а ничем, и
-    отказ по ней наверху решается иначе, чем непонятный ответ."""
-    def handler(request: httpx.Request) -> httpx.Response:
-        raise httpx.ConnectError("не дозвонились")
-
-    return httpx.MockTransport(handler)
 
 
 @pytest.fixture

@@ -1,6 +1,5 @@
 """Главное обещание приложения: без сети работает всё, кроме поиска чужого."""
 
-import httpx
 import pytest
 
 from backend.app import build_backend
@@ -26,11 +25,14 @@ from backend.storage.repository.external import (
 from backend.storage.posters import NotOpened
 from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
-from tests.conftest import MOMENT, PICTURE, RATED, WANTED, an_item
-
-
-def unplugged(request: httpx.Request) -> httpx.Response:
-    raise httpx.ConnectError("сети нет", request=request)
+from tests.conftest import (
+    MOMENT,
+    PICTURE,
+    RATED,
+    WANTED,
+    an_item,
+    unreachable,
+)
 
 
 def mine(title: str, **fields):
@@ -47,7 +49,7 @@ async def assemble(tmp_path):
 
     config = load_config({"DATA_DIR": str(tmp_path)}, base_dir=tmp_path)
     return await build_backend(config,
-                               transport=httpx.MockTransport(unplugged))
+                               transport=unreachable())
 
 
 @pytest.fixture
@@ -237,7 +239,7 @@ async def test_the_data_folder_is_made_if_it_is_not_there(tmp_path):
     config = load_config({"DATA_DIR": str(fresh)}, base_dir=tmp_path)
 
     backend = await build_backend(config,
-                                  transport=httpx.MockTransport(unplugged))
+                                  transport=unreachable())
     await backend.aclose()
 
     assert (fresh / "posters.db").exists()
@@ -283,8 +285,10 @@ async def test_everything_closes_and_lets_go(tmp_path):
     # `Exception` поймал бы и опечатку в самом тесте, и закрытие осталось бы
     # непроверенным. Окажись хранилище способно открыться заново — тест
     # покраснеет, и это правильный сигнал: закрытие тогда не закрытие.
+    # Спрашивается публичным путём: второй файл базы наружу не показывается, и
+    # `has` уходит в то же закрытое хранилище.
     with pytest.raises(NotOpened):
-        await backend.posters._store.get(1)
+        await backend.posters.has(1)
     for connection in backend._sources.connections:
         with pytest.raises(RuntimeError):
             await connection.get("https://example.invalid/")

@@ -9,8 +9,7 @@ import pytest
 from backend.model import Reason, Refusal
 from backend.sources.http import USER_AGENT, Breaker, SourceHttp
 from backend.sources.undocumented import refuse_undocumented
-from tests.backend.sources.conftest import FakeClock, unreachable
-from tests.conftest import capture
+from tests.conftest import FakeClock, capture, unreachable
 
 
 async def test_user_agent_is_always_sent():

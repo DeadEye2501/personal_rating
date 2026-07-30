@@ -9,7 +9,7 @@ from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.client import OmdbClient, until_midnight
 from backend.sources.ratings.omdb.parse import parse_ratings
-from tests.backend.sources.conftest import FakeClock, responding
+from tests.conftest import FakeClock, responding
 
 
 async def ask(transport):

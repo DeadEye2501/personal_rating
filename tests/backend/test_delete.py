@@ -2,25 +2,26 @@
 
 import pytest
 
-import pytest_asyncio
-
 from backend.model import Kind
+from backend.service.posters import PosterService
 from backend.service.removal import remove_card
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import PICTURE, poster_service
+from tests.conftest import PICTURE
 from tests.conftest import MOMENT as WHEN
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def service(posters):
     """Сервис обложек поверх тестового хранилища: удаление карточки идёт через
     него, потому что второй файл базы наружу не показывается.
 
-    Транспорта не нужно — за обложками здесь никто не ходит."""
-    return poster_service(posters, None)
+    Клиентов нет вовсе: удаление зовёт один `delete`. Собранный помощник поднял
+    бы три живых `AsyncClient` на каждый тест, и никто бы их не закрыл — а тесты
+здесь как раз про то, что за обложками отсюда не ходят."""
+    return PosterService({}, posters)
 
 
 async def furnished(sessions, posters, item_id: int, tag: str = "пересмотреть") -> int:

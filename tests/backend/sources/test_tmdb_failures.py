@@ -7,7 +7,7 @@ import httpx
 from backend.model import Kind, Missing, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
-from tests.backend.sources.conftest import FakeClock, responding
+from tests.conftest import FakeClock, responding
 
 
 async def ask(transport: httpx.MockTransport):

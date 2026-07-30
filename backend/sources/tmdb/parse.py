@@ -183,8 +183,8 @@ def parse_series(payload: dict) -> SourceCard:
         genre_ext_ids=_genres(payload),
         people=tuple(people),
         # У сериала на верхнем уровне `imdb_id` нет вовсе — он в довеске.
-        external_ids=identifier(IdSource.IMDB,
-                              (payload.get("external_ids") or {}).get("imdb_id")),
+        external_ids=identifier(
+            IdSource.IMDB, (payload.get("external_ids") or {}).get("imdb_id")),
         ratings=_own_rating(payload, now),
     )
 

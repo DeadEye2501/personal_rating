@@ -25,7 +25,7 @@ rating = Table(
     Column("review", Text),
     Column("created_at", DateTime, nullable=False),
     Column("updated_at", DateTime, nullable=False),
-    
+
     Index("ix_rating_score", "score"),
     Index("ix_rating_updated_at", "updated_at"),
 )

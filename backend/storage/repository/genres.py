@@ -5,12 +5,12 @@ from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Genre, GenreKind, GenreSource
 from backend.storage.repository.base import Repository
-from backend.unique import unique
 from backend.storage.rows import grouped, to_genre
 from backend.storage.statements import clearing
 from backend.storage.tables import genre as genre_table
 from backend.storage.tables import genre_map as genre_map_table
 from backend.storage.tables import item_genre as item_genre_table
+from backend.unique import unique
 
 
 class GenresRepository(Repository):

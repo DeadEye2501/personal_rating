@@ -157,7 +157,8 @@ async def test_a_broken_client_writes_nothing_either(sessions, item_id, enrich,
     # Запись обязательна: `caplog` тут был и раньше, но про лог ничего не
     # утверждалось, и замена `logger.exception` на `logger.debug` в
     # `service/asking.py` прошла бы молча.
-    assert [r.levelname for r in caplog.records if r.name.startswith("backend")]         == ["ERROR"]
+    assert [r.levelname for r in caplog.records
+            if r.name.startswith("backend")] == ["ERROR"]
     # Имя сорвавшегося — присутствием своего и отсутствием чужого: у MDBList и
     # OMDB в `PROVIDES` одно и то же `imdb`, и подмена `client.name` на
     # `client.PROVIDES[0]` показала бы в логе оба источника одним. Проект эту

@@ -16,7 +16,7 @@ from backend.model import (
 from backend.sources.gog.client import GogClient
 from backend.sources.gog.parse import parse_catalog, to_hit
 from backend.sources.http import SourceHttp
-from tests.backend.sources.conftest import responding
+from tests.conftest import responding
 
 
 def answering(body) -> SourceHttp:

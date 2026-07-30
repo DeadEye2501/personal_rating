@@ -36,6 +36,7 @@ def an_item(source_id: str, title: str, **fields) -> Item:
         **fields,
     )
 
+
 async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
     """Записанная карточка со своей оценкой — или без неё, если оценки нет.
 
@@ -48,6 +49,7 @@ async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
     if score is not None:
         await RatingsRepository(sessions).set_score(item_id, score, now=MOMENT)
     return item_id
+
 
 def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
     """Настоящая картинка заданного размера. Размер обязателен: там, где эта

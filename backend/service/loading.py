@@ -23,6 +23,7 @@ from backend.storage.repository.library import LibraryRepository
 
 logger = logging.getLogger(__name__)
 
+
 class Loader:
     """Всё, что карточка получает от источника после выдачи поиска.
 

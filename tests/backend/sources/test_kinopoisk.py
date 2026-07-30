@@ -9,7 +9,7 @@ from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
-from tests.backend.sources.conftest import FakeClock, responding
+from tests.conftest import FakeClock, responding
 
 
 def primary(transport) -> PoiskkinoClient:

@@ -1,12 +1,12 @@
 """Фикстуры тестов и поверхность общего.
 
-Подставные клиенты живут в `tests/fakes.py`, строители данных — в
+Подставной внешний мир живёт в `tests/fakes.py`, строители данных — в
 `tests/builders.py`, сборка объектов бэкенда — в `tests/wiring.py`. Отсюда они
 переэкспортируются: `conftest` и так читают все тесты, и второй адрес того же
-помощника означал бы два способа его найти."""
+помощника означал бы два способа его найти. Исключение одно — запуск миграций
+из `tests/alembic_runner.py`: его берут напрямую, и переэкспорта у него нет."""
 
 
-import httpx
 import pytest
 import sqlalchemy
 
@@ -28,7 +28,6 @@ from backend.storage.session import (
 )
 from backend.storage.tables import metadata
 from tests.alembic_runner import alembic
-
 from tests.builders import (
     LATER,
     MOMENT,
@@ -39,31 +38,41 @@ from tests.builders import (
     picture,
     rated,
 )
-from tests.fakes import FakeCatalog, FakeClient, FakeSources
+from tests.fakes import (
+    FakeCatalog,
+    FakeClient,
+    FakeClock,
+    FakeSources,
+    capture,
+    responding,
+    unreachable,
+)
 from tests.wiring import POSTER_SOURCES, card_parts, poster_service
 
+# Здесь только переэкспорт. Имя, приехавшее от соседа и не нужное самому
+# `conftest`, без списка `ruff` объявит неиспользуемым импортом — так держится
+# большая часть правила. На тех, которыми модуль пользуется сам (`MOMENT`,
+# `an_item`), проверка молчит, и правило держит этот абзац: локальные имена —
+# фикстуры, `RATED`, `TABLES` — сюда не пишем.
 __all__ = [
     "LATER",
-    "MINIMAL",
     "MOMENT",
     "PICTURE",
     "POSTER",
     "POSTER_SOURCES",
-    "RATED",
-    "TABLES",
-    "WANTED",
     "FakeCatalog",
     "FakeClient",
+    "FakeClock",
     "FakeSources",
     "an_item",
+    "capture",
     "card_parts",
-    "film_genres",
     "hit",
-    "ours",
     "picture",
     "poster_service",
     "rated",
-    "seed",
+    "responding",
+    "unreachable",
 ]
 
 # Вопрос ленты, от которого отталкиваются проверки разделов: оценённое кино по
@@ -103,24 +112,6 @@ async def seed(engine, *statements: str) -> None:
     async with engine.begin() as connection:
         for statement in statements:
             await connection.execute(sqlalchemy.text(statement))
-
-
-def capture(*, content: bytes | None = None, status: int = 200):
-    """Запоминает ушедшее на провод: проверять надо запрос, а не намерение.
-
-    `content` — тело ответа байтами, когда запрашивают картинку: пустой JSON
-    вместо неё сам стал бы отказом, и проверка адреса на него не добралась бы.
-    `status` нужен там, где проверяется отказ: тело при этом всё равно
-    возвращается, но до него дело не доходит."""
-    seen: list[httpx.Request] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
-        if content is None:
-            return httpx.Response(status, json={})
-        return httpx.Response(status, content=content)
-
-    return httpx.MockTransport(handler), seen
 
 
 # Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он

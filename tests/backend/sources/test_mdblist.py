@@ -8,7 +8,7 @@ from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.mdblist.parse import parse_ratings
-from tests.backend.sources.conftest import responding
+from tests.conftest import responding
 
 
 async def ask(transport, kind=Kind.MOVIE):

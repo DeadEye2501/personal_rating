@@ -1,6 +1,6 @@
 """Ручная карточка: заведение, правка и отвязка от источника."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -124,14 +124,18 @@ async def test_link_takes_only_the_asked_card(sessions):
 
 async def test_link_refreshes_synced_at(sessions):
     """Иначе карточка, заведённая давно, в момент привязки сразу окажется
-    просроченной и уедет на перезапрос — а там нечего запрашивать."""
+    просроченной и уедет на перезапрос — а там нечего запрашивать.
+
+    Второй момент выводится из первого, а не берётся общей константой: сравняй
+    их кто-нибудь, и проверка стала бы тавтологией молча."""
+    later = WHEN + timedelta(days=1)
     repository = LibraryRepository(sessions)
     item_id = await repository.create(
         new_manual_item(Kind.MOVIE, "Интерстеллар", synced_at=WHEN)
     )
-    await repository.link(item_id, Source.TMDB, "157336", now=LATER)
+    await repository.link(item_id, Source.TMDB, "157336", now=later)
 
-    assert (await repository.get(item_id)).synced_at == LATER
+    assert (await repository.get(item_id)).synced_at == later
 
 
 async def test_link_to_an_occupied_identity_is_refused(sessions):

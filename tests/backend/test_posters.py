@@ -75,7 +75,13 @@ async def test_the_fetch_time_is_stored_as_a_time_and_not_as_text(posters,
     типизированную колонку: SQLAlchemy применил бы обратное превращение и отдал
     `datetime` даже из текста, то есть скрыл бы ровно ту подмену, ради которой
     проверка написана."""
-    await posters.put(1, PICTURE, now=WHEN)
+    # Ровно ноль микросекунд, и это не косметика: на них типы и различимы —
+    # `DateTime` дописывает «.000000», а текстовая колонка через `isoformat`
+    # не дописывает ничего. С ненулевыми обе дают побайтово одну строку, и
+    # подмена типа прошла бы молча. Момент здесь свой, а не общий: у общего
+    # это свойство не сторожит никто.
+    whole = WHEN.replace(microsecond=0)
+    await posters.put(1, PICTURE, now=whole)
     await posters.close()
 
     connection = sqlite3.connect(tmp_path / "posters.db")
@@ -86,10 +92,9 @@ async def test_the_fetch_time_is_stored_as_a_time_and_not_as_text(posters,
     finally:
         connection.close()
 
-    # Драйвер кладёт время строкой ISO с пробелом вместо «T» и с микросекундами.
-    # Это и есть отпечаток объявленного типа: `isoformat()` без них дал бы другую
-    # строку, а сам `WHEN` — вообще не строку.
-    assert stored == "2026-07-29 12:00:00.000000"
+    # Драйвер кладёт время строкой ISO с пробелом вместо «T» и с микросекундами,
+    # и микросекунды здесь — весь отпечаток объявленного типа.
+    assert stored == whole.strftime("%Y-%m-%d %H:%M:%S.%f")
 
 
 async def test_the_store_makes_its_folder(tmp_path):
