@@ -7,7 +7,7 @@ from pathlib import Path
 import httpx
 
 from backend.config import load_config
-from backend.model import Kind
+from backend.model import Kind, Source
 from backend.sources.errors import Found, Refusal
 from backend.sources.gog.client import GogClient
 from backend.sources.http import Breaker
@@ -194,6 +194,27 @@ async def test_every_key_from_the_settings_reaches_its_own_source():
         "api.poiskkino.dev": "poiskkino-key",
         "kinopoiskapiunofficial.tech": "unofficial-key",
     }
+
+
+async def test_a_card_goes_back_to_the_client_it_came_from():
+    """Все подставные клиенты в тестах сервисов аргумент игнорируют — если
+    словарь тут перепутан, заметить это можно только здесь."""
+    registry = sources()
+
+    assert registry.client_for(Source.TMDB) is registry.tmdb
+    assert registry.client_for(Source.STEAM) is registry.steam
+    assert registry.client_for(Source.GOG) is registry.gog
+
+    await registry.aclose()
+
+
+async def test_a_manual_card_has_no_client():
+    """Она ниоткуда не приезжала — загружать нечего."""
+    registry = sources()
+
+    assert registry.client_for(Source.MANUAL) is None
+
+    await registry.aclose()
 
 
 async def test_closing_closes_every_connection():

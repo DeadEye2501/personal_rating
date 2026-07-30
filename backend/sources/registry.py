@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import httpx
 
 from backend.config import Config
-from backend.model import Kind
+from backend.model import Kind, Source
 from backend.sources.gog.client import GogClient
 from backend.sources.http import Breaker, SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
@@ -39,6 +39,15 @@ class Sources:
         if kind is Kind.GAME:
             return [self.steam, self.gog]
         return [self.tmdb]
+
+    def client_for(self, source: Source):
+        """Каталожный клиент по источнику карточки. У ручной карточки его нет и
+        быть не может: она ниоткуда не приезжает."""
+        return {
+            Source.TMDB: self.tmdb,
+            Source.STEAM: self.steam,
+            Source.GOG: self.gog,
+        }.get(source)
 
     def rating_sources(self, kind: Kind) -> list:
         """У игр оценки приходят вместе с карточкой — из Steam и GOG. Своего

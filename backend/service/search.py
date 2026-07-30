@@ -12,7 +12,8 @@ from backend.model import (
     SearchHit,
     view_from_hit,
 )
-from backend.sources.errors import Found, Reason, Refusal
+from backend.service.asking import answered
+from backend.sources.errors import Found, Refusal
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
@@ -71,22 +72,15 @@ class SearchService:
         """У игр магазина два, и спрашиваем их разом. Отказ одного не скрывает
         ответ другого."""
         clients = self._sources.catalog_for(kind)
-        # return_exceptions обязателен. `SourceHttp.get` ловит только
-        # `httpx.HTTPError`; всё, что сломается вне его — разбор, чужая
-        # библиотека, наша опечатка, — улетело бы из сервиса наружу, вопреки
-        # правилу «исключений из сервисов не летит». А заодно второй запрос
-        # остался бы недождавшимся, с `Task exception was never retrieved`.
         outcomes = await asyncio.gather(
-            *(client.search(query, kind) for client in clients),
-            return_exceptions=True,
+            *(answered(client.search(query, kind), client.name)
+              for client in clients)
         )
 
         answers: list[list[SearchHit]] = []
         refusals: list[Refusal] = []
-        for client, outcome in zip(clients, outcomes, strict=True):
-            if isinstance(outcome, BaseException):
-                refusals.append(self._broke(client, outcome))
-            elif isinstance(outcome, Refusal):
+        for outcome in outcomes:
+            if isinstance(outcome, Refusal):
                 refusals.append(outcome)
             elif isinstance(outcome, Found):
                 # Порция считается по источнику: одна страница — один запрос.
@@ -94,14 +88,6 @@ class SearchService:
 
         return ExternalSearch(views=tuple(await self._to_views(_weave(answers))),
                               refusals=tuple(refusals))
-
-    def _broke(self, client, error: BaseException) -> Refusal:
-        """Имя источника, а не repr клиента: `Refusal.source` уезжает в клиент и
-        оттуда в плашку сообщений, и «<TmdbClient object at 0x...>» человеку
-        показывать нечего."""
-        logger.exception("поиск в %s сорвался", client.name, exc_info=error)
-        return Refusal(source=client.name, reason=Reason.BROKEN,
-                       detail=str(error))
 
     async def _to_views(self, hits: list[SearchHit]) -> list[CardView]:
         index: dict[GenreSource, dict[str, tuple[Genre, ...]]] = {}

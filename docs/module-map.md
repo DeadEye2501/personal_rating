@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 62 модулей
+## backend — 64 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -161,6 +161,14 @@
 - `def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...]=()) -> CardView` (21)
 - `def view_from_item(item: Item) -> CardView` (18)
 
+### `backend/service/asking.py` — 23 строк
+
+Запрос к источнику, из которого не вылетает исключение.
+
+Зависит от: `backend.sources.errors`
+
+- `async def answered(awaitable, source: str)` (14)
+
 ### `backend/service/card_parts.py` — 52 строк
 
 Общая основа записи карточки в базу.
@@ -224,6 +232,15 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
+### `backend/service/loading.py` — 59 строк
+
+Кандидат превращается в карточку.
+
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.library`
+
+- `class Loader` (43)
+  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (32)
+
 ### `backend/service/posters.py` — 84 строк
 
 Путь обложки от источника до хранилища.
@@ -238,18 +255,17 @@
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
-### `backend/service/search.py` — 128 строк
+### `backend/service/search.py` — 114 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
 
 - `class ExternalSearch` (6)
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (16)
-- `class SearchService` (60)
+- `class SearchService` (45)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
-  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (27)
-  - `def _broke(self, client, error: BaseException) -> Refusal` (7)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (20)
   - `async def _to_views(self, hits: list[SearchHit]) -> list[CardView]` (9)
 - `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (12)
 
@@ -415,14 +431,15 @@
 - `def _number(raw: str | None) -> float | None` (10)
 - `def parse_ratings(payload: dict) -> Ratings` (21)
 
-### `backend/sources/registry.py` — 85 строк
+### `backend/sources/registry.py` — 94 строк
 
 Кто отвечает за какой тип содержимого.
 
 Зависит от: `backend.config`, `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-- `class Sources` (35)
+- `class Sources` (44)
   - `def catalog_for(self, kind: Kind) -> list` (6)
+  - `def client_for(self, source: Source)` (8)
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `def breakers(self) -> list[Breaker]` (2)
   - `async def aclose(self) -> None` (3)
@@ -889,7 +906,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 50 модулей
+## tests — 51 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -989,13 +1006,13 @@ OMDB: единственный источник, у которого отказ 
 
 - `async def ask(transport)` (5)
 
-### `tests/backend/sources/test_registry.py` — 210 строк
+### `tests/backend/sources/test_registry.py` — 231 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
 Зависит от: `backend.config`, `backend.model`, `backend.sources.errors`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-Тестов: 11
+Тестов: 13
 
 - `def sources()` (4)
 - `def keyed()` (12)
@@ -1208,6 +1225,23 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
+### `tests/backend/test_loading.py` — 303 строк ⚠ подошёл к 300
+
+
+
+Зависит от: `backend.model`, `backend.service.cards`, `backend.service.loading`, `backend.service.posters`, `backend.sources.errors`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+
+Тестов: 16
+
+- `class FakeCatalog` (11)
+  - `async def card(self, source_id: str, kind: Kind)` (3)
+- `def candidate(source_id='157336', poster='https://example.com/p.jpg') -> CardView` (3)
+- `def source_card(source_id='157336', poster='https://example.com/p.jpg') -> SourceCard` (9)
+- `class Rig` (8)
+- `async def loader(sessions, posters)` (24)
+  - `def build(outcome, poster_status: int=200) -> Rig` (18)
+    - `def answer(request: httpx.Request) -> httpx.Response` (3)
+
 ### `tests/backend/test_manual_cards.py` — 210 строк
 
 
@@ -1373,7 +1407,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 281 строк
+### `tests/conftest.py` — 286 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1382,8 +1416,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def ours(caplog) -> list[str]` (8)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
-- `class FakeSources` (12)
+- `class FakeSources` (17)
   - `def catalog_for(self, _kind: Kind) -> list` (4)
+  - `def client_for(self, _source: Source)` (4)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `async def film_genres(engine) -> None` (11)
 - `async def seed(engine, *statements: str) -> None` (7)

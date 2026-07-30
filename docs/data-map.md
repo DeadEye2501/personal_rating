@@ -227,6 +227,10 @@
   - `in_wishlist: bool` = `False`
 - `_OWN_RATING` = `словарь из 2`
 
+### `backend/service/asking.py`
+
+- `logger` = `logging.getLogger(__name__)`
+
 ### `backend/service/cards.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -246,6 +250,10 @@
 - `logger` = `logging.getLogger(__name__)`
 - `_FILLABLE` = `набор из 9`
 - `_EMPTY` = `набор из 2`
+
+### `backend/service/loading.py`
+
+- `logger` = `logging.getLogger(__name__)`
 
 ### `backend/service/posters.py`
 
@@ -560,6 +568,14 @@
 - `ADDRESSES` = `набор из 6`
 - `SHOUTED` = `набор из 5`
 - `NONSENSE` = `набор из 9`
+
+### `tests/backend/test_loading.py`
+
+- `class Rig`
+  - `load: Loader`
+  - `client: FakeCatalog`
+  - `posters: PosterService`
+  - `requests: list`
 
 ### `tests/backend/test_migrations.py`
 

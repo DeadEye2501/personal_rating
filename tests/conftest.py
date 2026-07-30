@@ -104,6 +104,11 @@ class FakeSources:
         его собственных тестах: здесь важно только, кого он вернул."""
         return self._clients
 
+    def client_for(self, _source: Source):
+        """Тот же довод про источник: подмену клиента источнику сторожат тесты
+        самого реестра. Без клиентов — `None`, как у ручной карточки."""
+        return self._clients[0] if self._clients else None
+
 
 async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
     """Записанная карточка со своей оценкой — или без неё, если оценки нет.
