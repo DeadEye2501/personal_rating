@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyside6 = "*"
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 aiosqlite = "*"
 alembic = "*"
@@ -12,6 +11,7 @@ greenlet = "*"
 httpx = "*"
 python-dotenv = "*"
 pillow = "*"
+pywebview = "*"
 
 [dev-packages]
 pytest = "*"
