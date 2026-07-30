@@ -10,7 +10,6 @@ from backend.model import (
     ExternalRating,
     GenreSource,
     IdSource,
-    Item,
     Kind,
     PersonRole,
     RatingSource,
@@ -28,16 +27,20 @@ from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from tests.backend.sources.conftest import responding, unreachable
 from tests.conftest import MOMENT as WHEN
-from tests.conftest import card_parts, film_genres, picture, seed
-
-POSTER = picture(600, 900, fmt="JPEG")
+from tests.conftest import (
+    POSTER,
+    an_item,
+    card_parts,
+    film_genres,
+    picture,
+    seed,
+)
 
 
 def source_card(**overrides) -> SourceCard:
     fields = dict(
-        item=Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
-                  title="Интерстеллар", synced_at=WHEN, year=2014,
-                  poster_url="https://example.com/poster.jpg", runtime=169),
+        item=an_item("157336", "Интерстеллар", year=2014, runtime=169,
+                     poster_url="https://example.com/poster.jpg"),
         genre_ext_ids=((GenreSource.TMDB, "878"), (GenreSource.TMDB, "12")),
         people=(
             Credit("Кристофер Нолан", PersonRole.DIRECTOR,
@@ -56,9 +59,9 @@ def source_card(**overrides) -> SourceCard:
 def game_card(source_id: str = "292030", **overrides) -> SourceCard:
     """Игра: жанры и оценки к делу не идут, а студия приходит голой строкой."""
     return source_card(**{
-        "item": Item(id=0, kind=Kind.GAME, source=Source.STEAM,
-                     source_id=source_id, title=f"игра {source_id}",
-                     synced_at=WHEN, poster_url="https://example.com/p.jpg"),
+        "item": an_item(source_id, f"игра {source_id}", kind=Kind.GAME,
+                        source=Source.STEAM,
+                        poster_url="https://example.com/p.jpg"),
         "genre_ext_ids": (), "people": (), "external_ids": (), "ratings": (),
         "companies": (Credit("CD Projekt RED", CompanyRole.DEVELOPER),),
         **overrides,
@@ -69,9 +72,8 @@ def another_movie(source_id: str, **overrides) -> SourceCard:
     """Вторая карточка того же вида: её идентичность свободна, а состав задаёт
     тест."""
     return source_card(**{
-        "item": Item(id=0, kind=Kind.MOVIE, source=Source.TMDB,
-                     source_id=source_id, title=f"фильм {source_id}",
-                     synced_at=WHEN, poster_url="https://example.com/p.jpg"),
+        "item": an_item(source_id, f"фильм {source_id}",
+                        poster_url="https://example.com/p.jpg"),
         "external_ids": (),
         **overrides,
     })
@@ -211,8 +213,7 @@ async def test_a_prefetched_poster_is_not_downloaded_again(writer):
 async def test_a_card_without_a_poster_url_is_still_written(writer):
     """Обложки нет в самом источнике — ждать нечего."""
     item_id = await writer.save(source_card(
-        item=Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="1",
-                  title="Без обложки", synced_at=WHEN),
+        item=an_item("1", "Без обложки"),
         external_ids=(),
     ))
 

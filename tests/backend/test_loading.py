@@ -6,7 +6,6 @@ import pytest
 from backend.model import (
     CardView,
     Credit,
-    Item,
     Kind,
     PersonRole,
     Source,
@@ -19,21 +18,13 @@ from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
 from tests.conftest import (
-    MOMENT,
     PICTURE,
-    FakeClient,
+    an_item,
+    FakeCatalog,
     FakeSources,
     capture,
     card_parts,
 )
-
-
-class FakeCatalog(FakeClient):
-    """Спрашивают у него только детальную карточку."""
-
-    async def card(self, source_id: str, kind: Kind):
-        self.asked.append((source_id, kind))
-        return self.outcome
 
 
 def candidate(source_id="157336", poster="https://example.com/p.jpg") -> CardView:
@@ -44,9 +35,8 @@ def candidate(source_id="157336", poster="https://example.com/p.jpg") -> CardVie
 def source_card(source_id="157336",
                 poster="https://example.com/p.jpg") -> SourceCard:
     return SourceCard(
-        item=Item(id=0, kind=Kind.MOVIE, source=Source.TMDB,
-                  source_id=source_id, title="Интерстеллар", synced_at=MOMENT,
-                  runtime=169, poster_url=poster),
+        item=an_item(source_id, "Интерстеллар", runtime=169,
+                     poster_url=poster),
         people=(Credit("Кристофер Нолан", PersonRole.DIRECTOR,
                        source=Source.TMDB, source_id="525"),),
     )

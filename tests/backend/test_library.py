@@ -10,20 +10,13 @@ from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
 from tests.conftest import LATER, MOMENT as WHEN
+from tests.conftest import an_item
 
 
 def make_item(**overrides) -> Item:
-    fields = dict(
-        id=0,
-        kind=Kind.MOVIE,
-        source=Source.TMDB,
-        source_id="157336",
-        title="Интерстеллар",
-        synced_at=WHEN,
-        year=2014,
-    )
-    fields.update(overrides)
-    return Item(**fields)
+    """Умолчания общего `an_item` плюс год: здесь он участвует в сортировках."""
+    return an_item(**({"source_id": "157336", "title": "Интерстеллар",
+                       "year": 2014} | overrides))
 
 
 async def test_create_inserts_and_returns_an_identifier(sessions):

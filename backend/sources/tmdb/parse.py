@@ -87,12 +87,38 @@ def _required(payload: dict, block: str) -> dict:
     return found
 
 
+# У фильма название в title, у сериала — в name; поле даты тоже разное. Знание
+# одно, и запись у него одна: отсюда ключи берут все три разборщика.
+_KEYS = {
+    Kind.MOVIE: ("title", "original_title", "release_date"),
+    Kind.SERIES: ("name", "original_name", "first_air_date"),
+}
+
+
+def _item(payload: dict, kind: Kind, now: datetime, **extra) -> Item:
+    """Девять полей, общих у фильма и сериала.
+
+    Различаются они тремя ключами и тем, что дописывает вызывающий:
+    длительностью у фильма, сезонами с сериями у сериала."""
+    title_key, original_key, date_key = _KEYS[kind]
+    return Item(
+        id=0,
+        kind=kind,
+        source=Source.TMDB,
+        source_id=str(payload["id"]),
+        title=payload.get(title_key) or "",
+        synced_at=now,
+        original_title=payload.get(original_key) or "",
+        year=year(payload.get(date_key)),
+        released_at=_released(payload.get(date_key)),
+        synopsis=payload.get("overview") or "",
+        poster_url=_poster(payload),
+        **extra,
+    )
+
+
 def parse_search(payload: dict, kind: Kind) -> list[SearchHit]:
-    """У фильма название в title, у сериала — в name. Поле даты тоже разное."""
-    is_series = kind is Kind.SERIES
-    title_key = "name" if is_series else "title"
-    original_key = "original_name" if is_series else "original_title"
-    date_key = "first_air_date" if is_series else "release_date"
+    title_key, original_key, date_key = _KEYS[kind]
 
     hits = []
     for row in payload.get("results", []):
@@ -127,20 +153,8 @@ def parse_movie(payload: dict) -> SourceCard:
 
     now = datetime.now()
     return SourceCard(
-        item=Item(
-            id=0,
-            kind=Kind.MOVIE,
-            source=Source.TMDB,
-            source_id=str(payload["id"]),
-            title=payload.get("title") or "",
-            synced_at=now,
-            original_title=payload.get("original_title") or "",
-            year=year(payload.get("release_date")),
-            released_at=_released(payload.get("release_date")),
-            synopsis=payload.get("overview") or "",
-            poster_url=_poster(payload),
-            runtime=payload.get("runtime") or None,
-        ),
+        item=_item(payload, Kind.MOVIE, now,
+                   runtime=payload.get("runtime") or None),
         genre_ext_ids=_genres(payload),
         people=tuple(people),
         external_ids=_imdb(payload.get("imdb_id")),
@@ -166,21 +180,9 @@ def parse_series(payload: dict) -> SourceCard:
     counts = parse_series_counts(payload)
     now = datetime.now()
     return SourceCard(
-        item=Item(
-            id=0,
-            kind=Kind.SERIES,
-            source=Source.TMDB,
-            source_id=str(payload["id"]),
-            title=payload.get("name") or "",
-            synced_at=now,
-            original_title=payload.get("original_name") or "",
-            year=year(payload.get("first_air_date")),
-            released_at=_released(payload.get("first_air_date")),
-            synopsis=payload.get("overview") or "",
-            poster_url=_poster(payload),
-            seasons_count=counts.seasons,
-            episodes_count=counts.episodes,
-        ),
+        item=_item(payload, Kind.SERIES, now,
+                   seasons_count=counts.seasons,
+                   episodes_count=counts.episodes),
         genre_ext_ids=_genres(payload),
         people=tuple(people),
         # У сериала на верхнем уровне `imdb_id` нет вовсе — он в довеске.

@@ -414,6 +414,7 @@
 ### `backend/sources/tmdb/parse.py`
 
 - `POSTER_BASE` = `'https://image.tmdb.org/t/p/w500'`
+- `_KEYS` = `словарь из 2`
 
 ### `backend/sources/undocumented.py`
 
@@ -563,10 +564,6 @@
 
 - `SILENT` = `httpx.MockTransport(lambda request: httpx.Respon…`
 
-### `tests/backend/test_card_writer.py`
-
-- `POSTER` = `picture(600, 900, fmt='JPEG')`
-
 ### `tests/backend/test_config.py`
 
 - `KEYS` = `словарь из 5`
@@ -611,8 +608,7 @@
 
 ### `tests/backend/test_linking.py`
 
-- `POSTER` = `picture(600, 900, fmt='JPEG')`
-- `FULL` = `Item(id=0, kind=Kind.SERIES, source=Source.TMDB,…`
+- `FULL` = `an_item('83867', 'Andor', kind=Kind.SERIES, orig…`
 
 ### `tests/backend/test_links.py`
 
@@ -636,10 +632,6 @@
 
 - `FROZEN` = `набор из 6`
 - `SCHEMA` = `набор из 8`
-
-### `tests/backend/test_poster_service.py`
-
-- `POSTER` = `picture(600, 900, fmt='JPEG')`
 
 ### `tests/backend/test_posters.py`
 
@@ -676,6 +668,7 @@
 - `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
+- `POSTER` = `picture(600, 900, fmt='JPEG')`
 - `TABLES` = `набор из 14`
 - `MINIMAL` = `словарь из 5`
 

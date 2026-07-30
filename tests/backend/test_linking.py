@@ -27,17 +27,23 @@ from backend.storage.repository.external import (
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import ItemExists, LibraryRepository
 from tests.backend.sources.conftest import responding
-from tests.conftest import LATER, MOMENT, card_parts, film_genres, ours, picture
-
-POSTER = picture(600, 900, fmt="JPEG")
+from tests.conftest import (
+    LATER,
+    MOMENT,
+    POSTER,
+    an_item,
+    card_parts,
+    film_genres,
+    ours,
+    picture,
+)
 
 
 def incoming(**overrides) -> SourceCard:
     fields = dict(
-        item=Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
-                  title="Interstellar", synced_at=MOMENT, year=2014,
-                  synopsis="официальный синопсис", runtime=169,
-                  poster_url="https://example.com/poster.jpg"),
+        item=an_item("157336", "Interstellar", year=2014, runtime=169,
+                     synopsis="официальный синопсис",
+                     poster_url="https://example.com/poster.jpg"),
         genre_ext_ids=((GenreSource.TMDB, "878"),),
         people=(Credit("Кристофер Нолан", PersonRole.DIRECTOR,
                        source=Source.TMDB, source_id="525"),),
@@ -67,9 +73,8 @@ def test_merge_fills_only_the_empty():
     assert merged.runtime == 169
 
 
-FULL = Item(
-    id=0, kind=Kind.SERIES, source=Source.TMDB, source_id="83867",
-    title="Andor", synced_at=MOMENT, original_title="Andor",
+FULL = an_item(
+    "83867", "Andor", kind=Kind.SERIES, original_title="Andor",
     year=2022, released_at=date(2022, 9, 21), synopsis="официальный синопсис",
     poster_url="https://example.com/andor.jpg", runtime=48,
     seasons_count=2, episodes_count=24,
@@ -107,9 +112,7 @@ def test_overwrite_keeps_what_the_source_never_sent():
     """Разборщики кладут в непришедшее пустую строку, а не оставляют поле
     незаполненным: у TMDB на русском пустой синопсис — обычное дело, и написанный
     руками текст исчез бы безвозвратно."""
-    empty = incoming(item=Item(id=0, kind=Kind.MOVIE, source=Source.TMDB,
-                               source_id="157336", title="Interstellar",
-                               synced_at=MOMENT)).item
+    empty = incoming(item=an_item("157336", "Interstellar")).item
 
     merged = overwrite_fields(mine(synopsis="мой текст", runtime=100), empty)
 
@@ -169,9 +172,8 @@ async def test_the_type_of_the_card_is_never_changed(linker, sessions):
     молча нельзя."""
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(item=Item(
-        id=0, kind=Kind.SERIES, source=Source.TMDB, source_id="83867",
-        title="Andor", synced_at=MOMENT, seasons_count=2,
+    await linker.link(item_id, incoming(item=an_item(
+        "83867", "Andor", kind=Kind.SERIES, seasons_count=2,
     )), now=LATER)
 
     assert (await LibraryRepository(sessions).get(item_id)).kind is Kind.MOVIE
@@ -308,8 +310,7 @@ async def test_identifiers_and_ratings_arrive_with_the_link(linker, sessions):
 async def test_linking_to_an_occupied_identity_is_refused(linker, sessions):
     library = LibraryRepository(sessions)
     await library.create(
-        Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
-             title="уже есть", synced_at=MOMENT)
+        an_item("157336", "уже есть")
     )
     ours = await manual_card(sessions, title="мой дубль")
 
@@ -401,9 +402,8 @@ async def test_a_card_without_a_poster_url_keeps_its_own(linker, sessions):
     await linker.posters.store_upload(item_id, picture(400, 400), now=MOMENT)
     ours = await linker.posters.store.get(item_id)
 
-    await linker.link(item_id, incoming(item=Item(
-        id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
-        title="Interstellar", synced_at=MOMENT,
+    await linker.link(item_id, incoming(item=an_item(
+        "157336", "Interstellar",
     )), now=LATER, overwrite=True)
 
     assert await linker.posters.store.get(item_id) == ours

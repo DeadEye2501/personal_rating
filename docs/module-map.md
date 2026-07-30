@@ -528,7 +528,7 @@
   - `async def series_counts(self, source_id: str) -> Outcome` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 190 строк
+### `backend/sources/tmdb/parse.py` — 192 строк
 
 Перевод ответов TMDB в наши типы.
 
@@ -543,10 +543,11 @@
 - `def _person(row: dict, role: PersonRole, position: int | None=None) -> Credit` (10)
 - `def _cast(rows: list[dict]) -> list[Credit]` (5)
 - `def _required(payload: dict, block: str) -> dict` (9)
-- `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (27)
-- `def parse_movie(payload: dict) -> SourceCard` (30)
+- `def _item(payload: dict, kind: Kind, now: datetime, **extra) -> Item` (20)
+- `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (23)
+- `def parse_movie(payload: dict) -> SourceCard` (18)
 - `def parse_series_counts(payload: dict) -> SeriesCounts` (7)
-- `def parse_series(payload: dict) -> SourceCard` (30)
+- `def parse_series(payload: dict) -> SourceCard` (18)
 
 ### `backend/sources/undocumented.py` — 22 строк
 
@@ -1148,7 +1149,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_card_writer.py` — 394 строк ⚠ подошёл к 300
+### `tests/backend/test_card_writer.py` — 395 строк ⚠ подошёл к 300
 
 
 
@@ -1156,9 +1157,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 22
 
-- `def source_card(**overrides) -> SourceCard` (18)
+- `def source_card(**overrides) -> SourceCard` (17)
 - `def game_card(source_id: str='292030', **overrides) -> SourceCard` (10)
-- `def another_movie(source_id: str, **overrides) -> SourceCard` (10)
+- `def another_movie(source_id: str, **overrides) -> SourceCard` (9)
 - `async def build(sessions, engine, posters, transport=None) -> CardWriter` (9)
 - `async def writer(sessions, engine, posters)` (4)
 
@@ -1313,7 +1314,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def python_files(package: str) -> list[Path]` (7)
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
 
-### `tests/backend/test_library.py` — 365 строк ⚠ подошёл к 300
+### `tests/backend/test_library.py` — 358 строк ⚠ подошёл к 300
 
 
 
@@ -1321,10 +1322,10 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 24
 
-- `def make_item(**overrides) -> Item` (12)
+- `def make_item(**overrides) -> Item` (4)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)
 
-### `tests/backend/test_link_loading.py` — 145 строк
+### `tests/backend/test_link_loading.py` — 140 строк
 
 Вставленная ссылка в карточку источника, готовую для привязки.
 
@@ -1332,9 +1333,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 7
 
-- `def source_card(source: Source, source_id: str) -> SourceCard` (5)
-- `class FakeCatalog(FakeClient)` (16)
-  - `async def card(self, source_id: str, kind: Kind)` (3)
+- `def source_card(source: Source, source_id: str) -> SourceCard` (4)
+- `class FakeCatalogWithSlug(FakeCatalog)` (12)
   - `async def resolve_slug(self, slug: str)` (3)
 - `async def loader(sessions)` (6)
   - `def build(client) -> Loader` (3)
@@ -1347,7 +1347,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 27
 
-- `def incoming(**overrides) -> SourceCard` (13)
+- `def incoming(**overrides) -> SourceCard` (12)
 - `def mine(**fields) -> Item` (4)
 - `async def linker(sessions, engine, posters)` (5)
 - `async def manual_card(sessions, **fields) -> int` (5)
@@ -1361,7 +1361,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 305 строк ⚠ подошёл к 300
+### `tests/backend/test_loading.py` — 295 строк
 
 
 
@@ -1369,10 +1369,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 16
 
-- `class FakeCatalog(FakeClient)` (6)
-  - `async def card(self, source_id: str, kind: Kind)` (3)
 - `def candidate(source_id='157336', poster='https://example.com/p.jpg') -> CardView` (3)
-- `def source_card(source_id='157336', poster='https://example.com/p.jpg') -> SourceCard` (9)
+- `def source_card(source_id='157336', poster='https://example.com/p.jpg') -> SourceCard` (8)
 - `class Rig` (8)
 - `async def loader(sessions, posters)` (19)
   - `def build(outcome, poster_status: int=200) -> Rig` (13)
@@ -1421,7 +1419,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def assemble(tmp_path)` (9)
 - `async def offline(tmp_path)` (4)
 
-### `tests/backend/test_poster_service.py` — 199 строк
+### `tests/backend/test_poster_service.py` — 197 строк
 
 
 
@@ -1449,7 +1447,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search.py` — 432 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 422 строк ⚠ подошёл к 300
 
 
 
@@ -1457,9 +1455,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 30
 
-- `class FakeCatalog(FakeClient)` (9)
+- `class FakeSearch(FakeClient)` (9)
   - `async def search(self, query: str, kind: Kind)` (5)
-- `def hit(source_id='157336', title='Интерстеллар', source=Source.TMDB, kind=Kind.MOVIE, **fields) -> SearchHit` (7)
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 - `async def service(sessions)` (7)
   - `def build(*clients) -> SearchService` (5)
@@ -1540,15 +1537,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 26
 
 
-### `tests/backend/test_view_types.py` — 125 строк
+### `tests/backend/test_view_types.py` — 119 строк
 
 
 
-Зависит от: `backend.model`
+Зависит от: `backend.model`, `tests.conftest`
 
 Тестов: 11
 
-- `def hit(**fields) -> SearchHit` (4)
 
 ### `tests/backend/test_views.py` — 318 строк ⚠ подошёл к 300
 
@@ -1569,7 +1565,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 324 строк ⚠ подошёл к 300
+### `tests/conftest.py` — 358 строк ⚠ подошёл к 300
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1579,6 +1575,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
 - `class FakeClient` (12)
+- `class FakeCatalog(FakeClient)` (7)
+  - `async def card(self, source_id: str, kind: Kind)` (3)
 - `class FakeSources` (23)
   - `def catalog_for(self, _kind: Kind) -> list` (4)
   - `def client_for(self, _source: Source)` (4)
@@ -1590,6 +1588,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `def handler(request: httpx.Request) -> httpx.Response` (5)
 - `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
+- `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
 - `def migrated(tmp_path)` (16)
 - `async def engine(tmp_path)` (8)
 - `async def sections(sessions)` (3)
@@ -1634,5 +1633,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 ## Абстракции с одной реализацией
 
 - `Base` — наследник один: `Note`
+- `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
 - `FakeRatings` — наследник один: `Breaking`
 - `ViewsRepository` — наследник один: `Forgetful`

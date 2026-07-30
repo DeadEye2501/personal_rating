@@ -11,19 +11,13 @@ from backend.model import (
     Item,
     Kind,
     RatingSource,
-    SearchHit,
     Source,
     view_from_hit,
     view_from_item,
 )
+from tests.conftest import hit
 
 DRAMA = Genre(id=1, name="Драма", kind=GenreKind.FILM)
-
-
-def hit(**fields) -> SearchHit:
-    base = dict(kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
-                title="Интерстеллар")
-    return SearchHit(**(base | fields))
 
 
 def test_a_candidate_has_no_identifier_in_the_base():

@@ -8,7 +8,17 @@ import pytest
 import sqlalchemy
 from PIL import Image
 
-from backend.model import Feed, Filters, Item, Kind, Order, Section, Sort, Source
+from backend.model import (
+    Feed,
+    Filters,
+    Item,
+    Kind,
+    Order,
+    SearchHit,
+    Section,
+    Sort,
+    Source,
+)
 from backend.service.posters import PosterService
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
@@ -106,6 +116,15 @@ class FakeClient:
         self.asked = []
 
 
+class FakeCatalog(FakeClient):
+    """Спрашивают у него детальную карточку. Наследники дописывают остальное:
+    у GOG к ней добавляется номер по слагу."""
+
+    async def card(self, source_id: str, kind: Kind):
+        self.asked.append((source_id, kind))
+        return self.outcome
+
+
 class FakeSources:
     """Реестр с заданными каталожными клиентами. Настоящий поднимает шесть
     клиентов, у каждого свой SSL-контекст, — а сервису поиска нужен от него
@@ -200,6 +219,21 @@ def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
     buffer = io.BytesIO()
     Image.new("RGB", (width, height), (10, 20, 30)).save(buffer, format=fmt)
     return buffer.getvalue()
+
+
+# Готовая обложка: 2:3 — форма постера, а не случайные числа, и объявлена она
+# один раз. Здесь же, чтобы три модуля не рисовали по картинке на импорте.
+POSTER = picture(600, 900, fmt="JPEG")
+
+
+def hit(source_id: str = "157336", title: str = "Интерстеллар",
+        **fields) -> SearchHit:
+    """Короткий кандидат выдачи: опознание аргументами, остальное по вкусу теста.
+
+    Умолчания уезжают в `base`, а не в подпись: иначе вызов `hit(kind=Kind.GAME)`
+    даёт «got multiple values for keyword argument»."""
+    base = dict(kind=Kind.MOVIE, source=Source.TMDB)
+    return SearchHit(source_id=source_id, title=title, **(base | fields))
 
 
 # Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он

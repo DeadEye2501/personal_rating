@@ -12,9 +12,7 @@ from backend.storage.posters import PosterStore
 from tests.backend.sources.conftest import responding, unreachable
 from tests.conftest import capture
 from tests.conftest import MOMENT as WHEN
-from tests.conftest import POSTER_SOURCES, picture, poster_service
-
-POSTER = picture(600, 900, fmt="JPEG")
+from tests.conftest import POSTER, POSTER_SOURCES, picture, poster_service
 
 
 @pytest.fixture

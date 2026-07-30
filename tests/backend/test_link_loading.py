@@ -2,21 +2,20 @@
 
 import pytest
 
-from backend.model import ExternalLink, Item, Kind, Source, SourceCard
+from backend.model import ExternalLink, Kind, Source, SourceCard
 from backend.service.loading import Loader
 from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.library import LibraryRepository
-from tests.conftest import MOMENT, FakeClient, FakeSources
+from tests.conftest import FakeCatalog, FakeSources, an_item
 
 
 def source_card(source: Source, source_id: str) -> SourceCard:
     return SourceCard(
-        item=Item(id=0, kind=Kind.GAME, source=source, source_id=source_id,
-                  title="Arcanum", synced_at=MOMENT)
+        item=an_item(source_id, "Arcanum", kind=Kind.GAME, source=source)
     )
 
 
-class FakeCatalog(FakeClient):
+class FakeCatalogWithSlug(FakeCatalog):
     """Спрашивают у него и карточку, и номер по слагу: у GOG это два запроса
     подряд, и порядок между ними — предмет проверки."""
 
@@ -24,10 +23,6 @@ class FakeCatalog(FakeClient):
         super().__init__(card_outcome, name)
         self.slug_outcome = slug_outcome
         self.slugs_asked = []
-
-    async def card(self, source_id: str, kind: Kind):
-        self.asked.append((source_id, kind))
-        return self.outcome
 
     async def resolve_slug(self, slug: str):
         self.slugs_asked.append(slug)
@@ -45,7 +40,7 @@ async def loader(sessions):
 
 async def test_a_tmdb_link_goes_straight_to_the_card(loader):
     """У TMDB в адресе настоящий идентификатор — превращать нечего."""
-    client = FakeCatalog(Found(source_card(Source.TMDB, "157336")), name="tmdb")
+    client = FakeCatalogWithSlug(Found(source_card(Source.TMDB, "157336")), name="tmdb")
 
     card = await loader(client).card_for_link(
         ExternalLink(source=Source.TMDB, source_id="157336", kind=Kind.MOVIE)
@@ -58,7 +53,7 @@ async def test_a_tmdb_link_goes_straight_to_the_card(loader):
 
 async def test_a_gog_slug_becomes_a_number_before_the_card(loader):
     """Ради этого шага задача и существует: каталог по слагу не спросить."""
-    client = FakeCatalog(Found(source_card(Source.GOG, "1207658930")),
+    client = FakeCatalogWithSlug(Found(source_card(Source.GOG, "1207658930")),
                          slug_outcome=Found("1207658930"))
 
     card = await loader(client).card_for_link(
@@ -73,7 +68,7 @@ async def test_a_gog_slug_becomes_a_number_before_the_card(loader):
 
 async def test_an_unresolved_slug_stops_before_the_card(loader):
     """Иначе в каталог ушёл бы слаг, и он ответил бы про чужую игру."""
-    client = FakeCatalog(Found(source_card(Source.GOG, "1")),
+    client = FakeCatalogWithSlug(Found(source_card(Source.GOG, "1")),
                          slug_outcome=Missing())
 
     result = await loader(client).card_for_link(
@@ -87,7 +82,7 @@ async def test_an_unresolved_slug_stops_before_the_card(loader):
 
 async def test_a_refusal_on_the_slug_is_passed_on(loader):
     refusal = Refusal(source="gog", reason=Reason.NETWORK)
-    client = FakeCatalog(Found(source_card(Source.GOG, "1")),
+    client = FakeCatalogWithSlug(Found(source_card(Source.GOG, "1")),
                          slug_outcome=refusal)
 
     result = await loader(client).card_for_link(
@@ -100,7 +95,7 @@ async def test_a_refusal_on_the_slug_is_passed_on(loader):
 
 async def test_a_refusal_on_the_card_is_passed_on(loader):
     refusal = Refusal(source="tmdb", reason=Reason.QUOTA)
-    client = FakeCatalog(refusal, name="tmdb")
+    client = FakeCatalogWithSlug(refusal, name="tmdb")
 
     result = await loader(client).card_for_link(
         ExternalLink(source=Source.TMDB, source_id="157336", kind=Kind.MOVIE)
@@ -111,7 +106,7 @@ async def test_a_refusal_on_the_card_is_passed_on(loader):
 
 async def test_a_broken_client_on_the_way_by_link_is_a_refusal(loader, caplog):
     """Сорвавшийся клиент — отказ, а не исключение в интерфейс."""
-    client = FakeCatalog(None, name="tmdb")
+    client = FakeCatalogWithSlug(None, name="tmdb")
 
     async def broken(source_id, kind):
         raise RuntimeError("разбор не удался")

@@ -4,7 +4,6 @@ from backend.model import (
     CardView,
     GenreSource,
     Kind,
-    SearchHit,
     Source,
     merge_results,
     view_from_hit,
@@ -14,10 +13,10 @@ from backend.sources.errors import Found, Missing, Reason, Refusal
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
-from tests.conftest import FakeClient, FakeSources, seed
+from tests.conftest import FakeClient, FakeSources, hit, seed
 
 
-class FakeCatalog(FakeClient):
+class FakeSearch(FakeClient):
     """Спрашивают у него только выдачу поиска. Заданное исключение он бросает, а
     не возвращает: сервис обязан пережить и это."""
 
@@ -26,15 +25,6 @@ class FakeCatalog(FakeClient):
         if isinstance(self.outcome, BaseException):
             raise self.outcome
         return self.outcome
-
-
-def hit(source_id="157336", title="Интерстеллар", source=Source.TMDB,
-        kind=Kind.MOVIE, **fields) -> SearchHit:
-    # `kind` — именованный параметр, а не жёсткое `Kind.MOVIE` внутри: иначе
-    # вызов `hit(..., kind=Kind.GAME)` даёт «got multiple values for keyword
-    # argument 'kind'».
-    return SearchHit(kind=kind, source=source, source_id=source_id,
-                     title=title, **fields)
 
 
 def local_view(source_id="157336", title="Интерстеллар") -> CardView:
@@ -114,7 +104,7 @@ async def service(sessions):
 
 
 async def test_the_external_answer_becomes_candidates(sessions, service):
-    search = service(FakeCatalog(Found([hit()])))
+    search = service(FakeSearch(Found([hit()])))
 
     result = await search.external(Kind.MOVIE, "интерстеллар")
 
@@ -126,7 +116,7 @@ async def test_the_external_answer_becomes_candidates(sessions, service):
 async def test_the_query_and_the_kind_reach_the_source(sessions, service):
     """Что спросили снаружи, то и уехало в источник: подмена типа содержимого
     молча дала бы выдачу не того раздела."""
-    client = FakeCatalog(Found([hit()]))
+    client = FakeSearch(Found([hit()]))
 
     await service(client).external(Kind.SERIES, "андор")
 
@@ -135,7 +125,7 @@ async def test_the_query_and_the_kind_reach_the_source(sessions, service):
 
 async def test_genres_are_unfolded_from_the_reference(sessions, reference, service):
     """В выдаче приходят голые идентификаторы: 18 — это драма."""
-    search = service(FakeCatalog(
+    search = service(FakeSearch(
         Found([hit(genre_ext_ids=((GenreSource.TMDB, "18"),))])
     ))
 
@@ -148,7 +138,7 @@ async def test_a_compound_genre_unfolds_into_two(sessions, reference, service):
     """У TMDB в сериалах «Боевик и приключения» — это не жанр, а два.
 
     Сверяем состав, а не длину: два неверных жанра прошли бы проверку длины."""
-    search = service(FakeCatalog(
+    search = service(FakeSearch(
         Found([hit(genre_ext_ids=((GenreSource.TMDB, "10759"),))])
     ))
 
@@ -161,7 +151,7 @@ async def test_overlapping_identifiers_do_not_duplicate_a_genre(
     sessions, reference, service
 ):
     """Сборный 10759 и обычный 28 оба дают Боевик — жанр должен быть один."""
-    search = service(FakeCatalog(Found([hit(genre_ext_ids=(
+    search = service(FakeSearch(Found([hit(genre_ext_ids=(
         (GenreSource.TMDB, "10759"), (GenreSource.TMDB, "28"),
     ))])))
 
@@ -176,7 +166,7 @@ async def test_the_spaces_of_genres_do_not_leak_into_each_other(
     """У магазина и у TMDB нумерация своя: `3` у Steam — это «ролевая», а у
     TMDB такого номера нет вовсе. Спроси справочник без отбора по пространству,
     и кино получило бы игровой жанр."""
-    search = service(FakeCatalog(
+    search = service(FakeSearch(
         Found([hit(genre_ext_ids=((GenreSource.TMDB, "3"),))])
     ))
 
@@ -199,7 +189,7 @@ async def test_a_compound_genre_comes_in_the_order_of_the_alphabet(
         "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
         "('tmdb', '99', 2), ('tmdb', '99', 3)",
     )
-    search = service(FakeCatalog(
+    search = service(FakeSearch(
         Found([hit(genre_ext_ids=((GenreSource.TMDB, "99"),))])
     ))
 
@@ -219,7 +209,7 @@ async def test_a_tag_and_a_genre_of_one_store_do_not_mix(sessions, engine,
         "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
         "('steam', '9', 5), ('steam_tag', '9', 4)",
     )
-    search = service(FakeCatalog(Found([hit(
+    search = service(FakeSearch(Found([hit(
         "292030", "Ведьмак", source=Source.STEAM, kind=Kind.GAME,
         genre_ext_ids=((GenreSource.STEAM, "9"), (GenreSource.STEAM_TAG, "9")),
     )]), name="steam"))
@@ -232,7 +222,7 @@ async def test_a_tag_and_a_genre_of_one_store_do_not_mix(sessions, engine,
 async def test_a_candidate_without_genres_brings_none(sessions, service):
     """В выдаче магазинов жанров не бывает вовсе — только в карточке. Пустой
     список не должен превращаться ни в отказ, ни в выдуманный жанр."""
-    search = service(FakeCatalog(Found([hit()])))
+    search = service(FakeSearch(Found([hit()])))
 
     result = await search.external(Kind.MOVIE, "интерстеллар")
 
@@ -244,7 +234,7 @@ async def test_an_unknown_genre_is_dropped_without_a_word(
 ):
     """Справочник нарочно засеян: с пустым `genre_map` неизвестен любой
     идентификатор, и тест был бы зелёным даже при сломанном разборе."""
-    search = service(FakeCatalog(Found([hit(genre_ext_ids=(
+    search = service(FakeSearch(Found([hit(genre_ext_ids=(
         (GenreSource.TMDB, "18"), (GenreSource.TMDB, "99999"),
     ))])))
 
@@ -258,7 +248,7 @@ async def test_an_unknown_genre_is_dropped_without_a_word(
 async def test_a_refusal_is_reported_and_not_raised(sessions, service):
     """Отказ источника — состояние данных, а не ошибка."""
     refusal = Refusal(source="tmdb", reason=Reason.NETWORK)
-    search = service(FakeCatalog(refusal))
+    search = service(FakeSearch(refusal))
 
     result = await search.external(Kind.MOVIE, "интерстеллар")
 
@@ -272,7 +262,7 @@ async def test_a_broken_client_becomes_a_refusal_with_its_name(
     """Сорвавшийся клиент — тоже отказ, а не исключение наружу: у границы
     потоков второго канала доставки нет. В отказе стоит имя источника, а не
     repr клиента: его увидит человек в плашке."""
-    search = service(FakeCatalog(RuntimeError("разбор не удался"), name="steam"))
+    search = service(FakeSearch(RuntimeError("разбор не удался"), name="steam"))
 
     with caplog.at_level("ERROR"):
         result = await search.external(Kind.GAME, "ведьмак")
@@ -287,8 +277,8 @@ async def test_a_broken_client_becomes_a_refusal_with_its_name(
 
 async def test_a_broken_client_does_not_hide_the_other(sessions, service):
     """Второй магазин отвечает своё, и его находки доезжают."""
-    broken = FakeCatalog(RuntimeError("сорвался"), name="steam")
-    gog = FakeCatalog(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
+    broken = FakeSearch(RuntimeError("сорвался"), name="steam")
+    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
                       name="gog")
 
     result = await service(broken, gog).external(Kind.GAME, "ведьмак")
@@ -299,7 +289,7 @@ async def test_a_broken_client_does_not_hide_the_other(sessions, service):
 
 async def test_an_empty_answer_is_not_a_refusal(sessions, service):
     """Внешняя база ответила и ничего не нашла — сообщать не о чем."""
-    search = service(FakeCatalog(Found([])))
+    search = service(FakeSearch(Found([])))
 
     result = await search.external(Kind.MOVIE, "ничего такого")
 
@@ -307,7 +297,7 @@ async def test_an_empty_answer_is_not_a_refusal(sessions, service):
 
 
 async def test_a_missing_answer_is_not_a_refusal_either(sessions, service):
-    search = service(FakeCatalog(Missing()))
+    search = service(FakeSearch(Missing()))
 
     result = await search.external(Kind.MOVIE, "ничего такого")
 
@@ -317,9 +307,9 @@ async def test_a_missing_answer_is_not_a_refusal_either(sessions, service):
 async def test_two_stores_are_asked_at_once(sessions, service):
     """У игр кандидатов спрашивают у двух магазинов сразу — и с тем же запросом
     и типом, что пришли снаружи."""
-    steam = FakeCatalog(Found([hit("292030", "Ведьмак", source=Source.STEAM)]),
+    steam = FakeSearch(Found([hit("292030", "Ведьмак", source=Source.STEAM)]),
                         name="steam")
-    gog = FakeCatalog(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
+    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
                       name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
@@ -333,9 +323,9 @@ async def test_two_stores_come_woven_and_not_in_blocks(sessions, service):
     """Спека требует «показывают вперемешку». Подряд это значит, что вторая
     половина страницы — всегда GOG, а он на бессмыслицу отдаёт два десятка
     несвязанных игр: настоящие находки уехали бы за экран."""
-    steam = FakeCatalog(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
                                for n in range(3)]), name="steam")
-    gog = FakeCatalog(Found([hit(f"g{n}", f"GOG {n}", source=Source.GOG)
+    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", source=Source.GOG)
                              for n in range(3)]), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
@@ -347,9 +337,9 @@ async def test_two_stores_come_woven_and_not_in_blocks(sessions, service):
 
 async def test_a_shorter_answer_does_not_leave_a_hole(sessions, service):
     """Магазины отдают разное число находок — переплетение это переживает."""
-    steam = FakeCatalog(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
                                for n in range(3)]), name="steam")
-    gog = FakeCatalog(Found([hit("g0", "GOG 0", source=Source.GOG)]), name="gog")
+    gog = FakeSearch(Found([hit("g0", "GOG 0", source=Source.GOG)]), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
 
@@ -358,7 +348,7 @@ async def test_a_shorter_answer_does_not_leave_a_hole(sessions, service):
 
 async def test_one_source_keeps_the_order_it_gave(sessions, service):
     """У кино источник один, и переплетать нечего: порядок TMDB как есть."""
-    search = service(FakeCatalog(Found([hit(str(n), f"Фильм {n}")
+    search = service(FakeSearch(Found([hit(str(n), f"Фильм {n}")
                                         for n in range(5)])))
 
     result = await search.external(Kind.MOVIE, "фильм")
@@ -367,9 +357,9 @@ async def test_one_source_keeps_the_order_it_gave(sessions, service):
 
 
 async def test_one_store_refusing_does_not_hide_the_other(sessions, service):
-    steam = FakeCatalog(Refusal(source="steam", reason=Reason.NETWORK),
+    steam = FakeSearch(Refusal(source="steam", reason=Reason.NETWORK),
                         name="steam")
-    gog = FakeCatalog(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
+    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
                       name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
@@ -381,9 +371,9 @@ async def test_one_store_refusing_does_not_hide_the_other(sessions, service):
 async def test_both_stores_refusing_report_both(sessions, service):
     """Ранний выход после первого отказа оставил бы человека без половины
     объяснения: плашка перечисляет всех, кто не ответил."""
-    steam = FakeCatalog(Refusal(source="steam", reason=Reason.NETWORK),
+    steam = FakeSearch(Refusal(source="steam", reason=Reason.NETWORK),
                         name="steam")
-    gog = FakeCatalog(Refusal(source="gog", reason=Reason.RATE), name="gog")
+    gog = FakeSearch(Refusal(source="gog", reason=Reason.RATE), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
 
@@ -394,9 +384,9 @@ async def test_both_stores_refusing_report_both(sessions, service):
 async def test_a_portion_is_counted_per_source_and_not_per_page(sessions, service):
     """У игр магазина два, и по 20 у каждого — это два запроса, как и сказано в
     спеке. Срез на общей выдаче отдал бы 20 на двоих."""
-    steam = FakeCatalog(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
                                for n in range(50)]), name="steam")
-    gog = FakeCatalog(Found([hit(f"g{n}", f"GOG {n}", source=Source.GOG)
+    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", source=Source.GOG)
                              for n in range(50)]), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
@@ -416,12 +406,12 @@ async def test_the_reference_is_asked_once_per_space(sessions, reference, servic
         return await original(self, source)
 
     monkeypatch.setattr(GenresRepository, "index", counting)
-    steam = FakeCatalog(Found([
+    steam = FakeSearch(Found([
         hit(f"s{n}", source=Source.STEAM, kind=Kind.GAME,
             genre_ext_ids=((GenreSource.STEAM, "3"),))
         for n in range(5)
     ]), name="steam")
-    gog = FakeCatalog(Found([
+    gog = FakeSearch(Found([
         hit(f"g{n}", source=Source.GOG, kind=Kind.GAME,
             genre_ext_ids=((GenreSource.GOG, "role-playing"),))
         for n in range(5)
