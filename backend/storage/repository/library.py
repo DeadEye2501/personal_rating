@@ -124,9 +124,16 @@ class LibraryRepository(Repository):
 
     async def delete(self, item_id: int, posters: PosterStore) -> None:
         """Оценка, теги, закладка и связи уходят каскадом; постер — кодом:
-        внешних ключей между двумя файлами SQLite не бывает."""
-        await self._run(delete(item_table).where(item_table.c.id == item_id))
+        внешних ключей между двумя файлами SQLite не бывает.
+
+        Постер уходит первым, и порядок здесь не косметика. Оборвись удаление на
+        середине — у обратного порядка в хранилище остался бы постер без хозяина,
+        а `id` карточки SQLite выдаёт повторно: `item` заведён без
+        `AUTOINCREMENT`, и следующая карточка молча получила бы чужую обложку.
+        В этом порядке остаётся карточка без обложки, а её скачают заново по
+        `poster_url` при первом же показе."""
         await posters.delete(item_id)
+        await self._run(delete(item_table).where(item_table.c.id == item_id))
 
     async def refresh_series_counts(self, item_id: int,
                                     seasons_count: int | None,

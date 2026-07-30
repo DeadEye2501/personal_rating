@@ -114,3 +114,28 @@ async def test_other_cards_are_untouched(sessions, posters, card):
 
 async def test_deleting_a_card_that_is_not_there_is_quiet(sessions, posters):
     await LibraryRepository(sessions).delete(404, posters)
+
+
+async def test_a_broken_deletion_leaves_the_card_not_the_poster(sessions, posters,
+                                                                card,
+                                                                monkeypatch):
+    """Оборваться удаление может только между двумя файлами базы: общей транзакции
+    на них не бывает. Из двух половин уцелеть должна карточка, а не постер.
+
+    Осиротевший постер хуже: `item` заведён без `AUTOINCREMENT`, номер SQLite
+    выдаёт повторно, и следующая карточка получила бы чужую обложку молча.
+    Карточка без обложки лечится сама — её скачают заново по `poster_url`."""
+    item_id = await furnished(sessions, posters, await card())
+    library = LibraryRepository(sessions)
+
+    async def refuse(*_args, **_kwargs):
+        raise OSError("второй файл базы занят")
+
+    monkeypatch.setattr(library, "_run", refuse)
+
+    with pytest.raises(OSError):
+        await library.delete(item_id, posters)
+
+    assert await posters.has(item_id) is False, \
+        "постер остался и достанется карточке с этим же номером"
+    assert await LibraryRepository(sessions).get(item_id) is not None

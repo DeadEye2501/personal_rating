@@ -14,9 +14,6 @@ from backend.model import (
 )
 from backend.service.enrich import Enricher
 from backend.sources.errors import Found, Missing, Reason, Refusal
-from backend.sources.ratings.kinopoisk.client import KinopoiskClient
-from backend.sources.ratings.mdblist.client import MdbListClient
-from backend.sources.ratings.omdb.client import OmdbClient
 from backend.storage.repository.external import (
     EMPTY_TTL,
     VALUE_TTL,
@@ -24,7 +21,7 @@ from backend.storage.repository.external import (
     ExternalRatingsRepository,
 )
 from backend.storage.repository.library import LibraryRepository
-from tests.conftest import MOMENT, FakeClient, FakeSources, an_item
+from tests.conftest import MOMENT, FakeClient, FakeSources, an_item, ours
 
 
 class FakeRatings(FakeClient):
@@ -38,6 +35,15 @@ class FakeRatings(FakeClient):
     async def ratings(self, imdb_id: str, _kind: Kind):
         self.asked.append(imdb_id)
         return self.outcome
+
+
+class Breaking(FakeRatings):
+    """Клиент, падающий не тем, что клиенты ловят: так выглядит наша опечатка или
+    чужая библиотека. Провод и разбор клиент разбирает сам и отдаёт отказом."""
+
+    async def ratings(self, imdb_id: str, _kind: Kind):
+        self.asked.append(imdb_id)
+        raise KeyError("payload")
 
 
 @pytest.fixture
@@ -408,18 +414,18 @@ async def test_the_expected_set_is_what_the_clients_promise(sessions, enrich):
     assert service.expected(Kind.GAME) == []
 
 
-def test_every_rating_client_declares_exactly_what_it_brings():
-    """Ради этого `enrich.py` и не знает имён клиентов: седьмой источник — новая
-    папка и строка в реестре, здесь не правится ничего.
+async def test_a_broken_client_names_itself_in_the_log(enrich, item_id, caplog):
+    """Сорвавшийся клиент отказ наружу не отдаёт — обогащение просто вернёт то,
+    что лежит в базе, — и единственный след остаётся в логе. Значит имя в нём и
+    есть весь ответ на вопрос «кто не ответил».
 
-    Сверяем состав, а не форму: по этому списку пишется пустое значение. Впиши
-    сюда KINOPOISK у OMDB — и приложение на неделю запишет «у Кинопоиска нет
-    Интерстеллара» всякий раз, когда OMDB ответил."""
-    assert MdbListClient.PROVIDES == (
-        RatingSource.IMDB, RatingSource.TMDB,
-        RatingSource.ROTTEN, RatingSource.METACRITIC,
-    )
-    assert OmdbClient.PROVIDES == (
-        RatingSource.IMDB, RatingSource.ROTTEN, RatingSource.METACRITIC,
-    )
-    assert KinopoiskClient.PROVIDES == (RatingSource.KINOPOISK,)
+    Взятое из `PROVIDES` имя врёт: первым там и у MDBList, и у OMDB стоит `imdb`,
+    так что оба сорвавшихся источника выглядели бы одним."""
+    service = enrich(Breaking((RatingSource.IMDB, RatingSource.ROTTEN), None,
+                              name="omdb"))
+
+    with caplog.at_level("ERROR"):
+        await service.enrich(item_id, Kind.MOVIE)
+
+    assert any(message.startswith("omdb:") for message in ours(caplog))
+    assert not any(message.startswith("imdb:") for message in ours(caplog))

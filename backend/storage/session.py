@@ -31,6 +31,11 @@ def prepare_connection(dbapi_connection) -> None:
     и Alembic, который ходит своим, синхронным."""
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
+    # Обычный журнал заставляет читателя ждать писателя, а у ленты это обычное
+    # положение дел: страница читает пятьдесят карточек, обложки пишутся по мере
+    # приезда, человек в это же время ставит оценку. `busy_timeout` не ставим —
+    # драйвер уже даёт 5000 мс, и повтор выглядел бы починкой, ничего не меняя.
+    cursor.execute("PRAGMA journal_mode=WAL")
     cursor.close()
     dbapi_connection.create_function("py_lower", 1, fold, deterministic=True)
 

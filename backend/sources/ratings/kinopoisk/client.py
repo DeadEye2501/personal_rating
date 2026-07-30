@@ -5,6 +5,7 @@ from typing import ClassVar
 
 from backend.model import Kind, RatingSource
 from backend.sources.errors import Outcome, Refusal
+from backend.sources.ratings.kinopoisk.mirror import SOURCE
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
 
@@ -21,6 +22,12 @@ class KinopoiskClient:
     def __init__(self, primary: PoiskkinoClient, fallback: UnofficialClient) -> None:
         self._primary = primary
         self._fallback = fallback
+
+    @property
+    def name(self) -> str:
+        """То же имя, что зеркала ставят в свои отказы: у остальных клиентов оно
+        берётся у транспорта, а здесь транспортов два и наружу они неразличимы."""
+        return SOURCE
 
     async def ratings(self, imdb_id: str, kind: Kind) -> Outcome:
         result = await self._primary.ratings(imdb_id, kind)

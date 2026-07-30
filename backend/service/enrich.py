@@ -69,7 +69,7 @@ class Enricher:
         asked = [client for client in self._sources.rating_sources(kind)
                  if set(client.PROVIDES) & set(stale)]
         outcomes = await asyncio.gather(
-            *(answered(client.ratings(imdb_id, kind), client.PROVIDES[0])
+            *(answered(client.ratings(imdb_id, kind), client.name)
               for client in asked)
         )
 

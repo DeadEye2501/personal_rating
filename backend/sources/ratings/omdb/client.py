@@ -44,6 +44,12 @@ class OmdbClient:
         self._http = http
         self._key = api_key
 
+    @property
+    def name(self) -> str:
+        """Под этим именем источник назовётся в отказе — в том числе в отказе,
+        который соберёт не он сам, а поймавший его исключение сервис."""
+        return self._http.name
+
     async def ratings(self, imdb_id: str, kind: Kind) -> Outcome:
         response = await self._http.get(
             BASE, params={"apikey": self._key, "i": imdb_id}

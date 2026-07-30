@@ -554,6 +554,10 @@
 
 - `SLUG` = `'arcanum_of_steamworks_and_magick_obscura'`
 
+### `tests/backend/sources/test_rating_provides.py`
+
+- `FULL_ANSWERS` = `набор из 3`
+
 ### `tests/backend/sources/test_registry.py`
 
 - `SILENT` = `httpx.MockTransport(lambda request: httpx.Respon…`

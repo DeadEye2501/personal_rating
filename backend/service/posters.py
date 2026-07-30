@@ -7,6 +7,7 @@ from datetime import datetime
 import httpx
 
 from backend.model import Source
+from backend.service.asking import answered
 from backend.service.images import crop_to_cover
 from backend.sources.errors import Reason, Refusal
 from backend.sources.http import SourceHttp
@@ -28,6 +29,14 @@ class PosterService:
         self.store = store
 
     async def fetch(self, source: Source, url: str) -> bytes | None | Refusal:
+        """Обложка байтами, и исключения из этого пути не вылетает.
+
+        Защита стоит здесь, а не у зовущих: их трое — загрузчик, писатель
+        карточки и привязка, — и двое последних публичные, то есть за границей
+        потоков, где второго канала для исключения нет."""
+        return await answered(self._fetched(source, url), f"poster:{source}")
+
+    async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal:
         if not url:
             # Обложки нет в самом источнике — ждать нечего.
             return None

@@ -3858,7 +3858,7 @@ def test_the_row_is_redrawn_after_a_write(qtbot, theme):
     page.feed.score_picked.emit(0, -1, 7)
     qtbot.wait(30)
 
-    assert any(name == "views.views_for" for name, _, _ in runtime.asked)
+    assert any(name == "feed.views_of" for name, _, _ in runtime.asked)
 
 
 def test_a_card_action_reaches_the_page_through_the_feed(qtbot, theme):
@@ -3900,7 +3900,7 @@ def test_a_card_action_reaches_the_page_through_the_feed(qtbot, theme):
 | страница `delete_wanted` | `confirm.ask(item_id, title)` |
 | `confirm.confirmed` | убрать строку из ленты |
 | `card_window.saved` | перерисовать ленту |
-| `item_tags.tags_changed` | перерисовать одну карточку через `backend.views` |
+| `item_tags.tags_changed` | перерисовать одну карточку через `backend.feed` |
 
 **Между карточкой и страницей стоит лента, и она эти сигналы не пробрасывает.**
 `FeedView._wire` из плана 5 связывает только `toggled` и `score_picked`;
@@ -3931,8 +3931,10 @@ def test_a_card_action_reaches_the_page_through_the_feed(qtbot, theme):
 `ratings.set_aspects(item_id, visual, narrative, gameplay, now)` — номер шкалы
 приходит первым аргументом `score_picked`, `-1` означает единственную. Закладка:
 `wishlist.add(item_id, now)` или `wishlist.remove(item_id)`. После каждой записи
-строка перерисовывается через `views.views_for([item_id])` — иначе вердикт и
-средняя останутся старыми.
+строка перерисовывается через `feed.views_of([item_id])` — иначе вердикт и
+средняя останутся старыми. Репозитория `views` у бэкенда наружу нет: через
+границу слоёв клиент репозитории не видит вовсе, и читает он список, а не
+словарь по номеру.
 
 - [ ] **Шаг 4: Убедиться, что тесты проходят**
 

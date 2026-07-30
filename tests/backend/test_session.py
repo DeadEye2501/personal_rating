@@ -23,6 +23,25 @@ async def test_foreign_keys_are_enabled_on_every_connection(bare_engine):
             assert result.scalar() == 1
 
 
+async def test_the_database_keeps_a_write_ahead_log(bare_engine, tmp_path):
+    """Ради этого WAL и включён: с обычным журналом читатель и писатель запирают
+    друг друга, а у ленты это обычное положение дел — страница читает пятьдесят
+    карточек, обложки пишутся по мере приезда, человек в это же время ставит
+    оценку.
+
+    Смотрим на файл рядом с базой, а не на `PRAGMA journal_mode`: прочитать
+    настройку и сравнить с ожидаемой значило бы повторить строку кода. Прямое
+    следствие — незапертый писатель — на этом драйвере не проверить: pysqlite не
+    открывает транзакцию на `SELECT`, и читательскую блокировку не удержать без
+    отдельной обвязки, а без неё оба режима отвечают одинаково."""
+    async with bare_engine.begin() as connection:
+        await connection.execute(text("CREATE TABLE sample (title TEXT)"))
+        await connection.execute(text("INSERT INTO sample VALUES ('Ведьмак')"))
+
+        assert (tmp_path / "library.db-wal").exists(), \
+            "журнала упреждающей записи нет — база в обычном режиме"
+
+
 async def test_case_folding_is_registered_on_every_connection(bare_engine):
     async with bare_engine.connect() as first, bare_engine.connect() as second:
         for connection in (first, second):

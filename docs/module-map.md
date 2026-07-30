@@ -190,14 +190,14 @@
   - `async def _attach_credits(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...]) -> None` (6)
   - `async def _write_external(self, item_id: int, card: SourceCard) -> None` (6)
 
-### `backend/service/cards.py` — 62 строк
+### `backend/service/cards.py` — 72 строк
 
 Карточка источника строками базы.
 
 Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.sources.errors`, `backend.storage.repository.library`
 
-- `class CardWriter(CardParts)` (49)
-  - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (30)
+- `class CardWriter(CardParts)` (58)
+  - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (39)
   - `async def _write_the_rest(self, item_id: int, card: SourceCard, poster: bytes | None) -> None` (13)
 
 ### `backend/service/enrich.py` — 149 строк
@@ -260,27 +260,28 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 137 строк
+### `backend/service/loading.py` — 136 строк
 
 Кандидат превращается в карточку.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.library`
 
 - `def _kept(fresh: int | None, stored: int | None) -> int | None` (4)
-- `class Loader` (109)
+- `class Loader` (108)
   - `def _catalog(self, source: Source, action: str)` (12)
-  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (30)
+  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
   - `async def refresh(self, item_id: int) -> None` (28)
 
-### `backend/service/posters.py` — 104 строк
+### `backend/service/posters.py` — 113 строк
 
 Путь обложки от источника до хранилища.
 
-Зависит от: `backend.model`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
 
-- `class PosterService` (84)
-  - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (16)
+- `class PosterService` (92)
+  - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (7)
+  - `async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal` (16)
   - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | Refusal` (18)
   - `def _refuse(self, source: Source, detail: str) -> Refusal` (5)
   - `async def poster_for(self, item_id: int | None, source: Source, url: str, now: datetime) -> bytes | None | Refusal` (19)
@@ -367,13 +368,14 @@
   - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (15)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/kinopoisk/client.py` — 39 строк
+### `backend/sources/ratings/kinopoisk/client.py` — 46 строк
 
 Кинопоиск снаружи: одно имя над двумя зеркалами.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`
 
-- `class KinopoiskClient` (26)
+- `class KinopoiskClient` (32)
+  - `def name(self) -> str` (4)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (11)
   - `async def aclose(self) -> None` (3)
 
@@ -424,14 +426,15 @@
   - `def _verdict(self, response: httpx.Response) -> Outcome` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/mdblist/client.py` — 104 строк
+### `backend/sources/ratings/mdblist/client.py` — 110 строк
 
 Разговор с MDBList по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.mdblist.parse`
 
 - `def _retry_after(response: httpx.Response) -> timedelta | None` (3)
-- `class MdbListClient` (69)
+- `class MdbListClient` (75)
+  - `def name(self) -> str` (4)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (8)
   - `def _verdict(self, response: httpx.Response) -> Outcome` (26)
   - `def _denied(self, response: httpx.Response) -> Refusal` (16)
@@ -445,14 +448,15 @@
 
 - `def parse_ratings(payload: dict) -> Ratings` (18)
 
-### `backend/sources/ratings/omdb/client.py` — 107 строк
+### `backend/sources/ratings/omdb/client.py` — 113 строк
 
 Разговор с OMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.omdb.parse`
 
 - `def until_midnight(now: datetime) -> timedelta` (7)
-- `class OmdbClient` (72)
+- `class OmdbClient` (78)
+  - `def name(self) -> str` (4)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (28)
   - `def _answer(self, payload: dict) -> Outcome` (11)
   - `def _denied(self, payload: dict) -> Refusal` (17)
@@ -645,7 +649,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 178 строк
+### `backend/storage/repository/library.py` — 185 строк
 
 Карточки библиотеки.
 
@@ -653,7 +657,7 @@
 
 - `class ItemExists(Exception)` (2)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (142)
+- `class LibraryRepository(Repository)` (149)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
@@ -662,7 +666,7 @@
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
   - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (23)
   - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
-  - `async def delete(self, item_id: int, posters: PosterStore) -> None` (5)
+  - `async def delete(self, item_id: int, posters: PosterStore) -> None` (12)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
   - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
@@ -759,7 +763,7 @@
 - `def to_external_rating(row: Row) -> ExternalRating` (4)
 - `def to_rating(row: Row) -> Rating` (11)
 
-### `backend/storage/session.py` — 50 строк
+### `backend/storage/session.py` — 55 строк
 
 Доступ к основной базе.
 
@@ -767,7 +771,7 @@
 
 - `def fold(value: str | None) -> str | None` (5)
 - `def folded(column: ColumnElement) -> ColumnElement[str]` (4)
-- `def prepare_connection(dbapi_connection) -> None` (9)
+- `def prepare_connection(dbapi_connection) -> None` (14)
 - `def create_engine(path: Path) -> AsyncEngine` (9)
   - `def prepare(dbapi_connection, _record)` (2)
 - `def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]` (2)
@@ -953,7 +957,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 58 модулей
+## tests — 60 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1061,6 +1065,19 @@ OMDB: единственный источник, у которого отказ 
 
 - `async def ask(transport)` (5)
 
+### `tests/backend/sources/test_rating_provides.py` — 72 строк
+
+`PROVIDES` против того, что клиент действительно разбирает.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`
+
+Тестов: 2
+
+- `def mdblist(transport) -> MdbListClient` (2)
+- `def omdb(transport) -> OmdbClient` (2)
+- `def kinopoisk(transport) -> KinopoiskClient` (7)
+- `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
+
 ### `tests/backend/sources/test_registry.py` — 231 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
@@ -1110,6 +1127,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
+### `tests/backend/test_asking.py` — 73 строк
+
+Что `answered` делает с сорвавшимся запросом и что — с отменой.
+
+Зависит от: `backend.service.asking`, `backend.sources.errors`, `tests.conftest`
+
+Тестов: 6
+
+- `async def broken_request()` (2)
+- `async def cancelled_request()` (2)
+- `async def good_request()` (2)
+
 ### `tests/backend/test_by_credit.py` — 146 строк
 
 Всё с этим человеком и с этой студией.
@@ -1119,13 +1148,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_card_writer.py` — 359 строк ⚠ подошёл к 300
+### `tests/backend/test_card_writer.py` — 383 строк ⚠ подошёл к 300
 
 
 
 Зависит от: `backend.model`, `backend.service.cards`, `backend.sources.errors`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 21
+Тестов: 22
 
 - `def source_card(**overrides) -> SourceCard` (18)
 - `def game_card(source_id: str='292030', **overrides) -> SourceCard` (10)
@@ -1161,25 +1190,27 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 24
 
 
-### `tests/backend/test_delete.py` — 116 строк
+### `tests/backend/test_delete.py` — 141 строк
 
 
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 8
+Тестов: 9
 
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
-### `tests/backend/test_enrich.py` — 425 строк ⚠ подошёл к 300
+### `tests/backend/test_enrich.py` — 431 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.service.enrich`, `backend.sources.errors`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.enrich`, `backend.sources.errors`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
 
 Тестов: 24
 
 - `class FakeRatings(FakeClient)` (11)
+  - `async def ratings(self, imdb_id: str, _kind: Kind)` (3)
+- `class Breaking(FakeRatings)` (7)
   - `async def ratings(self, imdb_id: str, _kind: Kind)` (3)
 - `async def item_id(sessions)` (8)
 - `async def enrich(sessions)` (12)
@@ -1390,7 +1421,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def assemble(tmp_path)` (9)
 - `async def offline(tmp_path)` (4)
 
-### `tests/backend/test_poster_service.py` — 194 строк
+### `tests/backend/test_poster_service.py` — 199 строк
 
 
 
@@ -1467,13 +1498,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def refresher(sessions)` (12)
   - `def build(outcome)` (6)
 
-### `tests/backend/test_session.py` — 90 строк
+### `tests/backend/test_session.py` — 109 строк
 
 
 
 Зависит от: `backend.storage.session`
 
-Тестов: 7
+Тестов: 8
 
 - `async def bare_engine(tmp_path)` (4)
 - `class Base(DeclarativeBase)` (2)
@@ -1603,4 +1634,5 @@ Steam: отсутствие игры приходит под кодом 200, а 
 ## Абстракции с одной реализацией
 
 - `Base` — наследник один: `Note`
+- `FakeRatings` — наследник один: `Breaking`
 - `ViewsRepository` — наследник один: `Forgetful`

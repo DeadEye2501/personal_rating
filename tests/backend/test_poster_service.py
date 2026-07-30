@@ -185,10 +185,15 @@ async def test_closing_the_service_closes_the_store(tmp_path):
 
 async def test_closing_the_service_closes_every_client(posters):
     """Клиентов у сервиса три, и закрыть надо каждого: незакрытый держит
-    соединение до конца работы приложения."""
+    соединение до конца работы приложения.
+
+    Закрытость видна по отказу: незакрытый клиент отдал бы байты. Исключением
+    она наружу не выходит — `fetch` его не выпускает, и это проверено рядом."""
     service = poster_service(posters, responding(content=POSTER))
     await service.aclose()
 
     for source in POSTER_SOURCES:
-        with pytest.raises(RuntimeError):
-            await service.fetch(source, "https://example.com/poster.jpg")
+        assert isinstance(
+            await service.fetch(source, "https://example.com/poster.jpg"),
+            Refusal,
+        )

@@ -1,5 +1,6 @@
 """Карточка источника строками базы."""
 
+import asyncio
 import logging
 
 from backend.model import SourceCard
@@ -33,6 +34,15 @@ class CardWriter(CardParts):
 
         try:
             await self._write_the_rest(item_id, card, poster)
+        except asyncio.CancelledError:
+            # Отмена в `Exception` не попадает — она наследник `BaseException`, —
+            # а приходит она штатно: так гасится загрузка при закрытии окна.
+            # Без своей ветки в базе осталась бы карточка со свежим `synced_at`,
+            # который утверждает, что на этот момент она была полной, — и
+            # перезапроса не будет никогда. Отмену пробрасываем: гасят ею нас.
+            logger.warning("запись карточки %s отменена, откатываю", item_id)
+            await self._library.delete(item_id, self.posters.store)
+            raise
         except Exception as error:
             # Ловим всё, а не один `IdentityTaken`. Последний шаг записи —
             # постер, а он ложится во второй файл базы, со своей дисковой

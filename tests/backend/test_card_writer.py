@@ -1,3 +1,4 @@
+import asyncio
 import sqlite3
 
 import pytest
@@ -295,6 +296,29 @@ async def test_the_rollback_takes_the_poster_with_it(writer):
     assert await writer.posters.store.has(first) is True
     assert await writer.posters.store.has(first + 1) is False, \
         "постер откаченной карточки остался и достанется следующей"
+
+
+async def test_cancelling_the_write_takes_the_card_with_it(writer, sessions,
+                                                           monkeypatch):
+    """Отмена — не поломка, а штатный путь: так гасится загрузка при закрытии
+    окна. В `except Exception` она не попадает, потому что наследник
+    `BaseException`, и без своей ветки в базе осталась бы карточка со свежим
+    `synced_at`, который утверждает, что она полная, — перезапроса не будет
+    никогда. Гасим на записи идентификаторов: к этому моменту уже легли и жанры,
+    и люди, то есть уходит именно записанная половина.
+
+    Наружу отмена уходит отменой: превратить её в отказ значит соврать про
+    закрытие приложения."""
+    async def cancel(*_args, **_kwargs):
+        raise asyncio.CancelledError
+
+    monkeypatch.setattr(writer._ids, "put", cancel)
+
+    with pytest.raises(asyncio.CancelledError):
+        await writer.save(source_card())
+
+    assert await LibraryRepository(sessions).find_by_source(
+        Source.TMDB, "157336") is None
 
 
 async def test_a_taken_card_identity_is_a_refusal_not_an_exception(writer):

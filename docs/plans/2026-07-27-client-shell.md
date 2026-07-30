@@ -4533,8 +4533,14 @@ class FilmCard(QFrame):
 
 `_aspect(rating, index)` достаёт `visual`, `narrative`, `gameplay` по номеру.
 
-`CardView.waiting` — источники, чьи оценки ещё едут. Поле есть в типе с плана 4,
-но наполняет его показ, а не база: «ещё едет» — состояние клиента. Страница
+`CardView.waiting` — источники, чьи оценки ещё едут. **Поле надо завести здесь:**
+план 4 его объявлял, но ревью сняло по правилу «ничего на всякий случай» —
+потребителя у него тогда не было, а теперь он и появляется. Строкой
+`waiting: tuple[RatingSource, ...] = ()` в `CardView`, последней среди полей со
+значением по умолчанию; `view_from_hit` и `view_from_item` не трогаются — у
+кандидата и у прочитанной строки ждать нечего.
+
+Наполняет поле показ, а не база: «ещё едет» — состояние клиента. Страница
 берёт `backend.enricher.expected(kind)`, вычитает из него то, что уже в
 `view.external`, и пересобирает вид через `dataclasses.replace`. Пока
 обогащение не запущено, поле пустое, и кольца нет — это правильно: не
@@ -5541,10 +5547,10 @@ def test_a_candidate_in_sight_is_turned_into_a_card(qtbot, theme):
                          source_id="157336", title="Интерстеллар")
     runtime = ready()
     runtime.answers["loader.ensure"] = 7
-    runtime.answers["views.views_for"] = {
-        7: CardView(item_id=7, kind=Kind.MOVIE, source=Source.TMDB,
-                    source_id="157336", title="Интерстеллар")
-    }
+    runtime.answers["feed.views_of"] = [
+        CardView(item_id=7, kind=Kind.MOVIE, source=Source.TMDB,
+                 source_id="157336", title="Интерстеллар")
+    ]
     page = FeedPage(runtime)
     qtbot.addWidget(page)
     page.feed.set_rows([candidate])
@@ -5884,8 +5890,8 @@ class FeedPage(QWidget):
             # Отказ источника: карточки не будет, кандидат остаётся кандидатом.
             return
         self._ask(
-            lambda backend: backend.views.views_for([item_id]),
-            lambda found, i=index, n=item_id: self._rebind(i, found.get(n)),
+            lambda backend: backend.feed.views_of([item_id]),
+            lambda found, i=index: self._rebind(i, found[0] if found else None),
         )
 
     def _rebind(self, index: int, view) -> None:

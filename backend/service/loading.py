@@ -73,8 +73,7 @@ class Loader:
         # детальный ответ её не ждёт.
         card, poster = await asyncio.gather(
             answered(client.card(view.source_id, view.kind), client.name),
-            answered(self._posters.fetch(view.source, view.poster_url),
-                     client.name),
+            self._posters.fetch(view.source, view.poster_url),
         )
 
         if isinstance(poster, Refusal):
