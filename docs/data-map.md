@@ -147,6 +147,11 @@
   - `excluded_tag_ids: tuple[int, ...]` = `набор из 0`
   - `excluded_genre_ids: tuple[int, ...]` = `набор из 0`
   - `excluded_scores: tuple[int, ...]` = `набор из 0`
+- `class Feed`
+  - `section: Section`
+  - `kind: Kind`
+  - `filters: Filters`
+  - `order: Order`
 - `class Bucket`
   - `score: int`
   - `count: int`
@@ -379,6 +384,11 @@
 
 - `_FIELDS` = `набор из 13`
 
+### `backend/storage/repository/sections.py`
+
+- `_COLUMN` = `cast(rating.c.score, Integer)`
+- `_KEYS` = `словарь из 5`
+
 ### `backend/storage/tables/base.py`
 
 - `metadata` = `MetaData(naming_convention={'pk': 'pk_%(table_na…`
@@ -555,6 +565,11 @@
 ### `tests/backend/test_posters.py`
 
 - `OTHER` = `'другая обложка'.encode()`
+
+### `tests/backend/test_sections.py`
+
+- `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
+- `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 
 ### `tests/backend/test_session.py`
 

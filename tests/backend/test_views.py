@@ -8,11 +8,9 @@ from backend.model import (
     GenreKind,
     GenreSource,
     IdSource,
-    Item,
     Kind,
     PersonRole,
     RatingSource,
-    Source,
 )
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.external import (
@@ -25,17 +23,14 @@ from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT
-
-
-def movie(source_id: str, title: str) -> Item:
-    return Item(id=0, kind=Kind.MOVIE, source=Source.TMDB, source_id=source_id,
-                title=title, synced_at=MOMENT, year=2014, runtime=169)
+from tests.conftest import MOMENT, an_item
 
 
 @pytest.fixture
 async def item_id(sessions):
-    return await LibraryRepository(sessions).create(movie("157336", "Интерстеллар"))
+    return await LibraryRepository(sessions).create(
+        an_item("157336", "Интерстеллар", year=2014, runtime=169)
+    )
 
 
 async def test_a_bare_card_comes_back(sessions, item_id):
@@ -206,8 +201,8 @@ async def test_my_marks_do_not_mix_between_cards(sessions, item_id):
     кого-то — значит, у всех», а с одной — от «все закладки достались первой
     найденной»."""
     library = LibraryRepository(sessions)
-    other_id = await library.create(movie("27205", "Начало"))
-    third_id = await library.create(movie("577922", "Довод"))
+    other_id = await library.create(an_item("27205", "Начало"))
+    third_id = await library.create(an_item("577922", "Довод"))
 
     tags = TagsRepository(sessions)
     mine = await tags.create(Kind.MOVIE, "пересмотреть")
@@ -240,7 +235,7 @@ async def test_what_came_from_the_source_does_not_mix_between_cards(
 ):
     """То же про пять признаков, приехавших снаружи. Разложены так же — по
     одному владельцу на каждый."""
-    other_id = await LibraryRepository(sessions).create(movie("27205", "Начало"))
+    other_id = await LibraryRepository(sessions).create(an_item("27205", "Начало"))
 
     genres = GenresRepository(sessions)
     await genres.set_for_item(item_id, await genres.resolve(GenreSource.TMDB, ["18"]))
@@ -288,8 +283,8 @@ async def test_a_page_costs_the_same_no_matter_how_many_cards(sessions, engine):
     вызывается из одного безусловного места, и его счётчик показывал бы единицу
     даже если внутри стоит цикл по карточкам."""
     library = LibraryRepository(sessions)
-    one = await library.create(movie("first", "Первый"))
-    many = [await library.create(movie(str(n), f"Фильм {n}")) for n in range(20)]
+    one = await library.create(an_item("first", "Первый"))
+    many = [await library.create(an_item(str(n), f"Фильм {n}")) for n in range(20)]
 
     counted = []
 

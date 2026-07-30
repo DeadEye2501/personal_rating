@@ -16,7 +16,15 @@ from backend.model.kinds import (
     RatingSource,
     Source,
 )
-from backend.model.query import Bucket, Filters, Histogram, Order, Section, Sort
+from backend.model.query import (
+    Bucket,
+    Feed,
+    Filters,
+    Histogram,
+    Order,
+    Section,
+    Sort,
+)
 from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.search import SearchHit
@@ -31,6 +39,7 @@ __all__ = [
     "ExternalId",
     "ExternalLink",
     "ExternalRating",
+    "Feed",
     "Filters",
     "Genre",
     "GenreKind",

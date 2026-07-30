@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 58 модулей
+## backend — 59 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 60 строк
+### `backend/model/__init__.py` — 69 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
 
-Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Feed`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -95,16 +95,17 @@
 - `class ExternalLink` (4)
 - `def parse_link(raw: str, kind: Kind | None=None) -> ExternalLink | None` (34)
 
-### `backend/model/query.py` — 72 строк
+### `backend/model/query.py` — 89 строк
 
 Язык, которым лента разговаривает с базой о разделах.
 
-Зависит от: —
+Зависит от: `backend.model.kinds`
 
 - `class Section(StrEnum)` (6)
 - `class Sort(StrEnum)` (10)
 - `class Order` (6)
 - `class Filters` (15)
+- `class Feed` (12)
 - `class Bucket` (5)
 - `class Histogram` (10)
 
@@ -587,6 +588,19 @@
   - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
+### `backend/storage/repository/sections.py` — 103 строк
+
+Кто попадает в ленту и в каком порядке.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
+
+- `def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (4)
+- `def _included(query: Select, filters: Filters) -> Select` (13)
+- `def _excluded(query: Select, filters: Filters) -> Select` (23)
+- `class SectionsRepository(Repository)` (32)
+  - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (12)
+  - `def _narrow(self, query: Select, feed: Feed) -> Select` (15)
+
 ### `backend/storage/repository/tags.py` — 109 строк
 
 Мои теги: наборы по типам содержимого и их развеска по карточкам.
@@ -835,7 +849,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 45 модулей
+## tests — 46 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1191,6 +1205,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
+### `tests/backend/test_sections.py` — 441 строк ⚠ подошёл к 300
+
+
+
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+
+Тестов: 23
+
+- `async def library(sessions)` (2)
+- `async def sections(sessions)` (2)
+
 ### `tests/backend/test_session.py` — 90 строк
 
 
@@ -1243,7 +1268,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def hit(**fields) -> SearchHit` (4)
 
-### `tests/backend/test_views.py` — 317 строк ⚠ подошёл к 300
+### `tests/backend/test_views.py` — 312 строк ⚠ подошёл к 300
 
 
 
@@ -1251,8 +1276,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 17
 
-- `def movie(source_id: str, title: str) -> Item` (3)
-- `async def item_id(sessions)` (2)
+- `async def item_id(sessions)` (4)
 
 ### `tests/backend/test_wishlist.py` — 117 строк
 
@@ -1263,7 +1287,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 223 строк
+### `tests/conftest.py` — 240 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1271,6 +1295,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def ours(caplog) -> list[str]` (8)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
+- `def an_item(source_id: str, title: str, **fields) -> Item` (15)
 - `async def film_genres(engine) -> None` (11)
 - `async def seed(engine, *statements: str) -> None` (7)
 - `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)

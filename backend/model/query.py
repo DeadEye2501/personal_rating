@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from enum import StrEnum
 
+from backend.model.kinds import Kind
+
 
 class Section(StrEnum):
     """Разделы, которые спрашивают у базы. Поиска тут нет: он спрашивает у
@@ -49,6 +51,21 @@ class Filters:
     excluded_tag_ids: tuple[int, ...] = ()
     excluded_genre_ids: tuple[int, ...] = ()
     excluded_scores: tuple[int, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class Feed:
+    """О чём спрашивает лента: раздел, тип содержимого, фильтры и порядок.
+
+    Четыре вещи ходят вместе всегда: раздел без типа содержимого — это половина
+    вопроса, а фильтры и порядок держит та же шапка, что и переключатель
+    раздела. Гистограмма спрашивает тем же объектом, потому что считать обязана
+    ровно по тому набору, который видно в ленте."""
+
+    section: Section
+    kind: Kind
+    filters: Filters
+    order: Order
 
 
 @dataclass(frozen=True, slots=True)

@@ -67,6 +67,23 @@ def card_parts(sessions, store: PosterStore,
     }
 
 
+def an_item(source_id: str, title: str, **fields) -> Item:
+    """Незаписанная карточка: опознание аргументами, остальное по вкусу теста.
+
+    Умолчания — фильм от TMDB: таких проверок больше всего, а `Item` требует
+    шесть полей, и повторять их в каждом тесте значит спрятать среди них то
+    одно, ради которого тест написан."""
+    return Item(
+        id=0,
+        kind=fields.pop("kind", Kind.MOVIE),
+        source=fields.pop("source", Source.TMDB),
+        source_id=source_id,
+        title=title,
+        synced_at=fields.pop("synced_at", MOMENT),
+        **fields,
+    )
+
+
 async def film_genres(engine) -> None:
     """Два киножанра со соответствиями к ним. Два, а не один: с одним нельзя
     проверить, что чужой жанр не затирает выбранный руками — дополнять было бы
