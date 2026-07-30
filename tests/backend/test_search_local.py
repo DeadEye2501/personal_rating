@@ -2,17 +2,19 @@ import pytest
 
 from backend.model import Kind
 from backend.service.search import SEARCH_SIZE, SearchService
+from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.views import ViewsRepository
-from tests.conftest import MOMENT, rated
+from tests.conftest import MOMENT, FakeSources, rated
 
 
 @pytest.fixture
 async def search(sessions):
-    """Источники сюда не передаются: `local()` в сеть не ходит, и добавит их
-    задача о внешнем поиске — вместе с тем, кто их спрашивает."""
-    return SearchService(LibraryRepository(sessions), ViewsRepository(sessions))
+    """Реестр подставной и пустой: `local()` в сеть не ходит вовсе, а поднимать
+    ради него шесть настоящих клиентов со своими SSL-контекстами — впустую."""
+    return SearchService(LibraryRepository(sessions), ViewsRepository(sessions),
+                         FakeSources(), GenresRepository(sessions))
 
 
 async def test_a_substring_is_enough(sessions, search):

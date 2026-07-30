@@ -41,6 +41,12 @@ class SteamClient:
     def __init__(self, http: SourceHttp) -> None:
         self._http = http
 
+    @property
+    def name(self) -> str:
+        """Под этим именем источник назовётся в отказе — в том числе в отказе,
+        который соберёт не он сам, а поймавший его исключение сервис."""
+        return self._http.name
+
     async def search(self, query: str, kind: Kind) -> Outcome:
         # Строка поиска идёт частью пути, поэтому её надо экранировать: `?` и
         # `#` для URL структурные, и «Who's Your Daddy?!» уедет обрезанным до

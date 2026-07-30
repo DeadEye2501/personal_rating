@@ -91,6 +91,20 @@ def an_item(source_id: str, title: str, **fields) -> Item:
     )
 
 
+class FakeSources:
+    """Реестр с заданными каталожными клиентами. Настоящий поднимает шесть
+    клиентов, у каждого свой SSL-контекст, — а сервису поиска нужен от него
+    только список тех, кого спрашивать."""
+
+    def __init__(self, *clients) -> None:
+        self._clients = list(clients)
+
+    def catalog_for(self, _kind: Kind) -> list:
+        """Тип содержимого настоящий реестр разбирает сам, и проверяется он в
+        его собственных тестах: здесь важно только, кого он вернул."""
+        return self._clients
+
+
 async def rated(sessions, source_id: str, score: float | None, **fields) -> int:
     """Записанная карточка со своей оценкой — или без неё, если оценки нет.
 

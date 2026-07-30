@@ -254,7 +254,11 @@
 
 ### `backend/service/search.py`
 
+- `logger` = `logging.getLogger(__name__)`
 - `SEARCH_SIZE` = `20`
+- `class ExternalSearch`
+  - `views: tuple[CardView, ...]`
+  - `refusals: tuple[Refusal, ...]`
 
 ### `backend/sources/errors.py`
 

@@ -68,6 +68,12 @@ class TmdbClient:
         self._http = http
         self._key = api_key
 
+    @property
+    def name(self) -> str:
+        """Под этим именем источник назовётся в отказе — в том числе в отказе,
+        который соберёт не он сам, а поймавший его исключение сервис."""
+        return self._http.name
+
     def _params(self, **extra: object) -> dict:
         return {"api_key": self._key, "language": LANGUAGE, **extra}
 

@@ -36,6 +36,12 @@ class GogClient:
     def __init__(self, http: SourceHttp) -> None:
         self._http = http
 
+    @property
+    def name(self) -> str:
+        """Под этим именем источник назовётся в отказе — в том числе в отказе,
+        который соберёт не он сам, а поймавший его исключение сервис."""
+        return self._http.name
+
     async def _catalog(self, query: str) -> list | Refusal:
         response = await self._http.get(
             CATALOG, params={"query": f"like:{query}", "locale": "ru-RU"}

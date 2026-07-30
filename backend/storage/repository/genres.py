@@ -1,5 +1,7 @@
 """Жанры карточки и разрешение чужих идентификаторов в свои."""
 
+from collections import defaultdict
+
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 
@@ -33,6 +35,26 @@ class GenresRepository(Repository):
         # Порядок сохраняется: сборный жанр разворачивается в два, и оба должны
         # прийти в том порядке, в каком лежат в справочнике.
         return list(dict.fromkeys(row.genre_id for row in rows))
+
+    async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]:
+        """Соответствия одного пространства целиком.
+
+        В выдаче поиска жанры приходят голыми идентификаторами, и разворачивать
+        их по кандидату значит запрос на кандидата. Один сборный идентификатор
+        разворачивается в несколько жанров — отсюда кортеж, а не жанр.
+
+        Пространство, а не источник карточки: у магазина их два, жанры и теги,
+        и нумеруются они порознь — `9` у Steam это и «Гонки», и «Стратегия»."""
+        rows = await self._rows(
+            select(genre_map_table.c.ext_id, genre_table)
+            .join(genre_table, genre_table.c.id == genre_map_table.c.genre_id)
+            .where(genre_map_table.c.source == source)
+            .order_by(genre_table.c.name)
+        )
+        found = defaultdict(list)
+        for row in rows:
+            found[row.ext_id].append(to_genre(row))
+        return {ext_id: tuple(genres) for ext_id, genres in found.items()}
 
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:
         """Набор жанров заменяется целиком: пришедшее из источника — это весь

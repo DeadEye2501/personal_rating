@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 61 модулей
+## backend — 62 модулей
 
 ### `backend/config.py` — 49 строк
 
@@ -19,13 +19,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 69 строк
+### `backend/model/__init__.py` — 71 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.view`
 
-Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Feed`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `Feed`, `Filters`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Order`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `SearchHit`, `Section`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -125,6 +125,14 @@
 Зависит от: `backend.model.external`
 
 - `class Ratings` (8)
+
+### `backend/model/results.py` — 32 строк
+
+Своя выдача и чужая, сложенные в одну.
+
+Зависит от: `backend.model.kinds`, `backend.model.view`
+
+- `def merge_results(local: list[CardView], external: list[CardView]) -> list[CardView]` (23)
 
 ### `backend/model/search.py` — 27 строк
 
@@ -230,14 +238,20 @@
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
-### `backend/service/search.py` — 23 строк
+### `backend/service/search.py` — 128 строк
 
-Поиск карточек — по своей библиотеке и по чужим базам.
+Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
 
-- `class SearchService` (12)
+- `class ExternalSearch` (6)
+- `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (16)
+- `class SearchService` (60)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (27)
+  - `def _broke(self, client, error: BaseException) -> Refusal` (7)
+  - `async def _to_views(self, hits: list[SearchHit]) -> list[CardView]` (9)
+- `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (12)
 
 ### `backend/sources/convert.py` — 52 строк
 
@@ -264,13 +278,14 @@
 - `def broken(source: str, error: Exception) -> Refusal` (4)
 - `def is_answer(outcome: Outcome) -> bool` (5)
 
-### `backend/sources/gog/client.py` — 79 строк
+### `backend/sources/gog/client.py` — 85 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (55)
+- `class GogClient` (61)
+  - `def name(self) -> str` (4)
   - `async def _catalog(self, query: str) -> list | Refusal` (13)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
@@ -414,13 +429,14 @@
 - `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
   - `def http(name: str) -> SourceHttp` (7)
 
-### `backend/sources/steam/client.py` — 129 строк
+### `backend/sources/steam/client.py` — 135 строк
 
 Разговор со Steam по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`, `backend.sources.undocumented`
 
-- `class SteamClient` (93)
+- `class SteamClient` (99)
+  - `def name(self) -> str` (4)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (39)
   - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
@@ -439,14 +455,15 @@
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (7)
 
-### `backend/sources/tmdb/client.py` — 118 строк
+### `backend/sources/tmdb/client.py` — 124 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
 - `def classify(response: httpx.Response) -> Missing | Refusal | None` (20)
-- `class TmdbClient` (59)
+- `class TmdbClient` (65)
+  - `def name(self) -> str` (4)
   - `def _params(self, **extra: object) -> dict` (2)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (7)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (15)
@@ -559,14 +576,15 @@
   - `async def ratings_of(self, item_id: int) -> list[ExternalRating]` (7)
   - `async def stale_sources(self, item_id: int, wanted: list[RatingSource], now: datetime) -> list[RatingSource]` (16)
 
-### `backend/storage/repository/genres.py` — 70 строк
+### `backend/storage/repository/genres.py` — 92 строк
 
 Жанры карточки и разрешение чужих идентификаторов в свои.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`
 
-- `class GenresRepository(Repository)` (56)
+- `class GenresRepository(Repository)` (76)
   - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (20)
+  - `async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]` (19)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (14)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
@@ -871,7 +889,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 49 модулей
+## tests — 50 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1249,15 +1267,30 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search_local.py` — 133 строк
+### `tests/backend/test_search.py` — 437 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.search`, `backend.sources.errors`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+
+Тестов: 30
+
+- `class FakeCatalog` (14)
+  - `async def search(self, query: str, kind: Kind)` (5)
+- `def hit(source_id='157336', title='Интерстеллар', source=Source.TMDB, kind=Kind.MOVIE, **fields) -> SearchHit` (7)
+- `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
+- `async def service(sessions)` (7)
+  - `def build(*clients) -> SearchService` (5)
+
+### `tests/backend/test_search_local.py` — 135 строк
+
+
+
+Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
 
 Тестов: 12
 
-- `async def search(sessions)` (4)
+- `async def search(sessions)` (5)
 
 ### `tests/backend/test_sections.py` — 434 строк ⚠ подошёл к 300
 
@@ -1340,7 +1373,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 267 строк
+### `tests/conftest.py` — 281 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
@@ -1349,6 +1382,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def ours(caplog) -> list[str]` (8)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
+- `class FakeSources` (12)
+  - `def catalog_for(self, _kind: Kind) -> list` (4)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `async def film_genres(engine) -> None` (11)
 - `async def seed(engine, *statements: str) -> None` (7)

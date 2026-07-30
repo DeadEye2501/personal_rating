@@ -29,6 +29,7 @@ from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.search import SearchHit
 from backend.model.suggestion import Suggestion
+from backend.model.results import merge_results
 from backend.model.view import CardView, Tag, view_from_hit, view_from_item
 
 __all__ = [
@@ -61,6 +62,7 @@ __all__ = [
     "Suggestion",
     "Tag",
     "average_score",
+    "merge_results",
     "new_manual_item",
     "new_source_id",
     "parse_link",
