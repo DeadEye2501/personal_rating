@@ -16,7 +16,6 @@ from backend.model import (
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
-from backend.storage.repository.sections import SectionsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
 from tests.conftest import MOMENT, an_item
@@ -31,11 +30,6 @@ WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
 @pytest.fixture
 async def library(sessions):
     return LibraryRepository(sessions)
-
-
-@pytest.fixture
-async def sections(sessions):
-    return SectionsRepository(sessions)
 
 
 async def test_the_rated_section_shows_only_what_has_a_score(

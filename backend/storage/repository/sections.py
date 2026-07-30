@@ -1,8 +1,18 @@
-"""Кто попадает в ленту и в каком порядке."""
+"""Вопросы к отфильтрованному набору раздела."""
 
-from sqlalchemy import Column, Integer, Select, Table, cast, select
+from dataclasses import replace
 
-from backend.model import Feed, Filters, Section, Sort
+from sqlalchemy import Column, Integer, Select, Table, cast, func, select
+
+from backend.model import (
+    Bucket,
+    Feed,
+    Filters,
+    Histogram,
+    Kind,
+    Section,
+    Sort,
+)
 from backend.storage.repository.base import Repository
 from backend.storage.session import folded
 from backend.storage.tables import item, item_genre, item_tag, rating, wishlist
@@ -70,15 +80,19 @@ def _excluded(query: Select, filters: Filters) -> Select:
 
 
 class SectionsRepository(Repository):
-    """Отдаёт идентификаторы: состав карточки собирает `ViewsRepository`, и
-    спрошенный тем же запросом дал бы строку на каждый жанр и тег."""
+    """Два ответа про один и тот же набор: кто в него попал и как в нём
+    распределены оценки. Оба стоят на общем `_narrow`, иначе гистограмма
+    показывала бы не то, что видно в ленте.
+
+    Карточки отдаются номерами: состав собирает `ViewsRepository`, а спрошенный
+    тем же запросом дал бы строку на каждый жанр и тег."""
 
     async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]:
         key = _KEYS[feed.order.key]
         # Второй ключ — идентификатор: без него равные оценки перетасовывались
         # бы между порциями, и карточка попадала бы в две сразу либо ни в одну.
         query = (
-            self._narrow(select(item.c.id), feed)
+            self._narrow(select(item.c.id), feed.section, feed.kind, feed.filters)
             .order_by(key.desc() if feed.order.descending else key.asc(),
                       item.c.id)
             .limit(limit)
@@ -86,18 +100,54 @@ class SectionsRepository(Repository):
         )
         return [row.id for row in await self._rows(query)]
 
-    def _narrow(self, query: Select, feed: Feed) -> Select:
+    async def histogram(self, kind: Kind, filters: Filters) -> Histogram:
+        """Десять столбцов всегда, включая пустые: пустой столбец — это
+        сведение, а не отсутствие данных. Плюс подвал: сколько всего и средняя.
+
+        Раздел здесь всегда «Оценённые»: гистограмма строится по выставленным
+        оценкам, и в «Хочу посмотреть» считать нечего.
+
+        Фильтр по оценке снимаем — и включение, и исключение: он выражен теми же
+        столбцами, что и сама гистограмма, и применённый к себе схлопнул бы её в
+        один столбец."""
+        narrowed = replace(filters, scores=(), excluded_scores=())
+        counted = self._narrow(
+            select(_COLUMN.label("bucket"), func.count().label("total")),
+            Section.RATED, kind, narrowed,
+        ).group_by("bucket")
+        # Средняя считается по неокруглённым оценкам: у игр score — среднее трёх
+        # шкал, и сумма по столбцам занизила бы её почти на полбалла. Всего же
+        # считать вторым запросом нечего: это сумма столбцов.
+        mean = self._narrow(
+            select(func.avg(rating.c.score).label("mean")),
+            Section.RATED, kind, narrowed,
+        )
+
+        counts = dict.fromkeys(range(1, 11), 0)
+        for row in await self._rows(counted):
+            counts[row.bucket] = row.total
+        average = (await self._row(mean)).mean
+
+        return Histogram(
+            buckets=tuple(Bucket(score=score, count=counts[score])
+                          for score in range(1, 11)),
+            total=sum(counts.values()),
+            average=average,
+        )
+
+    def _narrow(self, query: Select, section: Section, kind: Kind,
+                filters: Filters) -> Select:
         """Общая часть запроса раздела и гистограммы: они обязаны считать по
         одному и тому же набору, иначе отфильтрованную гистограмму не увидеть."""
         query = query.select_from(
             item
             .outerjoin(rating, rating.c.item_id == item.c.id)
             .outerjoin(wishlist, wishlist.c.item_id == item.c.id)
-        ).where(item.c.kind == feed.kind)
+        ).where(item.c.kind == kind)
 
-        if feed.section is Section.RATED:
+        if section is Section.RATED:
             query = query.where(rating.c.score.is_not(None))
-        elif feed.section is Section.WISHLIST:
+        elif section is Section.WISHLIST:
             query = query.where(wishlist.c.item_id.is_not(None))
 
-        return _excluded(_included(query, feed.filters), feed.filters)
+        return _excluded(_included(query, filters), filters)

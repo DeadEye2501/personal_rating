@@ -95,7 +95,7 @@
 - `class ExternalLink` (4)
 - `def parse_link(raw: str, kind: Kind | None=None) -> ExternalLink | None` (34)
 
-### `backend/model/query.py` — 89 строк
+### `backend/model/query.py` — 88 строк
 
 Язык, которым лента разговаривает с базой о разделах.
 
@@ -105,7 +105,7 @@
 - `class Sort(StrEnum)` (10)
 - `class Order` (6)
 - `class Filters` (15)
-- `class Feed` (12)
+- `class Feed` (11)
 - `class Bucket` (5)
 - `class Histogram` (10)
 
@@ -588,18 +588,19 @@
   - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
-### `backend/storage/repository/sections.py` — 103 строк
+### `backend/storage/repository/sections.py` — 153 строк
 
-Кто попадает в ленту и в каком порядке.
+Вопросы к отфильтрованному набору раздела.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
 
 - `def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (4)
 - `def _included(query: Select, filters: Filters) -> Select` (13)
 - `def _excluded(query: Select, filters: Filters) -> Select` (23)
-- `class SectionsRepository(Repository)` (32)
+- `class SectionsRepository(Repository)` (72)
   - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (12)
-  - `def _narrow(self, query: Select, feed: Feed) -> Select` (15)
+  - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (34)
+  - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
 ### `backend/storage/repository/tags.py` — 109 строк
 
@@ -849,7 +850,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 46 модулей
+## tests — 47 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1088,6 +1089,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
+### `tests/backend/test_histogram.py` — 210 строк
+
+
+
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+
+Тестов: 17
+
+- `async def make(sessions, source_id: str, score: float | None, **fields) -> int` (9)
+- `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
+
 ### `tests/backend/test_images.py` — 126 строк
 
 
@@ -1205,16 +1217,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_sections.py` — 441 строк ⚠ подошёл к 300
+### `tests/backend/test_sections.py` — 435 строк ⚠ подошёл к 300
 
 
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
 Тестов: 23
 
 - `async def library(sessions)` (2)
-- `async def sections(sessions)` (2)
 
 ### `tests/backend/test_session.py` — 90 строк
 
@@ -1287,11 +1298,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/conftest.py` — 240 строк
+### `tests/conftest.py` — 247 строк
 
 Общее для тестов: временные база и хранилище, фикстуры и минимальные строки.
 
-Зависит от: `backend.model`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
+Зависит от: `backend.model`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`
 
 - `def ours(caplog) -> list[str]` (8)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (13)
@@ -1302,6 +1313,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def migrated(tmp_path)` (16)
 - `async def engine(tmp_path)` (8)
+- `async def sections(sessions)` (3)
 - `async def reference(engine)` (17)
 - `async def sessions(engine)` (4)
 - `async def posters(tmp_path)` (6)

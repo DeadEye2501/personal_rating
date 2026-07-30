@@ -19,6 +19,7 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.sections import SectionsRepository
 from backend.storage.session import (
     create_engine,
     prepare_connection,
@@ -172,6 +173,12 @@ async def engine(tmp_path):
         await connection.run_sync(metadata.create_all)
     yield made
     await made.dispose()
+
+
+@pytest.fixture
+async def sections(sessions):
+    """Запросы разделов: их спрашивают и лента, и гистограмма."""
+    return SectionsRepository(sessions)
 
 
 @pytest.fixture
