@@ -27,6 +27,15 @@ class LibraryService:
     async def page(self, feed: Feed, offset: int = 0,
                    limit: int = PAGE_SIZE) -> list[CardView]:
         item_ids = await self._sections.ids(feed, limit=limit, offset=offset)
+        return await self.views_of(item_ids)
+
+    async def views_of(self, item_ids: list[int]) -> list[CardView]:
+        """Готовая лента по готовому списку номеров.
+
+        Ею пользуются двое: страница «всё с этим человеком», где что показывать
+        решил репозиторий связей, и перерисовка одной карточки — после загрузки
+        кандидата и после простановки оценки ленте нужна она одна, а не вся
+        страница."""
         return await self._views.in_order(item_ids)
 
     async def histogram(self, kind: Kind, filters: Filters) -> Histogram:

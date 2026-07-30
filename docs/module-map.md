@@ -6,15 +6,15 @@
 
 ## backend — 67 модулей
 
-### `backend/app.py` — 142 строк
+### `backend/app.py` — 138 строк
 
 Бэкенд, собранный целиком.
 
 Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.posters`, `backend.service.search`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
 
-- `class Backend` (35)
+- `class Backend` (32)
   - `async def aclose(self) -> None` (8)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (71)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (70)
 
 ### `backend/config.py` — 49 строк
 
@@ -234,14 +234,15 @@
 - `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
 - `def crop_to_cover(data: bytes) -> bytes` (20)
 
-### `backend/service/library.py` — 33 строк
+### `backend/service/library.py` — 42 строк
 
 Страницы разделов и гистограмма для показа.
 
 Зависит от: `backend.model`, `backend.storage.repository.sections`, `backend.storage.repository.views`
 
-- `class LibraryService` (22)
+- `class LibraryService` (31)
   - `async def page(self, feed: Feed, offset: int=0, limit: int=PAGE_SIZE) -> list[CardView]` (4)
+  - `async def views_of(self, item_ids: list[int]) -> list[CardView]` (8)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (2)
 
 ### `backend/service/linking.py` — 127 строк
@@ -583,7 +584,7 @@
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (7)
 
-### `backend/storage/repository/credits.py` — 248 строк
+### `backend/storage/repository/credits.py` — 271 строк
 
 Всё, что приложение делает в базе с человеком или студией как с
 
@@ -593,7 +594,7 @@
 - `class Entity` (14)
   - `def link(self) -> Column` (4)
 - `def to_credit(row: Row, entity: Entity) -> Credit` (16)
-- `class CreditRepository(Repository)` (166)
+- `class CreditRepository(Repository)` (189)
   - `def _link(self) -> Column` (2)
   - `def _folded_name(self) -> ColumnElement[str]` (2)
   - `def _same_name(self, name: str) -> ColumnElement[bool]` (2)
@@ -608,8 +609,9 @@
   - `async def attach(self, item_id: int, entity_id: int, role: PersonRole | CompanyRole, position: int | None=None) -> None` (13)
   - `async def detach_all(self, item_id: int) -> None` (2)
   - `async def credits_of(self, item_id: int) -> list[Credit]` (14)
+  - `async def items_of(self, entity_id: int, limit: int, offset: int) -> list[int]` (20)
   - `async def suggest(self, name: str, limit: int=10) -> list[Suggestion]` (15)
-  - `def _linked(self, entity_id: int) -> Select` (10)
+  - `def _linked(self, entity_id: int) -> Select` (12)
   - `async def _hint(self, entity_id: int) -> tuple[str, int | None]` (21)
 - `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 - `def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
@@ -951,7 +953,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 57 модулей
+## tests — 58 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1106,6 +1108,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
 Тестов: 15
+
+
+### `tests/backend/test_by_credit.py` — 146 строк
+
+Всё с этим человеком и с этой студией.
+
+Зависит от: `backend.model`, `backend.service.library`, `backend.storage.repository.credits`, `backend.storage.repository.views`, `tests.conftest`
+
+Тестов: 10
 
 
 ### `tests/backend/test_card_writer.py` — 359 строк ⚠ подошёл к 300

@@ -140,9 +140,9 @@ async def test_a_single_card_can_be_redrawn(offline):
     item_id = await offline.library.create(mine("Своё"))
     await offline.ratings.set_score(item_id, 7.0, now=MOMENT)
 
-    views = await offline.views.views_for([item_id])
+    views = await offline.feed.views_of([item_id])
 
-    assert views[item_id].rating.score == 7.0
+    assert views[0].rating.score == 7.0
 
 
 async def test_the_cast_of_a_hand_made_card_is_kept(offline):
@@ -155,7 +155,7 @@ async def test_the_cast_of_a_hand_made_card_is_kept(offline):
     await offline.people.attach(item_id, actor, PersonRole.ACTOR, 0)
     await offline.companies.attach(item_id, studio, CompanyRole.PUBLISHER)
 
-    view = (await offline.views.views_for([item_id]))[item_id]
+    view = (await offline.feed.views_of([item_id]))[0]
 
     assert [credit.name for credit in view.people] == ["Мэттью Макконахи"]
     assert [credit.name for credit in view.companies] == ["Syncopy"]
@@ -176,7 +176,7 @@ async def test_a_hand_made_card_gets_linked_to_a_source(offline):
 
     await offline.linker.link(item_id, incoming, now=MOMENT)
 
-    view = (await offline.views.views_for([item_id]))[item_id]
+    view = (await offline.feed.views_of([item_id]))[0]
     assert (view.year, view.source_id) == (2014, "157336")
     assert [credit.name for credit in view.people] == ["Кристофер Нолан"]
     assert view.companies == ()

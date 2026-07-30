@@ -45,9 +45,6 @@ class Backend:
     companies: CreditRepository
     ids: ExternalIdsRepository
     external_ratings: ExternalRatingsRepository
-    # Одна карточка по идентификатору: после загрузки кандидата и после
-    # простановки оценки ленте надо перерисовать её, а не всю страницу.
-    views: ViewsRepository
 
     search: SearchService
     feed: LibraryService
@@ -128,7 +125,6 @@ async def build_backend(
         companies=company_repository,
         ids=ids,
         external_ratings=external_ratings,
-        views=views,
         search=SearchService(library=library, views=views, sources=sources,
                              genres=genres),
         feed=LibraryService(SectionsRepository(sessions), views),

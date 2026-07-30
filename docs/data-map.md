@@ -18,7 +18,6 @@
   - `companies: CreditRepository`
   - `ids: ExternalIdsRepository`
   - `external_ratings: ExternalRatingsRepository`
-  - `views: ViewsRepository`
   - `search: SearchService`
   - `feed: LibraryService`
   - `loader: Loader`

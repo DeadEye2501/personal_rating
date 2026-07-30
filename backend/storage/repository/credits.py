@@ -191,6 +191,27 @@ class CreditRepository(Repository):
             lambda row: to_credit(row, self._entity),
         )
 
+    async def items_of(self, entity_id: int, limit: int,
+                       offset: int) -> list[int]:
+        """Всё, с чем связан этот человек или студия.
+
+        `distinct` обязателен: один человек бывает на карточке и режиссёром, и
+        актёром — это две строки связи и одна карточка.
+
+        Порядок — по своей оценке, высокие сверху; неоценённые следом. Спека его
+        не называет, но вопрос тот же, что в «Оценённых»: что у этого человека
+        стоит смотреть. SQLite при `DESC` кладёт `NULL` вниз сам."""
+        rows = await self._rows(
+            self._linked(entity_id)
+            .with_only_columns(item.c.id)
+            .distinct()
+            .join(rating, rating.c.item_id == item.c.id, isouter=True)
+            .order_by(rating.c.score.desc(), item.c.id)
+            .limit(limit)
+            .offset(offset)
+        )
+        return [row.id for row in rows]
+
     async def suggest(self, name: str, limit: int = 10) -> list[Suggestion]:
         """Строки подсказки при вводе имени. Тёзки различаются не
         метаданными, а тем, чем каждый из них известен в твоей библиотеке."""
@@ -208,9 +229,11 @@ class CreditRepository(Repository):
         return found
 
     def _linked(self, entity_id: int) -> Select:
-        """Общее у трёх ступеней подсказки. Вынесено не ради краткости:
-        потерять здесь отбор по человеку в одной ступени из трёх — значит
-        показать в подсказке чужую карточку."""
+        """Карточки этой сущности: соединение со связью и отбор по ней.
+
+        Общее у трёх ступеней подсказки и у страницы «всё с этим человеком».
+        Вынесено не ради краткости: потерять здесь отбор по человеку в одной
+        ступени из четырёх — значит показать чужую карточку."""
         return (
             select(item.c.title, item.c.id)
             .join_from(self._entity.credit, item,
