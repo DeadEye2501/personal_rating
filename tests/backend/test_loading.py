@@ -221,6 +221,11 @@ async def test_a_poster_that_did_not_arrive_stops_the_writing(sessions, loader,
     ) is None
     assert [r for r in caplog.records
             if r.name.startswith("backend") and r.levelname == "ERROR"] == []
+    # Запрос один и по адресу кандидата: узнав отказ, загрузчик не пускает
+    # писателя за той же обложкой ещё раз, а тот пошёл бы по адресу детального
+    # ответа. Без этой проверки досрочный выход из `ensure` не наблюдается
+    # ничем — карточки не будет в обоих случаях.
+    assert [str(one.url) for one in rig.requests] == [SEARCH_COVER]
 
 
 async def test_a_card_without_a_cover_in_the_source_is_still_written(

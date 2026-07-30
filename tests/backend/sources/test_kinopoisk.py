@@ -445,5 +445,9 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
             for record in caplog.records if record.name.startswith("backend")}
     assert "основного зеркала" in said["poiskkino"]
     assert "запасного зеркала" in said["unofficial"]
+    # И оба называют источник в самом тексте: подставляет его `parsed`, и
+    # читается запись целиком, не заглядывая в имя логгера. Имя у зеркал общее
+    # нарочно — наружу источник один.
+    assert all(one.startswith("kinopoisk:") for one in said.values())
 
 

@@ -141,15 +141,37 @@ def test_the_rest_of_the_crew_stays_out(fixture):
     assert roles == {PersonRole.ACTOR, PersonRole.DIRECTOR}
 
 
-def test_actors_keep_the_order_from_the_credits(fixture):
-    """Без порядка главные роли не отличить от эпизодических."""
-    card = parse_movie(fixture("tmdb/movie_detail.json"))
+def test_actors_are_placed_by_the_billing_of_the_source(fixture):
+    """Без порядка главные роли не отличить от эпизодических, и порядок этот —
+    `order` из ответа, а не номер строки.
+
+    Проверяется на сериале, хотя разбор состава общий: в записанном ответе фильма
+    `order` совпадает с номером строки, и подмена одного другим прошла бы там
+    молча — как и «позиция всегда ноль»."""
+    card = parse_series(fixture("tmdb/tv_detail.json"))
 
     actors = [one for one in card.people if one.role is PersonRole.ACTOR]
-    assert len(actors) > 5
     positions = [one.position for one in actors]
-    assert positions == sorted(positions)
-    assert positions[0] == 0
+    assert min(positions) == 0
+    assert positions != list(range(len(positions)))
+    assert len(set(positions)) > 5
+
+
+def test_an_actor_without_a_place_in_the_credits_falls_back_to_arrival(fixture):
+    """`order` есть у каждого актёра в обоих записанных ответах, поэтому умолчание
+    у `row.get` не исполнялось ни на одном теле: и `row["order"]`, и
+    `row.get("order", 0)` проходили молча.
+
+    Умолчание держим: ключа может не оказаться, а разбор без него отказал бы всей
+    карточкой. Номер строки — единственный порядок, который тогда известен."""
+    payload = fixture("tmdb/tv_detail.json")
+    for row in payload["aggregate_credits"]["cast"]:
+        row.pop("order", None)
+
+    actors = [one for one in parse_series(payload).people
+              if one.role is PersonRole.ACTOR]
+
+    assert [one.position for one in actors] == list(range(len(actors)))
 
 
 def test_series_card_has_seasons_and_episodes(fixture):

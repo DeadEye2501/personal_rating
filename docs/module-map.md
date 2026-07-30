@@ -1084,7 +1084,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 449 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 453 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
@@ -1149,13 +1149,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_tmdb_card.py` — 396 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_tmdb_card.py` — 418 строк ⚠ подошёл к 300
 
 Второй круг загрузки: карточка, которую уже можно записать.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
-Тестов: 31
+Тестов: 32
 
 
 ### `tests/backend/sources/test_tmdb_failures.py` — 202 строк
@@ -1299,7 +1299,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
-### `tests/backend/test_genre_reference.py` — 214 строк
+### `tests/backend/test_genre_reference.py` — 220 строк
 
 Справочник жанров из миграции против спеки.
 
@@ -1411,7 +1411,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 316 строк ⚠ подошёл к 300
+### `tests/backend/test_loading.py` — 321 строк ⚠ подошёл к 300
 
 Три круга загрузки: кандидат становится карточкой в базе.
 
@@ -1520,7 +1520,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(sessions)` (8)
   - `def build(*clients) -> SearchService` (6)
 
-### `tests/backend/test_search_local.py` — 148 строк
+### `tests/backend/test_search_local.py` — 153 строк
 
 Поиск по своей базе — единственный, который работает без сети.
 

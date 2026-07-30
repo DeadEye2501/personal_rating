@@ -143,6 +143,11 @@ async def test_the_search_does_not_touch_the_clock(sessions, search):
 
     found = await search.local(Kind.MOVIE, "Интерстеллар")
 
-    assert [view.title for view in found] == [
+    # Набор, а не порядок: порядок здесь алфавитный и сторожится соседним тестом,
+    # а падение этого должно говорить про свежесть — что давняя карточка из
+    # выдачи не выпала.
+    assert {view.title for view in found} == {
         "Интерстеллар давний", "Интерстеллар свежий"
-    ]
+    }
+    # И число: множество проглотило бы строку, размножившуюся соединением.
+    assert len(found) == 2
