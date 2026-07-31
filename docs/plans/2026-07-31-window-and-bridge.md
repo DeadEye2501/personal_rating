@@ -1750,6 +1750,11 @@ class Marks(Domain):
     def rename_tag(self, tag_id: int, name: str) -> dict:
         return self._reply(lambda back: back.tags.rename(tag_id, name))
 
+    def tag_usage(self, tag_id: int) -> dict:
+        """Сколько карточек носит тег. Спрашивается перед удалением: у тега с
+        носителями оно подтверждается с их числом, ничей уходит молча."""
+        return self._reply(lambda back: back.tags.usage(tag_id))
+
     def delete_tag(self, tag_id: int) -> dict:
         return self._reply(lambda back: back.tags.delete(tag_id))
 
@@ -2530,7 +2535,7 @@ git commit -m "feat: мост — поиск со складыванием вы�
   `outcome`, `to_wire` из `bridge.wire`.
 - Отдаёт: `World` с `parse(raw, kind)`, `card_for_link(op, raw, kind)`,
   `link(op, item_id, overwrite)`, `refresh_series(op, item_id)`,
-  `enrich(op, item_id, kind)`, `expected(op, kind)`.
+  `enrich(op, item_id, kind)`, `expected(op, kind)`, `open(url)`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
@@ -2683,11 +2688,13 @@ def test_a_synchronous_backend_method_still_answers(thread, backend):
 Создать `bridge/world.py`:
 
 ```python
-"""Мост: внешний мир — привязка, перезапрос сериала, оценки агрегаторов."""
+"""Мост: внешний мир — привязка, перезапрос сериала, оценки агрегаторов и
+открытие страницы источника."""
 
+import webbrowser
 from datetime import datetime
 
-from backend.model import Kind, parse_link
+from backend.model import Denied, Kind, parse_link
 from bridge.answer import Domain
 from bridge.kept import Kept
 from bridge.wire import outcome, to_wire
@@ -2754,6 +2761,21 @@ class World(Domain):
 
     async def _expected(self, back, kind: str):
         return back.enricher.expected(Kind(kind))
+
+    def open(self, url: str) -> dict:
+        """Страница источника открывается системным браузером.
+
+        Обычная ссылка увела бы саму страницу приложения: окно — это Chromium
+        без адресной строки и без кнопки «назад», и вернуться было бы нечем.
+        Мимо потока бэкенда намеренно — к базе и сети это отношения не имеет."""
+        return self._reply(lambda _back: self._opened(url))
+
+    async def _opened(self, url: str) -> None:
+        # Только свои адреса: `webbrowser` отдаёт строку системе как есть, а
+        # схема оттуда приходит с чужой страницы карточки.
+        if not url.startswith("https://"):
+            raise Denied(f"чужая схема адреса: {url}")
+        webbrowser.open(url)
 
     async def _asked(self, back, op, link):
         card = await back.loader.card_for_link(link)

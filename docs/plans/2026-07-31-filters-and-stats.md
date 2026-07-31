@@ -787,7 +787,8 @@ git commit -m "feat: строка списка с тремя состояния�
 - Изменить: `client/app/App.svelte`, `client/app/Topbar.svelte`
 
 **Интерфейсы:**
-- Потребляет: `cycled`, `isEmpty`, `cleared` из `$state/filters.js`; `Modal`,
+- Потребляет: `cycled`, `isEmpty`, `cleared` из `$state/filters.js`; `plural`
+  из `$state/facts.js`; `Confirm` из плана 9; `Modal`,
   `Scrollarea`, `TagRow`, `ScoreRow`; `call` из `$api/bridge.js`.
 - Отдаёт: `FiltersModal` с входными `field`, `kind`, `filters`, `onfilters`,
   `onclose`.
@@ -1006,9 +1007,19 @@ git commit -m "feat: три модалки фильтров с трёхпози�
 ```svelte
   const editable = $derived(field === 'tags')
 
+  // Удаление тега бьёт по всей библиотеке и не отменяется, поэтому у тега с
+  // носителями оно спрашивает и называет их число. Ничей уходит молча: терять
+  // нечего, и спрашивать не о чем.
   async function remove(row) {
+    const worn = await call('marks.tag_usage', row.id)
+    if (!worn) return drop(row)
+    asking = { row, worn }
+  }
+
+  async function drop(row) {
     await call('marks.delete_tag', row.id)
     rows = rows.filter((each) => each !== row)
+    asking = null
   }
 
   async function create(name) {
@@ -1026,7 +1037,36 @@ git commit -m "feat: три модалки фильтров с трёхпози�
 ```
 
 и в разметке строки — `ondelete={() => remove(row)}` с `ongrab` при `editable`,
-плюс `<NewTag oncreate={create} />` после списка.
+плюс `<NewTag oncreate={create} />` после списка и подтверждение поверх:
+
+```svelte
+  {#if asking}
+    <Confirm label="Удалить тег" ok="Удалить" danger
+             text={`Удалить тег «${asking.row.name}»? ${asking.worn} `
+                   + `${plural(asking.worn, NOUNS[kind])} `
+                   + `${plural(asking.worn, WEARS)} этот тег.`}
+             onyes={() => drop(asking.row)}
+             onclose={() => { asking = null }} />
+  {/if}
+```
+
+**Существительное — по открытой вкладке**, как в макете: «3 фильма», «3 сериала»,
+«3 игры». Склонение берётся общим `plural` из `$state/facts.js` — тем же, что
+считает серии и сезоны, второго его объявления быть не должно.
+
+```js
+  const NOUNS = { movie: ['фильм', 'фильма', 'фильмов'],
+                  series: ['сериал', 'сериала', 'сериалов'],
+                  game: ['игра', 'игры', 'игр'] }
+
+  const WEARS = ['имеет', 'имеют', 'имеют']
+```
+
+**Окно подтверждения заводит план 9**, а зовут его отсюда и оттуда: спрашивают им
+удаление карточки, удаление тега с носителями и совпадение названия. Значит либо
+`Confirm` переезжает в план 8 вместе с первым потребителем, либо эта половина
+задачи 4 уезжает в план 9 — **выбирает исполнитель на месте**, и довод
+записывает; на порядок задач это не влияет, планы соседние.
 
 **Перетаскивание указателем:** строка переставляется, как только курсор перешёл
 середину соседней. Порядок при этом держит массив `rows`, а не DOM: в макете его
@@ -1343,7 +1383,7 @@ cd client && npm test && npm run build
 cd .. && pipenv run python main.py
 ```
 
-Ожидание: PASS, 63 теста. В окне: десять столбцов, цвет по шкале, число над
+Ожидание: PASS, 65 тестов. В окне: десять столбцов, цвет по шкале, число над
 верхушкой своего столбца, подпись оценки под ним; при заходе на раздел столбцы
 отрастают из пола с задержкой; фильтр сужает и гистограмму тоже; уход и возврат
 проигрывают анимацию заново.

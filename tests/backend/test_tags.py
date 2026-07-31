@@ -319,6 +319,35 @@ async def test_deleting_a_tag_takes_it_out_of_sight(sessions, card):
     assert await repository.list_for_kind(Kind.MOVIE) == []
 
 
+async def test_a_tag_knows_how_many_cards_wear_it(sessions, card):
+    """Удаление тега спрашивает подтверждение и называет число носителей, а
+    ничей тег уходит молча — значит число надо откуда-то взять."""
+    repository = TagsRepository(sessions)
+    tag_id = await repository.create(Kind.MOVIE, "пересмотреть")
+    lonely = await repository.create(Kind.MOVIE, "ничей")
+    for number in range(3):
+        await repository.assign(await card(Kind.MOVIE, source_id=str(number)),
+                                tag_id)
+
+    assert await repository.usage(tag_id) == 3
+    assert await repository.usage(lonely) == 0
+
+
+async def test_the_count_is_of_that_tag_and_not_of_all(sessions, card):
+    """Считаются носители спрошенного тега, а не строки развески вообще: с
+    подсчётом всей таблицы число совпадало бы, пока тег в базе один."""
+    repository = TagsRepository(sessions)
+    asked = await repository.create(Kind.MOVIE, "пересмотреть")
+    other = await repository.create(Kind.MOVIE, "шедевр")
+    first = await card(Kind.MOVIE, source_id="1")
+    second = await card(Kind.MOVIE, source_id="2")
+    await repository.assign(first, asked)
+    await repository.assign(first, other)
+    await repository.assign(second, other)
+
+    assert await repository.usage(asked) == 1
+
+
 async def test_deleting_a_tag_takes_only_that_tag(sessions):
     repository = TagsRepository(sessions)
     first = await repository.create(Kind.MOVIE, "первый")

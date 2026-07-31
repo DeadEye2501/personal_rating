@@ -71,7 +71,8 @@ personal_rating/
 │  │  └─ Feed.svelte             список карточек с догрузкой
 │  ├─ state/
 │  │  ├─ scores.js               нотация оценок: ярлык, ступень, среднее, шкалы источников
-│  │  └─ facts.js                строки фактов: длительность, сезоны, состав
+│  │  ├─ facts.js                строки фактов: длительность, сезоны, состав
+│  │  └─ pages.js                адрес страницы источника по его идентификатору
 │  └─ app/
 │     ├─ section.js              запрос раздела из состояния
 │     ├─ visible.js              что делать с карточкой в поле зрения
@@ -114,7 +115,7 @@ personal_rating/
 - Отдаёт: `LABELS`, `stepOf(value, max)`, `stepOfSource(value, source)`,
   `nameOf(source)`, `colorOf(step)`, `verdictOf(score)`, `average(values)`,
   `partOf(score)`; `runtimeOf(minutes)`, `seriesOf(seasons, episodes)`,
-  `castOf(credits, role, limit)` — отдаёт титры, а не имена.
+  `castOf(credits, role, limit)` — отдаёт титры, а не имена; `plural(count, forms)`.
 
 - [ ] **Шаг 1: Написать падающие тесты**
 
@@ -278,6 +279,31 @@ describe('строки фактов', () => {
 })
 ```
 
+Создать `tests/web/pages.test.js`:
+
+```js
+import { describe, expect, it } from 'vitest'
+
+import { pagesOf } from '$state/pages.js'
+
+describe('адрес страницы источника', () => {
+  it('собирает адрес там, где идентификатор хранится', () => {
+    const found = pagesOf([{ source: 'imdb', value: 'tt0816692' }])
+
+    expect(found.get('imdb')).toContain('tt0816692')
+  })
+
+  it('молчит там, где идентификатора нет вовсе', () => {
+    // У Rotten и Metacritic оценки приезжают внутри чужого ответа, своего
+    // идентификатора мы не храним — и адреса у них нет.
+    const found = pagesOf([{ source: 'rotten', value: 'что угодно' }])
+
+    expect(found.has('rotten')).toBe(false)
+    expect(found.size).toBe(0)
+  })
+})
+```
+
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
 ```bash
@@ -383,8 +409,10 @@ export function castOf(credits, role, limit = TOP) {
     .slice(0, limit)
 }
 
-/** Русский счёт: 11–14 идут по правилу «много», а не по последней цифре. */
-function plural(count, forms) {
+/** Русский счёт: 11–14 идут по правилу «много», а не по последней цифре.
+ *  Открыт наружу со второго потребителя: тем же считает план 8 носителей тега
+ *  («3 фильма имеют этот тег»), и второго такого правила быть не должно. */
+export function plural(count, forms) {
   const tail = count % 100
   if (tail >= 11 && tail <= 14) return forms[2]
   const last = count % 10
@@ -407,7 +435,7 @@ function plural(count, forms) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 61 тест — восемнадцать новых и сорок три из плана 6.
+Ожидание: PASS, 63 теста — двадцать новых и сорок три из плана 6.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -1019,9 +1047,21 @@ git commit -m "feat: карточка ленты — постер, метки, �
 Строки нет — крутится кружок; строка с пустым значением — на месте оценки просто
 ничего, без следа и без сообщения; строка со значением — цифра.
 
+**Имя источника — ссылка там, где есть адрес, и подпись там, где его нет.**
+Решено 31.07.2026. В базе хранятся чужие идентификаторы четырёх видов — IMDb,
+Кинопоиск, Steam, GOG, — а у TMDB адрес собирается из собственного номера
+карточки. **У Rotten Tomatoes и Metacritic идентификатора нет вовсе:** их оценки
+приезжают внутри чужого ответа. Такие имена не отзываются ни на наведение, ни на
+щелчок — иначе человек тыкал бы в пустоту, выясняя это опытом.
+
+**Открывает системный браузер, а не сама страница.** Окно приложения — Chromium
+без адресной строки и без кнопки «назад»: обычная ссылка увела бы приложение на
+страницу Кинопоиска, и вернуться было бы нечем, кроме перезапуска.
+
 **Файлы:**
 - Создать: `client/styles/stars.css`, `aggr.css`, `acts.css`
 - Создать: `client/components/Stars.svelte`, `Aggregates.svelte`, `Acts.svelte`
+- Создать: `client/state/pages.js`, `tests/web/pages.test.js`
 - Изменить: `client/components/Film.svelte`, `client/main.js`
 
 **Интерфейсы:**
@@ -1253,11 +1293,46 @@ git commit -m "feat: карточка ленты — постер, метки, �
 
 `client/components/Aggregates.svelte`:
 
+Создать `client/state/pages.js`:
+
+```js
+/** Адрес страницы источника по чужим идентификаторам карточки. */
+
+// Пять из семи: у Rotten и Metacritic идентификатора не хранится вовсе, и
+// адреса у них нет — не по забывчивости, а потому что их оценки приезжают
+// внутри чужого ответа.
+const PAGES = {
+  imdb:      (id) => `https://www.imdb.com/title/${id}/`,
+  kinopoisk: (id) => `https://www.kinopoisk.ru/film/${id}/`,
+  steam:     (id) => `https://store.steampowered.com/app/${id}/`,
+  gog:       (id) => `https://www.gog.com/game/${id}`,
+  tmdb:      (id) => `https://www.themoviedb.org/movie/${id}`,
+}
+
+/** Источник → адрес, только для тех, у кого он собирается.
+ *
+ *  У `ExternalId` два поля — `source` и `value`; у TMDB своего `external_id`
+ *  нет, его номер лежит в самой карточке, и собирает его вызывающий. */
+export function pagesOf(ids) {
+  const found = new Map()
+  for (const one of ids) {
+    const make = PAGES[one.source]
+    if (make) found.set(one.source, make(one.value))
+  }
+  return found
+}
+```
+
 ```svelte
 <script>
   import { colorOf, nameOf, stepOfSource } from '$state/scores.js'
+  import { pagesOf } from '$state/pages.js'
 
-  let { external = [], expected = [] } = $props()
+  let { external = [], expected = [], ids = [], onopen } = $props()
+
+  // Адрес собирается из чужих идентификаторов карточки: у пяти источников из
+  // семи он есть, у Rotten и Metacritic его не хранится вовсе.
+  const pages = $derived(pagesOf(ids))
 
   const arrived = $derived(new Map(external.map((one) => [one.source, one])))
 
@@ -1273,7 +1348,17 @@ git commit -m "feat: карточка ленты — постер, метки, �
 <div class="film__aggr">
   {#each shown as one (one.source)}
     <span>
-      <a class="aggr">{nameOf(one.source)}</a>
+      <!-- Ссылка есть только там, где есть адрес: у Rotten и Metacritic
+           идентификатора не хранится вовсе, и они остаются подписью — без
+           наведения, без курсора и без щелчка в пустоту. -->
+      {#if pages.get(one.source)}
+        <a class="aggr" href={pages.get(one.source)}
+           onclick={(event) => { event.preventDefault()
+                                 onopen(pages.get(one.source)) }}
+        >{nameOf(one.source)}</a>
+      {:else}
+        <span class="aggr aggr--flat">{nameOf(one.source)}</span>
+      {/if}
       {#if one.value !== null}
         <b style:--score={colorOf(stepOfSource(one.value, one.source))}
         >{one.value}</b>
@@ -1328,7 +1413,8 @@ git commit -m "feat: карточка ленты — постер, метки, �
   import { average, colorOf, verdictOf } from '$state/scores.js'
 
   let { view, collapsed = false, expected = [], on, oncollapse, onmark,
-        onperson, ontag, onscore, onaspect, onedit, ondelete, onwish } = $props()
+        onperson, onopen, ontag, onscore, onaspect, onedit, ondelete,
+        onwish } = $props()
 
   const ASPECTS = [
     { key: 'visual', label: 'Визуал' },
@@ -1347,7 +1433,8 @@ git commit -m "feat: карточка ленты — постер, метки, �
 и разметка после `Synopsis`:
 
 ```svelte
-    <Aggregates external={view.external} {expected} />
+    <Aggregates external={view.external} {expected}
+                ids={view.external_ids} {onopen} />
 
     {#if view.kind === 'game'}
       {#each ASPECTS as aspect (aspect.key)}
@@ -1588,12 +1675,20 @@ git commit -m "feat: лента порциями и три круга по тр�
 **Отказ внешней базы — плашка, пустая выдача — нет.** Разница осмысленная: без
 внешней базы человек не получит того, что искал, и должен понимать причину.
 
+**Совпадение названия предупреждается и здесь**, и спека называет этот случай
+главным: у игр два магазина, одна и та же игра лежит в обоих и показывается
+двумя кандидатами. Окно то же, что у окна карточки, — акцентное, с кнопкой
+«OK»; заводит его план 9, и если этот план идёт раньше, `Confirm` переезжает
+сюда вместе с первым потребителем.
+
 **Файлы:**
 - Изменить: `client/app/SearchScreen.svelte`, `client/app/App.svelte`
 
 **Интерфейсы:**
-- Потребляет: `numbered`, `cancel` из `$api/bridge.js`; `Feed`; `onCardShown`.
-- Отдаёт: `SearchScreen` с входными `session`, `query`, `ontrouble`.
+- Потребляет: `call`, `numbered`, `cancel`, `lastOp` из `$api/bridge.js`;
+  `passes` из `$state/filters.js`; `Feed`; `Confirm` из плана 9; `onCardShown`.
+- Отдаёт: `SearchScreen` с входными `session`, `query`, `ontrouble`, `onmark`,
+  `onperson`.
 
 - [ ] **Шаг 1: Написать раздел**
 
@@ -1602,14 +1697,15 @@ git commit -m "feat: лента порциями и три круга по тр�
 ```svelte
 <script>
   import Feed from '$components/Feed.svelte'
-  import { cancel, lastOp, numbered } from '$api/bridge.js'
+  import { call, cancel, lastOp, numbered } from '$api/bridge.js'
   import { passes } from '$state/filters.js'
   import { onCardShown } from './visible.js'
 
-  let { session, query = '', ontrouble, onmark, onperson } = $props()
+  let { session, query = '', ontrouble, onmark, onperson, onopen } = $props()
 
   let views = $state([])
   let expected = $state([])
+  let warning = $state(null)
   const ops = []
 
   // Фильтры работают и в поиске. Спросить источник с фильтром нечем — у TMDB и
@@ -1660,7 +1756,16 @@ git commit -m "feat: лента порциями и три круга по тр�
     }
   }
 
-  async function add(view) {
+  async function add(view, confirmed = false) {
+    // Предупреждение о совпадении названия нужнее всего именно здесь: у игр два
+    // магазина, одна и та же игра лежит в обоих и показывается двумя
+    // кандидатами. Склейку мы не делаем — решает человек, а предупреждение не
+    // даёт промахнуться по невнимательности.
+    if (!confirmed) {
+      const same = await call('library.same_title', view.kind, view.title)
+      if (same.length) { warning = { view, other: same[0] }; return }
+    }
+
     // Тот же номер: кандидата мост берёт из выдачи, которую помнит под ним.
     const outcome = await numbered('search.ensure', view.source, view.source_id,
                                    { channel: 'search', op: lastOp('search') })
@@ -1685,8 +1790,16 @@ git commit -m "feat: лента порциями и три круга по тр�
       onshown={(view) => onCardShown(view, ops)}
       onscore={add} onaspect={add} oncollapse={() => {}}
       on={session.filters.on} onmark={onmark} onperson={onperson}
+      onopen={onopen}
       onedit={() => {}} ondelete={() => {}} onwish={() => {}}
       ontag={() => {}} />
+
+{#if warning}
+  <Confirm label="Такое уже есть" ok="OK"
+           text={`«${warning.other.title}» уже есть в библиотеке. Вы точно уверены?`}
+           onyes={() => { const one = warning.view; warning = null; add(one, true) }}
+           onclose={() => { warning = null }} />
+{/if}
 ```
 
 **Метка и человек уходят наверх, а не решаются здесь.** Клик по жанру или тегу
@@ -1801,7 +1914,7 @@ export function requestOf(session) {
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
   const PAGE = 50
 
-  let { session, ontrouble, onmark, onperson } = $props()
+  let { session, ontrouble, onmark, onperson, onopen } = $props()
 
   let views = $state([])
   let expected = $state([])
@@ -1866,6 +1979,7 @@ export function requestOf(session) {
       onshown={(view) => onCardShown(view, ops)}
       onscore={score} onaspect={aspect} onwish={wish} oncollapse={collapse}
       on={session.filters.on} onmark={onmark} onperson={onperson}
+      onopen={onopen}
       onedit={() => {}} ondelete={() => {}} ontag={() => {}} />
 ```
 

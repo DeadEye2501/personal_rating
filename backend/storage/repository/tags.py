@@ -64,6 +64,18 @@ class TagsRepository(Repository):
             TagExists(f"{name} уже заведён"),
         )
 
+    async def usage(self, tag_id: int) -> int:
+        """Сколько карточек носит этот тег.
+
+        Нужно удалению: у тега с носителями оно спрашивает подтверждение и
+        называет их число, а ничей тег уходит молча — терять там нечего."""
+        row = await self._row(
+            select(func.count())
+            .select_from(item_tag_table)
+            .where(item_tag_table.c.tag_id == tag_id)
+        )
+        return row.count
+
     async def delete(self, tag_id: int) -> None:
         await self._run(delete(tag_table).where(tag_table.c.id == tag_id))
 

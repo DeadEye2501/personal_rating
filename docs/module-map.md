@@ -797,7 +797,7 @@
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (34)
   - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
-### `backend/storage/repository/tags.py` — 106 строк
+### `backend/storage/repository/tags.py` — 118 строк
 
 Мои теги в базе.
 
@@ -805,11 +805,12 @@
 
 - `class WrongTagKind(Exception)` (2)
 - `class TagExists(Exception)` (2)
-- `class TagsRepository(Repository)` (85)
+- `class TagsRepository(Repository)` (97)
   - `async def create(self, kind: Kind, name: str) -> int` (17)
   - `async def list_for_kind(self, kind: Kind) -> list[Tag]` (7)
   - `async def reorder(self, kind: Kind, tag_ids: list[int]) -> None` (10)
   - `async def rename(self, tag_id: int, name: str) -> None` (6)
+  - `async def usage(self, tag_id: int) -> int` (11)
   - `async def delete(self, tag_id: int) -> None` (2)
   - `async def assign(self, item_id: int, tag_id: int) -> None` (20)
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
@@ -1588,13 +1589,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def counted(engine, table_name: str) -> int` (5)
 - `async def put(engine, table_name: str, **values) -> None` (4)
 
-### `tests/backend/test_tags.py` — 330 строк ⚠ подошёл к 300
+### `tests/backend/test_tags.py` — 359 строк ⚠ подошёл к 300
 
 Свои теги: заведение, привязка к карточке и порядок.
 
 Зависит от: `backend.model`, `backend.storage.repository.tags`
 
-Тестов: 26
+Тестов: 28
 
 
 ### `tests/backend/test_view_types.py` — 110 строк

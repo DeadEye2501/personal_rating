@@ -2143,6 +2143,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 ```svelte
 <script>
   import Topbar from './Topbar.svelte'
+  import { call } from '$api/bridge.js'
   import { newSession } from '$state/session.js'
 
   let session = $state(newSession())
@@ -2382,7 +2383,8 @@ git commit -m "feat: шапка целиком — поиск, переключ�
                     session = { ...session,
                                 filters: marked(session.filters, field, id) }
                   }}
-                  onperson={() => {}} />
+                  onperson={() => {}}
+                  onopen={(url) => call('world.open', url)} />
         </section>
       {/key}
     </div>
