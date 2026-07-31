@@ -120,14 +120,14 @@
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
 
-### `backend/model/query.py` — 88 строк
+### `backend/model/query.py` — 89 строк
 
 Язык, которым лента разговаривает с базой о разделах.
 
 Зависит от: `backend.model.kinds`
 
 - `class Section(StrEnum)` (6)
-- `class Sort(StrEnum)` (10)
+- `class Sort(StrEnum)` (11)
 - `class Order` (6)
 - `class Filters` (15)
 - `class Feed` (11)
