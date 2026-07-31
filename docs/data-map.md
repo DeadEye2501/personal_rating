@@ -692,9 +692,20 @@
 
 - `DRAMA` = `Genre(id=1, name='Драма', kind=GenreKind.FILM)`
 
+### `tests/bridge/test_bridge_covers.py`
+
+- `PNG` = `base64.b64encode(b'\x89PNG\r\n\x1a\n').decode()`
+
 ### `tests/bridge/test_bridge_feed.py`
 
 - `WISHED` = `словарь из 4`
+
+### `tests/bridge/test_bridge_surface.py`
+
+- `ROOT` = `Path(__file__).resolve().parents[2]`
+- `SOURCES` = `sorted((ROOT / 'bridge').glob('*.py'))`
+- `DOMAINS` = `набор из 7`
+- `CHOOSER` = `'_of'`
 
 ### `tests/builders.py`
 

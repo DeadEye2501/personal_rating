@@ -935,7 +935,7 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 10 модулей
+## bridge — 12 модулей
 
 ### `bridge/answer.py` — 71 строк
 
@@ -947,6 +947,27 @@
 - `def kebab(name: str) -> str` (4)
 - `class Domain` (39)
   - `def _reply(self, factory, op: int | None=None) -> dict` (30)
+
+### `bridge/api.py` — 40 строк
+
+Поверхность моста: семь доменов и отмена.
+
+Зависит от: `bridge.answer`, `bridge.covers`, `bridge.feed`, `bridge.library`, `bridge.marks`, `bridge.refs`, `bridge.search`, `bridge.world`
+
+- `class Api(Domain)` (24)
+  - `def cancel(self, ops: list) -> dict` (3)
+  - `async def _cancelled(self, ops: list) -> None` (2)
+
+### `bridge/covers.py` — 37 строк
+
+Мост: обложки — заливка своей картинки и наличие.
+
+Зависит от: `backend.model`, `bridge.answer`
+
+- `class Covers(Domain)` (11)
+  - `def store_upload(self, item_id: int, data: str) -> dict` (7)
+  - `def has(self, item_id: int) -> dict` (2)
+- `def _picture(data: str) -> bytes` (11)
 
 ### `bridge/feed.py` — 55 строк
 
@@ -1147,7 +1168,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 75 модулей
+## tests — 77 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1839,6 +1860,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Probe(Domain)` (5)
   - `def ask(self, what, op=None)` (2)
 
+### `tests/bridge/test_bridge_covers.py` — 49 строк
+
+Мост: обложки — заливка своей картинки и наличие.
+
+Зависит от: `backend.model`, `bridge.covers`
+
+Тестов: 4
+
+
 ### `tests/bridge/test_bridge_feed.py` — 163 строк
 
 Мост: лента — страницы разделов и гистограмма.
@@ -1884,6 +1914,21 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 12
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
+
+### `tests/bridge/test_bridge_surface.py` — 160 строк
+
+Каждый вызов, который мост делает бэкенду, обязан ему подходить.
+
+Зависит от: `backend.app`, `bridge.api`, `bridge.refs`
+
+Тестов: 6
+
+- `def chain(node)` (16)
+- `def _chooses(node) -> bool` (5)
+- `def calls() -> dict[str, dict[str, tuple]]` (15)
+- `def flat() -> list[tuple]` (4)
+- `def surface(api) -> set[str]` (13)
+- `def _behind(where, step)` (6)
 
 ### `tests/bridge/test_bridge_world.py` — 182 строк
 
