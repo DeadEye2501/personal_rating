@@ -72,3 +72,17 @@ def find_slug(payload: dict, slug: str) -> str | None:
         if row.get("slug") == slug:
             return str(row["id"])
     return None
+
+
+def title_of(payload: dict) -> str:
+    """Название товара строкой — им спрашивают каталог, когда на руках только
+    номер.
+
+    Пустое и `null` считаются неразобранным ответом, а не названием: пустой
+    запрос каталог понимает буквально и отдаёт весь каталог, шесть с лишним
+    тысяч наименований, из которых нужного может и не оказаться на первой
+    странице."""
+    title = payload["title"]
+    if not isinstance(title, str) or not title:
+        raise ValueError(f"название товара не строка: {title!r}")
+    return title

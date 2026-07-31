@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 import httpx
+import pytest
 
 from backend.model import Found, IdSource, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
@@ -438,16 +439,22 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
 
 
 
-async def test_a_well_formed_body_under_a_failure_code_is_not_an_answer(fixture):
+@pytest.mark.parametrize("mirror", ["primary", "fallback"])
+async def test_a_well_formed_body_under_a_failure_code_is_not_an_answer(fixture, mirror):
     """Ответ разбирается только под кодом 200. Тело правильной формы под 5xx —
     обычное дело у периметра, который кеширует старую страницу, и разобрать его
     значило бы записать чужую оценку как свежую.
 
-    Оба зеркала проверяются вместе: код у них общий по форме, но написан
-    порознь, и просевшая проверка у одного не видна по другому."""
-    body = fixture("kinopoisk/poiskkino_found.json")
+    Зеркала проверяются оба: проверка у них общая по форме, но написана порознь —
+    `poiskkino.py` и `unofficial.py`, — и просевшая у одного по другому не
+    видна."""
+    bodies = {"primary": "kinopoisk/poiskkino_found.json",
+              "fallback": "kinopoisk/unofficial_found.json"}
+    client = primary if mirror == "primary" else fallback
 
-    outcome = await primary(responding(500, json=body)).ratings("tt0816692", Kind.MOVIE)
+    outcome = await client(
+        responding(500, json=fixture(bodies[mirror]))
+    ).ratings("tt0816692", Kind.MOVIE)
 
     assert isinstance(outcome, Refusal)
     assert outcome.reason is Reason.BROKEN

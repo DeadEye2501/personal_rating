@@ -2,6 +2,7 @@
 записывается никогда."""
 
 import httpx
+import pytest
 
 from backend.model import (
     CompanyRole,
@@ -298,6 +299,23 @@ async def test_card_that_the_catalog_did_not_return_is_not_a_negative_fact(repla
 async def test_a_broken_product_answer_does_not_crash_the_client():
     """Названия в ответе не оказалось — отказ, а не исключение через границу."""
     client = GogClient(answering({"id": 1456460669}))
+
+    result = await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+
+
+@pytest.mark.parametrize("title", [None, ""])
+async def test_a_product_without_a_usable_title_is_a_refusal(title):
+    """Пустое название и `null` — неразобранный ответ, а не название. Пустым
+    запросом каталог понимает буквально: отдаёт весь каталог, шесть с лишним
+    тысяч наименований, и нужного там может не оказаться на первой странице —
+    то есть «каталог не вернул игру» вместо честного отказа.
+
+    Пропавший ключ этой ветки не проверяет: он ронял разбор и до неё."""
+    client = GogClient(answering({"id": 1456460669, "title": title}))
 
     result = await client.card(WANTED, Kind.GAME)
     await client.aclose()

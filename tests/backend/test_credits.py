@@ -191,7 +191,10 @@ async def test_attach_keeps_the_order_from_the_credits(sessions, card):
 
 
 async def test_one_person_can_hold_two_roles_on_one_card(sessions, card):
-    """Роль входит в первичный ключ именно поэтому."""
+    """Роль входит в первичный ключ именно поэтому: выпади она оттуда — вторая
+    привязка не добавила бы строки, её отбросил бы `on_conflict_do_nothing`, и
+    вторая роль исчезла бы молча. У студий это не редкость, а обычный путь: у
+    Steam и GOG разработчик и издатель сплошь и рядом одна и та же студия."""
     item_id = await card()
     repository = people(sessions)
     person_id = await repository.create("Клинт Иствуд")
@@ -313,18 +316,3 @@ async def test_deleting_the_card_takes_the_credits_but_not_the_person(
 
     assert await repository.credits_of(item_id) == []
     assert await repository.find_by_name("Кристофер Нолан") == [person_id]
-
-
-async def test_one_studio_holds_both_roles_on_one_card(sessions, card):
-    """У Steam и GOG разработчик и издатель сплошь и рядом одна студия. Роль
-    входит в первичный ключ связи именно поэтому: выпади она оттуда — вторая
-    привязка молча заменила бы первую, и издатель исчез бы с карточки."""
-    item_id = await card()
-    repository = companies(sessions)
-    studio = await repository.ensure(Credit("CD Projekt RED", CompanyRole.DEVELOPER))
-
-    await repository.attach(item_id, studio, CompanyRole.DEVELOPER)
-    await repository.attach(item_id, studio, CompanyRole.PUBLISHER)
-
-    roles = {one.role for one in await repository.credits_of(item_id)}
-    assert roles == {CompanyRole.DEVELOPER, CompanyRole.PUBLISHER}

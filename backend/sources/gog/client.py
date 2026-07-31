@@ -6,20 +6,16 @@ import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
 from backend.sources.errors import absent, parsed
-from backend.sources.gog.parse import find_slug, parse_catalog, to_hit
+from backend.sources.gog.parse import (
+    find_slug,
+    parse_catalog,
+    title_of,
+    to_hit,
+)
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import asked, refuse_undocumented
 
 logger = logging.getLogger(__name__)
-
-
-def _named(payload: dict) -> str:
-    """Название товара строкой. Пустое и `null` — это неразобранный ответ, а не
-    название: спрашивать каталог пустотой значит получить весь каталог."""
-    title = payload["title"]
-    if not isinstance(title, str) or not title:
-        raise ValueError(f"название товара не строка: {title!r}")
-    return title
 
 CATALOG = "https://catalog.gog.com/v1/catalog"
 # Каталог ищет только текстом: на числовой запрос он отвечает `productCount: 0`,
@@ -98,7 +94,7 @@ class GogClient:
         if response.status_code != 200:
             return refuse_undocumented(self._http, response.status_code)
         return parsed(logger, "gog", f"товар {source_id} не разобрался",
-                      lambda: _named(response.json()))
+                      lambda: title_of(response.json()))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         """Номер переводится в название, и название уходит в каталог: строкой
@@ -135,9 +131,10 @@ class GogClient:
         вместе — все шесть. Ложного срабатывания вторая попытка не добавляет:
         принимается только точное совпадение слага.
 
-        `Missing` тут возвращается, хотя из `search` и `card` — никогда: здесь
-        спрашивают не «что похоже на это название», а «есть ли ровно такой
-        слаг», и его отсутствие — честный ответ."""
+        `Missing` тут возвращается, хотя из `search` — никогда: здесь спрашивают
+        не «что похоже на это название», а «есть ли ровно такой слаг», и его
+        отсутствие — честный ответ. У `card` отрицательный факт свой, от товарной
+        ручки."""
         # Слаг без подчёркиваний обе формы даёт одинаковыми, и второй запрос был
         # бы тем же самым: спрашиваем один раз.
         for query in dict.fromkeys((slug, slug.replace("_", " "))):

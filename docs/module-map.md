@@ -385,24 +385,23 @@
 - `def is_json(response: httpx.Response) -> bool` (12)
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 
-### `backend/sources/gog/client.py` — 159 строк
+### `backend/sources/gog/client.py` — 156 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `def _named(payload: dict) -> str` (7)
-- `class GogClient` (128)
+- `class GogClient` (129)
   - `def name(self) -> str` (4)
   - `async def _payload(self, query: str) -> dict | Refusal` (11)
   - `async def _catalog(self, query: str) -> list | Refusal` (6)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
   - `async def _title(self, source_id: str) -> str | Outcome` (20)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (21)
-  - `async def resolve_slug(self, slug: str) -> Outcome` (32)
+  - `async def resolve_slug(self, slug: str) -> Outcome` (33)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/gog/parse.py` — 74 строк
+### `backend/sources/gog/parse.py` — 88 строк
 
 Перевод ответов GOG в наши типы.
 
@@ -412,6 +411,7 @@
 - `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
 - `def to_hit(card: SourceCard) -> SearchHit` (12)
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
+- `def title_of(payload: dict) -> str` (12)
 
 ### `backend/sources/http.py` — 97 строк
 
@@ -604,14 +604,14 @@
 - `def parse_series_counts(payload: dict) -> SeriesCounts` (7)
 - `def parse_series(payload: dict) -> SourceCard` (19)
 
-### `backend/sources/undocumented.py` — 41 строк
+### `backend/sources/undocumented.py` — 42 строк
 
 Разговор с магазином, который своих лимитов не объявляет.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.errors`, `backend.sources.http`
 
 - `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (6)
-- `async def asked(http: SourceHttp, url: str, params: dict | None=None) -> httpx.Response | Refusal` (16)
+- `async def asked(http: SourceHttp, url: str, params: dict | None=None) -> httpx.Response | Refusal` (17)
 
 ### `backend/storage/entity.py` — 34 строк
 
@@ -989,13 +989,13 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 380 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 398 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 27
+Тестов: 28
 
 - `def answering(body) -> SourceHttp` (3)
 
@@ -1018,7 +1018,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 453 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 460 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
@@ -1165,13 +1165,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def covers(posters)` (5)
 
-### `tests/backend/test_credits.py` — 330 строк ⚠ подошёл к 300
+### `tests/backend/test_credits.py` — 318 строк ⚠ подошёл к 300
 
 Люди и студии: одна реализация на две сущности, и различает их идентичность.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
-Тестов: 26
+Тестов: 25
 
 
 ### `tests/backend/test_delete.py` — 156 строк
@@ -1212,7 +1212,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 8
 
 
-### `tests/backend/test_external_ratings.py` — 233 строк
+### `tests/backend/test_external_ratings.py` — 234 строк
 
 Оценки агрегаторов: три состояния и сроки годности.
 
@@ -1256,7 +1256,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def genres(engine, sessions)` (3)
 
-### `tests/backend/test_genres.py` — 180 строк
+### `tests/backend/test_genres.py` — 184 строк
 
 Перевод чужих меток в наши жанры и запись их карточке.
 
@@ -1383,7 +1383,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 152 строк
+### `tests/backend/test_model.py` — 153 строк
 
 Типы границы слоёв: их поля, значения и неизменность.
 

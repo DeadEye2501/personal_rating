@@ -31,8 +31,9 @@ async def asked(http: SourceHttp, url: str,
     на взведённый предохранитель собирает транспорт, а любой код кроме 200 ни
     Steam, ни GOG не описывают нигде.
 
-    Товарной ручки GOG это не касается: её 404 означает «такого продукта нет» и
-    перехватывается раньше, до `refuse_undocumented`."""
+    Товарной ручки GOG это не касается: её 404 разбирается своим путём, до
+    `refuse_undocumented`, — и «такого продукта нет» читается там не по коду, а
+    по разобранному телу."""
     response = await http.get(url, params=params)
     if not isinstance(response, httpx.Response):
         return response
