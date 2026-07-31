@@ -1204,7 +1204,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 79 модулей
+## tests — 80 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1974,6 +1974,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 15
 
+
+### `tests/bridge/test_filters_contract.py` — 28 строк
+
+Шесть имён фильтра совпадают у страницы и у моста.
+
+Зависит от: `bridge.feed`
+
+Тестов: 1
+
+- `def named() -> set[str]` (4)
 
 ### `tests/bridge/test_kept.py` — 43 строк
 

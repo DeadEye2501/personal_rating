@@ -734,6 +734,11 @@
 - `DOMAINS` = `набор из 7`
 - `CHOOSER` = `'_of'`
 
+### `tests/bridge/test_filters_contract.py`
+
+- `CHOSEN` = `Path(__file__).resolve().parents[2] / 'client' /…`
+- `BODY` = `re.compile('export function chosen\\(filters\\) …`
+
 ### `tests/bridge/test_serve.py`
 
 - `PNG` = `b'\x89PNG\r\n\x1a\nthe rest'`

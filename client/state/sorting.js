@@ -1,0 +1,65 @@
+/* Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых»
+   восемь, в отложенном четыре, и выбирает его `cycleOf`. */
+
+// Есть только в переборе «Хочу посмотреть»: в «Оценённых» девятое состояние
+// понадобилось бы ровно одному разделу.
+export const ADDED_AT = 'added_at'
+
+// Глифы и подписи взяты из макета целиком. Направление показано стрелкой в
+// углу кнопки, а сам критерий — основным глифом: подсветки у перебора нет.
+//
+// Последняя пара — дата добавления — в макете отсутствует: там перебор был на
+// восемь состояний. Глиф у неё назван здесь впервые и подлежит сверке.
+export const SORT_STATES = [
+  { key: 'score',    down: true,  icon: 'star',          dir: 'arrow_downward', label: 'По оценке, сначала высокие' },
+  { key: 'score',    down: false, icon: 'star',          dir: 'arrow_upward',   label: 'По оценке, сначала низкие' },
+  { key: 'rated_at', down: true,  icon: 'history',       dir: 'arrow_downward', label: 'По времени оценки, сначала свежие' },
+  { key: 'rated_at', down: false, icon: 'history',       dir: 'arrow_upward',   label: 'По времени оценки, сначала давние' },
+  { key: 'year',     down: true,  icon: 'event',         dir: 'arrow_downward', label: 'По дате выхода, сначала новые' },
+  { key: 'year',     down: false, icon: 'event',         dir: 'arrow_upward',   label: 'По дате выхода, сначала старые' },
+  // У алфавита сторона расходится со стрелкой, и это не опечатка: «А → Я» —
+  // возрастание, тогда как «сначала высокие» и «сначала новые» — убывание.
+  // Стрелка следует подписи, `down` уезжает в базу.
+  { key: 'title',    down: false, icon: 'sort_by_alpha', dir: 'arrow_downward', label: 'По алфавиту, А → Я' },
+  { key: 'title',    down: true,  icon: 'sort_by_alpha', dir: 'arrow_upward',   label: 'По алфавиту, Я → А' },
+  { key: ADDED_AT,   down: true,  icon: 'bookmark_added', dir: 'arrow_downward', label: 'По дате добавления, сначала свежие' },
+  { key: ADDED_AT,   down: false, icon: 'bookmark_added', dir: 'arrow_upward',   label: 'По дате добавления, сначала давние' },
+]
+
+// Какие состояния перебирает раздел. В отложенном осмысленны только два
+// критерия: своей оценки у неоценённого не бывает, времени оценки тем более, а
+// дата выхода в списке дел ни о чём не говорит.
+//
+// Хранится позиция в наборе своего раздела, а не номер строки таблицы: при
+// смене раздела переключатель и так сбрасывается, а позиция читается глазами.
+const CYCLES = {
+  wishlist: [8, 9, 6, 7],
+  rated: [0, 1, 2, 3, 4, 5, 6, 7],
+}
+
+// Разделов с переключателем два. У поиска и статистики его нет вовсе, и
+// запасного набора им не заводится: спрошенный за них `cycleOf` обязан
+// упасть громко, а не выдать чужой круг из восьми состояний.
+export const cycleOf = (section) => CYCLES[section]
+
+export const nextSort = (section, position) =>
+  ((position ?? 0) + 1) % cycleOf(section).length
+
+/** Состояние переключателя раздела: глиф, стрелка, подпись. `null` значит
+ *  «не тронут» — стартовое значение каждого раздела, а не крайний случай. */
+export const stateAt = (section, position) =>
+  SORT_STATES[cycleOf(section)[position ?? 0]]
+
+/** То, что уезжает мосту полем `order`. Не открыт наружу: зовёт его один
+ *  `orderFor`, а второго потребителя нет. */
+function orderOf(index) {
+  const state = SORT_STATES[index]
+  return { key: state.key, descending: state.down }
+}
+
+/** Порядок раздела: `position` — состояние переключателя или `null`, если он не
+ *  тронут. Нетронутый значит первое состояние своего набора: в отложенном
+ *  свежие сверху, в оценённых высокие сверху. */
+export function orderFor(section, position) {
+  return orderOf(cycleOf(section)[position ?? 0])
+}

@@ -7,6 +7,20 @@
 ### app/App.svelte (21)
 - Корень страницы: показывает, дождалась ли она моста.
 
+## state — 3 файлов
+
+### state/filters.js (103)
+- Три состояния строки фильтра: не выбран, включён, исключён.
+- отдаёт: EMPTY, chosen, cleared, cycled, isEmpty, marked, passes
+
+### state/session.js (31)
+- Выбранное в приложении вместе с переходами между выборами.
+- отдаёт: newSession, withCollapsed, withKind, withSection
+
+### state/sorting.js (65)
+- Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
+- отдаёт: ADDED_AT, SORT_STATES, cycleOf, nextSort, orderFor, stateAt
+
 ## styles — 3 файлов
 
 ### styles/base.css (110)
