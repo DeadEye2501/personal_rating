@@ -56,7 +56,9 @@ WebView2, бэкенд в своём потоке со своим циклом a
   ответе, либо к записи в лог — минимум одно из двух, а у непредвиденного и то и
   другое.
 - **Время подставляет мост.** Десять операций бэкенда требуют `datetime`
-  доводом; страница о них не знает и часов не передаёт.
+  доводом, но мост подставляет его в семи: `library.refresh_series_counts`,
+  `library.link` и `posters.save` — служебные, страница их не зовёт. Часов от
+  неё не требуется нигде.
 - **В сеть тесты не ходят и окна не поднимают.** Проверяется всё обычным
   `pytest`: бэкенд подменяется двойником, окно в тестах не создаётся ни разу.
 - **Байтовые литералы только ASCII.** `b"текст"` с кириллицей — `SyntaxError` на
@@ -141,9 +143,11 @@ personal_rating/
    агрегаторов о нём нечем. Это не сужение, а то же самое, что записано в
    `search-and-loading.md`: «круг 3 нельзя начать раньше круга 2».
 
-6. **`NotOpened` не переезжает в модель вместе с шестью остальными.** Хранилище
-   постеров не открыто — это поломка сборки, а не нормальный ход событий:
-   такому место в непредвиденном сбое, с логом и плашкой.
+6. **Из семи исключений бэкенда в модель переезжают пять.** `NotOpened` —
+   поломка сборки, а не нормальный ход событий: такому место в непредвиденном
+   сбое, с логом и плашкой. `ExternalIdTaken` не пересекает границу вовсе: его
+   ловит и пишет в лог сам `Enricher`, а у привязки на том же месте поднимается
+   `ItemExists`. Оба остались бы в модели классами без сегодняшнего потребителя.
 
 7. **Страницу отдаёт свой WSGI-обработчик, а не файловый сервер pywebview.**
    Иначе не сделать трёх вещей: корень `/` у него отвечает `500` (маршрут зовёт
@@ -153,19 +157,28 @@ personal_rating/
 
 ---
 
-### Задача 1: Шесть отказов операции переезжают в модель
+### Задача 1: Пять отказов операции переезжают в модель
 
 Мост обязан различать, чем кончилась операция: переименовал тег в занятое имя —
 одно сообщение, залил не картинку — другое. Сейчас эти исключения объявлены в
-пяти модулях `storage/` и `service/`, а клиенту открыты только `backend.model` и
-`backend.config` — то есть поймать их по типу он не может вовсе.
+четырёх модулях `storage/` и `service/`, а клиенту открыты только `backend.model`
+и `backend.config` — то есть поймать их по типу он не может вовсе.
 
 Ровно так же в своё время переехали `Reason`, `Found`, `Missing` и `Refusal`:
 тип, который клиент обязан различать, живёт в модели.
 
-**`NotOpened` остаётся на месте.** Он значит «хранилище постеров не открыли при
-сборке» — это наша поломка, и ей место в непредвиденном сбое, а не в списке
-нормальных исходов.
+**Два исключения из семи остаются на месте, и оба по одной причине: до клиента
+они не долетают.**
+
+- **`NotOpened`** значит «хранилище постеров не открыли при сборке» — это наша
+  поломка, и ей место в непредвиденном сбое, а не в списке нормальных исходов.
+- **`ExternalIdTaken`** не пересекает границу вовсе. Проверено по коду: его
+  бросает `ExternalIdsRepository.put`, а ловит и записывает в лог сам
+  `Enricher._keep` (`backend/service/enrich.py:155`). У привязки же занятость
+  проверяется до первой записи, и `Linker._check_identifiers`
+  (`backend/service/linking.py:87`) поднимает на этом месте `ItemExists`, а не
+  его. Перенести его в модель значило бы завести класс без сегодняшнего
+  потребителя.
 
 **Файлы:**
 - Создать: `backend/model/denied.py`
@@ -173,14 +186,13 @@ personal_rating/
   `backend/storage/repository/library.py:17`,
   `backend/storage/repository/tags.py:14-18`,
   `backend/storage/repository/credits.py:31`,
-  `backend/storage/repository/external.py:20`,
   `backend/service/images.py:15`
 - Создать: `tests/backend/test_denied.py`
 
 **Интерфейсы:**
 - Потребляет: ничего.
 - Отдаёт: `Denied`, `ItemExists`, `TagExists`, `WrongTagKind`, `IdentityTaken`,
-  `ExternalIdTaken`, `BadImage` — всё импортируется из `backend.model`.
+  `BadImage` — всё импортируется из `backend.model`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
@@ -194,7 +206,6 @@ import pytest
 from backend.model import (
     BadImage,
     Denied,
-    ExternalIdTaken,
     IdentityTaken,
     ItemExists,
     Kind,
@@ -202,15 +213,15 @@ from backend.model import (
     WrongTagKind,
 )
 from backend.storage.posters import NotOpened
+from backend.storage.repository.external import ExternalIdTaken
 from backend.storage.repository.tags import TagsRepository
 
-SIX = [ItemExists, TagExists, WrongTagKind, IdentityTaken, ExternalIdTaken,
-       BadImage]
+FIVE = [ItemExists, TagExists, WrongTagKind, IdentityTaken, BadImage]
 
 
-@pytest.mark.parametrize("denial", SIX)
+@pytest.mark.parametrize("denial", FIVE)
 def test_every_denial_is_caught_by_the_common_ancestor(denial):
-    """Мост ловит один тип, а не шесть: иначе седьмой отказ пришлось бы
+    """Мост ловит один тип, а не пять: иначе шестой отказ пришлось бы
     дописывать и в бэкенд, и в мост."""
     with pytest.raises(Denied):
         raise denial("занято")
@@ -226,6 +237,13 @@ def test_the_ancestor_does_not_catch_everything():
 def test_a_closed_poster_store_is_not_a_denial():
     """Хранилище не открыли — это поломка сборки, а не занятое имя тега."""
     assert not issubclass(NotOpened, Denied)
+
+
+def test_a_taken_external_id_is_not_a_denial_either():
+    """Он не пересекает границу вовсе: его ловит и пишет в лог сам `Enricher`, а
+    у привязки на этом месте поднимается `ItemExists`. Класс в модели без
+    сегодняшнего потребителя — это «на всякий случай»."""
+    assert not issubclass(ExternalIdTaken, Denied)
 
 
 async def test_a_repository_raises_the_ancestor(sessions, migrated):
@@ -283,10 +301,6 @@ class IdentityTaken(Denied):
     """Человек или студия с такой идентичностью источника уже есть."""
 
 
-class ExternalIdTaken(Denied):
-    """Чужой идентификатор уже привязан к другой карточке."""
-
-
 class BadImage(Denied):
     """Залитый файл не разбирается как картинка."""
 ```
@@ -305,19 +319,20 @@ class BadImage(Denied):
 | `backend/storage/repository/library.py` | `class ItemExists` | `ItemExists` |
 | `backend/storage/repository/tags.py` | `class WrongTagKind`, `class TagExists` | `TagExists`, `WrongTagKind` |
 | `backend/storage/repository/credits.py` | `class IdentityTaken` | `IdentityTaken` |
-| `backend/storage/repository/external.py` | `class ExternalIdTaken` | `ExternalIdTaken` |
 | `backend/service/images.py` | `class BadImage` | `BadImage` |
+
+`backend/storage/repository/external.py` не трогается: `ExternalIdTaken`
+остаётся там, где объявлен.
 
 - [ ] **Шаг 5: Открыть имена наружу**
 
-В `backend/model/__init__.py` — импорт и семь имён в `__all__`, по алфавиту, как
+В `backend/model/__init__.py` — импорт и шесть имён в `__all__`, по алфавиту, как
 там заведено:
 
 ```python
 from backend.model.denied import (
     BadImage,
     Denied,
-    ExternalIdTaken,
     IdentityTaken,
     ItemExists,
     TagExists,
@@ -342,9 +357,9 @@ from backend.model.denied import (
 ```bash
 git add backend/model/denied.py backend/model/__init__.py \
         backend/storage/repository/library.py backend/storage/repository/tags.py \
-        backend/storage/repository/credits.py backend/storage/repository/external.py \
+        backend/storage/repository/credits.py \
         backend/service/images.py tests/backend/test_denied.py
-git commit -m "refactor: шесть отказов операции переезжают в модель"
+git commit -m "refactor: пять отказов операции переезжают в модель"
 ```
 
 ---
@@ -1376,8 +1391,15 @@ def test_the_summary_travels_as_a_flat_dictionary(spy, asked):
 ```python
 """Мост: свои отметки — оценки, теги, закладки."""
 
+from datetime import datetime
+
 from backend.model import Kind, TagExists
 from client.bridge.marks import Marks
+
+
+"""Момент везде зажат между двумя замерами вокруг вызова, а не проверен на
+`year >= 2026`: тот прошёл бы и для литерала `datetime(2026, 1, 1)`, то есть не
+отличил бы взятое время от захардкоженного."""
 
 
 def test_setting_a_score_carries_the_moment(spy, asked):
@@ -1386,12 +1408,34 @@ def test_setting_a_score_carries_the_moment(spy, asked):
     answers, log = asked
     answers["ratings.set_score"] = None
 
+    before = datetime.now()
     Marks(spy).score(12, 9.0)
+    after = datetime.now()
 
     name, args, _ = log[0]
     assert name == "ratings.set_score"
     assert args[:2] == (12, 9.0)
-    assert args[2].year >= 2026
+    assert before <= args[2] <= after
+
+
+def test_aspects_go_to_their_own_scales(spy, asked):
+    """Три шкалы у игры разные, и перепутанные местами дают другую карточку —
+    а сумма и среднее у них те же. Набор доводов этого не различает, привязка
+    различает."""
+    answers, log = asked
+    answers["ratings.set_aspects"] = 7.0
+
+    before = datetime.now()
+    Marks(spy).aspects(12, visual=9, narrative=8, gameplay=4)
+    after = datetime.now()
+
+    name, args, kwargs = log[0]
+    assert name == "ratings.set_aspects"
+    given = args[1:4] if len(args) > 3 else (kwargs["visual"],
+                                             kwargs["narrative"],
+                                             kwargs["gameplay"])
+    assert given == (9, 8, 4)
+    assert before <= args[4] <= after
 
 
 def test_aspects_answer_with_the_derived_score(spy, asked):
@@ -1410,6 +1454,20 @@ def test_clearing_a_rating_keeps_the_card(spy, asked):
     Marks(spy).clear_rating(12)
 
     assert [name for name, _, _ in log] == ["ratings.clear"]
+
+
+def test_a_review_goes_to_the_right_card_with_a_moment(spy, asked):
+    answers, log = asked
+    answers["ratings.set_review"] = None
+
+    before = datetime.now()
+    Marks(spy).review(12, "пересмотрел, всё ещё держит")
+    after = datetime.now()
+
+    name, args, _ = log[0]
+    assert name == "ratings.set_review"
+    assert args[:2] == (12, "пересмотрел, всё ещё держит")
+    assert before <= args[2] <= after
 
 
 def test_tags_come_for_the_asked_kind(spy, asked):
@@ -1435,6 +1493,19 @@ def test_reordering_survives_as_the_page_sent_it(spy, asked):
     assert args[1] == [5, 2, 9]
 
 
+def test_a_new_tag_belongs_to_one_kind(spy, asked):
+    """Наборы тегов у трёх типов независимы, и заведённый не тому типу тег
+    оказался бы невидим там, где его завели."""
+    answers, log = asked
+    answers["tags.create"] = 7
+
+    assert Marks(spy).create_tag("series", "пересмотреть") == {"ok": 7}
+
+    name, args, _ = log[0]
+    assert name == "tags.create"
+    assert args == (Kind.SERIES, "пересмотреть")
+
+
 def test_a_taken_tag_name_is_a_kind_of_failure(spy, asked):
     """Переименовал в занятое — нормальный ход событий, а не сбой."""
     answers, _ = asked
@@ -1443,15 +1514,67 @@ def test_a_taken_tag_name_is_a_kind_of_failure(spy, asked):
     assert Marks(spy).rename_tag(3, "драма")["fail"] == "tag-exists"
 
 
+def test_deleting_a_tag_names_the_tag_not_the_card(spy, asked):
+    """У удаления тега и снятия тега с карточки доводы разного рода, и
+    перепутать их — значит стереть тег у всей библиотеки вместо одной строки."""
+    answers, log = asked
+    answers["tags.delete"] = None
+
+    Marks(spy).delete_tag(3)
+
+    name, args, _ = log[0]
+    assert name == "tags.delete"
+    assert args == (3,)
+
+
+def test_assigning_names_the_card_first_then_the_tag(spy, asked):
+    """Оба довода — числа, и переставленные местами они молча пройдут до базы.
+    Порядок и есть то, что тут сторожится."""
+    answers, log = asked
+    answers["tags.assign"] = None
+
+    Marks(spy).assign(12, 3)
+
+    name, args, _ = log[0]
+    assert name == "tags.assign"
+    assert args == (12, 3)
+
+
+def test_unassigning_goes_the_same_way_round(spy, asked):
+    answers, log = asked
+    answers["tags.unassign"] = None
+
+    Marks(spy).unassign(12, 3)
+
+    name, args, _ = log[0]
+    assert name == "tags.unassign"
+    assert args == (12, 3)
+
+
 def test_wishing_carries_the_moment(spy, asked):
+    """Порядок по умолчанию в «Хочу посмотреть» — по дате добавления, и берётся
+    она отсюда."""
     answers, log = asked
     answers["wishlist.add"] = None
 
+    before = datetime.now()
     Marks(spy).wish(12)
+    after = datetime.now()
 
     name, args, _ = log[0]
     assert name == "wishlist.add"
-    assert args[1].year >= 2026
+    assert args[0] == 12
+    assert before <= args[1] <= after
+
+
+def test_unwishing_needs_no_moment(spy, asked):
+    """Снятие закладки момента не требует: строка уходит целиком."""
+    answers, log = asked
+    answers["wishlist.remove"] = None
+
+    Marks(spy).unwish(12)
+
+    assert log[0] == ("wishlist.remove", (12,), {})
 ```
 
 - [ ] **Шаг 3: Прогнать и увидеть красное**
@@ -1588,7 +1711,7 @@ class Marks(Domain):
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/client/ -v`
-Ожидание: PASS, 13 новых тестов.
+Ожидание: PASS, 20 новых тестов — шесть про карточку и четырнадцать про отметки.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -2361,7 +2484,9 @@ git commit -m "feat: мост — поиск со складыванием вы�
 ```python
 """Мост: внешний мир — привязка, перезапрос, оценки агрегаторов."""
 
-from backend.model import ExternalIdTaken, Kind, Missing, RatingSource
+from datetime import datetime
+
+from backend.model import ItemExists, Kind, Missing, RatingSource
 from client.bridge.world import World
 
 
@@ -2395,13 +2520,15 @@ def test_the_card_for_a_link_is_kept_not_sent_back(spy, asked):
     assert world.card_for_link(1, "themoviedb.org/movie/157336", None) == {
         "ok": {"outcome": "found", "value": "карточка"}}
 
+    before = datetime.now()
     world.link(1, 12, False)
+    after = datetime.now()
 
     name, args, kwargs = log[1]
     assert name == "linker.link"
     assert args[0] == 12
     assert args[1] == "карточка"
-    assert args[2].year >= 2026
+    assert before <= args[2] <= after
     assert kwargs == {"overwrite": False}
 
 
@@ -2411,15 +2538,20 @@ def test_linking_without_a_kept_card_is_stale(spy, asked):
 
 def test_a_taken_identity_is_a_kind_of_failure(spy, asked):
     """Ссылка ведёт на карточку, которая в библиотеке уже есть: дубль завести не
-    даём, и говорим об этом."""
+    даём, и говорим об этом.
+
+    Род отказа именно `item-exists`: занятость проверяется до первой записи, и
+    `Linker._check_identifiers` поднимает там `ItemExists`
+    (`backend/service/linking.py:87`). `ExternalIdTaken` до клиента не долетает
+    вовсе — его ловит и пишет в лог сам `Enricher`."""
     answers, _ = asked
     answers["loader.card_for_link"] = "карточка"
-    answers["linker.link"] = ExternalIdTaken("157336")
+    answers["linker.link"] = ItemExists("imdb:tt0816692 уже за карточкой 4")
 
     world = World(spy)
     world.card_for_link(1, "themoviedb.org/movie/157336", None)
 
-    assert world.link(1, 12, False)["fail"] == "external-id-taken"
+    assert world.link(1, 12, False)["fail"] == "item-exists"
 
 
 def test_a_source_without_that_card_says_missing(spy, asked):
@@ -2593,6 +2725,7 @@ git commit -m "feat: мост — внешний мир, привязка и о�
 """Мост: обложки — заливка своей картинки и наличие."""
 
 import base64
+from datetime import datetime
 
 from backend.model import BadImage
 from client.bridge.covers import Covers
@@ -2606,13 +2739,15 @@ def test_an_uploaded_picture_arrives_as_bytes(spy, asked):
     answers, log = asked
     answers["posters.store_upload"] = None
 
+    before = datetime.now()
     Covers(spy).store_upload(12, PNG)
+    after = datetime.now()
 
     name, args, _ = log[0]
     assert name == "posters.store_upload"
     assert args[0] == 12
     assert args[1] == b"\x89PNG\r\n\x1a\n"
-    assert args[2].year >= 2026
+    assert before <= args[2] <= after
 
 
 def test_not_a_picture_is_a_kind_of_failure(spy, asked):
