@@ -38,6 +38,13 @@ class Sources:
             return [self.steam, self.gog]
         return [self.tmdb]
 
+    def people_for(self, kind: Kind) -> TmdbClient | None:
+        """Кто умеет искать по человеку. У игр — никто, и это замерено, а не
+        предположено: Steam по разработчику отдаёт разметку витрины, GOG молча
+        игнорирует параметр и возвращает весь каталог. Людей же магазины не
+        отдают вовсе, только компании."""
+        return None if kind is Kind.GAME else self.tmdb
+
     def client_for(self, source: Source):
         """Каталожный клиент по источнику карточки. У ручной карточки его нет и
         быть не может: она ниоткуда не приезжает."""

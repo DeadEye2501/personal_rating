@@ -25,3 +25,17 @@ class SearchHit:
     # принимает `GenreSource` именно поэтому.
     genre_ext_ids: tuple[tuple[GenreSource, str], ...] = field(default_factory=tuple)
     source_rating: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class PersonHit:
+    """Человек, найденный у источника по имени.
+
+    Своего типа он требует потому, что `SearchHit` — это карточка, а тут не
+    карточка: ни года, ни постера, ни жанров. Клиент его не видит — сервис
+    берёт из него идентификатор и спрашивает фильмографию.
+
+    Имени в нём нет намеренно: отбора среди найденных не бывает — что источник
+    вернул на имя, то и ответ, — и читать имя было бы некому."""
+
+    source_id: str

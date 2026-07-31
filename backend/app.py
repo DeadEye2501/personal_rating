@@ -11,6 +11,7 @@ from backend.service.enrich import Enricher
 from backend.service.library import LibraryService
 from backend.service.linking import Linker
 from backend.service.loading import Loader
+from backend.service.people import PeopleSearch
 from backend.service.posters import POSTER_SOURCES, PosterService
 from backend.service.removal import remove_card
 from backend.service.search import SearchService
@@ -48,6 +49,7 @@ class Backend:
     companies: CreditRepository
 
     search: SearchService
+    finder: PeopleSearch
     feed: LibraryService
     loader: Loader
     series: SeriesRefresh
@@ -137,6 +139,9 @@ async def build_backend(
         companies=parts["companies"],
         search=SearchService(library=library, views=views, sources=sources,
                              genres=genres),
+        finder=PeopleSearch(views=views, people=parts["people"],
+                            companies=parts["companies"], sources=sources,
+                            genres=genres),
         feed=LibraryService(SectionsRepository(sessions), views),
         loader=Loader(library=library, writer=CardWriter(**parts),
                       sources=sources, posters=posters),

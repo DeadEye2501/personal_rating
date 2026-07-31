@@ -1,0 +1,385 @@
+{
+  "cast": [
+    {
+      "adult": false,
+      "backdrop_path": "/7ysNbTEttcxUq0MJwqWe3MO30Qy.jpg",
+      "genre_ids": [
+        10767
+      ],
+      "id": 64711,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "StarTalk with Neil deGrasse Tyson",
+      "overview": "",
+      "popularity": 9.0742,
+      "poster_path": "/qCSXMlSNtgqTkrAYzK9dWPS7hHR.jpg",
+      "first_air_date": "2015-04-20",
+      "softcore": false,
+      "name": "StarTalk with Neil deGrasse Tyson",
+      "vote_average": 6.7,
+      "vote_count": 25,
+      "character": "Self",
+      "credit_id": "56746a4192514179dd000414",
+      "episode_count": 1,
+      "first_credit_air_date": "2015-04-27"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/nbx6dQ5R8Bu20KVcY7eqp7DRzb9.jpg",
+      "genre_ids": [
+        10767
+      ],
+      "id": 231931,
+      "origin_country": [
+        "KR"
+      ],
+      "original_language": "ko",
+      "original_name": "알아두면 쓸데없는 지구별 잡학사전",
+      "overview": "",
+      "popularity": 1.9633,
+      "poster_path": "/nCYIsuLKhVJnmPe5usibTlsYfwW.jpg",
+      "first_air_date": "2023-08-03",
+      "softcore": false,
+      "name": "알아두면 쓸데없는 지구별 잡학사전",
+      "vote_average": 8.0,
+      "vote_count": 1,
+      "character": "Self",
+      "credit_id": "64cdddcdd9f4a603b8752d9e",
+      "episode_count": 1,
+      "first_credit_air_date": "2023-08-10"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/ocfRB5tUjrGBvwZ2HXun0OQG4yE.jpg",
+      "genre_ids": [
+        99
+      ],
+      "id": 223249,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "100 Years of Warner Bros.",
+      "overview": "Весь мир знает Warner Bros. как одну из величайших студий в истории кино. «Одиссея капитана Блада», «Певец джаза» «Мальтийский сокол», «Сияние», франшиза «Гарри Поттер» — лишь немногие успешные проекты, выпущенные компанией за сто лет своего существования. Однако мало кому известно, какой сложный путь пришлось пройти студии, чтобы достичь этих вершин, и на какие по-настоящему серьезные риски ей приходилось идти, чтобы оставаться лидером рынка. Новая лента повествует о том, как с помощью смелых и революционных, а иногда и грязных и аморальных поступков компания братьев Уорнеров на протяжении века пробивала себе путь к вершинам славы.\n\nФильм расскажет обо всех важнейших этапах жизни Warner Bros. из уст легенд кино и ведущих кинематографистов современности: в качестве рассказчиков на экране появятся Мартин Скорсезе, Баз Лурман, Клинт Иствуд, Киану Ривз, Харви Кейтель, Джордж Клуни и многие другие.",
+      "popularity": 6.0878,
+      "poster_path": "/vGotZtJzU5eGCndAO4lqxylPK5t.jpg",
+      "first_air_date": "2023-05-25",
+      "softcore": false,
+      "name": "100 лет Warner Bros",
+      "vote_average": 7.594,
+      "vote_count": 32,
+      "character": "Self",
+      "credit_id": "64d7a7f0f495ee0290e3ccab",
+      "episode_count": 4,
+      "first_credit_air_date": "2023-05-25"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/zu2vKWoIwdLN8raXNDASmTpawi6.jpg",
+      "genre_ids": [],
+      "id": 13667,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "MTV Movie & TV Awards",
+      "overview": "",
+      "popularity": 21.0366,
+      "poster_path": "/lPsSVqXFott193XjMpBS2qNsdWw.jpg",
+      "first_air_date": "1992-06-10",
+      "softcore": false,
+      "name": "Церемония вручения премии MTV Movie Awards",
+      "vote_average": 8.1,
+      "vote_count": 13,
+      "character": "Self / Presenter",
+      "credit_id": "64ebe040c5c1ef013cd376b5",
+      "episode_count": 1,
+      "first_credit_air_date": "2012-06-03"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/jiSlSDL0PZsd3DeW9832lk7eBsE.jpg",
+      "genre_ids": [
+        10764,
+        10767
+      ],
+      "id": 71494,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "Golden Globe Awards",
+      "overview": "",
+      "popularity": 43.686,
+      "poster_path": "/gYG3SHNKui9ps9RfN4u9MMwpy10.jpg",
+      "first_air_date": "1944-01-20",
+      "softcore": false,
+      "name": "Золотой глобус",
+      "vote_average": 7.05,
+      "vote_count": 20,
+      "character": "Self - Nominee",
+      "credit_id": "659ed0c7383df20257e6e01b",
+      "episode_count": 1,
+      "first_credit_air_date": "2024-01-07"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/Ajku4m7jbMpCTEPr794Imv19mCA.jpg",
+      "genre_ids": [
+        10763,
+        35
+      ],
+      "id": 4385,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The Colbert Report",
+      "overview": "Стивен Колберт ведёт новости в сатирическом ключе, юмористически сверхпатриотично комментируя крупные события, происходящие в США и остальном мире.",
+      "popularity": 54.3221,
+      "poster_path": "/pn2CVXjOlR8kY5MgOTJjZ71IM0Q.jpg",
+      "first_air_date": "2005-10-17",
+      "softcore": false,
+      "name": "Отчёт Колбера",
+      "vote_average": 6.931,
+      "vote_count": 303,
+      "character": "Self - Guest",
+      "credit_id": "659f6ceca843c1012a718bb5",
+      "episode_count": 1,
+      "first_credit_air_date": "2014-12-03"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/gMMnf8VRg3Z98WaFmOLr9Jk8pIs.jpg",
+      "genre_ids": [
+        35,
+        10767
+      ],
+      "id": 63770,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The Late Show with Stephen Colbert",
+      "overview": "",
+      "popularity": 161.3301,
+      "poster_path": "/9jkThAGYj2yp8jsS6Nriy5mzKFT.jpg",
+      "first_air_date": "2015-09-08",
+      "softcore": false,
+      "name": "Вечернее шоу со Стивеном Колбертом",
+      "vote_average": 6.084,
+      "vote_count": 359,
+      "character": "Self",
+      "credit_id": "65bdf24043999b0163c497c5",
+      "episode_count": 1,
+      "first_credit_air_date": "2024-02-07"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/AvydGD3Y03ad7QLxQ3tAZ3VVkng.jpg",
+      "genre_ids": [],
+      "id": 27023,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The Oscars",
+      "overview": "Церемония награждения премии «Оскар» за заслуги в области кинематографа.",
+      "popularity": 18.5311,
+      "poster_path": "/wyMHJMQp8WpmBg9CxefvbQnFhrm.jpg",
+      "first_air_date": "1953-03-19",
+      "softcore": false,
+      "name": "Церемония вручения премии «Оскар»",
+      "vote_average": 6.988,
+      "vote_count": 82,
+      "character": "Self",
+      "credit_id": "65ef0ea1efe37c0186eea347",
+      "episode_count": 1,
+      "first_credit_air_date": "2024-03-10"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/mxRACw7zfDZT9VKd1CMgP9D8d2y.jpg",
+      "genre_ids": [
+        99,
+        10765
+      ],
+      "id": 79003,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "James Cameron's Story of Science Fiction",
+      "overview": "Джеймс Кэмерон вместе с шестью знаковыми персонами в мире кинематографа — Гильермо дель Торо, Джорджем Лукасом, Кристофером Ноланом, Арнольдом Шварценеггером, Ридли Скоттом и Стивеном Спилбергом — обсудит развитие жанра фантастики и его влияние на зрителей по всему миру.",
+      "popularity": 4.901,
+      "poster_path": "/lnqzIvsr3UGEtIHio94TAkfNl4i.jpg",
+      "first_air_date": "2018-04-29",
+      "softcore": false,
+      "name": "История научной фантастики с Джеймсом Кэмероном",
+      "vote_average": 6.85,
+      "vote_count": 50,
+      "character": "Self",
+      "credit_id": "5d25976337b3a9492752dc0a",
+      "episode_count": 2,
+      "first_credit_air_date": "2018-05-20"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/4sT7q5OwpzBoG1zOlTyY9cIcjPq.jpg",
+      "genre_ids": [
+        10767,
+        10764
+      ],
+      "id": 108433,
+      "origin_country": [
+        "CN"
+      ],
+      "original_language": "zh",
+      "original_name": "十三邀",
+      "overview": "",
+      "popularity": 6.9071,
+      "poster_path": "/jaVXnCKiE3k1O3ULUQ1xFVwZSHg.jpg",
+      "first_air_date": "2016-05-17",
+      "softcore": false,
+      "name": "十三邀",
+      "vote_average": 8.8,
+      "vote_count": 4,
+      "character": "",
+      "credit_id": "6686b5514edaa2272217f00f",
+      "episode_count": 1,
+      "first_credit_air_date": "2017-09-08"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/gMMnf8VRg3Z98WaFmOLr9Jk8pIs.jpg",
+      "genre_ids": [
+        35,
+        10767
+      ],
+      "id": 63770,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The Late Show with Stephen Colbert",
+      "overview": "",
+      "popularity": 161.3301,
+      "poster_path": "/9jkThAGYj2yp8jsS6Nriy5mzKFT.jpg",
+      "first_air_date": "2015-09-08",
+      "softcore": false,
+      "name": "Вечернее шоу со Стивеном Колбертом",
+      "vote_average": 6.084,
+      "vote_count": 359,
+      "character": "Self - Guest",
+      "credit_id": "69f652ec727bd06e543a4619",
+      "episode_count": 1,
+      "first_credit_air_date": "2026-05-04"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/qLMfcvdCcCGD2BNLH8b6ZCBuO7D.jpg",
+      "genre_ids": [
+        10763,
+        35
+      ],
+      "id": 2224,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The Daily Show",
+      "overview": "\"Дневное шоу с Тревором Ноем\" - американская вечерняя сатирическая телевизионная программа, транслирующаяся каждый понедельник по четверг на Comedy Central и в Канаде The Comedy Network. Описывая себя как фальшивую новостную программу, \"Дневное шоу с Тревором Ноем\" привлекает свою комедию и сатиру из последних новостей, политических деятелей, медиа-организаций и, зачастую, аспектов самого шоу.",
+      "popularity": 121.349,
+      "poster_path": "/ixcfyK7it6FjRM36Te4OdblAq4X.jpg",
+      "first_air_date": "1996-07-22",
+      "softcore": false,
+      "name": "Дневное шоу с Тревором Ноем",
+      "vote_average": 6.4,
+      "vote_count": 647,
+      "character": "Self - Guest",
+      "credit_id": "6a55c543402fcc8a55ef268e",
+      "episode_count": 1,
+      "first_credit_air_date": "2026-07-13"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/tHZsAFdtNsKNxE58jopl9Eh4f7a.jpg",
+      "genre_ids": [
+        10767
+      ],
+      "id": 2221,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The View",
+      "overview": "Группа женщин обсуждает повседневные вопросы, делятся своим мнением и участвуют в интересных разговорах на разные темы.",
+      "popularity": 45.6115,
+      "poster_path": "/pEUNIxCMh2jFjUj7u09f4O5CcR4.jpg",
+      "first_air_date": "1997-08-11",
+      "softcore": false,
+      "name": "Взгляд",
+      "vote_average": 4.3,
+      "vote_count": 112,
+      "character": "Self",
+      "credit_id": "6a604388c4b9a4a3e9c349e9",
+      "episode_count": 1,
+      "first_credit_air_date": "2026-07-20"
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/7VO04TtL1jIT6XOPs9u4jdB8KaB.jpg",
+      "genre_ids": [
+        35,
+        10767
+      ],
+      "id": 59941,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "The Tonight Show Starring Jimmy Fallon",
+      "overview": "Комедийное ток-шоу, каждый выпуск которого открывается монологом Фэллона и продолжается беседами со звездными гостями, забавными скетчами, играми с их участием, а также музыкальными выступлениями.",
+      "popularity": 145.367,
+      "poster_path": "/1N4o5PmmqhlVDrcdJ2RlCFWbLGX.jpg",
+      "first_air_date": "2014-02-17",
+      "softcore": false,
+      "name": "Ночное шоу с Джимми Фэллоном",
+      "vote_average": 5.777,
+      "vote_count": 381,
+      "character": "Self - Guest",
+      "credit_id": "6a6510bea76d1a2956fdc24b",
+      "episode_count": 1,
+      "first_credit_air_date": "2026-07-23"
+    },
+    {
+      "adult": false,
+      "backdrop_path": null,
+      "genre_ids": [
+        10767
+      ],
+      "id": 290966,
+      "origin_country": [
+        "US"
+      ],
+      "original_language": "en",
+      "original_name": "WIRED's Autocomplete Interviews",
+      "overview": "",
+      "popularity": 11.012,
+      "poster_path": "/s0cZOT0vmHpziavldOKAfRX4zWR.jpg",
+      "first_air_date": "2016-03-01",
+      "softcore": false,
+      "name": "WIRED's Autocomplete Interviews",
+      "vote_average": 1.0,
+      "vote_count": 1,
+      "character": "Self - Guest",
+      "credit_id": "6a6b9b94b134dab28dd057c1",
+      "episode_count": 1,
+      "first_credit_air_date": "2023-07-20"
+    }
+  ],
+  "crew": [],
+  "id": 525
+}

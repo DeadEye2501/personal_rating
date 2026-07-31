@@ -8,21 +8,15 @@ from datetime import datetime
 from backend.model import (
     CardView,
     ExternalSearch,
-    Found,
-    Genre,
-    GenreSource,
     Kind,
-    Refusal,
     SearchHit,
-    view_from_hit,
 )
 from backend.service.asking import answered
-from backend.sources.convert import from_search
+from backend.service.hits import split, to_views
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
-from backend.unique import unique
 
 logger = logging.getLogger(__name__)
 
@@ -78,42 +72,11 @@ class SearchService:
               for client in clients)
         )
 
-        answers: list[list[SearchHit]] = []
-        refusals: list[Refusal] = []
-        for outcome in outcomes:
-            if isinstance(outcome, Refusal):
-                refusals.append(outcome)
-            elif isinstance(outcome, Found):
-                # Порция считается по источнику: одна страница — один запрос.
-                answers.append(list(outcome.value[:SEARCH_SIZE]))
+        answers, refusals = split(outcomes)
+        # Порция считается по источнику: одна страница — один запрос.
+        woven = _weave([answer[:SEARCH_SIZE] for answer in answers])
 
-        return ExternalSearch(views=tuple(await self._to_views(_weave(answers))),
-                              refusals=tuple(refusals))
-
-    async def _to_views(self, hits: list[SearchHit]) -> list[CardView]:
-        index: dict[GenreSource, dict[str, tuple[Genre, ...]]] = {}
-        views = []
-        for hit in hits:
-            for space, _ in hit.genre_ext_ids:
-                if space not in index:
-                    index[space] = await self._genres.index(space)
-            views.append(view_from_hit(
-                hit,
-                _genres_of(hit, index),
-                from_search(hit.source, hit.source_rating,
-                            self._clock()),
-            ))
-        return views
-
-
-def _genres_of(
-    hit: SearchHit,
-    index: dict[GenreSource, dict[str, tuple[Genre, ...]]],
-) -> tuple[Genre, ...]:
-    """Незнакомое молча отбрасывается: заводить жанр на лету нельзя — имена в
-    справочнике наши, а сборный жанр автоматически не разложить."""
-    return tuple(unique(
-        genre
-        for space, ext_id in hit.genre_ext_ids
-        for genre in index[space].get(ext_id, ())
-    ))
+        return ExternalSearch(
+            views=tuple(await to_views(woven, self._genres, self._clock)),
+            refusals=tuple(refusals),
+        )

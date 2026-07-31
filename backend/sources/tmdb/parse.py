@@ -9,6 +9,7 @@ from backend.model import (
     IdSource,
     Item,
     Kind,
+    PersonHit,
     PersonRole,
     RatingSource,
     SearchHit,
@@ -115,10 +116,39 @@ def _item(payload: dict, kind: Kind, now: datetime, **extra) -> Item:
 
 
 def parse_search(payload: dict, kind: Kind) -> list[SearchHit]:
+    return _hits(payload.get("results", []), kind)
+
+
+def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]:
+    """Фильмография человека. Разбираются оба списка: у режиссёра работы лежат
+    в `crew`, у актёра — в `cast`, и у многих есть и то и другое.
+
+    Одна работа приезжает дважды, если человек на ней в двух ролях. Повторы
+    снимаются по идентификатору работы, а не сравнением кандидатов целиком:
+    целиком они совпадают лишь пока разбор не читает ничего ролевого — ни
+    `character`, ни `job`, ни `order`, — и дедупликация ломалась бы от
+    добавления любого из этих полей."""
+    rows = [*payload.get("cast", []), *payload.get("crew", [])]
+    by_work: dict[str, SearchHit] = {}
+    for one in _hits(rows, kind):
+        by_work.setdefault(one.source_id, one)
+    return list(by_work.values())
+
+
+def parse_people(payload: dict) -> list[PersonHit]:
+    """Найденные приезжают все — это и есть ответ на поиск по имени. Поиск у
+    TMDB нечёткий, и близкие написания в ответе — тоже ответ."""
+    return [PersonHit(source_id=str(row["id"]))
+            for row in payload.get("results", [])]
+
+
+def _hits(rows: list[dict], kind: Kind) -> list[SearchHit]:
+    """Общее у выдачи поиска и у фильмографии: замерено, что строка там и там
+    одна и та же — те же названия, дата, постер, жанры и оценка."""
     title_key, original_key, date_key = _KEYS[kind]
 
     hits = []
-    for row in payload.get("results", []):
+    for row in rows:
         hits.append(
             SearchHit(
                 kind=kind,

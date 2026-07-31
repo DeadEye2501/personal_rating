@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from backend.model import (
     CompanyRole,
     Credit,
+    Kind,
     PersonRole,
     Source,
     Suggestion,
@@ -30,6 +31,22 @@ from backend.storage.tables import (
 
 class IdentityTaken(Exception):
     """Пара (source, source_id) уже принадлежит другому человеку или студии."""
+
+
+def _outer(row) -> str | None:
+    """Идентификатор, по которому строку можно спросить у внешнего источника.
+
+    У заведённого руками он тоже заполнен — свой `uuid4` под источником
+    `manual`, — но спросить по нему некого.
+
+    Знание про `manual` лежит в хранилище, а не в сервисе, намеренно: пишет эту
+    условность `create_manual` двадцатью строками ниже, и читатель рядом с
+    писателем разумнее, чем в другом слое.
+
+    Чей это идентификатор, наружу не отдаётся: людей заводит только TMDB, у
+    компаний внешней половины нет вовсе, и второму источнику людей взяться
+    неоткуда. Появись он — сравнивать источник с клиентом придётся здесь же."""
+    return row.source_id if row.source and row.source != Source.MANUAL else None
 
 
 class CreditRepository(Repository):
@@ -137,7 +154,10 @@ class CreditRepository(Repository):
 
     async def credits_of(self, item_id: int) -> list[Credit]:
         table, credit = self._entity.table, self._entity.credit
-        columns = [table.c.name, table.c.source, table.c.source_id, credit.c.role]
+        # `id` берётся ради клика по имени: искать связанное надо по строке, а
+        # не по имени — имя тёзку не различает.
+        columns = [table.c.id, table.c.name, table.c.source, table.c.source_id,
+                   credit.c.role]
         if self._entity.position is not None:
             columns.append(self._entity.position)
 
@@ -150,9 +170,29 @@ class CreditRepository(Repository):
             lambda row: to_credit(row, self._entity),
         )
 
-    async def items_of(self, entity_id: int, limit: int,
-                       offset: int) -> list[int]:
-        """Всё, с чем связан этот человек или студия.
+    async def identity_of(self, entity_id: int) -> tuple[str, str | None] | None:
+        """Имя строки и её идентичность **у внешнего источника**, либо `None`
+        вместо пары, если строки нет вовсе. Когда идентичность считается пустой
+        — у `_outer`.
+
+        Одним запросом, а не двумя: клику нужно и то и другое сразу — по
+        идентичности он спрашивает источник, а без неё спрашивает по имени."""
+        return await self._maybe(
+            select(self._entity.table.c.name, self._entity.table.c.source,
+                   self._entity.table.c.source_id)
+            .where(self._entity.table.c.id == entity_id),
+            lambda row: (row.name, _outer(row)),
+        )
+
+    async def items_of(self, entity_id: int, kind: Kind) -> list[int]:
+        """Всё, с чем связан этот человек или студия, в пределах вкладки.
+
+        Вкладка — первичный фильтр: во вкладке фильмов сериалов не бывает нигде,
+        и клик по человеку её не отменяет.
+
+        Предела нет: «покажи всё с ним» обрезанным ответом не отвечается, а
+        следующей страницы у этого жеста не бывает — обрезанное стало бы
+        недостижимым.
 
         `distinct` обязателен: один человек бывает на карточке и режиссёром, и
         актёром — это две строки связи и одна карточка.
@@ -163,11 +203,10 @@ class CreditRepository(Repository):
         rows = await self._rows(
             self._linked(entity_id)
             .with_only_columns(item.c.id)
+            .where(item.c.kind == kind)
             .distinct()
             .join(rating, rating.c.item_id == item.c.id, isouter=True)
             .order_by(rating.c.score.desc(), item.c.id)
-            .limit(limit)
-            .offset(offset)
         )
         return [row.id for row in rows]
 

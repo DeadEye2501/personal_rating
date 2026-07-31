@@ -4,148 +4,6 @@
   "productCount": 69,
   "products": [
     {
-      "id": "1214553287",
-      "slug": "legacy_of_kain_soul_reaver_12_remastered",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/b00796ebafc6ceee533e3cdc0e7d5e4220a3dd90477ba01d9f5bc9d3fd428950_{formatter}.jpg",
-        "https://images.gog-statics.com/b7dd56d7d37917ab494bde4cde7ec4551388ef5c362b0aaa3b026a44be520927_{formatter}.jpg",
-        "https://images.gog-statics.com/197f5f9b165c2d1eb6abbde596d46dd99476d59786285a1f0913ba1f3a65e95a_{formatter}.jpg",
-        "https://images.gog-statics.com/f63ac02049ea45adb7d5f02e220a60003a0a7c83931013344ad479e71d235897_{formatter}.jpg",
-        "https://images.gog-statics.com/437998148be4fc7428ec8536cf1c573f8d052dd39a3497543561bf703c192349_{formatter}.jpg",
-        "https://images.gog-statics.com/2e3e2e9eb1b43bb7274d40914fe8aaf356169bff68112cb2341babcf41c675fd_{formatter}.jpg",
-        "https://images.gog-statics.com/5f23db18f8211c20c9853ade4c1a7bdf1671f4292830c401a2536949cfa7f683_{formatter}.jpg",
-        "https://images.gog-statics.com/b61f7088abcb266ea952dbef50d9018a21d9b304b19468ebd9e5de9a008b0254_{formatter}.jpg",
-        "https://images.gog-statics.com/bdde6560ae11c0425f1d06b671446d21fe46a694a2d57233215370a89a29cf3f_{formatter}.jpg",
-        "https://images.gog-statics.com/3b4344f9bc0b96a67db120871a619ecc72c79ceafa1f640ad64713c1d578469f_{formatter}.jpg",
-        "https://images.gog-statics.com/bdc0757d9b1f1f89814dffc4fd1c78376c004601da484b806faaab2d5a3c3f87_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": true,
-        "inText": true
-      },
-      "releaseDate": "2024.12.10",
-      "storeReleaseDate": "2024.12.10",
-      "productType": "game",
-      "title": "Legacy of Kain™ Soul Reaver 1&2 Remastered",
-      "coverHorizontal": "https://images.gog-statics.com/1f281fb4ad6546c6c928d19b1052d5b36deaf30a3fd8c8044338525df7bfc0e9.png",
-      "coverVertical": "https://images.gog-statics.com/c30849500f365add6f20c7bc8601b46e15b4469e42368490c7dfe43d735973ae.jpg",
-      "logo": "https://images.gog-statics.com/aa6b7654d017e2a5dff4699b9e4d6652c779ac5eca6c3f59b1d310a0773a459c.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/21cd107840a9a1a2a161b25934f2c3bcfd1ba59efbe09cbb41a26907969b73e7.jpg",
-      "developers": [
-        "Aspyr",
-        "Crystal Dynamics"
-      ],
-      "publishers": [
-        "Aspyr"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$13.49",
-        "base": "$29.99",
-        "discount": "-55%",
-        "finalMoney": {
-          "amount": "13.49",
-          "currency": "USD",
-          "discount": "16.50"
-        },
-        "baseMoney": {
-          "amount": "29.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Атмосферные",
-          "slug": "atmospheric"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Головоломка",
-          "slug": "puzzle"
-        },
-        {
-          "name": "Мрачная",
-          "slug": "dark"
-        },
-        {
-          "name": "От третьего лица",
-          "slug": "third-person"
-        },
-        {
-          "name": "Платформер",
-          "slug": "platformer"
-        },
-        {
-          "name": "Магия",
-          "slug": "magic"
-        },
-        {
-          "name": "Ретро",
-          "slug": "retro"
-        },
-        {
-          "name": "Слэшер",
-          "slug": "hack-and-slash"
-        }
-      ],
-      "reviewsRating": 44,
-      "reviewsCount": 366,
-      "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/legacy_of_kain_soul_reaver_12_remastered"
-    },
-    {
       "id": "1155465637",
       "slug": "the_surge_2_premium_edition",
       "features": [
@@ -278,39 +136,43 @@
       "storeLink": "https://www.gog.com/ru/game/the_surge_2_premium_edition"
     },
     {
-      "id": "1207658980",
-      "slug": "lands_of_lore_1_2",
+      "id": "1207658937",
+      "slug": "ultima_underworld_1_2",
       "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
         {
           "name": "Одиночная игра",
           "slug": "single"
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/fe24a1de46142239a992a0c0e00df8de30d39395457fb1b7ec537fc79aedbc4b_{formatter}.jpg",
-        "https://images.gog-statics.com/df99e892b2ee89e4105f42516b777842572f7177ca094f7b0005665687304cea_{formatter}.jpg",
-        "https://images.gog-statics.com/9b8942256faf81e680ba97e7a470cc82db1fd5f076b23274c497a58e99080f75_{formatter}.jpg",
-        "https://images.gog-statics.com/0e91aed9a0e9655638c022b6ea30e1429049fcbc2aaa1b027e9a8ad3ce806b1c_{formatter}.jpg",
-        "https://images.gog-statics.com/e848cd439dd45050d47562267ae38d277f0f4e3fb4a8a439e4ff43105e3f9d94_{formatter}.jpg",
-        "https://images.gog-statics.com/65e8f0f5bac21f31e26427942c7e61a40d438c170aa6732fe4e067629c9a6a2f_{formatter}.jpg",
-        "https://images.gog-statics.com/1bbd5e01c09d5f45cb66dfa4764696156f2cbaf104578eaa5a6511441495b117_{formatter}.jpg",
-        "https://images.gog-statics.com/5c985453e4958eb3e982ea3096ca3cd5daf1c643cdb3f4c1ae7c91d4430b1411_{formatter}.jpg",
-        "https://images.gog-statics.com/6a5fea1004718f8f039f7e2d98aba2e7cc33c6e4c831ac44cb68c696ef25dc06_{formatter}.jpg",
-        "https://images.gog-statics.com/bff83486e727810a5b763e370b718b93b989ff7ab82f9f521324576f05d2af83_{formatter}.jpg",
-        "https://images.gog-statics.com/464c1887a0fce125eb57084e60c062b6713d75d63dd46c282e90d82fb2ac9505_{formatter}.jpg",
-        "https://images.gog-statics.com/cd73c1d1d16a21fbbda2e37c721ea5b8eef40864934146c19ffa09b242a10769_{formatter}.jpg"
+        "https://images.gog-statics.com/54058c0dd9d9e033e633ced9294de57678756158aac3234fb72c6ce6a59f3c00_{formatter}.jpg",
+        "https://images.gog-statics.com/7a9a4f5ba1912ddfeaf53641105e7ad38ca89c3c753dbd0f6fa980c4c1e92acf_{formatter}.jpg",
+        "https://images.gog-statics.com/2e7db1c08216c52804234b2b759ff1fb5b92106db2b7992d4a0d77cfdd23375a_{formatter}.jpg",
+        "https://images.gog-statics.com/0adf4e81ce22817dcc854c5580ec996056685d1da419c627585d44a1b184ea19_{formatter}.jpg",
+        "https://images.gog-statics.com/4ce8e99711beea913016971aee41995356076bf6b14619108ac0bba2326a3ea8_{formatter}.jpg",
+        "https://images.gog-statics.com/8ae6d0eeec8bf52c3b8859843e350e8c9b94bd44901fda314de9de8cd3d6c6e9_{formatter}.jpg",
+        "https://images.gog-statics.com/b32af27ba973ab3dad1e4c760bc8898029e2ec1c1076b4038c6e41440afede35_{formatter}.jpg",
+        "https://images.gog-statics.com/db51b907d5372c42a0de68de4bf34bdc693484356176422bb9315e9cfbba6d55_{formatter}.jpg",
+        "https://images.gog-statics.com/373dea5005e2acdb90d0ba8810337f2201ac658268b1e80865afa52813fddb6c_{formatter}.jpg",
+        "https://images.gog-statics.com/0519d994fdefaa53467e095fd15967baf7c3495c94d7de0d6b3104f75337084c_{formatter}.jpg",
+        "https://images.gog-statics.com/0796a9ad1f21553de8ad22a063c9ff92ded0a350e77daab6096d55bc09179039_{formatter}.jpg",
+        "https://images.gog-statics.com/2673bee0aef59fd86a457185dd5dc46ca6fb5537850399383bb0c0ad76877a7b_{formatter}.jpg"
       ],
       "userPreferredLanguage": null,
-      "releaseDate": "1993.01.02",
-      "storeReleaseDate": "2011.11.15",
+      "releaseDate": "1992.03.01",
+      "storeReleaseDate": "2021.06.30",
       "productType": "pack",
-      "title": "Lands of Lore™ 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/940d6fd36425f6c11bc96028905f67d9dc341eb185e81f7198c0da440a41fc46.png",
-      "coverVertical": "https://images.gog-statics.com/4e1297f9a86f3cafa7220a3c9429189723d5163c6ea60eab5c0d04a76dcd24f3.jpg",
-      "logo": null,
-      "galaxyBackgroundImage": null,
+      "title": "Ultima™ Underworld 1+2",
+      "coverHorizontal": "https://images.gog-statics.com/d72b0c7295fe255b2a292dfb52654213d7d119e0e2a17020144583621330eb1d.png",
+      "coverVertical": "https://images.gog-statics.com/77bd5fb18f3bd7e03feb3799d714c213c110d05451046f7a932a0dff77af40b3.jpg",
+      "logo": "https://images.gog-statics.com/b2c7b83d183e874c37305b9c3e1b8f789c4468f39b201dc1f39ee9e906a48956.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/562d6e60d1e197f81b0c9b8d27b6b1778498f2c2da2933447761c22ef612d501.jpg",
       "developers": [
-        "Westwood Studios"
+        "Blue Sky Productions"
       ],
       "publishers": [
         "Electronic Arts"
@@ -320,13 +182,13 @@
         "osx"
       ],
       "price": {
-        "final": "$1.49",
+        "final": "$5.99",
         "base": "$5.99",
-        "discount": "-75%",
+        "discount": null,
         "finalMoney": {
-          "amount": "1.49",
+          "amount": "5.99",
           "currency": "USD",
-          "discount": "4.50"
+          "discount": "0.00"
         },
         "baseMoney": {
           "amount": "5.99",
@@ -370,24 +232,145 @@
           "slug": "fps"
         },
         {
-          "name": "Компьютерная ролевая игра",
-          "slug": "crpg"
+          "name": "Good Old Game",
+          "slug": "good-old-game"
         }
       ],
-      "reviewsRating": 46,
-      "reviewsCount": 755,
+      "reviewsRating": 47,
+      "reviewsCount": 1283,
       "editions": [],
       "ratings": [
         {
           "name": "esrbRating",
-          "ageRating": "13"
+          "ageRating": "6"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/ultima_underworld_1_2"
+    },
+    {
+      "id": "1440441531",
+      "slug": "the_surge_1_2_dual_pack",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/7e5266eafd14eee9a442f77e1ed9257aab2f924366903c5fb3f7d671f866cfb1_{formatter}.jpg",
+        "https://images.gog-statics.com/64ab7aca75d1d4dbc419b96c6c9577375b6703d5ce2ad02db567370654566182_{formatter}.jpg",
+        "https://images.gog-statics.com/4cf799a4680c8ffce3829254ef99aed67be68f06ab5d4a5b5a9a36da39a8580a_{formatter}.jpg",
+        "https://images.gog-statics.com/36a46dae140eac28c8a97bfcf6b5cf80ab5276ebb40aa84d0baf242335c97f04_{formatter}.jpg",
+        "https://images.gog-statics.com/277291b3943792ad6b960448b4ee0452acf045e63f7b51c9d72283940dd15661_{formatter}.jpg",
+        "https://images.gog-statics.com/f2d604303e64a5a19c2df73ebdc5f065986a47403440294b656f9a05a48a742e_{formatter}.jpg",
+        "https://images.gog-statics.com/b3248658d90b7bffdbf5381dc3e7efa8da1656b0e931cb872f47c82bf8b8e8e2_{formatter}.jpg",
+        "https://images.gog-statics.com/e965c8a2c973ebe08d938daea6fc8fb40b87a6101f1ff4b1d0cfbaab205ed915_{formatter}.jpg",
+        "https://images.gog-statics.com/f48b85f330144b92bc4d810885175557169a48582ae042ac575fd1a6b7475eb0_{formatter}.jpg",
+        "https://images.gog-statics.com/0d20fa68626c8b52a60f1ccd9011833cc1c91325b45bcbdac7b2d4cf30924457_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2020.05.05",
+      "storeReleaseDate": "2020.05.05",
+      "productType": "pack",
+      "title": "The Surge 1 & 2 - Dual Pack",
+      "coverHorizontal": "https://images.gog-statics.com/1664b673394ebcbe794b5dd24066d321ead67f6898d6c82892cbc86efb806a48.png",
+      "coverVertical": "https://images.gog-statics.com/179b8625de367931e050863befcb1542824e98a2f3eb4fd0204bc64311941008.jpg",
+      "logo": "https://images.gog-statics.com/750cd3b95ce70d473d7e2102620eb477c4e58b71ce3484ca75b6b86bee40c00c.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/fba641d460acd975c1b75d228ddb185b79ac362aa5d4dae615a8f827b500e799.jpg",
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "Focus Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$4.39",
+        "base": "$39.99",
+        "discount": "-89%",
+        "finalMoney": {
+          "amount": "4.39",
+          "currency": "USD",
+          "discount": "35.60"
+        },
+        "baseMoney": {
+          "amount": "39.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        }
+      ],
+      "reviewsRating": 36,
+      "reviewsCount": 14,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
         },
         {
           "name": "uskRating",
-          "ageRating": "12"
+          "ageRating": "18"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/lands_of_lore_1_2"
+      "storeLink": "https://www.gog.com/ru/game/the_surge_1_2_dual_pack"
     },
     {
       "id": "1423059062",
@@ -439,13 +422,13 @@
         "osx"
       ],
       "price": {
-        "final": "$2.99",
+        "final": "$5.99",
         "base": "$5.99",
-        "discount": "-50%",
+        "discount": null,
         "finalMoney": {
-          "amount": "2.99",
+          "amount": "5.99",
           "currency": "USD",
-          "discount": "3.00"
+          "discount": "0.00"
         },
         "baseMoney": {
           "amount": "5.99",
@@ -517,108 +500,8 @@
       "storeLink": "https://www.gog.com/ru/game/mortal_kombat_123"
     },
     {
-      "id": "1207658796",
-      "slug": "realms_of_arkania_1_2",
-      "features": [
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/4f6c4ff41ec2cbde195d04e90cb3d5334fbf594d5c860cf864de534e33db2559_{formatter}.jpg",
-        "https://images.gog-statics.com/e8eed616c8c2be23269df1da4dc0f4f5616c9e1977e76b1a1307ae4dd85480ec_{formatter}.jpg",
-        "https://images.gog-statics.com/7e2201176c14c56399d1aca1572cd89f80bde9a53cdae8a965a13554b1cf03ce_{formatter}.jpg",
-        "https://images.gog-statics.com/cd0bfcbe4546abb87c8a5d3f528edc579e0aa8b570be8a9456985a41f8cff4ec_{formatter}.jpg",
-        "https://images.gog-statics.com/e88e5485b9d0f8f7ef9237080dca11ff392c34187141fdaa4c29e3f33e3b5de6_{formatter}.jpg",
-        "https://images.gog-statics.com/e832cb8f55d532b7448610f57b46bb0883deaf633f2fc6c434acbe59ad41112b_{formatter}.jpg",
-        "https://images.gog-statics.com/be17c8b06a784a420451283cc6533e74b5073b8da55b59a603b4018709d8efb3_{formatter}.jpg",
-        "https://images.gog-statics.com/3a3d0e3d855eb5fa55c5343a6c6d9116cc0d1ff87f74f4626c169f67c4ccade5_{formatter}.jpg",
-        "https://images.gog-statics.com/a79c69a7b0b41bee1a2c8edd1d902e89349f0866d83952687035e2e26265e3f3_{formatter}.jpg",
-        "https://images.gog-statics.com/a627dd80bc3e9f595ef60909147662a3b461b12690e430664cb98e07867c32c1_{formatter}.jpg",
-        "https://images.gog-statics.com/ee7f2101899cdb139a3cb60e23ea797011bd15c83aca27fdd57f2dae51a30b09_{formatter}.jpg",
-        "https://images.gog-statics.com/e874096a18b69d83070bb06c2a3c83dc06e47bf6eacc24ca85edee87e7c952ff_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": "1994.01.02",
-      "storeReleaseDate": "1991.12.24",
-      "productType": "pack",
-      "title": "Realms of Arkania 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/a2609f61b35684bec17fd6f06351f3e649e90f3bc801aa2d226b83b9b6cde886.png",
-      "coverVertical": "https://images.gog-statics.com/6a6410dfcb2c608c17173bc2296934c7fe7c4d4bdaf1d219c9e5bf980b8f2918.jpg",
-      "logo": null,
-      "galaxyBackgroundImage": null,
-      "developers": [
-        "attic Entertainment Software GmbH"
-      ],
-      "publishers": [
-        "attic Entertainment Software GmbH"
-      ],
-      "operatingSystems": [
-        "windows",
-        "osx"
-      ],
-      "price": {
-        "final": "$1.49",
-        "base": "$5.99",
-        "discount": "-75%",
-        "finalMoney": {
-          "amount": "1.49",
-          "currency": "USD",
-          "discount": "4.50"
-        },
-        "baseMoney": {
-          "amount": "5.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        },
-        {
-          "name": "Пошаговая",
-          "slug": "turnbased"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Пошаговая стратегия",
-          "slug": "turn-based"
-        }
-      ],
-      "reviewsRating": 42,
-      "reviewsCount": 764,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "uskRating",
-          "ageRating": "12"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/realms_of_arkania_1_2"
-    },
-    {
-      "id": "1207658937",
-      "slug": "ultima_underworld_1_2",
+      "id": "1207658878",
+      "slug": "kings_quest_1_2_3",
       "features": [
         {
           "name": "Облачные сохранения",
@@ -630,61 +513,183 @@
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/54058c0dd9d9e033e633ced9294de57678756158aac3234fb72c6ce6a59f3c00_{formatter}.jpg",
-        "https://images.gog-statics.com/7a9a4f5ba1912ddfeaf53641105e7ad38ca89c3c753dbd0f6fa980c4c1e92acf_{formatter}.jpg",
-        "https://images.gog-statics.com/2e7db1c08216c52804234b2b759ff1fb5b92106db2b7992d4a0d77cfdd23375a_{formatter}.jpg",
-        "https://images.gog-statics.com/0adf4e81ce22817dcc854c5580ec996056685d1da419c627585d44a1b184ea19_{formatter}.jpg",
-        "https://images.gog-statics.com/4ce8e99711beea913016971aee41995356076bf6b14619108ac0bba2326a3ea8_{formatter}.jpg",
-        "https://images.gog-statics.com/8ae6d0eeec8bf52c3b8859843e350e8c9b94bd44901fda314de9de8cd3d6c6e9_{formatter}.jpg",
-        "https://images.gog-statics.com/b32af27ba973ab3dad1e4c760bc8898029e2ec1c1076b4038c6e41440afede35_{formatter}.jpg",
-        "https://images.gog-statics.com/db51b907d5372c42a0de68de4bf34bdc693484356176422bb9315e9cfbba6d55_{formatter}.jpg",
-        "https://images.gog-statics.com/373dea5005e2acdb90d0ba8810337f2201ac658268b1e80865afa52813fddb6c_{formatter}.jpg",
-        "https://images.gog-statics.com/0519d994fdefaa53467e095fd15967baf7c3495c94d7de0d6b3104f75337084c_{formatter}.jpg",
-        "https://images.gog-statics.com/0796a9ad1f21553de8ad22a063c9ff92ded0a350e77daab6096d55bc09179039_{formatter}.jpg",
-        "https://images.gog-statics.com/2673bee0aef59fd86a457185dd5dc46ca6fb5537850399383bb0c0ad76877a7b_{formatter}.jpg"
+        "https://images.gog-statics.com/f08b5a8bfc52edde4983a4c152822135b15f1c6a82800cb0b9294b359313e8a7_{formatter}.jpg",
+        "https://images.gog-statics.com/1e69742b8a91ecfeca3c4a2984393fd610f93b897c918added22966e7507938a_{formatter}.jpg",
+        "https://images.gog-statics.com/dc97a491b9942200964cf5e64d9ee156a790826192844ab391b74f0e577dda47_{formatter}.jpg",
+        "https://images.gog-statics.com/b585f3879b8a5605a228ff993205702a4bf8c213597fc15b8832014153890592_{formatter}.jpg",
+        "https://images.gog-statics.com/3930395a43725c5f8d504bf47418bff738ede0bc30da39171bb0364a3a8e9355_{formatter}.jpg",
+        "https://images.gog-statics.com/711b04a3fb095ebb6bfb2ab70fa64e7f259b86161d3e3c25cf58118c49025e2d_{formatter}.jpg",
+        "https://images.gog-statics.com/34e6550e2b096e5f39955201fbc9cb65b46f535fd162affa844119097fc4b31f_{formatter}.jpg",
+        "https://images.gog-statics.com/eff33a7cf6cd6e1172fdc942ccb7d1cd6229cd22252ccaddc1dc04e943db6590_{formatter}.jpg",
+        "https://images.gog-statics.com/16fda3f5c1bfb33ba357cf0cd5ac3e2dcf87ff3c8b07fda140d6466914f50aa5_{formatter}.jpg",
+        "https://images.gog-statics.com/83d103a78fb5c732a7b7ec14dad037e1e8ba023e38e57dcf89538c1ed3ed1a82_{formatter}.jpg",
+        "https://images.gog-statics.com/ed7d6e860b53c18b73502846cdf6c79e465a68518caf6938c476659813426789_{formatter}.jpg",
+        "https://images.gog-statics.com/b8b8903eadca99135963d1cafd79301bb36a3f20ebf31cf227ee17f1fbc08074_{formatter}.jpg"
       ],
       "userPreferredLanguage": null,
-      "releaseDate": "1992.03.01",
-      "storeReleaseDate": "2021.06.30",
+      "releaseDate": "1986.10.01",
+      "storeReleaseDate": null,
       "productType": "pack",
-      "title": "Ultima™ Underworld 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/d72b0c7295fe255b2a292dfb52654213d7d119e0e2a17020144583621330eb1d.png",
-      "coverVertical": "https://images.gog-statics.com/77bd5fb18f3bd7e03feb3799d714c213c110d05451046f7a932a0dff77af40b3.jpg",
-      "logo": "https://images.gog-statics.com/b2c7b83d183e874c37305b9c3e1b8f789c4468f39b201dc1f39ee9e906a48956.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/562d6e60d1e197f81b0c9b8d27b6b1778498f2c2da2933447761c22ef612d501.jpg",
+      "title": "King's Quest 1+2+3",
+      "coverHorizontal": "https://images.gog-statics.com/e73248959ca0c532d69e71c85ddda98d1d67e7a232d03b4016e5d71c6f99f1da.png",
+      "coverVertical": "https://images.gog-statics.com/f077e1c4bfb82f173a2e91960468009e5ce1710eaf50dab8ac22172ad1d6dd91.jpg",
+      "logo": "https://images.gog-statics.com/67083e8648947434aebba4df8648e5f638341f1abf335629f669e8e23500b87a.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/b518b24227dbfea040a40e82b91bdf27761303d6a314f91d230ade78731effe5.jpg",
       "developers": [
-        "Blue Sky Productions"
+        "Sierra"
       ],
       "publishers": [
-        "Electronic Arts"
+        "Activision"
       ],
       "operatingSystems": [
-        "windows",
-        "osx"
+        "windows"
       ],
       "price": {
-        "final": "$2.99",
-        "base": "$5.99",
-        "discount": "-50%",
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
         "finalMoney": {
-          "amount": "2.99",
+          "amount": "9.99",
           "currency": "USD",
-          "discount": "3.00"
+          "discount": "0.00"
         },
         "baseMoney": {
-          "amount": "5.99",
+          "amount": "9.99",
           "currency": "USD"
         }
       },
       "productState": "default",
       "genres": [
         {
-          "name": "Ролевая игра",
-          "slug": "rpg"
+          "name": "Фэнтези",
+          "slug": "fantasy"
         },
         {
-          "name": "От первого лица",
-          "slug": "fpp"
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Квест",
+          "slug": "pointandclick"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "2D",
+          "slug": "two-dimensional"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Point&Click",
+          "slug": "point-and-click"
+        }
+      ],
+      "reviewsRating": 41,
+      "reviewsCount": 463,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "esrbRating",
+          "ageRating": "6"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "0"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/kings_quest_1_2_3"
+    },
+    {
+      "id": "1214553287",
+      "slug": "legacy_of_kain_soul_reaver_12_remastered",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/b00796ebafc6ceee533e3cdc0e7d5e4220a3dd90477ba01d9f5bc9d3fd428950_{formatter}.jpg",
+        "https://images.gog-statics.com/b7dd56d7d37917ab494bde4cde7ec4551388ef5c362b0aaa3b026a44be520927_{formatter}.jpg",
+        "https://images.gog-statics.com/197f5f9b165c2d1eb6abbde596d46dd99476d59786285a1f0913ba1f3a65e95a_{formatter}.jpg",
+        "https://images.gog-statics.com/f63ac02049ea45adb7d5f02e220a60003a0a7c83931013344ad479e71d235897_{formatter}.jpg",
+        "https://images.gog-statics.com/437998148be4fc7428ec8536cf1c573f8d052dd39a3497543561bf703c192349_{formatter}.jpg",
+        "https://images.gog-statics.com/2e3e2e9eb1b43bb7274d40914fe8aaf356169bff68112cb2341babcf41c675fd_{formatter}.jpg",
+        "https://images.gog-statics.com/5f23db18f8211c20c9853ade4c1a7bdf1671f4292830c401a2536949cfa7f683_{formatter}.jpg",
+        "https://images.gog-statics.com/b61f7088abcb266ea952dbef50d9018a21d9b304b19468ebd9e5de9a008b0254_{formatter}.jpg",
+        "https://images.gog-statics.com/bdde6560ae11c0425f1d06b671446d21fe46a694a2d57233215370a89a29cf3f_{formatter}.jpg",
+        "https://images.gog-statics.com/3b4344f9bc0b96a67db120871a619ecc72c79ceafa1f640ad64713c1d578469f_{formatter}.jpg",
+        "https://images.gog-statics.com/bdc0757d9b1f1f89814dffc4fd1c78376c004601da484b806faaab2d5a3c3f87_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2024.12.10",
+      "storeReleaseDate": "2024.12.10",
+      "productType": "game",
+      "title": "Legacy of Kain™ Soul Reaver 1&2 Remastered",
+      "coverHorizontal": "https://images.gog-statics.com/1f281fb4ad6546c6c928d19b1052d5b36deaf30a3fd8c8044338525df7bfc0e9.png",
+      "coverVertical": "https://images.gog-statics.com/c30849500f365add6f20c7bc8601b46e15b4469e42368490c7dfe43d735973ae.jpg",
+      "logo": "https://images.gog-statics.com/aa6b7654d017e2a5dff4699b9e4d6652c779ac5eca6c3f59b1d310a0773a459c.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/21cd107840a9a1a2a161b25934f2c3bcfd1ba59efbe09cbb41a26907969b73e7.jpg",
+      "developers": [
+        "Aspyr",
+        "Crystal Dynamics"
+      ],
+      "publishers": [
+        "Aspyr"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$29.99",
+        "base": "$29.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "29.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "29.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Приключение",
+          "slug": "adventure"
         },
         {
           "name": "Фэнтези",
@@ -693,40 +698,359 @@
       ],
       "tags": [
         {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
           "name": "Фэнтези",
           "slug": "fantasy"
         },
         {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
+          "name": "Атмосферные",
+          "slug": "atmospheric"
         },
         {
           "name": "Классика",
           "slug": "classic"
         },
         {
-          "name": "От первого лица",
-          "slug": "first-person"
+          "name": "Головоломка",
+          "slug": "puzzle"
         },
         {
-          "name": "Шутер от первого лица",
-          "slug": "fps"
+          "name": "Мрачная",
+          "slug": "dark"
         },
         {
-          "name": "Good Old Game",
-          "slug": "good-old-game"
+          "name": "От третьего лица",
+          "slug": "third-person"
+        },
+        {
+          "name": "Платформер",
+          "slug": "platformer"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Ретро",
+          "slug": "retro"
+        },
+        {
+          "name": "Слэшер",
+          "slug": "hack-and-slash"
         }
       ],
-      "reviewsRating": 47,
-      "reviewsCount": 1283,
+      "reviewsRating": 44,
+      "reviewsCount": 367,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/legacy_of_kain_soul_reaver_12_remastered"
+    },
+    {
+      "id": "1825987761",
+      "slug": "the_surge_2",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/2a6d04e18179cdb21794ca9a1f808cc99497c02f16f4682e126eef2342cd9fdf_{formatter}.jpg",
+        "https://images.gog-statics.com/5e310a73aaf20c55cdbe2925a7f2ae02e0a3cbcaa48533cc1707b8fa3d89095c_{formatter}.jpg",
+        "https://images.gog-statics.com/7b2cebefcfef51b40f3de8141f928a0f72fa14201359034a5424ae230fa36acc_{formatter}.jpg",
+        "https://images.gog-statics.com/c95f42543d2b4ed6a8ac3a946b8a5298ec3fb4c779bb20ad3db51264f58e492d_{formatter}.jpg",
+        "https://images.gog-statics.com/365d167f58aa60dd3d57dc5a33a56a9bcab2ba4f148dab4c77cf19442ff253c2_{formatter}.jpg",
+        "https://images.gog-statics.com/1341976c474b5b89453303b6c9e2650c1ff35a3800b935e019ac6d56ddd57e6f_{formatter}.jpg",
+        "https://images.gog-statics.com/2bbaaf48466554aec95ff0f6b8e35de399bcf0031f5b8bcfb82899eafd01d590_{formatter}.jpg",
+        "https://images.gog-statics.com/bec7afb6aeeaee8bbbb7880913ced90a99d8b44f3e6a9104caef12b45f59f945_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2019.09.24",
+      "storeReleaseDate": "2020.01.16",
+      "productType": "game",
+      "title": "The Surge 2",
+      "coverHorizontal": "https://images.gog-statics.com/d02887cdaace36e80d01198fd6580ee75fca26c6494bed7a14da8b833dc3a5df.png",
+      "coverVertical": "https://images.gog-statics.com/91798e0eadd69d096469b198b19cab93150bd2dda1b0334eb0d1e551e33c99ef.jpg",
+      "logo": "https://images.gog-statics.com/213e9727cd345dbba6bc74ca7b9ec0ddcd4ec8508e00e1cafce837305e328e53.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/ca19884793fb9c876cbb7afe5d6f324fa995ede3a4b89e42755e18491c5900b0.jpg",
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "Focus Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$2.99",
+        "base": "$29.99",
+        "discount": "-90%",
+        "finalMoney": {
+          "amount": "2.99",
+          "currency": "USD",
+          "discount": "27.00"
+        },
+        "baseMoney": {
+          "amount": "29.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        },
+        {
+          "name": "Протагонистка",
+          "slug": "female-protagonist"
+        },
+        {
+          "name": "Открытый мир",
+          "slug": "open-world"
+        },
+        {
+          "name": "От третьего лица",
+          "slug": "third-person"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "Нагота",
+          "slug": "nudity"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        },
+        {
+          "name": "Сложная",
+          "slug": "difficult"
+        },
+        {
+          "name": "Мясо",
+          "slug": "gore"
+        },
+        {
+          "name": "Слэшер",
+          "slug": "hack-and-slash"
+        },
+        {
+          "name": "Киберпанк",
+          "slug": "cyberpunk"
+        },
+        {
+          "name": "Метроидвания",
+          "slug": "metroidvania"
+        },
+        {
+          "name": "Роботы",
+          "slug": "robots"
+        },
+        {
+          "name": "Похожа на Dark Souls",
+          "slug": "souls-like"
+        }
+      ],
+      "reviewsRating": 36,
+      "reviewsCount": 171,
+      "editions": [
+        {
+          "id": 1825987761,
+          "name": "Standard Edition",
+          "isRootEdition": true
+        },
+        {
+          "id": 1155465637,
+          "name": "Premium Edition",
+          "isRootEdition": false
+        }
+      ],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "brRating",
+          "ageRating": "18"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/the_surge_2"
+    },
+    {
+      "id": "1650269977",
+      "slug": "the_surge_2_urbn_gear_pack",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/f9e8c1c1615fbaba3364d88e8bf370816624eb1f77d3d4cdf61c33dc4079f15b_{formatter}.jpg",
+        "https://images.gog-statics.com/d294371d21826f3275b565bfe3944e2f235891df6e69d579aee939e9b26b78aa_{formatter}.jpg",
+        "https://images.gog-statics.com/93b4f3558cf91e6d417acd2abea5dd4968c0d1776af20ee7509160364b41bb8b_{formatter}.jpg",
+        "https://images.gog-statics.com/a1641ece9c5369a07295e5688893bf1db6bc256af16be45317cf1802b2e468b4_{formatter}.jpg",
+        "https://images.gog-statics.com/165ab46e85eda4bd9516931fed0c0a96660fcf0a25ff0a30aded3faa17ab9f3a_{formatter}.jpg",
+        "https://images.gog-statics.com/0502cf5607c75522fa50ec41586b4f8f8f8da513c52ef6613041c1a9683a54f8_{formatter}.jpg",
+        "https://images.gog-statics.com/184f977e76ce8389c68d4ec3543860b0691518910690a0d5ded6ead5c67ca58d_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2019.09.24",
+      "storeReleaseDate": "2020.01.16",
+      "productType": "dlc",
+      "title": "The Surge 2 - URBN Gear Pack",
+      "coverHorizontal": "https://images.gog-statics.com/40603bbd05f30259c9675ff3a603e465ec0a25e18c7a89af67f57f1bd6c5cb7c.png",
+      "coverVertical": "https://images.gog-statics.com/e1fff3a35f3a2fdff2d1f76fc95998dc1d3b7d73d420d18825ab77fb2c0d5b70.jpg",
+      "logo": "https://images.gog-statics.com/a6441770ec8c90cbbd4d1662c76cd6fd07fa23607e54ad13bfd706e21ab3231f.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/84eaf92d5f8858786705ec1e852bdf506cbfc98dcdce088c05c799de63f0bd8a.jpg",
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "Focus Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$1.99",
+        "base": "$2.99",
+        "discount": "-33%",
+        "finalMoney": {
+          "amount": "1.99",
+          "currency": "USD",
+          "discount": "1.00"
+        },
+        "baseMoney": {
+          "amount": "2.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        }
+      ],
+      "reviewsRating": 0,
+      "reviewsCount": 0,
       "editions": [],
       "ratings": [
         {
           "name": "esrbRating",
-          "ageRating": "6"
+          "ageRating": "17"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/ultima_underworld_1_2"
+      "storeLink": "https://www.gog.com/ru/game/the_surge_2_urbn_gear_pack"
     },
     {
       "id": "1101603038",
@@ -1014,7 +1338,7 @@
         }
       ],
       "reviewsRating": 39,
-      "reviewsCount": 213,
+      "reviewsCount": 214,
       "editions": [
         {
           "id": 1480551779,
@@ -1048,220 +1372,57 @@
       "storeLink": "https://www.gog.com/ru/game/the_surge"
     },
     {
-      "id": "1207658854",
-      "slug": "master_of_orion_1_2",
+      "id": "1207659052",
+      "slug": "tomb_raider_123",
       "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "multi"
-        },
         {
           "name": "Одиночная игра",
           "slug": "single"
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/18b8ea37b0edbeb5ae6aebba8687acf5d4677955ee1674676ad9b5a7ceefb514_{formatter}.jpg",
-        "https://images.gog-statics.com/017325968f89fe0fbfa57b815fad31be3fa808b686dc444a33bcc480a34f81c5_{formatter}.jpg",
-        "https://images.gog-statics.com/161b521cb7808744bb72d7c43efb59f8a3c4c69d71facbd6ff9efc45de02a37c_{formatter}.jpg",
-        "https://images.gog-statics.com/2b7a0342f4e842c49f41bed1ac66adf4f0460a0cc8225bea8e5d3ee41f3a80c5_{formatter}.jpg",
-        "https://images.gog-statics.com/c678b0c499f30aa589a43eca688fce0332e9f70721be0b8a3093ea7aa1429af2_{formatter}.jpg",
-        "https://images.gog-statics.com/16487d0e9af1fc7bb03e8fe9866f3e9643c6bdccadc423a2c76adf1a55f01c40_{formatter}.jpg",
-        "https://images.gog-statics.com/323d232772843041657219c742a33352c5cea84df975edd3a044a04217ab847b_{formatter}.jpg",
-        "https://images.gog-statics.com/b3cba8462a90a6f42a52f41ef1d6509e9cfd455dfd8c3a7a5a86656e6b60f631_{formatter}.jpg",
-        "https://images.gog-statics.com/24cb2ea10e8edc9da0a403c2b5cc02a9908d90d4946e975e109a273398096a17_{formatter}.jpg",
-        "https://images.gog-statics.com/5a822a63ac4ba772738fd55c83fff12a91953c09411766525f3defa271519b2b_{formatter}.jpg",
-        "https://images.gog-statics.com/6fbea2e80fdff915b43ff0c358fe063df631a5de5390ba41bc50325d566d1f70_{formatter}.jpg",
-        "https://images.gog-statics.com/230e9cb481e903d45830f1feda7ecf4a4b6004679f5ba95ebb44bb3b9d27756a_{formatter}.jpg"
+        "https://images.gog-statics.com/6eec171ee8e8496561f747e9dff54308bc56beaac6f3d129e04f60c8efe24464_{formatter}.jpg",
+        "https://images.gog-statics.com/6a037d6aa351c64e64a5c59df09fb7835aba072c5eda29d56f542b860d7c125b_{formatter}.jpg",
+        "https://images.gog-statics.com/cced6c093e6ebe00d64d78816ff92cbbd8b22684b08f98867408b4895f731214_{formatter}.jpg",
+        "https://images.gog-statics.com/1361a7b34b8eb783e49bbf844f7b3239caca25ec67495c736dd3d4590211b2d9_{formatter}.jpg",
+        "https://images.gog-statics.com/ec2a10328a109a29ef8485eed5de461bc348ac87f52e222d1b03af1637ebf08c_{formatter}.jpg",
+        "https://images.gog-statics.com/52ed1acb3281a21a53fcea7eb2bbe17943356da8b6123fd09af8530cbc447020_{formatter}.jpg",
+        "https://images.gog-statics.com/2e4ed77a3fbe5d20f0e3b68cf35c501f51222c9bc92364e3ca3ebfebb58ffd4a_{formatter}.jpg",
+        "https://images.gog-statics.com/592931f64e3d157d9e1ec2e10fbd71efac69409aad63b6560715bb8bda69df4b_{formatter}.jpg",
+        "https://images.gog-statics.com/445039bcd37f8fe96e5137af3695c4962fb122be304899cc876d93f522792520_{formatter}.jpg",
+        "https://images.gog-statics.com/1160586af00c4f29bd07bb5933814e7e933f1d7dfdacddd8bdda2a984fece0d5_{formatter}.jpg",
+        "https://images.gog-statics.com/183ca8b953477ec8d7bdcf1214ccdcf4d7edc23853ac4a8ec4e030d05c10b2ae_{formatter}.jpg",
+        "https://images.gog-statics.com/faebb4b61e10c8a12ba4629dfae510cb44b79c9b93669770734dcbe16710323b_{formatter}.jpg"
       ],
       "userPreferredLanguage": null,
-      "releaseDate": "1996.11.22",
-      "storeReleaseDate": "1991.12.24",
+      "releaseDate": "1996.11.14",
+      "storeReleaseDate": "2012.05.30",
       "productType": "pack",
-      "title": "Master of Orion 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/7c6a9d4ef469fffd8cd5199170798aeac2edab329862772ad6ac2ad7eb60c8c2.png",
-      "coverVertical": "https://images.gog-statics.com/f09e581355de1cbb467a1ba0248b3c3e74f88869771175aee70c331f0c436c9f.jpg",
-      "logo": "https://images.gog-statics.com/49322c2cb931b63b4627c5a7987d9ae4425923035830b21b8945bc18b6ed83ad.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/c9709768b8185b3659af7791e680c4f1a62691621067766067f7f4a722b67bec.jpg",
+      "title": "Tomb Raider 1+2+3",
+      "coverHorizontal": "https://images.gog-statics.com/74a056bd156cb1fdb4d595dc21cc9172869e528a9e8449a3b8f97c96ebc95009.png",
+      "coverVertical": "https://images.gog-statics.com/aec1ef1a10ace90e5f5b7de95410dc75e1abe00ba5471cbc6868c65792d455c9.jpg",
+      "logo": "https://images.gog-statics.com/0a51e4b3783c9376702dd7d57e6086b832f42105762c0dab306b5d67a7b2abf0.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/3eea2c1c8aed7a33a88dd2ba02c26565fea86f48284ec0aa81bf83b74eac8a92.jpg",
       "developers": [
-        "SimTex"
+        "Core Design"
       ],
       "publishers": [
-        "Wargaming Labs"
-      ],
-      "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
-      ],
-      "price": {
-        "final": "$2.39",
-        "base": "$5.99",
-        "discount": "-60%",
-        "finalMoney": {
-          "amount": "2.39",
-          "currency": "USD",
-          "discount": "3.60"
-        },
-        "baseMoney": {
-          "amount": "5.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Стратегия",
-          "slug": "strategy"
-        },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        },
-        {
-          "name": "Экономика",
-          "slug": "economic"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Атмосферные",
-          "slug": "atmospheric"
-        },
-        {
-          "name": "Стратегия",
-          "slug": "strategy"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Пошаговая стратегия",
-          "slug": "turn-based"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        },
-        {
-          "name": "Управление",
-          "slug": "management"
-        },
-        {
-          "name": "Управление ресурсами",
-          "slug": "resource-management"
-        },
-        {
-          "name": "Космос",
-          "slug": "space"
-        },
-        {
-          "name": "Глобальная стратегия",
-          "slug": "grand-strategy"
-        },
-        {
-          "name": "4X",
-          "slug": "four-x"
-        },
-        {
-          "name": "Экономика",
-          "slug": "economic"
-        }
-      ],
-      "reviewsRating": 48,
-      "reviewsCount": 5279,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "esrbRating",
-          "ageRating": "6"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "12"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/master_of_orion_1_2"
-    },
-    {
-      "id": "1440441531",
-      "slug": "the_surge_1_2_dual_pack",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/7e5266eafd14eee9a442f77e1ed9257aab2f924366903c5fb3f7d671f866cfb1_{formatter}.jpg",
-        "https://images.gog-statics.com/64ab7aca75d1d4dbc419b96c6c9577375b6703d5ce2ad02db567370654566182_{formatter}.jpg",
-        "https://images.gog-statics.com/4cf799a4680c8ffce3829254ef99aed67be68f06ab5d4a5b5a9a36da39a8580a_{formatter}.jpg",
-        "https://images.gog-statics.com/36a46dae140eac28c8a97bfcf6b5cf80ab5276ebb40aa84d0baf242335c97f04_{formatter}.jpg",
-        "https://images.gog-statics.com/277291b3943792ad6b960448b4ee0452acf045e63f7b51c9d72283940dd15661_{formatter}.jpg",
-        "https://images.gog-statics.com/f2d604303e64a5a19c2df73ebdc5f065986a47403440294b656f9a05a48a742e_{formatter}.jpg",
-        "https://images.gog-statics.com/b3248658d90b7bffdbf5381dc3e7efa8da1656b0e931cb872f47c82bf8b8e8e2_{formatter}.jpg",
-        "https://images.gog-statics.com/e965c8a2c973ebe08d938daea6fc8fb40b87a6101f1ff4b1d0cfbaab205ed915_{formatter}.jpg",
-        "https://images.gog-statics.com/f48b85f330144b92bc4d810885175557169a48582ae042ac575fd1a6b7475eb0_{formatter}.jpg",
-        "https://images.gog-statics.com/0d20fa68626c8b52a60f1ccd9011833cc1c91325b45bcbdac7b2d4cf30924457_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2020.05.05",
-      "storeReleaseDate": "2020.05.05",
-      "productType": "pack",
-      "title": "The Surge 1 & 2 - Dual Pack",
-      "coverHorizontal": "https://images.gog-statics.com/1664b673394ebcbe794b5dd24066d321ead67f6898d6c82892cbc86efb806a48.png",
-      "coverVertical": "https://images.gog-statics.com/179b8625de367931e050863befcb1542824e98a2f3eb4fd0204bc64311941008.jpg",
-      "logo": "https://images.gog-statics.com/750cd3b95ce70d473d7e2102620eb477c4e58b71ce3484ca75b6b86bee40c00c.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/fba641d460acd975c1b75d228ddb185b79ac362aa5d4dae615a8f827b500e799.jpg",
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "Focus Entertainment"
+        "Crystal Dynamics"
       ],
       "operatingSystems": [
         "windows"
       ],
       "price": {
-        "final": "$4.39",
-        "base": "$39.99",
-        "discount": "-89%",
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
         "finalMoney": {
-          "amount": "4.39",
+          "amount": "9.99",
           "currency": "USD",
-          "discount": "35.60"
+          "discount": "0.00"
         },
         "baseMoney": {
-          "amount": "39.99",
+          "amount": "9.99",
           "currency": "USD"
         }
       },
@@ -1271,320 +1432,13 @@
           "name": "Экшн",
           "slug": "action"
         },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        }
-      ],
-      "reviewsRating": 36,
-      "reviewsCount": 14,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "esrbRating",
-          "ageRating": "17"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "18"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_1_2_dual_pack"
-    },
-    {
-      "id": "1825987761",
-      "slug": "the_surge_2",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/2a6d04e18179cdb21794ca9a1f808cc99497c02f16f4682e126eef2342cd9fdf_{formatter}.jpg",
-        "https://images.gog-statics.com/5e310a73aaf20c55cdbe2925a7f2ae02e0a3cbcaa48533cc1707b8fa3d89095c_{formatter}.jpg",
-        "https://images.gog-statics.com/7b2cebefcfef51b40f3de8141f928a0f72fa14201359034a5424ae230fa36acc_{formatter}.jpg",
-        "https://images.gog-statics.com/c95f42543d2b4ed6a8ac3a946b8a5298ec3fb4c779bb20ad3db51264f58e492d_{formatter}.jpg",
-        "https://images.gog-statics.com/365d167f58aa60dd3d57dc5a33a56a9bcab2ba4f148dab4c77cf19442ff253c2_{formatter}.jpg",
-        "https://images.gog-statics.com/1341976c474b5b89453303b6c9e2650c1ff35a3800b935e019ac6d56ddd57e6f_{formatter}.jpg",
-        "https://images.gog-statics.com/2bbaaf48466554aec95ff0f6b8e35de399bcf0031f5b8bcfb82899eafd01d590_{formatter}.jpg",
-        "https://images.gog-statics.com/bec7afb6aeeaee8bbbb7880913ced90a99d8b44f3e6a9104caef12b45f59f945_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2019.09.24",
-      "storeReleaseDate": "2020.01.16",
-      "productType": "game",
-      "title": "The Surge 2",
-      "coverHorizontal": "https://images.gog-statics.com/d02887cdaace36e80d01198fd6580ee75fca26c6494bed7a14da8b833dc3a5df.png",
-      "coverVertical": "https://images.gog-statics.com/91798e0eadd69d096469b198b19cab93150bd2dda1b0334eb0d1e551e33c99ef.jpg",
-      "logo": "https://images.gog-statics.com/213e9727cd345dbba6bc74ca7b9ec0ddcd4ec8508e00e1cafce837305e328e53.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/ca19884793fb9c876cbb7afe5d6f324fa995ede3a4b89e42755e18491c5900b0.jpg",
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "Focus Entertainment"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$2.99",
-        "base": "$29.99",
-        "discount": "-90%",
-        "finalMoney": {
-          "amount": "2.99",
-          "currency": "USD",
-          "discount": "27.00"
-        },
-        "baseMoney": {
-          "amount": "29.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        },
-        {
-          "name": "Протагонистка",
-          "slug": "female-protagonist"
-        },
-        {
-          "name": "Открытый мир",
-          "slug": "open-world"
-        },
-        {
-          "name": "От третьего лица",
-          "slug": "third-person"
-        },
-        {
-          "name": "Многопользовательская игра",
-          "slug": "multiplayer"
-        },
-        {
-          "name": "Нагота",
-          "slug": "nudity"
-        },
-        {
-          "name": "Насилие",
-          "slug": "violent"
-        },
-        {
-          "name": "Сложная",
-          "slug": "difficult"
-        },
-        {
-          "name": "Мясо",
-          "slug": "gore"
-        },
-        {
-          "name": "Слэшер",
-          "slug": "hack-and-slash"
-        },
-        {
-          "name": "Киберпанк",
-          "slug": "cyberpunk"
-        },
-        {
-          "name": "Метроидвания",
-          "slug": "metroidvania"
-        },
-        {
-          "name": "Похожа на Dark Souls",
-          "slug": "souls-like"
-        },
-        {
-          "name": "Роботы",
-          "slug": "robots"
-        }
-      ],
-      "reviewsRating": 36,
-      "reviewsCount": 170,
-      "editions": [
-        {
-          "id": 1825987761,
-          "name": "Standard Edition",
-          "isRootEdition": true
-        },
-        {
-          "id": 1155465637,
-          "name": "Premium Edition",
-          "isRootEdition": false
-        }
-      ],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "esrbRating",
-          "ageRating": "17"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "brRating",
-          "ageRating": "18"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_2"
-    },
-    {
-      "id": "1995040607",
-      "slug": "spellcasting_123",
-      "features": [
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/59b4aead6f73ec5496c6799ba218222548dba5d9a97ea6edbc6b62c91a5b8f11_{formatter}.jpg",
-        "https://images.gog-statics.com/30e3dadd979de97402d7877638ae7b993a3c262ccd669abbb8d35ed399f3e78a_{formatter}.jpg",
-        "https://images.gog-statics.com/8e5336421bc722b140283e51e1e6342e043a8b122028b80e625ceac9761edcd1_{formatter}.jpg",
-        "https://images.gog-statics.com/e419bd731fc19b61616587adcde3510be5660f47008d686c422159d5065657bf_{formatter}.jpg",
-        "https://images.gog-statics.com/9293ce31c994bff50ba85921cf928c4e0491d0ea65d999dfe10536cd32d168a1_{formatter}.jpg",
-        "https://images.gog-statics.com/74db8d58b43301c78683986a7f3feb2c590c55432daf85f90ace20fc0734d20a_{formatter}.jpg",
-        "https://images.gog-statics.com/9c89d609398b616665ec8e9b5c3a9d1d0c9bf89a4072baf16b96ac752fa2f756_{formatter}.jpg",
-        "https://images.gog-statics.com/6ed30ce58d7394c9e9ec31d570f072219df1f3584782fc87b7188ff171faa97f_{formatter}.jpg",
-        "https://images.gog-statics.com/c18248b69e88b0a0e9811f8593425b96abf6b4963bac6a0652c5265e515b580b_{formatter}.jpg",
-        "https://images.gog-statics.com/549af6c657334b02e88351181c5fd9dad03fd57506e064807398d4b25874429c_{formatter}.jpg",
-        "https://images.gog-statics.com/d5a4b26e5e9b95907e1e93dd48a111ac7acf15c0ed0bfe71b2dcbaf3e941fe46_{formatter}.jpg",
-        "https://images.gog-statics.com/80302a7e9684b8d81390aa4f19a934e05957453aabe6d1c95f8268dcbad732a0_{formatter}.jpg",
-        "https://images.gog-statics.com/d59f3ad1744490db32a45da9f060a3ff777498ddf6c38c7e37d68158fd9546c1_{formatter}.jpg",
-        "https://images.gog-statics.com/2a0ea601ff5806cd66bc246dceebadb5c4450591dba363383d954ff0e232f0db_{formatter}.jpg",
-        "https://images.gog-statics.com/d92b1d35e8d25c4db36bc6807b530e728b41ddf6476669483589c8eb993a2811_{formatter}.jpg",
-        "https://images.gog-statics.com/124d8781d7504eca2e72cf5442893357dc3bad42fbff00cb93521bbbfd084679_{formatter}.jpg",
-        "https://images.gog-statics.com/4f5b9e6ddaa82a3af049ddc8d6a37fa22f69c93c11fb353fd54f3bfc2df64b85_{formatter}.jpg",
-        "https://images.gog-statics.com/6723c22ca291c83128f07c31a25ef3c8c4685159769d41c729978e9ad2698d99_{formatter}.jpg",
-        "https://images.gog-statics.com/01a2d0b2c216143baeee35ae2e47c240cf4887cbe188506dfa5f8aca380600d7_{formatter}.jpg",
-        "https://images.gog-statics.com/47f800c41e2566c51eef92a5b1a76ec6d4e735bc7b388ad870100781a2d501dc_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": "1990.01.01",
-      "storeReleaseDate": "2018.04.26",
-      "productType": "game",
-      "title": "Spellcasting 1+2+3",
-      "coverHorizontal": "https://images.gog-statics.com/86168d445152a725bd6995560a3c27a75ab2dc04deb80d33948358da3c6b39e5.png",
-      "coverVertical": "https://images.gog-statics.com/477375075426051c04fe81ecca01a7e1b12af6386ad8a8f85274cab7312ee8fa.jpg",
-      "logo": null,
-      "galaxyBackgroundImage": "https://images.gog-statics.com/6d6f060a777cf709284bf830d181ad4d6bf29998f605b0aacb49d80616a2a768.jpg",
-      "developers": [
-        "Legend Entertainment"
-      ],
-      "publishers": [
-        "Ziggurat Interactive"
-      ],
-      "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
-      ],
-      "price": {
-        "final": "$2.09",
-        "base": "$6.99",
-        "discount": "-70%",
-        "finalMoney": {
-          "amount": "2.09",
-          "currency": "USD",
-          "discount": "4.90"
-        },
-        "baseMoney": {
-          "amount": "6.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
         {
           "name": "Приключение",
           "slug": "adventure"
         },
         {
-          "name": "Головоломка",
-          "slug": "puzzle"
-        },
-        {
-          "name": "Комедия",
-          "slug": "comedy"
+          "name": "Платформер",
+          "slug": "platformer"
         }
       ],
       "tags": [
@@ -1593,48 +1447,28 @@
           "slug": "adventure"
         },
         {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
           "name": "Классика",
           "slug": "classic"
         },
         {
-          "name": "Головоломка",
-          "slug": "puzzle"
-        },
-        {
-          "name": "Смешная",
-          "slug": "funny"
-        },
-        {
-          "name": "Сексуальный контент",
-          "slug": "sexual-content"
-        },
-        {
-          "name": "Нагота",
-          "slug": "nudity"
-        },
-        {
-          "name": "Логическая",
-          "slug": "logic"
-        },
-        {
-          "name": "Комедия",
-          "slug": "comedy"
-        },
-        {
-          "name": "Текстовая",
-          "slug": "text-based"
+          "name": "Платформер",
+          "slug": "platformer"
         }
       ],
-      "reviewsRating": 38,
-      "reviewsCount": 64,
+      "reviewsRating": 44,
+      "reviewsCount": 788,
       "editions": [],
       "ratings": [
         {
-          "name": "brRating",
+          "name": "uskRating",
           "ageRating": "16"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/spellcasting_123"
+      "storeLink": "https://www.gog.com/ru/game/tomb_raider_123"
     },
     {
       "id": "1207658961",
@@ -1683,13 +1517,13 @@
         "osx"
       ],
       "price": {
-        "final": "$2.99",
+        "final": "$5.99",
         "base": "$5.99",
-        "discount": "-50%",
+        "discount": null,
         "finalMoney": {
-          "amount": "2.99",
+          "amount": "5.99",
           "currency": "USD",
-          "discount": "3.00"
+          "discount": "0.00"
         },
         "baseMoney": {
           "amount": "5.99",
@@ -1740,56 +1574,58 @@
       "storeLink": "https://www.gog.com/ru/game/ultima_1_2_3"
     },
     {
-      "id": "1207660513",
-      "slug": "silent_service_12",
+      "id": "1207658983",
+      "slug": "starflight_1_2",
       "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
         {
           "name": "Одиночная игра",
           "slug": "single"
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/09e8dc8fad8377de43e083d9df3eaaad7f3bbd894234ddb09ecabfb312822d42_{formatter}.jpg",
-        "https://images.gog-statics.com/d20222a19e125ab1488bf4316649b7667006b763be99b8b30762730f8b1acbe7_{formatter}.jpg",
-        "https://images.gog-statics.com/fac3c8ba9d4aeb3aff64751c3fd5c69e561d975a320dc3b3af316dc903df181a_{formatter}.jpg",
-        "https://images.gog-statics.com/be7de46ef8c541b501001fdee7257748da0e3daf763ea7cdd90541468f6ab0a1_{formatter}.jpg",
-        "https://images.gog-statics.com/1327d21d277339baade91d47118c693b3af5b5eb488cf57f55f0672d340d4e82_{formatter}.jpg",
-        "https://images.gog-statics.com/3830634bef329b542f2318b8b4d7ce1bf26d8b75ee36472ad403d924fb0fac90_{formatter}.jpg",
-        "https://images.gog-statics.com/f4ff0d5a97bf85542bb606f66ac8f445627bd2e7d511e394ce73252dafcbac55_{formatter}.jpg",
-        "https://images.gog-statics.com/ea1899113e6791c84419bc5530530fb1f4f75db84aa898bff1a63a4f0d0d2df5_{formatter}.jpg",
-        "https://images.gog-statics.com/11e9c6ab66c84c4a4e41f020b7e76c6cc87edc9105ae8f82d94892dbf7fa7dd3_{formatter}.jpg",
-        "https://images.gog-statics.com/24451913baca02823f8dead6a2798b6bbcd6e918cc977ce3ffddae9f3b19c79b_{formatter}.jpg",
-        "https://images.gog-statics.com/07302678b3473c4e2494ca08bd5a4b7a1efa6608de319b2f2934424fbbc428bd_{formatter}.jpg",
-        "https://images.gog-statics.com/180e8265ef5e26de65dd32ce9c9b746d2a648c2c68f5ac18a055b12a79d63303_{formatter}.jpg"
+        "https://images.gog-statics.com/03fa397c442f62438a07855be3300c8d91654f774957125e7532ca3961fb89e5_{formatter}.jpg",
+        "https://images.gog-statics.com/ed4fd3fd55cbd16d25190efd3a5a11b0c74afa0e1afa4cf73e859755ff79c7bd_{formatter}.jpg",
+        "https://images.gog-statics.com/723ca0067b1311b47b9ec53414998277abff0e734b26449636b582e364e0cf55_{formatter}.jpg",
+        "https://images.gog-statics.com/cd0e7f24f82f259c2795e6dd97f1f4dad02a64dbe6792bb9f9430eb878301cae_{formatter}.jpg",
+        "https://images.gog-statics.com/c1440bb667d29664559e43c8331d18d67b3d653af8e6627bb3c9b30f682d8c17_{formatter}.jpg",
+        "https://images.gog-statics.com/cfbf53c11c0530b65e0a55064161dcb711cb2e663a892e875f07411ba3a230cc_{formatter}.jpg",
+        "https://images.gog-statics.com/6ddbf50b9d3f3f318543de49fcb99bd889b5451214d36d04251f67671fb4306b_{formatter}.jpg",
+        "https://images.gog-statics.com/c9ab27d066935710239e3c1459c03c46e4f405bc62abd7ab1b643e42a75b62c0_{formatter}.jpg",
+        "https://images.gog-statics.com/6cfc7bc08c8fb7d3b9952c6c409fbf70308b7cbdcf6bed762ad37475e87416a7_{formatter}.jpg",
+        "https://images.gog-statics.com/2cdd15ede56245d6719e57968625f8f148c5eec5d77008d0f04a056bb1ca6788_{formatter}.jpg",
+        "https://images.gog-statics.com/f28c7706f3799d41bab47c9102c795ba23429ecea7503d0484c0c34194da41b4_{formatter}.jpg",
+        "https://images.gog-statics.com/162f9b468b9cbbc6b83ebac14dddbc5925330292bc50f358094a66cedf3cf1e2_{formatter}.jpg"
       ],
       "userPreferredLanguage": null,
-      "releaseDate": "1985.12.31",
-      "storeReleaseDate": "2014.01.23",
+      "releaseDate": "1986.01.02",
+      "storeReleaseDate": "2011.11.24",
       "productType": "pack",
-      "title": "Silent Service 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/3222d3aa84768ee37b2b940c485f72d4cbd3501b01f3c85441fea2de8a9045a9.png",
-      "coverVertical": "https://images.gog-statics.com/5163059cb44bde71779e8d97e4b19b81d38121ac809c98d731acb7cd2a248d4f.jpg",
-      "logo": null,
-      "galaxyBackgroundImage": null,
+      "title": "Starflight™ 1+2",
+      "coverHorizontal": "https://images.gog-statics.com/0646e91e0c6dfce72beefc67c83d5993a05737846fee40edeeae45b6d983a535.png",
+      "coverVertical": "https://images.gog-statics.com/bcee856602a2d8667d928c37ca1d50ac44108d94f976154b662b3bf9617fdacc.jpg",
+      "logo": "https://images.gog-statics.com/81670fb32fb0adba2fe631e845f07a4e09118f058c2ccab565d539241757b742.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/e7ef10139025d86811b3e2a662721d0c2f5de26ba53e5509eaee562c8646c6bd.jpg",
       "developers": [
-        "MicroProse"
+        "Binary Systems"
       ],
       "publishers": [
-        "Atari"
+        "Electronic Arts"
       ],
       "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
+        "windows"
       ],
       "price": {
-        "final": "$1.19",
+        "final": "$5.99",
         "base": "$5.99",
-        "discount": "-80%",
+        "discount": null,
         "finalMoney": {
-          "amount": "1.19",
+          "amount": "5.99",
           "currency": "USD",
-          "discount": "4.80"
+          "discount": "0.00"
         },
         "baseMoney": {
           "amount": "5.99",
@@ -1799,145 +1635,601 @@
       "productState": "default",
       "genres": [
         {
-          "name": "Симулятор",
-          "slug": "simulation"
+          "name": "Ролевая игра",
+          "slug": "rpg"
         },
         {
-          "name": "В реальном времени",
-          "slug": "realtime"
+          "name": "Приключение",
+          "slug": "adventure"
         },
         {
-          "name": "Историческая",
-          "slug": "historical"
+          "name": "Фантастика",
+          "slug": "scifi"
         }
       ],
       "tags": [
+        {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
         {
           "name": "Классика",
           "slug": "classic"
         },
         {
-          "name": "Симулятор",
-          "slug": "simulation"
+          "name": "Наука",
+          "slug": "science"
         },
         {
-          "name": "История",
-          "slug": "historical"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "real-time"
+          "name": "Good Old Game",
+          "slug": "good-old-game"
         }
       ],
-      "reviewsRating": 44,
-      "reviewsCount": 152,
+      "reviewsRating": 46,
+      "reviewsCount": 388,
       "editions": [],
-      "ratings": [
-        {
-          "name": "uskRating",
-          "ageRating": "12"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/silent_service_12"
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/starflight_1_2"
     },
     {
-      "id": "1325286120",
-      "slug": "anstoss_13_bundle",
-      "features": [],
-      "screenshots": [
-        "https://images.gog-statics.com/b90dd896710d47da634a36b0b623c6458f5ce857eb061d7ba4f0b20e871602bc_{formatter}.jpg",
-        "https://images.gog-statics.com/a7f88d97c43ac67fa7b40a20d4f8485ba8fc1f6e4c9a182aad2f7aef9e164cdf_{formatter}.jpg",
-        "https://images.gog-statics.com/d76cd0ed13cb3212b701a72c2dfa43bd5cdf380270c115ceee76c0b1ce4fbc1e_{formatter}.jpg",
-        "https://images.gog-statics.com/5cc7c401e7ebc20ff27b65d8de07557fd6fa21ff3acba517d4f1e6db12e5329d_{formatter}.jpg",
-        "https://images.gog-statics.com/a184c53b780e1bdd3fcde1a1cb697dfe78af6666857a355332c8524571c504bc_{formatter}.jpg",
-        "https://images.gog-statics.com/8d3b06c82fed44d357393330983382a424eca553c76f939d658015d49a154573_{formatter}.jpg",
-        "https://images.gog-statics.com/ba6357e8a4485729325bc48d418c86fef04d11ae12b33b6e4cea98756af949ee_{formatter}.jpg",
-        "https://images.gog-statics.com/a1227e4ba71324171291cbc9fef2e5f1ccdb53e6edca5dc0779f20e42fbcffc5_{formatter}.jpg",
-        "https://images.gog-statics.com/06938bbbfc2924be0cf476c494ff5105c52ead1a750c9bdf4ef675ee697368be_{formatter}.jpg"
+      "id": "1731535264",
+      "slug": "atlas_fallen_reign_of_sand",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "galaxy_multiplayer"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
       ],
-      "userPreferredLanguage": null,
-      "releaseDate": "2021.07.09",
-      "storeReleaseDate": "2021.07.09",
-      "productType": "pack",
-      "title": "Anstoss 1-3 Bundle",
-      "coverHorizontal": "https://images.gog-statics.com/aa84a6c57fa75c27f6b74afb63af3b01c7d8ad62743bb6488a61b0bdc56cfc89.png",
-      "coverVertical": "https://images.gog-statics.com/6365cc732ebf3bbf2df81928b3862bf0dd3cad1c2f922defd88e8c9cc87fc10c.jpg",
-      "logo": "https://images.gog-statics.com/8465a66932b55416933a02a44b2b58c2f00b13e183076b7d1326aa8da1ece303.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/fb7c7336c6d1aa3263a7555643610986e092fc35b372866228f84b90f888b41c.jpg",
+      "screenshots": [
+        "https://images.gog-statics.com/fa3a6dbfd6e87211220396a8c84c947a369c929a7831c010d927cd42fbb4e4ca_{formatter}.jpg",
+        "https://images.gog-statics.com/d9a00eb664429af8782395fe3355761c8c34d0a4dd6def259b7cd3f697c9625e_{formatter}.jpg",
+        "https://images.gog-statics.com/5596f4461eea93074787db75fb1ca7b24265c9af38c8e88f0a068830fe4df19e_{formatter}.jpg",
+        "https://images.gog-statics.com/7d34a21e3f54709b6460b4f43017a86ce32e90651420b226d7c89becf6bd595e_{formatter}.jpg",
+        "https://images.gog-statics.com/ad6d69e4c6da3c0f5abd06101f52d8e0b896cdbdb4c658307f8c990f3be1646f_{formatter}.jpg",
+        "https://images.gog-statics.com/1ca67fa577835792e108e978fede8f490c5f2180de660454218f05c6d6d788b6_{formatter}.jpg",
+        "https://images.gog-statics.com/93308390c4f67e70f3225330e554d8bb4587639958fc650d3c406190bb2f94c3_{formatter}.jpg",
+        "https://images.gog-statics.com/213d8c5ebfe982b4dfed8a99260101173036e77f6f7d11c2a950fa11ab50c90e_{formatter}.jpg",
+        "https://images.gog-statics.com/c299e1ee19256ff78409a7eb2027c20df7b03b2b3959ac93a577e76c2b671e83_{formatter}.jpg",
+        "https://images.gog-statics.com/5f52f468631c12ddee75a68db8866b97a2b289ca03f5bf90e343b2e3e404e7a6_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2023.08.09",
+      "storeReleaseDate": "2024.10.15",
+      "productType": "game",
+      "title": "Atlas Fallen: Reign Of Sand",
+      "coverHorizontal": "https://images.gog-statics.com/67569562053233a5bf63819eb184d9ed08ea87603d4dccf5c8eefc9268465b07.png",
+      "coverVertical": "https://images.gog-statics.com/45236c174ddfdaef520cf44d0f761f6c60f00aff0773f0cf68886a4b91d30ddd.jpg",
+      "logo": "https://images.gog-statics.com/5beeea6267ee48e712ea6f92606a81a4059b85f87797bef1630c002c20c6175d.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/1bde0c957621b4aa6473bc49d4b2d5f0024be8a35e3a25f5a16a370d9ca442b4.jpg",
       "developers": [
-        "Ascaron"
+        "Deck13"
       ],
       "publishers": [
-        "Kalypso Media Digital"
+        "Focus Entertainment"
       ],
       "operatingSystems": [
         "windows"
       ],
       "price": {
-        "final": "$7.99",
-        "base": "$9.99",
-        "discount": "-20%",
+        "final": "$39.99",
+        "base": "$39.99",
+        "discount": null,
         "finalMoney": {
-          "amount": "7.99",
+          "amount": "39.99",
           "currency": "USD",
-          "discount": "2.00"
+          "discount": "0.00"
         },
         "baseMoney": {
-          "amount": "9.99",
+          "amount": "39.99",
           "currency": "USD"
         }
       },
       "productState": "default",
       "genres": [
         {
-          "name": "Симулятор",
-          "slug": "simulation"
+          "name": "Экшн",
+          "slug": "action"
         },
         {
-          "name": "Спорт",
-          "slug": "sports"
+          "name": "Приключение",
+          "slug": "adventure"
         },
         {
-          "name": "Менеджмент",
-          "slug": "managerial"
+          "name": "Фэнтези",
+          "slug": "fantasy"
         }
       ],
       "tags": [
         {
-          "name": "Классика",
-          "slug": "classic"
+          "name": "Приключение",
+          "slug": "adventure"
         },
         {
-          "name": "Симулятор",
-          "slug": "simulation"
+          "name": "Экшн",
+          "slug": "action"
         },
         {
-          "name": "Управление",
-          "slug": "management"
+          "name": "Фэнтези",
+          "slug": "fantasy"
         },
         {
-          "name": "Менеджмент",
-          "slug": "managerial"
+          "name": "Исследовательские",
+          "slug": "exploration"
         },
         {
-          "name": "Спорт",
-          "slug": "sports"
+          "name": "Протагонистка",
+          "slug": "female-protagonist"
         },
         {
-          "name": "Футбол",
-          "slug": "football"
+          "name": "Тайна",
+          "slug": "mystery"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Сверхъестественное",
+          "slug": "supernatural"
         }
       ],
-      "reviewsRating": 42,
-      "reviewsCount": 44,
+      "reviewsRating": 38,
+      "reviewsCount": 90,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/atlas_fallen_reign_of_sand"
+    },
+    {
+      "id": "1943447848",
+      "slug": "mafia_ii_definitive_edition",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/16fb9f601d4fa92118943d89de92964cc112f1aed1a8f950dfb51967f0e66df0_{formatter}.jpg",
+        "https://images.gog-statics.com/4aab3413da00dc73a34b081743aa1eee14ad97ae193855cc2874e4ab6efdaeac_{formatter}.jpg",
+        "https://images.gog-statics.com/198bcf000076fbd323cc8166132cb632c0c0bd8e0a9cb02f47dd4ed43f6fdd4a_{formatter}.jpg",
+        "https://images.gog-statics.com/cabd7b44f441b6fefa3ff6537752806c4537cf6e5f88cf875f21f32b11196f91_{formatter}.jpg",
+        "https://images.gog-statics.com/74ef4e90e1b3e9e5e9ff030e0607cfd6ff9540e366ce89b47f84930058bc8bfa_{formatter}.jpg",
+        "https://images.gog-statics.com/0de9ac005aa7dd6a5674fa9864ee2714cf35f45e5580240717e3d834716e5df6_{formatter}.jpg",
+        "https://images.gog-statics.com/ebcdd7de7ddadc3056530e7ecfef55c4179951c35212b7101ae978721b1ade06_{formatter}.jpg",
+        "https://images.gog-statics.com/0e2d49fc3d5ae26e0c8511101366a4f1ed63d297071acfce97c5050e9a7a6a88_{formatter}.jpg",
+        "https://images.gog-statics.com/2dd553c6f8b532386981b5fa1bf3e5e75650e5030edce7c02c6ed5930ce99879_{formatter}.jpg",
+        "https://images.gog-statics.com/7d4a4062d099c19460f3d125ed9d75c568694e61522c6fe9cfda6b3f2d68f8a4_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2020.05.19",
+      "storeReleaseDate": "2022.08.22",
+      "productType": "pack",
+      "title": "Mafia II: Definitive Edition",
+      "coverHorizontal": "https://images.gog-statics.com/ec9894ec739bdfd6a68b6cf2d8a51138272f75a382fd703ece336bb89e7c49a9.png",
+      "coverVertical": "https://images.gog-statics.com/578fa6a9f14f7a01f18576bc33b9965f972361320446f5eddda6241aa8aa9e0b.jpg",
+      "logo": "https://images.gog-statics.com/aa462a751ea5be9b79643c84325476638a16016346f558aa9709533857f1463f.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/add24f273ee4ca05c00e1316544040a6f764ade586d1f00938531dbd2286524c.jpg",
+      "developers": [
+        "Hangar 13"
+      ],
+      "publishers": [
+        "2K Games"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$29.99",
+        "base": "$29.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "29.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "29.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Open World",
+          "slug": "open-world"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Отличный саундтрек",
+          "slug": "great-soundtrack"
+        },
+        {
+          "name": "Открытый мир",
+          "slug": "open-world"
+        },
+        {
+          "name": "От третьего лица",
+          "slug": "third-person"
+        },
+        {
+          "name": "Для взрослых",
+          "slug": "mature"
+        },
+        {
+          "name": "Сексуальный контент",
+          "slug": "sexual-content"
+        },
+        {
+          "name": "Нагота",
+          "slug": "nudity"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        },
+        {
+          "name": "Мясо",
+          "slug": "gore"
+        },
+        {
+          "name": "Криминал",
+          "slug": "crime"
+        },
+        {
+          "name": "Нуар",
+          "slug": "noir"
+        }
+      ],
+      "reviewsRating": 35,
+      "reviewsCount": 116,
       "editions": [],
       "ratings": [
         {
-          "name": "gogRating",
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "brRating",
           "ageRating": "18"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/anstoss_13_bundle"
+      "storeLink": "https://www.gog.com/ru/game/mafia_ii_definitive_edition"
+    },
+    {
+      "id": "1522454794",
+      "slug": "the_surge_2_the_kraken_expansion",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/dbedefbb5c3afc72954b92f3264a254bc9766c3b8ae36cad874a3d4cbcac4263_{formatter}.jpg",
+        "https://images.gog-statics.com/4581cca731a63de87a73b03ccdab676a9b6649a98276f32941a64983fa70a075_{formatter}.jpg",
+        "https://images.gog-statics.com/a9797982a2752cbbdbb84c9341358bee9b8b48d96315fdb0b2b44207cbcd6c2f_{formatter}.jpg",
+        "https://images.gog-statics.com/20504429296d799c95f5d9d262c4db5ad32e813ea6bd03abab0297de3c680b36_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2020.01.16",
+      "storeReleaseDate": "2020.01.16",
+      "productType": "dlc",
+      "title": "The Surge 2 - The Kraken Expansion",
+      "coverHorizontal": "https://images.gog-statics.com/ef57bab617c85c85baa4c534dc8dd2561906e68d3c68d33c229af47d8ec58c86.png",
+      "coverVertical": "https://images.gog-statics.com/e7b8db5829dde832236eef43567daff795c4034b0338b9d526b49268c5c299f5.jpg",
+      "logo": "https://images.gog-statics.com/60d51c1310fe02daa22f09ea6111a27f2eef1f672d29225548a98e902772e72c.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/14308a89f4f123d36f7a36cce487417a819d677e75f7f6b52a15bf11349a40ff.jpg",
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "Focus Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$3.35",
+        "base": "$4.99",
+        "discount": "-33%",
+        "finalMoney": {
+          "amount": "3.35",
+          "currency": "USD",
+          "discount": "1.64"
+        },
+        "baseMoney": {
+          "amount": "4.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        },
+        {
+          "name": "Мясо",
+          "slug": "gore"
+        }
+      ],
+      "reviewsRating": 37,
+      "reviewsCount": 9,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/the_surge_2_the_kraken_expansion"
+    },
+    {
+      "id": "1632664975",
+      "slug": "the_surge_2_jerichos_legacy_gears_pack",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/c245b37cd807ceab363e18e4c1ea864c09183a751cb4182be41f47fd3ba4610b_{formatter}.jpg",
+        "https://images.gog-statics.com/97f5ddd174fd827f09a59dd65500a870b3a9caafc39663ed3219fd641aebb45a_{formatter}.jpg",
+        "https://images.gog-statics.com/61020b0b4b0171665583c7038a3a10a324afbd55e05261bd9c4f0938e23fd07c_{formatter}.jpg",
+        "https://images.gog-statics.com/220737ffa37c42995b78b6f9f8cadd6e7b9e3cffdf7427ea5b5c19907b4be4b7_{formatter}.jpg",
+        "https://images.gog-statics.com/7f41effdd2377bec4b6b19f5eb21937c3fd6cb13e4632e0c4af6f8321d6b3a0d_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2019.12.10",
+      "storeReleaseDate": "2020.01.16",
+      "productType": "dlc",
+      "title": "The Surge 2 - Jericho's Legacy Gears Pack",
+      "coverHorizontal": "https://images.gog-statics.com/9a4308f8f2a5259477bcdc48a5670d48670a54cadc93810f25c4fb6fd8df5c9d.png",
+      "coverVertical": "https://images.gog-statics.com/b30d5b790134d649d5837b16124547f9a406c1d31ee6349efef8cef590fcda11.jpg",
+      "logo": "https://images.gog-statics.com/7978a5731f82a976aed6ccfce5001d31271ffa3e219b3a709a718890d22f29a1.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/5c4ea5e187f66e7a532bcc7c8fac3f754d71f4cb8c69b1e8f233390f920af046.jpg",
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "Focus Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$1.99",
+        "base": "$2.99",
+        "discount": "-33%",
+        "finalMoney": {
+          "amount": "1.99",
+          "currency": "USD",
+          "discount": "1.00"
+        },
+        "baseMoney": {
+          "amount": "2.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        },
+        {
+          "name": "Мясо",
+          "slug": "gore"
+        }
+      ],
+      "reviewsRating": 0,
+      "reviewsCount": 0,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/the_surge_2_jerichos_legacy_gears_pack"
     },
     {
       "id": "1096417304",
@@ -2188,8 +2480,8 @@
       "storeLink": "https://www.gog.com/ru/game/the_surge_2_season_pass"
     },
     {
-      "id": "1650269977",
-      "slug": "the_surge_2_urbn_gear_pack",
+      "id": "1336694501",
+      "slug": "the_surge_the_good_the_bad_and_the_augmented_expansion",
       "features": [
         {
           "name": "Достижения",
@@ -2204,32 +2496,34 @@
           "slug": "controller_support"
         },
         {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
           "name": "Одиночная игра",
           "slug": "single"
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/f9e8c1c1615fbaba3364d88e8bf370816624eb1f77d3d4cdf61c33dc4079f15b_{formatter}.jpg",
-        "https://images.gog-statics.com/d294371d21826f3275b565bfe3944e2f235891df6e69d579aee939e9b26b78aa_{formatter}.jpg",
-        "https://images.gog-statics.com/93b4f3558cf91e6d417acd2abea5dd4968c0d1776af20ee7509160364b41bb8b_{formatter}.jpg",
-        "https://images.gog-statics.com/a1641ece9c5369a07295e5688893bf1db6bc256af16be45317cf1802b2e468b4_{formatter}.jpg",
-        "https://images.gog-statics.com/165ab46e85eda4bd9516931fed0c0a96660fcf0a25ff0a30aded3faa17ab9f3a_{formatter}.jpg",
-        "https://images.gog-statics.com/0502cf5607c75522fa50ec41586b4f8f8f8da513c52ef6613041c1a9683a54f8_{formatter}.jpg",
-        "https://images.gog-statics.com/184f977e76ce8389c68d4ec3543860b0691518910690a0d5ded6ead5c67ca58d_{formatter}.jpg"
+        "https://images.gog-statics.com/1a6e7e18543fb028daa42aea288715a8f3bcfdd2935702cba5707e77bde3f7f4_{formatter}.jpg",
+        "https://images.gog-statics.com/1eba7095b5ee480839fe0de3823adc95772fbe38a822f869ee7e5a2d15872c4d_{formatter}.jpg",
+        "https://images.gog-statics.com/4d4748cf92068ca3db924249dcbf2d38d56b3435069f4af6a3b60965b493a9af_{formatter}.jpg",
+        "https://images.gog-statics.com/38a56d5c74c7486ce126fb97f87a2d15af5dc73d9e12e43562c5df6d8382825b_{formatter}.jpg",
+        "https://images.gog-statics.com/efb4bd3ed48c29e581d33724ef744d950101e109d22edc6023061ba8d6809e73_{formatter}.jpg"
       ],
       "userPreferredLanguage": {
         "code": "ru",
         "inAudio": false,
         "inText": true
       },
-      "releaseDate": "2019.09.24",
-      "storeReleaseDate": "2020.01.16",
+      "releaseDate": "2018.10.02",
+      "storeReleaseDate": "2019.08.09",
       "productType": "dlc",
-      "title": "The Surge 2 - URBN Gear Pack",
-      "coverHorizontal": "https://images.gog-statics.com/40603bbd05f30259c9675ff3a603e465ec0a25e18c7a89af67f57f1bd6c5cb7c.png",
-      "coverVertical": "https://images.gog-statics.com/e1fff3a35f3a2fdff2d1f76fc95998dc1d3b7d73d420d18825ab77fb2c0d5b70.jpg",
-      "logo": "https://images.gog-statics.com/a6441770ec8c90cbbd4d1662c76cd6fd07fa23607e54ad13bfd706e21ab3231f.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/84eaf92d5f8858786705ec1e852bdf506cbfc98dcdce088c05c799de63f0bd8a.jpg",
+      "title": "The Surge - The Good, the Bad and the Augmented Expansion",
+      "coverHorizontal": "https://images.gog-statics.com/1ac50023ee4102d0e032a2fe5c3eda376f93df201cac367fc3ae2af52895cdeb.png",
+      "coverVertical": "https://images.gog-statics.com/88c9a17a1afa30a8d1848d0f50f28f744d5399ec12ade7d03ff3a2efe395ccbf.jpg",
+      "logo": "https://images.gog-statics.com/2f6e1b21517478e619aa8d8ae9c0de4a11c3b3fd03ad382866a539ff463b6441.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/bd3a61a344e235c706e582f1ed6e5ec420b9d82c0154cb510ceac9321df9843d.jpg",
       "developers": [
         "Deck13"
       ],
@@ -2240,16 +2534,16 @@
         "windows"
       ],
       "price": {
-        "final": "$1.99",
-        "base": "$2.99",
+        "final": "$3.35",
+        "base": "$4.99",
         "discount": "-33%",
         "finalMoney": {
-          "amount": "1.99",
+          "amount": "3.35",
           "currency": "USD",
-          "discount": "1.00"
+          "discount": "1.64"
         },
         "baseMoney": {
-          "amount": "2.99",
+          "amount": "4.99",
           "currency": "USD"
         }
       },
@@ -2284,6 +2578,14 @@
         {
           "name": "Наука",
           "slug": "science"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        },
+        {
+          "name": "Мясо",
+          "slug": "gore"
         }
       ],
       "reviewsRating": 0,
@@ -2291,11 +2593,144 @@
       "editions": [],
       "ratings": [
         {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
           "name": "esrbRating",
           "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_2_urbn_gear_pack"
+      "storeLink": "https://www.gog.com/ru/game/the_surge_the_good_the_bad_and_the_augmented_expansion"
+    },
+    {
+      "id": "1576720836",
+      "slug": "the_surge_a_walk_in_the_park",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/793664246ca7357a8e75541c39c49cd94f0ee39262e49a49872d266db61fa633_{formatter}.jpg",
+        "https://images.gog-statics.com/936ff44cfc60c62585c4c85a0bccbc4dfcb782afc6ad71b9aa23a0dbd8e73c07_{formatter}.jpg",
+        "https://images.gog-statics.com/9981c9d2ebb58576a96671a4358fee685bbc8bbd3929bde3c21494989fc04749_{formatter}.jpg",
+        "https://images.gog-statics.com/931acbba3c6a5a2d22ad261b0bb1221740e7a759ba7ce49ae81a03cb62ec6d41_{formatter}.jpg",
+        "https://images.gog-statics.com/4b0edaacc86973a7b45b7f91965528564438e17af02370df6b390896f5c7074d_{formatter}.jpg",
+        "https://images.gog-statics.com/19aded6244509d061982b5b2bc28933670597b4babc911b502c78c60e675d43c_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2017.12.05",
+      "storeReleaseDate": "2019.08.09",
+      "productType": "dlc",
+      "title": "The Surge - A Walk in the Park",
+      "coverHorizontal": "https://images.gog-statics.com/41abb2893df31e8ec07e42c7d4f54c586cb86edb5c1ebb31d015a263070a61f3.png",
+      "coverVertical": "https://images.gog-statics.com/badf8f55d8767cd913787f4197a6ecf19dcc943089fd875a9c34230a1a712c11.jpg",
+      "logo": "https://images.gog-statics.com/6cb0205598beccbd118516c6d721e2442e281db4a02940bcdf174b14d4ec30b5.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/00ad0ae9e71bc5ae1549211035e56522f8e086f0f4994b53d2dbca11107fd90c.jpg",
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "Focus Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$3.35",
+        "base": "$4.99",
+        "discount": "-33%",
+        "finalMoney": {
+          "amount": "3.35",
+          "currency": "USD",
+          "discount": "1.64"
+        },
+        "baseMoney": {
+          "amount": "4.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        }
+      ],
+      "reviewsRating": 41,
+      "reviewsCount": 10,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "18"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "18"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/the_surge_a_walk_in_the_park"
     },
     {
       "id": "1616584067",
@@ -2422,112 +2857,9 @@
       "storeLink": "https://www.gog.com/ru/game/the_surge_creo_special_employee_kit"
     },
     {
-      "id": "1207659241",
-      "slug": "jack_keane_2_the_fire_within",
+      "id": "1432565635",
+      "slug": "subject_13",
       "features": [
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/612f31e77bdaab70256e3fffff2f457ab9251712407eff3b115c4e40427934f6_{formatter}.jpg",
-        "https://images.gog-statics.com/044d359b8f1c3bf31441c0c7e053f417b98d86a0f792dd68b348af91fa7c7eea_{formatter}.jpg",
-        "https://images.gog-statics.com/bed78dab330eab5726489f700e1247eb33e803637d04198a908a21c5132ba197_{formatter}.jpg",
-        "https://images.gog-statics.com/82b30dd7d35cb5e89fa1501c24dab525e9517d26ef1ac0435dffeff875ae9506_{formatter}.jpg",
-        "https://images.gog-statics.com/291050537fcc595765c4ccc4524a303ea168ae947d0b1b77186ebea3290ff245_{formatter}.jpg",
-        "https://images.gog-statics.com/7c1f4240518c06f5e2885fe79d1bfc785ad8a1e570b3c2abf3aa9c1ded4dff51_{formatter}.jpg",
-        "https://images.gog-statics.com/c16cceaa906ed4ddb37d35aa22f085c54aa2fce830176dac4f787ae13dd7f25c_{formatter}.jpg",
-        "https://images.gog-statics.com/b444df0ccc141741f335d97c3c5478eb668dd359ec20cc2bdd3d78cd5cd173d6_{formatter}.jpg",
-        "https://images.gog-statics.com/4be8c9737221c8150897080dd7b295b743138d61500f7d70e83a3ceee2fa4237_{formatter}.jpg",
-        "https://images.gog-statics.com/39f621e1e9eb50aaf64db92b2179c2c41b18ed8c76892ba6a46138945365322e_{formatter}.jpg",
-        "https://images.gog-statics.com/2bae8f36810317e65fd7b7954fe9bb17a3beae71d7733a59b742c305a1133e36_{formatter}.jpg",
-        "https://images.gog-statics.com/24345a8b7fe19a221e8bd4b0c6442450f4e4baeb896dc4dc10f15720892e32e5_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": "2012.11.07",
-      "storeReleaseDate": "2014.12.19",
-      "productType": "game",
-      "title": "Jack Keane 2: The Fire Within",
-      "coverHorizontal": "https://images.gog-statics.com/d82c7e942bf940f765ffd8a253bf2bebf713220c31bb9df6b34d252758b714d2.png",
-      "coverVertical": "https://images.gog-statics.com/a91ef6e3a12a54f0895de86618cac58789d9f93912efc4202806eef57613a40b.jpg",
-      "logo": null,
-      "galaxyBackgroundImage": null,
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "astragon Entertainment"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$0.99",
-        "base": "$9.99",
-        "discount": "-90%",
-        "finalMoney": {
-          "amount": "0.99",
-          "currency": "USD",
-          "discount": "9.00"
-        },
-        "baseMoney": {
-          "amount": "9.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Современность",
-          "slug": "modern"
-        },
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Квест",
-          "slug": "pointandclick"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Point&Click",
-          "slug": "point-and-click"
-        },
-        {
-          "name": "Современность",
-          "slug": "modern"
-        }
-      ],
-      "reviewsRating": 39,
-      "reviewsCount": 281,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "16"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/jack_keane_2_the_fire_within"
-    },
-    {
-      "id": "1721250578",
-      "slug": "ankh_3_battle_of_the_gods",
-      "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
         {
           "name": "Оверлей",
           "slug": "overlay"
@@ -2538,34 +2870,38 @@
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/af1751b42ac6eb1f12a773a9536eed37cc37cc8e2b28528abfd5098bfc8e37dc_{formatter}.jpg",
-        "https://images.gog-statics.com/948a089fb31f0e28648ac42c51414d2eb48f592c3fe54c0c5ac843f052b5c2b2_{formatter}.jpg",
-        "https://images.gog-statics.com/22053b0a1eb45a8e425eeb3f2010e18211127e8b2f695d5210add4d3dcfa418d_{formatter}.jpg",
-        "https://images.gog-statics.com/8b80217756b24c5a845ce057d8fd7a364a80f584cb273c1b9fa7be0e867b79da_{formatter}.jpg",
-        "https://images.gog-statics.com/34c8c7ac89216a988ef5b785c9c3780cede28f2c16d05a37fc11d2c212949e56_{formatter}.jpg",
-        "https://images.gog-statics.com/8a7272cdc87c74b5d4ae9229914ec173d04291fccdf3a7693b2d1bac43b64eba_{formatter}.jpg",
-        "https://images.gog-statics.com/549dbbdd6ce409ce74e923af001b837b6795798f7db2799ff06b2757a4e140e2_{formatter}.jpg",
-        "https://images.gog-statics.com/b29e2e22a08f9428712172755d7687e7b66edc1b52ab8401f98eb8d4f8564a8b_{formatter}.jpg",
-        "https://images.gog-statics.com/e3d69c39a8827e61b29e61d52aa0f20b2abe38d6eb2af4734d1a536554c7bd95_{formatter}.jpg",
-        "https://images.gog-statics.com/cfeb87a2942ba9a33da53dbc274afee43014b67953ca4be359a8f745d3842e9a_{formatter}.jpg"
+        "https://images.gog-statics.com/b89a1bd296cebd7f3bf1950d3d9c80ea122f547968718685548bd49da1df7d74_{formatter}.jpg",
+        "https://images.gog-statics.com/6a347dc9c2631bd9474340c4ba386ac0bd1f8f6a3d27513a3c3bbfbbc72d90f8_{formatter}.jpg",
+        "https://images.gog-statics.com/edc76e496588aa10faa4b495a3a8f3509f7561bb31081b4db8b1c300c071abdc_{formatter}.jpg",
+        "https://images.gog-statics.com/62594a10127353481353dda88e1d61ba5ca1b036bdc0824611a02eee6298376a_{formatter}.jpg",
+        "https://images.gog-statics.com/63cddc9553ddfc7bc0cf94c9d3c9975833c103ad8945acf8bb7251a41a05bc2a_{formatter}.jpg",
+        "https://images.gog-statics.com/2be25dbc86940e30afe5b8aa60b9c57022381f8733103c5ccabfee1f2ff9d82a_{formatter}.jpg",
+        "https://images.gog-statics.com/3eaa445672debe8e9aebf967756053881c2769840d12205f7c474c83ed91bb0e_{formatter}.jpg",
+        "https://images.gog-statics.com/d99d5def49ef76c3778d5c4d67c123e676b43fef8f940f576a51aa4878264df7_{formatter}.jpg",
+        "https://images.gog-statics.com/8bdc43f081cf1ba4f0c5ae5d09c754cb3e606d1cc3d02a0367ccb0c3026e3e68_{formatter}.jpg",
+        "https://images.gog-statics.com/715db0416eedecdbbfdca35f3ebe0a13fc5a2a49ca01656b6fa97eb2c8e9e16b_{formatter}.jpg",
+        "https://images.gog-statics.com/393d9ce528a2076d81e38c7650d90648a526eaec9b24f972ecf19c8367564c1d_{formatter}.jpg",
+        "https://images.gog-statics.com/35a89ab12f05b5e9f423cd1039ae04ea136dbbee931294a6257a21f8a5fa8b21_{formatter}.jpg"
       ],
       "userPreferredLanguage": null,
-      "releaseDate": "2009.06.16",
-      "storeReleaseDate": "2020.10.16",
+      "releaseDate": "2015.05.28",
+      "storeReleaseDate": "2015.05.28",
       "productType": "game",
-      "title": "Ankh 3: Battle of the Gods",
-      "coverHorizontal": "https://images.gog-statics.com/c15371bdc65ab723ef071ab9b5b4cd28b0d8bc91b7e7111672cd8a0b102ddfe5.png",
-      "coverVertical": "https://images.gog-statics.com/62e3faac316105343a80dc975d379309287186fce2e5ff0a24adfb1279f3c279.jpg",
-      "logo": "https://images.gog-statics.com/a42aaaddbfc041b1a8ec5b29cc02bdb1c0d77d71c5b493dc5e05d88ff5aa599a.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/8171fc582da7b0c9a1af2d17aec68a586549a6465f28c2283f8f91ea600138e2.jpg",
+      "title": "Subject 13",
+      "coverHorizontal": "https://images.gog-statics.com/eb0d2d69ad11cd2162d764808986d037a8adf40c5622d9524df93e79c3b08e43.png",
+      "coverVertical": "https://images.gog-statics.com/4b195d219a98d04c7c24579fd00750d11501617ed73534c96810a217e34fd266.jpg",
+      "logo": "https://images.gog-statics.com/dc628f4b03dedeaf66314d970dda8a833568f2f37c216d263baf5da5d940c8b4.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/d4024d37a0415a51210ea4d7cf8ea4306404247862412cc49aa44b5c4d6f6d84.jpg",
       "developers": [
-        "Deck13"
+        "Paul Cuisset",
+        "Microids"
       ],
       "publishers": [
-        "Strategy First"
+        "Microids"
       ],
       "operatingSystems": [
-        "windows"
+        "windows",
+        "osx"
       ],
       "price": {
         "final": "$1.99",
@@ -2584,16 +2920,16 @@
       "productState": "default",
       "genres": [
         {
+          "name": "Фантастика",
+          "slug": "scifi"
+        },
+        {
           "name": "Приключение",
           "slug": "adventure"
         },
         {
-          "name": "Квест",
-          "slug": "pointandclick"
-        },
-        {
-          "name": "Комедия",
-          "slug": "comedy"
+          "name": "Головоломка",
+          "slug": "puzzle"
         }
       ],
       "tags": [
@@ -2602,32 +2938,180 @@
           "slug": "adventure"
         },
         {
-          "name": "Классика",
-          "slug": "classic"
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
         },
         {
-          "name": "Смешная",
-          "slug": "funny"
+          "name": "Исследовательские",
+          "slug": "exploration"
+        },
+        {
+          "name": "Головоломка",
+          "slug": "puzzle"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        },
+        {
+          "name": "Тайна",
+          "slug": "mystery"
         },
         {
           "name": "Point&Click",
           "slug": "point-and-click"
         },
         {
-          "name": "Комедия",
-          "slug": "comedy"
+          "name": "Логическая",
+          "slug": "logic"
         }
       ],
       "reviewsRating": 30,
-      "reviewsCount": 23,
+      "reviewsCount": 117,
       "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/ankh_3_battle_of_the_gods"
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "7"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/subject_13"
     },
     {
-      "id": "1207659152",
-      "slug": "cultures_12",
+      "id": "1207658758",
+      "slug": "megarace_1_2",
       "features": [
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/9c64604e89bc74bbc0b5091dc8bd93d1d32a75d7e0705562eb94f5d9d308b51c_{formatter}.jpg",
+        "https://images.gog-statics.com/fa374b7d80a589c99e5dc5905af0a297ad4ab2835f43bce0699b1422e7184811_{formatter}.jpg",
+        "https://images.gog-statics.com/e377ebddaa7d8c869a6386e858a82fb614a035627ae3cb1ec20c92ab8ade4398_{formatter}.jpg",
+        "https://images.gog-statics.com/051595e492f0bfd73282b599b221e4d39638b06299fe9e4d14fafd78350590f1_{formatter}.jpg",
+        "https://images.gog-statics.com/bcf3fb5e39572eb6f1b24f762ba289bcccb5bce8126702ed97bc1db6aa44d236_{formatter}.jpg",
+        "https://images.gog-statics.com/ebb8986b65e7935273a7321f49f7f8e3077ad447b6900256e133686926561be1_{formatter}.jpg",
+        "https://images.gog-statics.com/4f7c2497b46831864fcbd65fa2c3fae7270340c1d063e4c574f99f50f0bfd906_{formatter}.jpg",
+        "https://images.gog-statics.com/7bfdd9fea151387b13baf96d3a221b93ae679fcd2e46192e886953e2fc1764d1_{formatter}.jpg",
+        "https://images.gog-statics.com/a536a044512f1de374ff236348da1412acecba0774ef406b733891c9824ace5d_{formatter}.jpg",
+        "https://images.gog-statics.com/d12f44bffd0481c66b6c327104dbd95706d3618b83f8aefb4aaa865814eaaf18_{formatter}.jpg",
+        "https://images.gog-statics.com/0cd3dfb90432d7f0395f28219cf0af4b823c5001fc393577dbc7de7313b34efb_{formatter}.jpg",
+        "https://images.gog-statics.com/40e34ecabad7e56a5d8af9dab1657b08d587f8e50e5802c886b5715c8d78a3aa_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2009.04.30",
+      "storeReleaseDate": "2009.04.30",
+      "productType": "pack",
+      "title": "MegaRace 1+2",
+      "coverHorizontal": "https://images.gog-statics.com/4a0dddd37410e093bb134564ddd19308cea527c0ce9ca8a3cca91195c6b8fa12.png",
+      "coverVertical": "https://images.gog-statics.com/de024a7f8e9088c5228d5d14c9a3855bda23d9514941864b850970544d7bf18c.jpg",
+      "logo": "https://images.gog-statics.com/c85ee48595e3a82ccde30971d18ca1abb7a21672caadefd566541b1efdb1c50d.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/4ec48dff9f559da822850cc29242fa9491eda21a5d4ae5429aa23e7528905fc2.jpg",
+      "developers": [
+        "Cryo Interactive"
+      ],
+      "publishers": [
+        "Microids"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$2.99",
+        "base": "$5.99",
+        "discount": "-50%",
+        "finalMoney": {
+          "amount": "2.99",
+          "currency": "USD",
+          "discount": "3.00"
+        },
+        "baseMoney": {
+          "amount": "5.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Гонки",
+          "slug": "racing"
+        },
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Ралли",
+          "slug": "rally"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
+        },
+        {
+          "name": "Киберпанк",
+          "slug": "cyberpunk"
+        },
+        {
+          "name": "Файтинг",
+          "slug": "fighting"
+        },
+        {
+          "name": "Good Old Game",
+          "slug": "good-old-game"
+        },
+        {
+          "name": "Гонки",
+          "slug": "racing"
+        },
+        {
+          "name": "FMV-игра",
+          "slug": "fmv"
+        },
+        {
+          "name": "Ралли",
+          "slug": "rally"
+        }
+      ],
+      "reviewsRating": 39,
+      "reviewsCount": 448,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "esrbRating",
+          "ageRating": "6"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "6"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/megarace_1_2"
+    },
+    {
+      "id": "1207658854",
+      "slug": "master_of_orion_1_2",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
         {
           "name": "сетевая игра",
           "slug": "multi"
@@ -2638,48 +3122,50 @@
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/fa858392c84850d10c08f4487e1b7e862aa91d8e1eb52dea13bc3eb3d94b6960_{formatter}.jpg",
-        "https://images.gog-statics.com/c7243144fa685bfd2f39b33f1d61b80f0e884ed4c7eddb6ee795d31143a6e37a_{formatter}.jpg",
-        "https://images.gog-statics.com/e81cf27d70abbc8d876bc82d777a45efac3effa85c73c91f405dfd4abd3cd6e3_{formatter}.jpg",
-        "https://images.gog-statics.com/f133ad6e0283429c284e2771e9c05a95e751d38b9bb3431a7509deeb7c8143be_{formatter}.jpg",
-        "https://images.gog-statics.com/a3fc9ffeb70a7ce42974b30cf38141a4658c2b3ebebf90dec4075c78d75f69d7_{formatter}.jpg",
-        "https://images.gog-statics.com/903c91a8ded0aec7f8f7003b2275518fb1f3e9fda0810642af00534e03b00314_{formatter}.jpg",
-        "https://images.gog-statics.com/78c287744ad86e4e2ef90a9a01c0aab579e131690dfb90cabfce02b946d6d37c_{formatter}.jpg",
-        "https://images.gog-statics.com/1bf91df18c4e18859e4e5e460d7d1536129f6c52ea6ede752f8bb0ba96276e37_{formatter}.jpg",
-        "https://images.gog-statics.com/05d72e19caa6c0d148ca1359338afac0b0fd96f76e783e6b18406fdc5649e006_{formatter}.jpg",
-        "https://images.gog-statics.com/0d6a01e30e8ddfe82034ad244b78d079e80c54824212b5122fb16c9e881eab3d_{formatter}.jpg",
-        "https://images.gog-statics.com/f6dc5ecfc9f6eb36b0746495e68b947d9ca7cc726a7940810ea1e043ab7e91bd_{formatter}.jpg",
-        "https://images.gog-statics.com/50563932e829cffe512b4eeab1edb805ca456bb2b73675c85a68e2889d11fad2_{formatter}.jpg"
+        "https://images.gog-statics.com/18b8ea37b0edbeb5ae6aebba8687acf5d4677955ee1674676ad9b5a7ceefb514_{formatter}.jpg",
+        "https://images.gog-statics.com/017325968f89fe0fbfa57b815fad31be3fa808b686dc444a33bcc480a34f81c5_{formatter}.jpg",
+        "https://images.gog-statics.com/161b521cb7808744bb72d7c43efb59f8a3c4c69d71facbd6ff9efc45de02a37c_{formatter}.jpg",
+        "https://images.gog-statics.com/2b7a0342f4e842c49f41bed1ac66adf4f0460a0cc8225bea8e5d3ee41f3a80c5_{formatter}.jpg",
+        "https://images.gog-statics.com/c678b0c499f30aa589a43eca688fce0332e9f70721be0b8a3093ea7aa1429af2_{formatter}.jpg",
+        "https://images.gog-statics.com/16487d0e9af1fc7bb03e8fe9866f3e9643c6bdccadc423a2c76adf1a55f01c40_{formatter}.jpg",
+        "https://images.gog-statics.com/323d232772843041657219c742a33352c5cea84df975edd3a044a04217ab847b_{formatter}.jpg",
+        "https://images.gog-statics.com/b3cba8462a90a6f42a52f41ef1d6509e9cfd455dfd8c3a7a5a86656e6b60f631_{formatter}.jpg",
+        "https://images.gog-statics.com/24cb2ea10e8edc9da0a403c2b5cc02a9908d90d4946e975e109a273398096a17_{formatter}.jpg",
+        "https://images.gog-statics.com/5a822a63ac4ba772738fd55c83fff12a91953c09411766525f3defa271519b2b_{formatter}.jpg",
+        "https://images.gog-statics.com/6fbea2e80fdff915b43ff0c358fe063df631a5de5390ba41bc50325d566d1f70_{formatter}.jpg",
+        "https://images.gog-statics.com/230e9cb481e903d45830f1feda7ecf4a4b6004679f5ba95ebb44bb3b9d27756a_{formatter}.jpg"
       ],
       "userPreferredLanguage": null,
-      "releaseDate": "2001.07.25",
-      "storeReleaseDate": "2013.01.08",
+      "releaseDate": "1996.11.22",
+      "storeReleaseDate": null,
       "productType": "pack",
-      "title": "Cultures 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/769faf7a8f02c284ec38fd0b88d7a6a3e8a732b2473d3380e4e89720df7a2fcf.png",
-      "coverVertical": "https://images.gog-statics.com/20eb01badf21859cd9891af377b7be0e1613d91b63156e75cce104ba5af96582.jpg",
-      "logo": null,
-      "galaxyBackgroundImage": null,
+      "title": "Master of Orion 1+2",
+      "coverHorizontal": "https://images.gog-statics.com/7c6a9d4ef469fffd8cd5199170798aeac2edab329862772ad6ac2ad7eb60c8c2.png",
+      "coverVertical": "https://images.gog-statics.com/f09e581355de1cbb467a1ba0248b3c3e74f88869771175aee70c331f0c436c9f.jpg",
+      "logo": "https://images.gog-statics.com/49322c2cb931b63b4627c5a7987d9ae4425923035830b21b8945bc18b6ed83ad.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/c9709768b8185b3659af7791e680c4f1a62691621067766067f7f4a722b67bec.jpg",
       "developers": [
-        "Funatics Development"
+        "SimTex"
       ],
       "publishers": [
-        "Kalypso Media Digital"
+        "Wargaming Labs"
       ],
       "operatingSystems": [
-        "windows"
+        "windows",
+        "linux",
+        "osx"
       ],
       "price": {
-        "final": "$3.99",
-        "base": "$9.99",
-        "discount": "-60%",
+        "final": "$5.99",
+        "base": "$5.99",
+        "discount": null,
         "finalMoney": {
-          "amount": "3.99",
+          "amount": "5.99",
           "currency": "USD",
-          "discount": "6.00"
+          "discount": "0.00"
         },
         "baseMoney": {
-          "amount": "9.99",
+          "amount": "5.99",
           "currency": "USD"
         }
       },
@@ -2690,169 +3176,78 @@
           "slug": "strategy"
         },
         {
-          "name": "В реальном времени",
-          "slug": "realtime"
+          "name": "Фантастика",
+          "slug": "scifi"
         },
         {
-          "name": "Фэнтези",
-          "slug": "fantasy"
+          "name": "Экономика",
+          "slug": "economic"
         }
       ],
       "tags": [
         {
-          "name": "Фэнтези",
-          "slug": "fantasy"
+          "name": "Атмосферные",
+          "slug": "atmospheric"
         },
         {
           "name": "Стратегия",
           "slug": "strategy"
         },
         {
+          "name": "Научная фантастика",
+          "slug": "sci-fi"
+        },
+        {
           "name": "Классика",
           "slug": "classic"
+        },
+        {
+          "name": "Пошаговая стратегия",
+          "slug": "turn-based"
+        },
+        {
+          "name": "Наука",
+          "slug": "science"
         },
         {
           "name": "Управление",
           "slug": "management"
         },
         {
-          "name": "История",
-          "slug": "historical"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "real-time"
-        },
-        {
           "name": "Управление ресурсами",
           "slug": "resource-management"
         },
         {
-          "name": "Изометрия",
-          "slug": "isometric"
+          "name": "Космос",
+          "slug": "space"
         },
         {
-          "name": "Торговля",
-          "slug": "trading"
+          "name": "Глобальная стратегия",
+          "slug": "grand-strategy"
+        },
+        {
+          "name": "4X",
+          "slug": "four-x"
+        },
+        {
+          "name": "Экономика",
+          "slug": "economic"
         }
       ],
-      "reviewsRating": 44,
-      "reviewsCount": 168,
+      "reviewsRating": 48,
+      "reviewsCount": 5279,
       "editions": [],
       "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "12"
-        },
         {
           "name": "esrbRating",
-          "ageRating": "13"
+          "ageRating": "6"
         },
         {
           "name": "uskRating",
           "ageRating": "12"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/cultures_12"
-    },
-    {
-      "id": "1207659052",
-      "slug": "tomb_raider_123",
-      "features": [
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/6eec171ee8e8496561f747e9dff54308bc56beaac6f3d129e04f60c8efe24464_{formatter}.jpg",
-        "https://images.gog-statics.com/6a037d6aa351c64e64a5c59df09fb7835aba072c5eda29d56f542b860d7c125b_{formatter}.jpg",
-        "https://images.gog-statics.com/cced6c093e6ebe00d64d78816ff92cbbd8b22684b08f98867408b4895f731214_{formatter}.jpg",
-        "https://images.gog-statics.com/1361a7b34b8eb783e49bbf844f7b3239caca25ec67495c736dd3d4590211b2d9_{formatter}.jpg",
-        "https://images.gog-statics.com/ec2a10328a109a29ef8485eed5de461bc348ac87f52e222d1b03af1637ebf08c_{formatter}.jpg",
-        "https://images.gog-statics.com/52ed1acb3281a21a53fcea7eb2bbe17943356da8b6123fd09af8530cbc447020_{formatter}.jpg",
-        "https://images.gog-statics.com/2e4ed77a3fbe5d20f0e3b68cf35c501f51222c9bc92364e3ca3ebfebb58ffd4a_{formatter}.jpg",
-        "https://images.gog-statics.com/592931f64e3d157d9e1ec2e10fbd71efac69409aad63b6560715bb8bda69df4b_{formatter}.jpg",
-        "https://images.gog-statics.com/445039bcd37f8fe96e5137af3695c4962fb122be304899cc876d93f522792520_{formatter}.jpg",
-        "https://images.gog-statics.com/1160586af00c4f29bd07bb5933814e7e933f1d7dfdacddd8bdda2a984fece0d5_{formatter}.jpg",
-        "https://images.gog-statics.com/183ca8b953477ec8d7bdcf1214ccdcf4d7edc23853ac4a8ec4e030d05c10b2ae_{formatter}.jpg",
-        "https://images.gog-statics.com/faebb4b61e10c8a12ba4629dfae510cb44b79c9b93669770734dcbe16710323b_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": "1996.11.14",
-      "storeReleaseDate": "2012.05.30",
-      "productType": "pack",
-      "title": "Tomb Raider 1+2+3",
-      "coverHorizontal": "https://images.gog-statics.com/74a056bd156cb1fdb4d595dc21cc9172869e528a9e8449a3b8f97c96ebc95009.png",
-      "coverVertical": "https://images.gog-statics.com/aec1ef1a10ace90e5f5b7de95410dc75e1abe00ba5471cbc6868c65792d455c9.jpg",
-      "logo": "https://images.gog-statics.com/0a51e4b3783c9376702dd7d57e6086b832f42105762c0dab306b5d67a7b2abf0.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/3eea2c1c8aed7a33a88dd2ba02c26565fea86f48284ec0aa81bf83b74eac8a92.jpg",
-      "developers": [
-        "Core Design"
-      ],
-      "publishers": [
-        "Crystal Dynamics"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$4.99",
-        "base": "$9.99",
-        "discount": "-50%",
-        "finalMoney": {
-          "amount": "4.99",
-          "currency": "USD",
-          "discount": "5.00"
-        },
-        "baseMoney": {
-          "amount": "9.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Платформер",
-          "slug": "platformer"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Платформер",
-          "slug": "platformer"
-        }
-      ],
-      "reviewsRating": 44,
-      "reviewsCount": 788,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "uskRating",
-          "ageRating": "16"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/tomb_raider_123"
+      "storeLink": "https://www.gog.com/ru/game/master_of_orion_1_2"
     },
     {
       "id": "1207658923",
@@ -2977,122 +3372,6 @@
         }
       ],
       "storeLink": "https://www.gog.com/ru/game/alone_in_the_dark_the_trilogy_123"
-    },
-    {
-      "id": "1207658960",
-      "slug": "wing_commander_1_2",
-      "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/c94e646c02cd40192fabed284486ea80da36d536a1dc631715156526b469020b_{formatter}.jpg",
-        "https://images.gog-statics.com/23986d8c3a80e2785d0d64225c1df1735219f7424d7aa7383e7eeee35f82635b_{formatter}.jpg",
-        "https://images.gog-statics.com/d28acc6bdb4d32337d3f050dbb7b69627f163648bd3f38200756ebc42166909d_{formatter}.jpg",
-        "https://images.gog-statics.com/63cb3e78cb7a100f5714ae534cef3f00c4b398700c1db98873e2ebc3bf1c2122_{formatter}.jpg",
-        "https://images.gog-statics.com/35e76939fe68ade479d61b12991a86709668446106189df3b35b043bd36a4aef_{formatter}.jpg",
-        "https://images.gog-statics.com/55b15798128006adf8d0f8a01e35554f0a43b4a09e21f102f5b7b0c9f4737118_{formatter}.jpg",
-        "https://images.gog-statics.com/bc3214c93bd27fcccab1e20f16baa23c7e8062641da0ceb0829adc9d147d5784_{formatter}.jpg",
-        "https://images.gog-statics.com/fdbac7fd0b14adb9ef24879a2143e784a726c8922182527f8fd46d4410fae292_{formatter}.jpg",
-        "https://images.gog-statics.com/c5608452a29c27e5d72ac1dbbb2f723f1515ad2d1c362d8a2e4e884f17b247df_{formatter}.jpg",
-        "https://images.gog-statics.com/4e9612e3d97c15e01516d00cfd3f7d88aedb25b960002884dbc226b72e51f6f6_{formatter}.jpg",
-        "https://images.gog-statics.com/26b31c927b9c9940a4d5fc08a8680133470c0965de97496c4cd7e3e87b67c145_{formatter}.jpg",
-        "https://images.gog-statics.com/39161ac2fe5c2d43e4a238d273d4f641e77734f0d15521dfde63b2cc26a04043_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": null,
-      "storeReleaseDate": "1991.12.24",
-      "productType": "pack",
-      "title": "Wing Commander™ 1+2",
-      "coverHorizontal": "https://images.gog-statics.com/40ad0597b75dbc357495db591447958e17c60c15aa5d363bcdc3f7197f08979a.png",
-      "coverVertical": "https://images.gog-statics.com/87a6d89bdb696b6ebcd8218b568290e7b007769efd1e4de5f093aee0801c677b.jpg",
-      "logo": "https://images.gog-statics.com/f94d47971a487af8c70fd0b4ed681e8820a31ab295a612fe4c277bf7ddfdc736.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/77cf0722e0bd2d3f31ec0c001c9ef02fd394917fa30e2241870feaeab5f1ccd2.jpg",
-      "developers": [
-        "Origin Systems"
-      ],
-      "publishers": [
-        "Electronic Arts"
-      ],
-      "operatingSystems": [
-        "windows",
-        "osx"
-      ],
-      "price": {
-        "final": "$3.95",
-        "base": "$5.99",
-        "discount": "-34%",
-        "finalMoney": {
-          "amount": "3.95",
-          "currency": "USD",
-          "discount": "2.04"
-        },
-        "baseMoney": {
-          "amount": "5.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Шутер",
-          "slug": "shooter"
-        },
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        },
-        {
-          "name": "Шутер",
-          "slug": "shooter"
-        },
-        {
-          "name": "Good Old Game",
-          "slug": "good-old-game"
-        }
-      ],
-      "reviewsRating": 47,
-      "reviewsCount": 1193,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "esrbRating",
-          "ageRating": "6"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "12"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/wing_commander_1_2"
     },
     {
       "id": "1633484204",
@@ -3586,8 +3865,8 @@
       "reviewsCount": 0,
       "editions": [
         {
-          "id": 1216237502,
-          "name": "Construction Simulator 2 US - Pocket Edition",
+          "id": 1881809099,
+          "name": "Construction Simulator 3 - Pocket Edition",
           "isRootEdition": true
         },
         {
@@ -3740,146 +4019,6 @@
       "editions": [],
       "ratings": [],
       "storeLink": "https://www.gog.com/ru/game/dawn_of_the_monsters_arcade_character_dlc_pack"
-    },
-    {
-      "id": "1731535264",
-      "slug": "atlas_fallen_reign_of_sand",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Кооперативный режим",
-          "slug": "coop"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "galaxy_multiplayer"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "multi"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/fa3a6dbfd6e87211220396a8c84c947a369c929a7831c010d927cd42fbb4e4ca_{formatter}.jpg",
-        "https://images.gog-statics.com/d9a00eb664429af8782395fe3355761c8c34d0a4dd6def259b7cd3f697c9625e_{formatter}.jpg",
-        "https://images.gog-statics.com/5596f4461eea93074787db75fb1ca7b24265c9af38c8e88f0a068830fe4df19e_{formatter}.jpg",
-        "https://images.gog-statics.com/7d34a21e3f54709b6460b4f43017a86ce32e90651420b226d7c89becf6bd595e_{formatter}.jpg",
-        "https://images.gog-statics.com/ad6d69e4c6da3c0f5abd06101f52d8e0b896cdbdb4c658307f8c990f3be1646f_{formatter}.jpg",
-        "https://images.gog-statics.com/1ca67fa577835792e108e978fede8f490c5f2180de660454218f05c6d6d788b6_{formatter}.jpg",
-        "https://images.gog-statics.com/93308390c4f67e70f3225330e554d8bb4587639958fc650d3c406190bb2f94c3_{formatter}.jpg",
-        "https://images.gog-statics.com/213d8c5ebfe982b4dfed8a99260101173036e77f6f7d11c2a950fa11ab50c90e_{formatter}.jpg",
-        "https://images.gog-statics.com/c299e1ee19256ff78409a7eb2027c20df7b03b2b3959ac93a577e76c2b671e83_{formatter}.jpg",
-        "https://images.gog-statics.com/5f52f468631c12ddee75a68db8866b97a2b289ca03f5bf90e343b2e3e404e7a6_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2023.08.09",
-      "storeReleaseDate": "2024.10.15",
-      "productType": "game",
-      "title": "Atlas Fallen: Reign Of Sand",
-      "coverHorizontal": "https://images.gog-statics.com/67569562053233a5bf63819eb184d9ed08ea87603d4dccf5c8eefc9268465b07.png",
-      "coverVertical": "https://images.gog-statics.com/45236c174ddfdaef520cf44d0f761f6c60f00aff0773f0cf68886a4b91d30ddd.jpg",
-      "logo": "https://images.gog-statics.com/5beeea6267ee48e712ea6f92606a81a4059b85f87797bef1630c002c20c6175d.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/1bde0c957621b4aa6473bc49d4b2d5f0024be8a35e3a25f5a16a370d9ca442b4.jpg",
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "Focus Entertainment"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$39.99",
-        "base": "$39.99",
-        "discount": null,
-        "finalMoney": {
-          "amount": "39.99",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "39.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Исследовательские",
-          "slug": "exploration"
-        },
-        {
-          "name": "Протагонистка",
-          "slug": "female-protagonist"
-        },
-        {
-          "name": "Тайна",
-          "slug": "mystery"
-        },
-        {
-          "name": "Магия",
-          "slug": "magic"
-        },
-        {
-          "name": "Сверхъестественное",
-          "slug": "supernatural"
-        }
-      ],
-      "reviewsRating": 38,
-      "reviewsCount": 90,
-      "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/atlas_fallen_reign_of_sand"
     },
     {
       "id": "1991212089",
@@ -4856,6 +4995,105 @@
       "storeLink": "https://www.gog.com/ru/game/mafia_trilogy"
     },
     {
+      "id": "1325286120",
+      "slug": "anstoss_13_bundle",
+      "features": [],
+      "screenshots": [
+        "https://images.gog-statics.com/b90dd896710d47da634a36b0b623c6458f5ce857eb061d7ba4f0b20e871602bc_{formatter}.jpg",
+        "https://images.gog-statics.com/a7f88d97c43ac67fa7b40a20d4f8485ba8fc1f6e4c9a182aad2f7aef9e164cdf_{formatter}.jpg",
+        "https://images.gog-statics.com/d76cd0ed13cb3212b701a72c2dfa43bd5cdf380270c115ceee76c0b1ce4fbc1e_{formatter}.jpg",
+        "https://images.gog-statics.com/5cc7c401e7ebc20ff27b65d8de07557fd6fa21ff3acba517d4f1e6db12e5329d_{formatter}.jpg",
+        "https://images.gog-statics.com/a184c53b780e1bdd3fcde1a1cb697dfe78af6666857a355332c8524571c504bc_{formatter}.jpg",
+        "https://images.gog-statics.com/8d3b06c82fed44d357393330983382a424eca553c76f939d658015d49a154573_{formatter}.jpg",
+        "https://images.gog-statics.com/ba6357e8a4485729325bc48d418c86fef04d11ae12b33b6e4cea98756af949ee_{formatter}.jpg",
+        "https://images.gog-statics.com/a1227e4ba71324171291cbc9fef2e5f1ccdb53e6edca5dc0779f20e42fbcffc5_{formatter}.jpg",
+        "https://images.gog-statics.com/06938bbbfc2924be0cf476c494ff5105c52ead1a750c9bdf4ef675ee697368be_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2021.07.09",
+      "storeReleaseDate": "2021.07.09",
+      "productType": "pack",
+      "title": "Anstoss 1-3 Bundle",
+      "coverHorizontal": "https://images.gog-statics.com/aa84a6c57fa75c27f6b74afb63af3b01c7d8ad62743bb6488a61b0bdc56cfc89.png",
+      "coverVertical": "https://images.gog-statics.com/6365cc732ebf3bbf2df81928b3862bf0dd3cad1c2f922defd88e8c9cc87fc10c.jpg",
+      "logo": "https://images.gog-statics.com/8465a66932b55416933a02a44b2b58c2f00b13e183076b7d1326aa8da1ece303.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/fb7c7336c6d1aa3263a7555643610986e092fc35b372866228f84b90f888b41c.jpg",
+      "developers": [
+        "Ascaron"
+      ],
+      "publishers": [
+        "Kalypso Media Digital"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Симулятор",
+          "slug": "simulation"
+        },
+        {
+          "name": "Спорт",
+          "slug": "sports"
+        },
+        {
+          "name": "Менеджмент",
+          "slug": "managerial"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Симулятор",
+          "slug": "simulation"
+        },
+        {
+          "name": "Управление",
+          "slug": "management"
+        },
+        {
+          "name": "Менеджмент",
+          "slug": "managerial"
+        },
+        {
+          "name": "Спорт",
+          "slug": "sports"
+        },
+        {
+          "name": "Футбол",
+          "slug": "football"
+        }
+      ],
+      "reviewsRating": 42,
+      "reviewsCount": 44,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "gogRating",
+          "ageRating": "18"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/anstoss_13_bundle"
+    },
+    {
       "id": "1993581340",
       "slug": "mafia_definitive_edition",
       "features": [
@@ -4993,7 +5231,7 @@
         }
       ],
       "reviewsRating": 44,
-      "reviewsCount": 4329,
+      "reviewsCount": 4332,
       "editions": [],
       "ratings": [
         {
@@ -5014,171 +5252,6 @@
         }
       ],
       "storeLink": "https://www.gog.com/ru/game/mafia_definitive_edition"
-    },
-    {
-      "id": "1943447848",
-      "slug": "mafia_ii_definitive_edition",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/16fb9f601d4fa92118943d89de92964cc112f1aed1a8f950dfb51967f0e66df0_{formatter}.jpg",
-        "https://images.gog-statics.com/4aab3413da00dc73a34b081743aa1eee14ad97ae193855cc2874e4ab6efdaeac_{formatter}.jpg",
-        "https://images.gog-statics.com/198bcf000076fbd323cc8166132cb632c0c0bd8e0a9cb02f47dd4ed43f6fdd4a_{formatter}.jpg",
-        "https://images.gog-statics.com/cabd7b44f441b6fefa3ff6537752806c4537cf6e5f88cf875f21f32b11196f91_{formatter}.jpg",
-        "https://images.gog-statics.com/74ef4e90e1b3e9e5e9ff030e0607cfd6ff9540e366ce89b47f84930058bc8bfa_{formatter}.jpg",
-        "https://images.gog-statics.com/0de9ac005aa7dd6a5674fa9864ee2714cf35f45e5580240717e3d834716e5df6_{formatter}.jpg",
-        "https://images.gog-statics.com/ebcdd7de7ddadc3056530e7ecfef55c4179951c35212b7101ae978721b1ade06_{formatter}.jpg",
-        "https://images.gog-statics.com/0e2d49fc3d5ae26e0c8511101366a4f1ed63d297071acfce97c5050e9a7a6a88_{formatter}.jpg",
-        "https://images.gog-statics.com/2dd553c6f8b532386981b5fa1bf3e5e75650e5030edce7c02c6ed5930ce99879_{formatter}.jpg",
-        "https://images.gog-statics.com/7d4a4062d099c19460f3d125ed9d75c568694e61522c6fe9cfda6b3f2d68f8a4_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": true,
-        "inText": true
-      },
-      "releaseDate": "2020.05.19",
-      "storeReleaseDate": "2022.08.22",
-      "productType": "pack",
-      "title": "Mafia II: Definitive Edition",
-      "coverHorizontal": "https://images.gog-statics.com/ec9894ec739bdfd6a68b6cf2d8a51138272f75a382fd703ece336bb89e7c49a9.png",
-      "coverVertical": "https://images.gog-statics.com/578fa6a9f14f7a01f18576bc33b9965f972361320446f5eddda6241aa8aa9e0b.jpg",
-      "logo": "https://images.gog-statics.com/aa462a751ea5be9b79643c84325476638a16016346f558aa9709533857f1463f.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/add24f273ee4ca05c00e1316544040a6f764ade586d1f00938531dbd2286524c.jpg",
-      "developers": [
-        "Hangar 13"
-      ],
-      "publishers": [
-        "2K Games"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$29.99",
-        "base": "$29.99",
-        "discount": null,
-        "finalMoney": {
-          "amount": "29.99",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "29.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Open World",
-          "slug": "open-world"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Приключение",
-          "slug": "adventure"
-        },
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Насыщенный сюжет",
-          "slug": "story-rich"
-        },
-        {
-          "name": "Отличный саундтрек",
-          "slug": "great-soundtrack"
-        },
-        {
-          "name": "Открытый мир",
-          "slug": "open-world"
-        },
-        {
-          "name": "От третьего лица",
-          "slug": "third-person"
-        },
-        {
-          "name": "Для взрослых",
-          "slug": "mature"
-        },
-        {
-          "name": "Сексуальный контент",
-          "slug": "sexual-content"
-        },
-        {
-          "name": "Нагота",
-          "slug": "nudity"
-        },
-        {
-          "name": "Насилие",
-          "slug": "violent"
-        },
-        {
-          "name": "Мясо",
-          "slug": "gore"
-        },
-        {
-          "name": "Криминал",
-          "slug": "crime"
-        },
-        {
-          "name": "Нуар",
-          "slug": "noir"
-        }
-      ],
-      "reviewsRating": 35,
-      "reviewsCount": 116,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "esrbRating",
-          "ageRating": "17"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "brRating",
-          "ageRating": "18"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/mafia_ii_definitive_edition"
     },
     {
       "id": "1578751750",
@@ -5348,7 +5421,7 @@
         }
       ],
       "reviewsRating": 36,
-      "reviewsCount": 1713,
+      "reviewsCount": 1716,
       "editions": [],
       "ratings": [
         {
@@ -5369,253 +5442,6 @@
         }
       ],
       "storeLink": "https://www.gog.com/ru/game/mafia_iii_definitive_edition"
-    },
-    {
-      "id": "1522454794",
-      "slug": "the_surge_2_the_kraken_expansion",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/dbedefbb5c3afc72954b92f3264a254bc9766c3b8ae36cad874a3d4cbcac4263_{formatter}.jpg",
-        "https://images.gog-statics.com/4581cca731a63de87a73b03ccdab676a9b6649a98276f32941a64983fa70a075_{formatter}.jpg",
-        "https://images.gog-statics.com/a9797982a2752cbbdbb84c9341358bee9b8b48d96315fdb0b2b44207cbcd6c2f_{formatter}.jpg",
-        "https://images.gog-statics.com/20504429296d799c95f5d9d262c4db5ad32e813ea6bd03abab0297de3c680b36_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2020.01.16",
-      "storeReleaseDate": "2020.01.16",
-      "productType": "dlc",
-      "title": "The Surge 2 - The Kraken Expansion",
-      "coverHorizontal": "https://images.gog-statics.com/ef57bab617c85c85baa4c534dc8dd2561906e68d3c68d33c229af47d8ec58c86.png",
-      "coverVertical": "https://images.gog-statics.com/e7b8db5829dde832236eef43567daff795c4034b0338b9d526b49268c5c299f5.jpg",
-      "logo": "https://images.gog-statics.com/60d51c1310fe02daa22f09ea6111a27f2eef1f672d29225548a98e902772e72c.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/14308a89f4f123d36f7a36cce487417a819d677e75f7f6b52a15bf11349a40ff.jpg",
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "Focus Entertainment"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$3.35",
-        "base": "$4.99",
-        "discount": "-33%",
-        "finalMoney": {
-          "amount": "3.35",
-          "currency": "USD",
-          "discount": "1.64"
-        },
-        "baseMoney": {
-          "amount": "4.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        },
-        {
-          "name": "Насилие",
-          "slug": "violent"
-        },
-        {
-          "name": "Мясо",
-          "slug": "gore"
-        }
-      ],
-      "reviewsRating": 37,
-      "reviewsCount": 9,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "esrbRating",
-          "ageRating": "17"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "18"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_2_the_kraken_expansion"
-    },
-    {
-      "id": "1632664975",
-      "slug": "the_surge_2_jerichos_legacy_gears_pack",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/c245b37cd807ceab363e18e4c1ea864c09183a751cb4182be41f47fd3ba4610b_{formatter}.jpg",
-        "https://images.gog-statics.com/97f5ddd174fd827f09a59dd65500a870b3a9caafc39663ed3219fd641aebb45a_{formatter}.jpg",
-        "https://images.gog-statics.com/61020b0b4b0171665583c7038a3a10a324afbd55e05261bd9c4f0938e23fd07c_{formatter}.jpg",
-        "https://images.gog-statics.com/220737ffa37c42995b78b6f9f8cadd6e7b9e3cffdf7427ea5b5c19907b4be4b7_{formatter}.jpg",
-        "https://images.gog-statics.com/7f41effdd2377bec4b6b19f5eb21937c3fd6cb13e4632e0c4af6f8321d6b3a0d_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2019.12.10",
-      "storeReleaseDate": "2020.01.16",
-      "productType": "dlc",
-      "title": "The Surge 2 - Jericho's Legacy Gears Pack",
-      "coverHorizontal": "https://images.gog-statics.com/9a4308f8f2a5259477bcdc48a5670d48670a54cadc93810f25c4fb6fd8df5c9d.png",
-      "coverVertical": "https://images.gog-statics.com/b30d5b790134d649d5837b16124547f9a406c1d31ee6349efef8cef590fcda11.jpg",
-      "logo": "https://images.gog-statics.com/7978a5731f82a976aed6ccfce5001d31271ffa3e219b3a709a718890d22f29a1.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/5c4ea5e187f66e7a532bcc7c8fac3f754d71f4cb8c69b1e8f233390f920af046.jpg",
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "Focus Entertainment"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$1.99",
-        "base": "$2.99",
-        "discount": "-33%",
-        "finalMoney": {
-          "amount": "1.99",
-          "currency": "USD",
-          "discount": "1.00"
-        },
-        "baseMoney": {
-          "amount": "2.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        },
-        {
-          "name": "Насилие",
-          "slug": "violent"
-        },
-        {
-          "name": "Мясо",
-          "slug": "gore"
-        }
-      ],
-      "reviewsRating": 0,
-      "reviewsCount": 0,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "esrbRating",
-          "ageRating": "17"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "18"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_2_jerichos_legacy_gears_pack"
     },
     {
       "id": "1474822137",
@@ -6057,134 +5883,6 @@
       "storeLink": "https://www.gog.com/ru/game/the_surge_2_future_shock_weapon_pack"
     },
     {
-      "id": "1336694501",
-      "slug": "the_surge_the_good_the_bad_and_the_augmented_expansion",
-      "features": [
-        {
-          "name": "Достижения",
-          "slug": "achievements"
-        },
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Поддержка контроллера",
-          "slug": "controller_support"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/1a6e7e18543fb028daa42aea288715a8f3bcfdd2935702cba5707e77bde3f7f4_{formatter}.jpg",
-        "https://images.gog-statics.com/1eba7095b5ee480839fe0de3823adc95772fbe38a822f869ee7e5a2d15872c4d_{formatter}.jpg",
-        "https://images.gog-statics.com/4d4748cf92068ca3db924249dcbf2d38d56b3435069f4af6a3b60965b493a9af_{formatter}.jpg",
-        "https://images.gog-statics.com/38a56d5c74c7486ce126fb97f87a2d15af5dc73d9e12e43562c5df6d8382825b_{formatter}.jpg",
-        "https://images.gog-statics.com/efb4bd3ed48c29e581d33724ef744d950101e109d22edc6023061ba8d6809e73_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2018.10.02",
-      "storeReleaseDate": "2019.08.09",
-      "productType": "dlc",
-      "title": "The Surge - The Good, the Bad and the Augmented Expansion",
-      "coverHorizontal": "https://images.gog-statics.com/1ac50023ee4102d0e032a2fe5c3eda376f93df201cac367fc3ae2af52895cdeb.png",
-      "coverVertical": "https://images.gog-statics.com/88c9a17a1afa30a8d1848d0f50f28f744d5399ec12ade7d03ff3a2efe395ccbf.jpg",
-      "logo": "https://images.gog-statics.com/2f6e1b21517478e619aa8d8ae9c0de4a11c3b3fd03ad382866a539ff463b6441.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/bd3a61a344e235c706e582f1ed6e5ec420b9d82c0154cb510ceac9321df9843d.jpg",
-      "developers": [
-        "Deck13"
-      ],
-      "publishers": [
-        "Focus Entertainment"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$3.35",
-        "base": "$4.99",
-        "discount": "-33%",
-        "finalMoney": {
-          "amount": "3.35",
-          "currency": "USD",
-          "discount": "1.64"
-        },
-        "baseMoney": {
-          "amount": "4.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Фантастика",
-          "slug": "scifi"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Экшн",
-          "slug": "action"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Научная фантастика",
-          "slug": "sci-fi"
-        },
-        {
-          "name": "Наука",
-          "slug": "science"
-        },
-        {
-          "name": "Насилие",
-          "slug": "violent"
-        },
-        {
-          "name": "Мясо",
-          "slug": "gore"
-        }
-      ],
-      "reviewsRating": 0,
-      "reviewsCount": 0,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "18"
-        },
-        {
-          "name": "esrbRating",
-          "ageRating": "17"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "18"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_the_good_the_bad_and_the_augmented_expansion"
-    },
-    {
       "id": "1374354026",
       "slug": "the_surge_cutting_edge_pack",
       "features": [
@@ -6312,8 +6010,8 @@
       "storeLink": "https://www.gog.com/ru/game/the_surge_cutting_edge_pack"
     },
     {
-      "id": "1576720836",
-      "slug": "the_surge_a_walk_in_the_park",
+      "id": "1225354751",
+      "slug": "the_surge_fire_ice_weapon_pack",
       "features": [
         {
           "name": "Достижения",
@@ -6337,26 +6035,26 @@
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/793664246ca7357a8e75541c39c49cd94f0ee39262e49a49872d266db61fa633_{formatter}.jpg",
-        "https://images.gog-statics.com/936ff44cfc60c62585c4c85a0bccbc4dfcb782afc6ad71b9aa23a0dbd8e73c07_{formatter}.jpg",
-        "https://images.gog-statics.com/9981c9d2ebb58576a96671a4358fee685bbc8bbd3929bde3c21494989fc04749_{formatter}.jpg",
-        "https://images.gog-statics.com/931acbba3c6a5a2d22ad261b0bb1221740e7a759ba7ce49ae81a03cb62ec6d41_{formatter}.jpg",
-        "https://images.gog-statics.com/4b0edaacc86973a7b45b7f91965528564438e17af02370df6b390896f5c7074d_{formatter}.jpg",
-        "https://images.gog-statics.com/19aded6244509d061982b5b2bc28933670597b4babc911b502c78c60e675d43c_{formatter}.jpg"
+        "https://images.gog-statics.com/a69464bbafd086f3e95d99ef7153eda2c27da77f0c388ef5e853f2000f7326c8_{formatter}.jpg",
+        "https://images.gog-statics.com/fd1ced9b3bbd3224ae92b33d2fe36fad47a0ff656246abd2d1aea3b474b9cdbd_{formatter}.jpg",
+        "https://images.gog-statics.com/844960613e07957a6c8b258a1aaf8bb4ec13e3332a8db089f4a218ce7c2d9193_{formatter}.jpg",
+        "https://images.gog-statics.com/9ee5e8c9334a86ae895c5799589a389b35dd766d467f4b8a8c452912267069ef_{formatter}.jpg",
+        "https://images.gog-statics.com/4b93dc6d5e8a1111cbd2ba4110ccd6360aafe29febeead86f0fbecafb21d69cb_{formatter}.jpg",
+        "https://images.gog-statics.com/ff5e7ce5c1d21440dee1244fe38a63e89fd9455c710b45a6679d98ed754e53e2_{formatter}.jpg"
       ],
       "userPreferredLanguage": {
         "code": "ru",
         "inAudio": false,
         "inText": true
       },
-      "releaseDate": "2017.12.05",
+      "releaseDate": "2017.10.10",
       "storeReleaseDate": "2019.08.09",
       "productType": "dlc",
-      "title": "The Surge - A Walk in the Park",
-      "coverHorizontal": "https://images.gog-statics.com/41abb2893df31e8ec07e42c7d4f54c586cb86edb5c1ebb31d015a263070a61f3.png",
-      "coverVertical": "https://images.gog-statics.com/badf8f55d8767cd913787f4197a6ecf19dcc943089fd875a9c34230a1a712c11.jpg",
-      "logo": "https://images.gog-statics.com/6cb0205598beccbd118516c6d721e2442e281db4a02940bcdf174b14d4ec30b5.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/00ad0ae9e71bc5ae1549211035e56522f8e086f0f4994b53d2dbca11107fd90c.jpg",
+      "title": "The Surge - Fire & Ice Weapon Pack",
+      "coverHorizontal": "https://images.gog-statics.com/a85c2bf1e878faaa94dd065ea529ea0614e55ddf08ea8efb3d7d2855336c4ef4.png",
+      "coverVertical": "https://images.gog-statics.com/39a9d23eb67cf5db9946ab6b0bfe8da280831698c0a180882e29ecfb7e289068.jpg",
+      "logo": "https://images.gog-statics.com/3c9722daeff05c91cc3381ad8e994f687c01e957e6a649af78b76e9bbea78cee.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/259fa127aaa78b7da89c78169bcd8f53b385be5b69d29d31aa7ca73f72ba9440.jpg",
       "developers": [
         "Deck13"
       ],
@@ -6367,16 +6065,16 @@
         "windows"
       ],
       "price": {
-        "final": "$3.35",
-        "base": "$4.99",
-        "discount": "-33%",
+        "final": "$0.00",
+        "base": "$0.00",
+        "discount": null,
         "finalMoney": {
-          "amount": "3.35",
+          "amount": "0.00",
           "currency": "USD",
-          "discount": "1.64"
+          "discount": "0.00"
         },
         "baseMoney": {
-          "amount": "4.99",
+          "amount": "0.00",
           "currency": "USD"
         }
       },
@@ -6417,8 +6115,8 @@
           "slug": "violent"
         }
       ],
-      "reviewsRating": 41,
-      "reviewsCount": 10,
+      "reviewsRating": 39,
+      "reviewsCount": 9,
       "editions": [],
       "ratings": [
         {
@@ -6434,7 +6132,383 @@
           "ageRating": "18"
         }
       ],
-      "storeLink": "https://www.gog.com/ru/game/the_surge_a_walk_in_the_park"
+      "storeLink": "https://www.gog.com/ru/game/the_surge_fire_ice_weapon_pack"
+    },
+    {
+      "id": "1231448648",
+      "slug": "star_of_providence",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/04505fca98fd396117c6eb46659e9dbbf0ffb67f581dde45e84310b6a2f54b41_{formatter}.jpg",
+        "https://images.gog-statics.com/281e1bd715f00514205d42a54eb59f9d9016118230a11ec8c65427e2a0d5c216_{formatter}.jpg",
+        "https://images.gog-statics.com/7ec748ddd3afcbf5a69a88be5b9e4dc30456524675b4009c9c754f70b17c8218_{formatter}.jpg",
+        "https://images.gog-statics.com/d18e75fd14b3840d333cff719c7242b4f41ec5bbef8bea5d5a5336aa2c933bfb_{formatter}.jpg",
+        "https://images.gog-statics.com/e7cd71372ceb0fc750d80da74ce6973fa42b86ad6ecc8328c94fc5a8356f17c9_{formatter}.jpg",
+        "https://images.gog-statics.com/f295cd488008c33f3ec23aeda1a0b32d48ec69b9620080ed2795132644215d21_{formatter}.jpg",
+        "https://images.gog-statics.com/3a136a749372f2d82e781459f037d01ebf95fd28eea261efb77533667444391e_{formatter}.jpg",
+        "https://images.gog-statics.com/ee34a3900f7c64234ff67d185b0beee5d0c7652b67dc01298524ce1f86656d54_{formatter}.jpg",
+        "https://images.gog-statics.com/6a8e391e66a97f2b9dec4a540fed674df6cfbf1950a231ed7e3f9ac27fe4756b_{formatter}.jpg",
+        "https://images.gog-statics.com/1697aa251787605f0458588d89ba0a9d40e37b0c3a88447382a32513b81162dd_{formatter}.jpg",
+        "https://images.gog-statics.com/b3c2721cf483a7c9f053e28622633923c0b4a6087757d0fb38abc8b5bca748a0_{formatter}.jpg",
+        "https://images.gog-statics.com/d78f308f0a4c21ddf3c987ac347fe74c7b6a5477404c38a34b31bd742012df6b_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2017.06.07",
+      "storeReleaseDate": "2019.07.24",
+      "productType": "game",
+      "title": "Star of Providence",
+      "coverHorizontal": "https://images.gog-statics.com/8ce4cf78b995635f828c637576a83f6e01c2b3fbaf834d1d7eeefcc25a7d87ea.png",
+      "coverVertical": "https://images.gog-statics.com/3418691d7ea0e070b22f1d080c933b1423af5b38b88c11e7b698325d07c483ad.jpg",
+      "logo": "https://images.gog-statics.com/ce1c5883095868f07f97b1c51992a0723af1d6e564688d5f88e6ef2136b73f25.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/a4b5d6d999f23a4741fd845b4ff57bef5e887caf2164f91f1f10e20967cf9c96.jpg",
+      "developers": [
+        "Team D-13"
+      ],
+      "publishers": [
+        "Team D-13"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$14.99",
+        "base": "$14.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "14.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "14.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Сражения",
+          "slug": "combat"
+        },
+        {
+          "name": "Shoot 'em Up",
+          "slug": "shoot-em-up"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "2D",
+          "slug": "two-dimensional"
+        },
+        {
+          "name": "Пиксельная графика",
+          "slug": "pixel-graphics"
+        },
+        {
+          "name": "Сложная",
+          "slug": "difficult"
+        },
+        {
+          "name": "Рогалик",
+          "slug": "roguelike"
+        },
+        {
+          "name": "Вид сверху вних",
+          "slug": "top-down"
+        },
+        {
+          "name": "Упрощенный рогалик",
+          "slug": "roguelite"
+        },
+        {
+          "name": "Процедурная генерация",
+          "slug": "procedural-generation"
+        },
+        {
+          "name": "Подземелья",
+          "slug": "dungeon-crawler"
+        },
+        {
+          "name": "Сражения",
+          "slug": "combat"
+        },
+        {
+          "name": "Shoot'EmUp",
+          "slug": "shoot-em-up"
+        },
+        {
+          "name": "Скролл-шутер",
+          "slug": "bullet-hell"
+        },
+        {
+          "name": "Перманентная смерть",
+          "slug": "perma-death"
+        },
+        {
+          "name": "Твин-стик шутер",
+          "slug": "twin-stick-shooter"
+        }
+      ],
+      "reviewsRating": 46,
+      "reviewsCount": 65,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/star_of_providence"
+    },
+    {
+      "id": "1778055342",
+      "slug": "lords_of_the_fallen_game_of_the_year_edition",
+      "features": [
+        {
+          "name": "Достижения",
+          "slug": "achievements"
+        },
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Поддержка контроллера",
+          "slug": "controller_support"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/0b3f947bc82df4e048a1a4fa36847e9e5c02728ba650db8d8dbdf07ffb769a4e_{formatter}.jpg",
+        "https://images.gog-statics.com/4d42fa2b5491987ae6ef85b35f2d9ea663c5eeb1304703265ff1ae4fdff460ff_{formatter}.jpg",
+        "https://images.gog-statics.com/681c3ae7c6f96c74d072e9eac442b1cbaf79ae7f64cb327e39b32caadc76edd2_{formatter}.jpg",
+        "https://images.gog-statics.com/52d8800e49a12187ed752cefb401741e64e3e03f31f5b5c3a39bd72ac99de130_{formatter}.jpg",
+        "https://images.gog-statics.com/f287468287e9008fa84967edc86d21669d3bb54bd37f30b5a269d780af365b5e_{formatter}.jpg",
+        "https://images.gog-statics.com/347b893f25deec079989fc42bdce50fef39dd5b36049aa2c073f7dd6f8009504_{formatter}.jpg",
+        "https://images.gog-statics.com/95014e1d517cd1db63c80168342fd3996469c31e882d97afad231313b91a7f7e_{formatter}.jpg",
+        "https://images.gog-statics.com/ee7ad2cdb3077cb0528973aeac1616460d67cec3d15981034ae56d13fe03b609_{formatter}.jpg",
+        "https://images.gog-statics.com/200cd1ca6c86e0df3a493fa7db0e4ddfe162e68009c85ae0d94284b019a06ddf_{formatter}.jpg",
+        "https://images.gog-statics.com/ecdc1fbaefe08ed098d0fdbb31142d2ae0cf618b7f26f1c2f175f7f2ad8788c2_{formatter}.jpg",
+        "https://images.gog-statics.com/6f2f2cf1e5ecc3eda8e71d0c1e7cb451098b41a0a0bef0cbcc20a0be3d5b709c_{formatter}.jpg",
+        "https://images.gog-statics.com/614cdf3a4021a35752888c3d23e37db57192f8d4d4ce9045bffb105fd244b953_{formatter}.jpg",
+        "https://images.gog-statics.com/fd3f3520591f98b32bec73c33ad1dd3c38ddc795405e9a168f9cfaeb91f55967_{formatter}.jpg",
+        "https://images.gog-statics.com/8c857340274475c5551caaec23ade88684718a7257f8b2ad53ce3b1a3145a056_{formatter}.jpg",
+        "https://images.gog-statics.com/f3916b43ed4b57db48bed13d26b08503246cc815accfdec8acb255426fde95ef_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2014.10.28",
+      "storeReleaseDate": "2018.11.05",
+      "productType": "game",
+      "title": "Lords of the Fallen Game of the Year Edition 2014",
+      "coverHorizontal": "https://images.gog-statics.com/2ea0c4180a881c4349c7b53377483760b18131f8672366e12701cd3c48edf5e6.png",
+      "coverVertical": "https://images.gog-statics.com/666747d6ee06d23d8f902629980cc0b22384e53b81650909a198c84945d16c03.jpg",
+      "logo": "https://images.gog-statics.com/73beb695392a1483670bacbfb09ff2e0bafd00775d297de786f24ce73bd1fee4.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/3acf7e8f1c4d75ee0b10527cbb306c12360477aff6889db533bdd04e8aea907f.jpg",
+      "developers": [
+        "CI Games",
+        "Deck 13"
+      ],
+      "publishers": [
+        "CI Games"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$29.99",
+        "base": "$29.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "29.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "29.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Экшн",
+          "slug": "action"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Насилие",
+          "slug": "violent"
+        }
+      ],
+      "reviewsRating": 33,
+      "reviewsCount": 496,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "16"
+        },
+        {
+          "name": "esrbRating",
+          "ageRating": "17"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "16"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/lords_of_the_fallen_game_of_the_year_edition"
+    },
+    {
+      "id": "1207659241",
+      "slug": "jack_keane_2_the_fire_within",
+      "features": [
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/612f31e77bdaab70256e3fffff2f457ab9251712407eff3b115c4e40427934f6_{formatter}.jpg",
+        "https://images.gog-statics.com/044d359b8f1c3bf31441c0c7e053f417b98d86a0f792dd68b348af91fa7c7eea_{formatter}.jpg",
+        "https://images.gog-statics.com/bed78dab330eab5726489f700e1247eb33e803637d04198a908a21c5132ba197_{formatter}.jpg",
+        "https://images.gog-statics.com/82b30dd7d35cb5e89fa1501c24dab525e9517d26ef1ac0435dffeff875ae9506_{formatter}.jpg",
+        "https://images.gog-statics.com/291050537fcc595765c4ccc4524a303ea168ae947d0b1b77186ebea3290ff245_{formatter}.jpg",
+        "https://images.gog-statics.com/7c1f4240518c06f5e2885fe79d1bfc785ad8a1e570b3c2abf3aa9c1ded4dff51_{formatter}.jpg",
+        "https://images.gog-statics.com/c16cceaa906ed4ddb37d35aa22f085c54aa2fce830176dac4f787ae13dd7f25c_{formatter}.jpg",
+        "https://images.gog-statics.com/b444df0ccc141741f335d97c3c5478eb668dd359ec20cc2bdd3d78cd5cd173d6_{formatter}.jpg",
+        "https://images.gog-statics.com/4be8c9737221c8150897080dd7b295b743138d61500f7d70e83a3ceee2fa4237_{formatter}.jpg",
+        "https://images.gog-statics.com/39f621e1e9eb50aaf64db92b2179c2c41b18ed8c76892ba6a46138945365322e_{formatter}.jpg",
+        "https://images.gog-statics.com/2bae8f36810317e65fd7b7954fe9bb17a3beae71d7733a59b742c305a1133e36_{formatter}.jpg",
+        "https://images.gog-statics.com/24345a8b7fe19a221e8bd4b0c6442450f4e4baeb896dc4dc10f15720892e32e5_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2012.11.07",
+      "storeReleaseDate": "2014.12.19",
+      "productType": "game",
+      "title": "Jack Keane 2: The Fire Within",
+      "coverHorizontal": "https://images.gog-statics.com/d82c7e942bf940f765ffd8a253bf2bebf713220c31bb9df6b34d252758b714d2.png",
+      "coverVertical": "https://images.gog-statics.com/a91ef6e3a12a54f0895de86618cac58789d9f93912efc4202806eef57613a40b.jpg",
+      "logo": null,
+      "galaxyBackgroundImage": null,
+      "developers": [
+        "Deck13"
+      ],
+      "publishers": [
+        "astragon Entertainment"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$9.99",
+        "base": "$9.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "9.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Современность",
+          "slug": "modern"
+        },
+        {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Квест",
+          "slug": "pointandclick"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Приключение",
+          "slug": "adventure"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Point&Click",
+          "slug": "point-and-click"
+        },
+        {
+          "name": "Современность",
+          "slug": "modern"
+        }
+      ],
+      "reviewsRating": 39,
+      "reviewsCount": 281,
+      "editions": [],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "16"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/jack_keane_2_the_fire_within"
     }
   ],
   "dreamlistGames": [],
@@ -7176,12 +7250,12 @@
         "slug": "mature"
       },
       {
-        "name": "Сексуальный контент",
-        "slug": "sexual-content"
-      },
-      {
         "name": "OST",
         "slug": "ost"
+      },
+      {
+        "name": "Сексуальный контент",
+        "slug": "sexual-content"
       },
       {
         "name": "Песочница",
@@ -7244,16 +7318,16 @@
         "slug": "jrpg"
       },
       {
+        "name": "Ретро",
+        "slug": "retro"
+      },
+      {
         "name": "Рогалик",
         "slug": "roguelike"
       },
       {
         "name": "Изометрия",
         "slug": "isometric"
-      },
-      {
-        "name": "Ретро",
-        "slug": "retro"
       },
       {
         "name": "Магия",
@@ -7392,12 +7466,12 @@
         "slug": "tactical-rpg"
       },
       {
-        "name": "Глобальная стратегия",
-        "slug": "grand-strategy"
-      },
-      {
         "name": "Аркада",
         "slug": "arcade"
+      },
+      {
+        "name": "Глобальная стратегия",
+        "slug": "grand-strategy"
       },
       {
         "name": "Сюрреалистичная",
@@ -7428,12 +7502,12 @@
         "slug": "crpg"
       },
       {
-        "name": "Головоломка-платформер",
-        "slug": "puzzle-platformer"
-      },
-      {
         "name": "Современность",
         "slug": "modern"
+      },
+      {
+        "name": "Головоломка-платформер",
+        "slug": "puzzle-platformer"
       },
       {
         "name": "Файтинг",
@@ -7492,24 +7566,24 @@
         "slug": "politics"
       },
       {
-        "name": "Shoot'EmUp",
-        "slug": "shoot-em-up"
+        "name": "Триллер",
+        "slug": "thriller"
       },
       {
         "name": "Cozy",
         "slug": "cozy"
       },
       {
-        "name": "Триллер",
-        "slug": "thriller"
-      },
-      {
-        "name": "Дистопия",
-        "slug": "dystopian"
+        "name": "Shoot'EmUp",
+        "slug": "shoot-em-up"
       },
       {
         "name": "Скролл-шутер",
         "slug": "bullet-hell"
+      },
+      {
+        "name": "Дистопия",
+        "slug": "dystopian"
       },
       {
         "name": "4X",
@@ -7688,12 +7762,12 @@
         "slug": "parody"
       },
       {
-        "name": "Без насилия",
-        "slug": "non-violent"
-      },
-      {
         "name": "Вестерн",
         "slug": "western"
+      },
+      {
+        "name": "Без насилия",
+        "slug": "non-violent"
       },
       {
         "name": "Боевые искусства",
@@ -7804,16 +7878,16 @@
         "slug": "werewolves"
       },
       {
+        "name": "Mod",
+        "slug": "mod"
+      },
+      {
         "name": "Внедорожники",
         "slug": "offroad"
       },
       {
         "name": "Американский футбол",
         "slug": "soccer"
-      },
-      {
-        "name": "Mod",
-        "slug": "mod"
       },
       {
         "name": "Кино",

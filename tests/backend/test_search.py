@@ -38,20 +38,30 @@ def local_view(source_id="157336", title="Интерстеллар") -> CardView
                     source_id=source_id, title=title)
 
 
-def test_a_local_card_takes_the_place_of_its_external_twin():
-    """Своё стоит на своём месте в общей выдаче и ничем не выделено."""
+def test_a_local_card_comes_first_and_its_twin_does_not_repeat():
+    """Своё идёт впереди всего чужого, а чужой близнец вторым разом не
+    показывается: карточка одна, и показать надо ту, у которой есть оценка."""
     external = [view_from_hit(hit("1", "Первый")), view_from_hit(hit("157336"))]
     merged = merge_results([local_view()], external)
 
-    assert [v.source_id for v in merged] == ["1", "157336"]
-    assert merged[1].item_id == 7
+    assert [v.source_id for v in merged] == ["157336", "1"]
+    assert merged[0].item_id == 7
 
 
-def test_what_is_found_only_locally_goes_to_the_end():
+def test_what_is_found_only_locally_comes_first_too():
     external = [view_from_hit(hit("1", "Первый"))]
     merged = merge_results([local_view("999", "Только у меня")], external)
 
-    assert [v.source_id for v in merged] == ["1", "999"]
+    assert [v.source_id for v in merged] == ["999", "1"]
+
+
+def test_the_order_of_the_local_half_is_kept():
+    """Своя половина приходит уже упорядоченной — по оценке у клика, по
+    названию у строки, — и склейка этого порядка не трогает."""
+    mine = [local_view("999", "Своё первое"), local_view("998", "Своё второе")]
+    merged = merge_results(mine, [view_from_hit(hit("1", "Чужое"))])
+
+    assert [v.source_id for v in merged] == ["999", "998", "1"]
 
 
 def test_duplicates_inside_one_answer_are_dropped():
@@ -85,7 +95,7 @@ def test_a_local_card_of_another_source_does_not_take_the_place():
 
     merged = merge_results([mine], external)
 
-    assert [v.title for v in merged] == ["Ведьмак в GOG", "Ведьмак у меня"]
+    assert [v.title for v in merged] == ["Ведьмак у меня", "Ведьмак в GOG"]
 
 
 def test_order_of_the_source_is_kept():

@@ -1,6 +1,7 @@
 """Разговор с TMDB по сети."""
 
 import logging
+from collections.abc import Callable
 from datetime import timedelta
 
 import httpx
@@ -10,7 +11,9 @@ from backend.sources.backoff import refuse_until
 from backend.sources.errors import parsed
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.parse import (
+    parse_credits,
     parse_movie,
+    parse_people,
     parse_search,
     parse_series,
     parse_series_counts,
@@ -99,33 +102,56 @@ class TmdbClient:
         verdict = self._verdict(response)
         return response if verdict is None else verdict
 
-    async def search(self, query: str, kind: Kind) -> Outcome:
-        path = "/search/tv" if kind is Kind.SERIES else "/search/movie"
-        answer = await self._asked(f"{BASE}{path}", query=query)
+    async def _taken(self, url: str, complaint: str,
+                     parse: Callable[[dict], object], **extra: object) -> Outcome:
+        """Разобранное тело — либо исход, который уже всё решил.
+
+        Пять ручек клиента отличаются адресом, параметрами, разборщиком и
+        фразой в логе; хвост «ответ или готовый исход → разобрать» у них один и
+        тот же."""
+        answer = await self._asked(url, **extra)
         if not isinstance(answer, httpx.Response):
             return answer
-        return parsed(logger, "tmdb", "выдача поиска не разобралась",
-                      lambda: Found(parse_search(answer.json(), kind)))
+        return parsed(logger, "tmdb", complaint,
+                      lambda: Found(parse(answer.json())))
+
+    async def search(self, query: str, kind: Kind) -> Outcome:
+        path = "/search/tv" if kind is Kind.SERIES else "/search/movie"
+        return await self._taken(
+            f"{BASE}{path}", "выдача поиска не разобралась",
+            lambda payload: parse_search(payload, kind), query=query)
+
+    async def credits_of(self, person_id: str, kind: Kind) -> Outcome:
+        """Всё, что человек сделал, одним запросом.
+
+        Порций у фильмографии нет: замерено, у самого плодовитого режиссёра 78
+        строк съёмочной группы и 33 актёрских — меньше двух страниц выдачи."""
+        path = "tv_credits" if kind is Kind.SERIES else "movie_credits"
+        return await self._taken(
+            f"{BASE}/person/{person_id}/{path}",
+            f"фильмография {person_id} не разобралась",
+            lambda payload: parse_credits(payload, kind))
+
+    async def find_people(self, name: str) -> Outcome:
+        """Для того, у кого внешней идентичности нет. Найденные приезжают все —
+        это и есть ответ, и решение проекта прямо принимает их появление."""
+        return await self._taken(f"{BASE}/search/person",
+                                 "поиск человека не разобрался",
+                                 parse_people, query=name)
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         path = "tv" if kind is Kind.SERIES else "movie"
-        answer = await self._asked(f"{BASE}/{path}/{source_id}",
-                                   append_to_response=self._APPEND[kind])
-        if not isinstance(answer, httpx.Response):
-            return answer
-
         parse = parse_series if kind is Kind.SERIES else parse_movie
-        return parsed(logger, "tmdb", f"карточка {source_id} не разобралась",
-                      lambda: Found(parse(answer.json())))
+        return await self._taken(f"{BASE}/{path}/{source_id}",
+                                 f"карточка {source_id} не разобралась", parse,
+                                 append_to_response=self._APPEND[kind])
 
     async def series_counts(self, source_id: str) -> Outcome:
         """Перезапрос по сроку. Без `append_to_response`: `aggregate_credits`
         тянет 167 КБ, а нужны два числа."""
-        answer = await self._asked(f"{BASE}/tv/{source_id}")
-        if not isinstance(answer, httpx.Response):
-            return answer
-        return parsed(logger, "tmdb", f"сезоны {source_id} не разобрались",
-                      lambda: Found(parse_series_counts(answer.json())))
+        return await self._taken(f"{BASE}/tv/{source_id}",
+                                 f"сезоны {source_id} не разобрались",
+                                 parse_series_counts)
 
     async def aclose(self) -> None:
         await self._http.aclose()

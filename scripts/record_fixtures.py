@@ -29,6 +29,11 @@ ANDOR_TMDB = 83867
 INTERSTELLAR_IMDB = "tt0816692"
 WITCHER_APPID = 292030
 
+# Режиссёр и актёр: у первого работы лежат в crew, у второго в cast, и разбор
+# обязан видеть оба списка.
+NOLAN_TMDB = 525
+MURPHY_TMDB = 2037
+
 
 def save(source: str, case: str, response: httpx.Response) -> None:
     folder = OUT / source
@@ -75,6 +80,16 @@ async def record_tmdb(client: httpx.AsyncClient, key: str) -> None:
     save("tmdb", "movie_detail_typo_append", await client.get(
         f"{base}/movie/{INTERSTELLAR_TMDB}",
         params={**common, "append_to_response": "credtis"}))
+    save("tmdb", "person_credits_movie", await client.get(
+        f"{base}/person/{NOLAN_TMDB}/movie_credits", params=common))
+    save("tmdb", "person_credits_tv", await client.get(
+        f"{base}/person/{NOLAN_TMDB}/tv_credits", params=common))
+    save("tmdb", "person_credits_actor", await client.get(
+        f"{base}/person/{MURPHY_TMDB}/movie_credits", params=common))
+    save("tmdb", "search_person", await client.get(
+        f"{base}/search/person", params={**common, "query": "Christopher Nolan"}))
+    save("tmdb", "search_person_empty", await client.get(
+        f"{base}/search/person", params={**common, "query": "щщщ ыыы ъъъ"}))
     save("tmdb", "not_found", await client.get(
         f"{base}/movie/99999999", params=common))
     save("tmdb", "bad_key", await client.get(

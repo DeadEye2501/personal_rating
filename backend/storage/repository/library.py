@@ -2,9 +2,10 @@
 
 from datetime import datetime
 
-from sqlalchemy import Select, delete, func, select, update
+from sqlalchemy import Select, delete, exists, func, select, update
 
 from backend.model import Item, Kind, Source, new_source_id
+from backend.storage.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_item
 from backend.storage.session import fold, folded
@@ -23,6 +24,21 @@ _FIELDS = (
     "released_at", "synopsis", "poster_url", "runtime", "seasons_count",
     "episodes_count", "synced_at",
 )
+
+
+def _named(entity: Entity, needle: str):
+    """Связан ли с карточкой кто-то с таким именем.
+
+    Вынесено, потому что людей и студий две штуки, а запрос у них один и тот же
+    с точностью до описателя. Отбор по `item_id` внутри обязателен: без него
+    нашлась бы любая карточка, пока в базе есть хоть один человек с таким
+    именем."""
+    return exists(
+        select(entity.credit.c.item_id)
+        .join_from(entity.credit, entity.table, entity.link == entity.table.c.id)
+        .where(entity.credit.c.item_id == item_table.c.id,
+               folded(entity.table.c.name).contains(needle, autoescape=True))
+    )
 
 
 def _values(item: Item) -> dict:
@@ -91,11 +107,20 @@ class LibraryRepository(Repository):
         )
 
     async def search(self, kind: Kind, query: str, limit: int) -> list[int]:
-        """Поиск по своей библиотеке: вхождение в любое из двух названий.
+        """Широкий общий поиск: по людям, по названию и по оригинальному.
 
         В отличие от `find_by_title`, который сравнивает названия целиком ради
         предупреждения о совпадении, здесь нужна подстрока. `autoescape` гасит
-        `%` и `_` в самом запросе: иначе «%» вывалил бы всю библиотеку."""
+        `%` и `_` в самом запросе: иначе «%» вывалил бы всю библиотеку.
+
+        Это про строку поиска, а не про клик по имени: тот ищет по строке
+        человека в базе и сюда не заходит вовсе.
+
+        `distinct` тут не нужен, и это замерено: состав подмешан предикатом
+        `EXISTS`, а он строк не размножает — человек с двумя ролями даёт одну
+        карточку и без него. Стоял он с тех пор, когда запрос задумывался
+        соединением; сторожит это `test_a_card_is_returned_once_even_with_two_roles`,
+        который на соединении покраснеет."""
         needle = fold(query.strip())
         if not needle:
             return []
@@ -107,7 +132,9 @@ class LibraryRepository(Repository):
                 folded(item_table.c.title).contains(needle, autoescape=True)
                 | folded(item_table.c.original_title).contains(
                     needle, autoescape=True
-                ),
+                )
+                | _named(PEOPLE, needle)
+                | _named(COMPANIES, needle),
             )
             .order_by(item_table.c.title)
             .limit(limit)

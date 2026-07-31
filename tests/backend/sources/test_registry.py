@@ -100,6 +100,28 @@ async def test_games_ask_nobody_for_ratings():
     await registry.aclose()
 
 
+@pytest.mark.parametrize("kind", [Kind.MOVIE, Kind.SERIES])
+async def test_people_are_searched_at_tmdb(kind):
+    """Тождеством, а не типом: клиент должен быть тот же самый, что и в
+    каталоге, — второй такой же уехал бы в сеть со своим предохранителем."""
+    registry = sources()
+
+    assert registry.people_for(kind) is registry.tmdb
+
+    await registry.aclose()
+
+
+async def test_games_ask_nobody_about_people():
+    """Замерено: Steam по разработчику отдаёт разметку витрины, GOG молча
+    игнорирует параметр и возвращает весь каталог. Людей магазины не отдают
+    вовсе, только компании."""
+    registry = sources()
+
+    assert registry.people_for(Kind.GAME) is None
+
+    await registry.aclose()
+
+
 async def test_every_catalog_client_takes_the_same_arguments():
     """Ради этого реестр и существует: сервис зовёт их одинаково."""
     registry = sources()

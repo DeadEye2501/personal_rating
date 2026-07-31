@@ -142,6 +142,25 @@ async def test_the_identity_of_a_credit_survives_the_page(sessions, item_id):
     assert (credit.source, credit.source_id) == (Source.TMDB, "525")
 
 
+async def test_the_row_of_the_person_survives_the_page(sessions, item_id):
+    """Клик по имени зовёт `by_entity` именно этим номером, и приходит он к
+    клиенту той же дорогой, что и вся страница.
+
+    Номера карточки и человека нарочно разведены лишними людьми: в базе, где у
+    обоих первая строка, подмена колонки на `credit.item_id` сходится и молча
+    открывает работы случайного человека."""
+    repository = people(sessions)
+    for number in range(3):
+        await repository.create(f"Лишний {number}")
+    entity_id = await repository.create("Кристофер Нолан")
+    await repository.attach(item_id, entity_id, PersonRole.DIRECTOR)
+
+    credit = (await ViewsRepository(sessions).views_for([item_id]))[item_id].people[0]
+
+    assert credit.entity_id == entity_id
+    assert credit.entity_id != item_id
+
+
 async def test_a_studio_without_identity_comes_back_empty_and_not_broken(
     sessions, item_id
 ):

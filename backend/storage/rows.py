@@ -105,6 +105,7 @@ def to_credit(row: Row, entity: Entity) -> Credit:
     `Entity` приходит параметром: у людей и студий разные таблицы и разные
     наборы ролей, а порядок в титрах есть только у людей."""
     return Credit(
+        entity_id=row.id,
         name=row.name,
         # Роль возвращается перечислением, а не сырой строкой из базы:
         # `==` у StrEnum истинно и для строки, а `is` и `isinstance` —

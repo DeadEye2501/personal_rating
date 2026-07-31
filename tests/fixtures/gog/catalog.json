@@ -92,13 +92,13 @@
         "osx"
       ],
       "price": {
-        "final": "$59.99",
+        "final": "$41.99",
         "base": "$59.99",
-        "discount": null,
+        "discount": "-30%",
         "finalMoney": {
-          "amount": "59.99",
+          "amount": "41.99",
           "currency": "USD",
-          "discount": "0.00"
+          "discount": "18.00"
         },
         "baseMoney": {
           "amount": "59.99",
@@ -219,7 +219,7 @@
         }
       ],
       "reviewsRating": 46,
-      "reviewsCount": 9043,
+      "reviewsCount": 9048,
       "editions": [],
       "ratings": [
         {
@@ -236,142 +236,6 @@
         }
       ],
       "storeLink": "https://www.gog.com/ru/game/baldurs_gate_iii"
-    },
-    {
-      "id": "1268811982",
-      "slug": "baldurs_gate_reflections_of_myth_valor",
-      "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Кооперативный режим",
-          "slug": "coop"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "multi"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/0cb29a56b2ae6204927954cbb178d3cc774ee41fdda8c1ff1b1ee3c7040e46b2_{formatter}.jpg",
-        "https://images.gog-statics.com/e0609b20e03f2184517869cde809c98677741444a886b038f62b69f29db6888c_{formatter}.jpg",
-        "https://images.gog-statics.com/d64e66ede298414b0ad4ef30846ad062111d3a4dabad8e8c0eba48f2329fb63a_{formatter}.jpg",
-        "https://images.gog-statics.com/ed726286eab274c7bce5400bad2c7236c49e3e4d6868ffef751f2f369ee23a26_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": true,
-        "inText": true
-      },
-      "releaseDate": "2025.04.29",
-      "storeReleaseDate": "2025.04.29",
-      "productType": "dlc",
-      "title": "Baldur's Gate: Reflections Of Myth & Valor",
-      "coverHorizontal": "https://images.gog-statics.com/5460eb24159b31566455b0074847d8144af0280e58854696f0dade74755ac70f.png",
-      "coverVertical": "https://images.gog-statics.com/42c9f6403043d25e62e225cabafd9e56a1aebc7c350379a072295ff6dc8888fb.jpg",
-      "logo": "https://images.gog-statics.com/87231b140f70e4a07cfe348abf96be9dafb782542e636a12eeec36b8cc9369f7.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/f462460a724864383bbb224d62258017393c179d7187d88722fa9f43e6fe1a58.jpg",
-      "developers": [
-        "Beamdog"
-      ],
-      "publishers": [
-        "Beamdog"
-      ],
-      "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
-      ],
-      "price": {
-        "final": "$4.99",
-        "base": "$4.99",
-        "discount": null,
-        "finalMoney": {
-          "amount": "4.99",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "4.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "realtime"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Насыщенный сюжет",
-          "slug": "story-rich"
-        },
-        {
-          "name": "Атмосферные",
-          "slug": "atmospheric"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Многопользовательская игра",
-          "slug": "multiplayer"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "real-time"
-        },
-        {
-          "name": "Изометрия",
-          "slug": "isometric"
-        },
-        {
-          "name": "Магия",
-          "slug": "magic"
-        },
-        {
-          "name": "Компьютерная ролевая игра",
-          "slug": "crpg"
-        },
-        {
-          "name": "Римейк",
-          "slug": "remake"
-        }
-      ],
-      "reviewsRating": 19,
-      "reviewsCount": 23,
-      "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_reflections_of_myth_valor"
     },
     {
       "id": "1157299235",
@@ -419,13 +283,13 @@
         "osx"
       ],
       "price": {
-        "final": "$9.99",
+        "final": "$6.99",
         "base": "$9.99",
-        "discount": null,
+        "discount": "-30%",
         "finalMoney": {
-          "amount": "9.99",
+          "amount": "6.99",
           "currency": "USD",
-          "discount": "0.00"
+          "discount": "3.00"
         },
         "baseMoney": {
           "amount": "9.99",
@@ -546,163 +410,10 @@
         }
       ],
       "reviewsRating": 39,
-      "reviewsCount": 233,
+      "reviewsCount": 234,
       "editions": [],
       "ratings": [],
       "storeLink": "https://www.gog.com/ru/game/baldurs_gate_3_digital_deluxe_edition_upgrade"
-    },
-    {
-      "id": "1207666373",
-      "slug": "baldurs_gate_2_enhanced_edition",
-      "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Кооперативный режим",
-          "slug": "coop"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "multi"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/b670c13f916ad9f2ee62c6e935aef2fff49bbe0a02385c87f0cb06aad963b818_{formatter}.jpg",
-        "https://images.gog-statics.com/4c0bbdfb9660fb09ea88f3da7713544a0de90f1e43cf37c17b31d55fd56891b9_{formatter}.jpg",
-        "https://images.gog-statics.com/213d51053f504151a4253da8f17eb0ed6f1fb066037ef210652f5aff2f1a76b6_{formatter}.jpg",
-        "https://images.gog-statics.com/e8900cb11b0e7c97933830fb3a7c18630a9813248af762e7f155cb695ae08c6e_{formatter}.jpg",
-        "https://images.gog-statics.com/2ab0b84da93e0bcf46b36b718bc77940b640ef399f35c23b00d3d28474d113b6_{formatter}.jpg",
-        "https://images.gog-statics.com/6b9af940b9f3bc10d3f78623240dc9af71a3b54c1e71b8e3d4891c33a1fd130c_{formatter}.jpg",
-        "https://images.gog-statics.com/4921e8da8dcfc3a789f044c6bf07ef380a1a8223198b3dde2c42bf3f27e721a2_{formatter}.jpg",
-        "https://images.gog-statics.com/59e7098a5a98d7ab4c756a638aff822c70d177dbe9707ddea947ab1c8809f129_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2013.11.15",
-      "storeReleaseDate": "1991.12.24",
-      "productType": "game",
-      "title": "Baldur's Gate II: Enhanced Edition",
-      "coverHorizontal": "https://images.gog-statics.com/865e412024677b4594a91ea7cc3da75077ce8114adc26d5b92cb82c7f9b4509f.png",
-      "coverVertical": "https://images.gog-statics.com/179b0289f220b8d3fd4b338a235200252249746898400c35304889fddd0dfdd2.jpg",
-      "logo": "https://images.gog-statics.com/ffc7b35ec88f942ed19e44aa7353ce80a6d5954a819a5cb10abf14e6c2f930fc.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/828fed9bb5ee67b9897c72895bb37f6796d88ab34653460484becba2bb820f5e.jpg",
-      "developers": [
-        "Beamdog"
-      ],
-      "publishers": [
-        "Beamdog"
-      ],
-      "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
-      ],
-      "price": {
-        "final": "$19.99",
-        "base": "$19.99",
-        "discount": null,
-        "finalMoney": {
-          "amount": "19.99",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "19.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "realtime"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Насыщенный сюжет",
-          "slug": "story-rich"
-        },
-        {
-          "name": "Атмосферные",
-          "slug": "atmospheric"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Классика",
-          "slug": "classic"
-        },
-        {
-          "name": "Решения с последствиями",
-          "slug": "choices-matter"
-        },
-        {
-          "name": "Открытый мир",
-          "slug": "open-world"
-        },
-        {
-          "name": "Многопользовательская игра",
-          "slug": "multiplayer"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "real-time"
-        },
-        {
-          "name": "Изометрия",
-          "slug": "isometric"
-        },
-        {
-          "name": "Магия",
-          "slug": "magic"
-        },
-        {
-          "name": "Компьютерная ролевая игра",
-          "slug": "crpg"
-        },
-        {
-          "name": "Настольная игра",
-          "slug": "tabletop"
-        }
-      ],
-      "reviewsRating": 41,
-      "reviewsCount": 1747,
-      "editions": [],
-      "ratings": [
-        {
-          "name": "uskRating",
-          "ageRating": "12"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_2_enhanced_edition"
     },
     {
       "id": "1207666353",
@@ -843,7 +554,7 @@
         }
       ],
       "reviewsRating": 41,
-      "reviewsCount": 2223,
+      "reviewsCount": 2226,
       "editions": [],
       "ratings": [
         {
@@ -858,8 +569,8 @@
       "storeLink": "https://www.gog.com/ru/game/baldurs_gate_enhanced_edition"
     },
     {
-      "id": "2119788107",
-      "slug": "baldurs_gate_ii_reflections_of_myth_valor",
+      "id": "1459335293",
+      "slug": "baldurs_gate_siege_of_dragonspear",
       "features": [
         {
           "name": "Облачные сохранения",
@@ -883,24 +594,30 @@
         }
       ],
       "screenshots": [
-        "https://images.gog-statics.com/fe9ac163aa76054e248963de7ab5e75e680cd17562bc456a977eaeb25f78f55e_{formatter}.jpg",
-        "https://images.gog-statics.com/575f9dffb3cae0e9d80ae1578acf97842f72ea2a3e54d254ab1dbbc4ce268ca7_{formatter}.jpg",
-        "https://images.gog-statics.com/e0f8422d51db4638925ea35858344cee1d52e17fc7a7951f652597a2787a58dc_{formatter}.jpg",
-        "https://images.gog-statics.com/5730b8f0907cd3def9219f69b3325045cac7e77dcebaa5b2d1a57f30106f1bbe_{formatter}.jpg"
+        "https://images.gog-statics.com/aa9f5e18788194e59c2f2b1cbf67793fb35d6ab878d2fb41b1b57bc4d8726794_{formatter}.jpg",
+        "https://images.gog-statics.com/e8284178ec87328fa7d16fdb890d73f78575a3b943a3352207d23b074494af0c_{formatter}.jpg",
+        "https://images.gog-statics.com/e71e72daf99d43d85cddc2df4346e7bf009bfb1388887462eeeb667daf262bf3_{formatter}.jpg",
+        "https://images.gog-statics.com/4d8db313878c6ad07ca7abd24fb1e1f6ea4153804ad56a95cfeddd293597c7b5_{formatter}.jpg",
+        "https://images.gog-statics.com/23d161abdd94ffbcf57bc510893e18d1882a54405a082b71b34a02f89fc40f3e_{formatter}.jpg",
+        "https://images.gog-statics.com/93c758f5618f05310e66800588a03523c4f7fc138cc7b2fccc7a841b1a0f0ce7_{formatter}.jpg",
+        "https://images.gog-statics.com/c7cd1ff866fd762ee5fd2af8c3966932e093a57309f24711195b9b0f51ace215_{formatter}.jpg",
+        "https://images.gog-statics.com/046c1325a2a820b0b50d5e83680b049047668406d14df91003632443715253d6_{formatter}.jpg",
+        "https://images.gog-statics.com/11c529aeb8192eb4827f5af0c6064865868689392ee7973d9208259310fd6d1d_{formatter}.jpg",
+        "https://images.gog-statics.com/4bc197ff4b98c8665d4fc81d4f0183be2023923dce1ebff2bc8d138b241c0422_{formatter}.jpg",
+        "https://images.gog-statics.com/e8fb31f9bb4b24e05f63b368e162bdf9b7f87d67c59c4c17a1a92a8a9546a5c6_{formatter}.jpg",
+        "https://images.gog-statics.com/b4b299fe341bd2b763f810399239f40546a71f84dfb5d7516ff3f1d76fc1465f_{formatter}.jpg",
+        "https://images.gog-statics.com/df1130b39a473ffe477e5a15ed742e257bdc99b9b7b7b59257b7b2f5b5af9667_{formatter}.jpg",
+        "https://images.gog-statics.com/d11bff48daf210a551656ac5f158afcea2710d352dca6bb57f632b55ab2b3e61_{formatter}.jpg"
       ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": false,
-        "inText": true
-      },
-      "releaseDate": "2025.04.29",
-      "storeReleaseDate": "2025.04.29",
+      "userPreferredLanguage": null,
+      "releaseDate": "2016.04.01",
+      "storeReleaseDate": "2016.04.01",
       "productType": "dlc",
-      "title": "Baldur's Gate II: Reflections Of Myth & Valor",
-      "coverHorizontal": "https://images.gog-statics.com/b7336474d68fe516c92cdedb33e78ddc7d52c250e06af0b3de4490653a8a3226.png",
-      "coverVertical": "https://images.gog-statics.com/577d59b78a2e9d4e162ea6784118fbc51f6183133d61b3b2daf8686528d78c65.jpg",
-      "logo": "https://images.gog-statics.com/a177eaa9cf2630c4d55e072db172aa3475d9762f16a2e944d908b22545dd637c.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/ddce0d98710229da96cc893b3457b80526b2ef793089a0a0393b05b571931717.jpg",
+      "title": "Baldur's Gate: Siege of Dragonspear",
+      "coverHorizontal": "https://images.gog-statics.com/7855873c39ccdd9839a79d4a33305083f29b30584f2e52b6d36c4d3cd9a02a74.png",
+      "coverVertical": "https://images.gog-statics.com/198bd771f37cf94ecea61aff033b1ec131253dc88d71f515b4a1cab6c715abbf.jpg",
+      "logo": "https://images.gog-statics.com/ec22e579463b251e93d3a0ae9f235096bbbc04e5beaa1a2d46da54ff16fc8603.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/1d632c3fad003b65ec224342a5721c30aaad8d8a35c32b450678f08549997dbf.jpg",
       "developers": [
         "Beamdog"
       ],
@@ -913,16 +630,159 @@
         "osx"
       ],
       "price": {
-        "final": "$4.99",
-        "base": "$4.99",
+        "final": "$9.99",
+        "base": "$9.99",
         "discount": null,
         "finalMoney": {
-          "amount": "4.99",
+          "amount": "9.99",
           "currency": "USD",
           "discount": "0.00"
         },
         "baseMoney": {
-          "amount": "4.99",
+          "amount": "9.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "ЛГБТК+",
+          "slug": "lgbtq-plus"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        }
+      ],
+      "reviewsRating": 26,
+      "reviewsCount": 1799,
+      "editions": [
+        {
+          "id": 1459335293,
+          "name": "Standard Edition",
+          "isRootEdition": true
+        }
+      ],
+      "ratings": [
+        {
+          "name": "pegiRating",
+          "ageRating": "12"
+        },
+        {
+          "name": "uskRating",
+          "ageRating": "12"
+        }
+      ],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_siege_of_dragonspear"
+    },
+    {
+      "id": "1207666373",
+      "slug": "baldurs_gate_2_enhanced_edition",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/b670c13f916ad9f2ee62c6e935aef2fff49bbe0a02385c87f0cb06aad963b818_{formatter}.jpg",
+        "https://images.gog-statics.com/4c0bbdfb9660fb09ea88f3da7713544a0de90f1e43cf37c17b31d55fd56891b9_{formatter}.jpg",
+        "https://images.gog-statics.com/213d51053f504151a4253da8f17eb0ed6f1fb066037ef210652f5aff2f1a76b6_{formatter}.jpg",
+        "https://images.gog-statics.com/e8900cb11b0e7c97933830fb3a7c18630a9813248af762e7f155cb695ae08c6e_{formatter}.jpg",
+        "https://images.gog-statics.com/2ab0b84da93e0bcf46b36b718bc77940b640ef399f35c23b00d3d28474d113b6_{formatter}.jpg",
+        "https://images.gog-statics.com/6b9af940b9f3bc10d3f78623240dc9af71a3b54c1e71b8e3d4891c33a1fd130c_{formatter}.jpg",
+        "https://images.gog-statics.com/4921e8da8dcfc3a789f044c6bf07ef380a1a8223198b3dde2c42bf3f27e721a2_{formatter}.jpg",
+        "https://images.gog-statics.com/59e7098a5a98d7ab4c756a638aff822c70d177dbe9707ddea947ab1c8809f129_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2013.11.15",
+      "storeReleaseDate": null,
+      "productType": "game",
+      "title": "Baldur's Gate II: Enhanced Edition",
+      "coverHorizontal": "https://images.gog-statics.com/865e412024677b4594a91ea7cc3da75077ce8114adc26d5b92cb82c7f9b4509f.png",
+      "coverVertical": "https://images.gog-statics.com/179b0289f220b8d3fd4b338a235200252249746898400c35304889fddd0dfdd2.jpg",
+      "logo": "https://images.gog-statics.com/ffc7b35ec88f942ed19e44aa7353ce80a6d5954a819a5cb10abf14e6c2f930fc.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/828fed9bb5ee67b9897c72895bb37f6796d88ab34653460484becba2bb820f5e.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$19.99",
+        "base": "$19.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "19.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "19.99",
           "currency": "USD"
         }
       },
@@ -995,118 +855,16 @@
           "slug": "tabletop"
         }
       ],
-      "reviewsRating": 19,
-      "reviewsCount": 23,
+      "reviewsRating": 41,
+      "reviewsCount": 1750,
       "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_ii_reflections_of_myth_valor"
-    },
-    {
-      "id": "2100574330",
-      "slug": "baldurs_gate_3_toolkit",
-      "features": [
+      "ratings": [
         {
-          "name": "Одиночная игра",
-          "slug": "single"
+          "name": "uskRating",
+          "ageRating": "12"
         }
       ],
-      "screenshots": [
-        "https://images.gog-statics.com/ee24d60de49d667fca77671732a5401b0f45fbd46afe9bbf66f8241f98c73f93_{formatter}.jpg",
-        "https://images.gog-statics.com/c48a80dfecf1f5f424f56f2e0093be6561caec6369fc96e94a98daf572d96fda_{formatter}.jpg",
-        "https://images.gog-statics.com/704fc09acd4ec41afcc659f3c78941b78a05129e77dc0b0ceadd37bdbcfdfb7c_{formatter}.jpg",
-        "https://images.gog-statics.com/96cb4d80c0fb52be646f35dbdc9705a729e97706d1f9123ccc8b8aa12da2c527_{formatter}.jpg",
-        "https://images.gog-statics.com/647eb73d7d0df585be31a2db35dc14befeee7968a0861bbf4fdd7204fe4da14d_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": "2024.09.05",
-      "storeReleaseDate": "2024.09.05",
-      "productType": "pack",
-      "title": "Baldur's Gate 3 Toolkit",
-      "coverHorizontal": "https://images.gog-statics.com/35bb51be78b5b3f8735d01ce49fe81d6426528f57a84b5e7e13c34a3838441ad.png",
-      "coverVertical": "https://images.gog-statics.com/d11a921bb657f111460194c713a51165a801c20a93965c4f192fd3d679dbdee2.jpg",
-      "logo": "https://images.gog-statics.com/895fe3941129960cfdc2eb8517a6bc09ec98b960bcc5cd6c0acfa3a93b827a5f.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/564ccbc37702957f10629904da158562b872ac12479098f5ef41d0e834ec1bc1.jpg",
-      "developers": [
-        "Larian Studios"
-      ],
-      "publishers": [
-        "Larian Studios"
-      ],
-      "operatingSystems": [
-        "windows"
-      ],
-      "price": {
-        "final": "$0.00",
-        "base": "$0.00",
-        "discount": null,
-        "finalMoney": {
-          "amount": "0.00",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "0.00",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        },
-        {
-          "name": "Пошаговая",
-          "slug": "turnbased"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Атмосферные",
-          "slug": "atmospheric"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Исследовательские",
-          "slug": "exploration"
-        },
-        {
-          "name": "Пошаговая стратегия",
-          "slug": "turn-based"
-        },
-        {
-          "name": "Мрачная",
-          "slug": "dark"
-        },
-        {
-          "name": "Для взрослых",
-          "slug": "mature"
-        },
-        {
-          "name": "Магия",
-          "slug": "magic"
-        },
-        {
-          "name": "Средневековье",
-          "slug": "medieval"
-        }
-      ],
-      "reviewsRating": 26,
-      "reviewsCount": 13,
-      "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_3_toolkit"
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_2_enhanced_edition"
     },
     {
       "id": "1745438757",
@@ -1255,6 +1013,503 @@
       "storeLink": "https://www.gog.com/ru/game/baldurs_gate_dark_alliance_ii"
     },
     {
+      "id": "1915136134",
+      "slug": "baldurs_gate_faces_of_good_and_evil",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/089ed859a1aaa52d7688959e70dbafb950c0d98619c855cadbd70a76d6d41b93_{formatter}.jpg",
+        "https://images.gog-statics.com/dc9d3a95e81346e2aa2a367b5d6682e2e25409f7860c85bd323090d2d8f05079_{formatter}.jpg",
+        "https://images.gog-statics.com/78c94eb9e4be7601572dbd5921460da0ee5758c08884302c1096ae8c91b2b59d_{formatter}.jpg",
+        "https://images.gog-statics.com/1d5787df863bf1268b542bfaf24901653afccec4b6958d1c0aac943ca65757fd_{formatter}.jpg",
+        "https://images.gog-statics.com/6bbdd0e249319b0a919eba53699db57dd5d51213b0e4b3d2feb6f78be58b98a9_{formatter}.jpg",
+        "https://images.gog-statics.com/4f422c1f045c1787c499344b84ce0e998232115d7adaa8b505d9b971f80bc238_{formatter}.jpg",
+        "https://images.gog-statics.com/fc2f0ae3e94c98104ab396260dc2f738d057d6a027c92ed2bcc8e2a0e77578dc_{formatter}.jpg",
+        "https://images.gog-statics.com/232c06cfba7ff75b1fe49dbbaf1bd2ba683f0f1431ae46a0c5bd1e86771d074d_{formatter}.jpg",
+        "https://images.gog-statics.com/1e40ce46db87ac824457b4d82613a2dcbd429494fc971b79b2abde4fd0c8057e_{formatter}.jpg",
+        "https://images.gog-statics.com/86132723a5503fdd2ca8ea29f8f6072d7a82779d66259ec13678807a6cf69006_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2018.04.14",
+      "storeReleaseDate": "2018.04.20",
+      "productType": "dlc",
+      "title": "Baldur's Gate: Faces of Good and Evil",
+      "coverHorizontal": "https://images.gog-statics.com/b0019d1a95c931b2586d4a9bb494f070a3554c38ee098ba8cc4c4dfe1fcbb8f8.png",
+      "coverVertical": "https://images.gog-statics.com/bdbbdfc3b4db52532c0d0c1025916baccedf6a16d5d8d90efeda59f9dc9317a4.jpg",
+      "logo": "https://images.gog-statics.com/6fbeb034ec73fca2ca84173013a8cc6ee66ac25c5550aef8255737d8f7fb41f4.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/45391d783a1c24a606385508186547a0d92e5775fa41b094debc2076dc7a6945.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$1.99",
+        "base": "$1.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "1.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "1.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        }
+      ],
+      "reviewsRating": 13,
+      "reviewsCount": 432,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_faces_of_good_and_evil"
+    },
+    {
+      "id": "2119788107",
+      "slug": "baldurs_gate_ii_reflections_of_myth_valor",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/fe9ac163aa76054e248963de7ab5e75e680cd17562bc456a977eaeb25f78f55e_{formatter}.jpg",
+        "https://images.gog-statics.com/575f9dffb3cae0e9d80ae1578acf97842f72ea2a3e54d254ab1dbbc4ce268ca7_{formatter}.jpg",
+        "https://images.gog-statics.com/e0f8422d51db4638925ea35858344cee1d52e17fc7a7951f652597a2787a58dc_{formatter}.jpg",
+        "https://images.gog-statics.com/5730b8f0907cd3def9219f69b3325045cac7e77dcebaa5b2d1a57f30106f1bbe_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": false,
+        "inText": true
+      },
+      "releaseDate": "2025.04.29",
+      "storeReleaseDate": "2025.04.29",
+      "productType": "dlc",
+      "title": "Baldur's Gate II: Reflections Of Myth & Valor",
+      "coverHorizontal": "https://images.gog-statics.com/b7336474d68fe516c92cdedb33e78ddc7d52c250e06af0b3de4490653a8a3226.png",
+      "coverVertical": "https://images.gog-statics.com/577d59b78a2e9d4e162ea6784118fbc51f6183133d61b3b2daf8686528d78c65.jpg",
+      "logo": "https://images.gog-statics.com/a177eaa9cf2630c4d55e072db172aa3475d9762f16a2e944d908b22545dd637c.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/ddce0d98710229da96cc893b3457b80526b2ef793089a0a0393b05b571931717.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$4.99",
+        "base": "$4.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "4.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "4.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Решения с последствиями",
+          "slug": "choices-matter"
+        },
+        {
+          "name": "Открытый мир",
+          "slug": "open-world"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Настольная игра",
+          "slug": "tabletop"
+        }
+      ],
+      "reviewsRating": 19,
+      "reviewsCount": 23,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_ii_reflections_of_myth_valor"
+    },
+    {
+      "id": "1268811982",
+      "slug": "baldurs_gate_reflections_of_myth_valor",
+      "features": [
+        {
+          "name": "Облачные сохранения",
+          "slug": "cloud_saves"
+        },
+        {
+          "name": "Кооперативный режим",
+          "slug": "coop"
+        },
+        {
+          "name": "сетевая игра",
+          "slug": "multi"
+        },
+        {
+          "name": "Оверлей",
+          "slug": "overlay"
+        },
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/0cb29a56b2ae6204927954cbb178d3cc774ee41fdda8c1ff1b1ee3c7040e46b2_{formatter}.jpg",
+        "https://images.gog-statics.com/e0609b20e03f2184517869cde809c98677741444a886b038f62b69f29db6888c_{formatter}.jpg",
+        "https://images.gog-statics.com/d64e66ede298414b0ad4ef30846ad062111d3a4dabad8e8c0eba48f2329fb63a_{formatter}.jpg",
+        "https://images.gog-statics.com/ed726286eab274c7bce5400bad2c7236c49e3e4d6868ffef751f2f369ee23a26_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": {
+        "code": "ru",
+        "inAudio": true,
+        "inText": true
+      },
+      "releaseDate": "2025.04.29",
+      "storeReleaseDate": "2025.04.29",
+      "productType": "dlc",
+      "title": "Baldur's Gate: Reflections Of Myth & Valor",
+      "coverHorizontal": "https://images.gog-statics.com/5460eb24159b31566455b0074847d8144af0280e58854696f0dade74755ac70f.png",
+      "coverVertical": "https://images.gog-statics.com/42c9f6403043d25e62e225cabafd9e56a1aebc7c350379a072295ff6dc8888fb.jpg",
+      "logo": "https://images.gog-statics.com/87231b140f70e4a07cfe348abf96be9dafb782542e636a12eeec36b8cc9369f7.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/f462460a724864383bbb224d62258017393c179d7187d88722fa9f43e6fe1a58.jpg",
+      "developers": [
+        "Beamdog"
+      ],
+      "publishers": [
+        "Beamdog"
+      ],
+      "operatingSystems": [
+        "windows",
+        "linux",
+        "osx"
+      ],
+      "price": {
+        "final": "$4.99",
+        "base": "$4.99",
+        "discount": null,
+        "finalMoney": {
+          "amount": "4.99",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "4.99",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "realtime"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Насыщенный сюжет",
+          "slug": "story-rich"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Классика",
+          "slug": "classic"
+        },
+        {
+          "name": "Многопользовательская игра",
+          "slug": "multiplayer"
+        },
+        {
+          "name": "В реальном времени",
+          "slug": "real-time"
+        },
+        {
+          "name": "Изометрия",
+          "slug": "isometric"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Компьютерная ролевая игра",
+          "slug": "crpg"
+        },
+        {
+          "name": "Римейк",
+          "slug": "remake"
+        }
+      ],
+      "reviewsRating": 19,
+      "reviewsCount": 23,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_reflections_of_myth_valor"
+    },
+    {
+      "id": "2100574330",
+      "slug": "baldurs_gate_3_toolkit",
+      "features": [
+        {
+          "name": "Одиночная игра",
+          "slug": "single"
+        }
+      ],
+      "screenshots": [
+        "https://images.gog-statics.com/ee24d60de49d667fca77671732a5401b0f45fbd46afe9bbf66f8241f98c73f93_{formatter}.jpg",
+        "https://images.gog-statics.com/c48a80dfecf1f5f424f56f2e0093be6561caec6369fc96e94a98daf572d96fda_{formatter}.jpg",
+        "https://images.gog-statics.com/704fc09acd4ec41afcc659f3c78941b78a05129e77dc0b0ceadd37bdbcfdfb7c_{formatter}.jpg",
+        "https://images.gog-statics.com/96cb4d80c0fb52be646f35dbdc9705a729e97706d1f9123ccc8b8aa12da2c527_{formatter}.jpg",
+        "https://images.gog-statics.com/647eb73d7d0df585be31a2db35dc14befeee7968a0861bbf4fdd7204fe4da14d_{formatter}.jpg"
+      ],
+      "userPreferredLanguage": null,
+      "releaseDate": "2024.09.05",
+      "storeReleaseDate": "2024.09.05",
+      "productType": "pack",
+      "title": "Baldur's Gate 3 Toolkit",
+      "coverHorizontal": "https://images.gog-statics.com/35bb51be78b5b3f8735d01ce49fe81d6426528f57a84b5e7e13c34a3838441ad.png",
+      "coverVertical": "https://images.gog-statics.com/d11a921bb657f111460194c713a51165a801c20a93965c4f192fd3d679dbdee2.jpg",
+      "logo": "https://images.gog-statics.com/895fe3941129960cfdc2eb8517a6bc09ec98b960bcc5cd6c0acfa3a93b827a5f.png",
+      "galaxyBackgroundImage": "https://images.gog-statics.com/564ccbc37702957f10629904da158562b872ac12479098f5ef41d0e834ec1bc1.jpg",
+      "developers": [
+        "Larian Studios"
+      ],
+      "publishers": [
+        "Larian Studios"
+      ],
+      "operatingSystems": [
+        "windows"
+      ],
+      "price": {
+        "final": "$0.00",
+        "base": "$0.00",
+        "discount": null,
+        "finalMoney": {
+          "amount": "0.00",
+          "currency": "USD",
+          "discount": "0.00"
+        },
+        "baseMoney": {
+          "amount": "0.00",
+          "currency": "USD"
+        }
+      },
+      "productState": "default",
+      "genres": [
+        {
+          "name": "Ролевая игра",
+          "slug": "rpg"
+        },
+        {
+          "name": "Пошаговая",
+          "slug": "turnbased"
+        },
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        }
+      ],
+      "tags": [
+        {
+          "name": "Фэнтези",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Атмосферные",
+          "slug": "atmospheric"
+        },
+        {
+          "name": "Ролевая игра",
+          "slug": "role-playing"
+        },
+        {
+          "name": "Исследовательские",
+          "slug": "exploration"
+        },
+        {
+          "name": "Пошаговая стратегия",
+          "slug": "turn-based"
+        },
+        {
+          "name": "Мрачная",
+          "slug": "dark"
+        },
+        {
+          "name": "Для взрослых",
+          "slug": "mature"
+        },
+        {
+          "name": "Магия",
+          "slug": "magic"
+        },
+        {
+          "name": "Средневековье",
+          "slug": "medieval"
+        }
+      ],
+      "reviewsRating": 26,
+      "reviewsCount": 13,
+      "editions": [],
+      "ratings": [],
+      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_3_toolkit"
+    },
+    {
       "id": "1760702251",
       "slug": "baldurs_gate_dark_alliance",
       "features": [
@@ -1386,116 +1641,6 @@
       "editions": [],
       "ratings": [],
       "storeLink": "https://www.gog.com/ru/game/baldurs_gate_dark_alliance"
-    },
-    {
-      "id": "1915136134",
-      "slug": "baldurs_gate_faces_of_good_and_evil",
-      "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Кооперативный режим",
-          "slug": "coop"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "multi"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/089ed859a1aaa52d7688959e70dbafb950c0d98619c855cadbd70a76d6d41b93_{formatter}.jpg",
-        "https://images.gog-statics.com/dc9d3a95e81346e2aa2a367b5d6682e2e25409f7860c85bd323090d2d8f05079_{formatter}.jpg",
-        "https://images.gog-statics.com/78c94eb9e4be7601572dbd5921460da0ee5758c08884302c1096ae8c91b2b59d_{formatter}.jpg",
-        "https://images.gog-statics.com/1d5787df863bf1268b542bfaf24901653afccec4b6958d1c0aac943ca65757fd_{formatter}.jpg",
-        "https://images.gog-statics.com/6bbdd0e249319b0a919eba53699db57dd5d51213b0e4b3d2feb6f78be58b98a9_{formatter}.jpg",
-        "https://images.gog-statics.com/4f422c1f045c1787c499344b84ce0e998232115d7adaa8b505d9b971f80bc238_{formatter}.jpg",
-        "https://images.gog-statics.com/fc2f0ae3e94c98104ab396260dc2f738d057d6a027c92ed2bcc8e2a0e77578dc_{formatter}.jpg",
-        "https://images.gog-statics.com/232c06cfba7ff75b1fe49dbbaf1bd2ba683f0f1431ae46a0c5bd1e86771d074d_{formatter}.jpg",
-        "https://images.gog-statics.com/1e40ce46db87ac824457b4d82613a2dcbd429494fc971b79b2abde4fd0c8057e_{formatter}.jpg",
-        "https://images.gog-statics.com/86132723a5503fdd2ca8ea29f8f6072d7a82779d66259ec13678807a6cf69006_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": {
-        "code": "ru",
-        "inAudio": true,
-        "inText": true
-      },
-      "releaseDate": "2018.04.14",
-      "storeReleaseDate": "2018.04.20",
-      "productType": "dlc",
-      "title": "Baldur's Gate: Faces of Good and Evil",
-      "coverHorizontal": "https://images.gog-statics.com/b0019d1a95c931b2586d4a9bb494f070a3554c38ee098ba8cc4c4dfe1fcbb8f8.png",
-      "coverVertical": "https://images.gog-statics.com/bdbbdfc3b4db52532c0d0c1025916baccedf6a16d5d8d90efeda59f9dc9317a4.jpg",
-      "logo": "https://images.gog-statics.com/6fbeb034ec73fca2ca84173013a8cc6ee66ac25c5550aef8255737d8f7fb41f4.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/45391d783a1c24a606385508186547a0d92e5775fa41b094debc2076dc7a6945.jpg",
-      "developers": [
-        "Beamdog"
-      ],
-      "publishers": [
-        "Beamdog"
-      ],
-      "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
-      ],
-      "price": {
-        "final": "$1.99",
-        "base": "$1.99",
-        "discount": null,
-        "finalMoney": {
-          "amount": "1.99",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "1.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "realtime"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "real-time"
-        }
-      ],
-      "reviewsRating": 13,
-      "reviewsCount": 432,
-      "editions": [],
-      "ratings": [],
-      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_faces_of_good_and_evil"
     },
     {
       "id": "2129826400",
@@ -1786,151 +1931,6 @@
       "editions": [],
       "ratings": [],
       "storeLink": "https://www.gog.com/ru/game/siege_of_dragonspear_enhanced_edition_official_soundtrack"
-    },
-    {
-      "id": "1459335293",
-      "slug": "baldurs_gate_siege_of_dragonspear",
-      "features": [
-        {
-          "name": "Облачные сохранения",
-          "slug": "cloud_saves"
-        },
-        {
-          "name": "Кооперативный режим",
-          "slug": "coop"
-        },
-        {
-          "name": "сетевая игра",
-          "slug": "multi"
-        },
-        {
-          "name": "Оверлей",
-          "slug": "overlay"
-        },
-        {
-          "name": "Одиночная игра",
-          "slug": "single"
-        }
-      ],
-      "screenshots": [
-        "https://images.gog-statics.com/aa9f5e18788194e59c2f2b1cbf67793fb35d6ab878d2fb41b1b57bc4d8726794_{formatter}.jpg",
-        "https://images.gog-statics.com/e8284178ec87328fa7d16fdb890d73f78575a3b943a3352207d23b074494af0c_{formatter}.jpg",
-        "https://images.gog-statics.com/e71e72daf99d43d85cddc2df4346e7bf009bfb1388887462eeeb667daf262bf3_{formatter}.jpg",
-        "https://images.gog-statics.com/4d8db313878c6ad07ca7abd24fb1e1f6ea4153804ad56a95cfeddd293597c7b5_{formatter}.jpg",
-        "https://images.gog-statics.com/23d161abdd94ffbcf57bc510893e18d1882a54405a082b71b34a02f89fc40f3e_{formatter}.jpg",
-        "https://images.gog-statics.com/93c758f5618f05310e66800588a03523c4f7fc138cc7b2fccc7a841b1a0f0ce7_{formatter}.jpg",
-        "https://images.gog-statics.com/c7cd1ff866fd762ee5fd2af8c3966932e093a57309f24711195b9b0f51ace215_{formatter}.jpg",
-        "https://images.gog-statics.com/046c1325a2a820b0b50d5e83680b049047668406d14df91003632443715253d6_{formatter}.jpg",
-        "https://images.gog-statics.com/11c529aeb8192eb4827f5af0c6064865868689392ee7973d9208259310fd6d1d_{formatter}.jpg",
-        "https://images.gog-statics.com/4bc197ff4b98c8665d4fc81d4f0183be2023923dce1ebff2bc8d138b241c0422_{formatter}.jpg",
-        "https://images.gog-statics.com/e8fb31f9bb4b24e05f63b368e162bdf9b7f87d67c59c4c17a1a92a8a9546a5c6_{formatter}.jpg",
-        "https://images.gog-statics.com/b4b299fe341bd2b763f810399239f40546a71f84dfb5d7516ff3f1d76fc1465f_{formatter}.jpg",
-        "https://images.gog-statics.com/df1130b39a473ffe477e5a15ed742e257bdc99b9b7b7b59257b7b2f5b5af9667_{formatter}.jpg",
-        "https://images.gog-statics.com/d11bff48daf210a551656ac5f158afcea2710d352dca6bb57f632b55ab2b3e61_{formatter}.jpg"
-      ],
-      "userPreferredLanguage": null,
-      "releaseDate": "2016.04.01",
-      "storeReleaseDate": "2016.04.01",
-      "productType": "dlc",
-      "title": "Baldur's Gate: Siege of Dragonspear",
-      "coverHorizontal": "https://images.gog-statics.com/7855873c39ccdd9839a79d4a33305083f29b30584f2e52b6d36c4d3cd9a02a74.png",
-      "coverVertical": "https://images.gog-statics.com/198bd771f37cf94ecea61aff033b1ec131253dc88d71f515b4a1cab6c715abbf.jpg",
-      "logo": "https://images.gog-statics.com/ec22e579463b251e93d3a0ae9f235096bbbc04e5beaa1a2d46da54ff16fc8603.png",
-      "galaxyBackgroundImage": "https://images.gog-statics.com/1d632c3fad003b65ec224342a5721c30aaad8d8a35c32b450678f08549997dbf.jpg",
-      "developers": [
-        "Beamdog"
-      ],
-      "publishers": [
-        "Beamdog"
-      ],
-      "operatingSystems": [
-        "windows",
-        "linux",
-        "osx"
-      ],
-      "price": {
-        "final": "$9.99",
-        "base": "$9.99",
-        "discount": null,
-        "finalMoney": {
-          "amount": "9.99",
-          "currency": "USD",
-          "discount": "0.00"
-        },
-        "baseMoney": {
-          "amount": "9.99",
-          "currency": "USD"
-        }
-      },
-      "productState": "default",
-      "genres": [
-        {
-          "name": "Ролевая игра",
-          "slug": "rpg"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "realtime"
-        },
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        }
-      ],
-      "tags": [
-        {
-          "name": "Фэнтези",
-          "slug": "fantasy"
-        },
-        {
-          "name": "Ролевая игра",
-          "slug": "role-playing"
-        },
-        {
-          "name": "Многопользовательская игра",
-          "slug": "multiplayer"
-        },
-        {
-          "name": "В реальном времени",
-          "slug": "real-time"
-        },
-        {
-          "name": "Изометрия",
-          "slug": "isometric"
-        },
-        {
-          "name": "Магия",
-          "slug": "magic"
-        },
-        {
-          "name": "ЛГБТК+",
-          "slug": "lgbtq-plus"
-        },
-        {
-          "name": "Компьютерная ролевая игра",
-          "slug": "crpg"
-        }
-      ],
-      "reviewsRating": 26,
-      "reviewsCount": 1799,
-      "editions": [
-        {
-          "id": 1459335293,
-          "name": "Standard Edition",
-          "isRootEdition": true
-        }
-      ],
-      "ratings": [
-        {
-          "name": "pegiRating",
-          "ageRating": "12"
-        },
-        {
-          "name": "uskRating",
-          "ageRating": "12"
-        }
-      ],
-      "storeLink": "https://www.gog.com/ru/game/baldurs_gate_siege_of_dragonspear"
     }
   ],
   "dreamlistGames": [],
@@ -1941,7 +1941,7 @@
     },
     "priceRange": {
       "min": 0,
-      "max": 59.99,
+      "max": 41.99,
       "currency": "USD",
       "decimalPlaces": 2
     },
@@ -2672,12 +2672,12 @@
         "slug": "mature"
       },
       {
-        "name": "Сексуальный контент",
-        "slug": "sexual-content"
-      },
-      {
         "name": "OST",
         "slug": "ost"
+      },
+      {
+        "name": "Сексуальный контент",
+        "slug": "sexual-content"
       },
       {
         "name": "Песочница",
@@ -2740,16 +2740,16 @@
         "slug": "jrpg"
       },
       {
+        "name": "Ретро",
+        "slug": "retro"
+      },
+      {
         "name": "Рогалик",
         "slug": "roguelike"
       },
       {
         "name": "Изометрия",
         "slug": "isometric"
-      },
-      {
-        "name": "Ретро",
-        "slug": "retro"
       },
       {
         "name": "Магия",
@@ -2888,12 +2888,12 @@
         "slug": "tactical-rpg"
       },
       {
-        "name": "Глобальная стратегия",
-        "slug": "grand-strategy"
-      },
-      {
         "name": "Аркада",
         "slug": "arcade"
+      },
+      {
+        "name": "Глобальная стратегия",
+        "slug": "grand-strategy"
       },
       {
         "name": "Сюрреалистичная",
@@ -2924,12 +2924,12 @@
         "slug": "crpg"
       },
       {
-        "name": "Головоломка-платформер",
-        "slug": "puzzle-platformer"
-      },
-      {
         "name": "Современность",
         "slug": "modern"
+      },
+      {
+        "name": "Головоломка-платформер",
+        "slug": "puzzle-platformer"
       },
       {
         "name": "Файтинг",
@@ -2988,24 +2988,24 @@
         "slug": "politics"
       },
       {
-        "name": "Shoot'EmUp",
-        "slug": "shoot-em-up"
+        "name": "Триллер",
+        "slug": "thriller"
       },
       {
         "name": "Cozy",
         "slug": "cozy"
       },
       {
-        "name": "Триллер",
-        "slug": "thriller"
-      },
-      {
-        "name": "Дистопия",
-        "slug": "dystopian"
+        "name": "Shoot'EmUp",
+        "slug": "shoot-em-up"
       },
       {
         "name": "Скролл-шутер",
         "slug": "bullet-hell"
+      },
+      {
+        "name": "Дистопия",
+        "slug": "dystopian"
       },
       {
         "name": "4X",
@@ -3184,12 +3184,12 @@
         "slug": "parody"
       },
       {
-        "name": "Без насилия",
-        "slug": "non-violent"
-      },
-      {
         "name": "Вестерн",
         "slug": "western"
+      },
+      {
+        "name": "Без насилия",
+        "slug": "non-violent"
       },
       {
         "name": "Боевые искусства",
@@ -3300,16 +3300,16 @@
         "slug": "werewolves"
       },
       {
+        "name": "Mod",
+        "slug": "mod"
+      },
+      {
         "name": "Внедорожники",
         "slug": "offroad"
       },
       {
         "name": "Американский футбол",
         "slug": "soccer"
-      },
-      {
-        "name": "Mod",
-        "slug": "mod"
       },
       {
         "name": "Кино",

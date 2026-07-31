@@ -1,0 +1,303 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "gender": 2,
+      "id": 525,
+      "known_for_department": "Directing",
+      "name": "Кристофер Нолан",
+      "original_name": "Christopher Nolan",
+      "popularity": 15.094,
+      "profile_path": "/xuAIuYSmsUzKlUMBFGVZaWsY3DZ.jpg",
+      "known_for": [
+        {
+          "adult": false,
+          "backdrop_path": "/5XNQBqnBwPA9yT0jZ0p3s8bbLh0.jpg",
+          "id": 157336,
+          "title": "Интерстеллар",
+          "original_title": "Interstellar",
+          "overview": "Когда засуха, пыльные бури и вымирание растений приводят человечество к продовольственному кризису, коллектив исследователей и учёных отправляется сквозь червоточину в путешествие, чтобы превзойти прежние ограничения для космических путешествий человека и найти планету с подходящими для человечества условиями.",
+          "poster_path": "/vReLRjDV9XPhiOSEW7QWow4DXwf.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            12,
+            18,
+            878
+          ],
+          "popularity": 74.7932,
+          "release_date": "2014-11-05",
+          "softcore": false,
+          "video": false,
+          "vote_average": 8.483,
+          "vote_count": 40514
+        },
+        {
+          "adult": false,
+          "backdrop_path": "/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg",
+          "id": 27205,
+          "title": "Начало",
+          "original_title": "Inception",
+          "overview": "Дом Кобб — талантливый вор, лучший из лучших в опасном искусстве извлечения: он крадёт ценные секреты из глубин подсознания во время сна, когда человеческий разум наиболее уязвим. Редкие способности Кобба сделали его ценным игроком в привычном к предательству мире промышленного шпионажа, но они же превратили его в извечного беглеца и лишили всего, что он когда-либо любил.  И вот у Кобба появляется шанс исправить ошибки. Его последнее дело может вернуть всё назад, но для этого ему нужно совершить невозможное — инициацию. Вместо идеальной кражи Кобб и его команда спецов должны будут провернуть обратное. Теперь их задача — не украсть идею, а внедрить её. Если у них получится, это и станет идеальным преступлением.  Но никакое планирование или мастерство не могут подготовить команду к встрече с опасным противником, который, кажется, предугадывает каждый их ход. Врагом, увидеть которого мог бы лишь Кобб.",
+          "poster_path": "/piQXcdOGgv1O9HQ07pI0tnjkGJw.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            28,
+            878,
+            12
+          ],
+          "popularity": 61.0828,
+          "release_date": "2010-07-15",
+          "softcore": false,
+          "video": false,
+          "vote_average": 8.373,
+          "vote_count": 39693
+        },
+        {
+          "adult": false,
+          "backdrop_path": "/dqK9Hag1054tghRQSqLSfrkvQnA.jpg",
+          "id": 155,
+          "title": "Тёмный рыцарь",
+          "original_title": "The Dark Knight",
+          "overview": "Бэтмен поднимает ставки в войне с криминалом. С помощью лейтенанта Джима Гордона и прокурора Харви Дента он намерен очистить улицы от преступности, отравляющей город. Сотрудничество оказывается эффективным, но скоро они обнаружат себя посреди хаоса, развязанного восходящим криминальным гением, известным испуганным горожанам под именем Джокер.",
+          "poster_path": "/aPtN76OjnNKLqCJ2FJBnQOIL031.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            28,
+            80,
+            53
+          ],
+          "popularity": 57.0919,
+          "release_date": "2008-07-16",
+          "softcore": false,
+          "video": false,
+          "vote_average": 8.534,
+          "vote_count": 36220
+        }
+      ]
+    },
+    {
+      "adult": false,
+      "gender": 0,
+      "id": 6279344,
+      "known_for_department": "Directing",
+      "name": "Christopher Nolan",
+      "original_name": "Christopher Nolan",
+      "popularity": 0.1586,
+      "profile_path": null,
+      "known_for": [
+        {
+          "adult": false,
+          "backdrop_path": "/a8YAlsnO8TQoKWBdydHotd2fweP.jpg",
+          "id": 1712688,
+          "title": "thank you i guess",
+          "original_title": "thank you i guess",
+          "overview": "",
+          "poster_path": "/ukPbd3qmPwrhe5nZs5HBSJSWZsH.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            16,
+            10402,
+            10749,
+            35
+          ],
+          "popularity": 0.2539,
+          "release_date": "2026-04-29",
+          "softcore": false,
+          "video": false,
+          "vote_average": 10.0,
+          "vote_count": 1
+        },
+        {
+          "adult": false,
+          "backdrop_path": null,
+          "id": 1720881,
+          "title": "I'm Never Showing My Face Again",
+          "original_title": "I'm Never Showing My Face Again",
+          "overview": "",
+          "poster_path": "/lWh7VmQmFMYa6ljlG1oEWdyuSlW.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            35,
+            18,
+            10402
+          ],
+          "popularity": 0.1909,
+          "release_date": "2026-04-17",
+          "softcore": false,
+          "video": false,
+          "vote_average": 0.0,
+          "vote_count": 0
+        },
+        {
+          "adult": false,
+          "backdrop_path": null,
+          "id": 1720889,
+          "title": "Justin Bieber Followed Me?!?",
+          "original_title": "Justin Bieber Followed Me?!?",
+          "overview": "",
+          "poster_path": "/7J5wYKuGpN8pYMLwOImM20yhzUr.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            35,
+            18,
+            10402
+          ],
+          "popularity": 0.2563,
+          "release_date": "2026-04-23",
+          "softcore": false,
+          "video": false,
+          "vote_average": 0.0,
+          "vote_count": 0
+        }
+      ]
+    },
+    {
+      "adult": false,
+      "gender": 0,
+      "id": 4066940,
+      "known_for_department": "Acting",
+      "name": "Christopher Nolan",
+      "original_name": "Christopher Nolan",
+      "popularity": 0.2288,
+      "profile_path": null,
+      "known_for": [
+        {
+          "adult": false,
+          "backdrop_path": null,
+          "id": 1127782,
+          "title": "Chandamama raave ASAP",
+          "original_title": "Chandamama raave ASAP",
+          "overview": "",
+          "poster_path": "/fm90M2DbAUr8YkzkxRxRAHAA7Sx.jpg",
+          "media_type": "movie",
+          "original_language": "te",
+          "genre_ids": [
+            878,
+            53
+          ],
+          "popularity": 0.4309,
+          "release_date": "2021-07-02",
+          "softcore": false,
+          "video": false,
+          "vote_average": 0.0,
+          "vote_count": 0
+        }
+      ]
+    },
+    {
+      "adult": false,
+      "gender": 2,
+      "id": 1097178,
+      "known_for_department": "Acting",
+      "name": "Кристофер Патрик Нолан",
+      "original_name": "Christopher Patrick Nolan",
+      "popularity": 0.4218,
+      "profile_path": "/7xy74GTKm9JTVf3fErsNluQ1mrF.jpg",
+      "known_for": [
+        {
+          "adult": false,
+          "backdrop_path": "/6t8ES1d12OzWyCGxBeDYLHoaDrT.jpg",
+          "id": 330459,
+          "title": "Изгой-один: Звёздные войны. Истории",
+          "original_title": "Rogue One: A Star Wars Story",
+          "overview": "Фильм рассказывает о событиях, которые предшествовали четвёртому эпизоду «Звёздных Войн». Узнав о том, что Империя построила самую совершенную боевую станцию, способную уничтожать целые планеты, Альянс Повстанцев собирает особый отряд под руководством бывшей преступницы Джин Эрсо, целью которого является чертежи совершенного оружия Империи.  Несмотря на то, что миссия кажется самоубийственной, отряд готов рискнуть всем ради победы. Однако расстановка сил резко меняется, когда Император посылает за ними своего самого страшного и могущественного приспешника — Дарта Вейдера, чьё присутствие гарантирует как минимум одно — отряду повстанцев не суждено вернуться со своей миссии живыми.",
+          "poster_path": "/agKGn83Y380RKlakyVEIpTuMoA1.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            28,
+            12,
+            878
+          ],
+          "popularity": 11.3217,
+          "release_date": "2016-12-14",
+          "softcore": false,
+          "video": false,
+          "vote_average": 7.509,
+          "vote_count": 16555
+        },
+        {
+          "adult": false,
+          "backdrop_path": "/hLqezDDJB4Pjbk1w35OUIrw9keJ.jpg",
+          "id": 133448,
+          "title": "Macbeth",
+          "original_title": "Macbeth",
+          "overview": "",
+          "poster_path": "/yB8oGQbcVR2SJoopvmOGoEaloXE.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            18
+          ],
+          "popularity": 0.6004,
+          "release_date": "2010-12-12",
+          "softcore": false,
+          "video": false,
+          "vote_average": 6.8,
+          "vote_count": 36
+        },
+        {
+          "adult": false,
+          "backdrop_path": "/xtKsxEoXE6AR4X9ZSn3y0tDHJIA.jpg",
+          "id": 625884,
+          "title": "Линн и Люси",
+          "original_title": "Lynn + Lucy",
+          "overview": "Линни и Люси с детства были лучшими подругами. Линн рано вышла замуж и родила дочь, а взбалмошная Люси никак не могла остепениться. Даже когда она наконец-то выходит замуж и заводит ребёнка, она относится не нему не так, как ожидала Линн. Вскоре происходят трагические события, которые станут испытанием дружбы девушек и изменят их судьбы навсегда.",
+          "poster_path": "/bZ4YYC8En469TOgEYwXBcFz35fs.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            18
+          ],
+          "popularity": 0.4604,
+          "release_date": "2019-09-22",
+          "softcore": false,
+          "video": false,
+          "vote_average": 6.6,
+          "vote_count": 18
+        }
+      ]
+    },
+    {
+      "adult": false,
+      "gender": 0,
+      "id": 2526416,
+      "known_for_department": "Directing",
+      "name": "Christopher Noland",
+      "original_name": "Christopher Noland",
+      "popularity": 0.2034,
+      "profile_path": null,
+      "known_for": [
+        {
+          "adult": false,
+          "backdrop_path": null,
+          "id": 222625,
+          "title": "3.11: Surviving Japan",
+          "original_title": "3.11: Surviving Japan",
+          "overview": "",
+          "poster_path": "/aQ7bLU92HrOCH7NII3zTfjgU8bG.jpg",
+          "media_type": "movie",
+          "original_language": "en",
+          "genre_ids": [
+            99
+          ],
+          "popularity": 0.3905,
+          "release_date": "2013-03-11",
+          "softcore": false,
+          "video": false,
+          "vote_average": 8.0,
+          "vote_count": 3
+        }
+      ]
+    }
+  ],
+  "total_pages": 1,
+  "total_results": 5
+}

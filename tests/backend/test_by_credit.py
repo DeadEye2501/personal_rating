@@ -1,6 +1,6 @@
 """Всё с этим человеком и с этой студией."""
 
-from backend.model import CompanyRole, PersonRole
+from backend.model import CompanyRole, Kind, PersonRole
 from backend.service.library import LibraryService
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.views import ViewsRepository
@@ -20,7 +20,7 @@ async def test_everything_of_one_person_comes_back(sessions):
     await repository.attach(his_id, nolan, PersonRole.DIRECTOR)
     await repository.attach(hers_id, villeneuve, PersonRole.DIRECTOR)
 
-    found = await repository.items_of(nolan, limit=50, offset=0)
+    found = await repository.items_of(nolan, Kind.MOVIE)
 
     assert found == [his_id]
     assert hers_id not in found
@@ -35,7 +35,7 @@ async def test_the_highest_rated_comes_first(sessions):
     for item_id in (weaker_id, stronger_id):
         await repository.attach(item_id, nolan, PersonRole.DIRECTOR)
 
-    assert await repository.items_of(nolan, limit=50, offset=0) == [
+    assert await repository.items_of(nolan, Kind.MOVIE) == [
         stronger_id, weaker_id
     ]
 
@@ -49,7 +49,7 @@ async def test_the_unrated_follow_the_rated(sessions):
     for item_id in (unrated_id, rated_id):
         await repository.attach(item_id, nolan, PersonRole.DIRECTOR)
 
-    assert await repository.items_of(nolan, limit=50, offset=0) == [
+    assert await repository.items_of(nolan, Kind.MOVIE) == [
         rated_id, unrated_id
     ]
 
@@ -63,21 +63,27 @@ async def test_both_roles_of_one_person_give_one_card(sessions):
     await repository.attach(item_id, eastwood, PersonRole.DIRECTOR)
     await repository.attach(item_id, eastwood, PersonRole.ACTOR)
 
-    assert await repository.items_of(eastwood, limit=50, offset=0) == [item_id]
+    assert await repository.items_of(eastwood, Kind.MOVIE) == [item_id]
 
 
-async def test_a_portion_is_taken_from_the_offset(sessions):
-    """Пять карточек, а не четыре: с четырьмя порция от смещения совпадает с
-    остатком, и снятый предел прошёл бы молча."""
+async def test_the_kind_narrows_and_nothing_else_does(sessions):
+    """Вкладка — первичный фильтр: сериал того же человека во вкладку фильмов
+    не попадает. Предела при этом нет — все пять фильмов приезжают разом, потому
+    что следующей страницы у этого жеста не бывает."""
     repository = people(sessions)
     nolan = await repository.create("Кристофер Нолан")
-    ids = []
+    films = []
     for number in range(5):
         item_id = await rated(sessions, str(number), 10.0 - number)
         await repository.attach(item_id, nolan, PersonRole.DIRECTOR)
-        ids.append(item_id)
+        films.append(item_id)
+    series_id = await rated(sessions, "series", 9.5, kind=Kind.SERIES)
+    await repository.attach(series_id, nolan, PersonRole.SHOWRUNNER)
 
-    assert await repository.items_of(nolan, limit=2, offset=2) == ids[2:4]
+    found = await repository.items_of(nolan, Kind.MOVIE)
+
+    assert found == films
+    assert series_id not in found
 
 
 async def test_studios_work_the_same_way(sessions):
@@ -87,7 +93,7 @@ async def test_studios_work_the_same_way(sessions):
     item_id = await rated(sessions, "1", 9.0, title="Интерстеллар")
     await repository.attach(item_id, studio, CompanyRole.PUBLISHER)
 
-    assert await repository.items_of(studio, limit=50, offset=0) == [item_id]
+    assert await repository.items_of(studio, Kind.MOVIE) == [item_id]
 
 
 async def test_a_studio_does_not_see_the_films_of_a_person(sessions):
@@ -99,7 +105,7 @@ async def test_a_studio_does_not_see_the_films_of_a_person(sessions):
     await people(sessions).attach(item_id, nolan, PersonRole.DIRECTOR)
 
     assert nolan == studio
-    assert await companies(sessions).items_of(studio, limit=50, offset=0) == []
+    assert await companies(sessions).items_of(studio, Kind.MOVIE) == []
 
 
 async def test_equal_scores_keep_a_stable_order(sessions):
@@ -118,14 +124,14 @@ async def test_equal_scores_keep_a_stable_order(sessions):
         await repository.attach(item_id, nolan, PersonRole.DIRECTOR)
         ids.append(item_id)
 
-    assert await repository.items_of(nolan, limit=50, offset=0) == sorted(ids)
+    assert await repository.items_of(nolan, Kind.MOVIE) == sorted(ids)
 
 
 async def test_a_person_with_nothing_gives_nothing(sessions):
     repository = people(sessions)
     nobody = await repository.create("Никто")
 
-    assert await repository.items_of(nobody, limit=50, offset=0) == []
+    assert await repository.items_of(nobody, Kind.MOVIE) == []
 
 
 async def test_the_cards_come_back_whole(sessions, sections):
@@ -139,7 +145,7 @@ async def test_the_cards_come_back_whole(sessions, sections):
     for item_id in (weaker_id, stronger_id):
         await repository.attach(item_id, nolan, PersonRole.DIRECTOR)
 
-    ids = await repository.items_of(nolan, limit=50, offset=0)
+    ids = await repository.items_of(nolan, Kind.MOVIE)
     views = await feed.views_of(ids)
 
     assert [view.title for view in views] == ["Интерстеллар", "Довод"]

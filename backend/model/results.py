@@ -22,24 +22,24 @@ class ExternalSearch:
 
 def merge_results(local: list[CardView],
                   external: list[CardView]) -> list[CardView]:
-    """Порядок задан источником: у него есть данные о популярности и совпадении
-    с запросом, которых у нас нет.
+    """Сначала своё целиком, потом чужое. Правило одно на всю выдачу поиска —
+    и на строку ввода, и на клик по человеку.
 
-    Дубли снимаются по паре «источник + идентификатор». Одна и та же игра из
-    Steam и из GOG под эту пару не попадает и показывается дважды."""
-    mine = {(view.source, view.source_id): view for view in local}
+    Порядок внутри половин не трогается: своя приходит уже упорядоченной, у
+    чужой порядок задан источником — у него есть данные о популярности и
+    совпадении с запросом, которых у нас нет.
 
-    merged: list[CardView] = []
-    seen: set[tuple[Source, str]] = set()
+    Дубли снимаются по паре «источник + идентификатор»: совпавшее чужое не
+    показывается вторым разом, потому что своё уже показано выше и у него есть
+    оценка, теги и закладка. Одна и та же игра из Steam и из GOG под эту пару
+    не попадает и показывается дважды."""
+    merged = list(local)
+    seen: set[tuple[Source, str]] = {(view.source, view.source_id)
+                                     for view in local}
     for view in external:
         key = (view.source, view.source_id)
         if key in seen:
             continue
         seen.add(key)
-        # Своё стоит на своём месте и ничем не выделено — но показываем именно
-        # его: у него есть оценка, теги и закладка.
-        merged.append(mine.get(key, view))
-
-    merged.extend(view for view in local
-                  if (view.source, view.source_id) not in seen)
+        merged.append(view)
     return merged

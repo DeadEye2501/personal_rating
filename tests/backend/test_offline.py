@@ -298,6 +298,29 @@ async def test_the_assembly_wires_the_three_services_nobody_asked_about(offline)
     assert link.reason is Reason.NETWORK
 
 
+async def test_the_assembly_wires_the_click_on_a_name(offline):
+    """Четвёртое поле того же рода: `finder=None` оставлял весь набор зелёным —
+    боевую сборку клика не звал ни один тест.
+
+    Домены проверяются оба и по отдельности: подай сюда сборка людей вместо
+    студий, поиск по человеку пошёл бы в таблицу студий, там этой строки нет — и
+    ответ пришёл бы пустым. Номера у человека и студии для этого разведены: обе
+    таблицы нумеруются с единицы, и с равными номерами обмен сошёлся бы."""
+    item_id = await offline.library.create(mine("Домашнее видео"))
+    person_id = await offline.people.create_manual("Кристофер Нолан")
+    for number in range(3):
+        await offline.companies.create_manual(f"Лишняя {number}")
+    studio_id = await offline.companies.create_manual("Syncopy")
+    await offline.people.attach(item_id, person_id, PersonRole.DIRECTOR)
+    await offline.companies.attach(item_id, studio_id, CompanyRole.PUBLISHER)
+
+    by_person = await offline.finder.by_entity("people", person_id, Kind.MOVIE)
+    by_studio = await offline.finder.by_entity("companies", studio_id, Kind.MOVIE)
+
+    assert [view.item_id for view in by_person.views] == [item_id]
+    assert [view.item_id for view in by_studio.views] == [item_id]
+
+
 async def test_everything_closes_and_lets_go(tmp_path):
     """Пустой `aclose` прошёл бы проверку «файл существует» — проверяем, что
     закрыты все трое: соединения источников, хранилище постеров и движок базы.

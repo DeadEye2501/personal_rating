@@ -17,6 +17,7 @@
   - `people: CreditRepository`
   - `companies: CreditRepository`
   - `search: SearchService`
+  - `finder: PeopleSearch`
   - `feed: LibraryService`
   - `loader: Loader`
   - `series: SeriesRefresh`
@@ -54,6 +55,7 @@
   - `name: str`
   - `role: PersonRole | CompanyRole`
   - `position: int | None` = `None`
+  - `entity_id: int | None` = `None`
   - `source: Source | None` = `None`
   - `source_id: str | None` = `None`
 
@@ -235,6 +237,8 @@
   - `poster_url: str` = `''`
   - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
   - `source_rating: float | None` = `None`
+- `class PersonHit`
+  - `source_id: str`
 
 ### `backend/model/suggestion.py`
 
@@ -534,6 +538,8 @@
 - `ANDOR_TMDB` = `83867`
 - `INTERSTELLAR_IMDB` = `'tt0816692'`
 - `WITCHER_APPID` = `292030`
+- `NOLAN_TMDB` = `525`
+- `MURPHY_TMDB` = `2037`
 
 ## tests
 
@@ -603,9 +609,7 @@
 ### `tests/backend/test_layers.py`
 
 - `ROOT` = `Path(__file__).resolve().parents[2]`
-- `BANNED_IN_CLIENT` = `набор из 5`
 - `BANNED_IN_BACKEND` = `набор из 4`
-- `ALLOWED_FROM_BACKEND` = `набор из 2`
 
 ### `tests/backend/test_linking.py`
 
