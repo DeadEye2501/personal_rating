@@ -650,7 +650,7 @@ git commit -m "feat: палитра, база и локальные шрифты
 - Потребляет: ничего.
 - Отдаёт: `EMPTY`, `cycled(filters, field, id)`, `chosen(filters)`,
   `isEmpty(filters)`; `SORT_STATES`, `ADDED_AT`, `nextSort(index)`,
-  `orderOf(index)`, `defaultOrder(section)`; `newSession()`,
+  `orderOf(index)`, `orderFor(section, sort)`; `newSession()`,
   `withKind(session, kind)`, `withSection(session, section)`,
   `withCollapsed(session, collapsed)`.
 
@@ -719,7 +719,7 @@ describe('строка фильтра', () => {
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { ADDED_AT, SORT_STATES, defaultOrder, nextSort, orderOf }
+import { ADDED_AT, SORT_STATES, nextSort, orderFor, orderOf }
   from '$state/sorting.js'
 
 describe('переключатель сортировки', () => {
@@ -760,15 +760,23 @@ describe('переключатель сортировки', () => {
   })
 
   it('дату добавления в переборе не встретить', () => {
-    // Это порядок по умолчанию в «Хочу посмотреть», и девятое состояние ради
-    // возврата к нему стоило бы дороже самого возврата.
+    // В «Хочу посмотреть» сортировки нет вовсе, и девятое состояние
+    // понадобилось бы ровно одному разделу, где остальные восемь не значат
+    // ничего.
     const keys = SORT_STATES.map((_, index) => orderOf(index).key)
     expect(keys).not.toContain(ADDED_AT)
   })
 
-  it('в отложенном порядок по умолчанию — по дате добавления', () => {
-    expect(defaultOrder('wishlist')).toEqual({ key: ADDED_AT, descending: true })
-    expect(defaultOrder('rated')).toEqual(orderOf(0))
+  it('в отложенном порядок один и переключателем не сбивается', () => {
+    // Список дел смотрят сверху вниз: там один порядок, по дате добавления, и
+    // тронутый переключатель на него не действует.
+    expect(orderFor('wishlist', null)).toEqual({ key: ADDED_AT, descending: true })
+    expect(orderFor('wishlist', 5)).toEqual({ key: ADDED_AT, descending: true })
+  })
+
+  it('в оценённых переключатель действует, а нетронутый даёт умолчание', () => {
+    expect(orderFor('rated', null)).toEqual(orderOf(0))
+    expect(orderFor('rated', 5)).toEqual(orderOf(5))
   })
 
   it('каждое состояние объясняет себя словами', () => {
@@ -933,11 +941,16 @@ export function orderOf(index) {
   return { key: state.key, descending: state.down }
 }
 
-/** Пока переключатель не тронут. */
-export function defaultOrder(section) {
-  return section === 'wishlist'
-    ? { key: ADDED_AT, descending: true }
-    : orderOf(0)
+/** Порядок раздела: `sort` — состояние переключателя или `null`, если он не
+ *  тронут.
+ *
+ *  В «Хочу посмотреть» порядок один и переключателем не сбивается: это список
+ *  дел, а не библиотека, и смотрят его сверху вниз. Кнопки сортировки там нет
+ *  вовсе, но проверка стоит и на тронутом состоянии — чтобы правило держалось
+ *  само, а не тем, что кнопку забыли нарисовать. */
+export function orderFor(section, sort) {
+  if (section === 'wishlist') return { key: ADDED_AT, descending: true }
+  return sort === null ? orderOf(0) : orderOf(sort)
 }
 ```
 
@@ -987,7 +1000,7 @@ export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
 cd client && npm test
 ```
 
-Ожидание: PASS, 21 тест.
+Ожидание: PASS, 22 теста.
 
 - [ ] **Шаг 7: Коммит**
 
@@ -1258,7 +1271,7 @@ function tail(args) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 30 тестов — девять новых и двадцать один из задачи 3.
+Ожидание: PASS, 31 тест — девять новых и двадцать два из задачи 3.
 
 - [ ] **Шаг 5: Коммит**
 
@@ -1729,10 +1742,15 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
                 active={session.collapsed} pressed={session.collapsed}
                 onclick={() => onsession(withCollapsed(session, !session.collapsed))} />
 
-    <ToolButton icon={sort.icon} dir={sort.dir}
-                label={'Сортировка: ' + sort.label.toLowerCase()}
-                onclick={() => onsession({ ...session,
-                                           sort: nextSort(session.sort ?? 0) })} />
+    <!-- В «Хочу посмотреть» сортировки нет вовсе: там один порядок, по дате
+         добавления. Кнопка, которая ничего не делает, называла бы порядок,
+         которого не существует. -->
+    {#if session.section !== 'wishlist'}
+      <ToolButton icon={sort.icon} dir={sort.dir}
+                  label={'Сортировка: ' + sort.label.toLowerCase()}
+                  onclick={() => onsession({ ...session,
+                                             sort: nextSort(session.sort ?? 0) })} />
+    {/if}
 
     <ToolButton icon="add" label="Завести карточку" onclick={onadd} />
   </div>
@@ -1744,14 +1762,11 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 применён он один на все признаки. Разбор по признакам появится в плане 8, вместе
 с самими модалками.
 
-**Открытый вопрос к пользователю, а не решение исполнителя.** В «Хочу
-посмотреть» порядок по умолчанию — по дате добавления, но она в переборе не
-участвует, и показать её кнопке нечем: в макете такого состояния нет вовсе.
-Сейчас кнопка показывает первое состояние перебора («по оценке, сначала
-высокие»), пока переключатель не тронут, — то есть говорит не то, что делает
-лента. Вариантов у вопроса три: девятый глиф вне перебора, приглушённая кнопка
-до первого нажатия, или оставить как есть. Это оформление, и выбирает его
-пользователь. До ответа исполнитель ничего здесь не меняет и не придумывает.
+**В «Хочу посмотреть» сортировки нет, и кнопки там тоже нет.** Решено
+31.07.2026: в том разделе один порядок — по дате добавления, — и переключатель на
+него не действует. Показывать кнопку, которая ничего не делает, нельзя: она
+называла бы порядок, которого нет. Поэтому она просто не рисуется, как не
+рисуются фильтры в поиске.
 
 - [ ] **Шаг 4: Считать ширину зон замером**
 
@@ -2088,6 +2103,6 @@ git commit -m "feat: четыре раздела стопкой, переход 
 Разбор «какой именно фильтр применён» по признакам — план 8: сейчас все три
 кнопки горят от одного `isEmpty`, как и написано в спеке.
 
-**Чем измеряется готовность.** `npm test` зелёный, 30 тестов. Окно открывается,
+**Чем измеряется готовность.** `npm test` зелёный, 31 тест. Окно открывается,
 шапка совпадает с макетом при сверке рядом, переключение типа перетекает
 акцентом, разделы меняются проявлением, плашка выезжает и уходит.

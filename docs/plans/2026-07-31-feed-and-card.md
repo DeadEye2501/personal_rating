@@ -364,7 +364,7 @@ function plural(count, forms) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 46 тестов — шестнадцать новых и тридцать из плана 6.
+Ожидание: PASS, 47 тестов — шестнадцать новых и тридцать один из плана 6.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -1599,7 +1599,7 @@ git commit -m "feat: поиск — своё сразу, внешнее по г�
 - Изменить: `client/app/RatedScreen.svelte`, `WishScreen.svelte`
 
 **Интерфейсы:**
-- Потребляет: `chosen` из `$state/filters.js`; `defaultOrder`, `orderOf` из
+- Потребляет: `chosen` из `$state/filters.js`; `orderFor` из
   `$state/sorting.js`.
 - Отдаёт: `requestOf(session)` — то, что уезжает в `feed.page` и
   `feed.histogram`.
@@ -1612,16 +1612,16 @@ git commit -m "feat: поиск — своё сразу, внешнее по г�
 /** Запрос раздела: то, что уезжает мостом в `feed.page` и `feed.histogram`. */
 
 import { chosen } from '$state/filters.js'
-import { defaultOrder, orderOf } from '$state/sorting.js'
+import { orderFor } from '$state/sorting.js'
 
 export function requestOf(session) {
   return {
     section: session.section,
     kind: session.kind,
     filters: chosen(session.filters),
-    // Переключатель не тронут — действует порядок по умолчанию раздела.
-    order: session.sort === null ? defaultOrder(session.section)
-                                 : orderOf(session.sort),
+    // Что означает нетронутый переключатель и где он не действует вовсе —
+    // знает `orderFor`, а не эта сборка.
+    order: orderFor(session.section, session.sort),
   }
 }
 ```
@@ -1751,6 +1751,6 @@ git commit -m "feat: разделы «Оценённые» и «Хочу пос�
 `IntersectionObserver`. Оба удовлетворяют требованию; выбор записывается доводом
 в код.
 
-**Чем измеряется готовность.** `npm test` зелёный, 46 тестов. Найденное в
+**Чем измеряется готовность.** `npm test` зелёный, 47 тестов. Найденное в
 интернете заводится в библиотеку, оценивается звёздами и остаётся в разделах
 после перезапуска.
