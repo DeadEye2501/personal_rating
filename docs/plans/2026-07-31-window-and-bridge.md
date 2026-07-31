@@ -3185,7 +3185,7 @@ git commit -m "feat: мост собран целиком, со сторожем
 - Отдаёт: `Page(thread, root)` — WSGI-приложение (`__call__(environ,
   start_response)`), `WEB_ROOT`, `TYPES`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_serve.py`:
 
@@ -3329,12 +3329,12 @@ def test_a_cover_asked_without_anything_is_refused(tmp_path, spy, asked):
     assert status.startswith("400")
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_serve.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.serve'`.
 
-- [ ] **Шаг 3: Написать отдачу**
+- [x] **Шаг 3: Написать отдачу**
 
 Создать `bridge/serve.py`:
 
@@ -3467,18 +3467,18 @@ def _answer(start_response, status: str, kind: str, body: bytes,
     return [body]
 ```
 
-- [ ] **Шаг 4: Закрыть сборку фронта от git**
+- [x] **Шаг 4: Закрыть сборку фронта от git**
 
 Проверить `.gitignore`: строка `dist/` там уже есть и закрывает `client/dist`
 на любой глубине — дописывать нечего. Убедиться заодно, что `*.spec` не
 помешает плану 10: файл сборки PyInstaller туда попадает.
 
-- [ ] **Шаг 5: Прогнать и увидеть зелёное**
+- [x] **Шаг 5: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_serve.py -v`
 Ожидание: PASS, 10 тестов.
 
-- [ ] **Шаг 6: Коммит**
+- [x] **Шаг 6: Коммит**
 
 ```bash
 git add bridge/serve.py tests/bridge/test_serve.py .gitignore

@@ -935,7 +935,7 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 12 модулей
+## bridge — 13 модулей
 
 ### `bridge/answer.py` — 71 строк
 
@@ -1056,6 +1056,21 @@
   - `async def _added(self, back, candidate)` (2)
 - `def _found(views, source: str, source_id: str)` (7)
 
+### `bridge/serve.py` — 142 строк
+
+Страница, ресурсы и обложки по HTTP.
+
+Зависит от: `backend.model`, `bridge.thread`
+
+- `class Page` (65)
+  - `def __call__(self, environ, start_response)` (6)
+  - `def _file(self, path: str, start_response)` (18)
+  - `def _poster(self, query: dict, start_response)` (32)
+- `async def _fetched(back, item, source, url)` (12)
+- `def _looks_like(picture: bytes) -> str` (5)
+- `def _single(query: dict, name: str) -> str | None` (3)
+- `def _answer(start_response, status: str, kind: str, body: bytes, cache: str | None=None)` (7)
+
 ### `bridge/thread.py` — 185 строк
 
 Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом.
@@ -1168,7 +1183,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 77 модулей
+## tests — 78 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1947,6 +1962,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 3
 
+
+### `tests/bridge/test_serve.py` — 224 строк
+
+Отдача страницы, ресурсов и обложек.
+
+Зависит от: `backend.model`, `bridge.serve`
+
+Тестов: 16
+
+- `def call(page, path, query='')` (10)
+  - `def start(status, headers)` (3)
 
 ### `tests/bridge/test_thread.py` — 200 строк
 

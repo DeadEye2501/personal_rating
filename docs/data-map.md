@@ -508,6 +508,13 @@
 
 - `DOMAINS` = `набор из 2`
 
+### `bridge/serve.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `WEB_ROOT` = `Path(__file__).resolve().parent.parent / 'client…`
+- `TYPES` = `словарь из 8`
+- `MAGIC` = `набор из 3`
+
 ### `bridge/thread.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -706,6 +713,12 @@
 - `SOURCES` = `sorted((ROOT / 'bridge').glob('*.py'))`
 - `DOMAINS` = `набор из 7`
 - `CHOOSER` = `'_of'`
+
+### `tests/bridge/test_serve.py`
+
+- `PNG` = `b'\x89PNG\r\n\x1a\nthe rest'`
+- `JPEG` = `b'\xff\xd8\xff\xe0the rest'`
+- `CANDIDATE` = `'source=tmdb&url=https%3A%2F%2Fimage%2F1.jpg'`
 
 ### `tests/builders.py`
 
