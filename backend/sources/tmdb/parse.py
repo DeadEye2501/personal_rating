@@ -18,6 +18,7 @@ from backend.model import (
     SourceCard,
 )
 from backend.sources.convert import genres, identifier, rating, year
+from backend.unique import unique_by
 
 POSTER_BASE = "https://image.tmdb.org/t/p/w500"
 
@@ -129,10 +130,7 @@ def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]:
     `character`, ни `job`, ни `order`, — и дедупликация ломалась бы от
     добавления любого из этих полей."""
     rows = [*payload.get("cast", []), *payload.get("crew", [])]
-    by_work: dict[str, SearchHit] = {}
-    for one in _hits(rows, kind):
-        by_work.setdefault(one.source_id, one)
-    return list(by_work.values())
+    return unique_by(_hits(rows, kind), lambda one: one.source_id)
 
 
 def parse_people(payload: dict) -> list[PersonHit]:

@@ -249,7 +249,7 @@
 
 ### `backend/service/hits.py` — 75 строк
 
-Ответы источников в карточки показа: от пачки исходов до готовых карточек.
+Приведение того, что ответили источники, к виду выдачи.
 
 Зависит от: `backend.model`, `backend.sources.convert`, `backend.storage.repository.genres`, `backend.unique`
 
@@ -304,13 +304,13 @@
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/people.py` — 116 строк
+### `backend/service/people.py` — 114 строк
 
 Что найдётся по человеку или студии.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.views`, `backend.unique`
 
-- `def _once(refusals: list[Refusal]) -> list[Refusal]` (10)
+- `def _once(refusals: list[Refusal]) -> list[Refusal]` (7)
 - `class PeopleSearch` (77)
   - `async def by_entity(self, domain: str, entity_id: int, kind: Kind) -> ExternalSearch` (11)
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
@@ -344,7 +344,7 @@
 
 - `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (17)
 
-### `backend/service/search.py` — 82 строк
+### `backend/service/search.py` — 79 строк
 
 Что найдётся по запросу.
 
@@ -590,18 +590,18 @@
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (5)
 
-### `backend/sources/tmdb/client.py` — 157 строк
+### `backend/sources/tmdb/client.py` — 158 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
 - `def classify(response: httpx.Response) -> Missing | Refusal | None` (23)
-- `class TmdbClient` (99)
+- `class TmdbClient` (100)
   - `def name(self) -> str` (4)
   - `def _params(self, **extra: object) -> dict` (2)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (12)
-  - `async def _asked(self, url: str, **extra: object) -> httpx.Response | Missing | Refusal` (12)
+  - `async def _asked(self, url: str, **extra: object) -> httpx.Response | Missing | Refusal` (13)
   - `async def _taken(self, url: str, complaint: str, parse: Callable[[dict], object], **extra: object) -> Outcome` (12)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
   - `async def credits_of(self, person_id: str, kind: Kind) -> Outcome` (10)
@@ -610,11 +610,11 @@
   - `async def series_counts(self, source_id: str) -> Outcome` (6)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 220 строк
+### `backend/sources/tmdb/parse.py` — 218 строк
 
 Перевод ответов TMDB в наши типы.
 
-Зависит от: `backend.model`, `backend.sources.convert`
+Зависит от: `backend.model`, `backend.sources.convert`, `backend.unique`
 
 - `class Incomplete(ValueError)` (9)
 - `def _released(value: str | None) -> date | None` (7)
@@ -626,7 +626,7 @@
 - `def _required(payload: dict, block: str) -> dict` (9)
 - `def _item(payload: dict, kind: Kind, now: datetime, **extra) -> Item` (20)
 - `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (2)
-- `def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]` (14)
+- `def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]` (11)
 - `def parse_people(payload: dict) -> list[PersonHit]` (5)
 - `def _hits(rows: list[dict], kind: Kind) -> list[SearchHit]` (25)
 - `def parse_movie(payload: dict) -> SourceCard` (18)
@@ -745,7 +745,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 210 строк
+### `backend/storage/repository/library.py` — 213 строк
 
 Карточки библиотеки.
 
@@ -754,14 +754,14 @@
 - `class ItemExists(Exception)` (2)
 - `def _named(entity: Entity, needle: str)` (13)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (159)
+- `class LibraryRepository(Repository)` (162)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
   - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (18)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
-  - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (34)
+  - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (37)
   - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
   - `async def delete(self, item_id: int) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
@@ -848,7 +848,7 @@
   - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
-### `backend/storage/rows.py` — 117 строк
+### `backend/storage/rows.py` — 121 строк
 
 Строки базы в типы границы слоёв.
 
@@ -861,7 +861,7 @@
 - `def to_rating(row: Row) -> Rating` (11)
 - `def to_tag(row: Row) -> Tag` (7)
 - `def grouped(rows, column: str, make: Callable[[Row], object]) -> defaultdict[object, list]` (12)
-- `def to_credit(row: Row, entity: Entity) -> Credit` (16)
+- `def to_credit(row: Row, entity: Entity) -> Credit` (20)
 
 ### `backend/storage/session.py` — 55 строк
 
@@ -917,13 +917,14 @@
 Зависит от: `backend.storage.tables.base`
 
 
-### `backend/unique.py` — 16 строк
+### `backend/unique.py` — 32 строк
 
 Снятие повторов с сохранением порядка.
 
 Зависит от: —
 
 - `def unique(items: Iterable[T]) -> list[T]` (11)
+- `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
 ## migrations — 3 модулей
 
@@ -1092,7 +1093,7 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 324 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_registry.py` — 283 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
@@ -1101,6 +1102,7 @@ OMDB: единственный источник, у которого отказ 
 Тестов: 17
 
 - `def sources()` (4)
+- `async def registry()` (9)
 - `def keyed()` (12)
 
 ### `tests/backend/sources/test_steam.py` — 374 строк ⚠ подошёл к 300
@@ -1132,13 +1134,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def ask(transport: httpx.MockTransport)` (5)
 
-### `tests/backend/sources/test_tmdb_people.py` — 142 строк
+### `tests/backend/sources/test_tmdb_people.py` — 170 строк
 
 Фильмография человека и поиск человека по имени.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`, `tests.conftest`
 
-Тестов: 12
+Тестов: 13
 
 
 ### `tests/backend/sources/test_tmdb_search.py` — 182 строк
@@ -1162,7 +1164,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def cancelled_request()` (2)
 - `async def good_request()` (2)
 
-### `tests/backend/test_by_credit.py` — 152 строк
+### `tests/backend/test_by_credit.py` — 155 строк
 
 Всё с этим человеком и с этой студией.
 
@@ -1204,22 +1206,22 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def covers(posters)` (5)
 
-### `tests/backend/test_credit_search.py` — 109 строк
+### `tests/backend/test_credit_search.py` — 106 строк
 
 Строка поиска: широкий общий поиск по людям, названию и оригинальному.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`, `tests.builders`
 
-Тестов: 7
+Тестов: 6
 
 
-### `tests/backend/test_credits.py` — 318 строк ⚠ подошёл к 300
+### `tests/backend/test_credits.py` — 350 строк ⚠ подошёл к 300
 
 Люди и студии: одна реализация на две сущности, и различает их идентичность.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
-Тестов: 25
+Тестов: 27
 
 
 ### `tests/backend/test_delete.py` — 156 строк
@@ -1441,7 +1443,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def boundary_dataclasses()` (15)
 
-### `tests/backend/test_offline.py` — 356 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 362 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
@@ -1462,18 +1464,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 3
 
 
-### `tests/backend/test_people_search.py` — 300 строк
+### `tests/backend/test_people_search.py` — 356 строк ⚠ подошёл к 300
 
 Клик по человеку и студии: внутренняя половина и внешняя.
 
 Зависит от: `backend.model`, `backend.service.people`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 15
+Тестов: 18
 
-- `class FakePerson(FakeClient)` (18)
+- `class FakePerson(FakeClient)` (17)
   - `async def credits_of(self, person_id: str, kind: Kind)` (5)
   - `async def find_people(self, name: str)` (3)
-- `def parts(sessions, engine)` (8)
+- `def parts(sessions)` (8)
 - `def finder_on(parts, client) -> PeopleSearch` (5)
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
 
@@ -1519,11 +1521,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(sessions)` (8)
   - `def build(*clients) -> SearchService` (6)
 
-### `tests/backend/test_search_local.py` — 153 строк
+### `tests/backend/test_search_local.py` — 161 строк
 
 Поиск по своей базе — единственный, который работает без сети.
 
-Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
 
 Тестов: 12
 
@@ -1656,7 +1658,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def stored(engine)` (12)
   - `async def put(name: str, **values) -> int` (7)
 
-### `tests/fakes.py` — 136 строк
+### `tests/fakes.py` — 137 строк
 
 Подставные заменители внешнего мира: клиенты источников, транспорты, часы.
 
@@ -1665,9 +1667,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class FakeClient` (12)
 - `class FakeCatalog(FakeClient)` (7)
   - `async def card(self, source_id: str, kind: Kind)` (3)
-- `class FakeSources` (29)
+- `class FakeSources` (30)
   - `def catalog_for(self, _kind: Kind) -> list` (4)
-  - `def people_for(self, kind: Kind)` (5)
+  - `def people_for(self, kind: Kind)` (6)
   - `def client_for(self, _source: Source)` (4)
   - `def rating_sources(self, kind: Kind) -> list` (5)
 - `class FakeClock` (12)

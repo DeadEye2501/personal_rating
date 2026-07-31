@@ -53,6 +53,20 @@ def test_the_same_work_is_not_returned_twice(fixture):
     assert len(ids) == len(set(ids))
 
 
+def test_two_works_with_one_name_are_two_works():
+    """Повторы снимаются по номеру работы, а не по названию: ремейк и оригинал
+    у одного продюсера — обычное дело, и одна из двух карточек молча пропала бы.
+
+    Тело рукописное: в записанном ответе пары с общим названием нет, а без неё
+    ключ по названию неотличим от ключа по номеру."""
+    payload = {"cast": [{"id": 1, "title": "Дюна", "release_date": "1984-12-14"},
+                        {"id": 2, "title": "Дюна", "release_date": "2021-09-15"}]}
+
+    hits = parse_credits(payload, Kind.MOVIE)
+
+    assert [hit.source_id for hit in hits] == ["1", "2"]
+
+
 def test_a_series_reads_its_own_field_names(fixture):
     """У сериалов название лежит в `name`, а дата — в `first_air_date`.
     Прочитай их по-киношному — получишь пустые названия при 200 в ответе."""
@@ -77,9 +91,19 @@ def test_everyone_found_comes_back(fixture):
     assert "2526416" in [one.source_id for one in found]
 
 
-def test_nobody_found_is_not_a_refusal(fixture):
-    """Пустая выдача — не событие: источник ответил, просто такого у него нет."""
-    assert parse_people(fixture("tmdb/search_person_empty.json")) == []
+async def test_nobody_found_is_not_a_refusal(replay):
+    """Пустая выдача — не событие: источник ответил, просто такого у него нет.
+
+    Через клиент, а не через разбор: у `parse_people` путей к отказу нет вовсе,
+    и на голом разборе это утверждение проверить нечем. Собирает отказ `parsed`
+    в `_taken` — вот его и спрашиваем."""
+    transport, _ = counting(replay("tmdb/search_person_empty.json"))
+    client = TmdbClient(SourceHttp("tmdb", transport=transport), api_key="k")
+
+    outcome = await client.find_people("никого такого нет")
+    await client.aclose()
+
+    assert outcome == Found([])
 
 
 async def test_the_client_asks_the_movie_door(replay):
@@ -107,7 +131,11 @@ async def test_the_client_asks_the_series_door(replay):
 
 async def test_the_filmography_takes_one_request(replay):
     """Порций у неё нет: TMDB отдаёт её целиком, и второй запрос значил бы, что
-    мы их выдумали."""
+    мы их выдумали.
+
+    Сегодняшнюю реализацию тест не проверяет — строки, дающей второй запрос, в
+    ней нет; он сторожит **добавленную** порционность, как второй ключ
+    сортировки библиотеки сторожит смену планировщика."""
     transport, sent = counting(replay("tmdb/person_credits_movie.json"))
     client = TmdbClient(SourceHttp("tmdb", transport=transport), api_key="k")
 

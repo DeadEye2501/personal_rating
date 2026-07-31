@@ -23,18 +23,16 @@ from backend.sources.registry import Sources
 from backend.storage.repository.credits import CreditRepository
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.views import ViewsRepository
+from backend.unique import unique_by
 
 
 def _once(refusals: list[Refusal]) -> list[Refusal]:
     """Один отказ на источник и причину. Спросили пятерых найденных, лёг
     источник — плашка внизу всё равно говорит про источник, а он тут один.
 
-    Целиком отказы не сравниваются: у сетевого в `detail` стоит текст ошибки
-    с адресом, и пять одинаковых по сути отказов вышли бы пятью разными."""
-    seen: dict[tuple[str, str], Refusal] = {}
-    for refusal in refusals:
-        seen.setdefault((refusal.source, refusal.reason), refusal)
-    return list(seen.values())
+    Ключом, а не целиком: у сетевого отказа в `detail` стоит текст ошибки с
+    адресом, и пять одинаковых по сути отказов вышли бы пятью разными."""
+    return unique_by(refusals, lambda one: (one.source, one.reason))
 
 
 class PeopleSearch:

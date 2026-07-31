@@ -4,6 +4,7 @@ import pytest
 
 from backend.model import (
     Found,
+    GenreSource,
     Kind,
     Missing,
     PersonHit,
@@ -27,7 +28,6 @@ class FakePerson(FakeClient):
     def __init__(self, outcome=None, people_outcome=None) -> None:
         super().__init__(outcome)
         self.people_outcome = people_outcome
-        self.asked: list[tuple] = []
 
     async def credits_of(self, person_id: str, kind: Kind):
         self.asked.append(("credits_of", person_id, kind))
@@ -41,7 +41,7 @@ class FakePerson(FakeClient):
 
 
 @pytest.fixture
-def parts(sessions, engine):
+def parts(sessions):
     return {
         "library": LibraryRepository(sessions),
         "views": ViewsRepository(sessions),
@@ -118,7 +118,27 @@ async def test_every_namesake_brings_all_their_work(parts):
 
     asked_ids = {one[1] for one in client.asked if one[0] == "credits_of"}
     assert asked_ids == {"525", "999"}
-    assert {view.source_id for view in found.views} == {"1", "2", "3"}
+    # Список, а не множество: работы одного человека идут подряд, и перемешай
+    # их сборка — набор этого не различит, а лента перетасуется.
+    assert [view.source_id for view in found.views] == ["1", "3", "2"]
+
+
+async def test_the_works_carry_genres_and_the_free_rating(parts, reference):
+    """Кандидат клика проходит ту же сборку, что и кандидат строки поиска, —
+    со справочником жанров и с бесплатной оценкой источника.
+
+    Без этого фильтр по жанру спрятал бы всю внешнюю половину клика, и выглядело
+    бы это как «у режиссёра ничего нет»."""
+    client = FakePerson(outcome=Found([
+        hit(genre_ext_ids=((GenreSource.TMDB, "18"),), source_rating=8.4)
+    ]))
+    entity_id = await a_person(parts, source_id="525")
+
+    found = await finder_on(parts, client).by_entity("people", entity_id,
+                                                     Kind.MOVIE)
+
+    assert [one.name for one in found.views[0].genres] == ["Драма"]
+    assert [one.value for one in found.views[0].external] == [8.4]
 
 
 async def test_nobody_with_such_a_name_outside_is_not_a_refusal(parts):
@@ -165,6 +185,38 @@ async def test_one_source_refuses_once_however_many_it_was_asked(parts):
                                                      Kind.MOVIE)
 
     assert len(found.refusals) == 1
+
+
+async def test_two_reasons_from_one_source_stay_two(parts):
+    """Схлопывание идёт по паре «источник и причина», а не по источнику: у пяти
+    найденных один запрос упирается в квоту, другой рвётся по сети, и плашке
+    есть что сказать про обе."""
+    client = FakePerson(
+        outcome={"525": Refusal(source="tmdb", reason=Reason.QUOTA),
+                 "999": Refusal(source="tmdb", reason=Reason.NETWORK)},
+        people_outcome=Found([PersonHit("525"), PersonHit("999")]),
+    )
+    entity_id = await a_person(parts)
+
+    found = await finder_on(parts, client).by_entity("people", entity_id,
+                                                     Kind.MOVIE)
+
+    assert {one.reason for one in found.refusals} == {Reason.QUOTA,
+                                                      Reason.NETWORK}
+
+
+async def test_a_person_in_the_game_tab_never_goes_outside(parts):
+    """Кого спрашивать — решает реестр, и сервис обязан его слушаться: у игр
+    клиента людей нет вовсе. Отдельно от студий, потому что тех отсекает домен,
+    ещё до обращения к реестру, — и одной проверкой эти две ветки не различить."""
+    client = FakePerson(outcome=Found([]))
+    entity_id = await a_person(parts)
+
+    found = await finder_on(parts, client).by_entity("people", entity_id,
+                                                     Kind.GAME)
+
+    assert client.asked == []
+    assert found.refusals == ()
 
 
 async def test_a_company_never_goes_outside(parts):
@@ -214,10 +266,14 @@ async def test_the_tab_narrows_the_inside_half(parts):
     await parts["people"].attach(film, entity_id, PersonRole.DIRECTOR)
     await parts["people"].attach(series, entity_id, PersonRole.SHOWRUNNER)
 
-    found = await finder_on(parts, client).by_entity("people", entity_id,
-                                                     Kind.MOVIE)
+    finder = finder_on(parts, client)
+    films = await finder.by_entity("people", entity_id, Kind.MOVIE)
+    series_only = await finder.by_entity("people", entity_id, Kind.SERIES)
 
-    assert [view.item_id for view in found.views] == [film]
+    # Обе стороны, а не только «сериала во вкладке фильмов нет»: с одной
+    # зашитый в запрос `MOVIE` вместо вида проходит молча.
+    assert [view.item_id for view in films.views] == [film]
+    assert [view.item_id for view in series_only.views] == [series]
 
 
 async def test_all_own_cards_come_in_the_order_of_the_query(parts, sessions):

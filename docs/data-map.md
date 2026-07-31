@@ -322,7 +322,6 @@
 
 ### `backend/service/search.py`
 
-- `logger` = `logging.getLogger(__name__)`
 - `SEARCH_SIZE` = `20`
 
 ### `backend/service/series.py`

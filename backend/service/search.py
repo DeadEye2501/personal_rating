@@ -1,7 +1,6 @@
 """Что найдётся по запросу."""
 
 import asyncio
-import logging
 from collections.abc import Callable
 from datetime import datetime
 
@@ -17,8 +16,6 @@ from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
-
-logger = logging.getLogger(__name__)
 
 # Ровно страница выдачи TMDB: одна порция стоит одного запроса. Величина —
 # настройка, а не свойство схемы.

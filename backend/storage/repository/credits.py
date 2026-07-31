@@ -40,7 +40,7 @@ def _outer(row) -> str | None:
     `manual`, — но спросить по нему некого.
 
     Знание про `manual` лежит в хранилище, а не в сервисе, намеренно: пишет эту
-    условность `create_manual` двадцатью строками ниже, и читатель рядом с
+    условность `create_manual` ниже в этом же классе, и читатель рядом с
     писателем разумнее, чем в другом слое.
 
     Чей это идентификатор, наружу не отдаётся: людей заводит только TMDB, у
@@ -154,8 +154,8 @@ class CreditRepository(Repository):
 
     async def credits_of(self, item_id: int) -> list[Credit]:
         table, credit = self._entity.table, self._entity.credit
-        # `id` берётся ради клика по имени: искать связанное надо по строке, а
-        # не по имени — имя тёзку не различает.
+        # `id` берётся потому, что его требует общая сборка `to_credit`; зачем
+        # он там — сказано у неё.
         columns = [table.c.id, table.c.name, table.c.source, table.c.source_id,
                    credit.c.role]
         if self._entity.position is not None:

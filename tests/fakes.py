@@ -23,7 +23,7 @@ class FakeClient:
     def __init__(self, outcome, name: str = "tmdb") -> None:
         self.outcome = outcome
         self.name = name
-        self.asked = []
+        self.asked: list[tuple] = []
 
 
 class FakeCatalog(FakeClient):
@@ -49,9 +49,10 @@ class FakeSources:
         return self._clients
 
     def people_for(self, kind: Kind):
-        """Кто умеет искать по человеку. У игр — никто: настоящий реестр решает
-        это сам, и проверяется оно в его тестах; здесь важно только, что у игр
-        внешней половины не будет."""
+        """Кто умеет искать по человеку. Правило «у игр — никто» повторяется
+        отсюда нарочно: сервис обязан слушаться реестра, и без этой ветки
+        проверить его послушание было бы нечем. Само правило живёт в
+        `Sources.people_for`, там же и замер про магазины."""
         return None if kind is Kind.GAME else self._clients[0]
 
     def client_for(self, _source: Source):

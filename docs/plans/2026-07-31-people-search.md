@@ -122,7 +122,7 @@ personal_rating/
   `backend.storage.tables`.
 - Отдаёт: `search(kind, query, limit)` — та же сигнатура, шире охват.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/backend/test_credit_search.py`:
 
@@ -219,12 +219,12 @@ async def test_the_register_does_not_count(sessions, migrated):
     assert await library.search(Kind.MOVIE, "НОЛАН", limit=20) == [item_id]
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/backend/test_credit_search.py -v`
 Ожидание: FAIL — четыре теста про состав падают, два про название проходят.
 
-- [ ] **Шаг 3: Расширить поиск**
+- [x] **Шаг 3: Расширить поиск**
 
 В `backend/storage/repository/library.py` заменить условие в `search`:
 
@@ -277,13 +277,13 @@ def _named(table, credit, needle):
 Имя колонки связи собирается по имени таблицы — так же, как в
 `storage/entity.py`, где это уже сделано и объяснено.
 
-- [ ] **Шаг 4: Прогнать и увидеть зелёное**
+- [x] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/backend/ -v`
 Ожидание: PASS. Прежние тесты поиска обязаны остаться зелёными: охват
 расширился, поведение по названиям не изменилось.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add backend/storage/repository/library.py tests/backend/test_credit_search.py
@@ -319,7 +319,7 @@ git commit -m "feat: поиск по своей библиотеке смотр�
 - Отдаёт: `TmdbClient.credits_of(person_id, kind) -> Outcome`,
   `parse_credits(payload, kind) -> list[SearchHit]`.
 
-- [ ] **Шаг 1: Записать ответы источника**
+- [x] **Шаг 1: Записать ответы источника**
 
 Живьём, тем же инструментом, которым записаны остальные фикстуры:
 
@@ -337,7 +337,7 @@ pipenv run python scripts/record_fixtures.py
 подогнанной под ожидание фикстуре клиент вёл себя правильно, а живьём был сломан
 целиком.
 
-- [ ] **Шаг 2: Написать падающий тест**
+- [x] **Шаг 2: Написать падающий тест**
 
 Создать `tests/backend/sources/test_tmdb_people.py`:
 
@@ -410,12 +410,12 @@ async def test_one_request_and_no_more(tmdb_client_counting):
 берутся по образцу соседних тестов TMDB — `tests/backend/sources/test_tmdb_*.py`;
 там же лежит и приём с `responding`, `capture` и `counting`.
 
-- [ ] **Шаг 3: Прогнать и увидеть красное**
+- [x] **Шаг 3: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/backend/sources/test_tmdb_people.py -v`
 Ожидание: FAIL, `AttributeError: 'TmdbClient' object has no attribute 'credits_of'`.
 
-- [ ] **Шаг 4: Написать разбор**
+- [x] **Шаг 4: Написать разбор**
 
 В `backend/sources/tmdb/parse.py`, рядом с `parse_search` — общее у них
 выносится сразу, потому что вторая реализация появляется в этот же момент:
@@ -442,7 +442,7 @@ def parse_search(payload: dict, kind: Kind) -> list[SearchHit]:
 Снятие повторов идёт через `backend/unique.py` — он уже есть и делает ровно это,
 с сохранением порядка.
 
-- [ ] **Шаг 5: Написать ручку**
+- [x] **Шаг 5: Написать ручку**
 
 В `backend/sources/tmdb/client.py`, рядом с `search`:
 
@@ -458,13 +458,13 @@ def parse_search(payload: dict, kind: Kind) -> list[SearchHit]:
                       lambda: Found(parse_credits(answer.json(), kind)))
 ```
 
-- [ ] **Шаг 6: Прогнать и увидеть зелёное**
+- [x] **Шаг 6: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/backend/sources/ -v`
 Ожидание: PASS. Прежние тесты поиска обязаны остаться зелёными — `parse_search`
 изменил форму, но не поведение.
 
-- [ ] **Шаг 7: Коммит**
+- [x] **Шаг 7: Коммит**
 
 ```bash
 git add backend/sources/tmdb/ tests/backend/sources/test_tmdb_people.py \
@@ -492,7 +492,7 @@ git commit -m "feat: фильмография человека у TMDB"
 - Отдаёт: `PersonHit(source_id, name)`; `TmdbClient.find_people(name) ->
   Outcome`; `parse_people(payload) -> list[PersonHit]`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Дописать в `tests/backend/sources/test_tmdb_people.py`:
 
@@ -515,12 +515,12 @@ async def test_nobody_found_is_not_a_refusal(tmdb_client_empty):
     assert outcome.value == []
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/backend/sources/test_tmdb_people.py -v`
 Ожидание: FAIL, `AttributeError: … has no attribute 'find_people'`.
 
-- [ ] **Шаг 3: Завести тип**
+- [x] **Шаг 3: Завести тип**
 
 В `backend/model/search.py`:
 
@@ -537,7 +537,7 @@ class PersonHit:
 
 и в `backend/model/__init__.py` — имя в импорт и в `__all__`.
 
-- [ ] **Шаг 4: Написать разбор и ручку**
+- [x] **Шаг 4: Написать разбор и ручку**
 
 В `parse.py`:
 
@@ -560,12 +560,12 @@ def parse_people(payload: dict) -> list[PersonHit]:
                       lambda: Found(parse_people(answer.json())))
 ```
 
-- [ ] **Шаг 5: Прогнать и увидеть зелёное**
+- [x] **Шаг 5: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/backend/ -v`
 Ожидание: PASS.
 
-- [ ] **Шаг 6: Коммит**
+- [x] **Шаг 6: Коммит**
 
 ```bash
 git add backend/model/ backend/sources/tmdb/ tests/
@@ -607,7 +607,7 @@ GOG молча игнорирует фильтр. Правило пользов�
   `CreditRepository.find_identity(entity_id) -> tuple[Source, str] | None`;
   `Credit.entity_id`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/backend/test_people_search.py`:
 
@@ -701,12 +701,12 @@ async def test_the_card_carries_the_row_of_every_person(sessions, migrated):
 заводятся в этом же файле по образцу `tests/backend/test_search.py`: подставные
 источники — `FakeSources` с `FakeCatalog`, база — временный файл.
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/backend/test_people_search.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'backend.service.people'`.
 
-- [ ] **Шаг 3: Достать идентичность**
+- [x] **Шаг 3: Достать идентичность**
 
 В `backend/storage/repository/credits.py`:
 
@@ -722,7 +722,7 @@ async def test_the_card_carries_the_row_of_every_person(sessions, migrated):
         return row
 ```
 
-- [ ] **Шаг 4: Написать сервис**
+- [x] **Шаг 4: Написать сервис**
 
 Создать `backend/service/people.py`:
 
@@ -788,18 +788,18 @@ class PeopleSearch:
 **Отказ обязан быть значением, а не исключением**, и заворачивает его тот же
 `answered`, что и в остальных сервисах.
 
-- [ ] **Шаг 5: Собрать в приложении**
+- [x] **Шаг 5: Собрать в приложении**
 
 В `backend/app.py` добавить поле `finder: PeopleSearch` и собрать его теми же
 частями, что и `SearchService`. Довод для `card_parts` не нужен: своих записей у
 этого сервиса нет, он только читает.
 
-- [ ] **Шаг 6: Прогнать и увидеть зелёное**
+- [x] **Шаг 6: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/backend/ -v`
 Ожидание: PASS.
 
-- [ ] **Шаг 7: Коммит**
+- [x] **Шаг 7: Коммит**
 
 ```bash
 git add backend/service/people.py backend/storage/repository/credits.py \
@@ -813,8 +813,15 @@ git commit -m "feat: сервис поиска по человеку и студ
 
 Последняя задача: жест доходит до человека.
 
+> **Задачи 1–4 сделаны 31.07.2026 и в шести местах разошлись с этим текстом.**
+> Работая по задаче 5, читай код, а не план: `identity_of(entity_id) ->
+> tuple[str, str | None] | None` вместо `find_identity`; `PersonHit` с одним
+> полем `source_id`; `items_of(entity_id, kind)` без предела и смещения;
+> `PeopleSearch` не принимает `library`; константы `OWN_SIZE` нет.
+> Разборы — в `docs/reviews/2026-07-31-plan-11-*.md`.
+
 **Клик по имени открывает поиск**, а не отдельный вид: та же лента, те же
-карточки, своё и чужое вперемешку. Раздел при этом переключается на «Поиск» —
+карточки, сначала своё и потом чужое. Раздел при этом переключается на «Поиск» —
 там эта выдача и живёт.
 
 **Файлы:**

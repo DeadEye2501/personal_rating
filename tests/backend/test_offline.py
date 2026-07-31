@@ -320,6 +320,12 @@ async def test_the_assembly_wires_the_click_on_a_name(offline):
     assert [view.item_id for view in by_person.views] == [item_id]
     assert [view.item_id for view in by_studio.views] == [item_id]
 
+    # Внешняя половина наблюдается отказом: сеть тут мертва, и отказ появляется
+    # ровно тогда, когда сервису достался настоящий клиент от настоящего
+    # реестра. Без этой строки `people_for(MOVIE) → None` осталось бы зелёным.
+    assert [one.source for one in by_person.refusals] == ["tmdb"]
+    assert by_studio.refusals == ()
+
 
 async def test_everything_closes_and_lets_go(tmp_path):
     """Пустой `aclose` прошёл бы проверку «файл существует» — проверяем, что

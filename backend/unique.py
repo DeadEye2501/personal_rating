@@ -1,6 +1,6 @@
 """Снятие повторов с сохранением порядка."""
 
-from collections.abc import Hashable, Iterable
+from collections.abc import Callable, Hashable, Iterable
 
 
 def unique[T: Hashable](items: Iterable[T]) -> list[T]:
@@ -14,3 +14,19 @@ def unique[T: Hashable](items: Iterable[T]) -> list[T]:
     Лежит в корне пакета, а не в модели: это не тип границы слоёв, а приём,
     нужный всем трём слоям — хранилищу, источникам и сервисам."""
     return list(dict.fromkeys(items))
+
+
+def unique_by[T](items: Iterable[T],
+                 key: Callable[[T], Hashable]) -> list[T]:
+    """То же самое, но повторы считаются по ключу, а не по всему значению.
+    Побеждает первый: порядок первых появлений и есть то, что бережётся.
+
+    Отдельно от `unique`, потому что сравнение целиком — не частный случай
+    сравнения по ключу, а другое решение: у `unique` совпасть должно всё, и
+    именно этим он годится жанрам и оценкам. Здесь наоборот — значения
+    различаются, а считаются одним: одна работа человека в двух ролях, один
+    отказ источника на пять запросов."""
+    seen: dict[Hashable, T] = {}
+    for item in items:
+        seen.setdefault(key(item), item)
+    return list(seen.values())

@@ -35,6 +35,38 @@ async def test_roles_are_stored_as_their_plain_values(sessions, engine, card):
     assert stored == ("director", "publisher")
 
 
+async def test_a_credit_carries_the_row_of_the_person(sessions, card):
+    """Клик по имени зовёт поиск по внутреннему идентификатору, а звать его
+    нечем без этого поля: имя тёзку не различает, а внешней идентичности у
+    половины строк нет.
+
+    Номера карточки и человека разведены лишними людьми: с равными подмена
+    колонки на `credit.item_id` сходится и открывает работы чужого."""
+    item_id = await card()
+    crew = people(sessions)
+    for number in range(3):
+        await crew.create_manual(f"Лишний {number}")
+    entity_id = await crew.create_manual("Кристофер Нолан")
+    await crew.attach(item_id, entity_id, PersonRole.DIRECTOR)
+
+    credit = (await crew.credits_of(item_id))[0]
+    assert credit.entity_id == entity_id
+    assert credit.entity_id != item_id
+
+
+async def test_the_identity_goes_out_only_when_someone_can_be_asked(sessions):
+    """Пара «имя и внешняя идентичность» — то, чем клик выбирает путь наружу.
+    У строки из TMDB идентичность есть, у заведённой руками её нет, хотя в базе
+    у неё свой `uuid4` под `manual`: спросить по нему некого."""
+    repository = people(sessions)
+    outer = await repository.create("Кристофер Нолан", Source.TMDB, "525")
+    mine = await repository.create_manual("Василий Пупкин")
+
+    assert await repository.identity_of(outer) == ("Кристофер Нолан", "525")
+    assert await repository.identity_of(mine) == ("Василий Пупкин", None)
+    assert await repository.identity_of(404) is None
+
+
 async def test_a_studio_may_have_no_identity_at_all(sessions):
     """Steam и GOG отдают названия студий голыми строками — и такая строка
     попадает в безымянные, откуда её потом склеивают по имени."""

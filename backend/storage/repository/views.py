@@ -110,8 +110,8 @@ class ViewsRepository(Repository):
     async def _credits(self, session, item_ids, entity: Entity):
         """Люди и студии читаются одним кодом: для приложения эти две сущности
         различаются только тем, что у людей есть порядок в титрах."""
-        # `id` берётся ради клика по имени: искать связанное надо по строке, а
-        # не по имени — имя тёзку не различает.
+        # `id` берётся потому, что его требует общая сборка `to_credit`; зачем
+        # он там — сказано у неё.
         columns = [entity.credit.c.item_id, entity.table.c.id,
                    entity.table.c.name, entity.credit.c.role,
                    entity.table.c.source, entity.table.c.source_id]

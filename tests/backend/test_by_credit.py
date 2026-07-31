@@ -67,9 +67,14 @@ async def test_both_roles_of_one_person_give_one_card(sessions):
 
 
 async def test_the_kind_narrows_and_nothing_else_does(sessions):
-    """Вкладка — первичный фильтр: сериал того же человека во вкладку фильмов
-    не попадает. Предела при этом нет — все пять фильмов приезжают разом, потому
-    что следующей страницы у этого жеста не бывает."""
+    """Вкладка — первичный фильтр, и проверяется он с обеих сторон: сериал того
+    же человека во вкладку фильмов не попадает, а во вкладке сериалов он есть.
+    Одной стороны мало — зашитый в запрос литерал `MOVIE` проходит её молча.
+
+    Про отсутствие предела тест говорит слабо: пять карточек не отличат «предела
+    нет» от `limit=50`. Наблюдаемого следствия у этого свойства нет вовсе, пока
+    у человека нет полусотни работ; держится оно тем, что параметра больше не
+    существует."""
     repository = people(sessions)
     nolan = await repository.create("Кристофер Нолан")
     films = []
@@ -80,10 +85,8 @@ async def test_the_kind_narrows_and_nothing_else_does(sessions):
     series_id = await rated(sessions, "series", 9.5, kind=Kind.SERIES)
     await repository.attach(series_id, nolan, PersonRole.SHOWRUNNER)
 
-    found = await repository.items_of(nolan, Kind.MOVIE)
-
-    assert found == films
-    assert series_id not in found
+    assert await repository.items_of(nolan, Kind.MOVIE) == films
+    assert await repository.items_of(nolan, Kind.SERIES) == [series_id]
 
 
 async def test_studios_work_the_same_way(sessions):

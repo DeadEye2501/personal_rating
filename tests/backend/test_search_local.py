@@ -4,8 +4,9 @@ from datetime import timedelta
 
 import pytest
 
-from backend.model import Kind
+from backend.model import Kind, PersonRole
 from backend.service.search import SearchService
+from backend.storage.repository.credits import people
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.tags import TagsRepository
@@ -70,8 +71,15 @@ async def test_the_games_are_searched_by_the_same_call(sessions, search):
 
 
 async def test_a_percent_sign_is_a_letter_and_not_a_wildcard(sessions, search):
-    """Иначе запрос «%» вывалил бы всю библиотеку."""
-    await rated(sessions, "157336", None, title="Интерстеллар")
+    """Иначе запрос «%» вывалил бы всю библиотеку.
+
+    Человек на карточке стоит нарочно: веток отбора четыре — два названия и два
+    состава, — и без связи ветка состава в этом сценарии не срабатывает вовсе.
+    Экранирование там своё, забыть его можно отдельно."""
+    item_id = await rated(sessions, "157336", None, title="Интерстеллар")
+    crew = people(sessions)
+    await crew.attach(item_id, await crew.create_manual("Кристофер Нолан"),
+                      PersonRole.DIRECTOR)
 
     assert await search.local(Kind.MOVIE, "%") == []
 
@@ -85,8 +93,8 @@ async def test_an_underscore_is_a_letter_too(sessions, search):
 
 
 async def test_the_found_cards_are_whole(sessions, search):
-    """Своё стоит в общей выдаче на своём месте — но со своей оценкой, метками
-    и закладкой. Иначе показывать его вперемешку с чужим незачем."""
+    """Своя половина приезжает со своей оценкой, метками и закладкой. Иначе
+    показывать её впереди чужой было бы незачем."""
     item_id = await rated(sessions, "157336", 9.0, title="Интерстеллар")
     tags = TagsRepository(sessions)
     tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
