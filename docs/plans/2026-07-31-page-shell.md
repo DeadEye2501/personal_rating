@@ -648,8 +648,9 @@ git commit -m "feat: палитра, база и локальные шрифты
 
 **Интерфейсы:**
 - Потребляет: ничего.
-- Отдаёт: `EMPTY`, `cycled(filters, field, id)`, `chosen(filters)`,
-  `isEmpty(filters)`; `SORT_STATES`, `ADDED_AT`, `cycleOf(section)`,
+- Отдаёт: `EMPTY`, `cycled(filters, field, id)`, `marked(filters, field, id)`,
+  `chosen(filters)`, `isEmpty(filters)`, `passes(view, filters)`;
+  `SORT_STATES`, `ADDED_AT`, `cycleOf(section)`,
   `nextSort(section, position)`, `stateAt(section, position)`, `orderOf(index)`,
   `orderFor(section, position)`; `newSession()`,
   `withKind(session, kind)`, `withSection(session, section)`,
@@ -662,7 +663,7 @@ git commit -m "feat: палитра, база и локальные шрифты
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY, chosen, cycled, isEmpty, marked } from '$state/filters.js'
+import { EMPTY, chosen, cycled, isEmpty, marked, passes } from '$state/filters.js'
 
 describe('строка фильтра', () => {
   it('перебирает три состояния по кругу', () => {
@@ -711,6 +712,61 @@ describe('строка фильтра', () => {
 
   it('знает, что фильтр применён — по нему горит кнопка в шапке', () => {
     expect(isEmpty(cycled(EMPTY, 'tags', 3))).toBe(false)
+  })
+})
+
+describe('отсев выдачи поиска', () => {
+  // Спросить источник с фильтром нечем: у TMDB и магазинов нет ни наших тегов,
+  // ни наших оценок. Ответ приходит целиком, и уже показанное отсеивается по
+  // тем же признакам, что и лента.
+  const view = (fields) => ({ genres: [], tags: [], rating: null, ...fields })
+
+  it('без фильтра проходит всё', () => {
+    expect(passes(view({}), EMPTY)).toBe(true)
+  })
+
+  it('жанр у кандидата есть, и по нему отсев работает', () => {
+    // Жанры разворачиваются справочником прямо в выдаче — единственный признак
+    // фильтра, который у кандидата вообще есть.
+    const only = cycled(EMPTY, 'genres', 7)
+
+    expect(passes(view({ genres: [{ id: 7 }] }), only)).toBe(true)
+    expect(passes(view({ genres: [{ id: 9 }] }), only)).toBe(false)
+  })
+
+  it('внутри признака складывает по «или»', () => {
+    const two = cycled(cycled(EMPTY, 'genres', 7), 'genres', 9)
+    expect(passes(view({ genres: [{ id: 9 }] }), two)).toBe(true)
+  })
+
+  it('между признаками складывает по «и»', () => {
+    const both = cycled(cycled(EMPTY, 'genres', 7), 'tags', 3)
+
+    expect(passes(view({ genres: [{ id: 7 }], tags: [{ id: 3 }] }), both)).toBe(true)
+    expect(passes(view({ genres: [{ id: 7 }], tags: [] }), both)).toBe(false)
+  })
+
+  it('исключённое вычитается последним и сильнее включённого', () => {
+    // «Показать всё, кроме ужасов» — частый запрос; «показать ужасы, которые я
+    // же и исключил» смысла не имеет.
+    const drama = cycled(EMPTY, 'genres', 7)
+    const noHorror = cycled(cycled(drama, 'genres', 9), 'genres', 9)
+
+    expect(passes(view({ genres: [{ id: 7 }, { id: 9 }] }), noHorror)).toBe(false)
+  })
+
+  it('фильтр по тегу прячет всё, чего ещё нет в библиотеке', () => {
+    // У кандидата нет ни тегов, ни оценки: они держатся за `item_id`, а выдача
+    // поиска в базу не попадает никогда.
+    const tagged = cycled(EMPTY, 'tags', 3)
+    expect(passes(view({ tags: [] }), tagged)).toBe(false)
+  })
+
+  it('фильтр по оценке смотрит на округлённую вниз', () => {
+    // У игр оценка — среднее трёх шкал: 7.33 попадает в семёрку, как и везде.
+    const seven = cycled(EMPTY, 'scores', 7)
+    expect(passes(view({ rating: { score: 7.33 } }), seven)).toBe(true)
+    expect(passes(view({ rating: null }), seven)).toBe(false)
   })
 })
 
@@ -964,6 +1020,31 @@ export function isEmpty(filters) {
                               && !filters.ex[field].length)
 }
 
+/** Проходит ли карточка фильтр. Нужно поиску: спросить источник с фильтром
+ *  нечем — у TMDB и магазинов нет ни наших тегов, ни наших оценок, — поэтому
+ *  ответ приходит целиком, а отсев идёт здесь.
+ *
+ *  В разделах библиотеки этим не пользуются: там то же самое делает база, и
+ *  делает лучше — она не тащит через границу то, что всё равно скроют. */
+export function passes(view, filters) {
+  return FIELDS.every((field) => {
+    const has = ownedBy(view, field)
+    if (filters.ex[field].some((id) => has.includes(id))) return false
+    if (!filters.on[field].length) return true
+    return filters.on[field].some((id) => has.includes(id))
+  })
+}
+
+/** Чем карточка отвечает на каждый признак. У кандидата поиска есть только
+ *  жанры: теги и оценка держатся за `item_id`, а его у него нет. */
+function ownedBy(view, field) {
+  if (field === 'genres') return view.genres.map((one) => one.id)
+  if (field === 'tags') return view.tags.map((one) => one.id)
+  // Дробные оценки округляются вниз — правило общее для всего показа.
+  const score = view.rating?.score
+  return score ? [Math.floor(score)] : []
+}
+
 const without = (ids, id) => ids.filter((each) => each !== id)
 ```
 
@@ -1076,7 +1157,7 @@ export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
 cd client && npm test
 ```
 
-Ожидание: PASS, 25 тестов.
+Ожидание: PASS, 32 теста.
 
 - [ ] **Шаг 7: Коммит**
 
@@ -1347,7 +1428,7 @@ function tail(args) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 34 теста — девять новых и двадцать пять из задачи 3.
+Ожидание: PASS, 41 тест — девять новых и тридцать два из задачи 3.
 
 - [ ] **Шаг 5: Коммит**
 
@@ -2177,6 +2258,6 @@ git commit -m "feat: четыре раздела стопкой, переход 
 Разбор «какой именно фильтр применён» по признакам — план 8: сейчас все три
 кнопки горят от одного `isEmpty`, как и написано в спеке.
 
-**Чем измеряется готовность.** `npm test` зелёный, 34 теста. Окно открывается,
+**Чем измеряется готовность.** `npm test` зелёный, 41 тест. Окно открывается,
 шапка совпадает с макетом при сверке рядом, переключение типа перетекает
 акцентом, разделы меняются проявлением, плашка выезжает и уходит.
