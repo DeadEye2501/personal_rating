@@ -1,16 +1,10 @@
 """Граница слоёв: кто кого имеет право импортировать.
 
-Сторожит здесь только половина про бэкенд — та, у которой есть предмет: файлов в
-нём полторы сотни. Второй половины, про сторону интерфейса, тут нет вовсе, и это
-не дыра, а состояние проекта на 31.07.2026: питона на той стороне пока не
-написано ни строки.
-
-Раскладка при этом решена: `client/` — только фронт, ни одного `.py`; питон
-стыка живёт в `bridge/`. Проверки «`bridge` не знает про базу и сеть» и
-«`bridge` берёт из бэкенда только типы границы» заводятся вместе с первым файлом
-`bridge/` — план 5, задача 2. Заводить их раньше нечем: `python_files`
-утверждает, что пустой пакет это поломка проверки, а не чистый код, и оставленная
-впрок проверка падала бы каждым прогоном.
+Сторожат обе половины. Про бэкенд — что он не знает про окно и мост; про мост —
+что он не знает про базу и сеть, а из бэкенда берёт только типы границы. Вторая
+половина завелась 31.07.2026, вместе с первым файлом `bridge/`: раньше ей не
+было предмета, а `python_files` утверждает, что пустой пакет — это поломка
+проверки, а не чистый код, и оставленная впрок она падала бы каждым прогоном.
 
 Границу слоёв внутри `client/` этот файл не сторожит и не будет: там нет питона,
 а слои держит хук на записи файла — `<style>` в компоненте, стиль вне `styles/`,
@@ -31,6 +25,15 @@ ROOT = Path(__file__).resolve().parents[2]
 # 31.07.2026: до неё здесь стоял снятый из проекта `PySide6`, и сторож
 # сторожил отсутствующее.
 BANNED_IN_BACKEND = {"bridge", "webview", "pythonnet", "clr"}
+
+BANNED_IN_BRIDGE = {"sqlalchemy", "aiosqlite", "httpx", "alembic", "PIL"}
+
+# Из бэкенда мосту открыты только типы границы и настройки. Всё прочее —
+# репозитории, сервисы, клиенты источников — тянет за собой и сессию
+# SQLAlchemy, и поход к диску в потоке интерфейса, то есть ровно то, от чего
+# граница слоёв и заведена. Список корневых имён этого не ловит: они
+# `backend.*`, а не `sqlalchemy`.
+ALLOWED_FROM_BACKEND = {"backend.model", "backend.config"}
 
 
 def imported_modules(path: Path):
@@ -69,6 +72,22 @@ def offenders(package: str, banned: set[str]) -> list[str]:
     return found
 
 
+def reaching_backend(package: str, allowed: set[str]) -> list[str]:
+    """Взятое из бэкенда сверх открытого. Отбор идёт по полному имени, а не по
+    корневому: `backend.storage.repository` — такой же `backend`, как и
+    `backend.model`, и проверка по корням пропускает его целиком."""
+    found = []
+    for path in python_files(package):
+        for module in imported_modules(path):
+            if not module.startswith("backend"):
+                continue
+            if any(module == name or module.startswith(name + ".")
+                   for name in allowed):
+                continue
+            found.append(f"{path.relative_to(ROOT)} → {module}")
+    return found
+
+
 def test_backend_does_not_import_the_bridge_or_the_window():
     assert offenders("backend", BANNED_IN_BACKEND) == []
 
@@ -82,13 +101,24 @@ def test_the_model_depends_on_nothing_of_ours():
     что-нибудь из `sources/` ради регулярок адресов — и тот, кто взял
     `parse_link`, получил бы вместе с ним `httpx`. Проверка выше этого не видит:
     она смотрит на импорты бэкенда наружу, а не внутрь модели."""
-    found = []
-    for path in python_files("backend/model"):
-        for module in imported_modules(path):
-            if not module.startswith("backend"):
-                continue
-            if module == "backend.model" or module.startswith("backend.model."):
-                continue
-            found.append(f"{path.relative_to(ROOT)} → {module}")
+    assert reaching_backend("backend/model", {"backend.model"}) == []
 
-    assert found == []
+
+def test_the_bridge_does_not_import_storage_libraries():
+    assert offenders("bridge", BANNED_IN_BRIDGE) == []
+
+
+def test_the_bridge_takes_only_the_boundary_types_from_the_backend():
+    """Мост, импортирующий репозиторий, лежит не там: с ним приедет и сессия
+    SQLAlchemy, и синхронный поход к базе мимо потока бэкенда."""
+    assert reaching_backend("bridge", ALLOWED_FROM_BACKEND) == []
+
+
+def test_both_bridge_lists_are_alive():
+    """Пустой набор запретов и разрешение «мосту открыт весь бэкенд» зеленели бы
+    всегда — сегодня тем более, ведь мост не берёт из бэкенда ничего, и
+    разрешающая половина на его файлах не исполняется вовсе. Оба списка
+    проверяются там, где нарушение заведомо есть: хранилище берёт и
+    `sqlalchemy`, и `backend.storage.*`."""
+    assert offenders("backend/storage", BANNED_IN_BRIDGE)
+    assert reaching_backend("backend/storage", ALLOWED_FROM_BACKEND)

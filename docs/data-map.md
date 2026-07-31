@@ -493,6 +493,13 @@
 - `item_tag` = `Table('item_tag', metadata, item_fk(nullable=Fal…`
 - `wishlist` = `Table('wishlist', metadata, item_fk(primary_key=…`
 
+## bridge
+
+### `bridge/thread.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BUILD_TIMEOUT` = `30.0`
+
 ## migrations
 
 ### `migrations/env.py`
@@ -613,6 +620,8 @@
 
 - `ROOT` = `Path(__file__).resolve().parents[2]`
 - `BANNED_IN_BACKEND` = `набор из 4`
+- `BANNED_IN_BRIDGE` = `набор из 5`
+- `ALLOWED_FROM_BACKEND` = `набор из 2`
 
 ### `tests/backend/test_linking.py`
 

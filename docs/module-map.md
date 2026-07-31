@@ -935,6 +935,27 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
+## bridge — 1 модулей
+
+### `bridge/thread.py` — 161 строк
+
+Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом.
+
+Зависит от: —
+
+- `class Closed(Exception)` (2)
+- `class BackendThread` (141)
+  - `def start(self) -> None` (5)
+  - `def run(self, factory: Callable[[Any], Coroutine], op: int | None=None) -> concurrent.futures.Future` (10)
+  - `def cancel(self, ops) -> None` (10)
+  - `def close(self) -> None` (9)
+  - `def _live(self) -> None` (21)
+  - `def _refuse(self, error: BaseException) -> None` (6)
+  - `def _begin(self, factory, op, answer) -> None` (14)
+  - `def _end(self, task, op, answer) -> None` (15)
+  - `def _finish(self, done) -> None` (6)
+  - `async def _shutdown(self, done) -> None` (17)
+
 ## migrations — 3 модулей
 
 ### `migrations/env.py` — 56 строк
@@ -996,7 +1017,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 64 модулей
+## tests — 66 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1355,18 +1376,19 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
-### `tests/backend/test_layers.py` — 94 строк
+### `tests/backend/test_layers.py` — 124 строк
 
 Граница слоёв: кто кого имеет право импортировать.
 
 Зависит от: —
 
-Тестов: 2
+Тестов: 5
 
 - `def imported_modules(path: Path)` (10)
 - `def imported_roots(path: Path)` (4)
 - `def python_files(package: str) -> list[Path]` (7)
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
+- `def reaching_backend(package: str, allowed: set[str]) -> list[str]` (14)
 
 ### `tests/backend/test_library.py` — 378 строк ⚠ подошёл к 300
 
@@ -1644,6 +1666,36 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
+### `tests/bridge/conftest.py` — 105 строк
+
+Двойники бэкенда и потоки на них.
+
+Зависит от: `bridge.thread`
+
+- `class FakeBackend` (61)
+  - `async def echo(self, value)` (2)
+  - `async def where(self)` (2)
+  - `async def ident(self)` (2)
+  - `async def boom(self)` (2)
+  - `async def slow(self)` (7)
+  - `async def held(self)` (9)
+  - `async def release(self)` (2)
+  - `async def together(self, total)` (7)
+  - `async def aclose(self)` (6)
+- `async def ready(value)` (3)
+- `def wait_until(condition, timeout=5.0)` (8)
+- `def backend()` (2)
+- `def thread(backend)` (7)
+
+### `tests/bridge/test_thread.py` — 200 строк
+
+Граница потоков: что обязано быть правдой у стыка двух циклов.
+
+Зависит от: `bridge.thread`, `tests.bridge.conftest`
+
+Тестов: 17
+
+
 ### `tests/builders.py` — 74 строк
 
 Строители данных для тестов: карточки, кандидаты, картинки.
@@ -1713,6 +1765,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 ## Абстракции с одной реализацией
 
 - `Base` — наследник один: `Note`
+- `FakeBackend` — наследник один: `Stubborn`
 - `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
 - `FakePerson` — наследник один: `Broken`
 - `FakeRatings` — наследник один: `Breaking`
