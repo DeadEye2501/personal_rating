@@ -364,7 +364,7 @@ function plural(count, forms) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 47 тестов — шестнадцать новых и тридцать один из плана 6.
+Ожидание: PASS, 50 тестов — шестнадцать новых и тридцать четыре из плана 6.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -398,8 +398,8 @@ git commit -m "feat: нотация оценок и строки фактов к
 
 **Интерфейсы:**
 - Потребляет: `runtimeOf`, `seriesOf`, `castOf` из `$state/facts.js`.
-- Отдаёт: `Film` с входными `view`, `collapsed`, `oncollapse`, `onperson`,
-  `ontag`; место под оценки и действия из задачи 3.
+- Отдаёт: `Film` с входными `view`, `collapsed`, `on`, `oncollapse`,
+  `onmark`, `onperson`, `ontag`; место под оценки и действия из задачи 3.
 
 - [ ] **Шаг 1: Перенести оформление ленты и рамы**
 
@@ -601,17 +601,36 @@ git commit -m "feat: нотация оценок и строки фактов к
   background: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
-/* Видна всегда и приглушённой: спрятанная кнопка — ловушка, про которую надо
-   догадаться. */
+/* Метки кликабельны, поэтому они кнопки, а не надписи: своей подложки и рамки
+   у кнопки быть не должно — оправу рисует ::before. */
+.chip,
 .chip--add {
   padding: 0;
   border: none;
   background: transparent;
   font: var(--label-m);
+}
+
+/* Видна всегда и приглушённой: спрятанная кнопка — ловушка, про которую надо
+   догадаться. */
+.chip--add {
   color: rgba(255,255,255,.3);
   transition: color .18s ease;
 }
+
+/* Метка, по которой включён фильтр. Вид тот же, что у метки под курсором: путь
+   до состояния разный, само состояние одно — «этот жанр сейчас выбран». */
+.chip.is-on { color: var(--primary) }
+.chip.is-on::before {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
 ```
+
+Трёх последних правил в макете нет: там у меток не было ни обработчика, ни
+включённого состояния. Значения взяты у `:hover` той же метки — **это вопрос к
+пользователю**, а не решение: включённая метка и метка под курсором сейчас
+выглядят одинаково, и различать их, возможно, надо.
 
 Создать `client/styles/facts.css` — перенос `index.html:508-541`:
 
@@ -685,20 +704,41 @@ git commit -m "feat: нотация оценок и строки фактов к
 
 ```svelte
 <script>
-  let { genres = [], tags = [], ontag } = $props()
+  let { genres = [], tags = [], on = { genres: [], tags: [] }, onmark, ontag }
+    = $props()
 </script>
 
 <div class="film__chips">
+  <!-- Клик по метке включает фильтр по ней, повторный выключает. Не поиск:
+       «найти во внешней базе все боевики» — не тот вопрос, который задают, а
+       фильтр по своей библиотеке отвечает мгновенно и работает без сети. -->
   {#each genres as genre (genre.id)}
-    <span class="chip">{genre.name}</span>
+    <button type="button" class="chip" class:is-on={on.genres.includes(genre.id)}
+            aria-pressed={on.genres.includes(genre.id)}
+            onclick={() => onmark('genres', genre.id)}>{genre.name}</button>
   {/each}
   {#each tags as tag (tag.id)}
-    <span class="chip chip--tag">{tag.name}</span>
+    <button type="button" class="chip chip--tag" class:is-on={on.tags.includes(tag.id)}
+            aria-pressed={on.tags.includes(tag.id)}
+            onclick={() => onmark('tags', tag.id)}>{tag.name}</button>
   {/each}
   <!-- Кнопка всегда последняя и всегда видна. -->
   <button type="button" class="chip chip--add" onclick={ontag}>± Тег</button>
 </div>
 ```
+
+**У метки на карточке два состояния, а не три:** включён и не активен. Исключить
+с карточки нечем — третье состояние живёт только в модалке фильтра.
+
+**Переключение делает сборка, а не компонент.** `onmark` уходит наверх, там
+меняется `session.filters`, и оттуда же обратно приезжает `on`: компонент только
+показывает переданное и сам в общее состояние не лезет.
+
+В макете жанры и теги — `<span>`, а не кнопки: обработчика у них там не было
+вовсе. Здесь они кликабельны, и элемент обязан быть кнопкой — иначе жест
+недоступен ни с клавиатуры, ни озвучке экрана. Оформление от этого не меняется:
+`.chip` уже задаёт шрифт, цвет и курсор, а сброс рамки с подложкой, который есть
+у `.chip--add`, придётся распространить на `.chip` целиком.
 
 `client/components/Facts.svelte`:
 
@@ -801,7 +841,8 @@ git commit -m "feat: нотация оценок и строки фактов к
   import Poster from '$components/Poster.svelte'
   import Synopsis from '$components/Synopsis.svelte'
 
-  let { view, collapsed = false, oncollapse, onperson, ontag } = $props()
+  let { view, collapsed = false, on, oncollapse, onmark, onperson, ontag }
+    = $props()
 </script>
 
 <article class="film" class:is-collapsed={collapsed}>
@@ -816,7 +857,8 @@ git commit -m "feat: нотация оценок и строки фактов к
   <div class="film__body">
     <h2 class="film__title">{view.title}{#if view.year} ({view.year}){/if}</h2>
 
-    <Chips genres={view.genres} tags={view.tags} ontag={() => ontag(view)} />
+    <Chips genres={view.genres} tags={view.tags} {on} {onmark}
+           ontag={() => ontag(view)} />
     <Facts {view} onperson={(domain, name) => onperson(domain, name, view)} />
     <Synopsis text={view.synopsis} />
   </div>
@@ -1751,6 +1793,6 @@ git commit -m "feat: разделы «Оценённые» и «Хочу пос�
 `IntersectionObserver`. Оба удовлетворяют требованию; выбор записывается доводом
 в код.
 
-**Чем измеряется готовность.** `npm test` зелёный, 47 тестов. Найденное в
+**Чем измеряется готовность.** `npm test` зелёный, 50 тестов. Найденное в
 интернете заводится в библиотеку, оценивается звёздами и остаётся в разделах
 после перезапуска.

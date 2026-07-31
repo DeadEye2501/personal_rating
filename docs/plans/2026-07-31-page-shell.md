@@ -649,8 +649,9 @@ git commit -m "feat: палитра, база и локальные шрифты
 **Интерфейсы:**
 - Потребляет: ничего.
 - Отдаёт: `EMPTY`, `cycled(filters, field, id)`, `chosen(filters)`,
-  `isEmpty(filters)`; `SORT_STATES`, `ADDED_AT`, `nextSort(index)`,
-  `orderOf(index)`, `orderFor(section, sort)`; `newSession()`,
+  `isEmpty(filters)`; `SORT_STATES`, `ADDED_AT`, `cycleOf(section)`,
+  `nextSort(section, position)`, `stateAt(section, position)`, `orderOf(index)`,
+  `orderFor(section, position)`; `newSession()`,
   `withKind(session, kind)`, `withSection(session, section)`,
   `withCollapsed(session, collapsed)`.
 
@@ -661,7 +662,7 @@ git commit -m "feat: палитра, база и локальные шрифты
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY, chosen, cycled, isEmpty } from '$state/filters.js'
+import { EMPTY, chosen, cycled, isEmpty, marked } from '$state/filters.js'
 
 describe('строка фильтра', () => {
   it('перебирает три состояния по кругу', () => {
@@ -712,6 +713,34 @@ describe('строка фильтра', () => {
     expect(isEmpty(cycled(EMPTY, 'tags', 3))).toBe(false)
   })
 })
+
+describe('метка на карточке', () => {
+  it('переключает два состояния, а не три', () => {
+    // Исключить с карточки нечем: третье состояние живёт только в модалке.
+    const on = marked(EMPTY, 'genres', 7)
+    expect(chosen(on).genre_ids).toEqual([7])
+
+    const off = marked(on, 'genres', 7)
+    expect(isEmpty(off)).toBe(true)
+  })
+
+  it('не проводит метку через исключение по дороге', () => {
+    // Если бы клик по метке шёл тем же перебором, второе нажатие означало бы
+    // «ни одного такого» — то есть скрывало бы карточку, с которой нажали.
+    const twice = marked(marked(EMPTY, 'genres', 7), 'genres', 7)
+    expect(chosen(twice).excluded_genre_ids).toEqual([])
+  })
+
+  it('снимает исключение, выставленное в модалке', () => {
+    // Метка знает два состояния, и включённой она обязана стать из любого:
+    // иначе исключённый в модалке жанр с карточки было бы не включить.
+    const excluded = cycled(cycled(EMPTY, 'genres', 7), 'genres', 7)
+    const on = marked(excluded, 'genres', 7)
+
+    expect(chosen(on).genre_ids).toEqual([7])
+    expect(chosen(on).excluded_genre_ids).toEqual([])
+  })
+})
 ```
 
 Создать `tests/web/sorting.test.js`:
@@ -719,64 +748,69 @@ describe('строка фильтра', () => {
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { ADDED_AT, SORT_STATES, nextSort, orderFor, orderOf }
+import { ADDED_AT, SORT_STATES, cycleOf, nextSort, orderFor, orderOf, stateAt }
   from '$state/sorting.js'
 
+const keysOf = (section) =>
+  cycleOf(section).map((index) => SORT_STATES[index].key)
+
 describe('переключатель сортировки', () => {
-  it('держит восемь состояний', () => {
-    expect(SORT_STATES).toHaveLength(8)
+  it('в оценённых восемь состояний, в отложенном четыре', () => {
+    expect(cycleOf('rated')).toHaveLength(8)
+    expect(cycleOf('wishlist')).toHaveLength(4)
   })
 
-  it('соседи — две стороны одного критерия', () => {
-    // Четыре критерия по две стороны, а не восемь несвязанных: перебор обязан
-    // сначала перевернуть направление и лишь потом сменить критерий.
-    for (let index = 0; index < SORT_STATES.length; index += 2) {
-      const first = orderOf(index)
-      const second = orderOf(index + 1)
+  it('в отложенном осмысленны только два критерия', () => {
+    // Своей оценки у неоценённого не бывает, времени оценки тем более, а дата
+    // выхода в списке дел ни о чём не говорит.
+    expect(new Set(keysOf('wishlist'))).toEqual(new Set([ADDED_AT, 'title']))
+  })
 
-      expect(second.key).toBe(first.key)
-      expect(second.descending).toBe(!first.descending)
+  it('дату добавления в оценённых не встретить', () => {
+    // Девятое состояние понадобилось бы ровно одному разделу.
+    expect(keysOf('rated')).not.toContain(ADDED_AT)
+  })
+
+  it('соседи — две стороны одного критерия, и это верно в обоих разделах', () => {
+    // Перебор обязан сначала перевернуть направление и лишь потом сменить
+    // критерий: иначе он читается как случайный список.
+    for (const section of ['rated', 'wishlist']) {
+      const cycle = cycleOf(section)
+      for (let at = 0; at < cycle.length; at += 2) {
+        const first = orderFor(section, at)
+        const second = orderFor(section, at + 1)
+
+        expect(second.key).toBe(first.key)
+        expect(second.descending).toBe(!first.descending)
+      }
     }
   })
 
-  it('открывается на высоких оценках', () => {
-    expect(orderOf(0)).toEqual({ key: 'score', descending: true })
-  })
-
-  it('замыкается', () => {
-    let index = 0
-    for (let step = 0; step < SORT_STATES.length; step += 1) {
-      index = nextSort(index)
-    }
-    expect(index).toBe(0)
-  })
-
-  it('не повторяет ни одного состояния', () => {
-    const seen = SORT_STATES.map((_, index) => {
-      const { key, descending } = orderOf(index)
-      return `${key}:${descending}`
-    })
-    expect(new Set(seen).size).toBe(8)
-  })
-
-  it('дату добавления в переборе не встретить', () => {
-    // В «Хочу посмотреть» сортировки нет вовсе, и девятое состояние
-    // понадобилось бы ровно одному разделу, где остальные восемь не значат
-    // ничего.
-    const keys = SORT_STATES.map((_, index) => orderOf(index).key)
-    expect(keys).not.toContain(ADDED_AT)
-  })
-
-  it('в отложенном порядок один и переключателем не сбивается', () => {
-    // Список дел смотрят сверху вниз: там один порядок, по дате добавления, и
-    // тронутый переключатель на него не действует.
+  it('нетронутый переключатель даёт первое состояние своего набора', () => {
+    expect(orderFor('rated', null)).toEqual({ key: 'score', descending: true })
     expect(orderFor('wishlist', null)).toEqual({ key: ADDED_AT, descending: true })
-    expect(orderFor('wishlist', 5)).toEqual({ key: ADDED_AT, descending: true })
   })
 
-  it('в оценённых переключатель действует, а нетронутый даёт умолчание', () => {
-    expect(orderFor('rated', null)).toEqual(orderOf(0))
-    expect(orderFor('rated', 5)).toEqual(orderOf(5))
+  it('замыкается по своему набору, а не по общей таблице', () => {
+    // В отложенном круг вчетверо короче: перебор по восьми увёл бы его в
+    // состояния, которых у раздела нет.
+    let at = 0
+    for (let step = 0; step < 4; step += 1) at = nextSort('wishlist', at)
+    expect(at).toBe(0)
+
+    at = 0
+    for (let step = 0; step < 8; step += 1) at = nextSort('rated', at)
+    expect(at).toBe(0)
+  })
+
+  it('не повторяет ни одного состояния внутри набора', () => {
+    for (const section of ['rated', 'wishlist']) {
+      const seen = cycleOf(section).map((_, at) => {
+        const { key, descending } = orderFor(section, at)
+        return `${key}:${descending}`
+      })
+      expect(new Set(seen).size).toBe(cycleOf(section).length)
+    }
   })
 
   it('каждое состояние объясняет себя словами', () => {
@@ -786,6 +820,12 @@ describe('переключатель сортировки', () => {
       expect(state.icon.length).toBeGreaterThan(0)
       expect(state.dir).toMatch(/^arrow_(up|down)ward$/)
     }
+  })
+
+  it('кнопка берёт вид из состояния своего раздела', () => {
+    // Позиция 0 в двух разделах — разные состояния, и глиф обязан различаться.
+    expect(stateAt('wishlist', 0).key).toBe(ADDED_AT)
+    expect(stateAt('rated', 0).key).toBe('score')
   })
 })
 ```
@@ -900,6 +940,24 @@ export function chosen(filters) {
   }
 }
 
+/** Метка на карточке: два состояния вместо трёх. Включён и не активен —
+ *  исключить с карточки нечем.
+ *
+ *  Отдельно от `cycled` не по прихоти: пройди метка тем же перебором, второе
+ *  нажатие означало бы «ни одного такого», то есть скрывало бы ту самую
+ *  карточку, с которой нажали. */
+export function marked(filters, field, id) {
+  const on = filters.on[field].includes(id)
+  return {
+    on: { ...filters.on,
+          [field]: on ? without(filters.on[field], id)
+                      : [...filters.on[field], id] },
+    // Включённой метка становится из любого состояния: иначе исключённый в
+    // модалке жанр с карточки было бы не включить.
+    ex: { ...filters.ex, [field]: without(filters.ex[field], id) },
+  }
+}
+
 /** По этому горит кнопка фильтра в шапке. */
 export function isEmpty(filters) {
   return FIELDS.every((field) => !filters.on[field].length
@@ -916,12 +974,15 @@ const without = (ids, id) => ids.filter((each) => each !== id)
 ```js
 /** Восемь состояний переключателя: четыре критерия, каждый в две стороны. */
 
-// Порядок по умолчанию в «Хочу посмотреть». В переборе не участвует: девятое
-// состояние ради возврата к нему стоило бы дороже самого возврата.
+// Есть только в переборе «Хочу посмотреть»: в «Оценённых» девятое состояние
+// понадобилось бы ровно одному разделу.
 export const ADDED_AT = 'added_at'
 
 // Глифы и подписи взяты из макета целиком. Направление показано стрелкой в
 // углу кнопки, а сам критерий — основным глифом: подсветки у перебора нет.
+//
+// Последняя пара — дата добавления — в макете отсутствует: там перебор был на
+// восемь состояний. Глиф у неё назван здесь впервые и подлежит сверке.
 export const SORT_STATES = [
   { key: 'score',    down: true,  icon: 'star',          dir: 'arrow_downward', label: 'По оценке, сначала высокие' },
   { key: 'score',    down: false, icon: 'star',          dir: 'arrow_upward',   label: 'По оценке, сначала низкие' },
@@ -931,9 +992,29 @@ export const SORT_STATES = [
   { key: 'year',     down: false, icon: 'event',         dir: 'arrow_upward',   label: 'По дате выхода, сначала старые' },
   { key: 'title',    down: true,  icon: 'sort_by_alpha', dir: 'arrow_downward', label: 'По алфавиту, А → Я' },
   { key: 'title',    down: false, icon: 'sort_by_alpha', dir: 'arrow_upward',   label: 'По алфавиту, Я → А' },
+  { key: ADDED_AT,   down: true,  icon: 'bookmark_added', dir: 'arrow_downward', label: 'По дате добавления, сначала свежие' },
+  { key: ADDED_AT,   down: false, icon: 'bookmark_added', dir: 'arrow_upward',   label: 'По дате добавления, сначала давние' },
 ]
 
-export const nextSort = (index) => (index + 1) % SORT_STATES.length
+// Какие состояния перебирает раздел. В отложенном осмысленны только два
+// критерия: своей оценки у неоценённого не бывает, времени оценки тем более, а
+// дата выхода в списке дел ни о чём не говорит.
+//
+// Хранится позиция в наборе своего раздела, а не номер строки таблицы: при
+// смене раздела переключатель и так сбрасывается, а позиция читается глазами.
+const CYCLES = {
+  wishlist: [8, 9, 6, 7],
+  rated: [0, 1, 2, 3, 4, 5, 6, 7],
+}
+
+export const cycleOf = (section) => CYCLES[section] ?? CYCLES.rated
+
+export const nextSort = (section, position) =>
+  (position + 1) % cycleOf(section).length
+
+/** Состояние переключателя раздела: глиф, стрелка, подпись. */
+export const stateAt = (section, position) =>
+  SORT_STATES[cycleOf(section)[position]]
 
 /** То, что уезжает мосту полем `order`. */
 export function orderOf(index) {
@@ -941,16 +1022,11 @@ export function orderOf(index) {
   return { key: state.key, descending: state.down }
 }
 
-/** Порядок раздела: `sort` — состояние переключателя или `null`, если он не
- *  тронут.
- *
- *  В «Хочу посмотреть» порядок один и переключателем не сбивается: это список
- *  дел, а не библиотека, и смотрят его сверху вниз. Кнопки сортировки там нет
- *  вовсе, но проверка стоит и на тронутом состоянии — чтобы правило держалось
- *  само, а не тем, что кнопку забыли нарисовать. */
-export function orderFor(section, sort) {
-  if (section === 'wishlist') return { key: ADDED_AT, descending: true }
-  return sort === null ? orderOf(0) : orderOf(sort)
+/** Порядок раздела: `position` — состояние переключателя или `null`, если он не
+ *  тронут. Нетронутый значит первое состояние своего набора: в отложенном
+ *  свежие сверху, в оценённых высокие сверху. */
+export function orderFor(section, position) {
+  return orderOf(cycleOf(section)[position ?? 0])
 }
 ```
 
@@ -1000,7 +1076,7 @@ export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
 cd client && npm test
 ```
 
-Ожидание: PASS, 22 теста.
+Ожидание: PASS, 25 тестов.
 
 - [ ] **Шаг 7: Коммит**
 
@@ -1271,7 +1347,7 @@ function tail(args) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 31 тест — девять новых и двадцать два из задачи 3.
+Ожидание: PASS, 34 теста — девять новых и двадцать пять из задачи 3.
 
 - [ ] **Шаг 5: Коммит**
 
@@ -1309,7 +1385,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 - Изменить: `client/app/App.svelte`, `client/main.js`
 
 **Интерфейсы:**
-- Потребляет: `SORT_STATES`, `nextSort` из `$state/sorting.js`; `isEmpty` из
+- Потребляет: `nextSort`, `stateAt` из `$state/sorting.js`; `isEmpty` из
   `$state/filters.js`; `withKind`, `withSection`, `withCollapsed` из
   `$state/session.js`.
 - Отдаёт: `Topbar` с входными `session`, `onsession`, `onsearch`, `onadd`,
@@ -1656,7 +1732,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   import ToolButton from '$components/ToolButton.svelte'
   import { isEmpty } from '$state/filters.js'
   import { withCollapsed, withKind, withSection } from '$state/session.js'
-  import { SORT_STATES, nextSort } from '$state/sorting.js'
+  import { nextSort, stateAt } from '$state/sorting.js'
 
   let { session, onsession, onsearch, onadd, onfilter } = $props()
 
@@ -1683,7 +1759,9 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
   let drawing = $state(false)
 
-  const sort = $derived(SORT_STATES[session.sort ?? 0])
+  // Вид кнопки — из состояния своего раздела: позиция 0 в отложенном и в
+  // оценённых означает разное.
+  const sort = $derived(stateAt(session.section, session.sort ?? 0))
 
   function chooseKind(kind) {
     const root = document.documentElement.style
@@ -1742,15 +1820,12 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
                 active={session.collapsed} pressed={session.collapsed}
                 onclick={() => onsession(withCollapsed(session, !session.collapsed))} />
 
-    <!-- В «Хочу посмотреть» сортировки нет вовсе: там один порядок, по дате
-         добавления. Кнопка, которая ничего не делает, называла бы порядок,
-         которого не существует. -->
-    {#if session.section !== 'wishlist'}
-      <ToolButton icon={sort.icon} dir={sort.dir}
-                  label={'Сортировка: ' + sort.label.toLowerCase()}
-                  onclick={() => onsession({ ...session,
-                                             sort: nextSort(session.sort ?? 0) })} />
-    {/if}
+    <ToolButton icon={sort.icon} dir={sort.dir}
+                label={'Сортировка: ' + sort.label.toLowerCase()}
+                onclick={() => onsession({
+                  ...session,
+                  sort: nextSort(session.section, session.sort ?? 0),
+                })} />
 
     <ToolButton icon="add" label="Завести карточку" onclick={onadd} />
   </div>
@@ -1762,11 +1837,10 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 применён он один на все признаки. Разбор по признакам появится в плане 8, вместе
 с самими модалками.
 
-**В «Хочу посмотреть» сортировки нет, и кнопки там тоже нет.** Решено
-31.07.2026: в том разделе один порядок — по дате добавления, — и переключатель на
-него не действует. Показывать кнопку, которая ничего не делает, нельзя: она
-называла бы порядок, которого нет. Поэтому она просто не рисуется, как не
-рисуются фильтры в поиске.
+**Набор состояний сортировки зависит от раздела.** Решено 31.07.2026: в
+«Оценённых» их восемь, в «Хочу посмотреть» четыре — по дате добавления и по
+алфавиту, каждый в две стороны. Кнопка одна и та же, но перебирает она свой
+набор, и вид берёт из него же.
 
 - [ ] **Шаг 4: Считать ширину зон замером**
 
@@ -2103,6 +2177,6 @@ git commit -m "feat: четыре раздела стопкой, переход 
 Разбор «какой именно фильтр применён» по признакам — план 8: сейчас все три
 кнопки горят от одного `isEmpty`, как и написано в спеке.
 
-**Чем измеряется готовность.** `npm test` зелёный, 31 тест. Окно открывается,
+**Чем измеряется готовность.** `npm test` зелёный, 34 теста. Окно открывается,
 шапка совпадает с макетом при сверке рядом, переключение типа перетекает
 акцентом, разделы меняются проявлением, плашка выезжает и уходит.
