@@ -745,7 +745,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 213 строк
+### `backend/storage/repository/library.py` — 218 строк
 
 Карточки библиотеки.
 
@@ -754,7 +754,7 @@
 - `class ItemExists(Exception)` (2)
 - `def _named(entity: Entity, needle: str)` (13)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (162)
+- `class LibraryRepository(Repository)` (167)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
@@ -765,7 +765,7 @@
   - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
   - `async def delete(self, item_id: int) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
-  - `async def replace_fields(self, item_id: int, item: Item) -> None` (8)
+  - `async def replace_fields(self, item_id: int, item: Item) -> None` (13)
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
@@ -1351,13 +1351,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def python_files(package: str) -> list[Path]` (7)
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
 
-### `tests/backend/test_library.py` — 360 строк ⚠ подошёл к 300
+### `tests/backend/test_library.py` — 378 строк ⚠ подошёл к 300
 
 Репозиторий библиотеки: карточка, окна и поиск по названию.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 24
+Тестов: 25
 
 - `def make_item(**overrides) -> Item` (4)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)

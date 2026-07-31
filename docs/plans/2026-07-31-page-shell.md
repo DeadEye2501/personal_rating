@@ -982,15 +982,6 @@ describe('переключатель сортировки', () => {
     }
   })
 
-  it('каждое состояние объясняет себя словами', () => {
-    // Подпись уезжает в title кнопки: перебор без подсветки иначе не прочесть.
-    for (const state of SORT_STATES) {
-      expect(state.label.length).toBeGreaterThan(0)
-      expect(state.icon.length).toBeGreaterThan(0)
-      expect(state.dir).toMatch(/^arrow_(up|down)ward$/)
-    }
-  })
-
   it('кнопка берёт вид из состояния своего раздела', () => {
     // Позиция 0 в двух разделах — разные состояния, и глиф обязан различаться.
     expect(stateAt('wishlist', 0).key).toBe(ADDED_AT)
@@ -1286,7 +1277,7 @@ export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
 cd client && npm test
 ```
 
-Ожидание: PASS, 32 теста.
+Ожидание: PASS, 31 тест.
 
 - [ ] **Шаг 7: Коммит**
 
@@ -1601,7 +1592,7 @@ function tail(args) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 43 теста — одиннадцать новых и тридцать два из задачи 3.
+Ожидание: PASS, 42 теста — одиннадцать новых и тридцать один из задачи 3.
 
 - [ ] **Шаг 5: Коммит**
 

@@ -50,6 +50,9 @@ personal_rating/
 │  │  ├─ scorerow.css            строка оценки со звёздами
 │  │  ├─ newtag.css              форма нового тега
 │  │  └─ chart.css               гистограмма и сноска
+│  ├─ state/
+│  │  ├─ scroll.js               арифметика своей полосы прокрутки
+│  │  └─ histogram.js            доли столбцов гистограммы
 │  ├─ components/
 │  │  ├─ Modal.svelte            оболочка любого наложения
 │  │  ├─ Scrollarea.svelte       область со своей полосой
@@ -90,7 +93,8 @@ personal_rating/
 
 **Интерфейсы:**
 - Потребляет: ничего.
-- Отдаёт: `Modal` с входными `narrow`, `ask`, `danger`, `label`, `onclose`,
+- Отдаёт: `thumbOf(visible, total, passed)`, `scaleOf(visible, total)`;
+  `Modal` с входными `narrow`, `ask`, `danger`, `label`, `onclose`,
   `children`;
   `Scrollarea` с входным `children`.
 
@@ -249,7 +253,67 @@ Chromium 150, и там свойство давно без префикса. Э�
 совпадений и снова список, — и привязывать общий приём к имени одного из них
 значило бы писать его четырежды.
 
-- [ ] **Шаг 4: Написать оболочку**
+- [ ] **Шаг 4: Написать счёт ползунка**
+
+Создать `tests/web/scroll.test.js`:
+
+```js
+import { describe, expect, it } from 'vitest'
+
+import { scaleOf, thumbOf } from '$state/scroll.js'
+
+describe('своя полоса прокрутки', () => {
+  it('на коротком содержимом полосы нет вовсе', () => {
+    expect(thumbOf(400, 300, 0)).toBe(null)
+    expect(thumbOf(400, 400, 0)).toBe(null)
+  })
+
+  it('высота ползунка — доля видимого от всего', () => {
+    // Видно четверть — ползунок в четверть области.
+    expect(thumbOf(400, 1600, 0).height).toBe(100)
+  })
+
+  it('короткий ползунок не даёт себя ухватить, и потому у него есть предел', () => {
+    // Доля дала бы четыре пикселя: на списке в сто строк это не мишень.
+    expect(thumbOf(400, 40000, 0).height).toBe(28)
+  })
+
+  it('внизу списка ползунок стоит внизу области, а не за её краем', () => {
+    const found = thumbOf(400, 1600, 1200)
+
+    expect(found.offset).toBe(400 - found.height)
+  })
+
+  it('пиксель курсора стоит больше пикселя содержимого', () => {
+    // Иначе ползунок отставал бы от мыши тем сильнее, чем длиннее список.
+    expect(scaleOf(400, 1600)).toBe(4)
+  })
+})
+```
+
+Создать `client/state/scroll.js`:
+
+```js
+/** Арифметика своей полосы прокрутки. */
+
+// Минимальная высота ползунка: на длинном списке доля содержимого делает его
+// неухватываемым.
+const MIN_THUMB = 28
+
+/** Высота и смещение ползунка, либо `null` — прокручивать нечего. */
+export function thumbOf(visible, total, passed) {
+  if (total <= visible) return null
+
+  const height = Math.max(MIN_THUMB, visible * (visible / total))
+  const room = visible - height
+  return { height, offset: room * (passed / (total - visible)) }
+}
+
+/** Во сколько раз пиксель курсора длиннее пикселя содержимого. */
+export const scaleOf = (visible, total) => total / visible
+```
+
+- [ ] **Шаг 5: Написать оболочку**
 
 `client/components/Modal.svelte`:
 
@@ -293,15 +357,13 @@ Chromium 150, и там свойство давно без префикса. Э�
 </div>
 ```
 
-- [ ] **Шаг 5: Написать область со своей полосой**
+- [ ] **Шаг 6: Написать область со своей полосой**
 
 `client/components/Scrollarea.svelte`:
 
 ```svelte
 <script>
-  // Минимальная высота ползунка: на длинном списке доля содержимого делает его
-  // неухватываемым.
-  const MIN_THUMB = 28
+  import { scaleOf, thumbOf } from '$state/scroll.js'
 
   let { children } = $props()
 
@@ -309,17 +371,16 @@ Chromium 150, и там свойство давно без префикса. Э�
   let thumb = $state()
   let shown = $state(false)
 
+  // Считает `state/scroll.js`, здесь остаётся привязка к DOM: арифметику
+  // ползунка иначе не сторожит ничто — компоненты по решению не проверяются.
   function measure() {
     if (!box || !thumb) return
-    const ratio = box.clientHeight / box.scrollHeight
-    shown = ratio < 1
+    const found = thumbOf(box.clientHeight, box.scrollHeight, box.scrollTop)
+    shown = found !== null
     if (!shown) return
 
-    const height = Math.max(MIN_THUMB, box.clientHeight * ratio)
-    const room = box.clientHeight - height
-    const passed = box.scrollTop / (box.scrollHeight - box.clientHeight)
-    thumb.style.height = `${height}px`
-    thumb.style.transform = `translateY(${room * passed}px)`
+    thumb.style.height = `${found.height}px`
+    thumb.style.transform = `translateY(${found.offset}px)`
   }
 
   // Пересчёт нужен и при вводе текста, и при смене содержимого: список
@@ -335,7 +396,7 @@ Chromium 150, и там свойство давно без префикса. Э�
     event.preventDefault()
     const start = event.clientY
     const from = box.scrollTop
-    const scale = box.scrollHeight / box.clientHeight
+    const scale = scaleOf(box.clientHeight, box.scrollHeight)
 
     const move = (moved) => {
       box.scrollTop = from + (moved.clientY - start) * scale
@@ -359,7 +420,7 @@ Chromium 150, и там свойство давно без префикса. Э�
 </div>
 ```
 
-- [ ] **Шаг 6: Подключить и посмотреть**
+- [ ] **Шаг 7: Подключить и посмотреть**
 
 Дописать в `client/main.js`:
 
@@ -371,7 +432,7 @@ import '$styles/scrollarea.css'
 Смотреть пока не на чем — списка нет. Проверка оболочки идёт в задаче 3, вместе
 с первой настоящей модалкой.
 
-- [ ] **Шаг 7: Коммит**
+- [ ] **Шаг 8: Коммит**
 
 ```bash
 git add client/styles/ client/components/ client/main.js
@@ -1383,7 +1444,7 @@ cd client && npm test && npm run build
 cd .. && pipenv run python main.py
 ```
 
-Ожидание: PASS, 65 тестов. В окне: десять столбцов, цвет по шкале, число над
+Ожидание: PASS, 69 тестов. В окне: десять столбцов, цвет по шкале, число над
 верхушкой своего столбца, подпись оценки под ним; при заходе на раздел столбцы
 отрастают из пола с задержкой; фильтр сужает и гистограмму тоже; уход и возврат
 проигрывают анимацию заново.

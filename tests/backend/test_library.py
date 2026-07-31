@@ -319,10 +319,28 @@ async def test_replace_fields_rewrites_everything_the_human_gave(sessions):
     await repository.replace_fields(item_id, written)
 
     stored = await repository.get(item_id)
-    # Источник и его номер не трогаются: это привязка, отдельная операция.
+    # Источник, его номер и момент синхронизации не трогаются: первое — это
+    # привязка, второе — отметка о разговоре с источником, а тут ни того, ни
+    # другого не происходило.
     assert stored == replace(
-        written, id=item_id, source=Source.TMDB, source_id="157336"
+        written, id=item_id, source=Source.TMDB, source_id="157336",
+        synced_at=WHEN,
     )
+
+
+async def test_a_hand_edit_does_not_pretend_to_be_a_sync(sessions):
+    """Правка человеком и синхронизация с источником — разные события.
+
+    Свежий `synced_at` объявил бы карточку только что обновлённой, и дешёвый
+    перезапрос сезонов не случился бы ещё месяц: правишь название сериалу из
+    TMDB — теряешь обновление серий."""
+    repository = LibraryRepository(sessions)
+    item_id = await repository.create(make_item(synced_at=WHEN))
+
+    await repository.replace_fields(item_id, make_item(title="другое",
+                                                       synced_at=LATER))
+
+    assert (await repository.get(item_id)).synced_at == WHEN
 
 
 async def test_replace_fields_takes_only_the_asked_card(sessions):

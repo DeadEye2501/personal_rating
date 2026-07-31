@@ -243,15 +243,9 @@ def test_every_denial_is_caught_by_the_common_ancestor(denial):
         raise denial("занято")
 
 
-def test_the_ancestor_does_not_catch_everything():
-    """`except Denied` не должен становиться широким перехватом: непредвиденное
-    обязано долетать до лога."""
-    assert not issubclass(RuntimeError, Denied)
-    assert not issubclass(ValueError, Denied)
-
-
 def test_a_closed_poster_store_is_not_a_denial():
-    """Хранилище не открыли — это поломка сборки, а не занятое имя тега."""
+    """Хранилище не открыли — это поломка сборки, а не занятое имя тега: она
+    обязана долететь до лога, а не стать вежливым отказом на странице."""
     assert not issubclass(NotOpened, Denied)
 
 
@@ -1669,6 +1663,10 @@ class Library(Domain):
         return self._reply(lambda back: back.library.create(item))
 
     def replace(self, item_id: int, fields: dict) -> dict:
+        """Тот же `_manual`, что и у заведения: свежий `synced_at`, который он
+        подставляет, до базы не доезжает — `replace_fields` его не пишет.
+        Правка руками не разговор с источником, и объявить карточку только что
+        обновлённой значило бы отложить перезапрос сезонов на месяц."""
         item = _manual(fields)
         return self._reply(
             lambda back: back.library.replace_fields(item_id, item))

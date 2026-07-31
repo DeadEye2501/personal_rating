@@ -179,10 +179,15 @@ class LibraryRepository(Repository):
         )
 
     async def replace_fields(self, item_id: int, item: Item) -> None:
-        """Правка человеком: пишет все поля карточки. Источник и его
-        идентификатор не трогает — это привязка, отдельная операция."""
+        """Правка человеком: пишет все поля карточки.
+
+        Три поля не трогает. Источник и его идентификатор — это привязка,
+        отдельная операция. `synced_at` — отметка о разговоре с источником, а
+        правка руками разговором не является: поставь её здесь, и карточка
+        объявит себя только что обновлённой, а дешёвый перезапрос сезонов не
+        случится ещё месяц."""
         values = _values(item)
-        del values["source"], values["source_id"]
+        del values["source"], values["source_id"], values["synced_at"]
         await self._run(
             update(item_table).where(item_table.c.id == item_id).values(**values)
         )
