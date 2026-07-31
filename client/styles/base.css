@@ -1,0 +1,110 @@
+/* Правила, действующие на всю страницу сразу, а не на её блок. */
+
+*, *::before, *::after { box-sizing: border-box }
+
+/* display:none у атрибута hidden приходит из стилей браузера, и любой display
+   в классе его перебивает. Возвращаем атрибуту приоритет. */
+[hidden] { display: none !important }
+
+/* `#root` стоит между `body` и `.app`: это точка монтирования Svelte, которой
+   в макете не было вовсе. Без своей высоты она `auto`, и процент у `.app`
+   считается от неопределённого — то есть не действует. */
+html, body, #root { height: 100% }
+
+/* Минимума ширины и высоты здесь нет: их держит окно, `bridge/window.py`. */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: var(--body-m);
+  -webkit-font-smoothing: antialiased;
+
+  /* Это приложение, а не браузер: без выделения текста и без резинового
+     отскока при прокрутке. */
+  overscroll-behavior: none;
+  user-select: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--fill-primary-hover);
+  color: var(--text-bright);
+}
+
+/* Сам класс целиком приезжает из пакета `material-symbols/outlined.css`, и в
+   собранном CSS он стоит раньше — здесь только своё поверх него. В макете он
+   был написан руками вынужденно: Google Fonts по ссылке отдаёт `@font-face`,
+   а класса не отдаёт. */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0;
+  transition: font-variation-settings .18s;
+}
+
+/* Включённая кнопка показывает закрашенный вариант иконки, выключенная —
+   контурный. Одно правило на всё приложение. */
+.is-active > .material-symbols-outlined,
+.is-on > .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}
+
+.app {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  /* Тихое свечение от верхней кромки — стеклу есть что преломлять. */
+  background: radial-gradient(
+    ellipse at 50% 5%,
+    color-mix(in srgb, var(--primary) 3%, transparent) 0%,
+    transparent 45%);
+}
+
+.app::before,
+.app::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+/* Нить во всю ширину окна, гаснущая к краям. */
+.app::before {
+  top: 0;
+  height: 1px;
+  z-index: 2;
+  background: linear-gradient(90deg, transparent,
+    var(--primary) 22%, var(--primary) 78%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+/* Гало центром сидит на самой кромке, поэтому разлив уходит вниз, на страницу. */
+.app::after {
+  top: -8px;
+  height: 16px;
+  z-index: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 38%, transparent);
+  filter: blur(12px);
+}
+
+.app__main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
