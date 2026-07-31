@@ -6,6 +6,7 @@
 import asyncio
 import threading
 import time
+from datetime import datetime
 
 import pytest
 
@@ -31,6 +32,11 @@ class FakeBackend:
 
     async def where(self):
         return asyncio.get_running_loop()
+
+    async def moment(self):
+        """Значение, которого `json.dumps` сам не переварит: им наблюдается, что
+        перевод стоит на боевом пути, а не только зовётся тестом напрямую."""
+        return datetime(2026, 7, 31, 12, 0)
 
     async def ident(self):
         return threading.get_ident()

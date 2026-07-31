@@ -495,10 +495,16 @@
 
 ## bridge
 
+### `bridge/answer.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `_EDGE` = `re.compile('(?<!^)(?=[A-Z])')`
+
 ### `bridge/thread.py`
 
 - `logger` = `logging.getLogger(__name__)`
 - `BUILD_TIMEOUT` = `30.0`
+- `DEADLINE` = `60.0`
 
 ## migrations
 

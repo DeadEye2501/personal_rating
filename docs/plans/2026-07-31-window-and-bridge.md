@@ -881,14 +881,29 @@ pywebview сериализует ответ сам, штатным `json.dumps`,
 `int | Missing | Refusal` форма ответа одна и та же и всегда с меткой.
 
 **Файлы:**
-- Создать: `bridge/__init__.py` (пустой), `bridge/wire.py`
+- Создать: `bridge/wire.py`
 - Создать: `tests/bridge/test_wire.py`
 
-**Интерфейсы:**
-- Потребляет: `Missing`, `Refusal` из `backend.model`.
-- Отдаёт: `to_wire(value) -> Any`, `outcome(value) -> dict`.
+**Пустой `bridge/__init__.py` не заводится.** Проект живёт на неявных пакетах
+(PEP 420): его нет ни у `backend`, ни у `tests`, а корень в пути импорта ставит
+`pythonpath = .` из `pytest.ini`. Файл, не делающий ничего, — это правило 8.
 
-- [ ] **Шаг 1: Написать падающий тест**
+**Интерфейсы:**
+- Потребляет: ничего из проекта.
+- Отдаёт: `to_wire(value) -> Any`.
+
+**`outcome(value)` объявляет не эта задача, а первая, чей домен возвращает исход
+источника** — тот же довод, что у `DEADLINE`: у функции нет сегодняшнего
+потребителя, а это правило 8. Дом ей всё равно `bridge/wire.py`, и решение,
+ради которого она нужна, записано здесь, чтобы не выводить его заново:
+
+> `Missing` — датакласс без единого поля, и после разбора это `{}`, неотличимое
+> от чего угодно пустого. Различать исходы по набору ключей нельзя, поэтому у
+> объединений `int | Missing | Refusal` форма ответа одна и всегда с меткой:
+> `{"outcome": "missing"}`, `{"outcome": "refusal", "refusal": ...}`,
+> `{"outcome": "found", "value": ...}`.
+
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_wire.py`:
 
@@ -1019,12 +1034,12 @@ def test_a_value_is_wrapped_the_same_way():
 `title`; остальные тринадцать со значениями по умолчанию (сверено по
 `backend/model/view.py:23-48`).
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_wire.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.wire'`.
 
-- [ ] **Шаг 3: Написать перевод**
+- [x] **Шаг 3: Написать перевод**
 
 Создать пустой `bridge/__init__.py` и `bridge/wire.py`:
 
@@ -1086,12 +1101,12 @@ def outcome(value) -> dict:
 подкласс `int`, и обе ветви ведут в одно), `Enum` — раньше `str`, иначе `StrEnum`
 уедет подклассом строки и `type(...) is str` покраснеет.
 
-- [ ] **Шаг 4: Прогнать и увидеть зелёное**
+- [x] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_wire.py -v`
 Ожидание: PASS, 13 тестов.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add bridge/__init__.py bridge/wire.py tests/bridge/test_wire.py
@@ -1141,7 +1156,7 @@ DEADLINE = 60.0
 - Отдаёт: `Domain` с `__init__(thread)` и `_reply(factory, op=None) -> dict`,
   `kebab(name) -> str`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_answer.py`:
 
@@ -1223,12 +1238,12 @@ def test_the_kind_of_failure_is_kebab():
     assert kebab("BadImage") == "bad-image"
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_answer.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.answer'`.
 
-- [ ] **Шаг 3: Написать оболочку**
+- [x] **Шаг 3: Написать оболочку**
 
 Создать `bridge/answer.py`:
 
@@ -1288,12 +1303,12 @@ class Domain:
             return {"fail": "broken", "detail": str(error)}
 ```
 
-- [ ] **Шаг 4: Прогнать и увидеть зелёное**
+- [x] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_answer.py -v`
 Ожидание: PASS, 7 тестов.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add bridge/answer.py tests/bridge/test_answer.py

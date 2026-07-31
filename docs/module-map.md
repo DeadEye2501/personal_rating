@@ -935,19 +935,29 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 1 модулей
+## bridge — 3 модулей
 
-### `bridge/thread.py` — 161 строк
+### `bridge/answer.py` — 64 строк
+
+Оболочка вызова моста: срок, отказ, один формат ответа.
+
+Зависит от: `backend.model`, `bridge.thread`, `bridge.wire`
+
+- `def kebab(name: str) -> str` (4)
+- `class Domain` (39)
+  - `def _reply(self, factory, op: int | None=None) -> dict` (30)
+
+### `bridge/thread.py` — 176 строк
 
 Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом.
 
 Зависит от: —
 
 - `class Closed(Exception)` (2)
-- `class BackendThread` (141)
+- `class BackendThread` (147)
   - `def start(self) -> None` (5)
   - `def run(self, factory: Callable[[Any], Coroutine], op: int | None=None) -> concurrent.futures.Future` (10)
-  - `def cancel(self, ops) -> None` (10)
+  - `def cancel(self, ops) -> None` (16)
   - `def close(self) -> None` (9)
   - `def _live(self) -> None` (21)
   - `def _refuse(self, error: BaseException) -> None` (6)
@@ -955,6 +965,14 @@
   - `def _end(self, task, op, answer) -> None` (15)
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
+
+### `bridge/wire.py` — 40 строк
+
+Значения границы в то, что переживёт `json.dumps`.
+
+Зависит от: —
+
+- `def to_wire(value)` (29)
 
 ## migrations — 3 модулей
 
@@ -1017,7 +1035,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 66 модулей
+## tests — 68 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1666,15 +1684,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/conftest.py` — 105 строк
+### `tests/bridge/conftest.py` — 111 строк
 
 Двойники бэкенда и потоки на них.
 
 Зависит от: `bridge.thread`
 
-- `class FakeBackend` (61)
+- `class FakeBackend` (66)
   - `async def echo(self, value)` (2)
   - `async def where(self)` (2)
+  - `async def moment(self)` (4)
   - `async def ident(self)` (2)
   - `async def boom(self)` (2)
   - `async def slow(self)` (7)
@@ -1687,6 +1706,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def backend()` (2)
 - `def thread(backend)` (7)
 
+### `tests/bridge/test_answer.py` — 108 строк
+
+Один формат ответа на все операции: `{"ok": ...}` либо `{"fail": ...}`.
+
+Зависит от: `backend.model`, `bridge.answer`, `tests.bridge.conftest`
+
+Тестов: 10
+
+- `class Probe(Domain)` (5)
+  - `def ask(self, what, op=None)` (2)
+
 ### `tests/bridge/test_thread.py` — 200 строк
 
 Граница потоков: что обязано быть правдой у стыка двух циклов.
@@ -1694,6 +1724,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Зависит от: `bridge.thread`, `tests.bridge.conftest`
 
 Тестов: 17
+
+
+### `tests/bridge/test_wire.py` — 116 строк
+
+Перевод значений границы в то, что переживёт `json.dumps` без своего
+
+Зависит от: `backend.model`, `bridge.wire`
+
+Тестов: 12
 
 
 ### `tests/builders.py` — 74 строк
@@ -1765,6 +1804,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 ## Абстракции с одной реализацией
 
 - `Base` — наследник один: `Note`
+- `Domain` — наследник один: `Probe`
 - `FakeBackend` — наследник один: `Stubborn`
 - `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
 - `FakePerson` — наследник один: `Broken`

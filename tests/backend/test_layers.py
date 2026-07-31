@@ -116,9 +116,9 @@ def test_the_bridge_takes_only_the_boundary_types_from_the_backend():
 
 def test_both_bridge_lists_are_alive():
     """Пустой набор запретов и разрешение «мосту открыт весь бэкенд» зеленели бы
-    всегда — сегодня тем более, ведь мост не берёт из бэкенда ничего, и
-    разрешающая половина на его файлах не исполняется вовсе. Оба списка
-    проверяются там, где нарушение заведомо есть: хранилище берёт и
-    `sqlalchemy`, и `backend.storage.*`."""
+    всегда: на файлах моста ни один запрет не срабатывает, а разрешающая
+    половина отбирает только то, что и так разрешено. Оба списка проверяются
+    там, где нарушение заведомо есть: хранилище берёт и `sqlalchemy`, и
+    `backend.storage.*`."""
     assert offenders("backend/storage", BANNED_IN_BRIDGE)
     assert reaching_backend("backend/storage", ALLOWED_FROM_BACKEND)
