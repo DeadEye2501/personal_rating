@@ -30,6 +30,7 @@ from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import ItemExists, LibraryRepository
 from tests.conftest import (
     LATER,
+    capture,
     MOMENT,
     POSTER,
     an_item,
@@ -108,6 +109,19 @@ def test_overwrite_takes_the_incoming_over_the_own():
 
     assert merged.title == "Interstellar"
     assert merged.synopsis == "официальный синопсис"
+
+
+def test_overwrite_does_not_touch_the_kind_of_the_card():
+    """Тип содержимого источник не перезаписывает даже под галочкой: что делать
+    со ссылкой на сериал у карточки фильма — не решено, и менять его молча
+    нельзя. Попади `kind` в список доливаемых полей — галочка превратила бы
+    фильм в сериал.
+
+    Слияние без галочки той же проверки не требует: оно доливает только пустое,
+    а непустой `kind` не пуст никогда — упасть такое утверждение не может."""
+    series = incoming(item=an_item("1396", "Во все тяжкие", kind=Kind.SERIES)).item
+
+    assert overwrite_fields(mine(), series).kind is Kind.MOVIE
 
 
 def test_overwrite_keeps_what_the_source_never_sent():
@@ -368,6 +382,28 @@ async def test_an_own_poster_is_not_replaced(linker, sessions):
     await linker.link(item_id, incoming(), now=LATER)
 
     assert await linker.posters._store.get(item_id) == ours
+
+
+async def test_the_cover_is_taken_from_the_merged_card_and_not_from_the_source(
+    sessions, posters
+):
+    """«Что человек написал, остаётся его» — и адрес обложки такое же поле.
+
+    Наблюдается это единственным способом: смотреть, за какой картинкой ушёл
+    запрос. Иначе подмена слитой карточки на карточку источника неразличима —
+    в базе окажется одно и то же тело, потому что отвечает на оба адреса один
+    транспорт. Ни в одном тесте до этого у ручной карточки своего `poster_url`
+    не было вовсе."""
+    transport, seen = capture(content=POSTER)
+    built = Linker(**card_parts(sessions, posters, transport))
+    item_id = await manual_card(sessions, poster_url="https://example.com/my-own.jpg")
+
+    await built.link(item_id, incoming(), now=LATER)
+    await built.posters.aclose()
+
+    assert [str(request.url) for request in seen] == [
+        "https://example.com/my-own.jpg"
+    ]
 
 
 async def test_overwrite_replaces_the_own_poster(linker, sessions):

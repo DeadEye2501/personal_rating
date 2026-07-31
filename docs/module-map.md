@@ -1176,18 +1176,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(posters)` (8)
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
-### `tests/backend/test_enrich.py` — 447 строк ⚠ подошёл к 300
+### `tests/backend/test_enrich.py` — 460 строк ⚠ подошёл к 300
 
 Третий круг: оценки агрегаторов и сроки их годности.
 
 Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
 
-Тестов: 24
+Тестов: 25
 
 - `class FakeRatings(FakeClient)` (11)
-  - `async def ratings(self, imdb_id: str, _kind: Kind)` (3)
+  - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
 - `class Breaking(FakeRatings)` (7)
-  - `async def ratings(self, imdb_id: str, _kind: Kind)` (3)
+  - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
 - `async def item_id(sessions)` (8)
 - `async def enrich(sessions)` (12)
   - `def build(*clients) -> Enricher` (7)
@@ -1316,13 +1316,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def loader(sessions)` (6)
   - `def build(client) -> Loader` (3)
 
-### `tests/backend/test_linking.py` — 411 строк ⚠ подошёл к 300
+### `tests/backend/test_linking.py` — 447 строк ⚠ подошёл к 300
 
 Привязка ручной карточки к внешней базе и правила слияния.
 
 Зависит от: `backend.model`, `backend.service.linking`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.conftest`
 
-Тестов: 27
+Тестов: 29
 
 - `def incoming(**overrides) -> SourceCard` (12)
 - `def mine(**fields) -> Item` (4)
@@ -1415,13 +1415,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def service(posters)` (4)
 
-### `tests/backend/test_posters.py` — 181 строк
+### `tests/backend/test_posters.py` — 195 строк
 
 Хранилище постеров вторым файлом базы.
 
 Зависит от: `backend.storage.posters`, `backend.storage.session`, `tests.conftest`
 
-Тестов: 15
+Тестов: 16
 
 
 ### `tests/backend/test_ratings.py` — 188 строк
@@ -1542,7 +1542,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def item_id(sessions)` (4)
 
-### `tests/backend/test_wishlist.py` — 119 строк
+### `tests/backend/test_wishlist.py` — 128 строк
 
 Список запланированного: закладка, порядок и порции.
 

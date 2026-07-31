@@ -47,6 +47,20 @@ async def test_a_stored_poster_is_there(posters):
     assert await posters.has(1) is True
 
 
+async def test_an_empty_picture_is_still_there(posters):
+    """«Нет строки» и «строка пустая» — разные вещи, и решение это принятое:
+    `PosterService.poster_for` пустые байты отдаёт как ответ, а не лезет за
+    картинкой заново. `has` обязан отвечать так же, иначе привязка полезет в
+    сеть на каждую вставленную ссылку — она спрашивает именно его.
+
+    Своим путём пустые байты сюда не попадут: скачанное проверяется подписью
+    формата, залитое руками — обрезкой. А из старой версии или из битого
+    файла — попадут."""
+    await posters.put(1, b"", now=WHEN)
+
+    assert await posters.has(1) is True
+
+
 async def test_second_put_replaces_the_picture(posters):
     await posters.put(1, PICTURE, now=WHEN)
     await posters.put(1, OTHER, now=WHEN)

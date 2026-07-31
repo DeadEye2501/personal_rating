@@ -37,8 +37,8 @@ class FakeRatings(FakeClient):
         super().__init__(outcome, name)
         self.PROVIDES = provides
 
-    async def ratings(self, imdb_id: str, _kind: Kind):
-        self.asked.append(imdb_id)
+    async def ratings(self, imdb_id: str, kind: Kind):
+        self.asked.append((imdb_id, kind))
         return self.outcome
 
 
@@ -46,8 +46,8 @@ class Breaking(FakeRatings):
     """Клиент, падающий не тем, что клиенты ловят: так выглядит наша опечатка или
     чужая библиотека. Провод и разбор клиент разбирает сам и отдаёт отказом."""
 
-    async def ratings(self, imdb_id: str, _kind: Kind):
-        self.asked.append(imdb_id)
+    async def ratings(self, imdb_id: str, kind: Kind):
+        self.asked.append((imdb_id, kind))
         raise KeyError("payload")
 
 
@@ -299,7 +299,20 @@ async def test_an_empty_row_goes_stale_sooner(sessions, item_id, enrich):
 
     await enrich(client).enrich(item_id, Kind.MOVIE)
 
-    assert client.asked == ["tt0816692"]
+    assert client.asked == [("tt0816692", Kind.MOVIE)]
+
+
+async def test_a_series_is_asked_about_as_a_series(sessions, item_id, enrich):
+    """Один тип содержимого проверить мало: подставь клиенту `Kind.MOVIE`
+    жёстко, и фильмовый тест этого не заметит. У MDBList из типа собирается
+    адрес — `show` против `movie`, — и жёсткая подстановка оставила бы все
+    сериалы без оценок: источник ответил бы «такого нет», а это пустая строка
+    на месяц."""
+    client = FakeRatings((RatingSource.IMDB,), found((RatingSource.IMDB, 9.1)))
+
+    await enrich(client).enrich(item_id, Kind.SERIES)
+
+    assert client.asked == [("tt0816692", Kind.SERIES)]
 
 
 async def test_games_ask_nobody(sessions, enrich):
@@ -413,7 +426,7 @@ async def test_a_client_with_nothing_stale_is_not_asked(sessions, item_id, enric
     await enrich(fresh, stale).enrich(item_id, Kind.MOVIE)
 
     assert fresh.asked == []
-    assert stale.asked == ["tt0816692"]
+    assert stale.asked == [("tt0816692", Kind.MOVIE)]
 
 
 async def test_the_expected_set_is_what_the_clients_promise(sessions, enrich):

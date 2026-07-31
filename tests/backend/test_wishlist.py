@@ -19,13 +19,22 @@ async def test_add_and_contains(sessions, card):
 
 async def test_contains_answers_about_the_asked_card(sessions, card):
     """Без сравнения с `item_id` ответ был бы «да» на любую карточку, стоило
-    закладке появиться хоть одной."""
-    marked = await card(source_id="1")
-    plain = await card(source_id="2")
-    repository = WishlistRepository(sessions)
-    await repository.add(marked, now=WHEN)
+    закладке появиться хоть одной.
 
-    assert await repository.contains(plain) is False
+    Спрашиваем в обе стороны от закладки, и это не придирка: сравнение легко
+    сползает в `>=` или `<=`, а односторонний вопрос такую замену не различает —
+    номера у карточек идут по возрастанию, и одна из двух сторон совпадает с
+    правильным ответом случайно."""
+    lower = await card(source_id="1")
+    higher = await card(source_id="2")
+    repository = WishlistRepository(sessions)
+
+    await repository.add(lower, now=WHEN)
+    assert await repository.contains(higher) is False
+
+    await repository.remove(lower)
+    await repository.add(higher, now=WHEN)
+    assert await repository.contains(lower) is False
 
 
 async def test_adding_twice_keeps_the_first_date(sessions, engine, card):
