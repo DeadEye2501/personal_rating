@@ -8,7 +8,9 @@ from backend.model import (
     CompanyRole,
     Credit,
     ExternalId,
+    ExternalLink,
     Filters,
+    GenreKind,
     IdSource,
     Kind,
     PersonRole,
@@ -18,11 +20,12 @@ from backend.model import (
     SourceCard,
     new_manual_item,
 )
+from backend.service.posters import POSTER_SOURCES
+from backend.storage.posters import NotOpened
 from backend.storage.repository.external import (
     ExternalIdsRepository,
     ExternalRatingsRepository,
 )
-from backend.storage.posters import NotOpened
 from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
 from tests.conftest import (
@@ -202,34 +205,33 @@ async def test_a_hand_made_card_gets_linked_to_a_source(offline):
     assert view.companies == ()
 
 
-async def test_a_cover_from_the_network_is_a_refusal_and_not_a_hang(offline):
-    """Транспорт доезжает и до обложек: без него сервис постеров поднял бы
-    настоящий клиент и полез в сеть из теста."""
-    result = await offline.posters.poster_for(
-        None, Source.TMDB, "https://example.com/p.jpg", MOMENT
-    )
-
-    assert isinstance(result, Refusal)
-    assert result.reason is Reason.NETWORK
-
-
-async def test_a_failed_cover_says_which_source_failed(offline):
-    """Отказ постерного клиента называет свой источник, и у трёх источников три
-    разных имени.
+async def test_every_poster_source_got_its_own_named_client(offline):
+    """Отказ постерного клиента называет свой источник, и у всех источников
+    имена разные.
 
     Иначе сорвавшуюся обложку не отличить от чужой в логе — то же, чем однажды
     обернулось общее `imdb` у двух оценочных клиентов. Проверяется собранный
     бэкенд: своя ветка на источник живёт в сборке, и тесты сервиса обложек, у
-    которых клиенты свои, до неё не добираются."""
+    которых клиенты свои, до неё не добираются.
+
+    Причина отказа сторожится тем же проходом и по двум поводам сразу. Сетевая
+    она потому, что транспорт доехал до постерных клиентов: не доедь он — сюда
+    встал бы настоящий, и адрес `example.com` ответил бы кодом, а не обрывом.
+    Источник, которому в сборке не досталось клиента, дал бы `BROKEN`.
+
+    Набор берётся из `POSTER_SOURCES`, а не переписывается литералом: второй
+    список тех же трёх источников разошёлся бы с первым молча."""
     named = set()
-    for source in (Source.TMDB, Source.STEAM, Source.GOG):
+    for source in POSTER_SOURCES:
         result = await offline.posters.poster_for(
             None, source, "https://example.com/p.jpg", MOMENT
         )
+        assert isinstance(result, Refusal), f"{source}: обложку никто не просил"
+        assert result.reason is Reason.NETWORK, f"{source}: клиента нет в наборе"
         assert str(source) in result.source
         named.add(result.source)
 
-    assert len(named) == 3
+    assert len(named) == len(POSTER_SOURCES)
 
 
 async def test_the_data_folder_is_made_if_it_is_not_there(tmp_path):
@@ -265,6 +267,34 @@ async def test_the_enrichment_asks_nobody_without_the_network(offline):
 
     assert ratings == []
     assert await ExternalRatingsRepository(sessions).ratings_of(item_id) == []
+
+
+async def test_the_assembly_wires_the_three_services_nobody_asked_about(offline):
+    """Сборка — самое опасное место проекта: `loader=None` оставлял весь набор
+    зелёным, потому что боевой `Backend` про эти три поля не спрашивали нигде.
+    Остальные его поля сторожат тесты выше — каждое своим делом.
+
+    Ответы разные и нарочно: справочник жанров читается из базы и работает
+    офлайн, загрузка по ссылке упирается в мёртвую сеть, а перезапрос сериала у
+    ручной карточки заканчивается, не дойдя до сети. Ни одного из трёх не
+    получить, если поле осталось пустым или в него передали соседа."""
+    assert await offline.genres.list_for_kind(GenreKind.FILM) == [],         "схема поднята без миграций, справочник пуст"
+
+    # У перезапроса сериала возвращаемого значения нет вовсе, и наблюдать надо
+    # след: он ходит в сеть, а сеть мертва — значит момент синхронизации обязан
+    # остаться прежним. Сериал берём от TMDB: ручной и кино выходят из `refresh`
+    # на первой же проверке, не дойдя ни до сети, ни до записи.
+    series_id = await offline.library.create(
+        an_item("1396", "Во все тяжкие", kind=Kind.SERIES, synced_at=MOMENT)
+    )
+    await offline.series.refresh(series_id)
+    assert (await offline.library.get(series_id)).synced_at == MOMENT
+
+    link = await offline.loader.card_for_link(
+        ExternalLink(Source.TMDB, "157336", Kind.MOVIE)
+    )
+    assert isinstance(link, Refusal)
+    assert link.reason is Reason.NETWORK
 
 
 async def test_everything_closes_and_lets_go(tmp_path):

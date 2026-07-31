@@ -1278,7 +1278,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
-### `tests/backend/test_layers.py` — 105 строк
+### `tests/backend/test_layers.py` — 116 строк
 
 Граница слоёв: кто кого имеет право импортировать.
 
@@ -1383,11 +1383,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_offline.py` — 302 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 332 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
-Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
 Тестов: 18
 

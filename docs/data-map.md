@@ -603,7 +603,7 @@
 
 - `ROOT` = `Path(__file__).resolve().parents[2]`
 - `BANNED_IN_CLIENT` = `набор из 5`
-- `BANNED_IN_BACKEND` = `набор из 2`
+- `BANNED_IN_BACKEND` = `набор из 4`
 - `ALLOWED_FROM_BACKEND` = `набор из 2`
 
 ### `tests/backend/test_linking.py`
