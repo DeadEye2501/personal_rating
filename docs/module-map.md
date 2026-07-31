@@ -935,14 +935,15 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 7 модулей
+## bridge — 9 модулей
 
-### `bridge/answer.py` — 64 строк
+### `bridge/answer.py` — 71 строк
 
 Оболочка вызова моста: срок, отказ, один формат ответа.
 
 Зависит от: `backend.model`, `bridge.thread`, `bridge.wire`
 
+- `def stale() -> dict` (5)
 - `def kebab(name: str) -> str` (4)
 - `class Domain` (39)
   - `def _reply(self, factory, op: int | None=None) -> dict` (30)
@@ -959,6 +960,16 @@
   - `def histogram(self, op: int, kind: str, filters: dict) -> dict` (5)
 - `def _feed(feed: dict) -> Feed` (10)
 - `def _filters(filters: dict) -> Filters` (5)
+
+### `bridge/kept.py` — 24 строк
+
+То, что не пролезает обратно через JSON.
+
+Зависит от: —
+
+- `class Kept` (13)
+  - `def put(self, op: int, value) -> None` (3)
+  - `def taken(self, op: int)` (4)
 
 ### `bridge/library.py` — 62 строк
 
@@ -1009,6 +1020,21 @@
   - `def create_person(self, domain: str, name: str) -> dict` (5)
 - `def _of(backend, domain: str)` (7)
 
+### `bridge/search.py` — 78 строк
+
+Мост: поиск — своё, чужое, складывание, заведение найденного.
+
+Зависит от: `backend.model`, `bridge.answer`, `bridge.kept`, `bridge.wire`
+
+- `class Search(Domain)` (57)
+  - `def local(self, op: int, kind: str, query: str) -> dict` (7)
+  - `def external(self, op: int) -> dict` (12)
+  - `def ensure(self, op: int, source: str, source_id: str) -> dict` (8)
+  - `async def _own(self, back, op, kind, query)` (6)
+  - `async def _outer(self, back, op, kind, query)` (11)
+  - `async def _added(self, back, candidate)` (2)
+- `def _found(views, source: str, source_id: str)` (7)
+
 ### `bridge/thread.py` — 185 строк
 
 Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом.
@@ -1028,13 +1054,14 @@
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
 
-### `bridge/wire.py` — 40 строк
+### `bridge/wire.py` — 55 строк
 
 Значения границы в то, что переживёт `json.dumps`.
 
-Зависит от: —
+Зависит от: `backend.model`
 
 - `def to_wire(value)` (29)
+- `def outcome(value) -> dict` (11)
 
 ## migrations — 3 модулей
 
@@ -1097,7 +1124,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 72 модулей
+## tests — 74 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1825,6 +1852,25 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
+### `tests/bridge/test_bridge_search.py` — 201 строк
+
+Мост: поиск — своё, чужое, складывание, заведение найденного.
+
+Зависит от: `backend.model`, `bridge.search`
+
+Тестов: 12
+
+- `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
+
+### `tests/bridge/test_kept.py` — 28 строк
+
+То, что не пролезает обратно через JSON, мост помнит у себя.
+
+Зависит от: `bridge.kept`
+
+Тестов: 3
+
+
 ### `tests/bridge/test_thread.py` — 200 строк
 
 Граница потоков: что обязано быть правдой у стыка двух циклов.
@@ -1834,13 +1880,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 17
 
 
-### `tests/bridge/test_wire.py` — 116 строк
+### `tests/bridge/test_wire.py` — 138 строк
 
 Перевод значений границы в то, что переживёт `json.dumps` без своего
 
 Зависит от: `backend.model`, `bridge.wire`
 
-Тестов: 12
+Тестов: 15
 
 
 ### `tests/builders.py` — 74 строк

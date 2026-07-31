@@ -12,6 +12,7 @@ from backend.model import (
     Genre,
     GenreKind,
     Kind,
+    Missing,
     Rating,
     RatingSource,
     Reason,
@@ -19,7 +20,7 @@ from backend.model import (
     Source,
     Tag,
 )
-from bridge.wire import to_wire
+from bridge.wire import outcome, to_wire
 
 
 def test_a_moment_travels_as_iso_with_a_t():
@@ -104,6 +105,27 @@ def test_an_unknown_type_is_refused():
     доедет до страницы и сломается там, где искать её будет некому."""
     with pytest.raises(TypeError):
         to_wire(object())
+
+
+def test_missing_is_told_apart_from_anything_empty():
+    """После разбора `Missing` — это `{}`. Метку приклеивает мост: различать
+    исходы по набору ключей нельзя, пустое неотличимо от пустого."""
+    assert outcome(Missing()) == {"outcome": "missing"}
+
+
+def test_a_refusal_carries_its_reason():
+    refusal = Refusal(source="tmdb", reason=Reason.QUOTA,
+                      retry_after=timedelta(seconds=60), detail="квота")
+    assert outcome(refusal) == {
+        "outcome": "refusal",
+        "refusal": {"source": "tmdb", "reason": "quota",
+                    "retry_after": 60.0, "detail": "квота"},
+    }
+
+
+def test_a_value_is_wrapped_the_same_way():
+    """Форма ответа одна на все три исхода: ветка на стороне страницы одна."""
+    assert outcome(7) == {"outcome": "found", "value": 7}
 
 
 def test_a_refusal_travels_whole():

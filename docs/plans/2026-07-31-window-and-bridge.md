@@ -2215,7 +2215,7 @@ git commit -m "feat: мост — лента и гистограмма"
   `Search` с `local(op, kind, query)`, `external(op)`,
   `ensure(op, source, source_id)`.
 
-- [ ] **Шаг 1: Написать падающий тест на память**
+- [x] **Шаг 1: Написать падающий тест на память**
 
 Создать `tests/bridge/test_kept.py`:
 
@@ -2264,12 +2264,12 @@ def test_nothing_kept_is_not_a_failure():
     assert Kept().taken(1) is None
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_kept.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.kept'`.
 
-- [ ] **Шаг 3: Написать память**
+- [x] **Шаг 3: Написать память**
 
 Создать `bridge/kept.py`:
 
@@ -2304,7 +2304,7 @@ class Kept:
         self._value = None
 ```
 
-- [ ] **Шаг 4: Написать падающий тест на поиск**
+- [x] **Шаг 4: Написать падающий тест на поиск**
 
 Создать `tests/bridge/test_bridge_search.py`:
 
@@ -2455,12 +2455,12 @@ def test_a_source_that_lost_the_card_says_so(spy, asked):
         "ok": {"outcome": "missing"}}
 ```
 
-- [ ] **Шаг 5: Прогнать и увидеть красное**
+- [x] **Шаг 5: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_search.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.search'`.
 
-- [ ] **Шаг 6: Написать домен**
+- [x] **Шаг 6: Написать домен**
 
 Создать `bridge/search.py`:
 
@@ -2538,12 +2538,12 @@ def _found(views, source: str, source_id: str):
 запроса форма особая, с меткой, и собрать её может только `outcome`. `to_wire`
 поверх готового словаря отработает вторым проходом и ничего не испортит.
 
-- [ ] **Шаг 7: Прогнать и увидеть зелёное**
+- [x] **Шаг 7: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_kept.py tests/bridge/test_bridge_search.py -v`
 Ожидание: PASS, 14 тестов.
 
-- [ ] **Шаг 8: Коммит**
+- [x] **Шаг 8: Коммит**
 
 ```bash
 git add bridge/kept.py bridge/search.py \

@@ -8,6 +8,8 @@ import math
 from datetime import date, datetime, timedelta
 from enum import Enum
 
+from backend.model import Missing, Refusal
+
 
 def to_wire(value):
     """Отказ громкий, а не `default=str`: неизвестный тип, подставленный
@@ -38,3 +40,16 @@ def to_wire(value):
     if isinstance(value, dict):
         return {str(key): to_wire(item) for key, item in value.items()}
     raise TypeError(f"через мост не проходит: {type(value).__name__}")
+
+
+def outcome(value) -> dict:
+    """Одна форма на три исхода запроса к источнику.
+
+    `Missing` — датакласс без единого поля, и после разбора это `{}`,
+    неотличимое от чего угодно пустого. Различать по набору ключей нельзя,
+    поэтому метку приклеиваем здесь."""
+    if isinstance(value, Missing):
+        return {"outcome": "missing"}
+    if isinstance(value, Refusal):
+        return {"outcome": "refusal", "refusal": to_wire(value)}
+    return {"outcome": "found", "value": to_wire(value)}
