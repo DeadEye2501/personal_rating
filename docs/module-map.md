@@ -31,13 +31,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 94 строк
+### `backend/model/__init__.py` — 92 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.tag`, `backend.model.view`
 
-Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `is_answer`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -108,7 +108,7 @@
 - `class ExternalLink` (4)
 - `def parse_link(raw: str, kind: Kind | None=None) -> ExternalLink | None` (34)
 
-### `backend/model/outcome.py` — 52 строк
+### `backend/model/outcome.py` — 45 строк
 
 Чем может кончиться запрос к источнику: находкой, честным «нет» или отказом.
 
@@ -119,7 +119,6 @@
 - `class Missing` (3)
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
-- `def is_answer(outcome: Outcome) -> bool` (5)
 
 ### `backend/model/query.py` — 88 строк
 
@@ -283,13 +282,13 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 106 строк
+### `backend/service/loading.py` — 102 строк
 
 Кандидат превращается в карточку.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.repository.library`
 
-- `class Loader` (80)
+- `class Loader` (78)
   - `def _catalog(self, source: Source, action: str)` (12)
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
@@ -366,15 +365,16 @@
 - `def from_search(source: Source, value: float | None, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
 
-### `backend/sources/errors.py` — 59 строк
+### `backend/sources/errors.py` — 77 строк
 
 Как источник сообщает, что ответ не разобрался.
 
 Зависит от: `backend.model`
 
 - `def broken(source: str, error: Exception) -> Refusal` (4)
+- `def absent(response: httpx.Response, source: str) -> Missing | Refusal` (15)
 - `def refuse_code(source: str, status: int) -> Refusal` (5)
-- `def is_json(response: httpx.Response) -> bool` (11)
+- `def is_json(response: httpx.Response) -> bool` (12)
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 
 ### `backend/sources/gog/client.py` — 149 строк
@@ -452,16 +452,15 @@
 - `def parse_poiskkino(payload: dict) -> Ratings` (10)
 - `def parse_unofficial(payload: dict) -> Ratings` (10)
 
-### `backend/sources/ratings/kinopoisk/poiskkino.py` — 81 строк
+### `backend/sources/ratings/kinopoisk/poiskkino.py` — 68 строк
 
 Основное зеркало Кинопоиска.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.parse`
 
-- `class PoiskkinoClient` (55)
+- `class PoiskkinoClient` (42)
   - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (9)
   - `def _verdict(self, response: httpx.Response) -> Outcome` (16)
-  - `def _absent(self, response: httpx.Response) -> Outcome` (12)
   - `def _answer(self, response: httpx.Response) -> Outcome` (3)
   - `async def aclose(self) -> None` (2)
 
@@ -1021,13 +1020,13 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)
 
-### `tests/backend/sources/test_mdblist.py` — 237 строк
+### `tests/backend/sources/test_mdblist.py` — 259 строк
 
 MDBList: квота, битый ключ и чужой периметр — три разные беды.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.mdblist.parse`, `tests.conftest`
 
-Тестов: 20
+Тестов: 21
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
@@ -1396,13 +1395,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def assemble(tmp_path)` (9)
 - `async def offline(tmp_path)` (4)
 
-### `tests/backend/test_outcome.py` — 57 строк
+### `tests/backend/test_outcome.py` — 43 строк
 
-Три исхода запроса к источнику: что считается ответом, что обязательно, что
+Три исхода запроса к источнику: что обязательно, что неизменно и как причина
 
 Зависит от: `backend.model`
 
-Тестов: 6
+Тестов: 3
 
 
 ### `tests/backend/test_poster_service.py` — 226 строк

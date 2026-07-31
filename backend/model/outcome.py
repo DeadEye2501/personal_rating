@@ -43,10 +43,3 @@ class Refusal:
 
 
 Outcome: TypeAlias = Found | Missing | Refusal
-
-
-def is_answer(outcome: Outcome) -> bool:
-    """Источник ответил: нашёл или честно сказал, что не знает. Отказ ответом не
-    считается никогда, а можно ли записать ответ — решает пишущий: у поиска GOG,
-    например, «не нашлось» неотличимо от «поиск не справился»."""
-    return isinstance(outcome, (Found, Missing))

@@ -1,5 +1,5 @@
-"""Три исхода запроса к источнику: что считается ответом, что обязательно, что
-неизменно и как причина читается строкой.
+"""Три исхода запроса к источнику: что обязательно, что неизменно и как причина
+читается строкой.
 
 Только `backend/model/outcome.py`: сборка отказа по неразобранному телу живёт в
 `backend/sources/errors.py`, прямых тестов не имеет и сторожится у клиентов
@@ -13,21 +13,7 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
-from backend.model import Found, Missing, Reason, Refusal, is_answer
-
-
-def test_missing_is_an_answer_not_a_silence():
-    """«У источника такого нет» — это ответ, и его надо записать пустым
-    значением, иначе фильм будет перезапрашиваться при каждом показе."""
-    assert is_answer(Missing()) is True
-
-
-def test_refusal_is_not_an_answer():
-    assert is_answer(Refusal(source="omdb", reason=Reason.QUOTA)) is False
-
-
-def test_found_is_an_answer_too():
-    assert is_answer(Found(1.0)) is True
+from backend.model import Found, Reason, Refusal
 
 
 def test_neither_outcome_can_be_built_empty():

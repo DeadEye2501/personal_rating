@@ -27,7 +27,6 @@ from backend.model.outcome import (
     Outcome,
     Reason,
     Refusal,
-    is_answer,
 )
 from backend.model.query import (
     Bucket,
@@ -84,7 +83,6 @@ __all__ = [
     "Suggestion",
     "Tag",
     "average_score",
-    "is_answer",
     "merge_results",
     "new_manual_item",
     "new_source_id",

@@ -6,8 +6,8 @@ from typing import ClassVar
 
 import httpx
 
-from backend.model import Found, Kind, Missing, Outcome, RatingSource, Reason, Refusal
-from backend.sources.errors import is_json, parsed, refuse_code
+from backend.model import Found, Kind, Outcome, RatingSource, Reason, Refusal
+from backend.sources.errors import absent, is_json, parsed, refuse_code
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.parse import parse_ratings
 
@@ -60,7 +60,7 @@ class MdbListClient:
             return parsed(logger, "mdblist", "ответ не разобрался",
                           lambda: Found(parse_ratings(response.json())))
         if status == 404:
-            return Missing()
+            return absent(response, "mdblist")
         if status == 202:
             # Кеш строится — не отказ и не отсутствие, но писать нечего.
             return Refusal(

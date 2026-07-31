@@ -206,6 +206,28 @@ async def test_missing_object_is_an_answer():
     assert isinstance(result, Missing)
 
 
+async def test_a_404_without_json_is_not_an_absence(fixture):
+    """Отрицательный факт — только по разобранному телу. Перед MDBList стоит
+    Cloudflare, и его страница приезжает под чужим кодом обычным текстом. Тело
+    берём записанное — то самое, что приехало под 403; своего 404 от периметра у
+    нас не записано, а сочинять тело там, где форма и есть предмет проверки,
+    значит проверять собственную выдумку.
+
+    Записать такую страницу как ответ значит объявить на неделю, что у фильма
+    нет оценок ни в IMDb, ни в TMDB, ни в Rotten, ни в Metacritic — сразу четыре
+    пустые строки по странице, которая до MDBList даже не дошла.
+
+    Причина `BROKEN`, а не `NETWORK`: чей это 404 — периметра или самого
+    MDBList, — по телу не видно, и живьём такой ответ у него не наблюдали вовсе.
+    Имя источника сверяется вместе с причиной по тому же доводу, что записан у
+    соседей: в клиенте оно литерал, а MDBList и OMDB написаны по одному
+    образцу."""
+    result = await ask(responding(404, text=fixture("mdblist/cloudflare_403.txt")))
+
+    assert isinstance(result, Refusal)
+    assert (result.source, result.reason) == ("mdblist", Reason.BROKEN)
+
+
 async def test_cache_building_is_a_retry_not_an_absence():
     """202 и Retry-After: 5 — «кеш строится, повтори». В базу не пишем ничего:
     это не отсутствие оценки, а её отложенность."""

@@ -4,8 +4,8 @@ import logging
 
 import httpx
 
-from backend.model import Kind, Missing, Outcome, Reason, Refusal
-from backend.sources.errors import is_json, parsed
+from backend.model import Kind, Outcome
+from backend.sources.errors import absent, parsed
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.mirror import (
     SOURCE,
@@ -46,7 +46,7 @@ class PoiskkinoClient:
     def _verdict(self, response: httpx.Response) -> Outcome:
         status = response.status_code
         if status == 404:
-            return self._absent(response)
+            return absent(response, SOURCE)
         if status == 403:
             # Тот же 403 приходит на нарушение пагинации в демо-режиме — эти
             # два случая не различить.
@@ -59,19 +59,6 @@ class PoiskkinoClient:
         if status != 200:
             return refuse_code(status)
         return self._answer(response)
-
-    def _absent(self, response: httpx.Response) -> Outcome:
-        """Отрицательный факт — только по разобранному телу. Перед Кинопоиском
-        стоит Envoy, и при падении апстрима он отдаёт свой 404 обычным текстом.
-        Записать такую страницу как «Кинопоиск не знает этот фильм» значит
-        поселить в базе ложь на неделю."""
-        if not is_json(response):
-            return Refusal(
-                source=SOURCE,
-                reason=Reason.BROKEN,
-                detail="404 без JSON — это не «фильма нет»",
-            )
-        return Missing()
 
     def _answer(self, response: httpx.Response) -> Outcome:
         return parsed(logger, SOURCE, "ответ основного зеркала не разобрался",

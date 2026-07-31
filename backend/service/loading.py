@@ -2,8 +2,6 @@
 
 import asyncio
 import logging
-from collections.abc import Callable
-from datetime import datetime
 
 from backend.model import (
     CardView,
@@ -33,13 +31,11 @@ class Loader:
     заводят часы, а не человек."""
 
     def __init__(self, library: LibraryRepository, writer: CardWriter,
-                 sources: Sources, posters: PosterService,
-                 clock: Callable[[], datetime] = datetime.now) -> None:
+                 sources: Sources, posters: PosterService) -> None:
         self._library = library
         self._writer = writer
         self._sources = sources
         self._posters = posters
-        self._clock = clock
 
     def _catalog(self, source: Source, action: str):
         """Каталожный клиент источника — или отказ вместо него.
