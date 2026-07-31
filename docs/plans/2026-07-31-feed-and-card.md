@@ -893,13 +893,14 @@ import '$styles/facts.css'
 ```svelte
 <script>
   import Film from '$components/Film.svelte'
-  import { call } from '$api/bridge.js'
+  import { numbered } from '$api/bridge.js'
 
   let views = $state([])
 
   $effect(() => {
-    call('feed.page', { section: 'rated', kind: 'movie', filters: {},
-                        order: { key: 'score', descending: true } }, 0, 50)
+    numbered('feed.page', { section: 'rated', kind: 'movie', filters: {},
+                            order: { key: 'score', descending: true } }, 0, 50,
+             { channel: 'feed' })
       .then((page) => { views = page })
   })
 </script>
@@ -953,8 +954,8 @@ git commit -m "feat: карточка ленты — постер, метки, �
 сводятся в одну усреднённую с дробной звездой.
 
 **Кружок на месте неприехавшей оценки, а не пустота.** Сколько их рисовать,
-известно до ответа сети: `world.expected(kind)` — чистая операция без диска и
-сети.
+известно до ответа сети: `world.expected(op, kind)` — чистая операция без диска
+и сети.
 
 **Три состояния оценки агрегатора различаются на экране так же, как в базе.**
 Строки нет — крутится кружок; строка с пустым значением — на месте оценки просто
@@ -1456,8 +1457,11 @@ const DAY = 24 * 60 * 60 * 1000
 export async function onCardShown(view, ops) {
   if (!view.item_id) return
 
-  if (stale(view)) await quietly('world.refresh_series', view.item_id)
-  await quietly('world.enrich', view.item_id, view.kind)
+  // Номера ложатся в `ops`: карточка ушла за край экрана, человек ушёл с
+  // раздела — начатое ею гасится, и квота агрегаторов не тратится на ответ,
+  // которого никто не ждёт.
+  if (stale(view)) await quietly('world.refresh_series', view.item_id, { ops })
+  await quietly('world.enrich', view.item_id, view.kind, { ops })
 }
 
 /** Просрочку считает и бэкенд — `SeriesRefresh` тихо ничего не делает в трёх
@@ -1507,9 +1511,13 @@ git commit -m "feat: лента порциями и три круга по тр�
 Раздел, на котором приложение открывается. Своё показывается сразу, внешнее
 доливается по готовности, найденное заводится в библиотеку одним нажатием.
 
-**Выдача общая, вперемешку.** То, что уже лежит в базе, ничем не выделено, и
-порядок задаёт источник: у него есть данные о популярности и совпадении с
-запросом, которых у нас нет.
+**Сначала своя половина целиком, потом чужая.** Внутри половин порядок не
+трогается: своя приходит упорядоченной по названию, у чужой его задаёт источник —
+у него есть данные о популярности и совпадении с запросом, которых у нас нет.
+Складывает это `merge_results` на мосту, и правило одно на всю выдачу поиска.
+
+**Вкладка — первичный фильтр.** Тип содержимого уезжает доводом в каждый запрос,
+и во вкладке фильмов сериалов не бывает нигде — ни в своей половине, ни в чужой.
 
 **Отказ внешней базы — плашка, пустая выдача — нет.** Разница осмысленная: без
 внешней базы человек не получит того, что искал, и должен понимать причину.
@@ -1528,7 +1536,7 @@ git commit -m "feat: лента порциями и три круга по тр�
 ```svelte
 <script>
   import Feed from '$components/Feed.svelte'
-  import { cancel, numbered } from '$api/bridge.js'
+  import { cancel, lastOp, numbered } from '$api/bridge.js'
   import { passes } from '$state/filters.js'
   import { onCardShown } from './visible.js'
 
@@ -1547,23 +1555,36 @@ git commit -m "feat: лента порциями и три круга по тр�
   $effect(() => () => { cancel(ops.splice(0)) })
 
   $effect(() => {
-    numbered('world.expected', session.kind).then((sources) => { expected = sources })
+    numbered('world.expected', session.kind, { channel: 'expected', ops })
+      .then((sources) => { expected = sources })
+      .catch(lost)
   })
 
   $effect(() => {
     if (!query) { views = []; return }
-    look(query, session.kind)
+    look(query, session.kind).catch(lost)
   })
+
+  // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
+  // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое
+  // правило отказов запрещает.
+  const lost = (error) => {
+    if (!error.silent) ontrouble('Не удалось выполнить операцию')
+  }
 
   async function look(text, kind) {
     // Своё показывается сразу: локальная база отвечает за миллисекунды.
-    views = await numbered('search.local', kind, text, { channel: 'search' })
+    views = await numbered('search.local', kind, text, { channel: 'search', ops })
 
     // Внешнее доливается по готовности и складывается со своим на стороне
     // моста: `merge_results` живёт в модели ровно потому, что складывать
     // приходится клиенту, и второго его объявления быть не должно.
+    //
+    // Тем же номером, что и первый шаг: мостовая память узнаёт выдачу по нему,
+    // и с новым номером сюда всегда приходило бы «устарело».
     try {
-      const outer = await numbered('search.external', { channel: 'search' })
+      const outer = await numbered('search.external',
+                                   { channel: 'search', op: lastOp('search') })
       views = outer.views
       // Отказ источника — поле в ответе, а не исключение. Пустая выдача при
       // этом молчит: пустая лента и есть ответ.
@@ -1574,8 +1595,9 @@ git commit -m "feat: лента порциями и три круга по тр�
   }
 
   async function add(view) {
+    // Тот же номер: кандидата мост берёт из выдачи, которую помнит под ним.
     const outcome = await numbered('search.ensure', view.source, view.source_id,
-                                   { channel: 'search' })
+                                   { channel: 'search', op: lastOp('search') })
     if (outcome.outcome === 'refusal') {
       ontrouble('Внешняя база недоступна')
       return
@@ -1586,7 +1608,8 @@ git commit -m "feat: лента порциями и три круга по тр�
     }
     // Карточка записана целиком: перечитываем её одну, чтобы в ленте появились
     // жанры, состав и длительность, которых у кандидата не было.
-    const [fresh] = await numbered('feed.views_of', [outcome.value])
+    const [fresh] = await numbered('feed.views_of', [outcome.value],
+                                   { channel: 'views', ops })
     views = views.map((each) => each === view ? fresh : each)
   }
 </script>
@@ -1691,7 +1714,7 @@ export function requestOf(session) {
 ```svelte
 <script>
   import Feed from '$components/Feed.svelte'
-  import { cancel, numbered } from '$api/bridge.js'
+  import { call, cancel, numbered } from '$api/bridge.js'
   import { requestOf } from './section.js'
   import { onCardShown } from './visible.js'
 
@@ -1707,13 +1730,17 @@ export function requestOf(session) {
   $effect(() => () => { cancel(ops.splice(0)) })
 
   $effect(() => {
-    numbered('world.expected', session.kind).then((sources) => { expected = sources })
+    numbered('world.expected', session.kind, { channel: 'expected', ops })
+      .then((sources) => { expected = sources })
+      .catch((error) => {
+        if (!error.silent) ontrouble('Не удалось прочитать библиотеку')
+      })
   })
 
   // Смена фильтра, сортировки или типа содержимого перезапрашивает раздел с
   // начала: догружать поверх старого набора нечего.
   $effect(() => {
-    numbered('feed.page', requestOf(session), 0, PAGE, { channel: 'feed' })
+    numbered('feed.page', requestOf(session), 0, PAGE, { channel: 'feed', ops })
       .then((page) => { views = page })
       .catch((error) => {
         if (!error.silent) ontrouble('Не удалось прочитать библиотеку')
@@ -1722,12 +1749,14 @@ export function requestOf(session) {
 
   async function more() {
     const next = await numbered('feed.page', requestOf(session), views.length,
-                                PAGE, { channel: 'feed' })
+                                PAGE, { channel: 'feed', ops })
     views = [...views, ...next]
   }
 
+  // Записи идут без номера: отменять запись нельзя. Отказ у них показывается
+  // плашкой, а не гасится — человек должен знать, что оценка не сохранилась.
   async function score(view, value) {
-    await numbered('marks.score', view.item_id, value)
+    await call('marks.score', view.item_id, value)
     patch(view, { rating: { ...view.rating, score: value } })
   }
 
@@ -1735,13 +1764,13 @@ export function requestOf(session) {
     const next = { ...view.rating, [key]: value }
     // Ответ — выведенный балл: у игр оценка это среднее выставленных шкал, и
     // считает его база.
-    next.score = await numbered('marks.aspects', view.item_id, next.visual,
-                                next.narrative, next.gameplay)
+    next.score = await call('marks.aspects', view.item_id, next.visual,
+                            next.narrative, next.gameplay)
     patch(view, { rating: next })
   }
 
   async function wish(view) {
-    await numbered(view.in_wishlist ? 'marks.unwish' : 'marks.wish', view.item_id)
+    await call(view.in_wishlist ? 'marks.unwish' : 'marks.wish', view.item_id)
     patch(view, { in_wishlist: !view.in_wishlist })
   }
 

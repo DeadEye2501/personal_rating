@@ -123,11 +123,27 @@ personal_rating/
    складывание двух выдач требует, чтобы обе половины поиска лежали вместе.
    Отсюда `feed.py` (лента) и `search.py` (поиск).
 
-2. **Номер операции несут не все операции, а только отменяемые** — внешний мир и
-   поиск. Все три свойства, ради которых номер заведён, при этом держатся:
-   отменять нечего у запроса к диску на пять миллисекунд; устаревший ответ
-   отбрасывает обёртка на стороне страницы, и номер ей нужен свой, а не мостовой;
-   срок мост держит и без номера.
+2. **Номер операции несут поиск, внешний мир и лента** — то, что может быть
+   отменено или вытеснено следующим таким же. Решено пользователем 31.07.2026:
+   ленте номер нужен по той же причине, что и поиску, — при смене фильтра или
+   сортировки старый ответ приезжать не должен. **Оценки, теги и закладки идут
+   без номера:** отменять запись нельзя ни при каких обстоятельствах.
+
+   Кто с номером, а кто без — таблица, а не догадка по сигнатурам:
+
+   | Домен | С номером | Без номера |
+   |---|---|---|
+   | `search` | `local`, `external`, `ensure`, `by_person` | — |
+   | `world` | все | — |
+   | `feed` | `page`, `views_of`, `histogram` | — |
+   | `marks` | — | все |
+   | `library`, `refs`, `covers` | — | все |
+
+   **Номер приходит от страницы, а не заводится мостом**, и обёртка страницы
+   отдаёт его наружу — иначе второй шаг двухшаговой операции приходит с новым
+   номером, `Kept.taken` его не узнаёт, и внешняя выдача поиска не показывается
+   никогда. Это же делает возможной отмену: без номера наружу список отменяемых
+   наполнить нечем.
 
 3. **«Добавить кандидата» лежит в поиске, а не во внешнем мире.** `loader.ensure`
    принимает `CardView`, а `CardView` обратно через JSON не собрать; кандидата
@@ -1793,7 +1809,7 @@ git commit -m "feat: мост — карточка и свои отметки"
 **Интерфейсы:**
 - Потребляет: `Domain` из `bridge.answer`; `GenreKind` из `backend.model`.
 - Отдаёт: `Refs` с `genres(genre_kind)`, `suggest(domain, name)`,
-  `create_person(domain, name)`, `items_of(domain, entity_id, offset, limit)`.
+  `create_person(domain, name)`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
@@ -1847,22 +1863,14 @@ def test_enter_on_nothing_highlighted_creates_a_new_one(spy, asked):
 
     assert Refs(spy).create_person("people", "Василий Пупкин") == {"ok": 9}
     assert [name for name, _, _ in log] == ["people.create_manual"]
-
-
-def test_everything_with_this_person_is_paged(spy, asked):
-    answers, log = asked
-    answers["people.items_of"] = [3, 4]
-
-    assert Refs(spy).items_of("people", 9, 0, 50) == {"ok": [3, 4]}
-
-    _, args, _ = log[0]
-    assert args == (9, 50, 0)
 ```
 
-Порядок доводов у репозитория — `items_of(entity_id, limit, offset)`
-(`backend/storage/repository/credits.py:153`), а у моста — `(..., offset,
-limit)`, как у страницы: она листает, а не задаёт размер. Перестановка здесь
-намеренная, и сторожит её именно эта проверка.
+**`items_of` мосту не нужен вовсе, и его здесь нет.** Заводился он под «всё с
+этим человеком», а этот жест забрал план 11: там `Search.by_person` зовёт
+`finder.by_entity` и отдаёт обе половины — свою и внешнюю — уже собранными в
+карточки. Отдельная ручка «номера моих карточек с этим человеком» осталась бы
+без потребителя, то есть нарушила бы правило 8. Довод записан здесь, потому что
+искать его будут в этом плане.
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
@@ -1903,11 +1911,6 @@ class Refs(Domain):
         известен."""
         return self._reply(lambda back: _of(back, domain).create_manual(name))
 
-    def items_of(self, domain: str, entity_id: int, offset: int,
-                 limit: int) -> dict:
-        return self._reply(
-            lambda back: _of(back, domain).items_of(entity_id, limit, offset))
-
 
 def _of(backend, domain: str):
     """Опечатка на стороне страницы обязана стать отказом, а не вечным промисом:
@@ -1921,7 +1924,7 @@ def _of(backend, domain: str):
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_refs.py -v`
-Ожидание: PASS, 6 тестов.
+Ожидание: PASS, 5 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
@@ -1951,8 +1954,8 @@ git commit -m "feat: мост — справочники жанров, люде�
 **Интерфейсы:**
 - Потребляет: `Domain`; `Feed`, `Filters`, `Kind`, `Order`, `Section`, `Sort`
   из `backend.model`.
-- Отдаёт: `FeedBridge` с `page(feed, offset, limit)`, `views_of(item_ids)`,
-  `histogram(kind, filters)`.
+- Отдаёт: `FeedBridge` с `page(op, feed, offset, limit)`,
+  `views_of(op, item_ids)`, `histogram(op, kind, filters)`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
@@ -1977,7 +1980,7 @@ def test_the_request_is_assembled_from_what_the_page_holds(spy, asked):
     answers, log = asked
     answers["feed.page"] = []
 
-    FeedBridge(spy).page(WISHED, 0, 50)
+    FeedBridge(spy).page(1, WISHED, 0, 50)
 
     name, args, _ = log[0]
     assert name == "feed.page"
@@ -1994,7 +1997,7 @@ def test_three_states_of_a_filter_row_become_two_tuples(spy, asked):
     answers, log = asked
     answers["feed.page"] = []
 
-    FeedBridge(spy).page(WISHED, 0, 50)
+    FeedBridge(spy).page(1, WISHED, 0, 50)
 
     filters = log[0][1][0].filters
     assert filters.tag_ids == (3,)
@@ -2007,8 +2010,8 @@ def test_a_missing_filter_means_no_filter(spy, asked):
     answers, log = asked
     answers["feed.page"] = []
 
-    FeedBridge(spy).page({"section": "rated", "kind": "movie",
-                          "filters": {}, "order": {"key": "score"}}, 0, 50)
+    FeedBridge(spy).page(1, {"section": "rated", "kind": "movie",
+                             "filters": {}, "order": {"key": "score"}}, 0, 50)
 
     assert log[0][1][0].filters.scores == ()
 
@@ -2018,7 +2021,7 @@ def test_paging_carries_the_offset(spy, asked):
     answers, log = asked
     answers["feed.page"] = []
 
-    FeedBridge(spy).page(WISHED, 100, 50)
+    FeedBridge(spy).page(1, WISHED, 100, 50)
 
     _, args, kwargs = log[0]
     assert (args[1:], kwargs) in (((100, 50), {}), ((), {"offset": 100,
@@ -2030,7 +2033,7 @@ def test_one_card_is_reread_by_the_same_door(spy, asked):
     answers, log = asked
     answers["feed.views_of"] = []
 
-    FeedBridge(spy).views_of([12])
+    FeedBridge(spy).views_of(1, [12])
 
     assert [name for name, _, _ in log] == ["feed.views_of"]
 
@@ -2041,7 +2044,7 @@ def test_the_histogram_uses_the_same_filters(spy, asked):
     answers, log = asked
     answers["feed.histogram"] = None
 
-    FeedBridge(spy).histogram("game", {"tag_ids": [3]})
+    FeedBridge(spy).histogram(1, "game", {"tag_ids": [3]})
 
     name, args, _ = log[0]
     assert name == "feed.histogram"
@@ -2072,21 +2075,26 @@ FILTER_FIELDS = ("tag_ids", "genre_ids", "scores",
 
 class FeedBridge(Domain):
     """Имя с хвостом, потому что `Feed` — это тип модели, и второе значение у
-    того же слова путало бы обе стороны."""
+    того же слова путало бы обе стороны.
 
-    def page(self, feed: dict, offset: int, limit: int) -> dict:
+    Номер операции несут все три метода: смена фильтра или сортировки заводит
+    новый запрос, и ответ прежнего приезжать не должен — ни страницей карточек,
+    ни столбцами гистограммы. Решение и таблица «кто с номером» — в шапке плана."""
+
+    def page(self, op: int, feed: dict, offset: int, limit: int) -> dict:
         request = _feed(feed)
-        return self._reply(lambda back: back.feed.page(request, offset, limit))
+        return self._reply(lambda back: back.feed.page(request, offset, limit),
+                           op=op)
 
-    def views_of(self, item_ids: list) -> dict:
+    def views_of(self, op: int, item_ids: list) -> dict:
         """Точечное чтение после правки идёт той же дверью, что и лента."""
-        return self._reply(lambda back: back.feed.views_of(item_ids))
+        return self._reply(lambda back: back.feed.views_of(item_ids), op=op)
 
-    def histogram(self, kind: str, filters: dict) -> dict:
+    def histogram(self, op: int, kind: str, filters: dict) -> dict:
         """Тот же отфильтрованный набор, что и у разделов с карточками."""
         chosen = _filters(filters)
         return self._reply(
-            lambda back: back.feed.histogram(Kind(kind), chosen))
+            lambda back: back.feed.histogram(Kind(kind), chosen), op=op)
 
 
 def _feed(feed: dict) -> Feed:
@@ -2138,8 +2146,9 @@ git commit -m "feat: мост — лента и гистограмма"
 
 **Складывает мост, а не страница.** `merge_results` уже написан и живёт в
 модели ровно потому, что складывать приходится клиенту. Переписать его на JS
-значило бы объявить второй раз и правило снятия дублей, и правило «своё стоит на
-своём месте, но показываем именно его — у него есть оценка, теги и закладка».
+значило бы объявить второй раз и правило снятия дублей, и правило «своя половина
+целиком впереди чужой, а совпавшее чужое вторым разом не показывается — своё
+уже стоит выше, и у него есть оценка, теги и закладка».
 
 **Заведение — по паре «источник + идентификатор», а не по номеру строки.**
 Кандидата мост берёт из выдачи, которую сам же и помнит; пара переживает
@@ -2274,8 +2283,8 @@ def test_local_comes_first_and_alone(spy, asked):
 
 
 def test_external_is_merged_with_what_was_shown(spy, asked):
-    """Своё стоит на своём месте в общей выдаче и ничем не выделено — но
-    показываем именно его: у него есть оценка, теги и закладка."""
+    """Свой близнец чужого кандидата показывается один раз, и показывается
+    именно свой: у него есть оценка, теги и закладка."""
     answers, _ = asked
     answers["search.local"] = [a_view("1", item_id=5)]
     answers["search.external"] = ExternalSearch(
@@ -2290,9 +2299,9 @@ def test_external_is_merged_with_what_was_shown(spy, asked):
     assert answer["ok"]["views"][0]["item_id"] == 5
 
 
-def test_local_only_findings_go_to_the_end(spy, asked):
-    """Порядок задаёт источник: у него есть данные о популярности и совпадении
-    с запросом, которых у нас нет."""
+def test_the_local_half_comes_first(spy, asked):
+    """Сначала своя половина целиком, потом чужая — правило одно на всю выдачу
+    поиска, и живёт оно в `merge_results`."""
     answers, _ = asked
     answers["search.local"] = [a_view("9", item_id=5, title="Только своё")]
     answers["search.external"] = ExternalSearch(views=(a_view("1"),),
@@ -2303,7 +2312,7 @@ def test_local_only_findings_go_to_the_end(spy, asked):
 
     ids = [view["source_id"]
            for view in search.external(1)["ok"]["views"]]
-    assert ids == ["1", "9"]
+    assert ids == ["9", "1"]
 
 
 def test_the_query_is_asked_once(spy, asked):
@@ -2521,7 +2530,7 @@ git commit -m "feat: мост — поиск со складыванием вы�
   `outcome`, `to_wire` из `bridge.wire`.
 - Отдаёт: `World` с `parse(raw, kind)`, `card_for_link(op, raw, kind)`,
   `link(op, item_id, overwrite)`, `refresh_series(op, item_id)`,
-  `enrich(op, item_id, kind)`, `expected(kind)`.
+  `enrich(op, item_id, kind)`, `expected(op, kind)`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
@@ -2642,8 +2651,27 @@ def test_expected_sources_are_known_before_the_network(spy, asked):
     answers, _ = asked
     answers["enricher.expected"] = [RatingSource.IMDB, RatingSource.KINOPOISK]
 
-    assert World(spy).expected("movie") == {"ok": ["imdb", "kinopoisk"]}
+    assert World(spy).expected(1, "movie") == {"ok": ["imdb", "kinopoisk"]}
+
+
+def test_a_synchronous_backend_method_still_answers(thread, backend):
+    """`Enricher.expected` — обычный `def`, а поток кладёт фабрику в
+    `create_task`, и тот от не-корутины падает **внутри колбэка цикла**, мимо
+    `try` в `_reply`: заявка не разрешилась бы вовсе, и вызов досидел бы весь
+    срок, ответив «не уложились».
+
+    Идёт через настоящий поток, а не через двойника: `Asked.__call__` отдаёт
+    корутину на любой вызов, и у него синхронный метод бэкенда выглядит так же,
+    как асинхронный."""
+    backend.enricher = SimpleNamespace(
+        expected=lambda kind: [RatingSource.IMDB])
+
+    assert World(thread).expected(1, "movie") == {"ok": ["imdb"]}
 ```
+
+Этот тест — единственный в модуле, кто берёт настоящий `BackendThread`:
+проверяемое свойство лежит ровно на стыке «фабрика → `create_task`», а двойник
+этот стык и подменяет.
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
@@ -2673,8 +2701,16 @@ class World(Domain):
     def parse(self, raw: str, kind: str | None) -> dict:
         """Зовётся на каждое нажатие клавиши, но не ходит ни в сеть, ни на диск.
         Переписывать разбор на JS нельзя: вторая регулярка на тот же адрес
-        разошлась бы с первой молча."""
-        return {"ok": to_wire(parse_link(raw, _kind(kind)))}
+        разошлась бы с первой молча.
+
+        Идёт через `_reply`, как и всё остальное, хотя бэкенд ей не нужен:
+        отдельный путь наружу означал бы, что исключение из `parse_link` летит
+        через границу потоков мимо оболочки. Цена — переброс в поток без
+        единого обращения к диску или сети."""
+        return self._reply(lambda _back: self._parsed(raw, kind))
+
+    async def _parsed(self, raw: str, kind: str | None):
+        return parse_link(raw, _kind(kind))
 
     def card_for_link(self, op: int, raw: str, kind: str | None) -> dict:
         """Карточка помнится здесь: страница её не показывает, ей нужно только
@@ -2706,10 +2742,18 @@ class World(Domain):
         return self._reply(
             lambda back: back.enricher.enrich(item_id, Kind(kind)), op=op)
 
-    def expected(self, kind: str) -> dict:
+    def expected(self, op: int, kind: str) -> dict:
         """Под неприехавшую оценку рисуется кружок, и сколько их будет, надо
-        знать до ответа сети."""
-        return self._reply(lambda back: back.enricher.expected(Kind(kind)))
+        знать до ответа сети.
+
+        Обёрнуто в корутину, а не отдано как есть: `Enricher.expected` —
+        синхронный метод, а `_begin` кладёт фабрику в `create_task`, и тот от
+        списка падает **внутри колбэка цикла** — мимо `try` в `_reply`. Заявка
+        не разрешилась бы вовсе, и вызов досидел бы весь срок."""
+        return self._reply(lambda back: self._expected(back, kind), op=op)
+
+    async def _expected(self, back, kind: str):
+        return back.enricher.expected(Kind(kind))
 
     async def _asked(self, back, op, link):
         card = await back.loader.card_for_link(link)
@@ -2731,7 +2775,7 @@ def _kind(kind: str | None) -> Kind | None:
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_world.py -v`
-Ожидание: PASS, 10 тестов.
+Ожидание: PASS, 11 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
@@ -2821,16 +2865,21 @@ def test_having_a_cover_is_a_plain_answer(spy, asked):
 Создать `tests/bridge/test_bridge_surface.py`:
 
 ```python
-"""Каждое имя, которое мост зовёт у бэкенда, обязано на нём существовать.
+"""Каждый вызов, который мост делает бэкенду, обязан ему подходить.
 
-Записывающий двойник принимает любое имя — переименованный или опечатанный метод
-прошёл бы молча на всём наборе. Этой проверкой закрывается ровно та дыра.
+Записывающий двойник принимает любое имя с любыми доводами — переименованный
+метод и лишний довод прошли бы молча на всём наборе. Этой проверкой закрывается
+ровно та дыра, и закрывается она **обеими половинами**: имя должно
+существовать, а доводы — сходиться с сигнатурой. Половины имён мало: расхождение
+`items_of(entity_id, limit, offset)` с настоящим `items_of(entity_id, kind)` —
+это верное имя и неверный вызов, и до живого запуска его не видит никто.
 
-Имена собираются разбором исходников, а не переписываются сюда руками: список,
+Вызовы собираются разбором исходников, а не переписываются сюда руками: список,
 набранный вручную, разошёлся бы с кодом молча — и это была бы та же дыра, только
 на этаж выше."""
 
 import ast
+import inspect
 from pathlib import Path
 
 import pytest
@@ -2856,15 +2905,24 @@ def chain(node):
     return None
 
 
-def asked() -> set[str]:
-    found = set()
+def asked() -> dict[str, int]:
+    """Что мост зовёт у бэкенда и со сколькими позиционными доводами.
+
+    Доводы считаются, а не только имена: расхождение сигнатуры — ровно тот род
+    поломки, который у этого проекта дважды доезжал до живого запуска
+    (`items_of` с пределом, которого у репозитория нет). `hasattr` его не видит,
+    а число доводов видит."""
+    found = {}
     for path in SOURCES:
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 parts = chain(node.func)
                 if parts:
-                    found.add(".".join(parts))
+                    # Звёздочка в вызове означает «сколько угодно»: считать
+                    # нечего, и проверка сигнатуры для этого места снимается.
+                    starred = any(isinstance(one, ast.Starred) for one in node.args)
+                    found[".".join(parts)] = -1 if starred else len(node.args)
     return found
 
 
@@ -2898,12 +2956,18 @@ def test_something_is_actually_collected():
     assert len(asked()) > 30
 
 
-@pytest.mark.parametrize("path", sorted(asked()))
-def test_every_name_the_bridge_asks_exists_on_the_backend(path):
+@pytest.mark.parametrize(("path", "count"), sorted(asked().items()))
+def test_every_call_the_bridge_makes_fits_the_backend(path, count):
     where = Backend
     for step in path.split("."):
         assert hasattr(where, step), f"{path}: нет {step}"
         where = _behind(where, step)
+
+    if count < 0:
+        return
+    # `bind` проверяет не только число, но и обязательные без умолчания: вызов
+    # без `kind` у метода, который его требует, покраснеет здесь, а не в окне.
+    inspect.signature(where).bind(None, *range(count))
 
 
 def _behind(where, step):
@@ -3014,7 +3078,7 @@ class Api:
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/ -v`
-Ожидание: PASS. Сторож поверхности обязан пройти по всем именам, которые зовут
+Ожидание: PASS. Сторож поверхности обязан пройти по всем вызовам, которые делают
 семь доменов; расхождение здесь — это опечатка, и правится код моста, а не тест.
 
 - [ ] **Шаг 6: Коммит**
@@ -3226,7 +3290,10 @@ from bridge.thread import DEADLINE
 
 logger = logging.getLogger(__name__)
 
-WEB_ROOT = Path(__file__).resolve().parent / "web" / "dist"
+# `bridge/serve.py` лежит в `bridge/`, а собирает фронт Vite в `client/dist` —
+# отсюда шаг наверх. План 10 заменит константу функцией: под `sys._MEIPASS`
+# корень другой, но появляется он только при заморозке.
+WEB_ROOT = Path(__file__).resolve().parent.parent / "client" / "dist"
 
 # Тип объявляем сами: у `mimetypes` этой машины `.woff2` нет, и браузер получил
 # бы `text/html`. Модуль с неверным типом Chromium не исполнит вовсе.
@@ -3587,6 +3654,11 @@ git commit -m "feat: окно приложения, сборка и лог"
 `people.attach`, `people.ensure`: состав ручной карточки пишется в плане 9, и
 операции моста под него заводятся там же, с потребителем на том же слайсе.
 
+Нет `Search.by_person` и нет `Refs.items_of`. Первый заводит план 11 вместе со
+своим потребителем — щелчком по имени в карточке; второй не заводится вовсе,
+потому что после этого у него не осталось бы потребителя ни одного.
+
 **Чем измеряется готовность.** Весь набор зелёный; окно открывается и показывает
-ответ бэкенда; сторож поверхности моста проходит по всем именам; сторож границы
+ответ бэкенда; сторож поверхности моста сходится с бэкендом именами и
+сигнатурами; сторож границы
 слоёв зелёный обеими половинами впервые с 31.07.2026.

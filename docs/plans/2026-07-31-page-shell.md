@@ -1194,7 +1194,9 @@ git commit -m "feat: состояние приложения — фильтры,
 - Потребляет: поверхность моста из плана 5 — `library`, `marks`, `refs`, `feed`,
   `search`, `world`, `covers`, `cancel(ops)`.
 - Отдаёт: `ready()`, `call(path, ...args)`, `numbered(path, ...args)`,
-  `cancel(ops)`, `Failed`.
+  `lastOp(channel)`, `cancel(ops)`, `Failed`. Настройки вызова — последним
+  доводом-объектом: `channel` (что вытесняет само себя), `op` (чужой номер для
+  второго шага), `ops` (куда положить номер, чтобы было чем отменить).
 
 - [ ] **Шаг 1: Написать падающий тест**
 
@@ -1203,7 +1205,7 @@ git commit -m "feat: состояние приложения — фильтры,
 ```js
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Failed, call, cancel, numbered, ready } from '$api/bridge.js'
+import { Failed, call, cancel, lastOp, numbered, ready } from '$api/bridge.js'
 
 /** Поддельный мост: отвечает тем, что положили, и записывает, о чём спросили. */
 function fake(answers = {}) {
@@ -1264,6 +1266,29 @@ describe('обёртка моста', () => {
     await numbered('world.enrich', 2, 'movie')
 
     expect(asked[0][1][0]).not.toBe(asked[1][1][0])
+  })
+
+  it('второй шаг зовётся тем же номером, что и первый', async () => {
+    // Без этого мостовая память второй шаг не узнаёт и отвечает «устарело» —
+    // а это весь поиск, заведение кандидата и привязка ссылки разом.
+    const asked = fake({ 'search.local': { ok: [] }, 'search.external': { ok: [] } })
+
+    await numbered('search.local', 'movie', 'один', { channel: 'search' })
+    await numbered('search.external', { channel: 'search', op: lastOp('search') })
+
+    expect(asked[1][1][0]).toBe(asked[0][1][0])
+  })
+
+  it('номер ложится в список отменяемых', async () => {
+    // Иначе `cancel` зовётся с пустотой всегда, и обещание «страница ушла —
+    // начатое отменяется» не наступает нигде.
+    const ops = []
+    fake({ 'world.enrich': { ok: [] } })
+
+    await numbered('world.enrich', 12, 'movie', { ops })
+
+    expect(ops).toHaveLength(1)
+    expect(typeof ops[0]).toBe('number')
   })
 
   it('устаревший ответ не затирает свежий', async () => {
@@ -1380,12 +1405,22 @@ export async function call(path, ...args) {
   return unwrap(await at(path)(...args))
 }
 
-/** Вызов с номером: его есть чем отменить, и его ответ может устареть. */
+/**
+ * Вызов с номером: его есть чем отменить, и его ответ может устареть.
+ *
+ * Номер уходит наружу двумя путями, и оба обязательны. `options.op` — чужой
+ * номер: второй шаг двухшаговой операции обязан прийти с тем же, что и первый,
+ * иначе мостовая память его не узнает и ответит «устарело», а это весь поиск,
+ * заведение кандидата и привязка ссылки разом. `options.ops` — список, куда
+ * номер кладётся: без него уход с раздела гасить нечего, и `cancel` зовётся с
+ * пустотой всегда.
+ */
 export async function numbered(path, ...args) {
   const options = tail(args)
   const channel = options.channel ?? path
-  const op = (counter += 1)
+  const op = options.op ?? (counter += 1)
   latest.set(channel, op)
+  options.ops?.push(op)
 
   await ready()
   const answer = await at(path)(op, ...args)
@@ -1396,9 +1431,16 @@ export async function numbered(path, ...args) {
   return unwrap(answer)
 }
 
+/** Номер последней операции канала — им зовётся второй шаг. */
+export function lastOp(channel) {
+  return latest.get(channel)
+}
+
 /** Страница ушла — гасим всё, что начала, одним пересечением границы. */
 export function cancel(ops) {
-  if (ops.length) window.pywebview.api.cancel(ops)
+  // Мост проверяется, а не предполагается: уход с раздела бывает и до инъекции,
+  // и после закрытия окна, а `ready()` тут ждать нечего — гасить уже нечего.
+  if (ops.length && window.pywebview) window.pywebview.api.cancel(ops)
 }
 
 function at(path) {
@@ -1411,10 +1453,12 @@ function unwrap(answer) {
   throw new Failed(answer.fail, answer.detail)
 }
 
-/** Последний довод — настройки вызова, если это объект с `channel`. */
+const OPTIONS = ['channel', 'op', 'ops']
+
+/** Последний довод — настройки вызова, а не часть запроса. */
 function tail(args) {
   const last = args.at(-1)
-  if (last && typeof last === 'object' && 'channel' in last) {
+  if (last && typeof last === 'object' && OPTIONS.some((one) => one in last)) {
     args.pop()
     return last
   }
@@ -1428,7 +1472,7 @@ function tail(args) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 41 тест — девять новых и тридцать два из задачи 3.
+Ожидание: PASS, 43 теста — одиннадцать новых и тридцать два из задачи 3.
 
 - [ ] **Шаг 5: Коммит**
 

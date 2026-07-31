@@ -1244,19 +1244,22 @@ export function heightsOf(buckets) {
 ```svelte
 <script>
   import Bar from '$components/Bar.svelte'
-  import { numbered } from '$api/bridge.js'
+  import { cancel, numbered } from '$api/bridge.js'
   import { heightsOf } from '$state/histogram.js'
   import { requestOf } from './section.js'
 
   let { session, ontrouble } = $props()
 
   let histogram = $state({ buckets: [], total: 0, average: null })
+  const ops = []
+
+  $effect(() => () => { cancel(ops.splice(0)) })
 
   // Гистограмма строится по тому же отфильтрованному набору, что и разделы с
   // карточками, — иначе отфильтрованную её не увидеть никогда.
   $effect(() => {
     const { kind, filters } = requestOf(session)
-    numbered('feed.histogram', kind, filters, { channel: 'feed' })
+    numbered('feed.histogram', kind, filters, { channel: 'feed', ops })
       .then((answer) => { histogram = answer })
       .catch((error) => {
         if (!error.silent) ontrouble('Не удалось построить гистограмму')
