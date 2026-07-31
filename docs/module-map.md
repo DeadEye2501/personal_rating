@@ -893,8 +893,6 @@
 
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 
-## client — 0 модулей
-
 ## migrations — 3 модулей
 
 ### `migrations/env.py` — 56 строк
