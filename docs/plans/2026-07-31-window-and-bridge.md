@@ -10,12 +10,12 @@ WebView2, бэкенд в своём потоке со своим циклом a
 сроком, страница и обложки своим WSGI-обработчиком. После этого плана страница
 может спросить у бэкенда что угодно, а показывать это будет план 6.
 
-**Архитектура:** три слоя без обратных связей. `client/thread.py` владеет циклом
-и списком живых задач — он единственный, кто знает про потоки. `client/bridge/`
+**Архитектура:** три слоя без обратных связей. `bridge/thread.py` владеет циклом
+и списком живых задач — он единственный, кто знает про потоки. `bridge/`
 переводит вызов страницы в корутину бэкенда и ответ обратно в JSON: домен на
 файл, общее — в `wire.py` (значения) и `answer.py` (оболочка вызова).
-`client/serve.py` отдаёт страницу и обложки по HTTP, потому что байты через мост
-не ходят. `client/window.py` поднимает окно, `main.py` собирает всё и настраивает
+`bridge/serve.py` отдаёт страницу и обложки по HTTP, потому что байты через мост
+не ходят. `bridge/window.py` поднимает окно, `main.py` собирает всё и настраивает
 лог.
 
 Мост тонкий: он **не оркеструет**. Порядок нескольких записей — дело страницы,
@@ -32,14 +32,14 @@ WebView2, бэкенд в своём потоке со своим циклом a
 
 - **Зависит от планов 1–4.** Бэкенд закончен: `build_backend(config, transport)`
   отдаёт `Backend` с семью репозиториями и семью сервисами.
-- **`client` не импортирует ни `sqlalchemy`, ни `httpx`, ни `aiosqlite`, ни
+- **`bridge` не импортирует ни `sqlalchemy`, ни `httpx`, ни `aiosqlite`, ни
   `alembic`, ни `PIL`.** Из бэкенда ему открыты только `backend.model` и
   `backend.config`. Это сторожит `tests/backend/test_layers.py`, и на первом же
-  файле `client/` его вторая половина просыпается.
-- **`backend` не импортирует ни `client`, ни `webview`, ни `pythonnet`, ни `clr`.**
+  файле `bridge/` его вторая половина просыпается.
+- **`backend` не импортирует ни `bridge`, ни `webview`, ни `pythonnet`, ни `clr`.**
   Тот же сторож, обратная половина.
-- **`build_backend` в `client/` не вызывается и не импортируется.** Он приезжает
-  готовой функцией из `main.py`: иначе `client/thread.py` притащил бы
+- **`build_backend` в `bridge/` не вызывается и не импортируется.** Он приезжает
+  готовой функцией из `main.py`: иначе `bridge/thread.py` притащил бы
   `backend.app`, а с ним `sqlalchemy`. Это же и есть вторая причина, по которой
   сборка внедряется, а не берётся по имени.
 - **Через мост ходят только простые данные:** числа, строки, списки, словари,
@@ -72,25 +72,24 @@ WebView2, бэкенд в своём потоке со своим циклом a
 ```
 personal_rating/
 ├─ main.py                       сборка, лог, запуск окна
-├─ client/
+├─ bridge/
 │  ├─ thread.py                  поток бэкенда: цикл, живые задачи, отмена
 │  ├─ window.py                  окно pywebview и проверка рендерера
 │  ├─ serve.py                   WSGI: страница, ресурсы, обложка
-│  └─ bridge/
-│     ├─ api.py                  поверхность моста, собранная из доменов
-│     ├─ wire.py                 значения границы в JSON
-│     ├─ answer.py               оболочка вызова: срок, отказ, один формат
-│     ├─ kept.py                 то, что не пролезает обратно
-│     ├─ library.py              карточка: заведение, правка, удаление
-│     ├─ marks.py                мои отметки: оценки, теги, закладки
-│     ├─ refs.py                 справочники: жанры, люди, студии
-│     ├─ feed.py                 лента: страницы и гистограмма
-│     ├─ search.py               поиск: свой, чужой, складывание, заведение
-│     ├─ world.py                внешний мир: привязка, перезапрос, обогащение
-│     └─ covers.py               обложки: заливка и наличие
+│  ├─ api.py                     поверхность моста, собранная из доменов
+│  ├─ wire.py                    значения границы в JSON
+│  ├─ answer.py                  оболочка вызова: срок, отказ, один формат
+│  ├─ kept.py                    то, что не пролезает обратно
+│  ├─ library.py                 карточка: заведение, правка, удаление
+│  ├─ marks.py                   мои отметки: оценки, теги, закладки
+│  ├─ refs.py                    справочники: жанры, люди, студии
+│  ├─ feed.py                    лента: страницы и гистограмма
+│  ├─ search.py                  поиск: свой, чужой, складывание, заведение
+│  ├─ world.py                   внешний мир: привязка, перезапрос, обогащение
+│  └─ covers.py                  обложки: заливка и наличие
 ├─ backend/model/
-│  └─ denied.py                  шесть отказов операции
-└─ tests/client/
+│  └─ denied.py                  пять отказов операции
+└─ tests/bridge/
    ├─ conftest.py                двойники бэкенда и поток на них
    ├─ test_thread.py             граница потоков
    ├─ test_wire.py               перевод значений
@@ -107,8 +106,9 @@ personal_rating/
 Правятся и чужие файлы: `backend/model/__init__.py` (шесть имён отказа),
 `backend/storage/repository/{library,tags,credits,external}.py`,
 `backend/service/images.py` (объявления отказов уезжают в модель),
-`tests/backend/test_layers.py` (докстринг про спящую половину перестаёт быть
-правдой), `.gitignore` (`client/web/dist`).
+`tests/backend/test_layers.py` (половина про клиента переводится на `bridge`),
+`client/__init__.py` (удаляется: питона в `client/` больше нет),
+`.gitignore` (`client/dist`).
 
 ---
 
@@ -372,7 +372,7 @@ asyncio, поднимает в нём `Backend`, ведёт список жив�
 
 **Почему сборка внедряется, а не зовётся по имени.** Движок SQLAlchemy привязан
 к циклу, в котором создан, поэтому `Backend` обязан родиться внутри чужого
-потока. А импортировать `backend.app` из `client/` нельзя — с ним приедет
+потока. А импортировать `backend.app` из `bridge/` нельзя — с ним приедет
 `sqlalchemy`, и сторож границы слоёв покраснеет. Оба довода ведут в одно место:
 `main.py` передаёт функцию, поток её зовёт.
 
@@ -381,8 +381,8 @@ asyncio, поднимает в нём `Backend`, ведёт список жив�
 приходит внутрь бэкенда, где его умеют откатывать.
 
 **Файлы:**
-- Создать: `client/thread.py`
-- Создать: `tests/client/conftest.py`, `tests/client/test_thread.py`
+- Создать: `bridge/thread.py`
+- Создать: `tests/bridge/conftest.py`, `tests/bridge/test_thread.py`
 
 **Интерфейсы:**
 - Потребляет: ничего из проекта.
@@ -393,7 +393,7 @@ asyncio, поднимает в нём `Backend`, ведёт список жив�
 
 - [ ] **Шаг 1: Написать двойник бэкенда**
 
-Создать `tests/client/conftest.py`:
+Создать `tests/bridge/conftest.py`:
 
 ```python
 """Двойники бэкенда и потоки на них.
@@ -406,7 +406,7 @@ import time
 
 import pytest
 
-from client.thread import BackendThread
+from bridge.thread import BackendThread
 
 
 class FakeBackend:
@@ -487,7 +487,7 @@ def thread(backend):
 
 - [ ] **Шаг 2: Написать падающий тест**
 
-Создать `tests/client/test_thread.py`:
+Создать `tests/bridge/test_thread.py`:
 
 ```python
 """Граница потоков: что обязано быть правдой у стыка двух циклов."""
@@ -498,8 +498,8 @@ import threading
 
 import pytest
 
-from client.thread import BackendThread, Closed
-from tests.client.conftest import FakeBackend, ready, wait_until
+from bridge.thread import BackendThread, Closed
+from tests.bridge.conftest import FakeBackend, ready, wait_until
 
 
 def test_work_runs_in_another_thread(thread):
@@ -623,12 +623,12 @@ def test_the_thread_survives_a_backend_that_will_not_close():
 
 - [ ] **Шаг 3: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_thread.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.thread'`.
+Запустить: `pipenv run pytest tests/bridge/test_thread.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.thread'`.
 
 - [ ] **Шаг 4: Написать поток**
 
-Создать `client/thread.py`:
+Создать `bridge/thread.py`:
 
 ```python
 """Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом."""
@@ -663,7 +663,7 @@ class Closed(Exception):
 class BackendThread:
     """Сборка внедряется, а не зовётся по имени, по двум причинам сразу:
     движок SQLAlchemy привязан к циклу, в котором создан, — значит бэкенд обязан
-    родиться здесь, внутри; а импортировать `backend.app` из `client/` нельзя,
+    родиться здесь, внутри; а импортировать `backend.app` из `bridge/` нельзя,
     с ним приедет `sqlalchemy` и покраснеет сторож границы слоёв."""
 
     def __init__(self, build: Callable[[], Coroutine[Any, Any, Any]]) -> None:
@@ -772,21 +772,67 @@ class BackendThread:
 
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_thread.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_thread.py -v`
 Ожидание: PASS, 13 тестов.
 
-- [ ] **Шаг 6: Прогнать сторож границы**
+- [ ] **Шаг 6: Завести половину сторожа про мост**
+
+У `tests/backend/test_layers.py` сейчас две проверки вместо четырёх: половины
+про сторону интерфейса там нет вовсе, потому что до этого шага не было и
+предмета — ни одного `.py` вне `backend/`. Заводить её впрок было нечем:
+`python_files` утверждает, что пустой пакет это поломка проверки, а не чистый
+код, и оставленный впрок сторож падал бы каждым прогоном. Теперь предмет есть.
+
+Дописать в `tests/backend/test_layers.py`:
+
+```python
+BANNED_IN_BRIDGE = {"sqlalchemy", "aiosqlite", "httpx", "alembic", "PIL"}
+
+# Из бэкенда мосту открыты только типы границы и настройки. Всё прочее —
+# репозитории, сервисы, клиенты источников — тянет за собой и сессию
+# SQLAlchemy, и поход к диску в потоке интерфейса, то есть ровно то, от чего
+# граница слоёв и заведена. Список корневых имён этого не ловит: они
+# `backend.*`, а не `sqlalchemy`.
+ALLOWED_FROM_BACKEND = {"backend.model", "backend.config"}
+
+
+def test_the_bridge_does_not_import_storage_libraries():
+    assert offenders("bridge", BANNED_IN_BRIDGE) == []
+
+
+def test_the_bridge_takes_only_the_boundary_types_from_the_backend():
+    """Мост, импортирующий репозиторий, лежит не там.
+
+    Проверка по корневым именам это пропускает: `backend.storage.repository` —
+    такой же `backend`, как и `backend.model`, а тянет за собой сессию
+    SQLAlchemy и синхронный поход к базе мимо потока бэкенда."""
+    found = []
+    for path in python_files("bridge"):
+        for module in imported_modules(path):
+            if not module.startswith("backend"):
+                continue
+            if any(module == name or module.startswith(name + ".")
+                   for name in ALLOWED_FROM_BACKEND):
+                continue
+            found.append(f"{path.relative_to(ROOT)} → {module}")
+
+    assert found == []
+```
+
+Докстринг модуля переписать: абзац «второй половины тут нет вовсе, и это не
+дыра, а состояние проекта» перестал быть правдой ровно на этом шаге.
+
+**`client/` этим сторожем не проверяется и не будет.** Там нет питона, а границу
+его слоёв держит хук на записи файла: `<style>` в компоненте, стиль вне
+`styles/`, импорт вверх по слоям, цвет мимо палитры.
 
 Запустить: `pipenv run pytest tests/backend/test_layers.py -v`
-Ожидание: PASS. Половина сторожа про клиента проснулась — в `client/` появился
-первый файл. Поправить его докстринг: утверждение «31.07.2026 спит — от старого
-клиента остался пустой `__init__.py`, и проверять ей нечего» перестало быть
-правдой, и модуль о себе врать не должен.
+Ожидание: PASS, четыре проверки вместо двух.
 
 - [ ] **Шаг 7: Коммит**
 
 ```bash
-git add client/thread.py tests/client/conftest.py tests/client/test_thread.py \
+git add bridge/thread.py tests/bridge/conftest.py tests/bridge/test_thread.py \
         tests/backend/test_layers.py
 git commit -m "feat: поток бэкенда со своим циклом и настоящей отменой"
 ```
@@ -808,8 +854,8 @@ pywebview сериализует ответ сам, штатным `json.dumps`,
 `int | Missing | Refusal` форма ответа одна и та же и всегда с меткой.
 
 **Файлы:**
-- Создать: `client/bridge/__init__.py` (пустой), `client/bridge/wire.py`
-- Создать: `tests/client/test_wire.py`
+- Создать: `bridge/__init__.py` (пустой), `bridge/wire.py`
+- Создать: `tests/bridge/test_wire.py`
 
 **Интерфейсы:**
 - Потребляет: `Missing`, `Refusal` из `backend.model`.
@@ -817,7 +863,7 @@ pywebview сериализует ответ сам, штатным `json.dumps`,
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_wire.py`:
+Создать `tests/bridge/test_wire.py`:
 
 ```python
 """Перевод значений границы в то, что переживёт `json.dumps` без своего
@@ -842,7 +888,7 @@ from backend.model import (
     Source,
     Tag,
 )
-from client.bridge.wire import outcome, to_wire
+from bridge.wire import outcome, to_wire
 
 
 def test_a_moment_travels_as_iso_with_a_t():
@@ -948,12 +994,12 @@ def test_a_value_is_wrapped_the_same_way():
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_wire.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge'`.
+Запустить: `pipenv run pytest tests/bridge/test_wire.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.wire'`.
 
 - [ ] **Шаг 3: Написать перевод**
 
-Создать пустой `client/bridge/__init__.py` и `client/bridge/wire.py`:
+Создать пустой `bridge/__init__.py` и `bridge/wire.py`:
 
 ```python
 """Значения границы в то, что переживёт `json.dumps`.
@@ -1015,13 +1061,13 @@ def outcome(value) -> dict:
 
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_wire.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_wire.py -v`
 Ожидание: PASS, 13 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
 ```bash
-git add client/bridge/__init__.py client/bridge/wire.py tests/client/test_wire.py
+git add bridge/__init__.py bridge/wire.py tests/bridge/test_wire.py
 git commit -m "feat: значения границы в JSON, с меткой у исхода"
 ```
 
@@ -1044,22 +1090,22 @@ JS висит вечно. Это сторож от невозвращающег�
 20 секунд, то есть 40. Берём 60: выше любого законного пути с запасом и
 несравнимо ниже «навсегда».
 
-Сам `DEADLINE` объявлен в `client/thread.py` (задача 2), а не здесь: ждут двое —
+Сам `DEADLINE` объявлен в `bridge/thread.py` (задача 2), а не здесь: ждут двое —
 мост и отдача обложек, — и срок у них один по одному и тому же доводу.
 
 **Файлы:**
-- Создать: `client/bridge/answer.py`
-- Создать: `tests/client/test_answer.py`
+- Создать: `bridge/answer.py`
+- Создать: `tests/bridge/test_answer.py`
 
 **Интерфейсы:**
-- Потребляет: `Denied` из `backend.model`, `to_wire` из `client.bridge.wire`,
-  `Closed` и `DEADLINE` из `client.thread`.
+- Потребляет: `Denied` из `backend.model`, `to_wire` из `bridge.wire`,
+  `Closed` и `DEADLINE` из `bridge.thread`.
 - Отдаёт: `Domain` с `__init__(thread)` и `_reply(factory, op=None) -> dict`,
   `kebab(name) -> str`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_answer.py`:
+Создать `tests/bridge/test_answer.py`:
 
 ```python
 """Один формат ответа на все операции: `{"ok": ...}` либо `{"fail": ...}`."""
@@ -1068,8 +1114,8 @@ import logging
 import threading
 
 from backend.model import TagExists
-from client.bridge.answer import Domain, kebab
-from tests.client.conftest import wait_until
+from bridge.answer import Domain, kebab
+from tests.bridge.conftest import wait_until
 
 
 class Probe(Domain):
@@ -1119,7 +1165,7 @@ def test_a_cancelled_operation_answers_quietly(thread, backend):
 
 def test_a_hung_call_is_cut_off(thread, backend, monkeypatch):
     """У pywebview срока нет вовсе: зависший вызов оставил бы вечный промис."""
-    monkeypatch.setattr("client.bridge.answer.DEADLINE", 0.05)
+    monkeypatch.setattr("bridge.answer.DEADLINE", 0.05)
 
     assert Probe(thread).ask("slow", op=2) == {"fail": "timeout"}
     # Срок не только отвечает, но и гасит работу: иначе она досидит все тридцать
@@ -1141,12 +1187,12 @@ def test_the_kind_of_failure_is_kebab():
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_answer.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.answer'`.
+Запустить: `pipenv run pytest tests/bridge/test_answer.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.answer'`.
 
 - [ ] **Шаг 3: Написать оболочку**
 
-Создать `client/bridge/answer.py`:
+Создать `bridge/answer.py`:
 
 ```python
 """Оболочка вызова моста: срок, отказ, один формат ответа.
@@ -1160,8 +1206,8 @@ import logging
 import re
 
 from backend.model import Denied
-from client.bridge.wire import to_wire
-from client.thread import DEADLINE, Closed
+from bridge.wire import to_wire
+from bridge.thread import DEADLINE, Closed
 
 logger = logging.getLogger(__name__)
 
@@ -1206,13 +1252,13 @@ class Domain:
 
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_answer.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_answer.py -v`
 Ожидание: PASS, 7 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
 ```bash
-git add client/bridge/answer.py tests/client/test_answer.py
+git add bridge/answer.py tests/bridge/test_answer.py
 git commit -m "feat: один формат ответа моста, со сроком и родом отказа"
 ```
 
@@ -1229,13 +1275,13 @@ git commit -m "feat: один формат ответа моста, со сро�
 карточки живёт в `feed.views_of`, и второго адреса ему не нужно.
 
 **Файлы:**
-- Создать: `client/bridge/library.py`, `client/bridge/marks.py`
-- Изменить: `tests/client/conftest.py` (записывающий двойник)
-- Создать: `tests/client/test_bridge_library.py`,
-  `tests/client/test_bridge_marks.py`
+- Создать: `bridge/library.py`, `bridge/marks.py`
+- Изменить: `tests/bridge/conftest.py` (записывающий двойник)
+- Создать: `tests/bridge/test_bridge_library.py`,
+  `tests/bridge/test_bridge_marks.py`
 
 **Интерфейсы:**
-- Потребляет: `Domain` из `client.bridge.answer`; `Kind`, `new_manual_item` из
+- Потребляет: `Domain` из `bridge.answer`; `Kind`, `new_manual_item` из
   `backend.model`.
 - Отдаёт: `Library` с `create(fields)`, `replace(item_id, fields)`,
   `same_title(kind, title)`, `unlink(item_id)`, `deletion_summary(item_id)`,
@@ -1245,7 +1291,7 @@ git commit -m "feat: один формат ответа моста, со сро�
 
 - [ ] **Шаг 1: Написать записывающий двойник**
 
-Дописать в `tests/client/conftest.py`:
+Дописать в `tests/bridge/conftest.py`:
 
 ```python
 class Asked:
@@ -1257,7 +1303,7 @@ class Asked:
 
     Слабое место у приёма одно: принимается **любое** имя, и опечатка в имени
     метода бэкенда прошла бы молча. Закрывает его отдельная проверка поверхности
-    моста — `tests/client/test_bridge_surface.py`."""
+    моста — `tests/bridge/test_bridge_surface.py`."""
 
     def __init__(self, answers: dict, log: list, path: tuple = ()) -> None:
         self._answers = answers
@@ -1302,13 +1348,13 @@ def spy(asked):
 
 - [ ] **Шаг 2: Написать падающие тесты**
 
-Создать `tests/client/test_bridge_library.py`:
+Создать `tests/bridge/test_bridge_library.py`:
 
 ```python
 """Мост: карточка целиком — заведение, правка, отвязка, удаление."""
 
 from backend.model import Kind, Source
-from client.bridge.library import Library
+from bridge.library import Library
 
 
 def test_a_manual_card_is_built_by_the_bridge(spy, asked):
@@ -1386,7 +1432,7 @@ def test_the_summary_travels_as_a_flat_dictionary(spy, asked):
                                                         "rating": True}}
 ```
 
-Создать `tests/client/test_bridge_marks.py`:
+Создать `tests/bridge/test_bridge_marks.py`:
 
 ```python
 """Мост: свои отметки — оценки, теги, закладки."""
@@ -1394,7 +1440,7 @@ def test_the_summary_travels_as_a_flat_dictionary(spy, asked):
 from datetime import datetime
 
 from backend.model import Kind, TagExists
-from client.bridge.marks import Marks
+from bridge.marks import Marks
 
 
 """Момент везде зажат между двумя замерами вокруг вызова, а не проверен на
@@ -1579,12 +1625,12 @@ def test_unwishing_needs_no_moment(spy, asked):
 
 - [ ] **Шаг 3: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_library.py tests/client/test_bridge_marks.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.library'`.
+Запустить: `pipenv run pytest tests/bridge/test_bridge_library.py tests/bridge/test_bridge_marks.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.library'`.
 
 - [ ] **Шаг 4: Написать оба домена**
 
-Создать `client/bridge/library.py`:
+Создать `bridge/library.py`:
 
 ```python
 """Мост: карточка целиком — заведение, правка, отвязка, удаление."""
@@ -1592,7 +1638,7 @@ def test_unwishing_needs_no_moment(spy, asked):
 from datetime import date
 
 from backend.model import Kind, new_manual_item
-from client.bridge.answer import Domain
+from bridge.answer import Domain
 
 
 class Library(Domain):
@@ -1640,7 +1686,7 @@ def _manual(fields: dict):
     return new_manual_item(Kind(fields["kind"]), fields["title"], **known)
 ```
 
-Создать `client/bridge/marks.py`:
+Создать `bridge/marks.py`:
 
 ```python
 """Мост: свои отметки — оценки, теги, закладки.
@@ -1651,7 +1697,7 @@ def _manual(fields: dict):
 from datetime import datetime
 
 from backend.model import Kind
-from client.bridge.answer import Domain
+from bridge.answer import Domain
 
 
 class Marks(Domain):
@@ -1710,15 +1756,15 @@ class Marks(Domain):
 
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/ -v`
+Запустить: `pipenv run pytest tests/bridge/ -v`
 Ожидание: PASS, 20 новых тестов — шесть про карточку и четырнадцать про отметки.
 
 - [ ] **Шаг 6: Коммит**
 
 ```bash
-git add client/bridge/library.py client/bridge/marks.py \
-        tests/client/test_bridge_library.py tests/client/test_bridge_marks.py \
-        tests/client/conftest.py
+git add bridge/library.py bridge/marks.py \
+        tests/bridge/test_bridge_library.py tests/bridge/test_bridge_marks.py \
+        tests/bridge/conftest.py
 git commit -m "feat: мост — карточка и свои отметки"
 ```
 
@@ -1741,17 +1787,17 @@ git commit -m "feat: мост — карточка и свои отметки"
 новый (`create_manual`). Совпадение имени само по себе не решает ничего.
 
 **Файлы:**
-- Создать: `client/bridge/refs.py`
-- Создать: `tests/client/test_bridge_refs.py`
+- Создать: `bridge/refs.py`
+- Создать: `tests/bridge/test_bridge_refs.py`
 
 **Интерфейсы:**
-- Потребляет: `Domain` из `client.bridge.answer`; `GenreKind` из `backend.model`.
+- Потребляет: `Domain` из `bridge.answer`; `GenreKind` из `backend.model`.
 - Отдаёт: `Refs` с `genres(genre_kind)`, `suggest(domain, name)`,
   `create_person(domain, name)`, `items_of(domain, entity_id, offset, limit)`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_bridge_refs.py`:
+Создать `tests/bridge/test_bridge_refs.py`:
 
 ```python
 """Мост: справочники — жанры, люди, студии."""
@@ -1759,7 +1805,7 @@ git commit -m "feat: мост — карточка и свои отметки"
 import pytest
 
 from backend.model import GenreKind
-from client.bridge.refs import Refs
+from bridge.refs import Refs
 
 
 def test_genres_come_for_the_asked_set(spy, asked):
@@ -1820,12 +1866,12 @@ limit)`, как у страницы: она листает, а не задаёт
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_refs.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.refs'`.
+Запустить: `pipenv run pytest tests/bridge/test_bridge_refs.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.refs'`.
 
 - [ ] **Шаг 3: Написать домен**
 
-Создать `client/bridge/refs.py`:
+Создать `bridge/refs.py`:
 
 ```python
 """Мост: справочники — жанры, люди, студии.
@@ -1834,7 +1880,7 @@ limit)`, как у страницы: она листает, а не задаёт
 и писать их дважды нельзя. Имя домена приезжает доводом и выбирает репозиторий."""
 
 from backend.model import GenreKind
-from client.bridge.answer import Domain
+from bridge.answer import Domain
 
 DOMAINS = ("people", "companies")
 
@@ -1874,13 +1920,13 @@ def _of(backend, domain: str):
 
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_refs.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_bridge_refs.py -v`
 Ожидание: PASS, 6 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
 ```bash
-git add client/bridge/refs.py tests/client/test_bridge_refs.py
+git add bridge/refs.py tests/bridge/test_bridge_refs.py
 git commit -m "feat: мост — справочники жанров, людей и студий"
 ```
 
@@ -1899,8 +1945,8 @@ git commit -m "feat: мост — справочники жанров, люде�
 включённые и исключённые.
 
 **Файлы:**
-- Создать: `client/bridge/feed.py`
-- Создать: `tests/client/test_bridge_feed.py`
+- Создать: `bridge/feed.py`
+- Создать: `tests/bridge/test_bridge_feed.py`
 
 **Интерфейсы:**
 - Потребляет: `Domain`; `Feed`, `Filters`, `Kind`, `Order`, `Section`, `Sort`
@@ -1910,13 +1956,13 @@ git commit -m "feat: мост — справочники жанров, люде�
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_bridge_feed.py`:
+Создать `tests/bridge/test_bridge_feed.py`:
 
 ```python
 """Мост: лента — страницы разделов и гистограмма."""
 
 from backend.model import Kind, Section, Sort
-from client.bridge.feed import FeedBridge
+from bridge.feed import FeedBridge
 
 WISHED = {
     "section": "wishlist",
@@ -2005,18 +2051,18 @@ def test_the_histogram_uses_the_same_filters(spy, asked):
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_feed.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.feed'`.
+Запустить: `pipenv run pytest tests/bridge/test_bridge_feed.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.feed'`.
 
 - [ ] **Шаг 3: Написать домен**
 
-Создать `client/bridge/feed.py`:
+Создать `bridge/feed.py`:
 
 ```python
 """Мост: лента — страницы разделов и гистограмма."""
 
 from backend.model import Feed, Filters, Kind, Order, Section, Sort
-from client.bridge.answer import Domain
+from bridge.answer import Domain
 
 # Шесть кортежей `Filters` — по два на признак: включённые и исключённые.
 # Перечислены поимённо, потому что имя поля и есть контракт со страницей.
@@ -2063,13 +2109,13 @@ def _filters(filters: dict) -> Filters:
 
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_feed.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_bridge_feed.py -v`
 Ожидание: PASS, 6 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
 ```bash
-git add client/bridge/feed.py tests/client/test_bridge_feed.py
+git add bridge/feed.py tests/bridge/test_bridge_feed.py
 git commit -m "feat: мост — лента и гистограмма"
 ```
 
@@ -2100,25 +2146,25 @@ git commit -m "feat: мост — лента и гистограмма"
 перерисовку и переупорядочивание, номер строки — нет.
 
 **Файлы:**
-- Создать: `client/bridge/kept.py`, `client/bridge/search.py`
-- Создать: `tests/client/test_kept.py`,
-  `tests/client/test_bridge_search.py`
+- Создать: `bridge/kept.py`, `bridge/search.py`
+- Создать: `tests/bridge/test_kept.py`,
+  `tests/bridge/test_bridge_search.py`
 
 **Интерфейсы:**
 - Потребляет: `Domain`; `Kind`, `merge_results` из `backend.model`; `outcome`
-  из `client.bridge.wire`.
+  из `bridge.wire`.
 - Отдаёт: `Kept` с `put(op, value)`, `taken(op) -> value | None`, `drop()`;
   `Search` с `local(op, kind, query)`, `external(op)`,
   `ensure(op, source, source_id)`.
 
 - [ ] **Шаг 1: Написать падающий тест на память**
 
-Создать `tests/client/test_kept.py`:
+Создать `tests/bridge/test_kept.py`:
 
 ```python
 """То, что не пролезает обратно через JSON, мост помнит у себя."""
 
-from client.bridge.kept import Kept
+from bridge.kept import Kept
 
 
 def test_what_was_kept_comes_back():
@@ -2162,12 +2208,12 @@ def test_nothing_kept_is_not_a_failure():
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_kept.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.kept'`.
+Запустить: `pipenv run pytest tests/bridge/test_kept.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.kept'`.
 
 - [ ] **Шаг 3: Написать память**
 
-Создать `client/bridge/kept.py`:
+Создать `bridge/kept.py`:
 
 ```python
 """То, что не пролезает обратно через JSON.
@@ -2202,13 +2248,13 @@ class Kept:
 
 - [ ] **Шаг 4: Написать падающий тест на поиск**
 
-Создать `tests/client/test_bridge_search.py`:
+Создать `tests/bridge/test_bridge_search.py`:
 
 ```python
 """Мост: поиск — своё, чужое, складывание, заведение найденного."""
 
 from backend.model import CardView, ExternalSearch, Kind, Missing, Source
-from client.bridge.search import Search
+from bridge.search import Search
 
 
 def a_view(source_id, item_id=None, title="Одиссея"):
@@ -2353,12 +2399,12 @@ def test_a_source_that_lost_the_card_says_so(spy, asked):
 
 - [ ] **Шаг 5: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_search.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.search'`.
+Запустить: `pipenv run pytest tests/bridge/test_bridge_search.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.search'`.
 
 - [ ] **Шаг 6: Написать домен**
 
-Создать `client/bridge/search.py`:
+Создать `bridge/search.py`:
 
 ```python
 """Мост: поиск — своё, чужое, складывание, заведение найденного.
@@ -2368,9 +2414,9 @@ def test_a_source_that_lost_the_card_says_so(spy, asked):
 страница называет кандидата парой «источник + идентификатор»."""
 
 from backend.model import Kind, merge_results
-from client.bridge.answer import Domain
-from client.bridge.kept import Kept
-from client.bridge.wire import outcome
+from bridge.answer import Domain
+from bridge.kept import Kept
+from bridge.wire import outcome
 
 
 class Search(Domain):
@@ -2436,14 +2482,14 @@ def _found(views, source: str, source_id: str):
 
 - [ ] **Шаг 7: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_kept.py tests/client/test_bridge_search.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_kept.py tests/bridge/test_bridge_search.py -v`
 Ожидание: PASS, 14 тестов.
 
 - [ ] **Шаг 8: Коммит**
 
 ```bash
-git add client/bridge/kept.py client/bridge/search.py \
-        tests/client/test_kept.py tests/client/test_bridge_search.py
+git add bridge/kept.py bridge/search.py \
+        tests/bridge/test_kept.py tests/bridge/test_bridge_search.py
 git commit -m "feat: мост — поиск со складыванием выдач и памятью"
 ```
 
@@ -2467,19 +2513,19 @@ git commit -m "feat: мост — поиск со складыванием вы�
 он приходит только в детальном ответе: круг 3 нельзя начать раньше круга 2.
 
 **Файлы:**
-- Создать: `client/bridge/world.py`
-- Создать: `tests/client/test_bridge_world.py`
+- Создать: `bridge/world.py`
+- Создать: `tests/bridge/test_bridge_world.py`
 
 **Интерфейсы:**
 - Потребляет: `Domain`, `Kept`; `Kind`, `parse_link` из `backend.model`;
-  `outcome`, `to_wire` из `client.bridge.wire`.
+  `outcome`, `to_wire` из `bridge.wire`.
 - Отдаёт: `World` с `parse(raw, kind)`, `card_for_link(op, raw, kind)`,
   `link(op, item_id, overwrite)`, `refresh_series(op, item_id)`,
   `enrich(op, item_id, kind)`, `expected(kind)`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_bridge_world.py`:
+Создать `tests/bridge/test_bridge_world.py`:
 
 ```python
 """Мост: внешний мир — привязка, перезапрос, оценки агрегаторов."""
@@ -2487,7 +2533,7 @@ git commit -m "feat: мост — поиск со складыванием вы�
 from datetime import datetime
 
 from backend.model import ItemExists, Kind, Missing, RatingSource
-from client.bridge.world import World
+from bridge.world import World
 
 
 def test_a_pasted_link_is_parsed_without_the_network(spy, asked):
@@ -2601,12 +2647,12 @@ def test_expected_sources_are_known_before_the_network(spy, asked):
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_world.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.world'`.
+Запустить: `pipenv run pytest tests/bridge/test_bridge_world.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.world'`.
 
 - [ ] **Шаг 3: Написать домен**
 
-Создать `client/bridge/world.py`:
+Создать `bridge/world.py`:
 
 ```python
 """Мост: внешний мир — привязка, перезапрос сериала, оценки агрегаторов."""
@@ -2614,9 +2660,9 @@ def test_expected_sources_are_known_before_the_network(spy, asked):
 from datetime import datetime
 
 from backend.model import Kind, parse_link
-from client.bridge.answer import Domain
-from client.bridge.kept import Kept
-from client.bridge.wire import outcome, to_wire
+from bridge.answer import Domain
+from bridge.kept import Kept
+from bridge.wire import outcome, to_wire
 
 
 class World(Domain):
@@ -2684,13 +2730,13 @@ def _kind(kind: str | None) -> Kind | None:
 
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_world.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_bridge_world.py -v`
 Ожидание: PASS, 10 тестов.
 
 - [ ] **Шаг 5: Коммит**
 
 ```bash
-git add client/bridge/world.py tests/client/test_bridge_world.py
+git add bridge/world.py tests/bridge/test_bridge_world.py
 git commit -m "feat: мост — внешний мир, привязка и обогащение"
 ```
 
@@ -2707,9 +2753,9 @@ git commit -m "feat: мост — внешний мир, привязка и о�
 Поэтому картинка внутрь идёт base64, а наружу — HTTP-ручкой из задачи 11.
 
 **Файлы:**
-- Создать: `client/bridge/covers.py`, `client/bridge/api.py`
-- Создать: `tests/client/test_bridge_covers.py`,
-  `tests/client/test_bridge_surface.py`
+- Создать: `bridge/covers.py`, `bridge/api.py`
+- Создать: `tests/bridge/test_bridge_covers.py`,
+  `tests/bridge/test_bridge_surface.py`
 
 **Интерфейсы:**
 - Потребляет: все семь доменов.
@@ -2719,7 +2765,7 @@ git commit -m "feat: мост — внешний мир, привязка и о�
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_bridge_covers.py`:
+Создать `tests/bridge/test_bridge_covers.py`:
 
 ```python
 """Мост: обложки — заливка своей картинки и наличие."""
@@ -2728,7 +2774,7 @@ import base64
 from datetime import datetime
 
 from backend.model import BadImage
-from client.bridge.covers import Covers
+from bridge.covers import Covers
 
 PNG = base64.b64encode(b"\x89PNG\r\n\x1a\n").decode()
 
@@ -2772,7 +2818,7 @@ def test_having_a_cover_is_a_plain_answer(spy, asked):
     assert Covers(spy).has(12) == {"ok": True}
 ```
 
-Создать `tests/client/test_bridge_surface.py`:
+Создать `tests/bridge/test_bridge_surface.py`:
 
 ```python
 """Каждое имя, которое мост зовёт у бэкенда, обязано на нём существовать.
@@ -2790,12 +2836,11 @@ from pathlib import Path
 import pytest
 
 from backend.app import Backend
-from client.bridge.api import Api
+from bridge.api import Api
 
 ROOT = Path(__file__).resolve().parents[2]
 # Всё, что зовёт бэкенд по имени `back`: семь доменов моста и отдача обложек.
-SOURCES = [*sorted((ROOT / "client" / "bridge").glob("*.py")),
-           ROOT / "client" / "serve.py"]
+SOURCES = sorted((ROOT / "bridge").glob("*.py"))
 
 DOMAINS = {"library", "marks", "refs", "feed", "search", "world", "covers"}
 
@@ -2876,18 +2921,18 @@ def _behind(where, step):
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_bridge_covers.py tests/client/test_bridge_surface.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.bridge.covers'`.
+Запустить: `pipenv run pytest tests/bridge/test_bridge_covers.py tests/bridge/test_bridge_surface.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.covers'`.
 
 - [ ] **Шаг 3: Написать домен обложек**
 
-Создать `client/bridge/covers.py`:
+Создать `bridge/covers.py`:
 
 ```python
 """Мост: обложки — заливка своей картинки и наличие.
 
 Показ идёт не отсюда: байты вклеиваются в текст скрипта, поэтому обложка едет
-HTTP-ручкой (`client/serve.py`). Внутрь картинка идёт base64 — там канал другой,
+HTTP-ручкой (`bridge/serve.py`). Внутрь картинка идёт base64 — там канал другой,
 `postMessage` с JSON-строкой."""
 
 import binascii
@@ -2895,7 +2940,7 @@ import base64
 from datetime import datetime
 
 from backend.model import BadImage
-from client.bridge.answer import Domain
+from bridge.answer import Domain
 
 
 class Covers(Domain):
@@ -2928,7 +2973,7 @@ def _picture(data: str) -> bytes:
 
 - [ ] **Шаг 4: Собрать мост**
 
-Создать `client/bridge/api.py`:
+Создать `bridge/api.py`:
 
 ```python
 """Поверхность моста: семь доменов и отмена.
@@ -2937,13 +2982,13 @@ pywebview собирает её рефлексией — `dir()` без имён
 рекурсией в объекты, — и имена с точкой на стороне страницы разворачиваются в
 дерево: `pywebview.api.feed.page(...)`."""
 
-from client.bridge.covers import Covers
-from client.bridge.feed import FeedBridge
-from client.bridge.library import Library
-from client.bridge.marks import Marks
-from client.bridge.refs import Refs
-from client.bridge.search import Search
-from client.bridge.world import World
+from bridge.covers import Covers
+from bridge.feed import FeedBridge
+from bridge.library import Library
+from bridge.marks import Marks
+from bridge.refs import Refs
+from bridge.search import Search
+from bridge.world import World
 
 
 class Api:
@@ -2968,15 +3013,15 @@ class Api:
 
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/ -v`
+Запустить: `pipenv run pytest tests/bridge/ -v`
 Ожидание: PASS. Сторож поверхности обязан пройти по всем именам, которые зовут
 семь доменов; расхождение здесь — это опечатка, и правится код моста, а не тест.
 
 - [ ] **Шаг 6: Коммит**
 
 ```bash
-git add client/bridge/covers.py client/bridge/api.py \
-        tests/client/test_bridge_covers.py tests/client/test_bridge_surface.py
+git add bridge/covers.py bridge/api.py \
+        tests/bridge/test_bridge_covers.py tests/bridge/test_bridge_surface.py
 git commit -m "feat: мост собран целиком, со сторожем поверхности"
 ```
 
@@ -3001,25 +3046,25 @@ git commit -m "feat: мост собран целиком, со сторожем
 стороне страницы.
 
 **Файлы:**
-- Создать: `client/serve.py`
+- Создать: `bridge/serve.py`
 - Изменить: `.gitignore`
-- Создать: `tests/client/test_serve.py`
+- Создать: `tests/bridge/test_serve.py`
 
 **Интерфейсы:**
-- Потребляет: `DEADLINE` из `client.thread`; `Source` из `backend.model`.
+- Потребляет: `DEADLINE` из `bridge.thread`; `Source` из `backend.model`.
 - Отдаёт: `Page(thread, root)` — WSGI-приложение (`__call__(environ,
   start_response)`), `WEB_ROOT`, `TYPES`.
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_serve.py`:
+Создать `tests/bridge/test_serve.py`:
 
 ```python
 """Отдача страницы, ресурсов и обложек.
 
 WSGI зовётся напрямую: сервер здесь не поднимается, окно не создаётся."""
 
-from client.serve import Page
+from bridge.serve import Page
 
 PNG = b"\x89PNG\r\n\x1a\nостальное"
 JPEG = b"\xff\xd8\xff\xe0остальное"
@@ -3156,12 +3201,12 @@ def test_a_cover_asked_without_anything_is_refused(tmp_path, spy, asked):
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_serve.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.serve'`.
+Запустить: `pipenv run pytest tests/bridge/test_serve.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.serve'`.
 
 - [ ] **Шаг 3: Написать отдачу**
 
-Создать `client/serve.py`:
+Создать `bridge/serve.py`:
 
 ```python
 """Страница, ресурсы и обложки по HTTP.
@@ -3177,7 +3222,7 @@ from pathlib import Path
 from urllib.parse import parse_qs
 
 from backend.model import Source
-from client.thread import DEADLINE
+from bridge.thread import DEADLINE
 
 logger = logging.getLogger(__name__)
 
@@ -3288,19 +3333,19 @@ def _answer(start_response, status: str, kind: str, body: bytes):
 
 - [ ] **Шаг 4: Закрыть сборку фронта от git**
 
-Дописать в `.gitignore` строку `client/web/dist/` рядом с уже существующим
+Дописать в `.gitignore` строку `client/dist/` рядом с уже существующим
 `dist/`, если тот не покрывает вложенный путь, и убедиться, что `*.spec` не
 помешает плану 10 (файл сборки PyInstaller туда попадает).
 
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
-Запустить: `pipenv run pytest tests/client/test_serve.py -v`
+Запустить: `pipenv run pytest tests/bridge/test_serve.py -v`
 Ожидание: PASS, 10 тестов.
 
 - [ ] **Шаг 6: Коммит**
 
 ```bash
-git add client/serve.py tests/client/test_serve.py .gitignore
+git add bridge/serve.py tests/bridge/test_serve.py .gitignore
 git commit -m "feat: своя отдача страницы, ресурсов и обложек"
 ```
 
@@ -3320,8 +3365,8 @@ git commit -m "feat: своя отдача страницы, ресурсов и
 нужно и нельзя.
 
 **Файлы:**
-- Создать: `client/window.py`, `main.py`
-- Создать: `tests/client/test_window.py`
+- Создать: `bridge/window.py`, `main.py`
+- Создать: `tests/bridge/test_window.py`
 
 **Интерфейсы:**
 - Потребляет: `Api`, `Page`, `BackendThread`.
@@ -3330,12 +3375,12 @@ git commit -m "feat: своя отдача страницы, ресурсов и
 
 - [ ] **Шаг 1: Написать падающий тест**
 
-Создать `tests/client/test_window.py`:
+Создать `tests/bridge/test_window.py`:
 
 ```python
 """Решение по рендереру. Окно здесь не поднимается ни разу."""
 
-from client.window import supported
+from bridge.window import supported
 
 
 def test_the_system_chromium_is_what_we_drew_the_mockup_in():
@@ -3357,12 +3402,12 @@ def test_an_unknown_engine_is_not_accepted():
 
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
-Запустить: `pipenv run pytest tests/client/test_window.py -v`
-Ожидание: FAIL, `ModuleNotFoundError: No module named 'client.window'`.
+Запустить: `pipenv run pytest tests/bridge/test_window.py -v`
+Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.window'`.
 
 - [ ] **Шаг 3: Написать окно**
 
-Создать `client/window.py`:
+Создать `bridge/window.py`:
 
 ```python
 """Окно приложения и проверка того, чем оно рисует."""
@@ -3371,8 +3416,8 @@ import logging
 
 import webview
 
-from client.bridge.api import Api
-from client.serve import Page
+from bridge.api import Api
+from bridge.serve import Page
 
 logger = logging.getLogger(__name__)
 
@@ -3436,8 +3481,8 @@ from dotenv import load_dotenv
 
 from backend.app import build_backend
 from backend.config import load_config
-from client.thread import BackendThread
-from client.window import open_window
+from bridge.thread import BackendThread
+from bridge.window import open_window
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -3481,12 +3526,12 @@ if __name__ == "__main__":
 
 Запустить: `pipenv run pytest`
 Ожидание: зелено. `tests/backend/test_layers.py` обязан пройти: `main.py` не
-входит ни в `backend`, ни в `client`, и именно поэтому он и есть то место, где
+входит ни в `backend`, ни в `bridge`, и именно поэтому он и есть то место, где
 две половины встречаются.
 
 - [ ] **Шаг 6: Проверить руками**
 
-Заглушка страницы кладётся в `client/web/dist/index.html` и в репозиторий не
+Заглушка страницы кладётся в `client/dist/index.html` и в репозиторий не
 попадает (папка закрыта `.gitignore`); план 6 заменит её сборкой Vite.
 
 ```html
@@ -3516,7 +3561,7 @@ pipenv run python main.py
 - [ ] **Шаг 7: Коммит**
 
 ```bash
-git add client/window.py main.py tests/client/test_window.py
+git add bridge/window.py main.py tests/bridge/test_window.py
 git commit -m "feat: окно приложения, сборка и лог"
 ```
 

@@ -31,8 +31,8 @@ Vitest 4.1.10. Шрифты — `@fontsource-variable/roboto` 5.3.0 и
 
 Действуют на каждую задачу, повторять в них не нужно.
 
-- **Зависит от плана 5.** Мост отвечает на всё, `client/serve.py` отдаёт дерево
-  `client/web/dist`, окно поднимается `pipenv run python main.py`.
+- **Зависит от плана 5.** Мост отвечает на всё, `bridge/serve.py` отдаёт дерево
+  `client/dist`, окно поднимается `pipenv run python main.py`.
 - **Ни одной ссылки в сеть со страницы.** Ни шрифтов из Google Fonts, ни CDN, ни
   картинок по адресу. Приложение обязано работать офлайн целиком, а страница
   внутри WebView2 не отличает «нет сети» от «нет файла»: макет с сетевым шрифтом
@@ -64,42 +64,41 @@ Vitest 4.1.10. Шрифты — `@fontsource-variable/roboto` 5.3.0 и
 
 ```
 personal_rating/
-├─ client/web/
+├─ client/
 │  ├─ index.html                 точка входа Vite
+│  ├─ main.js                    монтирует корень
 │  ├─ package.json               зависимости и команды
 │  ├─ vite.config.js             сборка в dist, псевдонимы слоёв
 │  ├─ svelte.config.js
-│  └─ src/
-│     ├─ main.js                 монтирует корень
-│     ├─ styles/
-│     │  ├─ palette.css          28 токенов макета
-│     │  ├─ base.css             сброс, окно, иконки, кромка окна
-│     │  ├─ neon.css             неоновая кромка как приём
-│     │  ├─ topbar.css           шапка: три зоны
-│     │  ├─ search.css           поле поиска
-│     │  ├─ seg.css              переключатель типа
-│     │  ├─ tools.css            ряд круглых кнопок
-│     │  ├─ view.css             стопка разделов и переход
-│     │  └─ snack.css            плашка сообщений
-│     ├─ components/
-│     │  ├─ Icon.svelte          глиф Material Symbols
-│     │  ├─ SearchField.svelte   поле с кнопкой очистки
-│     │  ├─ Segmented.svelte     переключатель типа
-│     │  ├─ ToolButton.svelte    круглая кнопка шапки
-│     │  └─ Snack.svelte         плашка сообщений
-│     ├─ state/
-│     │  ├─ filters.js           три состояния строки фильтра
-│     │  ├─ sorting.js           восемь состояний переключателя
-│     │  └─ session.js           что выбрано в приложении
-│     ├─ api/
-│     │  └─ bridge.js            обёртка над мостом
-│     └─ app/
-│        ├─ App.svelte           корень: шапка плюс стопка разделов
-│        ├─ Topbar.svelte        сборка шапки
-│        ├─ SearchScreen.svelte  раздел «Поиск»
-│        ├─ RatedScreen.svelte   раздел «Оценённые»
-│        ├─ WishScreen.svelte    раздел «Хочу посмотреть»
-│        └─ StatsScreen.svelte   раздел «Статистика»
+│  ├─ styles/
+│  │  ├─ palette.css             28 токенов макета
+│  │  ├─ base.css                сброс, окно, иконки, кромка окна
+│  │  ├─ neon.css                неоновая кромка как приём
+│  │  ├─ topbar.css              шапка: три зоны
+│  │  ├─ search.css              поле поиска
+│  │  ├─ seg.css                 переключатель типа
+│  │  ├─ tools.css               ряд круглых кнопок
+│  │  ├─ view.css                стопка разделов и переход
+│  │  └─ snack.css               плашка сообщений
+│  ├─ components/
+│  │  ├─ Icon.svelte             глиф Material Symbols
+│  │  ├─ SearchField.svelte      поле с кнопкой очистки
+│  │  ├─ Segmented.svelte        переключатель типа
+│  │  ├─ ToolButton.svelte       круглая кнопка шапки
+│  │  └─ Snack.svelte            плашка сообщений
+│  ├─ state/
+│  │  ├─ filters.js              три состояния строки фильтра
+│  │  ├─ sorting.js              восемь состояний переключателя
+│  │  └─ session.js              что выбрано в приложении
+│  ├─ api/
+│  │  └─ bridge.js               обёртка над мостом
+│  └─ app/
+│     ├─ App.svelte              корень: шапка плюс стопка разделов
+│     ├─ Topbar.svelte           сборка шапки
+│     ├─ SearchScreen.svelte     раздел «Поиск»
+│     ├─ RatedScreen.svelte      раздел «Оценённые»
+│     ├─ WishScreen.svelte       раздел «Хочу посмотреть»
+│     └─ StatsScreen.svelte      раздел «Статистика»
 └─ tests/web/
    ├─ filters.test.js            три состояния и складывание
    ├─ sorting.test.js            перебор восьми состояний
@@ -107,7 +106,7 @@ personal_rating/
    └─ bridge.test.js             номер, отмена, устаревший ответ
 ```
 
-Правятся и чужие файлы: `.gitignore` (`node_modules/`), `client/window.py`
+Правятся и чужие файлы: `.gitignore` (`node_modules/`), `bridge/window.py`
 (цвет фона окна сводится с `--bg`), `CLAUDE.md` (вторая цепочка выпуска в
 разделе «Окружение»).
 
@@ -128,19 +127,19 @@ personal_rating/
 там протекает молча.
 
 **Файлы:**
-- Создать: `client/web/package.json`, `client/web/vite.config.js`,
-  `client/web/svelte.config.js`, `client/web/index.html`,
-  `client/web/src/main.js`, `client/web/src/app/App.svelte`
+- Создать: `client/package.json`, `client/vite.config.js`,
+  `client/svelte.config.js`, `client/index.html`,
+  `client/main.js`, `client/app/App.svelte`
 - Изменить: `.gitignore`
 
 **Интерфейсы:**
-- Потребляет: `client/serve.py` из плана 5 — он отдаёт `client/web/dist`.
+- Потребляет: `bridge/serve.py` из плана 5 — он отдаёт `client/dist`.
 - Отдаёт: команды `npm run build`, `npm run dev`, `npm test`; псевдонимы
   `$styles`, `$components`, `$state`, `$api`.
 
 - [ ] **Шаг 1: Завести пакет**
 
-Из `client/web/`:
+Из `client/`:
 
 ```bash
 npm init -y
@@ -151,7 +150,7 @@ npm i -D vite@8.2.0 svelte@5.56.8 @sveltejs/vite-plugin-svelte@7.2.0 vitest@4.1.
 мажорной версией и менял то, что означает «чисто». У сборщика фронта цена
 ошибки та же.
 
-Привести `client/web/package.json` к виду:
+Привести `client/package.json` к виду:
 
 ```json
 {
@@ -168,7 +167,7 @@ npm i -D vite@8.2.0 svelte@5.56.8 @sveltejs/vite-plugin-svelte@7.2.0 vitest@4.1.
 
 - [ ] **Шаг 2: Настроить сборку**
 
-Создать `client/web/vite.config.js`:
+Создать `client/vite.config.js`:
 
 ```js
 import { svelte } from '@sveltejs/vite-plugin-svelte'
@@ -185,10 +184,10 @@ export default defineConfig({
   // придумает сборщик, она не видит.
   resolve: {
     alias: {
-      $styles: here('./src/styles'),
-      $components: here('./src/components'),
-      $state: here('./src/state'),
-      $api: here('./src/api'),
+      $styles: here('./styles'),
+      $components: here('./components'),
+      $state: here('./state'),
+      $api: here('./api'),
     },
   },
 
@@ -200,11 +199,11 @@ export default defineConfig({
   // Проверяются `state/` и `api/` — обычные модули без разметки. Поддельный
   // браузер тут не нужен вовсе, а стоил бы ещё одной зависимости и секунд на
   // каждом прогоне.
-  test: { include: ['../../tests/web/**/*.test.js'], environment: 'node' },
+  test: { include: ['../tests/web/**/*.test.js'], environment: 'node' },
 })
 ```
 
-Создать `client/web/svelte.config.js`:
+Создать `client/svelte.config.js`:
 
 ```js
 export default {}
@@ -216,7 +215,7 @@ export default {}
 
 - [ ] **Шаг 3: Завести страницу**
 
-Создать `client/web/index.html`:
+Создать `client/index.html`:
 
 ```html
 <!doctype html>
@@ -227,12 +226,12 @@ export default {}
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/main.js"></script>
   </body>
 </html>
 ```
 
-Создать `client/web/src/main.js`:
+Создать `client/main.js`:
 
 ```js
 import { mount } from 'svelte'
@@ -242,7 +241,7 @@ import App from './app/App.svelte'
 export default mount(App, { target: document.getElementById('root') })
 ```
 
-Создать `client/web/src/app/App.svelte`:
+Создать `client/app/App.svelte`:
 
 ```svelte
 <script>
@@ -271,7 +270,7 @@ node_modules/
 - [ ] **Шаг 5: Собрать и запустить**
 
 ```bash
-cd client/web && npm run build
+cd client && npm run build
 cd ../.. && pipenv run python main.py
 ```
 
@@ -279,7 +278,7 @@ cd ../.. && pipenv run python main.py
 
 - [ ] **Шаг 6: Проверить, что граница слоёв сторожится**
 
-Записать в `client/web/src/components/Probe.svelte` строку
+Записать в `client/components/Probe.svelte` строку
 `import App from '../app/App.svelte'` и попробовать сохранить файл.
 
 Ожидание: **запись отклонена** — компонент не вправе знать про сборку.
@@ -292,10 +291,10 @@ cd ../.. && pipenv run python main.py
 - [ ] **Шаг 7: Коммит**
 
 ```bash
-git add client/web/package.json client/web/package-lock.json \
-        client/web/vite.config.js client/web/svelte.config.js \
-        client/web/index.html client/web/src/main.js \
-        client/web/src/app/App.svelte .gitignore
+git add client/package.json client/package-lock.json \
+        client/vite.config.js client/svelte.config.js \
+        client/index.html client/main.js \
+        client/app/App.svelte .gitignore
 git commit -m "feat: сборка страницы на Vite и Svelte, три слоя"
 ```
 
@@ -315,8 +314,8 @@ git commit -m "feat: сборка страницы на Vite и Svelte, три �
 `material-symbols` отдаёт именно переменный файл.
 
 **Файлы:**
-- Создать: `client/web/src/styles/palette.css`, `base.css`, `neon.css`
-- Изменить: `client/web/src/main.js`, `client/window.py`
+- Создать: `client/styles/palette.css`, `base.css`, `neon.css`
+- Изменить: `client/main.js`, `bridge/window.py`
 
 **Интерфейсы:**
 - Потребляет: значения из `docs/design/styles/tokens.css`, `base.css`,
@@ -328,7 +327,7 @@ git commit -m "feat: сборка страницы на Vite и Svelte, три �
 
 - [ ] **Шаг 1: Поставить шрифты**
 
-Из `client/web/`:
+Из `client/`:
 
 ```bash
 npm i @fontsource-variable/roboto@5.3.0 material-symbols@0.45.10
@@ -338,7 +337,7 @@ npm i @fontsource-variable/roboto@5.3.0 material-symbols@0.45.10
 
 - [ ] **Шаг 2: Перенести палитру**
 
-Создать `client/web/src/styles/palette.css`:
+Создать `client/styles/palette.css`:
 
 ```css
 /* Единственное место, где есть цвет. По месту пишется только var(). */
@@ -402,9 +401,9 @@ npm i @fontsource-variable/roboto@5.3.0 material-symbols@0.45.10
 
 - [ ] **Шаг 3: Перенести базу и кромку окна**
 
-Создать `client/web/src/styles/base.css`. Это `docs/design/styles/base.css` плюс
+Создать `client/styles/base.css`. Это `docs/design/styles/base.css` плюс
 кромка окна из инлайнового стиля (`index.html:23-56`), с одной правкой:
-`min-width` у `body` не ставим — минимум окна держит `client/window.py`.
+`min-width` у `body` не ставим — минимум окна держит `bridge/window.py`.
 
 ```css
 *, *::before, *::after { box-sizing: border-box }
@@ -521,7 +520,7 @@ body {
 
 - [ ] **Шаг 4: Перенести приём неоновой кромки**
 
-Создать `client/web/src/styles/neon.css` — перенос `docs/design/styles/neon.css`
+Создать `client/styles/neon.css` — перенос `docs/design/styles/neon.css`
 без правок:
 
 ```css
@@ -583,7 +582,7 @@ body {
 
 - [ ] **Шаг 5: Подключить**
 
-В `client/web/src/main.js` — импорты до монтирования. Порядок обязателен:
+В `client/main.js` — импорты до монтирования. Порядок обязателен:
 палитра первой, иначе `base.css` возьмёт неопределённые переменные.
 
 ```js
@@ -601,14 +600,14 @@ export default mount(App, { target: document.getElementById('root') })
 
 - [ ] **Шаг 6: Свести цвет окна с палитрой**
 
-В `client/window.py` цвет фона окна стоит литералом — это цвет до отрисовки
+В `bridge/window.py` цвет фона окна стоит литералом — это цвет до отрисовки
 страницы, и разъехавшись с `--bg`, он дал бы вспышку другого оттенка при каждом
 запуске. Поставить `#0a0a0a` и записать рядом, откуда значение.
 
 - [ ] **Шаг 7: Собрать и посмотреть**
 
 ```bash
-cd client/web && npm run build
+cd client && npm run build
 cd ../.. && pipenv run python main.py
 ```
 
@@ -621,8 +620,8 @@ cd ../.. && pipenv run python main.py
 - [ ] **Шаг 8: Коммит**
 
 ```bash
-git add client/web/src/styles/ client/web/src/main.js client/web/package.json \
-        client/web/package-lock.json client/window.py
+git add client/styles/ client/main.js client/package.json \
+        client/package-lock.json bridge/window.py
 git commit -m "feat: палитра, база и локальные шрифты из макета"
 ```
 
@@ -644,7 +643,7 @@ git commit -m "feat: палитра, база и локальные шрифты
 два кортежа.
 
 **Файлы:**
-- Создать: `client/web/src/state/filters.js`, `sorting.js`, `session.js`
+- Создать: `client/state/filters.js`, `sorting.js`, `session.js`
 - Создать: `tests/web/filters.test.js`, `sorting.test.js`, `session.test.js`
 
 **Интерфейсы:**
@@ -847,14 +846,14 @@ describe('состояние приложения', () => {
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
 ```bash
-cd client/web && npm test
+cd client && npm test
 ```
 
 Ожидание: FAIL, `Cannot find module '$state/filters.js'`.
 
 - [ ] **Шаг 3: Написать фильтры**
 
-Создать `client/web/src/state/filters.js`:
+Создать `client/state/filters.js`:
 
 ```js
 /** Три состояния строки фильтра: не выбран, включён, исключён. */
@@ -904,7 +903,7 @@ const without = (ids, id) => ids.filter((each) => each !== id)
 
 - [ ] **Шаг 4: Написать сортировку**
 
-Создать `client/web/src/state/sorting.js`:
+Создать `client/state/sorting.js`:
 
 ```js
 /** Восемь состояний переключателя: четыре критерия, каждый в две стороны. */
@@ -944,7 +943,7 @@ export function defaultOrder(section) {
 
 - [ ] **Шаг 5: Написать состояние**
 
-Создать `client/web/src/state/session.js`:
+Создать `client/state/session.js`:
 
 ```js
 /** Что выбрано в приложении и что чем сбрасывается. */
@@ -985,7 +984,7 @@ export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
 - [ ] **Шаг 6: Прогнать и увидеть зелёное**
 
 ```bash
-cd client/web && npm test
+cd client && npm test
 ```
 
 Ожидание: PASS, 21 тест.
@@ -993,7 +992,7 @@ cd client/web && npm test
 - [ ] **Шаг 7: Коммит**
 
 ```bash
-git add client/web/src/state/ tests/web/
+git add client/state/ tests/web/
 git commit -m "feat: состояние приложения — фильтры, сортировка, что чем сбрасывается"
 ```
 
@@ -1018,7 +1017,7 @@ git commit -m "feat: состояние приложения — фильтры,
 одно и то же, и разъехались бы они молча.
 
 **Файлы:**
-- Создать: `client/web/src/api/bridge.js`
+- Создать: `client/api/bridge.js`
 - Создать: `tests/web/bridge.test.js`
 
 **Интерфейсы:**
@@ -1166,14 +1165,14 @@ describe('обёртка моста', () => {
 - [ ] **Шаг 2: Прогнать и увидеть красное**
 
 ```bash
-cd client/web && npm test
+cd client && npm test
 ```
 
 Ожидание: FAIL, `Cannot find module '$api/bridge.js'`.
 
 - [ ] **Шаг 3: Написать обёртку**
 
-Создать `client/web/src/api/bridge.js`:
+Создать `client/api/bridge.js`:
 
 ```js
 /** Единственное место страницы, которое знает про `window.pywebview`. */
@@ -1256,7 +1255,7 @@ function tail(args) {
 - [ ] **Шаг 4: Прогнать и увидеть зелёное**
 
 ```bash
-cd client/web && npm test
+cd client && npm test
 ```
 
 Ожидание: PASS, 30 тестов — девять новых и двадцать один из задачи 3.
@@ -1264,7 +1263,7 @@ cd client/web && npm test
 - [ ] **Шаг 5: Коммит**
 
 ```bash
-git add client/web/src/api/ tests/web/bridge.test.js
+git add client/api/ tests/web/bridge.test.js
 git commit -m "feat: обёртка моста — номер, отмена, устаревший ответ"
 ```
 
@@ -1289,12 +1288,12 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 значение лежало бы в двух местах и могло разойтись.
 
 **Файлы:**
-- Создать: `client/web/src/components/Icon.svelte`, `SearchField.svelte`,
+- Создать: `client/components/Icon.svelte`, `SearchField.svelte`,
   `Segmented.svelte`, `ToolButton.svelte`
-- Создать: `client/web/src/styles/topbar.css`, `search.css`, `seg.css`,
+- Создать: `client/styles/topbar.css`, `search.css`, `seg.css`,
   `tools.css`
-- Создать: `client/web/src/app/Topbar.svelte`
-- Изменить: `client/web/src/app/App.svelte`, `client/web/src/main.js`
+- Создать: `client/app/Topbar.svelte`
+- Изменить: `client/app/App.svelte`, `client/main.js`
 
 **Интерфейсы:**
 - Потребляет: `SORT_STATES`, `nextSort` из `$state/sorting.js`; `isEmpty` из
@@ -1307,7 +1306,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 Четыре файла, значения из `docs/design/index.html:78-326` точь-в-точь.
 
-`client/web/src/styles/topbar.css`:
+`client/styles/topbar.css`:
 
 ```css
 /* Три зоны: переключатель держится центра окна независимо от того, насколько
@@ -1334,7 +1333,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 }
 ```
 
-`client/web/src/styles/search.css`:
+`client/styles/search.css`:
 
 ```css
 .search {
@@ -1417,7 +1416,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 }
 ```
 
-`client/web/src/styles/seg.css`:
+`client/styles/seg.css`:
 
 ```css
 /* Колонки в 1fr при авто-ширине контейнера выравниваются по самой широкой —
@@ -1465,7 +1464,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 }
 ```
 
-`client/web/src/styles/tools.css`:
+`client/styles/tools.css`:
 
 ```css
 /* Подложка та же, что у переключателя; кнопка 34px плюс отступы даёт ровно те
@@ -1549,7 +1548,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 - [ ] **Шаг 2: Написать компоненты**
 
-`client/web/src/components/Icon.svelte`:
+`client/components/Icon.svelte`:
 
 ```svelte
 <script>
@@ -1559,7 +1558,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 <span class="material-symbols-outlined {extra}" aria-hidden="true">{name}</span>
 ```
 
-`client/web/src/components/SearchField.svelte`:
+`client/components/SearchField.svelte`:
 
 ```svelte
 <script>
@@ -1590,7 +1589,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 Поиск идёт по Enter, а не на каждую букву: одна буква — это запрос к внешней
 базе, а их квоты конечны.
 
-`client/web/src/components/Segmented.svelte`:
+`client/components/Segmented.svelte`:
 
 ```svelte
 <script>
@@ -1611,7 +1610,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 </nav>
 ```
 
-`client/web/src/components/ToolButton.svelte`:
+`client/components/ToolButton.svelte`:
 
 ```svelte
 <script>
@@ -1635,7 +1634,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 - [ ] **Шаг 3: Собрать шапку**
 
-Создать `client/web/src/app/Topbar.svelte`:
+Создать `client/app/Topbar.svelte`:
 
 ```svelte
 <script>
@@ -1756,7 +1755,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 - [ ] **Шаг 4: Считать ширину зон замером**
 
-Дописать в `client/web/src/app/App.svelte` — измеряется переключатель, а не
+Дописать в `client/app/App.svelte` — измеряется переключатель, а не
 задаётся числом: его ширину определяет самая длинная подпись, то есть шрифт.
 
 ```svelte
@@ -1799,7 +1798,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 - [ ] **Шаг 5: Подключить стили**
 
-Дописать в `client/web/src/main.js` после базовых:
+Дописать в `client/main.js` после базовых:
 
 ```js
 import '$styles/topbar.css'
@@ -1811,7 +1810,7 @@ import '$styles/tools.css'
 - [ ] **Шаг 6: Собрать и посмотреть**
 
 ```bash
-cd client/web && npm run build
+cd client && npm run build
 cd ../.. && pipenv run python main.py
 ```
 
@@ -1829,8 +1828,8 @@ cd ../.. && pipenv run python main.py
 - [ ] **Шаг 7: Коммит**
 
 ```bash
-git add client/web/src/components/ client/web/src/styles/ \
-        client/web/src/app/ client/web/src/main.js
+git add client/components/ client/styles/ \
+        client/app/ client/main.js
 git commit -m "feat: шапка целиком — поиск, переключатель типа, девять кнопок"
 ```
 
@@ -1852,11 +1851,11 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 появляется, только когда база **не ответила**.
 
 **Файлы:**
-- Создать: `client/web/src/styles/view.css`, `snack.css`
-- Создать: `client/web/src/components/Snack.svelte`
-- Создать: `client/web/src/app/SearchScreen.svelte`, `RatedScreen.svelte`,
+- Создать: `client/styles/view.css`, `snack.css`
+- Создать: `client/components/Snack.svelte`
+- Создать: `client/app/SearchScreen.svelte`, `RatedScreen.svelte`,
   `WishScreen.svelte`, `StatsScreen.svelte`
-- Изменить: `client/web/src/app/App.svelte`, `client/web/src/main.js`
+- Изменить: `client/app/App.svelte`, `client/main.js`
 
 **Интерфейсы:**
 - Потребляет: `session` из задачи 3, `Failed` из `$api/bridge.js`.
@@ -1865,7 +1864,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
 - [ ] **Шаг 1: Перенести стили**
 
-`client/web/src/styles/view.css`:
+`client/styles/view.css`:
 
 ```css
 .view { display: none }
@@ -1885,7 +1884,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 }
 ```
 
-`client/web/src/styles/snack.css`:
+`client/styles/snack.css`:
 
 ```css
 /* Единственное место, где приложение что-то сообщает: и отказ источника, и
@@ -1917,7 +1916,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
 - [ ] **Шаг 2: Написать плашку**
 
-Создать `client/web/src/components/Snack.svelte`:
+Создать `client/components/Snack.svelte`:
 
 ```svelte
 <script>
@@ -1954,7 +1953,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 Все четыре пока пусты — их наполняют планы 7–9. Заводятся сейчас потому, что
 стопка и переход между разделами проверяются только на настоящих разделах.
 
-`client/web/src/app/SearchScreen.svelte`:
+`client/app/SearchScreen.svelte`:
 
 ```svelte
 <div class="feed"></div>
@@ -1969,7 +1968,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
 - [ ] **Шаг 4: Собрать стопку**
 
-Дописать `client/web/src/app/App.svelte`: раздел выбирается один, остальные не
+Дописать `client/app/App.svelte`: раздел выбирается один, остальные не
 рисуются вовсе.
 
 ```svelte
@@ -2034,7 +2033,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
 - [ ] **Шаг 5: Подключить стили**
 
-Дописать в `client/web/src/main.js`:
+Дописать в `client/main.js`:
 
 ```js
 import '$styles/view.css'
@@ -2044,7 +2043,7 @@ import '$styles/snack.css'
 - [ ] **Шаг 6: Собрать и посмотреть**
 
 ```bash
-cd client/web && npm run build
+cd client && npm run build
 cd ../.. && pipenv run python main.py
 ```
 
@@ -2062,13 +2061,13 @@ cd ../.. && pipenv run python main.py
 - [ ] **Шаг 7: Записать вторую цепочку выпуска**
 
 В `CLAUDE.md`, раздел «Окружение», дописать команды фронта рядом с питоновскими:
-сборка `npm run build` из `client/web`, прогон `npm test`. Без этого из чистого
+сборка `npm run build` из `client`, прогон `npm test`. Без этого из чистого
 клона рабочую страницу соберёт только тот, кто уже собирал.
 
 - [ ] **Шаг 8: Коммит**
 
 ```bash
-git add client/web/src/ CLAUDE.md
+git add client/ CLAUDE.md
 git commit -m "feat: четыре раздела стопкой, переход проявлением, плашка"
 ```
 
