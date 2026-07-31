@@ -95,8 +95,8 @@ personal_rating/
 
 **Интерфейсы:**
 - Потребляет: `Modal`, `Scrollarea` из плана 8.
-- Отдаёт: `FIELDS`, `emptyCard(kind)`, `shownFor(kind)`, `filled(card)`;
-  `Field` с входными `value`, `placeholder`, `variant`; `CardModal` с
+- Отдаёт: `emptyCard(kind)`, `shownFor(kind)`;
+  `Field` с входными `value`, `placeholder`, `variant`, `area`; `CardModal` с
   `view`, `kind`, `onsave`, `onclose`.
 
 - [ ] **Шаг 1: Написать падающий тест**
@@ -106,7 +106,7 @@ personal_rating/
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { emptyCard, filled, shownFor } from '$state/card.js'
+import { emptyCard, shownFor } from '$state/card.js'
 
 describe('форма карточки', () => {
   it('у фильма длительность, а сезонов нет', () => {
@@ -145,21 +145,6 @@ describe('форма карточки', () => {
     expect(card.genres).toEqual([])
   })
 
-  it('заполненным считается непустое, а не тронутое', () => {
-    // Внешнее доливает только пустое, и «пустое» здесь и определяется. Пробел
-    // — это пусто: иначе случайный Space занял бы поле навсегда.
-    expect(filled({ title: 'Одиссея' }, 'title')).toBe(true)
-    expect(filled({ title: '   ' }, 'title')).toBe(false)
-    expect(filled({ year: 0 }, 'year')).toBe(false)
-    expect(filled({ year: 1997 }, 'year')).toBe(true)
-  })
-
-  it('непустое — значит занятое целиком, в том числе у полей, которых много', () => {
-    // Вписал одного разработчика — состав не дополняется. Выбрал один жанр —
-    // то же самое.
-    expect(filled({ companies: [{ name: 'CD Projekt' }] }, 'companies')).toBe(true)
-    expect(filled({ companies: [] }, 'companies')).toBe(false)
-  })
 })
 ```
 
@@ -190,16 +175,18 @@ const OWN = {
   game: ['developer', 'publisher'],
 }
 
-export const FIELDS = COMMON
-
 export const shownFor = (kind) => [...COMMON, ...OWN[kind]]
 
+// Ключи те же, что в `COMMON` и `OWN`, и все сразу: поле, которого в форме нет,
+// Svelte не свяжет — `bind:value` на `undefined` молча ничего не делает.
 export const emptyCard = (kind) => ({
   kind,
   title: '',
   original_title: '',
   year: null,
   synopsis: '',
+  poster: null,
+  link: '',
   runtime: null,
   seasons_count: null,
   episodes_count: null,
@@ -207,17 +194,13 @@ export const emptyCard = (kind) => ({
   people: [],
   companies: [],
 })
-
-/** Заполненным считается непустое, а не тронутое: внешнее доливает только
- *  пустое, и граница проходит здесь. Пробел — это пусто, иначе случайный
- *  Space занял бы поле навсегда. */
-export function filled(card, field) {
-  const value = card[field]
-  if (Array.isArray(value)) return value.length > 0
-  if (typeof value === 'string') return value.trim().length > 0
-  return Boolean(value)
-}
 ```
+
+**`filled` и `FIELDS` здесь не заводятся.** Правило «внешнее доливает только
+пустое» целиком живёт в бэкенде — `merge_fields` в `service/linking.py`, — и
+странице применять его негде: она отдаёт форму как есть, а сливает мост. Второе
+объявление того же правила разошлось бы с первым молча. `FIELDS` был просто
+вторым именем для `COMMON`, и у него не было ни одного читателя.
 
 - [ ] **Шаг 4: Перенести поле ввода**
 
@@ -373,7 +356,10 @@ export function filled(card, field) {
   color: var(--primary);
 }
 
-.cardform__foot {
+/* Ряд кнопок один на все окна — и у карточки, и у подтверждения. Имя общее,
+   потому что и правило общее: у карточки он прижат книзу флексом, у
+   подтверждения стоит следом за вопросом. */
+.modalfoot {
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
@@ -381,8 +367,8 @@ export function filled(card, field) {
 }
 ```
 
-Правила `img` и `overflow` в макете нет по той же причине, что и в ленте: там
-нет ни одного `<img>`.
+Правило `img` обрезает залитый постер по рамке: приехавший из источника уже
+2:3, а выбранный руками какой угодно.
 
 Создать `client/styles/btn.css` — перенос `index.html:1162-1184`:
 
@@ -421,16 +407,18 @@ export function filled(card, field) {
 
 ```svelte
 <script>
-  let { value = $bindable(''), placeholder, variant = '', area = false,
-        label = placeholder } = $props()
+  // Подписи отдельной от подсказки у поля нет: в покое оно обозначает себя
+  // подсказкой, и второе имя было бы параметром без сегодняшнего потребителя.
+  let { value = $bindable(''), placeholder, variant = '', area = false }
+    = $props()
 </script>
 
 <label class="field {variant}">
   {#if area}
-    <textarea class="field__input" {placeholder} aria-label={label}
+    <textarea class="field__input" {placeholder} aria-label={placeholder}
               spellcheck="false" bind:value></textarea>
   {:else}
-    <input class="field__input" type="text" {placeholder} aria-label={label}
+    <input class="field__input" type="text" {placeholder} aria-label={placeholder}
            spellcheck="false" autocomplete="off" bind:value>
   {/if}
 </label>
@@ -497,7 +485,7 @@ export function filled(card, field) {
       </div>
     </div>
 
-    <div class="cardform__foot">
+    <div class="modalfoot">
       <Button variant="btn--cancel" onclick={onclose}>
         {#snippet children()}Отмена{/snippet}
       </Button>
@@ -529,7 +517,7 @@ cd client && npm test && npm run build
 cd .. && pipenv run python main.py
 ```
 
-Ожидание: PASS, 79 тестов. В окне: постер слева, поля справа, подчёркивание
+Ожидание: PASS, 80 тестов. В окне: постер слева, поля справа, подчёркивание
 только под фокусом, у фильма «Минуты», у сериала «Сезоны» и «Серии», у игры ни
 того ни другого.
 
@@ -746,7 +734,7 @@ git commit -m "feat: окно карточки — поля по типу сод
 <div class="cardform__pick">
   <div class="picker">
     <Field bind:value={text} placeholder={label} />
-    <svelte:element this="ul" class="picker__hits" hidden={!hits.length}>
+    <ul class="picker__hits" hidden={!hits.length}>
       {#each hits as hit, index (hit.entity_id)}
         <li>
           <!-- На mousedown, а не на click: поле теряет фокус раньше, чем клик
@@ -757,7 +745,7 @@ git commit -m "feat: окно карточки — поля по типу сод
           </button>
         </li>
       {/each}
-    </svelte:element>
+    </ul>
   </div>
 
   <ul class="picker__chosen">
@@ -919,7 +907,8 @@ git commit -m "feat: поле с подсказкой и жест различе
 - Изменить: `client/app/CardModal.svelte`
 
 **Интерфейсы:**
-- Потребляет: `call` из `$api/bridge.js`.
+- Потребляет: `Icon`. За мостом ходит сборка: постер уезжает вместе с карточкой,
+  а компонент только показывает выбранное.
 - Отдаёт: `PosterPick` с входными `item_id`, `onpicked`.
 
 - [ ] **Шаг 1: Написать выбор постера**
@@ -1554,6 +1543,6 @@ git commit -m "feat: удаление карточки с подтвержден
 Первое и второе собраны из готовых частей — узкая модалка и подвал с двумя
 кнопками — как заглушка до решения; третье оставлено пустым обработчиком.
 
-**Чем измеряется готовность.** `npm test` зелёный, 79 тестов. Карточку можно
+**Чем измеряется готовность.** `npm test` зелёный, 80 тестов. Карточку можно
 завести, оценить, привязать и удалить **без интернета** — то есть выполнена
 главная граница проекта: без сети нельзя найти готовое, всё остальное работает.

@@ -52,6 +52,7 @@ personal_rating/
 │  │  └─ chart.css               гистограмма и сноска
 │  ├─ state/
 │  │  ├─ scroll.js               арифметика своей полосы прокрутки
+│  │  ├─ tags.js                 заведение тега с общим отказом
 │  │  └─ histogram.js            доли столбцов гистограммы
 │  ├─ components/
 │  │  ├─ Modal.svelte            оболочка любого наложения
@@ -348,6 +349,10 @@ export const scaleOf = (visible, total) => total / visible
 
 <svelte:window onkeydown={escaped} />
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- Затемнение — не кнопка: клавиатуре тут делать нечего, окно закрывает
+     Escape. Предупреждения сняты адресно, а не настройкой на весь проект. -->
 <div class="overlay" onclick={outside}>
   <div class="modal" class:modal--narrow={narrow} class:modal--ask={ask}
        class:modal--danger={danger} role="dialog" aria-modal="true"
@@ -520,6 +525,8 @@ git commit -m "feat: оболочка модалки и своя полоса п
   background: var(--text-bright);
 }
 
+/* Класс вешает перетаскивание — то самое, что двигает строку: ставит его
+   обработчик `ongrab`, а не входной параметр компонента. */
 .tagrow.is-dragging { opacity: .55 }
 .tagrow.is-dragging .taggrip { cursor: grabbing }
 
@@ -721,11 +728,11 @@ git commit -m "feat: оболочка модалки и своя полоса п
   import Icon from '$components/Icon.svelte'
   import TagBox from '$components/TagBox.svelte'
 
-  let { name, state = 'off', ontoggle, ondelete = null, ongrab = null,
-        dragging = false } = $props()
+  let { name, state = 'off', ontoggle, ondelete = null, ongrab = null }
+    = $props()
 </script>
 
-<li class="tagrow" class:is-dragging={dragging}>
+<li class="tagrow">
   {#if ongrab}
     <!-- Порядок хранит база: `tags.reorder` пишет `position`, и он переживает
          перезапуск. -->
@@ -849,7 +856,8 @@ git commit -m "feat: строка списка с тремя состояния�
 
 **Интерфейсы:**
 - Потребляет: `cycled`, `isEmpty`, `cleared` из `$state/filters.js`; `plural`
-  из `$state/facts.js`; `Confirm` из плана 9; `Modal`,
+  из `$state/facts.js`; `created` из `$state/tags.js`; `Confirm` из плана 9;
+  `Modal`,
   `Scrollarea`, `TagRow`, `ScoreRow`; `call` из `$api/bridge.js`.
 - Отдаёт: `FiltersModal` с входными `field`, `kind`, `filters`, `onfilters`,
   `onclose`.
@@ -997,7 +1005,9 @@ git commit -m "feat: три модалки фильтров с трёхпози�
 **Интерфейсы:**
 - Потребляет: `Modal`, `Scrollarea`, `TagRow`, `NewTag`; `call` из
   `$api/bridge.js`.
-- Отдаёт: `CardTagsModal` с входными `view`, `onview`, `onclose`.
+- Отдаёт: `created(kind, name, ontrouble)` из `$state/tags.js`; `CardTagsModal`
+  с входными `view`, `onview`, `onclose`, `ontrouble` — без последнего он падает
+  на занятом имени тега.
 
 - [ ] **Шаг 1: Написать модалку тегов карточки**
 
@@ -1030,16 +1040,10 @@ git commit -m "feat: три модалки фильтров с трёхпози�
     onview({ tags: rows.filter((row) => next.has(row.id)) })
   }
 
-  async function create(name) {
-    try {
-      const id = await call('marks.create_tag', view.kind, name)
-      rows = [...rows, { id, name }]
-    } catch (error) {
-      // Занятое имя — нормальный ход событий, а не сбой.
-      ontrouble(error.kind === 'tag-exists' ? 'Такой тег уже есть'
-                                            : 'Не удалось завести тег')
-    }
-  }
+  const create = (name) =>
+    created(view.kind, name, ontrouble).then((row) => {
+      if (row) rows = [...rows, row]
+    })
 </script>
 
 <Modal label="Теги фильма" {onclose}>
@@ -1058,6 +1062,30 @@ git commit -m "feat: три модалки фильтров с трёхпози�
   {/snippet}
 </Modal>
 ```
+
+**Заведение тега — одно на обе модалки.** Вынесено в `client/state/tags.js`:
+
+```js
+import { call } from '$api/bridge.js'
+
+/** Новый тег или `null`, если завести не вышло.
+ *
+ *  Отказ обрабатывается здесь, а не у каждого вызывающего: занятое имя — это
+ *  нормальный ход событий, и сказать про него надо одинаково в обоих местах. */
+export async function created(kind, name, ontrouble) {
+  try {
+    const id = await call('marks.create_tag', kind, name)
+    return { id, name }
+  } catch (error) {
+    ontrouble(error.kind === 'tag-exists' ? 'Такой тег уже есть'
+                                          : 'Не удалось завести тег')
+    return null
+  }
+}
+```
+
+Слой `state/` тут не нарушается: это не разметка и не сборка, а обычная функция
+над обычными данными — та же, что `passes` или `lost`.
 
 - [ ] **Шаг 2: Дописать правку набора в модалку фильтра по тегам**
 
@@ -1083,10 +1111,10 @@ git commit -m "feat: три модалки фильтров с трёхпози�
     asking = null
   }
 
-  async function create(name) {
-    const id = await call('marks.create_tag', kind, name)
-    rows = [...rows, { id, name }]
-  }
+  // Тот же `created`, что и у модалки тегов карточки: заведение одно на обе, и
+  // отказ у него один — занятое имя это нормальный ход событий.
+  const create = (name) =>
+    created(kind, name, ontrouble).then((row) => { if (row) rows = [...rows, row] })
 
   // Порядок хранит база: без вызова перестановка живёт до перезапуска.
   async function reorder(from, to) {
@@ -1376,7 +1404,7 @@ export function heightsOf(buckets) {
   import Bar from '$components/Bar.svelte'
   import { cancel, numbered } from '$api/bridge.js'
   import { heightsOf } from '$state/histogram.js'
-  import { requestOf } from './section.js'
+  import { requestOf } from '$state/section.js'
 
   let { session, ontrouble } = $props()
 
@@ -1421,21 +1449,29 @@ export function heightsOf(buckets) {
 
 - [ ] **Шаг 6: Завести отрастание при каждом заходе**
 
-Класс `is-drawing` вешается на `.view` при входе в раздел и снимается после
-анимации: держать его состоянием нельзя — тогда столбцы вырастут один раз за всё
-время работы. В `App.svelte`, там же, где выбирается экран:
+Класс отрастания вешается на каждый заход и снимается после анимации: держать
+его состоянием нельзя — тогда столбцы вырастут один раз за всё время работы.
+
+**Приём тот же, что у столбиков иконки статистики в шапке**, и второй раз он не
+переписывается: `redrawn` из `$state/redraw.js` заведён планом 6 у своего первого
+потребителя.
+
+Класс на `.view` вешает `App.svelte`, там же, где выбирается экран:
 
 ```svelte
   let drawing = $state(false)
 
   $effect(() => {
     if (session.section !== 'stats') return
-    drawing = false
-    requestAnimationFrame(() => { drawing = true })
+    redrawn((on) => { drawing = on })
   })
 
   <section class="view is-shown" class:is-drawing={drawing}>
 ```
+
+**Имя класса общее с шапкой, и это не столкновение.** `.is-drawing` там стоит на
+`.tools`, здесь на `.view`, и оба правила отбирают по родителю: `.is-drawing
+.tools__chart rect` против `.view.is-drawing .bar__fill`.
 
 - [ ] **Шаг 7: Прогнать и посмотреть**
 
@@ -1444,7 +1480,7 @@ cd client && npm test && npm run build
 cd .. && pipenv run python main.py
 ```
 
-Ожидание: PASS, 69 тестов. В окне: десять столбцов, цвет по шкале, число над
+Ожидание: PASS, 72 теста. В окне: десять столбцов, цвет по шкале, число над
 верхушкой своего столбца, подпись оценки под ним; при заходе на раздел столбцы
 отрастают из пола с задержкой; фильтр сужает и гистограмму тоже; уход и возврат
 проигрывают анимацию заново.
@@ -1476,6 +1512,6 @@ git commit -m "feat: гистограмма оценок по отфильтро
 **Открытых вопросов не осталось:** слова в подвале статистики согласованы
 31.07.2026.
 
-**Чем измеряется готовность.** `npm test` зелёный, 69 тестов. Фильтры сужают и
+**Чем измеряется готовность.** `npm test` зелёный, 72 теста. Фильтры сужают и
 ленту, и гистограмму; теги вешаются на карточку и переживают перезапуск вместе
 со своим порядком.

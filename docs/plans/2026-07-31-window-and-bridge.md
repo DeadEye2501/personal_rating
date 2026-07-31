@@ -1216,8 +1216,8 @@ import logging
 import re
 
 from backend.model import Denied
-from bridge.wire import to_wire
 from bridge.thread import DEADLINE, Closed
+from bridge.wire import to_wire
 
 logger = logging.getLogger(__name__)
 
@@ -3125,7 +3125,7 @@ git commit -m "feat: мост собран целиком, со сторожем
 **Обложка мимо моста.** Результат вызова pywebview вклеивает в текст скрипта:
 на каждый постер это сериализация, экранирование, склейка исходника и разбор
 движком. Через `<img src="/poster?item=12">` браузер берёт картинку сам,
-кеширует по `ETag` и **сам же обрывает запрос**, когда карточка ушла из
+кеширует по `Cache-Control` и **сам же обрывает запрос**, когда карточка ушла из
 разметки, — та самая отмена начатой загрузки, только без единой строки на
 стороне страницы.
 
@@ -3297,8 +3297,8 @@ def test_a_cover_asked_without_anything_is_refused(tmp_path, spy, asked):
 
 Своё, а не файловый сервер pywebview, по трём замеренным причинам: корень `/` у
 него отвечает `500`, `.woff2` уезжает как `text/html`, а ручки обложки нет
-вовсе. Сам сервер при этом его — окну отдаётся WSGI-приложение, и он поднимает
-именно нас."""
+вовсе. Сам сервер при этом поднимает pywebview: окну отдаётся WSGI-приложение,
+и оно оказывается нашим."""
 
 import logging
 from datetime import datetime
@@ -3321,13 +3321,11 @@ TYPES = {
     ".html": "text/html; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
     ".css": "text/css; charset=utf-8",
-    ".json": "application/json; charset=utf-8",
     ".svg": "image/svg+xml",
     ".woff2": "font/woff2",
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".webp": "image/webp",
-    ".ico": "image/x-icon",
 }
 
 # Тип картинки берётся из первых байтов: хранилище держит только байты, а
@@ -3380,7 +3378,12 @@ class Page:
             # Не приехала, отказал источник, пустые байты — на месте обложки
             # заглушка, и делает её `onerror` у картинки.
             return _answer(start_response, "404 Not Found", "text/plain", b"")
-        return _answer(start_response, "200 OK", _looks_like(picture), picture)
+        # Обложка не меняется, пока карточку не перезалили, а прокрутка ленты
+        # спрашивает одну и ту же по многу раз. Без этого каждая перерисовка
+        # тащила бы все постеры заново — по потоку моста и чтению второго файла
+        # базы на карточку.
+        return _answer(start_response, "200 OK", _looks_like(picture), picture,
+                       cache="max-age=86400")
 
 
 async def _fetched(back, item, source, url):
@@ -3409,20 +3412,20 @@ def _single(query: dict, name: str) -> str | None:
     return values[0] if values else None
 
 
-def _answer(start_response, status: str, kind: str, body: bytes):
-    start_response(status, [("Content-Type", kind),
-                            ("Content-Length", str(len(body)))])
+def _answer(start_response, status: str, kind: str, body: bytes,
+            cache: str | None = None):
+    headers = [("Content-Type", kind), ("Content-Length", str(len(body)))]
+    if cache:
+        headers.append(("Cache-Control", cache))
+    start_response(status, headers)
     return [body]
 ```
 
-`_file` разворачивает путь дважды (`wanted`, потом `resolved`) — лишнее;
-оставить одно разрешение и одну проверку.
-
 - [ ] **Шаг 4: Закрыть сборку фронта от git**
 
-Дописать в `.gitignore` строку `client/dist/` рядом с уже существующим
-`dist/`, если тот не покрывает вложенный путь, и убедиться, что `*.spec` не
-помешает плану 10 (файл сборки PyInstaller туда попадает).
+Проверить `.gitignore`: строка `dist/` там уже есть и закрывает `client/dist`
+на любой глубине — дописывать нечего. Убедиться заодно, что `*.spec` не
+помешает плану 10: файл сборки PyInstaller туда попадает.
 
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
@@ -3519,6 +3522,11 @@ RENDERER = "edgechromium"
 MIN_WIDTH = 900
 MIN_HEIGHT = 600
 
+# Стартовый размер задан явно: умолчание `create_window` — 800×600, то есть
+# меньше собственного минимума, и окно открывалось бы уже подтянутым.
+WIDTH = 1280
+HEIGHT = 820
+
 
 def supported(renderer: str | None) -> bool:
     return renderer == RENDERER
@@ -3530,6 +3538,8 @@ def open_window(thread, debug: bool = False) -> None:
         TITLE,
         url=Page(thread),
         js_api=Api(thread),
+        width=WIDTH,
+        height=HEIGHT,
         min_size=(MIN_WIDTH, MIN_HEIGHT),
         background_color="#0d0d0d",
     )
@@ -3599,7 +3609,8 @@ def main() -> None:
 
     # Сборка уезжает функцией: бэкенд обязан родиться внутри чужого потока —
     # движок SQLAlchemy привязан к циклу, в котором создан, — а импортировать
-    # `backend.app` из `client/` нельзя, там сторож границы слоёв.
+    # `backend.app` из `bridge/` нельзя: там стоит сторож границы слоёв, и с
+    # ним приехали бы и SQLAlchemy, и httpx в поток интерфейса.
     thread = BackendThread(lambda: build_backend(config))
     thread.start()
     open_window(thread, debug=bool(os.environ.get("PR_DEBUG")))

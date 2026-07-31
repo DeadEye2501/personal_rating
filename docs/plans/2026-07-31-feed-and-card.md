@@ -72,9 +72,9 @@ personal_rating/
 │  ├─ state/
 │  │  ├─ scores.js               нотация оценок: ярлык, ступень, среднее, шкалы источников
 │  │  ├─ facts.js                строки фактов: длительность, сезоны, состав
-│  │  └─ pages.js                адрес страницы источника по его идентификатору
+│  │  ├─ pages.js                адрес страницы источника по его идентификатору
+│  │  └─ section.js              запрос раздела из состояния
 │  └─ app/
-│     ├─ section.js              запрос раздела из состояния
 │     ├─ visible.js              что делать с карточкой в поле зрения
 │     ├─ SearchScreen.svelte     поиск: своё, чужое, заведение
 │     └─ LibraryScreen.svelte    оценённые и хочу посмотреть
@@ -86,9 +86,11 @@ personal_rating/
 Правятся и чужие файлы: `client/app/App.svelte` (запрос от шапки к разделу,
 плашка снизу вверх), `client/main.js` (новые файлы оформления).
 
-**`app/visible.js` и `app/section.js` лежат в сборке, а не в состоянии.** Первый
-зовёт мост, второй собирает запрос из фильтров и сортировки — оба знают про
-границу, а `state/` о ней не знает вовсе.
+**`app/visible.js` лежит в сборке, а не в состоянии:** он зовёт мост, а `state/`
+про границу не знает вовсе. **`state/section.js` — наоборот в состоянии:** он
+складывает запрос из фильтров и сортировки и ничего никуда не отправляет, то есть
+проверяется обычными тестами. Граница между двумя папками проходит по этому: не
+«про что модуль», а «ходит ли он куда-нибудь».
 
 ---
 
@@ -435,7 +437,7 @@ export function plural(count, forms) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 62 теста — двадцать новых и сорок два из плана 6.
+Ожидание: PASS, 65 тестов — двадцать три новых и сорок два из плана 6.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -458,7 +460,7 @@ git commit -m "feat: нотация оценок и строки фактов к
 стрелки.
 
 **Обложка едет своей ручкой, а не мостом.** `<img src="/poster?item=12">` —
-браузер берёт её сам, кеширует по `ETag` и обрывает запрос, когда карточка ушла
+браузер берёт её сам, кеширует по `Cache-Control` и обрывает запрос, когда карточка ушла
 из разметки. Заглушка появляется по `onerror`.
 
 **Файлы:**
@@ -590,8 +592,8 @@ git commit -m "feat: нотация оценок и строки фактов к
 }
 .film__poster .material-symbols-outlined { font-size: 38px }
 
-/* Картинка ложится поверх подложки-заглушки. В макете этих двух правил нет,
-   потому что там нет ни одного <img>: постеры нарисованы пустыми блоками. */
+/* Картинка ложится поверх подложки-заглушки и обрезается по её рамке: постер
+   приходит 2:3, но у ручной карточки он какой залили. */
 .film__poster img { width: 100%; height: 100%; object-fit: cover }
 
 .film__body {
@@ -887,7 +889,8 @@ git commit -m "feat: нотация оценок и строки фактов к
 <script>
   import { onMount } from 'svelte'
 
-  // Сколько строк показывать до раскрытия. Значение из макета.
+  // Сколько строк синопсиса видно до раскрытия: три помещаются рядом с
+  // постером, четвёртая уже уводит карточку вниз.
   const LINES = 3
 
   let { text = '' } = $props()
@@ -1866,7 +1869,7 @@ git commit -m "feat: поиск — своё сразу, внешнее по г�
 **Порция — 50.** Лента читается с диска и стоит дёшево.
 
 **Файлы:**
-- Создать: `client/app/section.js`
+- Создать: `client/state/section.js`, `tests/web/section.test.js`
 - Изменить: `client/app/LibraryScreen.svelte`
 
 **Интерфейсы:**
@@ -1877,7 +1880,46 @@ git commit -m "feat: поиск — своё сразу, внешнее по г�
 
 - [ ] **Шаг 1: Собрать запрос из состояния**
 
-Создать `client/app/section.js`:
+Создать `tests/web/section.test.js`:
+
+```js
+import { describe, expect, it } from 'vitest'
+
+import { EMPTY, cycled } from '$state/filters.js'
+import { requestOf } from '$state/section.js'
+import { newSession } from '$state/session.js'
+
+describe('запрос раздела', () => {
+  it('несёт раздел и тип содержимого', () => {
+    const asked = requestOf({ ...newSession(), section: 'wishlist',
+                              kind: 'game' })
+
+    expect(asked.section).toBe('wishlist')
+    expect(asked.kind).toBe('game')
+  })
+
+  it('раскладывает фильтры так, как их ждёт мост', () => {
+    // Шесть кортежей, и имена полей — контракт: мост кладёт их прямо в
+    // `Filters`, а не разбирает по-своему.
+    const session = { ...newSession(), filters: cycled(EMPTY, 'tags', 3) }
+
+    expect(requestOf(session).filters.tag_ids).toEqual([3])
+  })
+
+  it('нетронутый переключатель — первое состояние своего набора', () => {
+    // В отложенном свежие сверху, в оценённых высокие: наборы разные, и
+    // позиция 0 означает в них разное.
+    const wished = requestOf({ ...newSession(), section: 'wishlist' })
+    const rated = requestOf({ ...newSession(), section: 'rated' })
+
+    expect(wished.order.key).toBe('added_at')
+    expect(rated.order.key).toBe('score')
+  })
+})
+```
+
+Создать `client/state/section.js` — **в `state/`, а не в `app/`**: это обычная
+функция над обычными данными, и оставленная в сборке она не проверялась бы вовсе.
 
 ```js
 /** Запрос раздела: то, что уезжает мостом в `feed.page` и `feed.histogram`. */
@@ -1908,7 +1950,7 @@ export function requestOf(session) {
 <script>
   import Feed from '$components/Feed.svelte'
   import { call, cancel, numbered } from '$api/bridge.js'
-  import { requestOf } from './section.js'
+  import { requestOf } from '$state/section.js'
   import { onCardShown } from './visible.js'
 
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
@@ -2032,6 +2074,6 @@ git commit -m "feat: разделы «Оценённые» и «Хочу пос�
 `IntersectionObserver`. Оба удовлетворяют требованию; выбор записывается доводом
 в код.
 
-**Чем измеряется готовность.** `npm test` зелёный, 62 теста. Найденное в
+**Чем измеряется готовность.** `npm test` зелёный, 65 тестов. Найденное в
 интернете заводится в библиотеку, оценивается звёздами и остаётся в разделах
 после перезапуска.

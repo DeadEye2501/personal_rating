@@ -89,7 +89,8 @@ personal_rating/
 │  ├─ state/
 │  │  ├─ filters.js              три состояния строки фильтра
 │  │  ├─ sorting.js              восемь состояний переключателя
-│  │  └─ session.js              что выбрано в приложении
+│  │  ├─ session.js              что выбрано в приложении
+│  │  └─ redraw.js               перезапуск анимации при каждом заходе
 │  ├─ api/
 │  │  └─ bridge.js               обёртка над мостом
 │  └─ app/
@@ -100,7 +101,7 @@ personal_rating/
 │     └─ StatsScreen.svelte      раздел «Статистика»
 └─ tests/web/
    ├─ filters.test.js            три состояния и складывание
-   ├─ sorting.test.js            перебор восьми состояний
+   ├─ sorting.test.js            перебор состояний: свой набор у раздела
    ├─ session.test.js            что чем сбрасывается
    └─ bridge.test.js             номер, отмена, устаревший ответ
 ```
@@ -187,7 +188,9 @@ npm i -D vite@8.2.0 svelte@5.56.8 @sveltejs/vite-plugin-svelte@7.2.0 vitest@4.1.
 ```js
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
+// Из `vitest/config`, а не из `vite`: ключ `test` витестовый, и у чужого
+// `defineConfig` он проходит лишь потому, что Vite не выбрасывает незнакомое.
+import { defineConfig } from 'vitest/config'
 
 const here = (path) => fileURLToPath(new URL(path, import.meta.url))
 
@@ -214,7 +217,15 @@ export default defineConfig({
   // Проверяются `state/` и `api/` — обычные модули без разметки. Поддельный
   // браузер тут не нужен вовсе, а стоил бы ещё одной зависимости и секунд на
   // каждом прогоне.
-  test: { include: ['../tests/web/**/*.test.js'], environment: 'node' },
+  //
+  // Тесты лежат выше корня Vite (`client/`), поэтому корень прогона поднимается
+  // на уровень: иначе разрешение путей и `server.fs.allow` ведут себя не так,
+  // как для файлов внутри корня.
+  test: {
+    root: '..',
+    include: ['tests/web/**/*.test.js'],
+    environment: 'node',
+  },
 })
 ```
 
@@ -303,7 +314,7 @@ node_modules/
 
 ```bash
 cd client && npm run build
-cd ../.. && pipenv run python main.py
+cd .. && pipenv run python main.py
 ```
 
 Ожидание: окно открывается, в нём «мост на месте».
@@ -313,8 +324,10 @@ cd ../.. && pipenv run python main.py
 Записать в `client/components/Probe.svelte` строку
 `import { call } from '$api/bridge.js'` и попробовать сохранить файл.
 
-Ожидание: **запись отклонена** — компоненту `api/` закрыт: поход через мост это
-уже не показ переданного.
+Ожидание: **хук отвечает отказом** — компоненту `api/` закрыт: поход через мост
+это уже не показ переданного. Отказ приходит **после** записи: проверка висит
+на `PostToolUse`, файл к этому моменту на диске. Так и задумано — важен отказ,
+а не то, что файла не появилось.
 
 **Псевдонимом, а не относительным путём, и это существенно.** Весь код фронта
 пишется на `$`-путях, а хук разбирает их только по объявленным псевдонимам.
@@ -683,6 +696,8 @@ body {
 
 ```js
 import '@fontsource-variable/roboto'
+// Путь проверить сразу после установки: в метаданных пакета 0.45.10 указан
+// только `index.css`, а `outlined.css` лежит в тарболе исторически.
 import 'material-symbols/outlined.css'
 import { mount } from 'svelte'
 
@@ -704,7 +719,7 @@ export default mount(App, { target: document.getElementById('root') })
 
 ```bash
 cd client && npm run build
-cd ../.. && pipenv run python main.py
+cd .. && pipenv run python main.py
 ```
 
 Ожидание: фон почти чёрный, по верхней кромке окна — салатовая нить со
@@ -748,7 +763,7 @@ git commit -m "feat: палитра, база и локальные шрифты
   `chosen(filters)`, `isEmpty(filters, field?)`, `cleared(filters, field)`,
   `passes(view, filters)`;
   `SORT_STATES`, `ADDED_AT`, `cycleOf(section)`,
-  `nextSort(section, position)`, `stateAt(section, position)`, `orderOf(index)`,
+  `nextSort(section, position)`, `stateAt(section, position)`,
   `orderFor(section, position)`; `newSession()`,
   `withKind(session, kind)`, `withSection(session, section)`,
   `withCollapsed(session, collapsed)`.
@@ -917,7 +932,7 @@ describe('метка на карточке', () => {
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { ADDED_AT, SORT_STATES, cycleOf, nextSort, orderFor, orderOf, stateAt }
+import { ADDED_AT, SORT_STATES, cycleOf, nextSort, orderFor, stateAt }
   from '$state/sorting.js'
 
 const keysOf = (section) =>
@@ -1173,7 +1188,8 @@ const without = (ids, id) => ids.filter((each) => each !== id)
 Создать `client/state/sorting.js`:
 
 ```js
-/** Восемь состояний переключателя: четыре критерия, каждый в две стороны. */
+/** Все состояния переключателя: критерий и сторона. Набор у раздела свой —
+ *  в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`. */
 
 // Есть только в переборе «Хочу посмотреть»: в «Оценённых» девятое состояние
 // понадобилось бы ровно одному разделу.
@@ -1217,8 +1233,9 @@ export const nextSort = (section, position) =>
 export const stateAt = (section, position) =>
   SORT_STATES[cycleOf(section)[position]]
 
-/** То, что уезжает мосту полем `order`. */
-export function orderOf(index) {
+/** То, что уезжает мосту полем `order`. Не открыт наружу: зовёт его один
+ *  `orderFor`, а второго потребителя нет. */
+function orderOf(index) {
   const state = SORT_STATES[index]
   return { key: state.key, descending: state.down }
 }
@@ -1239,8 +1256,6 @@ export function orderFor(section, position) {
 /** Что выбрано в приложении и что чем сбрасывается. */
 
 import { EMPTY } from '$state/filters.js'
-
-export const SECTIONS = ['search', 'rated', 'wishlist', 'stats']
 
 /** При запуске карточек нет: приложение открывается на поиске. */
 export const newSession = () => ({
@@ -1626,6 +1641,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   `Segmented.svelte`, `ToolButton.svelte`
 - Создать: `client/styles/topbar.css`, `search.css`, `seg.css`,
   `tools.css`
+- Создать: `client/state/redraw.js`
 - Создать: `client/app/Topbar.svelte`
 - Изменить: `client/app/App.svelte`, `client/main.js`
 
@@ -1975,6 +1991,22 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 - [ ] **Шаг 3: Собрать шапку**
 
+Создать `client/state/redraw.js`:
+
+```js
+/** Перезапуск анимации: снять признак и вернуть его следующим кадром.
+ *
+ *  Без кадра между снятием и возвратом браузер смены не увидит вовсе — он
+ *  сличает состояние на конец задачи, и анимация не перезапустится.
+ *
+ *  Вынесено сразу, потому что второй потребитель известен и близок: тем же
+ *  приёмом отрастает гистограмма в плане 8. */
+export function redrawn(set) {
+  set(false)
+  requestAnimationFrame(() => set(true))
+}
+```
+
 Создать `client/app/Topbar.svelte`:
 
 ```svelte
@@ -1983,6 +2015,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   import Segmented from '$components/Segmented.svelte'
   import ToolButton from '$components/ToolButton.svelte'
   import { isEmpty, marked } from '$state/filters.js'
+  import { redrawn } from '$state/redraw.js'
   import { withCollapsed, withKind, withSection } from '$state/session.js'
   import { nextSort, stateAt } from '$state/sorting.js'
 
@@ -2038,6 +2071,10 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
   let drawing = $state(false)
 
+  // Разделы, где сортировка действует: обе половины библиотеки. У поиска
+  // порядок задан склейкой, у статистики сортировать нечего.
+  const sorted = new Set(['rated', 'wishlist'])
+
   // Вид кнопки — из состояния своего раздела: позиция 0 в отложенном и в
   // оценённых означает разное.
   const sort = $derived(stateAt(session.section, session.sort ?? 0))
@@ -2056,9 +2093,9 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
   function chooseStats() {
     // Класс вешается на каждый заход, а не держится состоянием: иначе
-    // столбики иконки отрастут один раз за всё время работы.
-    drawing = false
-    requestAnimationFrame(() => { drawing = true })
+    // столбики иконки отрастут один раз за всё время работы. Тем же приёмом
+    // отрастает гистограмма в плане 8, и общее у них — `redrawn`.
+    redrawn((on) => { drawing = on })
     chooseView('stats')
   }
 </script>
@@ -2104,12 +2141,17 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
                 active={session.collapsed} pressed={session.collapsed}
                 onclick={() => onsession(withCollapsed(session, !session.collapsed))} />
 
-    <ToolButton icon={sort.icon} dir={sort.dir}
-                label={'Сортировка: ' + sort.label.toLowerCase()}
-                onclick={() => onsession({
-                  ...session,
-                  sort: nextSort(session.section, session.sort ?? 0),
-                })} />
+    <!-- Только там, где сортировка действует. В поиске порядок задан склейкой
+         двух половин, в статистике сортировать нечего — кнопка, которая
+         перебирает восемь состояний и не меняет ничего, обманывает. -->
+    {#if sorted.has(session.section)}
+      <ToolButton icon={sort.icon} dir={sort.dir}
+                  label={'Сортировка: ' + sort.label.toLowerCase()}
+                  onclick={() => onsession({
+                    ...session,
+                    sort: nextSort(session.section, session.sort ?? 0),
+                  })} />
+    {/if}
 
     <ToolButton icon="add" label="Завести карточку" onclick={onadd} />
   </div>
@@ -2170,7 +2212,7 @@ import '$styles/tools.css'
 
 ```bash
 cd client && npm run build
-cd ../.. && pipenv run python main.py
+cd .. && pipenv run python main.py
 ```
 
 Сверить с макетом (`docs/design/index.html` открыть в браузере рядом):
@@ -2181,7 +2223,8 @@ cd ../.. && pipenv run python main.py
 - переключение типа перекрашивает акцент **перетеканием**, а не скачком:
   салатовый → синий → жёлтый;
 - включённая кнопка показывает закрашенную иконку, выключенная — контурную;
-- щелчок по сортировке меняет и глиф, и стрелку, по кругу из восьми;
+- щелчок по сортировке меняет и глиф, и стрелку, по кругу своего раздела —
+  восемь состояний в «Оценённых», четыре в «Хочу посмотреть»;
 - заход на статистику отращивает три столбика иконки.
 
 - [ ] **Шаг 7: Коммит**
@@ -2279,8 +2322,8 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
 ```svelte
 <script>
-  // Сколько держится сообщение. Значение из макета: плашка выезжает, держится
-  // несколько секунд и уходит.
+  // Сколько держится сообщение: хватает прочесть фразу и не хватает, чтобы
+  // она начала мешать.
   const LINGER = 4000
 
   let { text = '' } = $props()
@@ -2402,7 +2445,7 @@ import '$styles/snack.css'
 
 ```bash
 cd client && npm run build
-cd ../.. && pipenv run python main.py
+cd .. && pipenv run python main.py
 ```
 
 Ожидание:
