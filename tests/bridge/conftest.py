@@ -144,16 +144,31 @@ def asked():
 
 @pytest.fixture
 def spy(asked):
-    """Поток на записывающем двойнике: имена вызовов и доводы."""
+    """Поток на записывающем двойнике: имена вызовов, доводы и номера заявок."""
     answers, log = asked
-    yield from _running(Asked(answers, log))
+    yield from _running(Watched(lambda: ready(Asked(answers, log))))
 
 
-def _running(double):
-    """Поток на готовом двойнике. Закрывается всегда — иначе повисший поток
-    переживёт свой тест и утащит за собой соседний, а искать причину такого
-    падения дороже, чем сам тест."""
-    running = BackendThread(lambda: ready(double))
+class Watched(BackendThread):
+    """Поток, который помнит номера заявок.
+
+    Записывающий двойник бэкенда их не видит: номер уходит не в бэкенд, а в сам
+    поток — им гасят устаревшее. Без этого подмена `op=op` на `op=None` в любом
+    домене прошла бы молча, а лента стала бы неотменяемой."""
+
+    def __init__(self, build) -> None:
+        super().__init__(build)
+        self.ops = []
+
+    def run(self, factory, op=None):
+        self.ops.append(op)
+        return super().run(factory, op=op)
+
+
+def _running(running):
+    """Готовый поток, закрытый в любом случае: иначе повисший переживёт свой
+    тест и утащит за собой соседний, а искать причину такого падения дороже,
+    чем сам тест."""
     running.start()
     yield running
     running.close()
@@ -162,4 +177,4 @@ def _running(double):
 @pytest.fixture
 def thread(backend):
     """Поток на двойнике поведения: счётчики, событие, сон."""
-    yield from _running(backend)
+    yield from _running(BackendThread(lambda: ready(backend)))

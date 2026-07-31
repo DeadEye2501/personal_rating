@@ -500,6 +500,14 @@
 - `logger` = `logging.getLogger(__name__)`
 - `_EDGE` = `re.compile('(?<!^)(?=[A-Z])')`
 
+### `bridge/feed.py`
+
+- `FILTER_FIELDS` = `набор из 6`
+
+### `bridge/refs.py`
+
+- `DOMAINS` = `набор из 2`
+
 ### `bridge/thread.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -683,6 +691,10 @@
 ### `tests/backend/test_view_types.py`
 
 - `DRAMA` = `Genre(id=1, name='Драма', kind=GenreKind.FILM)`
+
+### `tests/bridge/test_bridge_feed.py`
+
+- `WISHED` = `словарь из 4`
 
 ### `tests/builders.py`
 

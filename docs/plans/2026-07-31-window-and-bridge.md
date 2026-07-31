@@ -1860,7 +1860,7 @@ git commit -m "feat: мост — карточка и свои отметки"
 - Отдаёт: `Refs` с `genres(genre_kind)`, `suggest(domain, name)`,
   `create_person(domain, name)`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_bridge_refs.py`:
 
@@ -1921,12 +1921,12 @@ def test_enter_on_nothing_highlighted_creates_a_new_one(spy, asked):
 без потребителя, то есть нарушила бы правило 8. Довод записан здесь, потому что
 искать его будут в этом плане.
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_refs.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.refs'`.
 
-- [ ] **Шаг 3: Написать домен**
+- [x] **Шаг 3: Написать домен**
 
 Создать `bridge/refs.py`:
 
@@ -1970,12 +1970,12 @@ def _of(backend, domain: str):
     return getattr(backend, domain)
 ```
 
-- [ ] **Шаг 4: Прогнать и увидеть зелёное**
+- [x] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_refs.py -v`
 Ожидание: PASS, 5 тестов.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add bridge/refs.py tests/bridge/test_bridge_refs.py
@@ -2006,7 +2006,7 @@ git commit -m "feat: мост — справочники жанров, люде�
 - Отдаёт: `FeedBridge` с `page(op, feed, offset, limit)`,
   `views_of(op, item_ids)`, `histogram(op, kind, filters)`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_bridge_feed.py`:
 
@@ -2101,12 +2101,12 @@ def test_the_histogram_uses_the_same_filters(spy, asked):
     assert args[1].tag_ids == (3,)
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_feed.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.feed'`.
 
-- [ ] **Шаг 3: Написать домен**
+- [x] **Шаг 3: Написать домен**
 
 Создать `bridge/feed.py`:
 
@@ -2164,12 +2164,12 @@ def _filters(filters: dict) -> Filters:
                       for name in FILTER_FIELDS})
 ```
 
-- [ ] **Шаг 4: Прогнать и увидеть зелёное**
+- [x] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_feed.py -v`
 Ожидание: PASS, 6 тестов.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add bridge/feed.py tests/bridge/test_bridge_feed.py

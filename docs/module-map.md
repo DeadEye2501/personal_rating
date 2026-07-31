@@ -935,7 +935,7 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 5 модулей
+## bridge — 7 модулей
 
 ### `bridge/answer.py` — 64 строк
 
@@ -946,6 +946,19 @@
 - `def kebab(name: str) -> str` (4)
 - `class Domain` (39)
   - `def _reply(self, factory, op: int | None=None) -> dict` (30)
+
+### `bridge/feed.py` — 55 строк
+
+Мост: лента — страницы разделов и гистограмма.
+
+Зависит от: `backend.model`, `bridge.answer`
+
+- `class FeedBridge(Domain)` (25)
+  - `def page(self, op: int, feed: dict, offset: int, limit: int) -> dict` (3)
+  - `def views_of(self, op: int, item_ids: list) -> dict` (3)
+  - `def histogram(self, op: int, kind: str, filters: dict) -> dict` (5)
+- `def _feed(feed: dict) -> Feed` (10)
+- `def _filters(filters: dict) -> Filters` (5)
 
 ### `bridge/library.py` — 62 строк
 
@@ -983,6 +996,18 @@
   - `def unassign(self, item_id: int, tag_id: int) -> dict` (2)
   - `def wish(self, item_id: int) -> dict` (3)
   - `def unwish(self, item_id: int) -> dict` (2)
+
+### `bridge/refs.py` — 37 строк
+
+Мост: справочники — жанры, люди, студии.
+
+Зависит от: `backend.model`, `bridge.answer`
+
+- `class Refs(Domain)` (17)
+  - `def genres(self, genre_kind: str) -> dict` (5)
+  - `def suggest(self, domain: str, name: str) -> dict` (4)
+  - `def create_person(self, domain: str, name: str) -> dict` (5)
+- `def _of(backend, domain: str)` (7)
 
 ### `bridge/thread.py` — 185 строк
 
@@ -1072,7 +1097,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 70 модулей
+## tests — 72 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1721,7 +1746,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/conftest.py` — 165 строк
+### `tests/bridge/conftest.py` — 180 строк
 
 Двойники бэкенда и потоки на них.
 
@@ -1748,7 +1773,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def backend()` (2)
 - `def asked()` (3)
 - `def spy(asked)` (4)
-- `def _running(double)` (8)
+- `class Watched(BackendThread)` (14)
+  - `def run(self, factory, op=None)` (3)
+- `def _running(running)` (7)
 - `def thread(backend)` (3)
 
 ### `tests/bridge/test_answer.py` — 108 строк
@@ -1761,6 +1788,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `class Probe(Domain)` (5)
   - `def ask(self, what, op=None)` (2)
+
+### `tests/bridge/test_bridge_feed.py` — 163 строк
+
+Мост: лента — страницы разделов и гистограмма.
+
+Зависит от: `backend.model`, `bridge.feed`
+
+Тестов: 11
+
 
 ### `tests/bridge/test_bridge_library.py` — 122 строк
 
@@ -1778,6 +1814,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Зависит от: `backend.model`, `bridge.marks`
 
 Тестов: 15
+
+
+### `tests/bridge/test_bridge_refs.py` — 68 строк
+
+Мост: справочники — жанры, люди, студии.
+
+Зависит от: `backend.model`, `bridge.refs`
+
+Тестов: 5
 
 
 ### `tests/bridge/test_thread.py` — 200 строк
@@ -1866,6 +1911,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 ## Абстракции с одной реализацией
 
+- `BackendThread` — наследник один: `Watched`
 - `Base` — наследник один: `Note`
 - `FakeBackend` — наследник один: `Stubborn`
 - `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
