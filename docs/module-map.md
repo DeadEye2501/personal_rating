@@ -935,7 +935,7 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 3 модулей
+## bridge — 5 модулей
 
 ### `bridge/answer.py` — 64 строк
 
@@ -947,21 +947,58 @@
 - `class Domain` (39)
   - `def _reply(self, factory, op: int | None=None) -> dict` (30)
 
-### `bridge/thread.py` — 176 строк
+### `bridge/library.py` — 62 строк
+
+Мост: карточка целиком — заведение, правка, отвязка, удаление.
+
+Зависит от: `backend.model`, `bridge.answer`
+
+- `class Library(Domain)` (40)
+  - `def create(self, fields: dict) -> dict` (9)
+  - `def replace(self, item_id: int, fields: dict) -> dict` (7)
+  - `def same_title(self, kind: str, title: str) -> dict` (5)
+  - `def unlink(self, item_id: int) -> dict` (2)
+  - `def deletion_summary(self, item_id: int) -> dict` (2)
+  - `def delete(self, item_id: int) -> dict` (5)
+- `def _manual(fields: dict)` (12)
+
+### `bridge/marks.py` — 66 строк
+
+Мост: свои отметки — оценки, теги, закладки.
+
+Зависит от: `backend.model`, `bridge.answer`
+
+- `class Marks(Domain)` (55)
+  - `def score(self, item_id: int, score: float | None) -> dict` (4)
+  - `def aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None) -> dict` (8)
+  - `def review(self, item_id: int, text: str) -> dict` (4)
+  - `def clear_rating(self, item_id: int) -> dict` (2)
+  - `def create_tag(self, kind: str, name: str) -> dict` (2)
+  - `def tags(self, kind: str) -> dict` (2)
+  - `def reorder_tags(self, kind: str, tag_ids: list) -> dict` (2)
+  - `def rename_tag(self, tag_id: int, name: str) -> dict` (2)
+  - `def tag_usage(self, tag_id: int) -> dict` (4)
+  - `def delete_tag(self, tag_id: int) -> dict` (2)
+  - `def assign(self, item_id: int, tag_id: int) -> dict` (2)
+  - `def unassign(self, item_id: int, tag_id: int) -> dict` (2)
+  - `def wish(self, item_id: int) -> dict` (3)
+  - `def unwish(self, item_id: int) -> dict` (2)
+
+### `bridge/thread.py` — 185 строк
 
 Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом.
 
 Зависит от: —
 
 - `class Closed(Exception)` (2)
-- `class BackendThread` (147)
+- `class BackendThread` (156)
   - `def start(self) -> None` (5)
   - `def run(self, factory: Callable[[Any], Coroutine], op: int | None=None) -> concurrent.futures.Future` (10)
   - `def cancel(self, ops) -> None` (16)
   - `def close(self) -> None` (9)
   - `def _live(self) -> None` (21)
   - `def _refuse(self, error: BaseException) -> None` (6)
-  - `def _begin(self, factory, op, answer) -> None` (14)
+  - `def _begin(self, factory, op, answer) -> None` (23)
   - `def _end(self, task, op, answer) -> None` (15)
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
@@ -1035,7 +1072,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 68 модулей
+## tests — 70 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1684,7 +1721,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/conftest.py` — 111 строк
+### `tests/bridge/conftest.py` — 165 строк
 
 Двойники бэкенда и потоки на них.
 
@@ -1703,8 +1740,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `async def aclose(self)` (6)
 - `async def ready(value)` (3)
 - `def wait_until(condition, timeout=5.0)` (8)
+- `class Asked` (29)
+  - `def __getattr__(self, name)` (2)
+  - `def __call__(self, *args, **kwargs)` (5)
+  - `async def aclose(self)` (3)
+- `async def _raising(error)` (2)
 - `def backend()` (2)
-- `def thread(backend)` (7)
+- `def asked()` (3)
+- `def spy(asked)` (4)
+- `def _running(double)` (8)
+- `def thread(backend)` (3)
 
 ### `tests/bridge/test_answer.py` — 108 строк
 
@@ -1716,6 +1761,24 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `class Probe(Domain)` (5)
   - `def ask(self, what, op=None)` (2)
+
+### `tests/bridge/test_bridge_library.py` — 122 строк
+
+Мост: карточка целиком — заведение, правка, отвязка, удаление.
+
+Зависит от: `backend.model`, `bridge.library`
+
+Тестов: 9
+
+
+### `tests/bridge/test_bridge_marks.py` — 199 строк
+
+Мост: свои отметки — оценки, теги, закладки.
+
+Зависит от: `backend.model`, `bridge.marks`
+
+Тестов: 15
+
 
 ### `tests/bridge/test_thread.py` — 200 строк
 
@@ -1804,7 +1867,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 ## Абстракции с одной реализацией
 
 - `Base` — наследник один: `Note`
-- `Domain` — наследник один: `Probe`
 - `FakeBackend` — наследник один: `Stubborn`
 - `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
 - `FakePerson` — наследник один: `Broken`

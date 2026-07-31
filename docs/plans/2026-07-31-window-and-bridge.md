@@ -1339,10 +1339,10 @@ git commit -m "feat: один формат ответа моста, со сро�
 - Отдаёт: `Library` с `create(fields)`, `replace(item_id, fields)`,
   `same_title(kind, title)`, `unlink(item_id)`, `deletion_summary(item_id)`,
   `delete(item_id)`; `Marks` с `score`, `aspects`, `review`, `clear_rating`,
-  `create_tag`, `tags`, `reorder_tags`, `rename_tag`, `delete_tag`, `assign`,
+  `create_tag`, `tags`, `reorder_tags`, `rename_tag`, `tag_usage`, `delete_tag`, `assign`,
   `unassign`, `wish`, `unwish`.
 
-- [ ] **Шаг 1: Написать записывающий двойник**
+- [x] **Шаг 1: Написать записывающий двойник**
 
 Дописать в `tests/bridge/conftest.py`:
 
@@ -1399,7 +1399,7 @@ def spy(asked):
 `Asked.aclose` объявлен обычным методом, а не собирается через `__getattr__`:
 иначе закрытие потока записалось бы в `log` и сбило проверки порядка.
 
-- [ ] **Шаг 2: Написать падающие тесты**
+- [x] **Шаг 2: Написать падающие тесты**
 
 Создать `tests/bridge/test_bridge_library.py`:
 
@@ -1676,12 +1676,12 @@ def test_unwishing_needs_no_moment(spy, asked):
     assert log[0] == ("wishlist.remove", (12,), {})
 ```
 
-- [ ] **Шаг 3: Прогнать и увидеть красное**
+- [x] **Шаг 3: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_library.py tests/bridge/test_bridge_marks.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.library'`.
 
-- [ ] **Шаг 4: Написать оба домена**
+- [x] **Шаг 4: Написать оба домена**
 
 Создать `bridge/library.py`:
 
@@ -1816,12 +1816,15 @@ class Marks(Domain):
 `Marks.aspects` берёт четыре довода и `self` — предел правила 5 по параметрам;
 пятого сюда добавлять нельзя, и если понадобится, шкалы едут словарём.
 
-- [ ] **Шаг 5: Прогнать и увидеть зелёное**
+- [x] **Шаг 5: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/ -v`
-Ожидание: PASS, 20 новых тестов — шесть про карточку и четырнадцать про отметки.
+Ожидание: PASS, 24 новых теста — девять про карточку и пятнадцать про отметки.
+Плана на четыре больше: он не давал тестов трём объявленным им же методам
+(`replace`, `unlink`, `tag_usage`), а четвёртый — про то, что кривое поле формы
+становится ответом, а не исключением через границу потоков.
 
-- [ ] **Шаг 6: Коммит**
+- [x] **Шаг 6: Коммит**
 
 ```bash
 git add bridge/library.py bridge/marks.py \

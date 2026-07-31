@@ -128,7 +128,16 @@ class BackendThread:
             # бы никогда, и обработчик страницы повис бы навсегда.
             answer.set_exception(Closed("поток бэкенда закрыт"))
             return
-        task = self._loop.create_task(factory(self._backend))
+        try:
+            task = self._loop.create_task(factory(self._backend))
+        except Exception as error:
+            # Заявка развалилась, не став задачей: домен собирает доводы внутри
+            # неё, и кривое поле формы — это исключение прямо здесь. Ответ
+            # обязан прийти всё равно, иначе проситель досидит весь свой срок и
+            # получит «не дождались» вместо причины.
+            logger.exception("заявка не собралась")
+            answer.set_exception(error)
+            return
         self._answers[task] = answer
         if op is not None:
             self._numbered[op] = task

@@ -96,16 +96,70 @@ def wait_until(condition, timeout=5.0):
     raise AssertionError("не дождались")
 
 
+class Asked:
+    """Записывающий фасад: имя собирается из точек, ответ берётся из словаря.
+
+    Тест не пишет ни одного класса-двойника — весь бэкенд описывается словарём
+    `{"tags.create": 7}`, а проверяется потом `log`: и имя, и аргументы, и
+    порядок.
+
+    Слабое место у приёма одно: принимается **любое** имя, и опечатка в имени
+    метода бэкенда прошла бы молча. Закроет его отдельная проверка поверхности
+    моста — она заводится вместе со сборкой моста, а пока имена сверены с
+    настоящим бэкендом руками."""
+
+    def __init__(self, answers: dict, log: list, path: tuple = ()) -> None:
+        self._answers = answers
+        self._log = log
+        self._path = path
+
+    def __getattr__(self, name):
+        return Asked(self._answers, self._log, (*self._path, name))
+
+    def __call__(self, *args, **kwargs):
+        name = ".".join(self._path)
+        self._log.append((name, args, kwargs))
+        answer = self._answers.get(name)
+        return _raising(answer) if isinstance(answer, Exception) else ready(answer)
+
+    async def aclose(self):
+        """Обычным методом, а не через `__getattr__`: иначе закрытие потока
+        записалось бы в `log` и сбило проверки порядка."""
+
+
+async def _raising(error):
+    raise error
+
+
 @pytest.fixture
 def backend():
     return FakeBackend()
 
 
 @pytest.fixture
-def thread(backend):
-    """Поток, поднятый на двойнике. Закрывается всегда — иначе повисший поток
-    переживёт тест и утащит за собой соседний."""
-    running = BackendThread(lambda: ready(backend))
+def asked():
+    """Пара «чем отвечать» и «о чём спросили»."""
+    return {}, []
+
+
+@pytest.fixture
+def spy(asked):
+    """Поток на записывающем двойнике: имена вызовов и доводы."""
+    answers, log = asked
+    yield from _running(Asked(answers, log))
+
+
+def _running(double):
+    """Поток на готовом двойнике. Закрывается всегда — иначе повисший поток
+    переживёт свой тест и утащит за собой соседний, а искать причину такого
+    падения дороже, чем сам тест."""
+    running = BackendThread(lambda: ready(double))
     running.start()
     yield running
     running.close()
+
+
+@pytest.fixture
+def thread(backend):
+    """Поток на двойнике поведения: счётчики, событие, сон."""
+    yield from _running(backend)
