@@ -4,16 +4,14 @@ import io
 
 from PIL import Image, UnidentifiedImageError
 
+from backend.model import BadImage
+
 TARGET_RATIO = 2 / 3
 # Размер взят из w500 у TMDB: спека называет только пропорцию, но считает
 # хранилище из ~80 КБ на постер, а фотография с телефона ломает эту арифметику.
 TARGET_SIZE = (500, 750)
 
 _QUALITY = 88
-
-
-class BadImage(Exception):
-    """Байты не разбираются как картинка."""
 
 
 def _centred_box(width: int, height: int) -> tuple[int, int, int, int]:

@@ -4,11 +4,10 @@ import logging
 from dataclasses import replace
 from datetime import datetime
 
-from backend.model import Credit, Item, Refusal, SourceCard
+from backend.model import Credit, Item, ItemExists, Refusal, SourceCard
 from backend.service.card_parts import CardParts
 from backend.service.genres import resolved_genres
 from backend.storage.repository.credits import CreditRepository
-from backend.storage.repository.library import ItemExists
 
 logger = logging.getLogger(__name__)
 

@@ -10,6 +10,7 @@ import pytest
 from backend import model
 from backend.model import (
     CompanyRole,
+    Denied,
     GenreKind,
     GenreSource,
     IdSource,
@@ -64,7 +65,16 @@ def boundary_dataclasses():
                 yield declared
 
 
-@pytest.mark.parametrize("declared", list(boundary_dataclasses()),
+def boundary_denials():
+    """Отказы операции — тоже типы границы, но не датаклассы: клиент ловит их по
+    имени, и забытое в `__all__` имя ловить нечем. Заморозки от них не требуется,
+    поэтому набор отдельный, а не расширенный фильтр у соседа."""
+    yield Denied
+    yield from Denied.__subclasses__()
+
+
+@pytest.mark.parametrize("declared",
+                         list(boundary_dataclasses()) + list(boundary_denials()),
                          ids=lambda cls: cls.__name__)
 def test_every_boundary_type_is_named_on_the_surface(declared):
     """Поверхность `backend.model` — то, что клиент берёт по имени. Тип, забытый

@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import Select, delete, exists, func, select, update
 
-from backend.model import Item, Kind, Source, new_source_id
+from backend.model import Item, ItemExists, Kind, Source, new_source_id
 from backend.storage.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_item
@@ -13,10 +13,6 @@ from backend.storage.tables import item as item_table
 from backend.storage.tables import item_tag as item_tag_table
 from backend.storage.tables import rating as rating_table
 from backend.storage.tables import wishlist as wishlist_table
-
-
-class ItemExists(Exception):
-    """Пара (source, source_id) уже занята другой карточкой."""
 
 
 _FIELDS = (

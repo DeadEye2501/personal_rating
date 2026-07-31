@@ -3,20 +3,12 @@
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.sqlite import insert
 
-from backend.model import Kind, Tag
+from backend.model import Kind, Tag, TagExists, WrongTagKind
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_tag
 from backend.storage.tables import item as item_table
 from backend.storage.tables import item_tag as item_tag_table
 from backend.storage.tables import tag as tag_table
-
-
-class WrongTagKind(Exception):
-    """Тег одного типа содержимого на карточке другого."""
-
-
-class TagExists(Exception):
-    """Тег с таким именем в этом наборе уже есть."""
 
 
 class TagsRepository(Repository):

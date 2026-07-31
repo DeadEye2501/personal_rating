@@ -2,6 +2,14 @@
 
 from backend.model.card import SourceCard
 from backend.model.credit import Credit
+from backend.model.denied import (
+    BadImage,
+    Denied,
+    IdentityTaken,
+    ItemExists,
+    TagExists,
+    WrongTagKind,
+)
 from backend.model.external import ExternalId, ExternalRating
 from backend.model.genre import Genre
 from backend.model.item import (
@@ -47,10 +55,12 @@ from backend.model.view import CardView, view_from_hit, view_from_item
 
 
 __all__ = [
+    "BadImage",
     "Bucket",
     "CardView",
     "CompanyRole",
     "Credit",
+    "Denied",
     "ExternalId",
     "ExternalLink",
     "ExternalRating",
@@ -63,7 +73,9 @@ __all__ = [
     "GenreSource",
     "Histogram",
     "IdSource",
+    "IdentityTaken",
     "Item",
+    "ItemExists",
     "Kind",
     "Missing",
     "Order",
@@ -83,6 +95,8 @@ __all__ = [
     "SourceCard",
     "Suggestion",
     "Tag",
+    "TagExists",
+    "WrongTagKind",
     "average_score",
     "merge_results",
     "new_manual_item",

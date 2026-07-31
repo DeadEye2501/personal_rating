@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from backend.model import (
     CompanyRole,
     Credit,
+    IdentityTaken,
     Kind,
     PersonRole,
     Source,
@@ -27,10 +28,6 @@ from backend.storage.tables import (
     rating,
     wishlist,
 )
-
-
-class IdentityTaken(Exception):
-    """Пара (source, source_id) уже принадлежит другому человеку или студии."""
 
 
 def _outer(row) -> str | None:

@@ -4,7 +4,7 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
-## backend — 76 модулей
+## backend — 77 модулей
 
 ### `backend/app.py` — 154 строк
 
@@ -31,13 +31,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 93 строк
+### `backend/model/__init__.py` — 107 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
-Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.tag`, `backend.model.view`
+Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.denied`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.tag`, `backend.model.view`
 
-Отдаёт наружу: `Bucket`, `CardView`, `CompanyRole`, `Credit`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `Item`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonHit`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `BadImage`, `Bucket`, `CardView`, `CompanyRole`, `Credit`, `Denied`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `IdentityTaken`, `Item`, `ItemExists`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonHit`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `TagExists`, `WrongTagKind`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -55,6 +55,19 @@
 Зависит от: `backend.model.kinds`
 
 - `class Credit` (15)
+
+### `backend/model/denied.py` — 36 строк
+
+Отказ операции: занятое имя, занятая идентичность, негодная картинка.
+
+Зависит от: —
+
+- `class Denied(Exception)` (2)
+- `class ItemExists(Denied)` (4)
+- `class TagExists(Denied)` (2)
+- `class WrongTagKind(Denied)` (2)
+- `class IdentityTaken(Denied)` (2)
+- `class BadImage(Denied)` (2)
 
 ### `backend/model/external.py` — 19 строк
 
@@ -213,11 +226,11 @@
   - `async def _attach_credits(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...]) -> None` (6)
   - `async def _write_external(self, item_id: int, card: SourceCard) -> None` (6)
 
-### `backend/service/cards.py` — 73 строк
+### `backend/service/cards.py` — 72 строк
 
 Карточка источника строками базы.
 
-Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.service.removal`, `backend.sources.errors`, `backend.storage.repository.library`
+Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.service.removal`, `backend.sources.errors`
 
 - `class CardWriter(CardParts)` (58)
   - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (39)
@@ -257,13 +270,12 @@
 - `async def to_views(hits: list[SearchHit], genres: GenresRepository, clock: Callable[[], datetime]) -> list[CardView]` (16)
 - `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (11)
 
-### `backend/service/images.py` — 51 строк
+### `backend/service/images.py` — 49 строк
 
 Приведение залитой с диска картинки к виду обложки.
 
-Зависит от: —
+Зависит от: `backend.model`
 
-- `class BadImage(Exception)` (2)
 - `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
 - `def crop_to_cover(data: bytes) -> bytes` (20)
 
@@ -278,11 +290,11 @@
   - `async def views_of(self, item_ids: list[int]) -> list[CardView]` (8)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (2)
 
-### `backend/service/linking.py` — 126 строк
+### `backend/service/linking.py` — 125 строк
 
 Привязка карточки к внешнему источнику: внешнее заполняет только пустое.
 
-Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.storage.repository.credits`, `backend.storage.repository.library`
+Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.genres`, `backend.storage.repository.credits`
 
 - `def merge_fields(existing: Item, incoming: Item) -> Item` (7)
 - `def overwrite_fields(existing: Item, incoming: Item) -> Item` (14)
@@ -685,13 +697,12 @@
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (7)
 
-### `backend/storage/repository/credits.py` — 269 строк
+### `backend/storage/repository/credits.py` — 266 строк
 
 Один репозиторий на людей и на студий — различает их только описатель.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
 
-- `class IdentityTaken(Exception)` (2)
 - `def _outer(row) -> str | None` (14)
 - `class CreditRepository(Repository)` (211)
   - `def _link(self) -> Column` (2)
@@ -745,13 +756,12 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 218 строк
+### `backend/storage/repository/library.py` — 214 строк
 
 Карточки библиотеки.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.tables`
 
-- `class ItemExists(Exception)` (2)
 - `def _named(entity: Entity, needle: str)` (13)
 - `def _values(item: Item) -> dict` (6)
 - `class LibraryRepository(Repository)` (167)
@@ -797,14 +807,12 @@
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (34)
   - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
-### `backend/storage/repository/tags.py` — 118 строк
+### `backend/storage/repository/tags.py` — 110 строк
 
 Мои теги в базе.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.tables`
 
-- `class WrongTagKind(Exception)` (2)
-- `class TagExists(Exception)` (2)
 - `class TagsRepository(Repository)` (97)
   - `async def create(self, kind: Kind, name: str) -> int` (17)
   - `async def list_for_kind(self, kind: Kind) -> list[Tag]` (7)
@@ -988,7 +996,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 63 модулей
+## tests — 64 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1236,6 +1244,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(posters)` (8)
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
+### `tests/backend/test_denied.py` — 68 строк
+
+Отказ операции — нормальный ход событий, и клиент обязан их различать.
+
+Зависит от: `backend.model`, `backend.service.images`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.repository.tags`
+
+Тестов: 5
+
+
 ### `tests/backend/test_enrich.py` — 474 строк ⚠ подошёл к 300
 
 Третий круг: оценки агрегаторов и сроки их годности.
@@ -1434,7 +1451,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 153 строк
+### `tests/backend/test_model.py` — 163 строк
 
 Типы границы слоёв: их поля, значения и неизменность.
 
@@ -1443,6 +1460,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 - `def boundary_dataclasses()` (15)
+- `def boundary_denials()` (6)
 
 ### `tests/backend/test_offline.py` — 362 строк ⚠ подошёл к 300
 

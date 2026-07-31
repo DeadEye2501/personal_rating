@@ -579,6 +579,10 @@
 
 - `ALONE` = `набор из 3`
 
+### `tests/backend/test_denied.py`
+
+- `FIVE` = `набор из 5`
+
 ### `tests/backend/test_external_ratings.py`
 
 - `WANTED` = `набор из 3`

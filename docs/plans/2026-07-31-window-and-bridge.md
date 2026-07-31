@@ -203,14 +203,25 @@ personal_rating/
   `backend/storage/repository/tags.py:14-18`,
   `backend/storage/repository/credits.py:31`,
   `backend/service/images.py:15`
+- Изменить: `backend/service/cards.py`, `backend/service/linking.py` — оба берут
+  `ItemExists` из `storage/repository/library.py`. После снятия объявления это
+  работало бы транзитом, но у двух сервисов осталась бы зависимость от хранилища,
+  которой в коде больше нет ни по одному другому поводу.
 - Создать: `tests/backend/test_denied.py`
+- Изменить: `tests/backend/test_model.py` — сторож поверхности `__all__` обходит
+  модель фильтром `is_dataclass`, и шесть новых имён под него не попадают.
+
+**Семь тестовых модулей остаются на старых адресах** (`test_library`,
+`test_linking`, `test_manual_cards`, `test_tags`, `test_credits`, `test_images`,
+`test_poster_service`) — решение записано в `docs/deferred.md` вместе со списком
+мест, потому что довод держится до первой правки старых модулей.
 
 **Интерфейсы:**
 - Потребляет: ничего.
 - Отдаёт: `Denied`, `ItemExists`, `TagExists`, `WrongTagKind`, `IdentityTaken`,
   `BadImage` — всё импортируется из `backend.model`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/backend/test_denied.py`:
 
@@ -269,12 +280,12 @@ async def test_a_repository_raises_the_ancestor(sessions, migrated):
 Фикстуры `sessions` и `migrated` уже есть в `tests/conftest.py`; порядок
 аргументов сверить с соседними тестами репозиториев.
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/backend/test_denied.py -v`
 Ожидание: FAIL, `ImportError: cannot import name 'Denied' from 'backend.model'`.
 
-- [ ] **Шаг 3: Завести модуль отказов**
+- [x] **Шаг 3: Завести модуль отказов**
 
 Создать `backend/model/denied.py`:
 
@@ -318,7 +329,7 @@ class BadImage(Denied):
 Докстринги шести классов берутся из тех, что стоят у нынешних объявлений, если
 те точнее написанных здесь.
 
-- [ ] **Шаг 4: Перевести пять модулей на общее объявление**
+- [x] **Шаг 4: Перевести пять модулей на общее объявление**
 
 В каждом файле объявление класса снимается, а имя добавляется **в существующее
 перечисление** `from backend.model import (...)`, если оно там уже есть, а не
@@ -334,7 +345,7 @@ class BadImage(Denied):
 `backend/storage/repository/external.py` не трогается: `ExternalIdTaken`
 остаётся там, где объявлен.
 
-- [ ] **Шаг 5: Открыть имена наружу**
+- [x] **Шаг 5: Открыть имена наружу**
 
 В `backend/model/__init__.py` — импорт и шесть имён в `__all__`, по алфавиту, как
 там заведено:
@@ -350,13 +361,13 @@ from backend.model.denied import (
 )
 ```
 
-- [ ] **Шаг 6: Прогнать и увидеть зелёное**
+- [x] **Шаг 6: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/backend/test_denied.py tests/backend/test_layers.py -v`
 Ожидание: PASS. Сторож границы обязан остаться зелёным: `denied.py` не
 импортирует ничего, и проверка «модель не зависит ни от чего нашего» это видит.
 
-- [ ] **Шаг 7: Прогнать весь набор**
+- [x] **Шаг 7: Прогнать весь набор**
 
 Запустить: `pipenv run pytest`
 Ожидание: зелено. Тесты, импортирующие отказы из старых модулей, не правятся:

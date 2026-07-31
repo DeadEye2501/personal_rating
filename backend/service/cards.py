@@ -3,12 +3,11 @@
 import asyncio
 import logging
 
-from backend.model import Refusal, SourceCard
+from backend.model import ItemExists, Refusal, SourceCard
 from backend.service.card_parts import CardParts
 from backend.service.genres import resolved_genres
 from backend.service.removal import remove_card
 from backend.sources.errors import broken
-from backend.storage.repository.library import ItemExists
 
 logger = logging.getLogger(__name__)
 
