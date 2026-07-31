@@ -4,6 +4,15 @@
 Править руками нельзя — правки затрёт следующая сборка.
 У набора называется размер, а не содержимое.
 
+## .
+
+### `main.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE_DIR` = `Path(__file__).resolve().parent`
+- `LOG_BYTES` = `5 * 1024 * 1024`
+- `LOG_FILES` = `3`
+
 ## backend
 
 ### `backend/app.py`
@@ -520,6 +529,16 @@
 - `logger` = `logging.getLogger(__name__)`
 - `BUILD_TIMEOUT` = `30.0`
 - `DEADLINE` = `60.0`
+
+### `bridge/window.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `TITLE` = `'Personal Rating'`
+- `RENDERER` = `'edgechromium'`
+- `MIN_WIDTH` = `900`
+- `MIN_HEIGHT` = `600`
+- `WIDTH` = `1280`
+- `HEIGHT` = `820`
 
 ## migrations
 

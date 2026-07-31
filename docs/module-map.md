@@ -4,6 +4,17 @@
 Править руками нельзя — правки затрёт следующая сборка.
 Число в скобках — сколько строк занимает объявление.
 
+## . — 1 модулей
+
+### `main.py` — 63 строк
+
+Собирает зависимости, настраивает лог и поднимает окно.
+
+Зависит от: `backend.app`, `backend.config`, `bridge.thread`, `bridge.window`
+
+- `def setup_logging(config) -> None` (12)
+- `def main() -> None` (22)
+
 ## backend — 77 модулей
 
 ### `backend/app.py` — 154 строк
@@ -935,7 +946,7 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 13 модулей
+## bridge — 14 модулей
 
 ### `bridge/answer.py` — 71 строк
 
@@ -1090,6 +1101,16 @@
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
 
+### `bridge/window.py` — 55 строк
+
+Окно приложения и проверка того, чем оно рисует.
+
+Зависит от: `bridge.api`, `bridge.serve`
+
+- `def supported(renderer: str | None) -> bool` (2)
+- `def open_window(thread, debug: bool=False) -> None` (15)
+- `def _check_renderer() -> None` (6)
+
 ### `bridge/wire.py` — 55 строк
 
 Значения границы в то, что переживёт `json.dumps`.
@@ -1183,7 +1204,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 78 модулей
+## tests — 79 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1981,6 +2002,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Зависит от: `bridge.thread`, `tests.bridge.conftest`
 
 Тестов: 17
+
+
+### `tests/bridge/test_window.py` — 75 строк
+
+Решение по рендереру и настройка лога. Окно здесь не поднимается ни разу.
+
+Зависит от: `bridge.window`
+
+Тестов: 6
 
 
 ### `tests/bridge/test_wire.py` — 138 строк

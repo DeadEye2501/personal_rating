@@ -3509,7 +3509,7 @@ git commit -m "feat: своя отдача страницы, ресурсов и
 - Отдаёт: `open_window(thread, debug=False)`, `supported(renderer) -> bool`,
   `RENDERER`, `MIN_WIDTH`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_window.py`:
 
@@ -3536,12 +3536,12 @@ def test_an_unknown_engine_is_not_accepted():
     assert not supported(None)
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_window.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.window'`.
 
-- [ ] **Шаг 3: Написать окно**
+- [x] **Шаг 3: Написать окно**
 
 Создать `bridge/window.py`:
 
@@ -3608,7 +3608,7 @@ def _check_renderer() -> None:
 `--bg` из палитры, когда та появится в плане 6. Пока стоит значение из макета;
 сверить и поправить там же.
 
-- [ ] **Шаг 4: Написать сборку**
+- [x] **Шаг 4: Написать сборку**
 
 Создать `main.py`:
 
@@ -3666,14 +3666,14 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Шаг 5: Прогнать весь набор**
+- [x] **Шаг 5: Прогнать весь набор**
 
 Запустить: `pipenv run pytest`
 Ожидание: зелено. `tests/backend/test_layers.py` обязан пройти: `main.py` не
 входит ни в `backend`, ни в `bridge`, и именно поэтому он и есть то место, где
 две половины встречаются.
 
-- [ ] **Шаг 6: Проверить руками**
+- [x] **Шаг 6: Проверить руками**
 
 Заглушка страницы кладётся в `client/dist/index.html` и в репозиторий не
 попадает (папка закрыта `.gitignore`); план 6 заменит её сборкой Vite.
@@ -3702,7 +3702,7 @@ pipenv run python main.py
 
 Заглушку после проверки удалить.
 
-- [ ] **Шаг 7: Коммит**
+- [x] **Шаг 7: Коммит**
 
 ```bash
 git add bridge/window.py main.py tests/bridge/test_window.py
