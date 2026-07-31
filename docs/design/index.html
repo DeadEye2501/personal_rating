@@ -462,11 +462,18 @@
    стилями, чтобы не зависеть от источника. */
 .chip::first-letter{ text-transform:uppercase }
 
+/* Метки кликабельны — клик включает фильтр по этому жанру или тегу, — поэтому
+   они кнопки, а не надписи: иначе жест недоступен с клавиатуры. Своей подложки
+   и рамки у кнопки нет, оправу рисует ::before. */
 .chip{
   position:relative;
+  padding:0;
+  border:none;
+  background:transparent;
   font:var(--label-m);
   color:rgba(255,255,255,.55);
   cursor:pointer;
+  transition:color .18s ease;
 }
 /* Свои теги отличаются от жанров из внешней базы. */
 .chip--tag{ color:#fff }
@@ -484,24 +491,41 @@
   pointer-events:none;
   transition:border-color .18s ease, background .18s ease;
 }
-.chip:hover{ color:var(--primary) }
+/* Наведение — белым, включённый фильтр — акцентом. Разводит их цвет, а не
+   форма: акцент означает «этот жанр сейчас выбран», белый — «сюда можно
+   нажать». */
+.chip:hover{ color:#fff }
 .chip:hover::before{
+  border-color:rgba(255,255,255,.55);
+  background:rgba(255,255,255,.06);
+}
+
+/* Кнопка тега — действие, а не отбор, поэтому наведение у неё осталось
+   акцентным целиком, каким было до фильтров: и текст, и оправа. */
+.chip--add:hover{ color:var(--primary) }
+.chip--add:hover::before{
   border-color:color-mix(in srgb, var(--primary) 55%, transparent);
   background:color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* Включённая метка. Оправа заметно плотнее, чем при наведении: состояние
+   держится само, а наведение уходит вместе с курсором, и путать их нельзя. */
+.chip.is-on{ color:var(--primary) }
+.chip.is-on::before{
+  border-color:color-mix(in srgb, var(--primary) 70%, transparent);
+  background:color-mix(in srgb, var(--primary) 14%, transparent);
+}
+.chip.is-on:hover{ color:var(--primary) }
+.chip.is-on:hover::before{
+  border-color:var(--primary);
+  background:color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 /* ─── Добавить тег ───────────────────────────────────────────────── */
 /* Видна всегда и приглушённой: спрятанная кнопка — ловушка,
    про которую надо догадаться. */
 
-.chip--add{
-  padding:0;
-  border:none;
-  background:transparent;
-  font:var(--label-m);
-  color:rgba(255,255,255,.3);
-  transition:color .18s ease;
-}
+.chip--add{ color:rgba(255,255,255,.3) }
 
 /* ─── Факты ──────────────────────────────────────────────────────── */
 
@@ -840,6 +864,10 @@
 }
 
 .modal{
+  /* Цвет кромки переменной: у подтверждения удаления она красная, а сам
+     градиент от этого не меняется — иначе он лёг бы вторым экземпляром. */
+  --neon:var(--primary);
+
   position:relative;
   width:min(560px, 100%);
   min-height:200px;
@@ -876,13 +904,13 @@
      даёт заметный обрыв, ступени его сглаживают. */
   background:linear-gradient(90deg,
     transparent 0%,
-    color-mix(in srgb, var(--primary) 18%, transparent) 14%,
-    color-mix(in srgb, var(--primary) 55%, transparent) 26%,
-    color-mix(in srgb, var(--primary) 88%, transparent) 38%,
-    var(--primary) 50%,
-    color-mix(in srgb, var(--primary) 88%, transparent) 62%,
-    color-mix(in srgb, var(--primary) 55%, transparent) 74%,
-    color-mix(in srgb, var(--primary) 18%, transparent) 86%,
+    color-mix(in srgb, var(--neon) 18%, transparent) 14%,
+    color-mix(in srgb, var(--neon) 55%, transparent) 26%,
+    color-mix(in srgb, var(--neon) 88%, transparent) 38%,
+    var(--neon) 50%,
+    color-mix(in srgb, var(--neon) 88%, transparent) 62%,
+    color-mix(in srgb, var(--neon) 55%, transparent) 74%,
+    color-mix(in srgb, var(--neon) 18%, transparent) 86%,
     transparent 100%);
 }
 
@@ -897,13 +925,33 @@
   height:24px;
   background:linear-gradient(90deg,
     transparent 0%,
-    color-mix(in srgb, var(--primary) 4%,  transparent) 18%,
-    color-mix(in srgb, var(--primary) 15%, transparent) 40%,
-    color-mix(in srgb, var(--primary) 15%, transparent) 60%,
-    color-mix(in srgb, var(--primary) 4%,  transparent) 82%,
+    color-mix(in srgb, var(--neon) 4%,  transparent) 18%,
+    color-mix(in srgb, var(--neon) 15%, transparent) 40%,
+    color-mix(in srgb, var(--neon) 15%, transparent) 60%,
+    color-mix(in srgb, var(--neon) 4%,  transparent) 82%,
     transparent 100%);
   filter:blur(12px);
   pointer-events:none;
+}
+
+/* ─── Подтверждение ──────────────────────────────────────────────── */
+/* Вопрос и две кнопки, больше ничего. `min-height` снят: общая двухсотка
+   рассчитана на списки, а здесь окно ровно по своему содержимому. */
+
+.modal--ask{
+  width:min(420px, 100%);
+  min-height:0;
+  padding:26px 26px 18px;
+}
+
+/* Красное — только необратимое. Цвет ошибки тут не про поломку: он про
+   то, что отменить это будет нечем. */
+.modal--danger{ --neon:var(--error) }
+
+.ask__text{
+  margin:0 0 22px;
+  font:var(--body-l);
+  color:var(--text);
 }
 
 /* ─── Окно карточки ──────────────────────────────────────────────── */
@@ -1150,9 +1198,11 @@
 /* ─── Кнопки окна ────────────────────────────────────────────────── */
 /* Ни подложки, ни рамки в покое — кнопка это надпись, и обе одинаково
    блёклы. Под курсором проступает рамка и светлеет текст; разводит их
-   только цвет: отмена белым, сохранение акцентом. */
+   только цвет: отмена белым, согласие — цветом окна. */
 
-.cardform__foot{
+/* Ряд один на все окна: у карточки он прижат книзу флексом, у
+   подтверждения стоит следом за вопросом. */
+.modalfoot{
   margin-top:auto;
   display:flex;
   justify-content:flex-end;
@@ -1181,6 +1231,13 @@
 .btn--go:hover{
   border-color:var(--primary);
   color:var(--primary);
+}
+
+/* Удаление светится тем же цветом, что и кромка своего окна: у согласия и
+   у окна ответ один, и разными цветами они бы спорили. */
+.btn--danger:hover{
+  border-color:var(--error);
+  color:var(--error);
 }
 
 /* ─── Список тегов ───────────────────────────────────────────────── */
@@ -1694,9 +1751,21 @@
           <ul class="picker__chosen"></ul>
         </div>
 
-        <div class="cardform__foot">
+        <div class="modalfoot">
           <button type="button" class="btn btn--cancel" id="cardCancel">Отмена</button>
           <button type="button" class="btn btn--go">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Подтверждение удаления -->
+    <div class="overlay" id="askModal" hidden>
+      <div class="modal modal--ask modal--danger" role="dialog" aria-modal="true"
+           aria-labelledby="askText">
+        <p class="ask__text" id="askText"></p>
+        <div class="modalfoot">
+          <button type="button" class="btn btn--cancel" id="askNo">Отмена</button>
+          <button type="button" class="btn btn--danger" id="askYes">Удалить</button>
         </div>
       </div>
     </div>
@@ -2022,21 +2091,47 @@ function attachRowDrag(list, onDrop){
 }
 
 
+// ─── Закрытие окна ─────────────────────────────────────────────────
+// Открывается каждое окно по-своему, а закрывается одинаково: кликом мимо
+// и по Escape. Клик внутри окна не считается — цель клика должна быть сама
+// затемнённая подложка.
+
+function dismissable(overlay, close){
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) close();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+
+    // Уходит верхнее окно, а не все разом: подтверждение открывается поверх
+    // списка тегов, и один Escape убрал бы заодно и список. Верхнее — это
+    // последнее показанное в разметке, оно же рисуется поверх.
+    const shown = [...document.querySelectorAll('.overlay:not([hidden])')];
+    if (shown.at(-1) === overlay) close();
+  });
+}
+
+
 // ─── Общая модалка фильтра ─────────────────────────────────────────
 
 function createFilterModal({ modal, list, bar, button, items, editable, renderBody,
-                             cycle = CYCLE_FILTER, selected = [] }){
-  const state = new Map(items.map((name) => [name, selected.includes(name) ? 'on' : 'off']));
+                             cycle = CYCLE_FILTER, selected = [], onChange }){
+  let state = new Map(items.map((name) => [name, selected.includes(name) ? 'on' : 'off']));
   let order = [...items];
 
   const layout = attachScrollbar(list, bar);
 
-  // У модалки простановки тегов кнопки в шапке нет.
-  function syncButton(){
-    if (!button) return;
-    const on = [...state.values()].some((value) => value !== 'off');
-    button.classList.toggle('is-active', on);
-    button.setAttribute('aria-pressed', String(on));
+  // Одна точка на всякую смену отбора: кнопка в шапке и метки на карточках
+  // показывают одно и то же состояние, и разойтись им нельзя.
+  function synced(){
+    // У модалки простановки тегов кнопки в шапке нет.
+    if (button) {
+      const on = [...state.values()].some((value) => value !== 'off');
+      button.classList.toggle('is-active', on);
+      button.setAttribute('aria-pressed', String(on));
+    }
+    if (onChange) onChange();
   }
 
   function syncOrder(){
@@ -2090,30 +2185,39 @@ function createFilterModal({ modal, list, bar, button, items, editable, renderBo
       box.setAttribute('aria-label', name + ': ' + BOX_STATES[value].label);
 
       state.set(name, value);
-      syncButton();               // фильтр вступает в силу сразу
+      synced();               // фильтр вступает в силу сразу
       return;
     }
 
     const del = event.target.closest('.tagrow__del');
     if (del) {
-      const name = del.closest('.tagrow').dataset.tag;
-      del.closest('.tagrow').remove();
-      state.delete(name);
-      syncOrder();
-      syncButton();
-      layout();
+      const row  = del.closest('.tagrow');
+      const name = row.dataset.tag;
+
+      // Ни на одной карточке не стоит — терять нечего, и спрашивать не о чем.
+      const used = tagged(name);
+      if (!used) return drop(row, name);
+
+      askDelete(
+        `Удалить тег «${name}»? ${used} ` +
+        `${plural(used, ...KIND_NOUNS[activeKind])} ` +
+        `${plural(used, 'имеет', 'имеют', 'имеют')} этот тег.`,
+        () => drop(row, name),
+      );
     }
   });
 
+  function drop(row, name){
+    row.remove();
+    state.delete(name);
+    syncOrder();
+    synced();
+    layout();
+  }
+
   if (editable) attachRowDrag(list, syncOrder);
 
-  modal.addEventListener('click', (event) => {
-    if (event.target === modal) close();
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !modal.hidden) close();
-  });
+  dismissable(modal, () => close());
 
   function open(){
     draw();
@@ -2124,7 +2228,15 @@ function createFilterModal({ modal, list, bar, button, items, editable, renderBo
 
   function reset(){
     state.forEach((_, name) => state.set(name, 'off'));
-    syncButton();
+    synced();
+  }
+
+  // Другой набор целиком. Отбор при этом снимается сам: держать включённым
+  // тег, которого в новом наборе нет, значило бы фильтровать невидимым.
+  function load(next){
+    order = [...next];
+    state = new Map(next.map((name) => [name, 'off']));
+    synced();
   }
 
   function add(name){
@@ -2136,8 +2248,17 @@ function createFilterModal({ modal, list, bar, button, items, editable, renderBo
     return true;
   }
 
+  // Клик по метке на карточке. Состояний у него два, а не три: исключить жанр
+  // одним нажатием некуда — «не этот» осмысленно только рядом с остальными,
+  // то есть в модалке.
+  function toggle(name){
+    state.set(name, state.get(name) === 'on' ? 'off' : 'on');
+    synced();
+  }
+
   return {
-    open, close, reset, add,
+    open, close, reset, add, toggle, load,
+    stateOf: (name) => state.get(name) ?? 'off',
     isActive: () => button.classList.contains('is-active'),
   };
 }
@@ -2145,17 +2266,30 @@ function createFilterModal({ modal, list, bar, button, items, editable, renderBo
 
 // ─── Теги ──────────────────────────────────────────────────────────
 
+// Наборов три, по одному на тип содержимого: в базе у тега есть свой вид, и
+// «Одиночный» у фильмов и у игр — две разные строки. Список один на обе
+// теговых модалки — отбор и простановку карточке.
+const TAGS = {
+  movies: ['Анимация','Аниме','Байопик','Веха','Гибли','Джеймс Бонд',
+           'Documentary','Звёздные Войны','Классика','Марвел','Нуар',
+           'Одиночный','Пересмотреть','Пиксар','Постапокалипсис','Ретро',
+           'Сюрреализм','Тарантино','Ужасы','Фильм','Франшиза','Шедевр'],
+  series: ['Анимация','Аниме','Веха','Documentary','Звёздные Войны','Классика',
+           'Марвел','Мини-сериал','Пересмотреть','Постапокалипсис','Ретро',
+           'Сериал','Ужасы','Франшиза','Шедевр'],
+  games:  ['Веха','Игра','Инди','Классика','Кооператив','Одиночный',
+           'Пересмотреть','Постапокалипсис','Ретро','Ужасы','Франшиза',
+           'Шедевр'],
+};
+
 const tagsFilter = createFilterModal({
   modal:  document.getElementById('tagsModal'),
   list:   document.getElementById('tagsList'),
   bar:    document.getElementById('tagsBar'),
   button: tools.querySelector('[data-modal="tags"]'),
-  items: ['Анимация','Аниме','Байопик','Веха','Гибли','Джеймс Бонд',
-          'Documentary','Звёздные Войны','Инди','Классика','Кооператив',
-          'Марвел','Нуар','Одиночный','Пересмотреть','Пиксар',
-          'Постапокалипсис','Ретро','Сериал','Сюрреализм','Тарантино',
-          'Ужасы','Фильм','Хоррор','Шедевр'],
+  items: TAGS.movies,
   editable: true,
+  onChange: () => paintMarks(),
 });
 
 
@@ -2167,12 +2301,16 @@ const genresFilter = createFilterModal({
   list:   document.getElementById('genresList'),
   bar:    document.getElementById('genresBar'),
   button: tools.querySelector('[data-modal="genres"]'),
-  items: ['Боевик','Вестерн','Военный','Детектив','Документальный','Драма',
-          'История','Комедия','Криминал','Мелодрама','Музыка','Мультфильм',
-          'Приключения','Семейный','Телефильм','Триллер','Ужасы',
-          'Фантастика','Фэнтези'],
+  items: ['Биография','Боевик','Вестерн','Военный','Детектив','Документальный',
+          'Драма','История','Комедия','Криминал','Мелодрама','Музыка',
+          'Мультфильм','Приключения','Семейный','Телефильм','Триллер','Ужасы',
+          'Фантастика','Фэнтези','RPG'],
   editable: false,
+  onChange: () => paintMarks(),
 });
+
+// Куда ведёт метка с карточки: пространство при ней — ключ отсюда.
+const MARK_FILTERS = { genres: genresFilter, tags: tagsFilter };
 
 // ─── Нотация оценок ────────────────────────────────────────────────
 // Цвета лежат в tokens.css (--score-1…10), ярлыки — здесь.
@@ -2184,6 +2322,19 @@ const SCORE_LABELS = {
 
 
 // ─── Карточки ──────────────────────────────────────────────────────
+
+// Считается по открытой вкладке, и называется тем же словом: список тегов
+// человек открыл из неё, про неё и спрашиваем.
+const KIND_NOUNS = {
+  movies: ['фильм', 'фильма', 'фильмов'],
+  series: ['сериал', 'сериала', 'сериалов'],
+  games:  ['игра', 'игры', 'игр'],
+};
+
+function tagged(name){
+  return FILMS.filter((film) => !film.gone && film.kind === activeKind
+                             && film.tags.includes(name)).length;
+}
 
 const FILMS = [
   {
@@ -2431,13 +2582,20 @@ function peopleHtml(names){
     .join(', ');
 }
 
+// Пространство метки едет атрибутом: имя жанра и имя тега совпасть могут
+// («Ужасы» есть в обоих списках), и без него клик отобрал бы не то.
+function mark(space, name, extra = ''){
+  return `<button type="button" class="chip${extra}" ` +
+         `data-space="${space}" data-mark="${name}">${name}</button>`;
+}
+
 function buildFilm(film){
   const el = document.createElement('article');
   el.className = 'film';
 
   const chips =
-    film.genres.map((g) => `<span class="chip">${g}</span>`).join('') +
-    film.tags.map((t) => `<span class="chip chip--tag">${t}</span>`).join('') +
+    film.genres.map((g) => mark('genres', g)).join('') +
+    film.tags.map((t) => mark('tags', t, ' chip--tag')).join('') +
     '<button type="button" class="chip chip--add">± Тег</button>';
 
   const runtime = runtimeText(film);
@@ -2569,6 +2727,7 @@ function renderFeed(){
   feed.innerHTML = '';
 
   FILMS.forEach((film, index) => {
+    if (film.gone) return;
     if (film.kind !== activeKind) return;
     if (activeView === 'rated' && !isRated(film)) return;
     if (activeView === 'wish'  && !film.wish)     return;
@@ -2576,6 +2735,19 @@ function renderFeed(){
     const card = buildFilm(film);
     card.dataset.index = index;
     feed.appendChild(card);
+  });
+
+  paintMarks();
+}
+
+// Метка на карточке и строка в модалке — два вида одного отбора, поэтому
+// подсветка берётся из состояния фильтра, а не хранится при метке: иначе
+// снятое в модалке осталось бы гореть на карточках.
+function paintMarks(){
+  feed.querySelectorAll('.chip[data-mark]').forEach((chip) => {
+    const on = MARK_FILTERS[chip.dataset.space].stateOf(chip.dataset.mark) === 'on';
+    chip.classList.toggle('is-on', on);
+    chip.setAttribute('aria-pressed', String(on));
   });
 }
 
@@ -2609,8 +2781,24 @@ feed.addEventListener('click', (event) => {
     return;
   }
 
+  if (event.target.closest('[data-act="delete"]')) {
+    askDelete(`Удалить «${film.title}»? Оценка и теги пропадут вместе с ней.`,
+      () => {
+        film.gone = true;
+        card.remove();
+        notify('Карточка удалена');
+      });
+    return;
+  }
+
   if (event.target.closest('.chip--add')) {
     filmTags.open();
+    return;
+  }
+
+  const chip = event.target.closest('.chip[data-mark]');
+  if (chip) {
+    MARK_FILTERS[chip.dataset.space].toggle(chip.dataset.mark);
     return;
   }
 
@@ -2739,11 +2927,7 @@ const filmTags = createFilterModal({
   list:   document.getElementById('filmTagsList'),
   bar:    document.getElementById('filmTagsBar'),
   button: null,
-  items: ['Анимация','Аниме','Байопик','Веха','Гибли','Джеймс Бонд',
-          'Documentary','Звёздные Войны','Инди','Классика','Кооператив',
-          'Марвел','Нуар','Одиночный','Пересмотреть','Пиксар',
-          'Постапокалипсис','Ретро','Сериал','Сюрреализм','Тарантино',
-          'Ужасы','Фильм','Хоррор','Шедевр'],
+  items: TAGS.movies,
   editable: true,
   cycle: CYCLE_TOGGLE,
   selected: ['Фильм','Одиночный'],   // те же, что стоят чипами в карточке
@@ -2823,6 +3007,11 @@ kinds.addEventListener('click', (event) => {
 
   activeKind = btn.dataset.kind;
   paintAccent(activeKind);
+
+  // Теги у каждого типа содержимого свои — в базе у тега есть вид.
+  tagsFilter.load(TAGS[activeKind]);
+  filmTags.load(TAGS[activeKind]);
+
   renderFeed();
   drawChart();          // в подвале статистики свой тип содержимого
 });
@@ -2973,17 +3162,40 @@ const cardWindow = (() => {
   }
 
   document.getElementById('cardCancel').addEventListener('click', close);
-
-  // Клик мимо окна закрывает, внутри — нет.
-  overlay.addEventListener('click', (event) => {
-    if (event.target === overlay) close();
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !overlay.hidden) close();
-  });
+  dismissable(overlay, close);
 
   return { open, close };
+})();
+
+
+// ─── Подтверждение удаления ────────────────────────────────────────
+// Окно только спрашивает: что удалять и как, знает тот, кто его позвал, —
+// иначе оно знало бы и про ленту, и про карточку сразу.
+
+const askDelete = (() => {
+  const overlay = document.getElementById('askModal');
+  const text    = document.getElementById('askText');
+  let agreed    = null;
+
+  function close(){
+    overlay.hidden = true;
+    agreed = null;
+  }
+
+  document.getElementById('askNo').addEventListener('click', close);
+  document.getElementById('askYes').addEventListener('click', () => {
+    const act = agreed;
+    close();                       // сперва закрыть: дальше карточки не станет
+    act();
+  });
+
+  dismissable(overlay, close);
+
+  return (question, act) => {
+    text.textContent = question;
+    agreed = act;
+    overlay.hidden = false;
+  };
 })();
 
 
