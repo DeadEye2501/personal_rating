@@ -375,7 +375,7 @@
 
 ### `backend/sources/errors.py` — 77 строк
 
-Как источник сообщает, что ответ не разобрался.
+Как источник отвечает, когда верить ответу нельзя.
 
 Зависит от: `backend.model`
 
@@ -385,18 +385,19 @@
 - `def is_json(response: httpx.Response) -> bool` (12)
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 
-### `backend/sources/gog/client.py` — 148 строк
+### `backend/sources/gog/client.py` — 159 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (126)
+- `def _named(payload: dict) -> str` (7)
+- `class GogClient` (128)
   - `def name(self) -> str` (4)
   - `async def _payload(self, query: str) -> dict | Refusal` (11)
   - `async def _catalog(self, query: str) -> list | Refusal` (6)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
-  - `async def _title(self, source_id: str) -> str | Outcome` (19)
+  - `async def _title(self, source_id: str) -> str | Outcome` (20)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (21)
   - `async def resolve_slug(self, slug: str) -> Outcome` (32)
   - `async def aclose(self) -> None` (2)
@@ -566,17 +567,17 @@
 - `def parse_card(data: dict) -> SourceCard` (21)
 - `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (5)
 
-### `backend/sources/tmdb/client.py` — 130 строк
+### `backend/sources/tmdb/client.py` — 131 строк
 
 Разговор с TMDB по сети.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.tmdb.parse`
 
 - `def classify(response: httpx.Response) -> Missing | Refusal | None` (23)
-- `class TmdbClient` (75)
+- `class TmdbClient` (76)
   - `def name(self) -> str` (4)
   - `def _params(self, **extra: object) -> dict` (2)
-  - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (11)
+  - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (12)
   - `async def _asked(self, url: str, **extra: object) -> httpx.Response | Missing | Refusal` (12)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (7)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (10)
@@ -988,13 +989,13 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 364 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 380 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 26
+Тестов: 27
 
 - `def answering(body) -> SourceHttp` (3)
 
@@ -1017,13 +1018,13 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 438 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 453 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.conftest`
 
-Тестов: 29
+Тестов: 30
 
 - `def primary(transport) -> PoiskkinoClient` (2)
 - `def fallback(transport) -> UnofficialClient` (2)
@@ -1164,13 +1165,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def covers(posters)` (5)
 
-### `tests/backend/test_credits.py` — 315 строк ⚠ подошёл к 300
+### `tests/backend/test_credits.py` — 330 строк ⚠ подошёл к 300
 
 Люди и студии: одна реализация на две сущности, и различает их идентичность.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
-Тестов: 25
+Тестов: 26
 
 
 ### `tests/backend/test_delete.py` — 156 строк
@@ -1184,13 +1185,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(posters)` (8)
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
-### `tests/backend/test_enrich.py` — 460 строк ⚠ подошёл к 300
+### `tests/backend/test_enrich.py` — 474 строк ⚠ подошёл к 300
 
 Третий круг: оценки агрегаторов и сроки их годности.
 
 Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
 
-Тестов: 25
+Тестов: 26
 
 - `class FakeRatings(FakeClient)` (11)
   - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
@@ -1211,13 +1212,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 8
 
 
-### `tests/backend/test_external_ratings.py` — 210 строк
+### `tests/backend/test_external_ratings.py` — 233 строк
 
 Оценки агрегаторов: три состояния и сроки годности.
 
 Зависит от: `backend.model`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
 
-Тестов: 13
+Тестов: 14
 
 
 ### `tests/backend/test_feed.py` — 132 строк
@@ -1255,13 +1256,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def genres(engine, sessions)` (3)
 
-### `tests/backend/test_genres.py` — 159 строк
+### `tests/backend/test_genres.py` — 180 строк
 
 Перевод чужих меток в наши жанры и запись их карточке.
 
 Зависит от: `backend.model`, `backend.storage.repository.genres`, `tests.conftest`
 
-Тестов: 14
+Тестов: 15
 
 
 ### `tests/backend/test_histogram.py` — 199 строк

@@ -1,4 +1,4 @@
-"""Как источник сообщает, что ответ не разобрался."""
+"""Как источник отвечает, когда верить ответу нельзя."""
 
 from collections.abc import Callable
 from logging import Logger

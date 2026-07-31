@@ -2,6 +2,8 @@
 
 from datetime import timedelta
 
+from sqlalchemy import text
+
 from backend.model import ExternalRating, RatingSource
 from backend.storage.repository.external import (
     EMPTY_TTL,
@@ -208,3 +210,24 @@ async def test_ratings_go_away_with_the_card(sessions, card, posters):
     await LibraryRepository(sessions).delete(item_id)
 
     assert await repository.ratings_of(item_id) == []
+
+
+async def test_the_source_is_stored_as_its_own_text(sessions, card):
+    """Колонка текстовая, а `RatingSource` — `StrEnum`, и связь между членом и
+    строкой в базе не сторожил никто: переименуй значение с `imdb` на `IMDb`, и
+    старые строки перестанут находиться, а тесты останутся зелёными — они
+    сравнивают член с членом, и подмена сокращается с обеих сторон.
+
+    Поэтому здесь строка читается сырым запросом и сверяется с буквами."""
+    item_id = await card()
+    await ExternalRatingsRepository(sessions).record(
+        item_id, ExternalRating(RatingSource.IMDB, 8.6, MOMENT)
+    )
+
+    async with sessions() as session:
+        stored = (await session.execute(
+            text("SELECT source FROM external_rating WHERE item_id = :id"),
+            {"id": item_id},
+        )).scalar_one()
+
+    assert stored == "imdb"

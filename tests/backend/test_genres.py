@@ -157,3 +157,24 @@ async def test_list_for_kind_keeps_the_two_sets_apart(sessions, reference):
     game = [genre.name for genre in await repository.list_for_kind(GenreKind.GAME)]
     assert film == ["Боевик", "Драма", "Приключения"]
     assert game == ["ролевая"]
+
+
+async def test_a_failed_replacement_keeps_the_old_set(sessions, reference, card):
+    """Замена набора — это очистка плюс вставка, и обе обязаны быть одной
+    транзакцией. Сорвись вставка на полпути — карточка осталась бы без жанров
+    вовсе, и починить это могла бы только новая загрузка из источника.
+
+    Срыв здесь настоящий: номер жанра, которого в справочнике нет, роняет
+    внешний ключ уже после очистки."""
+    item_id = await card()
+    repository = GenresRepository(sessions)
+    await repository.set_for_item(item_id, await repository.resolve(
+        GenreSource.TMDB, ["18"]
+    ))
+    before = [one.id for one in await repository.genres_of(item_id)]
+    assert before, "фикстура пуста — проверять нечего"
+
+    with pytest.raises(Exception):
+        await repository.set_for_item(item_id, [999999])
+
+    assert [one.id for one in await repository.genres_of(item_id)] == before

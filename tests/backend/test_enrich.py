@@ -302,6 +302,20 @@ async def test_an_empty_row_goes_stale_sooner(sessions, item_id, enrich):
     assert client.asked == [("tt0816692", Kind.MOVIE)]
 
 
+async def test_an_honest_zero_reaches_the_row(sessions, item_id, enrich):
+    """Ноль — это оценка, просто самая низкая, и от «у источника её нет» он
+    отличается только проверкой на `None`. Проверка на ложность их сливает, и
+    ноль записался бы пустым значением — то есть «нет оценки» на месяц.
+
+    Сторож стоял слоем ниже, у разбора ответа; сюда, к проводке через сервис,
+    ноль не доезжал ни в одном тесте."""
+    client = FakeRatings((RatingSource.IMDB,), found((RatingSource.IMDB, 0.0)))
+
+    await enrich(client).enrich(item_id, Kind.MOVIE)
+
+    assert await stored_ratings(sessions, item_id) == {RatingSource.IMDB: 0.0}
+
+
 async def test_a_series_is_asked_about_as_a_series(sessions, item_id, enrich):
     """Один тип содержимого проверить мало: подставь клиенту `Kind.MOVIE`
     жёстко, и фильмовый тест этого не заметит. У MDBList из типа собирается

@@ -5,12 +5,21 @@ import logging
 import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
-from backend.sources.errors import parsed
+from backend.sources.errors import absent, parsed
 from backend.sources.gog.parse import find_slug, parse_catalog, to_hit
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import asked, refuse_undocumented
 
 logger = logging.getLogger(__name__)
+
+
+def _named(payload: dict) -> str:
+    """Название товара строкой. Пустое и `null` — это неразобранный ответ, а не
+    название: спрашивать каталог пустотой значит получить весь каталог."""
+    title = payload["title"]
+    if not isinstance(title, str) or not title:
+        raise ValueError(f"название товара не строка: {title!r}")
+    return title
 
 CATALOG = "https://catalog.gog.com/v1/catalog"
 # Каталог ищет только текстом: на числовой запрос он отвечает `productCount: 0`,
@@ -24,13 +33,14 @@ class GogClient:
     """Поиск GOG никогда не отвечает «не найдено»: на бессмыслицу приезжает
     200 и два десятка несвязанных игр, на пустой запрос — весь каталог.
 
-    Отсюда правило, которое этот клиент обязан держать: **`Missing` не
-    возвращается ни из `search`, ни из `card`.** Пустой список и чужая выдача —
-    это «поиск отранжировал мимо», а не «игры в каталоге нет».
+    Отсюда правило, которое этот клиент обязан держать: **из каталога `Missing`
+    не приходит никогда.** Пустой список и чужая выдача — это «поиск
+    отранжировал мимо», а не «игры в каталоге нет», и `search` отрицательного
+    факта не даёт вовсе.
 
     Отрицательный факт дают два места, и каждое спрашивает не «что похоже», а
     «есть ли ровно это»: товарная ручка кодом 404 — у `card`, и точное
-    совпадение слага — у `resolve_slug`.
+    совпадение слага — у `resolve_slug`. Оба читают его по разобранному телу.
 
     Аргумент `kind` есть ради общего контракта каталожных клиентов и
     игнорируется: у GOG содержимое одного типа."""
@@ -82,12 +92,13 @@ class GogClient:
         if not isinstance(response, httpx.Response):
             return response
         if response.status_code == 404:
-            logger.info("gog: продукта %s нет", source_id)
-            return Missing()
+            # Тем же общим правилом, что у оценочных источников: 404 со
+            # страницей вместо JSON — это чужой периметр, а не «игры нет».
+            return absent(response, self._http.name)
         if response.status_code != 200:
             return refuse_undocumented(self._http, response.status_code)
         return parsed(logger, "gog", f"товар {source_id} не разобрался",
-                      lambda: response.json()["title"])
+                      lambda: _named(response.json()))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         """Номер переводится в название, и название уходит в каталог: строкой

@@ -264,6 +264,22 @@ async def test_a_number_that_is_no_product_is_missing(replay):
     assert isinstance(result, Missing)
 
 
+async def test_a_404_without_json_is_not_a_missing_product():
+    """Тем же правилом, что у оценочных источников: страница вместо JSON под
+    кодом 404 — это чужой периметр, а не «игры нет». Записанный отсюда
+    отрицательный факт объявил бы существующую игру отсутствующей.
+
+    Записанная фикстура товарной ручки отвечает честным JSON, и эту половину
+    сторожит сосед; здесь проверяется вторая."""
+    client = GogClient(SourceHttp("gog", transport=responding(404, text="<html>")))
+
+    result = await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+
+
 async def test_card_that_the_catalog_did_not_return_is_not_a_negative_fact(replay):
     """Товар есть, а каталог его не отдал — это отказ, а не «игры нет».
     Каталог отвечает чем-нибудь на что угодно, и записать отсюда Missing значит

@@ -436,3 +436,18 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
     assert all(one.startswith("kinopoisk:") for one in said.values())
 
 
+
+
+async def test_a_well_formed_body_under_a_failure_code_is_not_an_answer(fixture):
+    """Ответ разбирается только под кодом 200. Тело правильной формы под 5xx —
+    обычное дело у периметра, который кеширует старую страницу, и разобрать его
+    значило бы записать чужую оценку как свежую.
+
+    Оба зеркала проверяются вместе: код у них общий по форме, но написан
+    порознь, и просевшая проверка у одного не видна по другому."""
+    body = fixture("kinopoisk/poiskkino_found.json")
+
+    outcome = await primary(responding(500, json=body)).ratings("tt0816692", Kind.MOVIE)
+
+    assert isinstance(outcome, Refusal)
+    assert outcome.reason is Reason.BROKEN
