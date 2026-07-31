@@ -1008,29 +1008,35 @@ git commit -m "feat: постер тремя способами вставки"
 
 **Интерфейсы:**
 - Потребляет: `call` из `$api/bridge.js`; `Modal`, `Button`.
-- Отдаёт: `Confirm` с входными `label`, `text`, `ok`, `onyes`, `onclose`.
+- Отдаёт: `Confirm` с входными `label`, `text`, `ok`, `danger`, `onyes`,
+  `onclose`.
 
 - [ ] **Шаг 1: Написать подтверждение**
 
 `client/app/Confirm.svelte` — одна оболочка на предупреждение о совпадении и на
 подтверждение удаления: спрашивают они разное, а устроены одинаково.
 
+Перенос `docs/design/index.html:1761-1771` — окно в макете нарисовано, и
+собирать его из чужих частей не нужно:
+
 ```svelte
 <script>
   import Button from '$components/Button.svelte'
   import Modal from '$components/Modal.svelte'
 
-  let { label, text, ok = 'Продолжить', onyes, onclose } = $props()
+  // `danger` — про необратимое, а не про поломку: красным светится только то,
+  // что отменить будет нечем. Предупреждение о совпадении остаётся акцентным.
+  let { label, text, ok = 'OK', danger = false, onyes, onclose } = $props()
 </script>
 
-<Modal narrow {label} {onclose}>
+<Modal ask {danger} {label} {onclose}>
   {#snippet children()}
-    <p>{text}</p>
-    <div class="cardform__foot">
+    <p class="ask__text">{text}</p>
+    <div class="modalfoot">
       <Button variant="btn--cancel" onclick={onclose}>
         {#snippet children()}Отмена{/snippet}
       </Button>
-      <Button variant="btn--go" onclick={onyes}>
+      <Button variant={danger ? 'btn--danger' : 'btn--go'} onclick={onyes}>
         {#snippet children()}{ok}{/snippet}
       </Button>
     </div>
@@ -1038,17 +1044,68 @@ git commit -m "feat: постер тремя способами вставки"
 </Modal>
 ```
 
-**Вида этих двух окон в макете нет.** Пять наложений там — теги фильма, оценки,
-жанры, теги и карточка; ни подтверждения удаления, ни предупреждения о совпадении
-не нарисовано, хотя спека ручных карточек требует оба. Здесь они собраны из уже
-готовых частей — узкая модалка и два подвальных кнопочных места, — и это
-**заглушка до решения пользователя**, а не выбор оформления.
+Дописать в `client/styles/modal.css` — перенос `index.html:937-956`:
+
+```css
+/* Вопрос и две кнопки, больше ничего. `min-height` снят: общая двухсотка
+   рассчитана на списки, а здесь окно ровно по своему содержимому. */
+.modal--ask {
+  width: min(420px, 100%);
+  min-height: 0;
+  padding: 26px 26px 18px;
+}
+
+/* Красное — только необратимое. Цвет ошибки тут не про поломку: он про то,
+   что отменить это будет нечем. */
+.modal--danger { --neon: var(--error) }
+
+.ask__text {
+  margin: 0 0 22px;
+  font: var(--body-l);
+  color: var(--text);
+}
+```
+
+Дописать в `client/styles/btn.css` — перенос `index.html:1238-1244`:
+
+```css
+/* Удаление светится тем же цветом, что и кромка своего окна: у согласия и у
+   окна ответ один, и разными цветами они бы спорили. */
+.btn--danger:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+```
+
+**Кромка окна стала переменной, а градиент — нет.** В `modal.css` из плана 8
+восемь остановок неоновой нити и свечения написаны через `var(--primary)`;
+здесь они меняются на `var(--neon)`, а `--neon` объявляется на самой `.modal`
+значением `var(--primary)`. Второго градиента от этого не появляется: у
+подтверждения удаления та же нить, только другого цвета.
+
+**Предупреждение о совпадении названия в макете не нарисовано** — оно описано
+словами в `docs/specs/2026-07-27-manual-cards.md`, и отличий у него от удаления
+ровно три: акцентный цвет вместо красного (`danger` не передан), кнопка «OK» и
+текст, кончающийся вопросом «Вы точно уверены?».
 
 - [ ] **Шаг 2: Написать сохранение**
 
 Дописать в `CardModal.svelte`:
 
 ```svelte
+  // Состояние окна объявлено здесь целиком: `card` — форма, `roles` — состав по
+  // ролям, `picture` — залитый постер, `suggested` — совпадения по каждому полю
+  // с подсказкой, `warning` — найденный однофамилец, `confirmed` — «да, всё
+  // равно заводи».
+  let card = $state(view ? { ...view } : emptyCard(kind))
+  let roles = $state(rolesOf(view))
+  let picture = $state(null)
+  let suggested = $state({})
+  let warning = $state(null)
+  let confirmed = $state(false)
+
+  const setRole = (role, list) => { roles = { ...roles, [role]: list } }
+
   async function save() {
     const same = await call('library.same_title', card.kind, card.title.trim())
     // Предупреждение, а не запрет; и не при правке самой себя.
@@ -1086,6 +1143,25 @@ git commit -m "feat: постер тремя способами вставки"
   const number = (value) => (value === '' || value === null ? null : Number(value))
 ```
 
+Предупреждение показывается тем же окном, что и подтверждение удаления, только
+акцентным и с кнопкой «OK»:
+
+```svelte
+  {#if warning}
+    <Confirm label="Такое уже есть" ok="OK"
+             text={`«${warning.title}» уже есть в библиотеке. Вы точно уверены?`}
+             onyes={() => { confirmed = true; warning = null; save() }}
+             onclose={() => { warning = null }} />
+  {/if}
+```
+
+**Это же предупреждение нужно и при добавлении из выдачи поиска**, и спека
+называет тот случай главным: у игр два магазина, одна и та же игра лежит в обоих
+и показывается двумя кандидатами, склейки мы не делаем. Поэтому `Confirm`
+заводится здесь, а зовёт его ещё и `SearchScreen` — правка в плане 7, задача 5:
+`add(view)` спрашивает `library.same_title` до `search.ensure` и при находке
+показывает то же окно.
+
 **`refs.set_genres` и запись состава — новые операции моста.** План 5 их не
 завёл намеренно: там не было сегодняшнего потребителя. Заводятся они здесь,
 вместе с ним, в `bridge/refs.py`:
@@ -1097,22 +1173,52 @@ git commit -m "feat: постер тремя способами вставки"
         return self._reply(
             lambda back: back.genres.set_for_item(item_id, genre_ids))
 
-    def set_credits(self, domain: str, item_id: int, credits: list) -> dict:
-        """Состав пишется целиком: у страницы он и правится целиком, а сличать
-        построчно значило бы решать за неё, что именно человек поменял."""
-        return self._reply(lambda back: _rewritten(back, domain, item_id, credits))
+    def detach_all(self, domain: str, item_id: int) -> dict:
+        """Состав правится целиком: сличать построчно значило бы решать за
+        страницу, что именно человек поменял."""
+        return self._reply(lambda back: _of(back, domain).detach_all(item_id))
 
-
-async def _rewritten(back, domain, item_id, credits):
-    repository = _of(back, domain)
-    await repository.detach_all(item_id)
-    for position, one in enumerate(credits):
-        entity_id = one["entity_id"] or await repository.create_manual(one["name"])
-        await repository.attach(item_id, entity_id, one["role"], position)
+    def attach(self, domain: str, item_id: int, entity_id: int, role: str,
+               position: int) -> dict:
+        return self._reply(
+            lambda back: _of(back, domain).attach(item_id, entity_id, role,
+                                                  position))
 ```
 
-и дописываются в сторож поверхности — он собирает имена разбором исходников, так
-что править его не нужно, но прогнать обязательно.
+**Порядок трёх записей принадлежит странице, а не мосту** — это записанное
+решение плана 5: «мост тонкий, он не оркеструет». Поэтому здесь три отдельные
+операции, а не одна, которая внутри себя снимает связи, заводит людей и
+расставляет позиции. Заодно `refs.py` остаётся справочниками и описывается одной
+фразой без «и»: запись состава конкретной карточки — это карточка, а не
+справочник.
+
+Складывает их страница, в том же `CardModal.svelte`:
+
+```svelte
+  // Состав: снять всё, потом расставить заново. Новый человек заводится по
+  // ходу — `entity_id` у него пуст, потому что его не выбирали из подсказки.
+  async function writeCredits(id) {
+    for (const domain of ['people', 'companies']) {
+      await call('refs.detach_all', domain, id)
+    }
+    for (const [role, chosen] of Object.entries(roles)) {
+      const domain = DOMAIN_OF[role]
+      let position = 0
+      for (const one of chosen) {
+        const entity_id = one.entity_id
+          ?? await call('refs.create_person', domain, one.name)
+        await call('refs.attach', domain, id, entity_id, role, position)
+        position += 1
+      }
+    }
+  }
+
+  const DOMAIN_OF = { director: 'people', showrunner: 'people', actor: 'people',
+                      developer: 'companies', publisher: 'companies' }
+```
+
+Новые имена дописываются в сторож поверхности сами — он собирает вызовы разбором
+исходников, так что править его не нужно, но прогнать обязательно.
 
 - [ ] **Шаг 3: Открыть окно с карточки и из шапки**
 
@@ -1314,15 +1420,17 @@ git commit -m "feat: привязка карточки вставкой ссыл
 
 ```svelte
   {#if removing}
-    <Confirm label="Удалить карточку" ok="Удалить"
+    <Confirm label="Удалить карточку" ok="Удалить" danger
              text={lost(removing.view, removing.summary)}
              onyes={remove} onclose={() => { removing = null }} />
   {/if}
 ```
 
 где `lost` собирает фразу из непустых полей сводки — оценка, число тегов,
-закладка. **Слова этой фразы в макете не нарисованы**, как и само окно: это тот
-же открытый вопрос, что и в задаче 4.
+закладка. Окно нарисовано в макете (`index.html:1761-1771`), и там же лежит
+готовая фраза карточки: «Удалить «Ведьмак 3»? Оценка и теги пропадут вместе с
+ней». `danger` тут стоит, а у предупреждения о совпадении не стоит: красным
+светится только необратимое.
 
 - [ ] **Шаг 2: «Всё с этим человеком» делает не этот план**
 

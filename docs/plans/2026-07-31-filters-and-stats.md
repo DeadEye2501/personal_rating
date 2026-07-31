@@ -90,7 +90,8 @@ personal_rating/
 
 **Интерфейсы:**
 - Потребляет: ничего.
-- Отдаёт: `Modal` с входными `narrow`, `label`, `onclose`, `children`;
+- Отдаёт: `Modal` с входными `narrow`, `ask`, `danger`, `label`, `onclose`,
+  `children`;
   `Scrollarea` с входным `children`.
 
 - [ ] **Шаг 1: Завести цвет исключения**
@@ -253,18 +254,39 @@ Chromium 150, и там свойство давно без префикса. Э�
 `client/components/Modal.svelte`:
 
 ```svelte
+<script module>
+  // Счётчик общий на все окна: он про стопку, а не про одно из них.
+  let opened = 0
+</script>
+
 <script>
-  let { narrow = false, label, onclose, children } = $props()
+  let { narrow = false, ask = false, danger = false, label, onclose, children }
+    = $props()
 
   // Клик мимо окна закрывает, внутри — нет. Проверяем цель, а не всплытие:
   // остановка всплытия внутри сломала бы всё, что на нём стоит.
   const outside = (event) => { if (event.target === event.currentTarget) onclose() }
+
+  // Окна встают стопкой: подтверждение удаления открывается поверх списка
+  // тегов, предупреждение о совпадении — поверх окна карточки. Escape обязан
+  // убрать **верхнее**, иначе одно нажатие сложило бы оба.
+  let mine = $state(0)
+
+  $effect(() => {
+    mine = ++opened
+    return () => { opened -= 1 }
+  })
+
+  const escaped = (event) => {
+    if (event.key === 'Escape' && mine === opened) onclose()
+  }
 </script>
 
-<svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
+<svelte:window onkeydown={escaped} />
 
 <div class="overlay" onclick={outside}>
-  <div class="modal" class:modal--narrow={narrow} role="dialog" aria-modal="true"
+  <div class="modal" class:modal--narrow={narrow} class:modal--ask={ask}
+       class:modal--danger={danger} role="dialog" aria-modal="true"
        aria-label={label}>
     {@render children()}
   </div>
@@ -765,7 +787,7 @@ git commit -m "feat: строка списка с тремя состояния�
 - Изменить: `client/app/App.svelte`, `client/app/Topbar.svelte`
 
 **Интерфейсы:**
-- Потребляет: `cycled`, `isEmpty` из `$state/filters.js`; `Modal`,
+- Потребляет: `cycled`, `isEmpty`, `cleared` из `$state/filters.js`; `Modal`,
   `Scrollarea`, `TagRow`, `ScoreRow`; `call` из `$api/bridge.js`.
 - Отдаёт: `FiltersModal` с входными `field`, `kind`, `filters`, `onfilters`,
   `onclose`.
@@ -845,11 +867,17 @@ git commit -m "feat: строка списка с тремя состояния�
 ```svelte
   let modal = $state(null)   // null | 'genres' | 'tags' | 'scores'
 
-  // Повторное нажатие по горящей кнопке сбрасывает фильтр целиком, а не
-  // открывает модалку: так в макете.
+  // Повторное нажатие по горящей кнопке сбрасывает **свой** признак, а не
+  // открывает модалку: так в макете, где у каждого из трёх фильтров свой
+  // `isActive()` и свой `reset()`.
+  //
+  // По признаку, а не одним махом на три: сбрасывая всё, кнопка «Жанры» стирала
+  // бы теговый фильтр и не открывала ничего, а сочетание «выбрал драму,
+  // исключил ужасы» стало бы недостижимым — при том что спека требует «между
+  // признаками — по „и“».
   function filter(field) {
-    if (!isEmpty(session.filters)) {
-      session = { ...session, filters: EMPTY }
+    if (!isEmpty(session.filters, field)) {
+      session = { ...session, filters: cleared(session.filters, field) }
       return
     }
     modal = field
@@ -874,7 +902,8 @@ git commit -m "feat: строка списка с тремя состояния�
 - крестик красный, галочка акцентная и перекрашивается вместе с типом
   содержимого;
 - список длиннее окна прокручивается своей полосой, ползунок хватается мышью;
-- щелчок мимо окна закрывает, внутри — нет; Escape закрывает;
+- щелчок мимо окна закрывает, внутри — нет; Escape закрывает **верхнее** окно, а
+  не все разом;
 - лента сужается сразу, а кнопка в шапке загорается;
 - повторное нажатие по горящей кнопке сбрасывает фильтр.
 

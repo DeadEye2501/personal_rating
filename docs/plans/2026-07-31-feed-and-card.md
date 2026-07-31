@@ -114,7 +114,7 @@ personal_rating/
 - Отдаёт: `LABELS`, `stepOf(value, max)`, `stepOfSource(value, source)`,
   `nameOf(source)`, `colorOf(step)`, `verdictOf(score)`, `average(values)`,
   `partOf(score)`; `runtimeOf(minutes)`, `seriesOf(seasons, episodes)`,
-  `castOf(credits, role, limit)`.
+  `castOf(credits, role, limit)` — отдаёт титры, а не имена.
 
 - [ ] **Шаг 1: Написать падающие тесты**
 
@@ -197,6 +197,8 @@ import { describe, expect, it } from 'vitest'
 
 import { castOf, runtimeOf, seriesOf } from '$state/facts.js'
 
+const named = (credit) => credit.name
+
 describe('строки фактов', () => {
   it('длительность показывается часами и минутами', () => {
     expect(runtimeOf(158)).toBe('2 ч 38 мин')
@@ -234,31 +236,42 @@ describe('строки фактов', () => {
     // Роли лежат в одном списке, и путаница ролью показала бы режиссёра в
     // строке «В ролях».
     const credits = [
-      { name: 'Дэвид Финчер', role: 'director', position: null },
-      { name: 'Руни Мара', role: 'actor', position: 0 },
-      { name: 'Дэниел Крейг', role: 'actor', position: 1 },
+      { entity_id: 1, name: 'Дэвид Финчер', role: 'director', position: null },
+      { entity_id: 2, name: 'Руни Мара', role: 'actor', position: 0 },
+      { entity_id: 3, name: 'Дэниел Крейг', role: 'actor', position: 1 },
     ]
 
-    expect(castOf(credits, 'director')).toEqual(['Дэвид Финчер'])
-    expect(castOf(credits, 'actor')).toEqual(['Руни Мара', 'Дэниел Крейг'])
+    expect(castOf(credits, 'director').map(named)).toEqual(['Дэвид Финчер'])
+    expect(castOf(credits, 'actor').map(named))
+      .toEqual(['Руни Мара', 'Дэниел Крейг'])
   })
 
   it('актёры идут по позиции в титрах, а не по тому, как легли в ответе', () => {
     // Топ-5 — это первые пять по `position`, и сортировка тут и есть смысл.
     const credits = [
-      { name: 'Третий', role: 'actor', position: 2 },
-      { name: 'Первый', role: 'actor', position: 0 },
-      { name: 'Второй', role: 'actor', position: 1 },
+      { entity_id: 3, name: 'Третий', role: 'actor', position: 2 },
+      { entity_id: 1, name: 'Первый', role: 'actor', position: 0 },
+      { entity_id: 2, name: 'Второй', role: 'actor', position: 1 },
     ]
 
-    expect(castOf(credits, 'actor')).toEqual(['Первый', 'Второй', 'Третий'])
+    expect(castOf(credits, 'actor').map(named))
+      .toEqual(['Первый', 'Второй', 'Третий'])
+  })
+
+  it('отдаёт титры целиком, а не одни имена', () => {
+    // Клик по имени зовёт поиск по номеру строки человека: имя тёзку не
+    // различает, и по нему звать было бы нечего.
+    const credits = [{ entity_id: 9, name: 'Нолан', role: 'director' }]
+
+    expect(castOf(credits, 'director')[0].entity_id).toBe(9)
   })
 
   it('показывает только первых, а не весь состав', () => {
     // У сериала состав приезжает из aggregate_credits — у «Andor» это 302
     // человека, и вся лента превратилась бы в список имён.
     const many = Array.from({ length: 20 }, (_, index) =>
-      ({ name: `Актёр ${index}`, role: 'actor', position: index }))
+      ({ entity_id: index, name: `Актёр ${index}`, role: 'actor',
+         position: index }))
 
     expect(castOf(many, 'actor', 5)).toHaveLength(5)
   })
@@ -368,7 +381,6 @@ export function castOf(credits, role, limit = TOP) {
     .filter((credit) => credit.role === role)
     .toSorted((one, other) => (one.position ?? 0) - (other.position ?? 0))
     .slice(0, limit)
-    .map((credit) => credit.name)
 }
 
 /** Русский счёт: 11–14 идут по правилу «много», а не по последней цифре. */
@@ -385,13 +397,17 @@ function plural(count, forms) {
 `castOf` берёт `TOP` по умолчанию, а не `Infinity`: у режиссёра и студий их
 всё равно единицы, а забытый довод у актёров вывалил бы в ленту весь состав.
 
+Отдаёт он **титры целиком, а не имена**: клик по имени зовёт поиск по номеру
+строки человека, и без `entity_id` звать его было бы нечем — имя тёзку не
+различает.
+
 - [ ] **Шаг 5: Прогнать и увидеть зелёное**
 
 ```bash
 cd client && npm test
 ```
 
-Ожидание: PASS, 60 тестов — семнадцать новых и сорок три из плана 6.
+Ожидание: PASS, 61 тест — восемнадцать новых и сорок три из плана 6.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -431,6 +447,18 @@ git commit -m "feat: нотация оценок и строки фактов к
 - [ ] **Шаг 1: Перенести оформление ленты и рамы**
 
 Создать `client/styles/feed.css`:
+
+**`--content-w` считается здесь, а не остаётся литералом.** План 6 её отложил —
+потребителей не было, — и первый потребитель это `.feed`. Замер тот же и там же,
+где `--side-w`: в `Topbar.svelte`, потому что обе величины про ширину шапки, а
+шапка ими и владеет. Дописать в тот же `$effect`:
+
+```js
+      // Содержимое шириной с шапку: иначе лента разъедется с ней ровно на
+      // столько, на сколько замер поправил боковые зоны.
+      const root = document.documentElement
+      root.style.setProperty('--content-w', `${Math.ceil(bar.offsetWidth)}px`)
+```
 
 ```css
 /* Те же границы, что у гистограммы и у содержимого шапки. */
@@ -798,9 +826,11 @@ git commit -m "feat: нотация оценок и строки фактов к
     ? seriesOf(view.seasons_count, view.episodes_count)
     : runtimeOf(view.runtime))
 
+  // Строки несут не имена, а сами титры: клик по имени зовёт поиск по
+  // **номеру строки** человека — имя тёзку не различает.
   const rows = $derived(ROWS
-    .map((row) => ({ ...row, names: castOf(view[row.from], row.role) }))
-    .filter((row) => row.names.length))
+    .map((row) => ({ ...row, credits: castOf(view[row.from], row.role) }))
+    .filter((row) => row.credits.length))
 </script>
 
 <dl class="film__facts">
@@ -812,10 +842,11 @@ git commit -m "feat: нотация оценок и строки фактов к
   {#each rows as row (row.label)}
     <dt>{row.label}</dt>
     <dd>
-      {#each row.names as name, index (name)}
+      {#each row.credits as credit, index (credit.entity_id)}
         {#if index}, {/if}
-        <button type="button" class="person" onclick={() => onperson(row.from, name)}
-        >{name}</button>
+        <button type="button" class="person"
+                onclick={() => onperson(row.from, credit.entity_id)}
+        >{credit.name}</button>
       {/each}
     </dd>
   {/each}
@@ -895,7 +926,7 @@ git commit -m "feat: нотация оценок и строки фактов к
 
     <Chips genres={view.genres} tags={view.tags} {on} {onmark}
            ontag={() => ontag(view)} />
-    <Facts {view} onperson={(domain, name) => onperson(domain, name, view)} />
+    <Facts {view} onperson={(domain, entity_id) => onperson(domain, entity_id)} />
     <Synopsis text={view.synopsis} />
   </div>
 </article>
@@ -1296,8 +1327,8 @@ git commit -m "feat: карточка ленты — постер, метки, �
   import Stars from '$components/Stars.svelte'
   import { average, colorOf, verdictOf } from '$state/scores.js'
 
-  let { view, collapsed = false, expected = [], oncollapse, onperson, ontag,
-        onscore, onaspect, onedit, ondelete, onwish } = $props()
+  let { view, collapsed = false, expected = [], on, oncollapse, onmark,
+        onperson, ontag, onscore, onaspect, onedit, ondelete, onwish } = $props()
 
   const ASPECTS = [
     { key: 'visual', label: 'Визуал' },
@@ -1405,20 +1436,35 @@ git commit -m "feat: оценки звёздами, агрегаторы и ря
 
   // Насколько заранее просить следующую порцию. Экран с запасом: догрузка
   // обязана начаться до того, как человек упрётся в дно.
-  const AHEAD = 600
+  const AHEAD = '600px'
 
   let { views = [], collapsed = false, expected = [], onmore, onshown,
         ...card } = $props()
 
-  let box = $state()
   let asking = $state(false)
   const told = new Set()
 
-  // Просим ещё, только когда близко дно, и не просим повторно, пока предыдущая
-  // порция не приехала.
-  function scrolled() {
-    if (asking || !box) return
-    if (box.scrollHeight - box.scrollTop - box.clientHeight > AHEAD) return
+  /**
+   * И догрузка, и «карточка попала в поле зрения» — один наблюдатель на два
+   * дела, а не два разных средства.
+   *
+   * Прокрутку слушать нельзя: прокручивается `.content`, а лента внутри неё —
+   * обычная колонка, и `scroll` у непрокручиваемого блока не наступает вовсе.
+   * Тянуться вверх за скроллером значило бы, что компонент знает про раскладку
+   * сборки. Наблюдатель этого не требует: он работает от того, что видно, а не
+   * от того, что прокручивается.
+   */
+  function watched(node, onseen) {
+    const eye = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) onseen()
+    }, { rootMargin: AHEAD })
+    eye.observe(node)
+    return { destroy: () => eye.disconnect() }
+  }
+
+  function more() {
+    // Не просим повторно, пока предыдущая порция не приехала.
+    if (asking) return
     asking = true
     Promise.resolve(onmore()).finally(() => { asking = false })
   }
@@ -1433,12 +1479,14 @@ git commit -m "feat: оценки звёздами, агрегаторы и ря
   }
 </script>
 
-<div class="feed" bind:this={box} onscroll={scrolled}>
+<div class="feed">
   {#each views as view (view.source + ' ' + view.source_id)}
-    <div onintroend={() => shown(view)}>
+    <div use:watched={() => shown(view)}>
       <Film {view} {collapsed} {expected} {...card} />
     </div>
   {/each}
+  <!-- Метка дна: попала в поле зрения — значит пора просить следующую порцию. -->
+  <div class="feed__end" use:watched={more}></div>
 </div>
 ```
 
@@ -1447,13 +1495,12 @@ git commit -m "feat: оценки звёздами, агрегаторы и ря
 чужим данным. Пул карточек в вебе не заводится — эта пара и есть то, что вместо
 него держит соответствие.
 
-**Что считать «попала в поле зрения», решает исполнитель** и записывает довод в
-код: у `content-visibility` есть событие `contentvisibilityautostatechange`,
-которое срабатывает ровно на смене «рисуется / не рисуется», а есть
-`IntersectionObserver`, который работает независимо от него. Первое короче и не
-заводит наблюдателя на каждую карточку, второе понятнее и не зависит от свойства
-оформления. Оба годятся; `onintroend` выше — заглушка, которую надо заменить
-одним из двух.
+**Наблюдатель, а не событие оформления.** У `content-visibility` есть
+`contentvisibilityautostatechange`, и он короче — но тогда «карточка показалась»
+зависело бы от свойства оформления, а «пора догружать» пришлось бы решать вторым
+средством. Один `IntersectionObserver` закрывает оба дела и не зависит ни от
+того, какой предок прокручивается, ни от того, включено ли
+`content-visibility`.
 
 - [ ] **Шаг 2: Написать три круга по требованию**
 
@@ -1559,7 +1606,7 @@ git commit -m "feat: лента порциями и три круга по тр�
   import { passes } from '$state/filters.js'
   import { onCardShown } from './visible.js'
 
-  let { session, query = '', ontrouble } = $props()
+  let { session, query = '', ontrouble, onmark, onperson } = $props()
 
   let views = $state([])
   let expected = $state([])
@@ -1637,9 +1684,16 @@ git commit -m "feat: лента порциями и три круга по тр�
       onmore={() => {}}
       onshown={(view) => onCardShown(view, ops)}
       onscore={add} onaspect={add} oncollapse={() => {}}
+      on={session.filters.on} onmark={onmark} onperson={onperson}
       onedit={() => {}} ondelete={() => {}} onwish={() => {}}
-      onperson={() => {}} ontag={() => {}} />
+      ontag={() => {}} />
 ```
+
+**Метка и человек уходят наверх, а не решаются здесь.** Клик по жанру или тегу
+включает фильтр по себе, клик по имени открывает поиск по человеку — и то и
+другое меняет общее состояние, то есть принадлежит сборке. Экран только
+пробрасывает: `on` вниз, `onmark` и `onperson` наверх. Тело `onperson` пишет
+план 11 задачей 5 — там же, где заводится `search.by_person`.
 
 **Порции в поиске не догружаются**, и `onmore` пуст намеренно: у TMDB одна
 страница выдачи это ровно 20 кандидатов и один запрос, у игр два магазина по 20.
@@ -1688,8 +1742,13 @@ git commit -m "feat: поиск — своё сразу, внешнее по г�
 
 Два раздела на одной ленте, отличающиеся только тем, что спрашивают у бэкенда.
 
-**Фильтры и сортировка действуют здесь, а в поиске нет.** Фильтр по своему тегу
-оставил бы только то, что уже в библиотеке, то есть выключил бы внешний поиск.
+**Фильтры действуют везде, включая поиск** — решение пользователя от
+31.07.2026. Разница в том, **кто** фильтрует: здесь база, потому что она не
+тащит через границу то, что всё равно скроют; в поиске страница, потому что
+спросить источник с нашими тегами и оценками нечем.
+
+**Сортировка — только здесь.** В поиске порядок задан склейкой двух половин, и
+переключатель на неё не действует.
 
 **Порция — 50.** Лента читается с диска и стоит дёшево.
 
@@ -1742,7 +1801,7 @@ export function requestOf(session) {
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
   const PAGE = 50
 
-  let { session, ontrouble } = $props()
+  let { session, ontrouble, onmark, onperson } = $props()
 
   let views = $state([])
   let expected = $state([])
@@ -1806,8 +1865,8 @@ export function requestOf(session) {
 <Feed {views} collapsed={session.collapsed} {expected} onmore={more}
       onshown={(view) => onCardShown(view, ops)}
       onscore={score} onaspect={aspect} onwish={wish} oncollapse={collapse}
-      onedit={() => {}} ondelete={() => {}} onperson={() => {}}
-      ontag={() => {}} />
+      on={session.filters.on} onmark={onmark} onperson={onperson}
+      onedit={() => {}} ondelete={() => {}} ontag={() => {}} />
 ```
 
 **Свёрнутость приходит с двух сторон, и это не путаница.** Тумблер шапки —
@@ -1841,7 +1900,8 @@ git commit -m "feat: разделы «Оценённые» и «Хочу пос�
 ## Самопроверка плана
 
 **Покрытие.** Спека разделов — задачи 5 и 6: первые три раздела одна лента,
-фильтры в поиске не действуют, порядок по умолчанию у отложенного свой.
+фильтры действуют и в поиске (там их применяет страница), сортировка в поиске
+не применяется, порядок по умолчанию у отложенного свой.
 `search-and-loading.md` — задачи 4 и 5: своё сразу, внешнее по готовности, порции
 20 и 50, свёрнутость на загрузку не влияет, кандидат ещё не карточка. Спека
 клиента, «Лента» — задачи 2 и 4. `errors.md` — задача 5: плашка только когда база

@@ -745,7 +745,8 @@ git commit -m "feat: палитра, база и локальные шрифты
 **Интерфейсы:**
 - Потребляет: ничего.
 - Отдаёт: `EMPTY`, `cycled(filters, field, id)`, `marked(filters, field, id)`,
-  `chosen(filters)`, `isEmpty(filters)`, `passes(view, filters)`;
+  `chosen(filters)`, `isEmpty(filters, field?)`, `cleared(filters, field)`,
+  `passes(view, filters)`;
   `SORT_STATES`, `ADDED_AT`, `cycleOf(section)`,
   `nextSort(section, position)`, `stateAt(section, position)`, `orderOf(index)`,
   `orderFor(section, position)`; `newSession()`,
@@ -759,7 +760,8 @@ git commit -m "feat: палитра, база и локальные шрифты
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY, chosen, cycled, isEmpty, marked, passes } from '$state/filters.js'
+import { EMPTY, chosen, cleared, cycled, isEmpty, marked, passes }
+  from '$state/filters.js'
 
 describe('строка фильтра', () => {
   it('перебирает три состояния по кругу', () => {
@@ -808,6 +810,21 @@ describe('строка фильтра', () => {
 
   it('знает, что фильтр применён — по нему горит кнопка в шапке', () => {
     expect(isEmpty(cycled(EMPTY, 'tags', 3))).toBe(false)
+  })
+
+  it('кнопка фильтра горит и гаснет за свой признак', () => {
+    // Три кнопки, и каждая про своё: общая проверка сделала бы сочетание
+    // «жанр и тег» недостижимым — сброс одного стирал бы второй.
+    const tagged = cycled(EMPTY, 'tags', 3)
+
+    expect(isEmpty(tagged, 'tags')).toBe(false)
+    expect(isEmpty(tagged, 'genres')).toBe(true)
+
+    const both = cycled(tagged, 'genres', 7)
+    const left = cleared(both, 'genres')
+
+    expect(isEmpty(left, 'genres')).toBe(true)
+    expect(isEmpty(left, 'tags')).toBe(false)
   })
 })
 
@@ -1110,10 +1127,26 @@ export function marked(filters, field, id) {
   }
 }
 
-/** По этому горит кнопка фильтра в шапке. */
-export function isEmpty(filters) {
-  return FIELDS.every((field) => !filters.on[field].length
-                              && !filters.ex[field].length)
+/** Признак сброшен, остальные на месте: кнопка фильтра гасит свой, а не все.
+ *  Второе нажатие по горящей кнопке — это «убрать этот отбор», и убирать вместе
+ *  с ним чужой значило бы отменять то, чего человек не трогал. */
+export function cleared(filters, field) {
+  return {
+    on: { ...filters.on, [field]: [] },
+    ex: { ...filters.ex, [field]: [] },
+  }
+}
+
+/** По этому горит кнопка фильтра в шапке.
+ *
+ *  Признак необязателен: без него — «нет ни одного фильтра вовсе», с ним — «нет
+ *  фильтра по этому признаку». Кнопок в шапке три, и каждая обязана гореть за
+ *  себя: спека требует сочетаний («между признаками — по „и“»), а одна общая
+ *  проверка делала бы «выбрал драму, исключил ужасы» недостижимым с экрана. */
+export function isEmpty(filters, field = null) {
+  const fields = field ? [field] : FIELDS
+  return fields.every((one) => !filters.on[one].length
+                            && !filters.ex[one].length)
 }
 
 /** Проходит ли карточка фильтр. Нужно поиску: спросить источник с фильтром
@@ -1636,6 +1669,12 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   padding: 14px var(--corner);
 }
 
+/* Обёртка переключателя: её и замеряет шапка. Собственной ширины у неё нет —
+   она ровно по содержимому, поэтому раскладка от неё не меняется. */
+.topbar__seg { grid-column: 2 }
+
+/* Прокручивается область содержимого, а не лента: полоса идёт у края окна, а
+   не по краю колонки с карточками. */
 .content {
   flex: 1;
   min-height: 0;
@@ -1730,9 +1769,10 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 ```css
 /* Колонки в 1fr при авто-ширине контейнера выравниваются по самой широкой —
-   сегменты получаются одинаковыми без ручной ширины. */
+   сегменты получаются одинаковыми без ручной ширины.
+   Колонку шапки держит обёртка `.topbar__seg`: её замеряет шапка, и своей
+   `grid-column` здесь быть не должно — иначе их две на одно место. */
 .seg {
-  grid-column: 2;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
@@ -1951,11 +1991,37 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   import SearchField from '$components/SearchField.svelte'
   import Segmented from '$components/Segmented.svelte'
   import ToolButton from '$components/ToolButton.svelte'
-  import { isEmpty } from '$state/filters.js'
+  import { isEmpty, marked } from '$state/filters.js'
   import { withCollapsed, withKind, withSection } from '$state/session.js'
   import { nextSort, stateAt } from '$state/sorting.js'
 
   let { session, onsession, onsearch, onadd, onfilter } = $props()
+
+  let bar = $state()
+  let seg = $state()
+
+  /**
+   * Ширина боковых зон считается замером, а не числом: подписи «Хочу
+   * посмотреть» и «Фильтр по оценке» длиннее любой догадки, и на глаз шапка
+   * разъедется на первом же шрифте.
+   *
+   * Замер живёт здесь, а не в сборке: шапка владеет обеими зонами и своей
+   * переменной, а сборка добиралась бы до них `querySelector` по именам
+   * классов — то есть знала бы про чужую разметку, а не про входные параметры.
+   *
+   * Шрифт приезжает позже разметки, и первый замер без него врёт: подписи ещё
+   * системные, ширина другая.
+   */
+  $effect(() => {
+    const measure = () => {
+      if (!seg || !bar) return
+      bar.style.setProperty('--side-w', `${Math.ceil(seg.offsetWidth)}px`)
+    }
+
+    document.fonts.ready.then(measure)
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  })
 
   const KINDS = [
     { value: 'movie',  icon: 'movie',           label: 'Фильмы' },
@@ -2006,10 +2072,15 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   }
 </script>
 
-<header class="topbar">
+<header class="topbar" bind:this={bar}>
   <SearchField {onsearch} />
 
-  <Segmented items={KINDS} chosen={session.kind} onchoose={chooseKind} />
+  <!-- Замеряется обёртка, а не сам переключатель: ссылку на свой корень
+       компонент наружу не отдаёт, и просить её значило бы завести ему входной
+       параметр ради чужой раскладки. -->
+  <div bind:this={seg} class="topbar__seg">
+    <Segmented items={KINDS} chosen={session.kind} onchoose={chooseKind} />
+  </div>
 
   <div class="tools" class:is-drawing={drawing}>
     {#each VIEWS as view (view.value)}
@@ -2032,8 +2103,8 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
     {#each FILTERS as filter (filter.field)}
       <ToolButton icon={filter.icon} label={filter.label}
-                  active={!isEmpty(session.filters)}
-                  pressed={!isEmpty(session.filters)}
+                  active={!isEmpty(session.filters, filter.field)}
+                  pressed={!isEmpty(session.filters, filter.field)}
                   onclick={() => onfilter(filter.field)} />
     {/each}
 
@@ -2075,26 +2146,10 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   import { newSession } from '$state/session.js'
 
   let session = $state(newSession())
-  let topbar = $state()
-
-  // Шрифт приезжает позже разметки, и первый замер без него врёт: подписи
-  // ещё системные, ширина другая.
-  $effect(() => {
-    const measure = () => {
-      const seg = topbar?.querySelector('.seg')
-      const bar = topbar?.querySelector('.topbar')
-      if (!seg || !bar) return
-      bar.style.setProperty('--side-w', `${Math.ceil(seg.offsetWidth)}px`)
-    }
-
-    document.fonts.ready.then(measure)
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  })
 </script>
 
 <div class="app">
-  <main class="app__main" bind:this={topbar}>
+  <main class="app__main">
     <Topbar {session}
             onsession={(next) => { session = next }}
             onsearch={() => {}} onadd={() => {}} onfilter={() => {}} />
@@ -2105,7 +2160,8 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 
 `--content-w` здесь не считается: её потребители — гистограмма и лента, и
 появятся они в планах 7 и 8. Заводить её раньше значило бы завести переменную
-без сегодняшнего потребителя.
+без сегодняшнего потребителя. **Считать её будет план 7**, тем же замером и в
+том же месте, что и `--side-w`: обе про ширину шапки, и разъехаться им нельзя.
 
 - [ ] **Шаг 5: Подключить стили**
 
@@ -2303,34 +2359,30 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
   let session = $state(newSession())
   let trouble = $state('')
-  let topbar = $state()
 
   const Screen = $derived(SCREENS[session.section])
 
-  $effect(() => {
-    const measure = () => {
-      const seg = topbar?.querySelector('.seg')
-      const bar = topbar?.querySelector('.topbar')
-      if (!seg || !bar) return
-      bar.style.setProperty('--side-w', `${Math.ceil(seg.offsetWidth)}px`)
-    }
-
-    document.fonts.ready.then(measure)
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  })
+  // Одна плашка на все сообщения: разделы говорят сюда, а не заводят свою.
+  const ontrouble = (text) => { trouble = text }
 </script>
 
 <div class="app">
-  <main class="app__main" bind:this={topbar}>
+  <main class="app__main">
     <Topbar {session}
             onsession={(next) => { session = next }}
             onsearch={() => {}} onadd={() => {}} onfilter={() => {}} />
 
+    <!-- Прокручивается область содержимого, а не лента: так в макете, и полоса
+         идёт у края окна, а не по краю колонки шириной 1146 пикселей. -->
     <div class="content">
       {#key session.section}
         <section class="view is-shown">
-          <Screen />
+          <Screen {session} {ontrouble}
+                  onmark={(field, id) => {
+                    session = { ...session,
+                                filters: marked(session.filters, field, id) }
+                  }}
+                  onperson={() => {}} />
         </section>
       {/key}
     </div>
@@ -2397,10 +2449,13 @@ git commit -m "feat: четыре раздела стопкой, переход 
 **Что этот план сознательно не делает.** Ни одной карточки: лента пуста, и
 `.feed` — пустой блок. Модалок нет вовсе, и кнопки фильтров зовут пустой
 обработчик. Гистограммы нет. `--content-w` не считается: её потребители
-появятся в планах 7 и 8, и раньше это была бы переменная без потребителя.
-Разбор «какой именно фильтр применён» по признакам — план 8: сейчас все три
-кнопки горят от одного `isEmpty`, как и написано в спеке.
+появятся в планах 7 и 8, и раньше это была бы переменная без потребителя;
+считает её план 7, там же, где `--side-w`.
+Модалок нет: кнопки фильтров зовут пустой обработчик, а горят уже по своему
+признаку — `isEmpty(filters, field)`. Общая на три кнопки проверка сделала бы
+сочетание «жанр и тег» недостижимым с экрана, а спека требует «между признаками
+— по „и“».
 
-**Чем измеряется готовность.** `npm test` зелёный, 41 тест. Окно открывается,
+**Чем измеряется готовность.** `npm test` зелёный, 43 теста. Окно открывается,
 шапка совпадает с макетом при сверке рядом, переключение типа перетекает
 акцентом, разделы меняются проявлением, плашка выезжает и уходит.
