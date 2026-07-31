@@ -338,6 +338,7 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `CATALOG` = `'https://catalog.gog.com/v1/catalog'`
+- `PRODUCT` = `'https://api.gog.com/products/{source_id}'`
 
 ### `backend/sources/http.py`
 
@@ -543,6 +544,10 @@
 ### `tests/backend/sources/conftest.py`
 
 - `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
+
+### `tests/backend/sources/test_gog.py`
+
+- `WANTED` = `'1456460669'`
 
 ### `tests/backend/sources/test_gog_slug.py`
 

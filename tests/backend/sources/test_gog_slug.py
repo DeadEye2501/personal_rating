@@ -68,9 +68,11 @@ async def test_the_number_comes_back(fixture):
     assert result.value == "1207658930"
 
 
-async def test_the_slug_becomes_words_in_the_query(fixture):
-    """Форма запроса — самое хрупкое место задачи: живьём она не проверена. Хотя
-    бы зафиксируем, что уходит именно то, что задумано."""
+async def test_the_slug_itself_is_asked_first(fixture):
+    """Форма запроса — самое хрупкое место задачи, и живьём она проверена
+    31.07.2026: первой уходит сама строка слага. Нашлось с первого раза — второй
+    запрос не делается, лишний поход в сеть на каждую вставленную ссылку стоил бы
+    дороже редкой второй попытки."""
     asked = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -81,7 +83,28 @@ async def test_the_slug_becomes_words_in_the_query(fixture):
 
     await client(handler).resolve_slug(SLUG)
 
-    assert asked == ["like:arcanum of steamworks and magick obscura"]
+    assert asked == [f"like:{SLUG}"]
+
+
+async def test_the_second_form_is_asked_when_the_first_misses(fixture):
+    """Каталог отвечает находкой только на вторую форму, словами. Не будь её,
+    существующая игра по вставленной ссылке объявлялась бы отсутствующей — а это
+    ложный отрицательный факт, и живёт он в базе неделю. Почему форм две и
+    почему одной не хватает — замер в докстринге `resolve_slug`."""
+    asked = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        query = request.url.params["query"]
+        asked.append(query)
+        body = fixture("gog/catalog_nonsense.json") if "_" in query \
+            else fixture("gog/catalog_by_slug.json")
+        return httpx.Response(200, json=body)
+
+    result = await client(handler).resolve_slug(SLUG)
+
+    assert isinstance(result, Found), "вторая форма запроса не пробовалась"
+    assert result.value == "1207658930"
+    assert asked == [f"like:{SLUG}", f"like:{SLUG.replace('_', ' ')}"]
 
 
 async def test_a_slug_the_catalog_does_not_have_is_missing():

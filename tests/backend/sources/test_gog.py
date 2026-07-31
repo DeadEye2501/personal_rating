@@ -8,6 +8,7 @@ from backend.model import (
     Found,
     GenreSource,
     Kind,
+    Missing,
     RatingSource,
     Reason,
     Refusal,
@@ -16,12 +17,18 @@ from backend.model import (
 from backend.sources.gog.client import GogClient
 from backend.sources.gog.parse import parse_catalog, to_hit
 from backend.sources.http import SourceHttp
-from tests.conftest import responding
+from tests.conftest import responding, unreachable
 
 
 def answering(body) -> SourceHttp:
     """Каталог GOG отвечает всегда — отсюда обёртка вокруг общей заготовки."""
     return SourceHttp("gog", transport=responding(json=body))
+
+
+# Номер, под которым один и тот же продукт лежит в обеих записанных фикстурах:
+# в товарной ручке с названием «Baldur's Gate 3» и в ответе каталога. Цепочка
+# «номер → название → каталог» иначе не проверяется целиком.
+WANTED = "1456460669"
 
 
 def test_catalog_row_is_already_a_card(fixture):
@@ -203,30 +210,109 @@ async def test_search_asks_the_catalog_the_way_that_answers(fixture):
     assert "locale=ru-RU" in seen["url"]
 
 
-async def test_card_picks_the_asked_identifier(fixture):
-    cards = parse_catalog(fixture("gog/catalog.json"))
-    wanted = cards[1].item.source_id
-    client = GogClient(answering(fixture("gog/catalog.json")))
+async def test_card_picks_the_asked_identifier(replay):
+    """Номер приходит из выдачи поиска, и по нему собирается карточка. Ответы
+    идут парой: сначала товарная ручка с названием, потом каталог."""
+    client = GogClient(SourceHttp(
+        "gog", transport=replay("gog/product.json", "gog/catalog.json")
+    ))
 
-    result = await client.card(wanted, Kind.GAME)
+    result = await client.card(WANTED, Kind.GAME)
     await client.aclose()
 
     assert isinstance(result, Found)
-    assert result.value.item.source_id == wanted
+    assert result.value.item.source_id == WANTED
 
 
-async def test_card_that_the_catalog_did_not_return_is_not_a_negative_fact(fixture):
-    """Каталог не отдал запрошенный идентификатор — это отказ, а не «игры
-    нет». Спрашиваем мы конкретный id, но спрашиваем у поиска по названию, а он
-    отвечает чем-нибудь на что угодно. Записать отсюда Missing значит навсегда
-    не дать добавить существующую игру."""
-    client = GogClient(answering(fixture("gog/catalog.json")))
+async def test_the_catalog_is_asked_by_title_and_never_by_number(fixture):
+    """Сторожим оба запроса разом: сначала товарная ручка номером, потом каталог
+    названием. Подстановка номера в каталог возвращает прежнюю поломку, при
+    которой игру из GOG нельзя было добавить вовсе — почему именно название, а
+    не слаг, замерено в докстринге `_title`."""
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url)
+        body = fixture("gog/product.json") if len(seen) == 1 \
+            else fixture("gog/catalog.json")
+        return httpx.Response(200, json=body)
+
+    client = GogClient(SourceHttp("gog", transport=httpx.MockTransport(handler)))
+    await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
+    assert f"api.gog.com/products/{WANTED}" in str(seen[0])
+    assert seen[1].host == "catalog.gog.com"
+    # Сверяем разобранный параметр, а не строку адреса: как httpx кодирует
+    # апостроф и пробел, к делу не относится.
+    asked = seen[1].params["query"]
+    assert asked == "like:Baldur's Gate 3", "каталог спрошен названием"
+    assert WANTED not in asked, "номер в каталоге не находит ничего"
+
+
+async def test_a_number_that_is_no_product_is_missing(replay):
+    """У товарной ручки 404 — единственное честное «такого продукта нет» у GOG:
+    поиск в каталоге сказать этого не умеет, а она умеет. Проверено живьём и
+    записано в спеке отказов."""
+    client = GogClient(SourceHttp(
+        "gog", transport=replay("gog/product_missing.json")
+    ))
 
     result = await client.card("999999999", Kind.GAME)
     await client.aclose()
 
+    assert isinstance(result, Missing)
+
+
+async def test_card_that_the_catalog_did_not_return_is_not_a_negative_fact(replay):
+    """Товар есть, а каталог его не отдал — это отказ, а не «игры нет».
+    Каталог отвечает чем-нибудь на что угодно, и записать отсюда Missing значит
+    навсегда не дать добавить существующую игру."""
+    client = GogClient(SourceHttp(
+        "gog", transport=replay("gog/product.json", "gog/catalog_nonsense.json")
+    ))
+
+    result = await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
+
+
+async def test_a_broken_product_answer_does_not_crash_the_client():
+    """Названия в ответе не оказалось — отказ, а не исключение через границу."""
+    client = GogClient(answering({"id": 1456460669}))
+
+    result = await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+
+
+async def test_a_product_endpoint_failure_is_a_refusal():
+    """Отказ товарной ручки — отказ всей карточки: без названия спрашивать
+    каталог нечем, и «нет игры» отсюда не следует. Ветка своя: у `card` теперь
+    два запроса, и первый ходит к другому хосту."""
+    client = GogClient(SourceHttp("gog", transport=responding(500)))
+
+    result = await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.BROKEN
+
+
+async def test_a_dead_network_on_the_product_endpoint_is_a_refusal():
+    """`SourceHttp.get` отдаёт отказ вместо ответа — до этой ветки транспорт с
+    готовым телом не доводит никогда."""
+    client = GogClient(SourceHttp("gog", transport=unreachable()))
+
+    result = await client.card(WANTED, Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.NETWORK
 
 
 async def test_server_failure_is_a_refusal():

@@ -13,6 +13,11 @@ from backend.sources.undocumented import refuse_undocumented
 logger = logging.getLogger(__name__)
 
 CATALOG = "https://catalog.gog.com/v1/catalog"
+# Каталог ищет только текстом: на числовой запрос он отвечает `productCount: 0`,
+# а `productIds` и `query=id:` игнорирует молча, отдавая случайную выдачу —
+# проверено живьём 31.07.2026. Номер в название переводит эта ручка, и она же
+# единственная у GOG умеет сказать «такого продукта нет».
+PRODUCT = "https://api.gog.com/products/{source_id}"
 
 
 class GogClient:
@@ -20,8 +25,12 @@ class GogClient:
     200 и два десятка несвязанных игр, на пустой запрос — весь каталог.
 
     Отсюда правило, которое этот клиент обязан держать: **`Missing` не
-    возвращается ни из `search`, ни из `card`.** Пустой список — это «поиск
-    отранжировал мимо», а не «игры в каталоге нет».
+    возвращается ни из `search`, ни из `card`.** Пустой список и чужая выдача —
+    это «поиск отранжировал мимо», а не «игры в каталоге нет».
+
+    Отрицательный факт дают два места, и каждое спрашивает не «что похоже», а
+    «есть ли ровно это»: товарная ручка кодом 404 — у `card`, и точное
+    совпадение слага — у `resolve_slug`.
 
     Аргумент `kind` есть ради общего контракта каталожных клиентов и
     игнорируется: у GOG содержимое одного типа."""
@@ -61,14 +70,37 @@ class GogClient:
             return cards
         return Found([to_hit(card) for card in cards])
 
-    async def card(self, source_id: str, kind: Kind) -> Outcome:
-        """Повторяет тот же запрос и выбирает нужный идентификатор. Лишний
-        запрос — цена за то, что контракт у трёх магазинов один.
+    async def _title(self, source_id: str) -> str | Outcome:
+        """Название по номеру. Отдельный запрос — цена за то, что контракт у трёх
+        магазинов один: снаружи карточка спрашивается номером, а каталог номера
+        не понимает.
 
-        Не нашли нужный id — это «поиск отранжировал мимо», а не «игры в
-        каталоге нет»: спрашиваем мы конкретный идентификатор, но спрашиваем
-        его у поиска по названию."""
-        cards = await self._catalog(source_id)
+        Берём именно название, а не слаг: замерено на шести играх 31.07.2026 —
+        по названию каталог находит нужную все шесть раз, по словам слага три из
+        шести. Длинный слаг вроде `..._game_of_the_year_edition` уводит поиск на
+        девять чужих игр, а тот же товар по названию отдаётся один."""
+        response = await self._http.get(PRODUCT.format(source_id=source_id))
+        if not isinstance(response, httpx.Response):
+            return response
+        if response.status_code == 404:
+            logger.info("gog: продукта %s нет", source_id)
+            return Missing()
+        if response.status_code != 200:
+            return refuse_undocumented(self._http, response.status_code)
+        return parsed(logger, "gog", f"товар {source_id} не разобрался",
+                      lambda: response.json()["title"])
+
+    async def card(self, source_id: str, kind: Kind) -> Outcome:
+        """Номер переводится в название, и название уходит в каталог: строкой
+        каталога карточка приезжает целиком, отдельной детальной ручки у GOG нет.
+
+        Каталог не отдал нужный id — это «поиск отранжировал мимо», а не «игры
+        нет»: спрашиваем мы конкретный идентификатор, но спрашиваем его у поиска
+        по названию."""
+        title = await self._title(source_id)
+        if not isinstance(title, str):
+            return title
+        cards = await self._catalog(title)
         if isinstance(cards, Refusal):
             return cards
         for card in cards:
@@ -81,24 +113,37 @@ class GogClient:
         )
 
     async def resolve_slug(self, slug: str) -> Outcome:
-        """В адресе у GOG слаг, а каталогу нужен номер. Спрашиваем каталог тем же
-        слагом, разобранным на слова, и берём только точное совпадение.
+        """В адресе у GOG слаг, а каталогу нужен номер. Ручки «слаг → номер» у
+        GOG нет вовсе — проверено живьём: `v2/games?slug` и `products?slug`
+        параметр игнорируют. Значит спрашиваем каталог самим слагом, и берём
+        только точное совпадение.
+
+        Форм запроса две, и обе нужны: замерено на шести играх 31.07.2026 — слаг
+        словами не находит `the_witcher_3_wild_hunt_game_of_the_year_edition`
+        (каталог отдаёт девять чужих игр), слаг подчёркиваниями не находит
+        коротких вроде `baldurs_gate_iii`. Каждая форма берёт три игры из шести,
+        вместе — все шесть. Ложного срабатывания вторая попытка не добавляет:
+        принимается только точное совпадение слага.
 
         `Missing` тут возвращается, хотя из `search` и `card` — никогда: здесь
         спрашивают не «что похоже на это название», а «есть ли ровно такой
         слаг», и его отсутствие — честный ответ."""
-        payload = await self._payload(slug.replace("_", " "))
-        if isinstance(payload, Refusal):
-            return payload
-        found = parsed(logger, "gog", f"каталог по слагу {slug} не разобрался",
-                       lambda: find_slug(payload, slug))
-        if isinstance(found, Refusal):
-            return found
+        # Слаг без подчёркиваний обе формы даёт одинаковыми, и второй запрос был
+        # бы тем же самым: спрашиваем один раз.
+        for query in dict.fromkeys((slug, slug.replace("_", " "))):
+            payload = await self._payload(query)
+            if isinstance(payload, Refusal):
+                return payload
+            found = parsed(logger, "gog",
+                           f"каталог по слагу {slug} не разобрался",
+                           lambda: find_slug(payload, slug))
+            if isinstance(found, Refusal):
+                return found
+            if found is not None:
+                return Found(found)
 
-        if found is None:
-            logger.info("gog: слага %s в каталоге не нашлось", slug)
-            return Missing()
-        return Found(found)
+        logger.info("gog: слага %s в каталоге не нашлось", slug)
+        return Missing()
 
     async def aclose(self) -> None:
         await self._http.aclose()

@@ -127,6 +127,15 @@ async def record_gog(client: httpx.AsyncClient) -> None:
     save("gog", "catalog_nonsense", await client.get(
         "https://catalog.gog.com/v1/catalog",
         params={"query": "like:zzqqxxnotagame123", "locale": "ru-RU"}))
+    # Товарная ручка: она переводит номер в название, потому что каталог по
+    # числу не находит ничего. Номер взят из ответа каталога выше — цепочка
+    # «номер → название → каталог» иначе не проверяется целиком.
+    save("gog", "product", await client.get(
+        "https://api.gog.com/products/1456460669"))
+    # Единственное место, где GOG умеет сказать «такого продукта нет». Номер
+    # заведомо несуществующий: у `products/1` лежит настоящая игра.
+    save("gog", "product_missing", await client.get(
+        "https://api.gog.com/products/999999999"))
 
 
 async def record_mdblist(client: httpx.AsyncClient, key: str) -> None:

@@ -377,19 +377,20 @@
 - `def is_json(response: httpx.Response) -> bool` (11)
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 
-### `backend/sources/gog/client.py` — 104 строк
+### `backend/sources/gog/client.py` — 149 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (87)
+- `class GogClient` (127)
   - `def name(self) -> str` (4)
   - `async def _payload(self, query: str) -> dict | Refusal` (12)
   - `async def _catalog(self, query: str) -> list | Refusal` (6)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (18)
-  - `async def resolve_slug(self, slug: str) -> Outcome` (19)
+  - `async def _title(self, source_id: str) -> str | Outcome` (19)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (21)
+  - `async def resolve_slug(self, slug: str) -> Outcome` (32)
   - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/gog/parse.py` — 74 строк
@@ -931,7 +932,7 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
-### `scripts/record_fixtures.py` — 198 строк
+### `scripts/record_fixtures.py` — 207 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -941,7 +942,7 @@
 - `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (24)
 - `async def record_steam(client: httpx.AsyncClient) -> None` (35)
   - `def ask(ids: list[dict]) -> str` (7)
-- `async def record_gog(client: httpx.AsyncClient) -> None` (9)
+- `async def record_gog(client: httpx.AsyncClient) -> None` (18)
 - `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
 - `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
@@ -980,23 +981,23 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 283 строк
+### `tests/backend/sources/test_gog.py` — 369 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 21
+Тестов: 26
 
 - `def answering(body) -> SourceHttp` (3)
 
-### `tests/backend/sources/test_gog_slug.py` — 124 строк
+### `tests/backend/sources/test_gog_slug.py` — 147 строк
 
 Слаг из адреса GOG в номер каталога.
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
 
-Тестов: 13
+Тестов: 14
 
 - `def client(handler) -> GogClient` (2)
 
