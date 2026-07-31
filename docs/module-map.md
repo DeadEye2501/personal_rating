@@ -935,7 +935,7 @@
 - `def unique(items: Iterable[T]) -> list[T]` (11)
 - `def unique_by(items: Iterable[T], key: Callable[[T], Hashable]) -> list[T]` (14)
 
-## bridge — 9 модулей
+## bridge — 10 модулей
 
 ### `bridge/answer.py` — 71 строк
 
@@ -1063,6 +1063,29 @@
 - `def to_wire(value)` (29)
 - `def outcome(value) -> dict` (11)
 
+### `bridge/world.py` — 130 строк
+
+Мост: всё, что смотрит наружу, — привязка по ссылке, перезапрос сериала,
+
+Зависит от: `backend.model`, `bridge.answer`, `bridge.kept`, `bridge.wire`
+
+- `class BadLink(Denied)` (6)
+- `class ForeignScheme(Denied)` (5)
+- `class World(Domain)` (67)
+  - `def parse(self, raw: str, kind: str | None) -> dict` (10)
+  - `def card_for_link(self, op: int, raw: str, kind: str | None) -> dict` (4)
+  - `def link(self, op: int, item_id: int, overwrite: bool) -> dict` (10)
+  - `def refresh_series(self, op: int, item_id: int) -> dict` (4)
+  - `def enrich(self, op: int, item_id: int, kind: str) -> dict` (5)
+  - `def expected(self, op: int, kind: str) -> dict` (9)
+  - `def open(self, url: str) -> dict` (8)
+  - `async def _asked(self, back, op, raw, kind)` (5)
+- `async def _parsed(raw: str, kind: str | None)` (2)
+- `async def _expected(back, kind: str)` (2)
+- `async def _opened(url: str) -> None` (9)
+- `def _link(raw: str, kind: str | None)` (8)
+- `def _kind(kind: str | None) -> Kind | None` (4)
+
 ## migrations — 3 модулей
 
 ### `migrations/env.py` — 56 строк
@@ -1124,7 +1147,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 74 модулей
+## tests — 75 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1372,7 +1395,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def service(posters)` (8)
 - `async def furnished(sessions, posters, item_id: int, tag: str='пересмотреть') -> int` (9)
 
-### `tests/backend/test_denied.py` — 68 строк
+### `tests/backend/test_denied.py` — 77 строк
 
 Отказ операции — нормальный ход событий, и клиент обязан их различать.
 
@@ -1861,6 +1884,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 12
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
+
+### `tests/bridge/test_bridge_world.py` — 182 строк
+
+Мост: внешний мир — привязка, перезапрос, оценки агрегаторов.
+
+Зависит от: `backend.model`, `bridge.world`
+
+Тестов: 14
+
 
 ### `tests/bridge/test_kept.py` — 28 строк
 

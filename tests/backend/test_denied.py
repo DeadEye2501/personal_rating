@@ -44,14 +44,23 @@ async def test_two_denials_of_different_operations_keep_different_types(sessions
     assert type(taken.value) is not type(broken.value)
 
 
-def test_the_denials_are_five_and_all_of_them_are_here():
+def test_the_denials_of_the_model_are_five_and_all_of_them_are_here():
     """Список набран руками, и сверяется он с настоящим потомством предка: отказ,
     заведённый шестым, иначе не попал бы ни в одну проверку — а ради того, чтобы
     мост ловил один тип вместо перечисления, предок и заведён.
 
+    Считаются только объявленные в модели. Наследоваться от `Denied` вправе и
+    мост — так `bridge/world.py` объявляет «вставленное не похоже на адрес»,
+    и это не отказ бэкенда, а отказ стыка, доезжающий до плашки тем же путём.
+    Без этого отбора проверка ещё и зависела бы от того, какие модули успел
+    загрузить прогон.
+
     Отказ **вне** иерархии — свой `Exception` в хранилище — этим не ловится:
     такой не увидит и мост, и заметить его может только чтение."""
-    assert set(Denied.__subclasses__()) == set(FIVE)
+    ours = {kind for kind in Denied.__subclasses__()
+            if kind.__module__.startswith("backend.model")}
+
+    assert ours == set(FIVE)
     assert len(set(FIVE)) == 5
 
 

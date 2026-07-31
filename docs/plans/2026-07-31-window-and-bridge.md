@@ -2581,7 +2581,7 @@ git commit -m "feat: мост — поиск со складыванием вы�
   `link(op, item_id, overwrite)`, `refresh_series(op, item_id)`,
   `enrich(op, item_id, kind)`, `expected(op, kind)`, `open(url)`.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Создать `tests/bridge/test_bridge_world.py`:
 
@@ -2722,12 +2722,12 @@ def test_a_synchronous_backend_method_still_answers(thread, backend):
 проверяемое свойство лежит ровно на стыке «фабрика → `create_task`», а двойник
 этот стык и подменяет.
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_world.py -v`
 Ожидание: FAIL, `ModuleNotFoundError: No module named 'bridge.world'`.
 
-- [ ] **Шаг 3: Написать домен**
+- [x] **Шаг 3: Написать домен**
 
 Создать `bridge/world.py`:
 
@@ -2838,12 +2838,12 @@ def _kind(kind: str | None) -> Kind | None:
 `{"outcome": "found"}`, и другой ветки у неё нет. Если это перестанет быть
 правдой, память обязана держать только найденное.
 
-- [ ] **Шаг 4: Прогнать и увидеть зелёное**
+- [x] **Шаг 4: Прогнать и увидеть зелёное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_world.py -v`
 Ожидание: PASS, 11 тестов.
 
-- [ ] **Шаг 5: Коммит**
+- [x] **Шаг 5: Коммит**
 
 ```bash
 git add bridge/world.py tests/bridge/test_bridge_world.py
