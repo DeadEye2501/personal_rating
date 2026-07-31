@@ -263,3 +263,40 @@ async def test_closing_closes_every_connection():
         except RuntimeError:
             continue
         raise AssertionError(f"соединение {one.name} осталось открытым")
+
+
+CATALOG_OWNERS = ("tmdb", "steam", "gog")
+
+
+@pytest.mark.parametrize("owner", [*CATALOG_OWNERS, "mdblist", "omdb"])
+async def test_a_client_signs_refusals_with_the_name_it_calls_itself(owner):
+    """`name` уходит наружу единственным путём: сорвись у клиента корутина, имя
+    отказу подставит не он сам, а поймавший его `answered`. Разойдись оно с
+    литералом, которым клиент подписывает собственные отказы, — и человек увидит
+    в логе два разных источника вместо одного, а искать пойдёт не тот ключ.
+    Ровно этим однажды обернулось общее `imdb` у двух оценочных клиентов.
+
+    Отказ нужен именно собственный, собранный литералом. Мёртвая сеть для этого
+    не годится: её отказ подписывает `SourceHttp` своим же именем, и сравнение
+    вышло бы тавтологией. Поэтому каталожным даём пустое тело под кодом 200 —
+    разбор его не переживает, — а оценочным код 500, которого у них не описано:
+    и то, и другое клиент подписывает сам.
+
+    Кинопоиска в пятёрке нет намеренно: имя и подписи отказов обоих его зеркал
+    берутся из одной константы `SOURCE`, и сверка вышла бы той самой
+    тавтологией."""
+    catalog = owner in CATALOG_OWNERS
+    registry = build_sources(
+        keyed(), transport=SILENT if catalog else responding(500)
+    )
+    client = getattr(registry, owner)
+
+    if catalog:
+        result = await client.card("1", Kind.MOVIE if owner == "tmdb" else Kind.GAME)
+    else:
+        result = await client.ratings("tt0816692", Kind.MOVIE)
+
+    assert isinstance(result, Refusal), f"{owner}: этот ответ обязан отказать"
+    assert result.source == client.name
+
+    await registry.aclose()

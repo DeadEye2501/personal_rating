@@ -560,6 +560,7 @@
 ### `tests/backend/sources/test_registry.py`
 
 - `SILENT` = `responding(json={})`
+- `CATALOG_OWNERS` = `набор из 3`
 
 ### `tests/backend/test_config.py`
 
@@ -632,7 +633,6 @@
 
 ### `tests/backend/test_model.py`
 
-- `FROZEN` = `набор из 6`
 - `SCHEMA` = `набор из 8`
 
 ### `tests/backend/test_posters.py`

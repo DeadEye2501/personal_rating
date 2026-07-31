@@ -113,14 +113,22 @@ def test_a_game_from_the_last_century_keeps_its_year():
     assert parse_card(data).item.year == 1997
 
 
-def test_genres_arrive_with_identifiers(fixture):
-    card = parse_card(block_of(fixture("steam/appdetails.json")))
+def test_genres_come_from_the_genres_and_not_from_the_neighbours(fixture):
+    """Номера сверяются с записанным ответом, а не с их формой: у Steam рядом с
+    `genres` лежат `categories`, они устроены так же и тоже нумерованы. Подмена
+    ключа проходит проверку «цифры и пространство» молча, а в справочнике
+    `steam:2` — это `Strategy`, тогда как `categories[2]` — «Одиночная игра»:
+    каждая одиночная игра уехала бы в базу стратегией."""
+    block = block_of(fixture("steam/appdetails.json"))
+    card = parse_card(block)
 
-    assert card.genre_ext_ids
-    assert all(
-        space is GenreSource.STEAM and ext_id.isdigit()
-        for space, ext_id in card.genre_ext_ids
-    )
+    numbers = [ext_id for space, ext_id in card.genre_ext_ids
+               if space is GenreSource.STEAM]
+
+    # Сверяется равенство, и его хватает: в записанном ответе жанр один, а
+    # категорий девятнадцать, так что подмена ключа роняет тест длиной. Отдельное
+    # «не равно категориям» покраснеть не может никогда и потому не пишется.
+    assert numbers == [str(one["id"]) for one in block["genres"]]
 
 
 def test_tags_arrive_in_their_own_space(fixture):
@@ -133,6 +141,20 @@ def test_tags_arrive_in_their_own_space(fixture):
     assert all(
         space is GenreSource.STEAM_TAG and ext_id.isdigit() for space, ext_id in tags
     )
+
+
+def test_a_tag_is_its_number_and_not_its_weight(fixture):
+    """Номера тегов сверяются с записанным ответом: рядом с `tagid` в том же
+    объекте лежит `weight`, тоже целое, и подмена одного другим проверку «цифры
+    и пространство» проходит молча. В базу тогда уедут веса под видом номеров —
+    и совпадут с чужими жанрами."""
+    payload = fixture("steam/store_items.json")
+    recorded = payload["response"]["store_items"][0]["tags"]
+
+    numbers = [ext_id for _, ext_id in parse_tags(payload)]
+
+    assert numbers == [str(one["tagid"]) for one in recorded]
+    assert numbers != [str(one["weight"]) for one in recorded]
 
 
 def test_an_answer_without_items_gives_no_tags(fixture):

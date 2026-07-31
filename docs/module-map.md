@@ -1053,24 +1053,24 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 265 строк
+### `tests/backend/sources/test_registry.py` — 302 строк ⚠ подошёл к 300
 
 Реестр держится на том, что контракт у всех клиентов один.
 
 Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `tests.conftest`
 
-Тестов: 14
+Тестов: 15
 
 - `def sources()` (4)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 356 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam.py` — 378 строк ⚠ подошёл к 300
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
 
-Тестов: 26
+Тестов: 27
 
 - `def block_of(payload: dict) -> dict` (2)
 
@@ -1374,16 +1374,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 114 строк
+### `tests/backend/test_model.py` — 152 строк
 
 Типы границы слоёв: их поля, значения и неизменность.
 
-Зависит от: `backend.model`, `tests.conftest`
+Зависит от: `backend`, `backend.model`, `tests.conftest`
 
-Тестов: 9
+Тестов: 10
 
+- `def boundary_dataclasses()` (15)
 
-### `tests/backend/test_offline.py` — 332 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 333 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 

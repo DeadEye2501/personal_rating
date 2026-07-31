@@ -1,15 +1,15 @@
 """Типы границы слоёв: их поля, значения и неизменность."""
 
-from dataclasses import FrozenInstanceError
+from dataclasses import MISSING, FrozenInstanceError, is_dataclass
+
+import pkgutil
+from importlib import import_module
 
 import pytest
 
+from backend import model
 from backend.model import (
     CompanyRole,
-    Credit,
-    ExternalId,
-    ExternalRating,
-    Genre,
     GenreKind,
     GenreSource,
     IdSource,
@@ -47,25 +47,63 @@ def test_zero_counts_as_a_filled_aspect():
     assert average_score(0, 10, None) == 5.0
 
 
-FROZEN = [
-    (Item(id=1, kind=Kind.MOVIE, source=Source.TMDB, source_id="157336",
-          title="Интерстеллар", synced_at=MOMENT), "title", "другое"),
-    (Rating(item_id=1, score=8.0), "score", 1.0),
-    (Credit(name="Нолан", role=PersonRole.DIRECTOR), "name", "не Нолан"),
-    (Genre(id=1, name="Драма", kind=GenreKind.FILM), "name", "Комедия"),
-    (ExternalId(source=IdSource.IMDB, value="tt0816692"), "value", "tt0000000"),
-    (ExternalRating(source=RatingSource.IMDB, value=8.6, fetched_at=MOMENT),
-     "value", 1.0),
-]
+def boundary_dataclasses():
+    """Все датаклассы модели. Собираются обходом её подмодулей, а не списком:
+    перечисленный руками отстаёт молча — так и вышло, шесть имён против
+    двадцати трёх объявлений.
+
+    Обход идёт по файлам, а не по `model.__all__`, и это не одно и то же:
+    забытый в поверхности тип из `__all__` выпал бы вместе с проверкой, а
+    клиенту он всё равно открыт — граница слоёв пускает любой `backend.model.*`
+    по префиксу, а не по списку."""
+    for info in pkgutil.iter_modules(model.__path__):
+        submodule = import_module(f"{model.__name__}.{info.name}")
+        for declared in vars(submodule).values():
+            if (isinstance(declared, type) and is_dataclass(declared)
+                    and declared.__module__ == submodule.__name__):
+                yield declared
 
 
-@pytest.mark.parametrize(("value", "field", "other"), FROZEN,
-                         ids=lambda item: type(item).__name__)
-def test_boundary_types_are_frozen(value, field, other):
-    # Через границу слоёв они ходят между потоками: разморозь один — и
-    # состояние карточки поедет вслед за ссылкой.
-    with pytest.raises(FrozenInstanceError):
-        setattr(value, field, other)
+@pytest.mark.parametrize("declared", list(boundary_dataclasses()),
+                         ids=lambda cls: cls.__name__)
+def test_every_boundary_type_is_named_on_the_surface(declared):
+    """Поверхность `backend.model` — то, что клиент берёт по имени. Тип, забытый
+    в `__all__`, импортируется всё равно, но перестаёт быть объявленным: его не
+    видит ни `from backend.model import *`, ни тот, кто читает поверхность,
+    чтобы понять, что вообще ездит через границу слоёв."""
+    assert declared.__name__ in model.__all__
+
+
+@pytest.mark.parametrize("declared", list(boundary_dataclasses()),
+                         ids=lambda cls: cls.__name__)
+def test_boundary_types_are_frozen(declared):
+    """Через границу слоёв они ходят между потоками: разморозь один — и
+    состояние карточки поедет вслед за ссылкой.
+
+    Присваивание проверяется на пустом объекте, минуя конструктор: у двадцати
+    трёх типов свои обязательные поля, и собирать каждый значило бы завести тот
+    самый список, который уже однажды отстал. Заморозку это наблюдает так же —
+    её держит `__setattr__`, а не `__init__`."""
+    # Обязательные поля заполняются пустотой: значения здесь ни при чём,
+    # проверяется присваивание после сборки. Мимо конструктора идти нельзя —
+    # у типов со `slots=True` собранный руками объект ломает сам `__setattr__`.
+    required = {
+        name: None for name, field in declared.__dataclass_fields__.items()
+        if field.default is MISSING and field.default_factory is MISSING
+    }
+    built = declared(**required)
+
+    # У `Missing` полей нет вовсе, и присваивать приходится чужое имя. Тогда
+    # сгенерированный `__setattr__` уходит в ветку `super()`, а у типов со
+    # `slots=True` она спотыкается о собственное замыкание CPython и даёт
+    # `TypeError` вместо `FrozenInstanceError`. Присваивание не проходит и там,
+    # и там — а неизменность и есть предмет проверки.
+    field = next(iter(declared.__dataclass_fields__), "чужое_имя")
+    refuses = (FrozenInstanceError if declared.__dataclass_fields__
+               else (FrozenInstanceError, TypeError))
+
+    with pytest.raises(refuses):
+        setattr(built, field, None)
 
 
 def test_optional_fields_have_sane_defaults():
