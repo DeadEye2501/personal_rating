@@ -9,7 +9,7 @@ from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.client import OmdbClient, until_midnight
 from backend.sources.ratings.omdb.parse import parse_ratings
-from tests.conftest import FakeClock, responding
+from tests.conftest import FakeClock, counting, responding
 
 
 async def ask(transport):
@@ -216,42 +216,32 @@ async def test_quota_waits_until_the_next_day():
 
 
 async def test_quota_trips_the_breaker():
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(401, json={"Error": "Request limit reached!"})
+    transport, seen = counting(responding(401, json={"Error": "Request limit reached!"}))
 
     client = OmdbClient(
-        SourceHttp("omdb", transport=httpx.MockTransport(handler)), api_key="k"
+        SourceHttp("omdb", transport=transport), api_key="k"
     )
     await client.ratings("tt0816692", Kind.MOVIE)
     second = await client.ratings("tt0111161", Kind.MOVIE)
     await client.aclose()
 
     assert isinstance(second, Refusal)
-    assert calls == 1, "второй запрос ушёл в сеть после исчерпанной квоты"
+    assert len(seen) == 1, "второй запрос ушёл в сеть после исчерпанной квоты"
 
 
 async def test_a_bad_key_does_not_trip_the_breaker():
     """Битый ключ сроком не лечится: закрыв источник на сутки, мы не дали бы
     человеку и шанса вписать новый."""
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(401, json={"Error": "Invalid API key!"})
+    transport, seen = counting(responding(401, json={"Error": "Invalid API key!"}))
 
     client = OmdbClient(
-        SourceHttp("omdb", transport=httpx.MockTransport(handler)), api_key="k"
+        SourceHttp("omdb", transport=transport), api_key="k"
     )
     await client.ratings("tt0816692", Kind.MOVIE)
     await client.ratings("tt0111161", Kind.MOVIE)
     await client.aclose()
 
-    assert calls == 2
+    assert len(seen) == 2
 
 
 async def test_the_key_and_the_identifier_are_sent():

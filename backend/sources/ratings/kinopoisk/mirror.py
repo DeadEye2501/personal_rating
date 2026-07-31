@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 from backend.model import Found, Missing, Outcome, Ratings, Reason, Refusal
+from backend.sources.backoff import refuse_until
 from backend.sources.errors import refuse_code as code_refusal
 from backend.sources.http import SourceHttp
 
@@ -21,15 +22,13 @@ RATE_BACKOFF = timedelta(minutes=1)
 
 
 def refuse_quota(http: SourceHttp) -> Refusal:
-    http.breaker.trip(QUOTA_BACKOFF)
-    return Refusal(source=SOURCE, reason=Reason.QUOTA, retry_after=QUOTA_BACKOFF)
+    return refuse_until(http, Reason.QUOTA, QUOTA_BACKOFF, SOURCE)
 
 
 def refuse_rate(http: SourceHttp) -> Refusal:
     """Предохранитель здесь обязателен: без него `KinopoiskClient` на каждый
     частотный ответ дёргал бы второе зеркало, тратя его суточные пятьсот."""
-    http.breaker.trip(RATE_BACKOFF, Reason.RATE)
-    return Refusal(source=SOURCE, reason=Reason.RATE, retry_after=RATE_BACKOFF)
+    return refuse_until(http, Reason.RATE, RATE_BACKOFF, SOURCE)
 
 
 def refuse_key() -> Refusal:

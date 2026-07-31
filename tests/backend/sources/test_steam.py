@@ -23,6 +23,7 @@ from backend.sources.steam.parse import (
     parse_tags,
     poster_url,
 )
+from tests.conftest import counting, responding
 
 
 def block_of(payload: dict) -> dict:
@@ -359,15 +360,10 @@ async def test_a_query_with_url_punctuation_survives(fixture):
 
 
 async def test_rate_limit_trips_the_breaker():
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, text="slow down")
+    transport, seen = counting(responding(429, text="slow down"))
 
     client = SteamClient(
-        SourceHttp("steam", transport=httpx.MockTransport(handler))
+        SourceHttp("steam", transport=transport)
     )
     first = await client.card("292030", Kind.GAME)
     await client.card("292030", Kind.GAME)
@@ -375,4 +371,4 @@ async def test_rate_limit_trips_the_breaker():
 
     assert isinstance(first, Refusal)
     assert first.reason is Reason.RATE
-    assert calls == 1, "второй запрос ушёл в сеть после 429"
+    assert len(seen) == 1, "второй запрос ушёл в сеть после 429"

@@ -7,6 +7,7 @@ from typing import ClassVar
 import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, RatingSource, Reason, Refusal
+from backend.sources.backoff import refuse_until
 from backend.sources.errors import parsed, refuse_code
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.parse import parse_ratings
@@ -82,9 +83,8 @@ class OmdbClient:
         не из документации."""
         error = (payload.get("Error") or "").lower()
         if "limit" in error:
-            delay = until_midnight(self._http.clock())
-            self._http.breaker.trip(delay)
-            return Refusal(source="omdb", reason=Reason.QUOTA, retry_after=delay)
+            return refuse_until(self._http, Reason.QUOTA,
+                                until_midnight(self._http.clock()))
         if "key" in error:
             # Предохранитель не взводим: битый ключ сроком не лечится, и закрыв
             # источник на сутки, мы не дали бы человеку вписать новый.

@@ -44,6 +44,7 @@ from tests.fakes import (
     FakeClock,
     FakeSources,
     capture,
+    counting,
     responding,
     unreachable,
 )
@@ -67,6 +68,7 @@ __all__ = [
     "an_item",
     "capture",
     "card_parts",
+    "counting",
     "hit",
     "picture",
     "poster_service",

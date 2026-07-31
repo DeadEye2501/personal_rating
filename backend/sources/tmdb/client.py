@@ -6,6 +6,7 @@ from datetime import timedelta
 import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
+from backend.sources.backoff import refuse_until
 from backend.sources.errors import parsed
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.parse import (
@@ -42,7 +43,10 @@ def classify(response: httpx.Response) -> Missing | Refusal | None:
     if response.status_code == 404 and status in _ABSENT:
         return Missing()
     if response.status_code == 429:
-        return Refusal(source="tmdb", reason=Reason.RATE, retry_after=RATE_BACKOFF)
+        # Срок здесь не называется: его поставит `_verdict` тем же вызовом,
+        # которым закроет источник, — иначе одно и то же число живёт в двух
+        # местах, и разъехаться им ничто не мешает.
+        return Refusal(source="tmdb", reason=Reason.RATE)
     if response.status_code == 401:
         return Refusal(source="tmdb", reason=Reason.KEY)
     return Refusal(source="tmdb", reason=Reason.BROKEN,
@@ -71,10 +75,14 @@ class TmdbClient:
 
     def _verdict(self, response: httpx.Response) -> Missing | Refusal | None:
         """Разобранный отказ, а заодно взведённый предохранитель: без него
-        следующий показ ленты упрётся в тот же 429."""
+        следующий показ ленты упрётся в тот же 429.
+
+        Отказ по частоте пересобирается, а не пропускается насквозь: срок должен
+        называться один раз — тем же вызовом, что закрывает источник. У
+        `classify` транспорта нет и быть не может, её зовут и без клиента."""
         verdict = classify(response)
         if isinstance(verdict, Refusal) and verdict.reason is Reason.RATE:
-            self._http.breaker.trip(RATE_BACKOFF, Reason.RATE)
+            return refuse_until(self._http, Reason.RATE, RATE_BACKOFF)
         return verdict
 
     async def _asked(self, url: str,

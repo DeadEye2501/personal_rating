@@ -10,7 +10,7 @@ import httpx
 from backend.model import Found, GenreSource, Kind, Missing, Outcome, Reason, Refusal
 from backend.sources.errors import BROKEN_BY_PARSING, broken, parsed
 from backend.sources.http import SourceHttp
-from backend.sources.undocumented import refuse_undocumented
+from backend.sources.undocumented import asked
 from backend.sources.steam.parse import parse_card, parse_search, parse_tags
 
 logger = logging.getLogger(__name__)
@@ -39,26 +39,12 @@ class SteamClient:
         который соберёт не он сам, а поймавший его исключение сервис."""
         return self._http.name
 
-    async def _asked(self, url: str,
-                     params: dict | None = None) -> httpx.Response | Refusal:
-        """Ответ, годный к разбору, — либо отказ, который уже всё решил.
-
-        Оба запроса магазина отличаются только адресом: отказ на обрыв и на
-        взведённый предохранитель собирает транспорт, а любой код кроме 200
-        Steam не описывает нигде — отсюда общий `refuse_undocumented`."""
-        response = await self._http.get(url, params=params)
-        if not isinstance(response, httpx.Response):
-            return response
-        if response.status_code != 200:
-            return refuse_undocumented(self._http, response.status_code)
-        return response
-
     async def search(self, query: str, kind: Kind) -> Outcome:
         # Строка поиска идёт частью пути, поэтому её надо экранировать: `?` и
         # `#` для URL структурные, и «Who's Your Daddy?!» уедет обрезанным до
         # «Who's Your Daddy». Steam при этом ответит 200 и найдёт не то, что
         # просили, — то есть тихо неверная выдача, а не отказ.
-        answer = await self._asked(f"{SEARCH}/{quote(query, safe='')}")
+        answer = await asked(self._http, f"{SEARCH}/{quote(query, safe='')}")
         if not isinstance(answer, httpx.Response):
             return answer
         return parsed(logger, "steam", "выдача поиска не разобралась",
@@ -67,8 +53,8 @@ class SteamClient:
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         # Отсутствия Steam кодом не выражает: битый или отсутствующий appids
         # даёт 400 и тело `null`, поэтому «такого нет» читается ниже, из тела.
-        answer = await self._asked(DETAILS,
-                                   {"appids": source_id, "l": "russian"})
+        answer = await asked(self._http, DETAILS,
+                             {"appids": source_id, "l": "russian"})
         if not isinstance(answer, httpx.Response):
             return answer
 

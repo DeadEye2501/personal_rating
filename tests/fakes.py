@@ -90,6 +90,24 @@ def responding(status: int = 200, *, json=None, text=None, content=None,
     )
 
 
+def counting(transport: httpx.MockTransport):
+    """Тот же транспорт, но помнит, сколько раз в него сходили.
+
+    Заведено на одиннадцати рукописных счётчиках в шести модулях: везде
+    проверяется одно и то же — что после взведённого предохранителя второй
+    запрос в сеть не ушёл. Готовые `responding` и `capture` не подходили порознь:
+    первый не считает, второй сам сочиняет тело, а тут нужно и своё тело, и
+    счёт. Обёртка складывает их: телом занимается вложенный транспорт, счётом —
+    эта."""
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return transport.handler(request)
+
+    return httpx.MockTransport(handler), seen
+
+
 def unreachable() -> httpx.MockTransport:
     """Транспорт, до которого не дозвонились: сеть отвечает не кодом, а ничем, и
     отказ по ней наверху решается иначе, чем непонятный ответ."""
@@ -106,12 +124,7 @@ def capture(*, content: bytes | None = None, status: int = 200):
     вместо неё сам стал бы отказом, и проверка адреса на него не добралась бы.
     `status` нужен там, где проверяется отказ: тело при этом всё равно
     возвращается, но до него дело не доходит."""
-    seen: list[httpx.Request] = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
-        if content is None:
-            return httpx.Response(status, json={})
-        return httpx.Response(status, content=content)
-
-    return httpx.MockTransport(handler), seen
+    return counting(
+        responding(status, json={}) if content is None
+        else responding(status, content=content)
+    )

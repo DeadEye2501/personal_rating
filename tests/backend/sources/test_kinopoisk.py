@@ -9,7 +9,7 @@ from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
-from tests.conftest import FakeClock, responding
+from tests.conftest import FakeClock, counting, responding
 
 
 def primary(transport) -> PoiskkinoClient:
@@ -92,38 +92,28 @@ async def test_primary_bad_key_is_a_refusal():
 async def test_a_bad_key_does_not_close_the_source():
     """Битый ключ сроком не лечится: закрыв Кинопоиск на шесть часов, мы не
     дали бы человеку и шанса вписать новый."""
-    calls = 0
+    transport, seen = counting(responding(401, json={"statusCode": 401}))
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(401, json={"statusCode": 401})
-
-    client = primary(httpx.MockTransport(handler))
+    client = primary(transport)
     await client.ratings("tt0816692", Kind.MOVIE)
     await client.ratings("tt0111161", Kind.MOVIE)
 
-    assert calls == 2
+    assert len(seen) == 2
 
 
 async def test_primary_rate_limit_trips_the_breaker_too():
     """Свалившись в поломку, частота не взвела бы предохранитель — и на каждый
     такой ответ мы дёргали бы запасное зеркало, тратя его суточные пятьсот."""
-    calls = 0
+    transport, seen = counting(responding(429, json={"statusCode": 429}))
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, json={"statusCode": 429})
-
-    client = primary(httpx.MockTransport(handler))
+    client = primary(transport)
     first = await client.ratings("tt0816692", Kind.MOVIE)
     await client.ratings("tt0111161", Kind.MOVIE)
 
     assert first.reason is Reason.RATE
     assert first.source == "kinopoisk"
     assert first.retry_after == timedelta(minutes=1)
-    assert calls == 1
+    assert len(seen) == 1
     # Второй ответ собирает уже предохранитель, из запомненной причины: без
     # `Reason.RATE` при взводе он сказал бы «кончилась суточная квота» — а квота у
     # Кинопоиска шесть часов против минуты, и человек ждал бы напрасно.
@@ -269,20 +259,15 @@ async def test_fallback_html_from_nginx_does_not_crash_the_parser(replay, meta):
 async def test_fallback_rate_limit_trips_its_breaker_too():
     """Пять запросов в секунду — предел этой ручки. Не взведя предохранитель,
     мы продолжили бы стучаться и выбрали бы суточную квоту на отказы."""
-    calls = 0
+    transport, seen = counting(responding(429, text="<html>429</html>"))
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, text="<html>429</html>")
-
-    client = fallback(httpx.MockTransport(handler))
+    client = fallback(transport)
     first = await client.ratings("tt0816692", Kind.MOVIE)
     await client.ratings("tt0111161", Kind.MOVIE)
 
     assert first.reason is Reason.RATE
     assert first.retry_after == timedelta(minutes=1)
-    assert calls == 1
+    assert len(seen) == 1
 
 
 async def test_the_quota_closes_the_mirror_for_six_hours():

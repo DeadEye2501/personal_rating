@@ -7,7 +7,7 @@ import httpx
 from backend.model import Kind, Missing, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
-from tests.conftest import FakeClock, responding
+from tests.conftest import FakeClock, counting, responding
 
 
 async def ask(transport: httpx.MockTransport):
@@ -109,49 +109,39 @@ async def test_the_absence_code_alone_is_not_a_negative_fact():
 
 async def test_rate_limit_trips_the_breaker():
     """Иначе следующий показ ленты снова упрётся в тот же 429."""
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, json={"status_code": 25})
+    transport, seen = counting(responding(429, json={"status_code": 25}))
 
     client = TmdbClient(
-        SourceHttp("tmdb", transport=httpx.MockTransport(handler)), api_key="k"
+        SourceHttp("tmdb", transport=transport), api_key="k"
     )
     await client.card("157336", Kind.MOVIE)
     second = await client.card("83867", Kind.MOVIE)
     await client.aclose()
 
     assert isinstance(second, Refusal)
-    assert calls == 1, "второй запрос ушёл в сеть после 429"
+    assert len(seen) == 1, "второй запрос ушёл в сеть после 429"
 
 
 async def test_the_breaker_lets_go_when_the_backoff_has_passed():
     """Откат — минута, и это срок, а не украшение: поставь час, и после 429
     источник промолчал бы весь час, хотя TMDB готов отвечать через минуту."""
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, json={"status_code": 25})
+    transport, seen = counting(responding(429, json={"status_code": 25}))
 
     clock = FakeClock()
     client = TmdbClient(
-        SourceHttp("tmdb", transport=httpx.MockTransport(handler), clock=clock),
+        SourceHttp("tmdb", transport=transport, clock=clock),
         api_key="k",
     )
     await client.card("157336", Kind.MOVIE)
     clock.advance(timedelta(seconds=30))
     await client.card("83867", Kind.MOVIE)
-    assert calls == 1, "предохранитель отпустил раньше срока"
+    assert len(seen) == 1, "предохранитель отпустил раньше срока"
 
     clock.advance(timedelta(seconds=31))
     await client.card("83867", Kind.MOVIE)
     await client.aclose()
 
-    assert calls == 2, "предохранитель не отпустил через минуту"
+    assert len(seen) == 2, "предохранитель не отпустил через минуту"
 
 
 async def test_the_tripped_breaker_keeps_the_reason_it_was_tripped_for():
@@ -170,21 +160,16 @@ async def test_the_tripped_breaker_keeps_the_reason_it_was_tripped_for():
 async def test_a_missing_object_does_not_trip_the_breaker():
     """«Такого нет» — обычный ответ. Закрыв на нём источник, приложение
     перестало бы искать после первого же промаха."""
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(404, json={"status_code": 34})
+    transport, seen = counting(responding(404, json={"status_code": 34}))
 
     client = TmdbClient(
-        SourceHttp("tmdb", transport=httpx.MockTransport(handler)), api_key="k"
+        SourceHttp("tmdb", transport=transport), api_key="k"
     )
     await client.card("157336", Kind.MOVIE)
     await client.card("83867", Kind.MOVIE)
     await client.aclose()
 
-    assert calls == 2
+    assert len(seen) == 2
 
 
 async def test_search_classifies_the_same_way():

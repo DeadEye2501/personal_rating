@@ -17,7 +17,7 @@ from backend.model import (
 from backend.sources.gog.client import GogClient
 from backend.sources.gog.parse import parse_catalog, to_hit
 from backend.sources.http import SourceHttp
-from tests.conftest import responding, unreachable
+from tests.conftest import counting, responding, unreachable
 
 
 def answering(body) -> SourceHttp:
@@ -329,21 +329,16 @@ async def test_server_failure_is_a_refusal():
 
 
 async def test_rate_limit_trips_the_breaker():
-    calls = 0
+    transport, seen = counting(responding(429, text="slow down"))
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, text="slow down")
-
-    client = GogClient(SourceHttp("gog", transport=httpx.MockTransport(handler)))
+    client = GogClient(SourceHttp("gog", transport=transport))
     first = await client.search("Baldur's Gate", Kind.GAME)
     await client.search("Baldur's Gate", Kind.GAME)
     await client.aclose()
 
     assert isinstance(first, Refusal)
     assert first.reason is Reason.RATE
-    assert calls == 1, "второй запрос ушёл в сеть после 429"
+    assert len(seen) == 1, "второй запрос ушёл в сеть после 429"
 
 
 async def test_non_json_body_does_not_crash_the_parser():

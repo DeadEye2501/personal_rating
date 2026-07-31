@@ -8,7 +8,7 @@ from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
 from backend.sources.errors import parsed
 from backend.sources.gog.parse import find_slug, parse_catalog, to_hit
 from backend.sources.http import SourceHttp
-from backend.sources.undocumented import refuse_undocumented
+from backend.sources.undocumented import asked, refuse_undocumented
 
 logger = logging.getLogger(__name__)
 
@@ -47,13 +47,12 @@ class GogClient:
     async def _payload(self, query: str) -> dict | Refusal:
         """Тело ответа каталога. Разбирают его двое и по-разному: поиску нужны
         кандидаты, привязке — номер по слагу."""
-        response = await self._http.get(
-            CATALOG, params={"query": f"like:{query}", "locale": "ru-RU"}
+        response = await asked(
+            self._http, CATALOG,
+            {"query": f"like:{query}", "locale": "ru-RU"},
         )
-        if not isinstance(response, httpx.Response):
+        if isinstance(response, Refusal):
             return response
-        if response.status_code != 200:
-            return refuse_undocumented(self._http, response.status_code)
         return parsed(logger, "gog", "тело каталога не разобралось",
                       response.json)
 

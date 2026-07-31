@@ -8,7 +8,7 @@ from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.mdblist.parse import parse_ratings
-from tests.conftest import responding
+from tests.conftest import counting, responding
 
 
 async def ask(transport, kind=Kind.MOVIE):
@@ -147,23 +147,19 @@ async def test_a_delay_that_is_not_a_number_falls_back_too():
 
 
 async def test_quota_trips_the_breaker():
-    calls = 0
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal calls
-        calls += 1
-        return httpx.Response(429, json={"error": "Daily API limit exceeded!"},
-                              headers={"Retry-After": "600"})
-
+    transport, seen = counting(responding(
+        429, json={"error": "Daily API limit exceeded!"},
+        headers={"Retry-After": "600"},
+    ))
     client = MdbListClient(
-        SourceHttp("mdblist", transport=httpx.MockTransport(handler)), api_key="k"
+        SourceHttp("mdblist", transport=transport), api_key="k"
     )
     await client.ratings("tt0816692", Kind.MOVIE)
     second = await client.ratings("tt0111161", Kind.MOVIE)
     await client.aclose()
 
     assert isinstance(second, Refusal)
-    assert calls == 1, "второй запрос ушёл в сеть после исчерпанной квоты"
+    assert len(seen) == 1, "второй запрос ушёл в сеть после исчерпанной квоты"
 
 
 async def test_recorded_bad_key_is_a_refusal(replay, meta):

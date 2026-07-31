@@ -7,6 +7,7 @@ from typing import ClassVar
 import httpx
 
 from backend.model import Found, Kind, Outcome, RatingSource, Reason, Refusal
+from backend.sources.backoff import refuse_until
 from backend.sources.errors import absent, is_json, parsed, refuse_code
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.mdblist.parse import parse_ratings
@@ -69,9 +70,8 @@ class MdbListClient:
                 retry_after=_retry_after(response),
             )
         if status == 429:
-            delay = _retry_after(response) or QUOTA_FALLBACK
-            self._http.breaker.trip(delay)
-            return Refusal(source="mdblist", reason=Reason.QUOTA, retry_after=delay)
+            return refuse_until(self._http, Reason.QUOTA,
+                                _retry_after(response) or QUOTA_FALLBACK)
         if status in (401, 403):
             return self._denied(response)
         return refuse_code("mdblist", status)
