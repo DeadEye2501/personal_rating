@@ -71,7 +71,7 @@ personal_rating/
 │  ├─ vite.config.js             сборка в dist, псевдонимы слоёв
 │  ├─ svelte.config.js
 │  ├─ styles/
-│  │  ├─ palette.css             28 токенов макета
+│  │  ├─ palette.css             58 токенов макета: цвета, ступени, шрифты
 │  │  ├─ base.css                сброс, окно, иконки, кромка окна
 │  │  ├─ neon.css                неоновая кромка как приём
 │  │  ├─ topbar.css              шапка: три зоны
@@ -96,8 +96,7 @@ personal_rating/
 │     ├─ App.svelte              корень: шапка плюс стопка разделов
 │     ├─ Topbar.svelte           сборка шапки
 │     ├─ SearchScreen.svelte     раздел «Поиск»
-│     ├─ RatedScreen.svelte      раздел «Оценённые»
-│     ├─ WishScreen.svelte       раздел «Хочу посмотреть»
+│     ├─ LibraryScreen.svelte    «Оценённые» и «Хочу посмотреть»
 │     └─ StatsScreen.svelte      раздел «Статистика»
 └─ tests/web/
    ├─ filters.test.js            три состояния и складывание
@@ -125,6 +124,22 @@ personal_rating/
 `.claude/clean.json` и разбирает импорты — относительные и по объявленному
 псевдониму. Всё, что придумает сборщик сверх этого, он не видит, и граница слоёв
 там протекает молча.
+
+**Объявлены они дважды, и это не дубль, а два разных читателя.** `vite.config.js`
+говорит сборщику, куда ведёт `$state/`; `.claude/clean.json` говорит хуку, что
+`$state/` — это слой `state`. Второй список **не лежит в репозитории**: `.claude/`
+закрыт `.gitignore` по решению проекта, и в свежем клоне его нет. Поэтому он
+заводится шагом задачи, а не считается данностью.
+
+Разойтись эти два списка могут, и единственный сторож тут — шаг 6, который обязан
+проверять **псевдонимом**. Относительным импортом он проходит и с пустыми
+псевдонимами, то есть не может упасть на том, ради чего написан.
+
+**Компонентам открыт `state/`** — решение пользователя от 31.07.2026, и оно уже
+записано в `allowed`. Правило «компонент в общее состояние не ходит» от этого не
+страдает: общего состояния в этом слое нет вовсе, руны живут только в
+компонентах, а `state/` считает переходы обычными функциями. `api/` закрыт
+по-прежнему: поход через мост — это уже не показ переданного.
 
 **Файлы:**
 - Создать: `client/package.json`, `client/vite.config.js`,
@@ -209,6 +224,23 @@ export default defineConfig({
 export default {}
 ```
 
+Дописать в `.claude/clean.json`, в раздел `front`, — те же псевдонимы для хука:
+
+```json
+    "aliases": {
+      "$styles": "styles",
+      "$components": "components",
+      "$state": "state",
+      "$api": "api"
+    },
+```
+
+Без этого ключа `layers._target` на `$state/...` возвращает `None`, и импорт
+пропускается молча — то есть проверка границы слоёв не видит **ни одного**
+импорта фронта, потому что все они пишутся псевдонимами. Файл в репозиторий не
+входит (`.claude/` закрыт `.gitignore`), поэтому шаг обязателен и в свежем
+клоне.
+
 Файл пустой намеренно: препроцессора нет — TypeScript в проекте не берут, а
 стили из компонентов вынесены по решению, и обрабатывать в них нечего. Плагин
 всё равно ищет этот файл.
@@ -279,9 +311,15 @@ cd ../.. && pipenv run python main.py
 - [ ] **Шаг 6: Проверить, что граница слоёв сторожится**
 
 Записать в `client/components/Probe.svelte` строку
-`import App from '../app/App.svelte'` и попробовать сохранить файл.
+`import { call } from '$api/bridge.js'` и попробовать сохранить файл.
 
-Ожидание: **запись отклонена** — компонент не вправе знать про сборку.
+Ожидание: **запись отклонена** — компоненту `api/` закрыт: поход через мост это
+уже не показ переданного.
+
+**Псевдонимом, а не относительным путём, и это существенно.** Весь код фронта
+пишется на `$`-путях, а хук разбирает их только по объявленным псевдонимам.
+Проверь относительным импортом — и она пройдёт даже с пустым `aliases`, то есть
+не сможет упасть на том, ради чего написана.
 
 Это проверка самого хука, а не кода: фронтовая половина написана против
 воображаемого кода, ни одного `.svelte` в проекте до сих пор не было. Первый
@@ -313,6 +351,19 @@ git commit -m "feat: сборка страницы на Vite и Svelte, три �
 покое, заливка во включённом» держится на `font-variation-settings: 'FILL' 1`, и
 `material-symbols` отдаёт именно переменный файл.
 
+**Палитра собирается вся и сразу, а не по мере надобности.** Причина машинная:
+хук отклоняет запись любого файла внутри `client/`, где встретился цвет — `#hex`,
+`rgba(`, даже слово `black`, — и храповика у этой проверки нет. Значит первый же
+файл оформления с литералом просто не запишется. Поэтому ступени белого и
+чёрного перенесены сюда все двадцать шесть, хотя потребители у большинства
+появятся только в планах 7–9: это не «на всякий случай», а единственный способ
+вообще написать те файлы.
+
+**Ступени названы числом, а не ролью, и это решение, а не лень.** Одна и та же
+`rgba(255,255,255,.09)` служит в макете то границей окна, то подложкой кнопки,
+то разделителем строки; роль в имени была бы неправдой в половине мест.
+Значения перенесены точь-в-точь — меняется только имя.
+
 **Файлы:**
 - Создать: `client/styles/palette.css`, `base.css`, `neon.css`
 - Изменить: `client/main.js`, `bridge/window.py`
@@ -320,8 +371,10 @@ git commit -m "feat: сборка страницы на Vite и Svelte, три �
 **Интерфейсы:**
 - Потребляет: значения из `docs/design/styles/tokens.css`, `base.css`,
   `neon.css` и из инлайнового стиля `docs/design/index.html:13-72`.
-- Отдаёт: переменные `--primary`, `--bg`, `--error`, `--glass-error`,
-  `--surface-pop`, `--score-1`…`--score-10`, `--text`, `--text-bright`,
+- Отдаёт: переменные `--primary`, `--bg`, `--error`, `--glass`, `--glass-error`,
+  `--surface-pop`, `--opaque`, `--score-1`…`--score-10`, `--accent-movie`,
+  `--accent-series`, `--accent-game`, `--tint-02`…`--tint-85` (двадцать две
+  ступени), `--shade-25`…`--shade-60` (четыре), `--text`, `--text-bright`,
   `--text-dim`, `--r-card`, `--r-full`, `--font` и шесть типографических ролей;
   классы `.app`, `.material-symbols-outlined`, `.neon`.
 
@@ -360,6 +413,11 @@ npm i @fontsource-variable/roboto@5.3.0 material-symbols@0.45.10
 
   --glass-error:        rgba(39,15,15,.55);
   --surface-pop:        rgba(14,16,19,.98);
+  --glass:              rgba(6,7,9,.72);
+
+  /* Непрозрачная точка градиента-маски. Цвет в маске не участвует вовсе —
+     читается только альфа, — но написанный по месту он всё равно цвет. */
+  --opaque:             #000;
 
   /* Цвет закреплён за значением и одинаков везде — в фильтре, на карточках, в
      статистике. Имя собирается строкой: var(--score-${n}). */
@@ -377,6 +435,44 @@ npm i @fontsource-variable/roboto@5.3.0 material-symbols@0.45.10
   --text:               rgba(255,255,255,.90);
   --text-bright:        #ffffff;
   --text-dim:           rgba(255,255,255,.32);
+
+  /* Акцент типа содержимого. Переключатель ставит `--primary` одним из трёх;
+     литералами в разметке им делать нечего — цвет живёт здесь. */
+  --accent-movie:       #84e310;
+  --accent-series:      #3b9eff;
+  --accent-game:        #FFC107;
+
+  /* Белое и чёрное поверх тёмного фона. Названы ступенью, а не ролью, и это
+     не лень: одна и та же ступень служит то границей, то подложкой, то
+     приглушённым текстом, и роль в имени была бы неправдой в половине мест.
+     Значения перенесены из макета точь-в-точь — меняется только имя. */
+  --tint-02:  rgba(255,255,255,.02);
+  --tint-035: rgba(255,255,255,.035);
+  --tint-05:  rgba(255,255,255,.05);
+  --tint-06:  rgba(255,255,255,.06);
+  --tint-07:  rgba(255,255,255,.07);
+  --tint-09:  rgba(255,255,255,.09);
+  --tint-10:  rgba(255,255,255,.1);
+  --tint-14:  rgba(255,255,255,.14);
+  --tint-16:  rgba(255,255,255,.16);
+  --tint-18:  rgba(255,255,255,.18);
+  --tint-22:  rgba(255,255,255,.22);
+  --tint-25:  rgba(255,255,255,.25);
+  --tint-28:  rgba(255,255,255,.28);
+  --tint-30:  rgba(255,255,255,.3);
+  --tint-34:  rgba(255,255,255,.34);
+  --tint-35:  rgba(255,255,255,.35);
+  --tint-40:  rgba(255,255,255,.4);
+  --tint-45:  rgba(255,255,255,.45);
+  --tint-55:  rgba(255,255,255,.55);
+  --tint-75:  rgba(255,255,255,.75);
+  --tint-80:  rgba(255,255,255,.8);
+  --tint-85:  rgba(255,255,255,.85);
+
+  --shade-25: rgba(0,0,0,.25);
+  --shade-32: rgba(0,0,0,.32);
+  --shade-55: rgba(0,0,0,.55);
+  --shade-60: rgba(0,0,0,.6);
 
   --r-card:             20px;
   --r-full:             999px;
@@ -551,7 +647,7 @@ body {
 
   border-radius: inherit;
   border-top: 1px solid var(--neon);
-  mask-image: linear-gradient(90deg, transparent, #000 50%, transparent);
+  mask-image: linear-gradient(90deg, transparent, var(--opaque) 50%, transparent);
   filter: drop-shadow(0 0 3px var(--neon)) drop-shadow(0 0 9px var(--neon));
 }
 
@@ -1559,25 +1655,25 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   height: 42px;                /* вровень с капсулой переключателя */
   padding: 0 16px;
   border-radius: var(--r-full);
-  background: rgba(255,255,255,.035);
-  border: 1px solid rgba(255,255,255,.06);
+  background: var(--tint-035);
+  border: 1px solid var(--tint-06);
   transition: background .18s, border-color .18s;
 }
 
 .search:hover {
-  background: rgba(255,255,255,.05);
-  border-color: rgba(255,255,255,.1);
+  background: var(--tint-05);
+  border-color: var(--tint-10);
 }
 
 .search:focus-within {
-  background: rgba(255,255,255,.05);
+  background: var(--tint-05);
   border-color: color-mix(in srgb, var(--primary) 45%, transparent);
 }
 
 .search__icon {
   flex: 0 0 auto;
   font-size: 20px;
-  color: rgba(255,255,255,.35);
+  color: var(--tint-35);
   transition: color .18s;
 }
 .search:focus-within .search__icon { color: var(--primary) }
@@ -1593,7 +1689,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   caret-color: var(--primary);
   user-select: text;
 }
-.search__input::placeholder { color: rgba(255,255,255,.28) }
+.search__input::placeholder { color: var(--tint-28) }
 
 /* Своя кнопка очистки вместо системной: та рисуется цветом ОС. */
 .search__input::-webkit-search-cancel-button,
@@ -1643,8 +1739,8 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   gap: 2px;
   padding: 3px;
   border-radius: var(--r-full);
-  background: rgba(255,255,255,.035);
-  border: 1px solid rgba(255,255,255,.06);
+  background: var(--tint-035);
+  border: 1px solid var(--tint-06);
 }
 
 .seg__btn {
@@ -1657,7 +1753,7 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   border: none;
   border-radius: var(--r-full);
   background: transparent;
-  color: rgba(255,255,255,.45);
+  color: var(--tint-45);
   font: var(--title-s);
   cursor: pointer;
   transition: background .18s, color .18s;
@@ -1665,8 +1761,8 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
 .seg__btn .material-symbols-outlined { font-size: 19px }
 
 .seg__btn:hover {
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.75);
+  background: var(--tint-05);
+  color: var(--tint-75);
 }
 
 .seg__btn.is-active {
@@ -1690,8 +1786,8 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   justify-content: space-between;
   padding: 3px;
   border-radius: var(--r-full);
-  background: rgba(255,255,255,.035);
-  border: 1px solid rgba(255,255,255,.06);
+  background: var(--tint-035);
+  border: 1px solid var(--tint-06);
 }
 
 .tools__btn {
@@ -1704,15 +1800,15 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
   border: none;
   border-radius: var(--r-full);
   background: transparent;
-  color: rgba(255,255,255,.45);
+  color: var(--tint-45);
   cursor: pointer;
   transition: background .18s, color .18s;
 }
 .tools__btn .material-symbols-outlined { font-size: 19px }
 
 .tools__btn:hover {
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.75);
+  background: var(--tint-05);
+  color: var(--tint-75);
 }
 
 .tools__btn.is-active {
@@ -1867,9 +1963,10 @@ git commit -m "feat: обёртка моста — номер, отмена, у�
     { value: 'game',   icon: 'sports_esports',  label: 'Игры' },
   ]
 
-  // Фильмам достаётся объявленный в палитре: держать его ещё и здесь значило бы
-  // положить одно значение в два места, где оно может разойтись.
-  const ACCENTS = { series: '#3b9eff', game: '#FFC107' }
+  // Фильмам достаётся значение по умолчанию из палитры, поэтому его тут нет:
+  // положить одно значение в два места значит дать ему разойтись. Остальные два
+  // подставляются токенами, а не литералами — цвет живёт в палитре.
+  const ACCENTS = { series: 'var(--accent-series)', game: 'var(--accent-game)' }
 
   const VIEWS = [
     { value: 'rated',    icon: 'thumb_up', label: 'Оценённые' },
@@ -2067,8 +2164,8 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 **Файлы:**
 - Создать: `client/styles/view.css`, `snack.css`
 - Создать: `client/components/Snack.svelte`
-- Создать: `client/app/SearchScreen.svelte`, `RatedScreen.svelte`,
-  `WishScreen.svelte`, `StatsScreen.svelte`
+- Создать: `client/app/SearchScreen.svelte`, `LibraryScreen.svelte`,
+  `StatsScreen.svelte`
 - Изменить: `client/app/App.svelte`, `client/main.js`
 
 **Интерфейсы:**
@@ -2173,7 +2270,7 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 <div class="feed"></div>
 ```
 
-`RatedScreen.svelte` и `WishScreen.svelte` — то же самое.
+`LibraryScreen.svelte` — то же самое.
 `StatsScreen.svelte`:
 
 ```svelte
@@ -2187,18 +2284,20 @@ git commit -m "feat: шапка целиком — поиск, переключ�
 
 ```svelte
 <script>
-  import RatedScreen from './RatedScreen.svelte'
+  import LibraryScreen from './LibraryScreen.svelte'
   import SearchScreen from './SearchScreen.svelte'
   import StatsScreen from './StatsScreen.svelte'
   import Topbar from './Topbar.svelte'
-  import WishScreen from './WishScreen.svelte'
   import Snack from '$components/Snack.svelte'
   import { newSession } from '$state/session.js'
 
   const SCREENS = {
     search: SearchScreen,
-    rated: RatedScreen,
-    wishlist: WishScreen,
+    // Оба раздела библиотеки — один экран: различает их `session.section`,
+    // и он же уезжает в запрос. Второй файл был бы копией на шестьдесят пять
+    // строк, которую планы 8 и 9 правили бы дважды.
+    rated: LibraryScreen,
+    wishlist: LibraryScreen,
     stats: StatsScreen,
   }
 

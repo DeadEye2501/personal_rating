@@ -115,7 +115,7 @@ personal_rating/
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(0,0,0,.32);
+  background: var(--shade-32);
   animation: overlay-in .18s ease-out;
 }
 
@@ -124,18 +124,18 @@ personal_rating/
   width: min(560px, 100%);
   min-height: 200px;
   padding: 22px 24px 18px;
-  border: 1px solid rgba(255,255,255,.09);
+  border: 1px solid var(--tint-09);
   border-radius: var(--r-card);
 
   /* Тёмное стекло: заливка чёрная и полупрозрачная, поэтому окно остаётся
      тёмным и при этом размывает то, что под ним. */
-  background: rgba(6,7,9,.72);
+  background: var(--glass);
   backdrop-filter: blur(8px) saturate(140%);
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.14),
-    inset 0 -1px 0 rgba(0,0,0,.25),
-    0 30px 90px rgba(0,0,0,.6);
+    inset 0 1px 0 var(--tint-14),
+    inset 0 -1px 0 var(--shade-25),
+    0 30px 90px var(--shade-60);
 
   animation: modal-in .22s cubic-bezier(.2,.8,.2,1);
 }
@@ -235,12 +235,12 @@ Chromium 150, и там свойство давно без префикса. Э�
   right: 0;
   top: 0;
   border-radius: 4px;
-  background: rgba(255,255,255,.16);
+  background: var(--tint-16);
   cursor: grab;
   transition: background .18s;
 }
-.scrollbar__thumb:hover  { background: rgba(255,255,255,.28) }
-.scrollbar__thumb:active { cursor: grabbing; background: rgba(255,255,255,.34) }
+.scrollbar__thumb:hover  { background: var(--tint-28) }
+.scrollbar__thumb:active { cursor: grabbing; background: var(--tint-34) }
 ```
 
 В макете скрытие системной полосы висит на `.taglist`, здесь оно уехало на
@@ -408,7 +408,7 @@ git commit -m "feat: оболочка модалки и своя полоса п
 .tagrow__name {
   flex: 1;
   min-width: 0;
-  color: #fff;
+  color: var(--text-bright);
   font: var(--body-l);
   white-space: nowrap;
   overflow: hidden;
@@ -434,7 +434,7 @@ git commit -m "feat: оболочка модалки и своя полоса п
   display: block;
   width: 4px;
   height: 4px;
-  background: #fff;
+  background: var(--text-bright);
 }
 
 .tagrow.is-dragging { opacity: .55 }
@@ -448,7 +448,7 @@ git commit -m "feat: оболочка модалки и своя полоса п
   width: 20px;
   height: 20px;
   padding: 0;
-  border: 2px solid rgba(255,255,255,.25);
+  border: 2px solid var(--tint-25);
   border-radius: var(--r-full);
   background: transparent;
   color: transparent;
@@ -463,7 +463,7 @@ git commit -m "feat: оболочка модалки и своя полоса п
 /* Реагирует только невыбранный: у включённого рамка уже цветная, и белая
    поверх неё сказала бы не то. Состояние в селекторе, а не порядок правил
    ниже, — иначе перестановка блоков молча сломала бы это. */
-.tagbox[data-state="off"]:hover { border-color: rgba(255,255,255,.55) }
+.tagbox[data-state="off"]:hover { border-color: var(--tint-55) }
 
 .tagbox[data-state="on"] {
   border-color: var(--primary);
@@ -486,7 +486,7 @@ git commit -m "feat: оболочка модалки и своя полоса п
   /* Подложки нет, но скругление держим: по нему идёт рамка фокуса. */
   border-radius: var(--r-full);
   background: transparent;
-  color: rgba(255,255,255,.3);
+  color: var(--tint-30);
   cursor: pointer;
   transition: color .16s;
 }
@@ -527,7 +527,7 @@ git commit -m "feat: оболочка модалки и своя полоса п
   font-variation-settings: 'FILL' 1;
 }
 .scorerow__stars .is-empty {
-  color: rgba(255,255,255,.14);
+  color: var(--tint-14);
   font-variation-settings: 'FILL' 0;
 }
 
@@ -1191,13 +1191,13 @@ export function heightsOf(buckets) {
 .chart__foot {
   margin: 14px 0 0;
   padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,.07);
+  border-top: 1px solid var(--tint-07);
   text-align: center;
   font: var(--body-m);
-  color: rgba(255,255,255,.45);
+  color: var(--tint-45);
 }
 .chart__foot b {
-  color: rgba(255,255,255,.8);
+  color: var(--tint-80);
   font-weight: 600;
 }
 
@@ -1214,7 +1214,7 @@ export function heightsOf(buckets) {
 }
 ```
 
-`#fff` у `.bar__value` заменён на `var(--text-bright)` — то же значение, и цвет
+`var(--text-bright)` у `.bar__value` заменён на `var(--text-bright)` — то же значение, и цвет
 по месту хук отклоняет.
 
 - [ ] **Шаг 5: Написать столбец и раздел**
@@ -1314,7 +1314,7 @@ cd client && npm test && npm run build
 cd .. && pipenv run python main.py
 ```
 
-Ожидание: PASS, 60 тестов. В окне: десять столбцов, цвет по шкале, число над
+Ожидание: PASS, 63 теста. В окне: десять столбцов, цвет по шкале, число над
 верхушкой своего столбца, подпись оценки под ним; при заходе на раздел столбцы
 отрастают из пола с задержкой; фильтр сужает и гистограмму тоже; уход и возврат
 проигрывают анимацию заново.

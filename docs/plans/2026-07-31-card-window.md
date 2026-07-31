@@ -356,9 +356,9 @@ export function filled(card, field) {
   aspect-ratio: 2 / 3;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255,255,255,.18);
+  border: 1px solid var(--tint-18);
   border-radius: 8px;
-  color: rgba(255,255,255,.22);
+  color: var(--tint-22);
   cursor: pointer;
   overflow: hidden;
   transition: border-color .16s, color .16s;
@@ -527,7 +527,7 @@ cd client && npm test && npm run build
 cd .. && pipenv run python main.py
 ```
 
-Ожидание: PASS, 67 тестов. В окне: постер слева, поля справа, подчёркивание
+Ожидание: PASS, 70 тестов. В окне: постер слева, поля справа, подчёркивание
 только под фокусом, у фильма «Минуты», у сериала «Сезоны» и «Серии», у игры ни
 того ни другого.
 
@@ -563,7 +563,9 @@ git commit -m "feat: окно карточки — поля по типу сод
 
 **Интерфейсы:**
 - Потребляет: `call` из `$api/bridge.js`; `Field`.
-- Отдаёт: `Picker` с входными `label`, `domain`, `chosen`, `onchosen`.
+- Отдаёт: `Picker` с входными `label`, `hits`, `chosen`, `ontype`, `onchosen`,
+  `oncreate`. За мостом ходит сборка: у компонента своего источника данных не
+  бывает, и `api/` ему закрыт машинной проверкой границы слоёв.
 
 - [ ] **Шаг 1: Перенести оформление**
 
@@ -595,10 +597,10 @@ git commit -m "feat: окно карточки — поля по типу сод
   max-height: 216px;
   overflow-y: auto;
   list-style: none;
-  border: 1px solid rgba(255,255,255,.09);
+  border: 1px solid var(--tint-09);
   border-radius: 10px;
   background: var(--surface-pop);
-  box-shadow: 0 18px 40px rgba(0,0,0,.55);
+  box-shadow: 0 18px 40px var(--shade-55);
   scrollbar-width: none;
 }
 .picker__hits::-webkit-scrollbar { display: none }
@@ -610,7 +612,7 @@ git commit -m "feat: окно карточки — поля по типу сод
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: rgba(255,255,255,.75);
+  color: var(--tint-75);
   font: var(--body-m);
   text-align: left;
   cursor: pointer;
@@ -639,7 +641,7 @@ git commit -m "feat: окно карточки — поля по типу сод
   display: flex;
   align-items: center;
   gap: 4px;
-  color: rgba(255,255,255,.8);
+  color: var(--tint-80);
   font: var(--body-m);
 }
 .picked__del {
@@ -650,7 +652,7 @@ git commit -m "feat: окно карточки — поля по типу сод
   border: none;
   border-radius: var(--r-full);
   background: transparent;
-  color: rgba(255,255,255,.3);
+  color: var(--tint-30);
   cursor: pointer;
   transition: color .16s;
 }
@@ -678,27 +680,25 @@ git commit -m "feat: окно карточки — поля по типу сод
 <script>
   import Field from '$components/Field.svelte'
   import Icon from '$components/Icon.svelte'
-  import { call } from '$api/bridge.js'
 
   // Разделитель строки подсказки: `U+2022 BULLET`. Обычная точка не годится —
   // она читается как конец предложения и слипается с названием.
   const DOT = '•'
 
-  let { label, domain, chosen = [], onchosen } = $props()
+  // Совпадения приходят параметром, а за мостом ходит сборка: компонент,
+  // у которого есть свой источник данных, перестаёт быть показом переданного.
+  // Отсюда же и закрытый список жанров — он просто не передаёт `oncreate`.
+  let { label, hits = [], chosen = [], ontype, onchosen, oncreate } = $props()
 
   let text = $state('')
-  let hits = $state([])
   let marked = $state(-1)
 
   $effect(() => {
     const typed = text.trim()
-    if (!typed) { hits = []; marked = -1; return }
-    call('refs.suggest', domain, typed).then((found) => {
-      hits = found
-      // Подсветки нет, пока её не поставили стрелкой: пока в списке ничего не
-      // подсвечено, Enter заводит нового.
-      marked = -1
-    })
+    // Подсветки нет, пока её не поставили стрелкой: пока в списке ничего не
+    // подсвечено, Enter заводит нового.
+    marked = -1
+    ontype(typed)
   })
 
   function keydown(event) {
@@ -718,13 +718,23 @@ git commit -m "feat: окно карточки — поля по типу сод
 
   // Enter при неподсвеченном списке заводит нового — и человека, и студию.
   // Совпадение имени само по себе не решает ничего: полные тёзки существуют.
-  const create = () => { add({ entity_id: null, name: text.trim() }) }
+  // У закрытого списка (жанры) заводить нечего, и `oncreate` там не передан —
+  // отсутствие обработчика и есть закрытость.
+  function create() {
+    const name = text.trim()
+    if (!name || !oncreate) return
+    oncreate({ entity_id: null, name })
+    clear()
+  }
 
   function add(one) {
     if (!one.name) return
     onchosen([...chosen, one])
+    clear()
+  }
+
+  function clear() {
     text = ''
-    hits = []
     marked = -1
   }
 
@@ -807,10 +817,10 @@ git commit -m "feat: окно карточки — поля по типу сод
   aspect-ratio: 2 / 3;
   object-fit: cover;
   z-index: 6;
-  border: 1px solid rgba(255,255,255,.09);
+  border: 1px solid var(--tint-09);
   border-radius: 10px;
   background: var(--surface-pop);
-  box-shadow: 0 18px 40px rgba(0,0,0,.55);
+  box-shadow: 0 18px 40px var(--shade-55);
   pointer-events: none;
 }
 ```
@@ -825,31 +835,53 @@ git commit -m "feat: окно карточки — поля по типу сод
 Дописать в `CardModal.svelte` после `.cardform__top` — роли по типу содержимого:
 
 ```svelte
-    {#if shown.has('director')}
-      <Picker label="Режиссёр" domain="people"
-              chosen={roles.director} onchosen={(list) => setRole('director', list)} />
-    {/if}
-    {#if shown.has('showrunner')}
-      <Picker label="Шоураннер" domain="people"
-              chosen={roles.showrunner} onchosen={(list) => setRole('showrunner', list)} />
-    {/if}
-    {#if shown.has('developer')}
-      <Picker label="Разработчик" domain="companies"
-              chosen={roles.developer} onchosen={(list) => setRole('developer', list)} />
-      <Picker label="Издатель" domain="companies"
-              chosen={roles.publisher} onchosen={(list) => setRole('publisher', list)} />
-    {/if}
-    {#if shown.has('actors')}
-      <Picker label="Актёры" domain="people"
-              chosen={roles.actor} onchosen={(list) => setRole('actor', list)} />
-    {/if}
+<script>
+  // За мостом ходит сборка, а не поле: у компонента своего источника данных не
+  // бывает. Роль здесь — ключ, потому что полей на экране до четырёх, и у
+  // каждого свой список совпадений.
+  let suggested = $state({})
+
+  async function suggest(role, domain, text) {
+    if (!text) { suggested = { ...suggested, [role]: [] }; return }
+    const found = await call('refs.suggest', domain, text)
+    suggested = { ...suggested, [role]: found }
+  }
+
+  const ROLES = [
+    { role: 'director',   label: 'Режиссёр',    domain: 'people' },
+    { role: 'showrunner', label: 'Шоураннер',   domain: 'people' },
+    { role: 'developer',  label: 'Разработчик', domain: 'companies' },
+    { role: 'publisher',  label: 'Издатель',    domain: 'companies' },
+    { role: 'actor',      label: 'Актёры',      domain: 'people' },
+  ]
+</script>
+
+    {#each ROLES as one (one.role)}
+      {#if shown.has(one.role)}
+        <Picker label={one.label} hits={suggested[one.role] ?? []}
+                ontype={(text) => suggest(one.role, one.domain, text)}
+                oncreate={(made) => setRole(one.role, [...roles[one.role], made])}
+                chosen={roles[one.role]}
+                onchosen={(list) => setRole(one.role, list)} />
+      {/if}
+    {/each}
 ```
 
-**Жанры выбираются тем же полем, но список у них закрытый.** Свой жанр завести
-нельзя — набор зашит в миграцию, и `Picker` для них берёт совпадения не у
-`refs.suggest`, а из уже прочитанного `refs.genres`; Enter при неподсвеченном
-списке там не заводит ничего. Это второе поведение того же поля, и различает их
-входной параметр `closed`.
+Пять полей одним перебором, а не пятью почти одинаковыми блоками: различаются
+они подписью, доменом и ключом роли — то есть данными, а не разметкой. `actors`
+в наборе полей называется `actor` в ролях состава; таблица и держит это
+соответствие в одном месте.
+
+**Жанры выбираются тем же полем, и второго поведения у него от этого не
+появляется.** `Picker` не знает, откуда берутся совпадения: он получает `hits`
+и сообщает набранное через `ontype`. У людей и студий сборка отвечает на это
+`refs.suggest`, у жанров — отбором из уже прочитанного `refs.genres`.
+
+Заводить новое умеет тот, кому передали `oncreate`. Жанрам его не передают —
+набор зашит в миграцию, своего жанра не бывает, — и Enter при неподсвеченном
+списке там не делает ничего. Это не параметр «а теперь ты не поле», а отсутствие
+обработчика: ровно тот довод, по которому план 8 отказался сводить `Stars` и
+`ScoreRow`.
 
 - [ ] **Шаг 4: Посмотреть**
 
@@ -1250,8 +1282,8 @@ git commit -m "feat: привязка карточки вставкой ссыл
 котором перечислено, что именно пропадёт.
 
 **Файлы:**
-- Изменить: `client/app/App.svelte`, `client/app/RatedScreen.svelte`,
-  `WishScreen.svelte`, `SearchScreen.svelte`
+- Изменить: `client/app/App.svelte`, `client/app/LibraryScreen.svelte`,
+  `SearchScreen.svelte`
 
 **Интерфейсы:**
 - Потребляет: `Confirm`; `call` из `$api/bridge.js`.

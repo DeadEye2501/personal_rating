@@ -70,14 +70,13 @@ personal_rating/
 │  │  ├─ Acts.svelte             правка, удаление, закладка
 │  │  └─ Feed.svelte             список карточек с догрузкой
 │  ├─ state/
-│  │  ├─ scores.js               нотация оценок: ярлык, ступень, среднее
+│  │  ├─ scores.js               нотация оценок: ярлык, ступень, среднее, шкалы источников
 │  │  └─ facts.js                строки фактов: длительность, сезоны, состав
 │  └─ app/
 │     ├─ section.js              запрос раздела из состояния
 │     ├─ visible.js              что делать с карточкой в поле зрения
 │     ├─ SearchScreen.svelte     поиск: своё, чужое, заведение
-│     ├─ RatedScreen.svelte      оценённые
-│     └─ WishScreen.svelte       хочу посмотреть
+│     └─ LibraryScreen.svelte    оценённые и хочу посмотреть
 └─ tests/web/
    ├─ scores.test.js
    └─ facts.test.js
@@ -112,9 +111,10 @@ personal_rating/
 
 **Интерфейсы:**
 - Потребляет: ничего.
-- Отдаёт: `LABELS`, `stepOf(value, max)`, `colorOf(step)`, `verdictOf(score)`,
-  `average(values)`, `partOf(score)`; `runtimeOf(minutes)`,
-  `seriesOf(seasons, episodes)`, `castOf(credits, role, limit)`.
+- Отдаёт: `LABELS`, `stepOf(value, max)`, `stepOfSource(value, source)`,
+  `nameOf(source)`, `colorOf(step)`, `verdictOf(score)`, `average(values)`,
+  `partOf(score)`; `runtimeOf(minutes)`, `seriesOf(seasons, episodes)`,
+  `castOf(credits, role, limit)`.
 
 - [ ] **Шаг 1: Написать падающие тесты**
 
@@ -123,8 +123,8 @@ personal_rating/
 ```js
 import { describe, expect, it } from 'vitest'
 
-import { LABELS, average, colorOf, partOf, stepOf, verdictOf }
-  from '$state/scores.js'
+import { LABELS, average, colorOf, nameOf, partOf, stepOf, stepOfSource,
+  verdictOf } from '$state/scores.js'
 
 describe('нотация оценок', () => {
   it('десять ступеней, и ни одна не повторяется', () => {
@@ -137,6 +137,16 @@ describe('нотация оценок', () => {
     // браться из той же нотации, что и своя оценка.
     expect(stepOf(8.7, 10)).toBe(9)
     expect(stepOf(87, 100)).toBe(9)
+  })
+
+  it('знает шкалу каждого источника', () => {
+    // Проверка не таблицы, а следствия: у GOG шкала 0–50, и `46` это девятая
+    // ступень, а не десятая. С пятёркой десятой была бы каждая игра из GOG.
+    expect(stepOfSource(46, 'gog')).toBe(stepOf(46, 50))
+    expect(stepOfSource(87, 'metacritic')).toBe(stepOf(87, 100))
+    // Незнакомый источник — десятибалльный: молчать тут нельзя, а гадать не о
+    // чем, шкала 0–10 у трёх из семи.
+    expect(stepOfSource(8.7, 'кто-то новый')).toBe(stepOf(8.7, 10))
   })
 
   it('зажимает выход за границы шкалы', () => {
@@ -287,6 +297,23 @@ export function stepOf(value, max) {
 
 export const colorOf = (step) => `var(--score-${step})`
 
+/** Шкала каждого источника — часть нотации, а не знание карточки: показывает
+ *  цифру одно место, а красит её эта таблица.
+ *
+ *  У GOG шкала 0–50, а не 0–5: доля положительных отзывов кладётся в базу как
+ *  есть (`reviewsRating` в ответе каталога), и в записанных ответах там 46, 39,
+ *  41. С пятёркой каждая игра из GOG получала бы десятую ступень. */
+const MAX = { imdb: 10, kinopoisk: 10, tmdb: 10, gog: 50,
+              rotten: 100, metacritic: 100, steam: 100 }
+
+const NAMES = { imdb: 'IMDb', kinopoisk: 'Кинопоиск', tmdb: 'TMDB',
+                rotten: 'Rotten Tomatoes', metacritic: 'Metacritic',
+                steam: 'Steam', gog: 'GOG' }
+
+export const stepOfSource = (value, source) => stepOf(value, MAX[source] ?? 10)
+
+export const nameOf = (source) => NAMES[source] ?? source
+
 /** Дробные оценки округляются вниз — правило общее для всего показа. */
 export function verdictOf(score) {
   return LABELS[Math.floor(score ?? 0)] ?? ''
@@ -364,7 +391,7 @@ function plural(count, forms) {
 cd client && npm test
 ```
 
-Ожидание: PASS, 57 тестов — шестнадцать новых и сорок один из плана 6.
+Ожидание: PASS, 60 тестов — семнадцать новых и сорок три из плана 6.
 
 - [ ] **Шаг 6: Коммит**
 
@@ -394,7 +421,7 @@ git commit -m "feat: нотация оценок и строки фактов к
 - Создать: `client/styles/feed.css`, `film.css`, `chips.css`, `facts.css`
 - Создать: `client/components/Film.svelte`, `Poster.svelte`, `Chips.svelte`,
   `Facts.svelte`, `Synopsis.svelte`
-- Изменить: `client/main.js`, `client/app/RatedScreen.svelte`
+- Изменить: `client/main.js`, `client/app/LibraryScreen.svelte`
 
 **Интерфейсы:**
 - Потребляет: `runtimeOf`, `seriesOf`, `castOf` из `$state/facts.js`.
@@ -431,9 +458,9 @@ git commit -m "feat: нотация оценок и строки фактов к
   display: flex;
   gap: 20px;
   padding: 18px var(--gutter) 18px 18px;
-  border: 1px solid rgba(255,255,255,.07);
+  border: 1px solid var(--tint-07);
   border-radius: 14px;
-  background: rgba(255,255,255,.035);
+  background: var(--tint-035);
 
   /* Карточка за краем экрана не рисуется, а место под неё держится по
      последней измеренной высоте. Запасное число выведено из макета: постер
@@ -454,7 +481,7 @@ git commit -m "feat: нотация оценок и строки фактов к
   border: none;
   border-radius: var(--r-full);
   background: transparent;
-  color: rgba(255,255,255,.3);
+  color: var(--tint-30);
   cursor: pointer;
   transition: background .16s, color .16s;
 }
@@ -466,7 +493,7 @@ git commit -m "feat: нотация оценок и строки фактов к
   text-align: center;
   transition: transform .22s cubic-bezier(.2,.8,.2,1);
 }
-.film__toggle:hover { color: #fff }
+.film__toggle:hover { color: var(--text-bright) }
 
 .film.is-collapsed .film__toggle .material-symbols-outlined {
   transform: rotate(180deg);
@@ -501,8 +528,8 @@ git commit -m "feat: нотация оценок и строки фактов к
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.02));
-  color: rgba(255,255,255,.16);
+  background: linear-gradient(160deg, var(--tint-09), var(--tint-02));
+  color: var(--tint-16);
   overflow: hidden;
 }
 .film__poster .material-symbols-outlined { font-size: 38px }
@@ -527,14 +554,14 @@ git commit -m "feat: нотация оценок и строки фактов к
   font: var(--title-l);
   font-weight: 600;
   letter-spacing: -.2px;
-  color: #fff;
+  color: var(--text-bright);
 }
 
 .film__synopsis {
   margin: 0;
   font: var(--body-m);
   line-height: 1.55;
-  color: rgba(255,255,255,.55);
+  color: var(--tint-55);
 }
 
 /* Раскрывает обрезанный текст. Появляется только когда содержимое не
@@ -545,7 +572,7 @@ git commit -m "feat: нотация оценок и строки фактов к
   border: none;
   background: transparent;
   font: inherit;
-  color: rgba(255,255,255,.4);
+  color: var(--tint-40);
   cursor: pointer;
   transition: color .16s ease;
 }
@@ -575,12 +602,12 @@ git commit -m "feat: нотация оценок и строки фактов к
 .chip {
   position: relative;
   font: var(--label-m);
-  color: rgba(255,255,255,.55);
+  color: var(--tint-55);
   cursor: pointer;
 }
 
 /* Свои теги отличаются от жанров из внешней базы. */
-.chip--tag { color: #fff }
+.chip--tag { color: var(--text-bright) }
 
 /* Оправа рисуется псевдоэлементом с отрицательными отступами: она выходит за
    границы слова, не занимая места, поэтому соседи при наведении не
@@ -589,7 +616,7 @@ git commit -m "feat: нотация оценок и строки фактов к
   content: '';
   position: absolute;
   inset: -3px -10px;
-  border: 1px solid rgba(255,255,255,.09);
+  border: 1px solid var(--tint-09);
   border-radius: var(--r-full);
   background: transparent;
   pointer-events: none;
@@ -601,8 +628,8 @@ git commit -m "feat: нотация оценок и строки фактов к
    акцент уехал состоянию, наведению остался белый. */
 .chip:hover { color: var(--text-bright) }
 .chip:hover::before {
-  border-color: rgba(255,255,255,.55);
-  background: rgba(255,255,255,.06);
+  border-color: var(--tint-55);
+  background: var(--tint-06);
 }
 
 /* Метки кликабельны, поэтому они кнопки, а не надписи: своей подложки и рамки
@@ -618,7 +645,7 @@ git commit -m "feat: нотация оценок и строки фактов к
 /* Видна всегда и приглушённой: спрятанная кнопка — ловушка, про которую надо
    догадаться. */
 .chip--add {
-  color: rgba(255,255,255,.3);
+  color: var(--tint-30);
   transition: color .18s ease;
 }
 
@@ -636,9 +663,9 @@ git commit -m "feat: нотация оценок и строки фактов к
 наведение подсвечивает белым. В макете включённого состояния у метки не было
 вовсе — там был только акцентный `:hover`.
 
-Значения белого наведения названы здесь впервые: `rgba(255,255,255,.55)` у
+Значения белого наведения названы здесь впервые: `var(--tint-55)` у
 оправы — то же, что у единственного белого наведения в макете
-(`.tagbox[data-state="off"]:hover`), и `rgba(255,255,255,.06)` у подложки —
+(`.tagbox[data-state="off"]:hover`), и `var(--tint-06)` у подложки —
 вдвое слабее акцентной, чтобы белая заливка не читалась ярче цветной.
 
 Создать `client/styles/facts.css` — перенос `index.html:508-541`:
@@ -652,18 +679,18 @@ git commit -m "feat: нотация оценок и строки фактов к
   font: var(--body-m);
 }
 .film__facts dt {
-  color: rgba(255,255,255,.35);
+  color: var(--tint-35);
   white-space: nowrap;
 }
 .film__facts dd {
   margin: 0;
-  color: rgba(255,255,255,.85);
+  color: var(--tint-85);
 }
 
 /* Подпись роли внутри строки — выглядит как заголовок в левой колонке. */
 .film__role {
   margin: 0 8px 0 20px;
-  color: rgba(255,255,255,.35);
+  color: var(--tint-35);
 }
 
 /* Каждое имя — отдельная цель: по нему можно найти остальное с его участием. */
@@ -888,7 +915,7 @@ import '$styles/facts.css'
 ```
 
 Чтобы карточку было на чём посмотреть до того, как появится раздел, — черновик
-в `client/app/RatedScreen.svelte`:
+в `client/app/LibraryScreen.svelte`:
 
 ```svelte
 <script>
@@ -992,7 +1019,7 @@ git commit -m "feat: карточка ленты — постер, метки, �
   flex: 0 0 auto;
   width: 86px;
   font: var(--body-m);
-  color: rgba(255,255,255,.35);
+  color: var(--tint-35);
 }
 
 .stars { display: flex; gap: 2px }
@@ -1004,7 +1031,7 @@ git commit -m "feat: карточка ленты — постер, метки, �
   padding: 0;
   border: none;
   background: transparent;
-  color: rgba(255,255,255,.16);
+  color: var(--tint-16);
 }
 .stars button { cursor: pointer }
 
@@ -1055,7 +1082,7 @@ git commit -m "feat: карточка ленты — постер, метки, �
   gap: 14px;
   font: var(--body-m);
 }
-.film__aggr span { color: rgba(255,255,255,.35) }
+.film__aggr span { color: var(--tint-35) }
 
 /* Название источника ведёт на страницу карточки у него. */
 .aggr {
@@ -1079,8 +1106,8 @@ git commit -m "feat: карточка ленты — постер, метки, �
   height: 10px;
   margin-left: 6px;
   vertical-align: -1px;
-  border: 2px solid rgba(255,255,255,.16);
-  border-top-color: rgba(255,255,255,.55);
+  border: 2px solid var(--tint-16);
+  border-top-color: var(--tint-55);
   border-radius: 50%;
   animation: aggr-spin .8s linear infinite;
 }
@@ -1115,7 +1142,7 @@ git commit -m "feat: карточка ленты — постер, метки, �
   border: none;
   border-radius: var(--r-full);
   background: transparent;
-  color: rgba(255,255,255,.3);
+  color: var(--tint-30);
   cursor: pointer;
   transition: color .16s, opacity .16s;
 }
@@ -1197,17 +1224,9 @@ git commit -m "feat: карточка ленты — постер, метки, �
 
 ```svelte
 <script>
-  import { colorOf, stepOf } from '$state/scores.js'
+  import { colorOf, nameOf, stepOfSource } from '$state/scores.js'
 
   let { external = [], expected = [] } = $props()
-
-  // Шкалы у источников разные, и цвет обязан браться из общей нотации.
-  const MAX = { imdb: 10, kinopoisk: 10, tmdb: 10, gog: 5,
-                rotten: 100, metacritic: 100, steam: 100 }
-
-  const NAMES = { imdb: 'IMDb', kinopoisk: 'Кинопоиск', tmdb: 'TMDB',
-                  rotten: 'Rotten Tomatoes', metacritic: 'Metacritic',
-                  steam: 'Steam', gog: 'GOG' }
 
   const arrived = $derived(new Map(external.map((one) => [one.source, one])))
 
@@ -1223,9 +1242,9 @@ git commit -m "feat: карточка ленты — постер, метки, �
 <div class="film__aggr">
   {#each shown as one (one.source)}
     <span>
-      <a class="aggr">{NAMES[one.source] ?? one.source}</a>
+      <a class="aggr">{nameOf(one.source)}</a>
       {#if one.value !== null}
-        <b style:--score={colorOf(stepOf(one.value, MAX[one.source] ?? 10))}
+        <b style:--score={colorOf(stepOfSource(one.value, one.source))}
         >{one.value}</b>
       {:else if !one.asked}
         <i class="aggr-wait" aria-hidden="true"></i>
@@ -1676,7 +1695,7 @@ git commit -m "feat: поиск — своё сразу, внешнее по г�
 
 **Файлы:**
 - Создать: `client/app/section.js`
-- Изменить: `client/app/RatedScreen.svelte`, `WishScreen.svelte`
+- Изменить: `client/app/LibraryScreen.svelte`
 
 **Интерфейсы:**
 - Потребляет: `chosen` из `$state/filters.js`; `orderFor` из
@@ -1708,8 +1727,10 @@ export function requestOf(session) {
 
 - [ ] **Шаг 2: Написать раздел**
 
-`client/app/RatedScreen.svelte` — и такой же `WishScreen.svelte`, отличающийся
-только тем, что приезжает в `session.section`:
+`client/app/LibraryScreen.svelte` — **один экран на оба раздела библиотеки.**
+Различает их `session.section`, и он же уезжает в запрос через `requestOf`;
+второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды, а
+машинная проверка дублей `.svelte` не разбирает вовсе:
 
 ```svelte
 <script>
