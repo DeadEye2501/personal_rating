@@ -19,6 +19,7 @@ build/
 dist/
 *.spec
 *.exe
+node_modules/
 
 # Логи
 *.log

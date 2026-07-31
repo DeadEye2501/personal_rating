@@ -1,0 +1,16 @@
+{
+  "name": "personal-rating-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "7.2.0",
+    "svelte": "5.56.8",
+    "vite": "8.2.0",
+    "vitest": "4.1.10"
+  }
+}
