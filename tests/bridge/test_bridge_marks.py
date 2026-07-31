@@ -112,7 +112,8 @@ def test_a_new_tag_belongs_to_one_kind(spy, asked):
 
     name, args, _ = log[0]
     assert name == "tags.create"
-    assert args == (Kind.SERIES, "пересмотреть")
+    assert args[0] is Kind.SERIES
+    assert args[1] == "пересмотреть"
 
 
 def test_a_taken_tag_name_is_a_kind_of_failure(spy, asked):

@@ -55,6 +55,11 @@ class Page:
         return self._file(path, start_response)
 
     def _file(self, path: str, start_response):
+        if not self._root.is_dir():
+            # Фронт не собран: окно откроется пустым, и без этой записи оно
+            # молчит о причине — а причина ровно одна и чинится одной командой.
+            logger.error("нет собранного фронта: %s", self._root)
+            return _answer(start_response, "404 Not Found", "text/plain", b"")
         wanted = "index.html" if path == "/" else path.lstrip("/")
         # Проверка по разрешённому пути, а не по строке: `..` внутри имени файла
         # — законный символ, а вот выход за корень отдавать нельзя.

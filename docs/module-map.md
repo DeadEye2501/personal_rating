@@ -1067,15 +1067,15 @@
   - `async def _added(self, back, candidate)` (2)
 - `def _found(views, source: str, source_id: str)` (7)
 
-### `bridge/serve.py` — 142 строк
+### `bridge/serve.py` — 147 строк
 
 Страница, ресурсы и обложки по HTTP.
 
 Зависит от: `backend.model`, `bridge.thread`
 
-- `class Page` (65)
+- `class Page` (70)
   - `def __call__(self, environ, start_response)` (6)
-  - `def _file(self, path: str, start_response)` (18)
+  - `def _file(self, path: str, start_response)` (23)
   - `def _poster(self, query: dict, start_response)` (32)
 - `async def _fetched(back, item, source, url)` (12)
 - `def _looks_like(picture: bytes) -> str` (5)
@@ -1101,7 +1101,7 @@
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
 
-### `bridge/window.py` — 55 строк
+### `bridge/window.py` — 59 строк
 
 Окно приложения и проверка того, чем оно рисует.
 
@@ -1120,7 +1120,7 @@
 - `def to_wire(value)` (29)
 - `def outcome(value) -> dict` (11)
 
-### `bridge/world.py` — 130 строк
+### `bridge/world.py` — 134 строк
 
 Мост: всё, что смотрит наружу, — привязка по ссылке, перезапрос сериала,
 
@@ -1128,7 +1128,7 @@
 
 - `class BadLink(Denied)` (6)
 - `class ForeignScheme(Denied)` (5)
-- `class World(Domain)` (67)
+- `class World(Domain)` (71)
   - `def parse(self, raw: str, kind: str | None) -> dict` (10)
   - `def card_for_link(self, op: int, raw: str, kind: str | None) -> dict` (4)
   - `def link(self, op: int, item_id: int, overwrite: bool) -> dict` (10)
@@ -1136,7 +1136,7 @@
   - `def enrich(self, op: int, item_id: int, kind: str) -> dict` (5)
   - `def expected(self, op: int, kind: str) -> dict` (9)
   - `def open(self, url: str) -> dict` (8)
-  - `async def _asked(self, back, op, raw, kind)` (5)
+  - `async def _asked(self, back, op, raw, kind)` (9)
 - `async def _parsed(raw: str, kind: str | None)` (2)
 - `async def _expected(back, kind: str)` (2)
 - `async def _opened(url: str) -> None` (9)
@@ -1853,7 +1853,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/conftest.py` — 180 строк
+### `tests/bridge/conftest.py` — 184 строк
 
 Двойники бэкенда и потоки на них.
 
@@ -1872,9 +1872,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `async def aclose(self)` (6)
 - `async def ready(value)` (3)
 - `def wait_until(condition, timeout=5.0)` (8)
-- `class Asked` (29)
+- `class Asked` (33)
   - `def __getattr__(self, name)` (2)
-  - `def __call__(self, *args, **kwargs)` (5)
+  - `def __call__(self, *args, **kwargs)` (9)
   - `async def aclose(self)` (3)
 - `async def _raising(error)` (2)
 - `def backend()` (2)
@@ -1896,7 +1896,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Probe(Domain)` (5)
   - `def ask(self, what, op=None)` (2)
 
-### `tests/bridge/test_bridge_covers.py` — 49 строк
+### `tests/bridge/test_bridge_covers.py` — 52 строк
 
 Мост: обложки — заливка своей картинки и наличие.
 
@@ -1914,7 +1914,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 11
 
 
-### `tests/bridge/test_bridge_library.py` — 122 строк
+### `tests/bridge/test_bridge_library.py` — 125 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
@@ -1923,7 +1923,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/bridge/test_bridge_marks.py` — 199 строк
+### `tests/bridge/test_bridge_marks.py` — 200 строк
 
 Мост: свои отметки — оценки, теги, закладки.
 
@@ -1941,23 +1941,23 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/bridge/test_bridge_search.py` — 201 строк
+### `tests/bridge/test_bridge_search.py` — 230 строк
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.search`
 
-Тестов: 12
+Тестов: 13
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
 
-### `tests/bridge/test_bridge_surface.py` — 160 строк
+### `tests/bridge/test_bridge_surface.py` — 187 строк
 
 Каждый вызов, который мост делает бэкенду, обязан ему подходить.
 
 Зависит от: `backend.app`, `bridge.api`, `bridge.refs`
 
-Тестов: 6
+Тестов: 7
 
 - `def chain(node)` (16)
 - `def _chooses(node) -> bool` (5)
@@ -1966,25 +1966,25 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def surface(api) -> set[str]` (13)
 - `def _behind(where, step)` (6)
 
-### `tests/bridge/test_bridge_world.py` — 182 строк
+### `tests/bridge/test_bridge_world.py` — 203 строк
 
 Мост: внешний мир — привязка, перезапрос, оценки агрегаторов.
 
 Зависит от: `backend.model`, `bridge.world`
 
-Тестов: 14
+Тестов: 15
 
 
-### `tests/bridge/test_kept.py` — 28 строк
+### `tests/bridge/test_kept.py` — 43 строк
 
 То, что не пролезает обратно через JSON, мост помнит у себя.
 
 Зависит от: `bridge.kept`
 
-Тестов: 3
+Тестов: 4
 
 
-### `tests/bridge/test_serve.py` — 224 строк
+### `tests/bridge/test_serve.py` — 226 строк
 
 Отдача страницы, ресурсов и обложек.
 
@@ -1995,25 +1995,25 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def call(page, path, query='')` (10)
   - `def start(status, headers)` (3)
 
-### `tests/bridge/test_thread.py` — 200 строк
+### `tests/bridge/test_thread.py` — 274 строк
 
 Граница потоков: что обязано быть правдой у стыка двух циклов.
 
 Зависит от: `bridge.thread`, `tests.bridge.conftest`
 
-Тестов: 17
+Тестов: 21
 
 
-### `tests/bridge/test_window.py` — 75 строк
+### `tests/bridge/test_window.py` — 126 строк
 
 Решение по рендереру и настройка лога. Окно здесь не поднимается ни разу.
 
-Зависит от: `bridge.window`
+Зависит от: `bridge.api`, `bridge.serve`, `bridge.thread`, `bridge.window`
 
-Тестов: 6
+Тестов: 8
 
 
-### `tests/bridge/test_wire.py` — 138 строк
+### `tests/bridge/test_wire.py` — 143 строк
 
 Перевод значений границы в то, что переживёт `json.dumps` без своего
 
@@ -2092,7 +2092,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `BackendThread` — наследник один: `Watched`
 - `Base` — наследник один: `Note`
-- `FakeBackend` — наследник один: `Stubborn`
 - `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
 - `FakePerson` — наследник один: `Broken`
 - `FakeRatings` — наследник один: `Breaking`

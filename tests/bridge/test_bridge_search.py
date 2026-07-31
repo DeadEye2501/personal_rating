@@ -1,5 +1,7 @@
 """Мост: поиск — своё, чужое, складывание, заведение найденного."""
 
+import asyncio
+import threading
 from datetime import timedelta
 
 from backend.model import (
@@ -114,6 +116,33 @@ def test_a_stale_number_gets_nothing(spy, asked):
     search.local(2, "movie", "новое")
 
     assert search.external(1) == {"fail": "stale"}
+
+
+def test_a_late_answer_does_not_take_the_cell_of_the_new_search(spy, asked):
+    """pywebview зовёт каждый метод в своём потоке, и пока летел ответ, человек
+    успел набрать новую строку. Затереть чужую ячейку значит отнять у новой
+    операции её собственную половину — ту, где оценки, теги и закладка."""
+    answers, _ = asked
+    gate = threading.Event()
+
+    async def waiting(kind, query):
+        await asyncio.to_thread(gate.wait)
+        return ExternalSearch(views=(a_view("1"),), refusals=())
+
+    answers["search.local"] = [a_view("своё", item_id=5)]
+    answers["search.external"] = waiting
+
+    search = Search(spy)
+    search.local(1, "movie", "старое")
+    late = threading.Thread(target=lambda: search.external(1))
+    late.start()
+
+    search.local(2, "movie", "новое")
+    gate.set()
+    late.join(timeout=5)
+
+    # Ячейка принадлежит второй операции, и её половина на месте.
+    assert search.ensure(2, "tmdb", "своё")["ok"]["outcome"] == "found"
 
 
 def test_a_refusal_of_the_outer_base_travels_as_a_field(spy, asked):

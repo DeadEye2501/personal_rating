@@ -5,7 +5,7 @@ import asyncio
 import webbrowser
 from datetime import datetime
 
-from backend.model import Denied, Kind, parse_link
+from backend.model import Denied, Kind, Missing, Refusal, parse_link
 from bridge.answer import Domain, stale
 from bridge.kept import Kept
 from bridge.wire import outcome
@@ -91,7 +91,11 @@ class World(Domain):
     async def _asked(self, back, op, raw, kind):
         link = _link(raw, kind)
         card = await back.loader.card_for_link(link)
-        self._kept.put(op, card)
+        if not isinstance(card, Missing | Refusal):
+            # Помним только найденное. Привязка первым делом читает внешние
+            # идентификаторы карточки, и «не нашлось» на этом месте дало бы
+            # человеку невнятный сбой вместо ответа «связывать не с чем».
+            self._kept.put(op, card)
         return outcome(card)
 
 

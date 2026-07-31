@@ -3,7 +3,7 @@
 from datetime import datetime
 from types import SimpleNamespace
 
-from backend.model import ItemExists, Kind, Missing, RatingSource
+from backend.model import ItemExists, Kind, Missing, RatingSource, Source
 from bridge.world import World
 
 
@@ -48,7 +48,9 @@ def test_the_card_for_a_link_is_kept_not_sent_back(spy, asked):
     assert before <= args[2] <= after
     assert kwargs == {"overwrite": False}
     assert spy.ops == [1, 1]
-    assert log[0][1][0].source_id == "157336"
+    link = log[0][1][0]
+    assert (link.source, link.source_id, link.kind) == (
+        Source.TMDB, "157336", Kind.MOVIE)
 
 
 def test_the_overwrite_box_reaches_the_backend(spy, asked):
@@ -92,6 +94,20 @@ def test_a_source_without_that_card_says_missing(spy, asked):
 
     assert World(spy).card_for_link(1, "themoviedb.org/movie/1", None) == {
         "ok": {"outcome": "missing"}}
+
+
+def test_a_card_that_was_not_found_is_not_kept_for_linking(spy, asked):
+    """Память держит только найденное: привязка первым делом читает внешние
+    идентификаторы, и «не нашлось» на этом месте стало бы невнятным сбоем
+    вместо ответа «связывать не с чем»."""
+    answers, log = asked
+    answers["loader.card_for_link"] = Missing()
+
+    world = World(spy)
+    world.card_for_link(1, "themoviedb.org/movie/1", None)
+
+    assert world.link(1, 12, False) == {"fail": "stale"}
+    assert [name for name, _, _ in log] == ["loader.card_for_link"]
 
 
 def test_an_unparsable_link_never_reaches_the_network(spy, asked):
@@ -143,7 +159,9 @@ def test_expected_sources_are_known_before_the_network(thread, backend):
                                                     RatingSource.KINOPOISK])
 
     assert World(thread).expected(1, "movie") == {"ok": ["imdb", "kinopoisk"]}
-    assert seen == [Kind.MOVIE]
+    # Тождеством: без перевода в перечисление реестр источников спросил бы у
+    # игры оценки в трёх кинематографических агрегаторах.
+    assert seen[0] is Kind.MOVIE
 
 
 def test_a_foreign_scheme_is_refused(spy, asked, monkeypatch):
@@ -158,6 +176,9 @@ def test_a_foreign_scheme_is_refused(spy, asked, monkeypatch):
     answer = World(spy).open("file:///C:/Windows/system32")
 
     assert answer["fail"] == "foreign-scheme"
+    # И `http` тоже чужой: между двумя крайностями сужение проверки до одной
+    # буквы иначе не наблюдается ничем.
+    assert World(spy).open("http://www.imdb.com/")["fail"] == "foreign-scheme"
     assert opened == []
 
 

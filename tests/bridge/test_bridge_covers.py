@@ -35,9 +35,12 @@ def test_not_a_picture_is_a_kind_of_failure(spy, asked):
 
 
 def test_broken_base64_does_not_reach_the_backend(spy, asked):
+    """Мусор нарочно из латиницы: кириллица падает раньше проверки алфавита, и
+    на ней строгость разбора не наблюдалась бы вовсе — картинка с приписанным
+    хвостом доехала бы до бэкенда."""
     _, log = asked
 
-    assert Covers(spy).store_upload(12, "не base64!")["fail"] == "bad-image"
+    assert Covers(spy).store_upload(12, PNG + "!!")["fail"] == "bad-image"
     assert log == []
 
 

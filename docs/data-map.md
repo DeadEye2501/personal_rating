@@ -539,6 +539,7 @@
 - `MIN_HEIGHT` = `600`
 - `WIDTH` = `1280`
 - `HEIGHT` = `820`
+- `BACKGROUND` = `'#0a0a0a'`
 
 ## migrations
 

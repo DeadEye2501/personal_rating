@@ -109,9 +109,11 @@ def test_each_name_hides_its_own_domain(spy):
     вместо поиска. Тот же род поломки, что перепутанные люди со студиями."""
     api = Api(spy)
 
-    behind = [type(getattr(api, name)) for name in sorted(DOMAINS)]
+    behind = {name: type(getattr(api, name)).__name__ for name in DOMAINS}
 
-    assert len(set(behind)) == len(DOMAINS)
+    assert behind == {"library": "Library", "marks": "Marks", "refs": "Refs",
+                      "feed": "FeedBridge", "search": "Search",
+                      "world": "World", "covers": "Covers"}
 
 
 def test_cancelling_reaches_the_thread(spy):
@@ -158,3 +160,28 @@ def _behind(where, step):
     обычные методы класса."""
     annotations = getattr(where, "__annotations__", {})
     return annotations.get(step) or getattr(where, step)
+
+
+def test_every_domain_on_the_surface_actually_reaches_the_backend(spy, asked):
+    """Поверхность проверяется отдельно от того, что за ней работает: `Api` с
+    доменом на пустом потоке даёт «непредвиденный сбой» на каждый вызов, а имена
+    при этом на месте. Тот же класс, что несобранный загрузчик в бэкенде —
+    девятьсот тестов зелёные, приложение не работает."""
+    answers, log = asked
+    answers.update({"library.unlink": None, "wishlist.remove": None,
+                    "genres.list_for_kind": [], "feed.views_of": [],
+                    "search.local": [], "series.refresh": None,
+                    "posters.has": True})
+    api = Api(spy)
+
+    api.library.unlink(1)
+    api.marks.unwish(1)
+    api.refs.genres("film")
+    api.feed.views_of(1, [1])
+    api.search.local(1, "movie", "одиссея")
+    api.world.refresh_series(1, 1)
+    api.covers.has(1)
+
+    assert [name for name, _, _ in log] == [
+        "library.unlink", "wishlist.remove", "genres.list_for_kind",
+        "feed.views_of", "search.local", "series.refresh", "posters.has"]

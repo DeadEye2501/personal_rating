@@ -110,7 +110,9 @@ def test_a_cover_of_a_library_card_is_taken_by_its_number(tmp_path, spy, asked):
     assert body == PNG
     assert [name for name, _, _ in log] == ["library.get", "posters.poster_for"]
     _, args, _ = log[1]
-    assert args[:3] == (12, Source.TMDB, "https://image/1.jpg")
+    assert args[0] == 12
+    assert args[1] is Source.TMDB
+    assert args[2] == "https://image/1.jpg"
     # Часы подставляет мост, как и везде: без момента строка обложки не
     # запишется вовсе — `fetched_at` в базе обязательный.
     assert isinstance(args[3], datetime)

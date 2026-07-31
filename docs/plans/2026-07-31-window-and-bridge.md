@@ -133,8 +133,8 @@ personal_rating/
 
    | Домен | С номером | Без номера |
    |---|---|---|
-   | `search` | `local`, `external`, `ensure`, `by_person` | — |
-   | `world` | все | — |
+   | `search` | `local`, `external`, `ensure` | — |
+   | `world` | `card_for_link`, `link`, `refresh_series`, `enrich`, `expected` | `parse`, `open` |
    | `feed` | `page`, `views_of`, `histogram` | — |
    | `marks` | — | все |
    | `library`, `refs`, `covers` | — | все |

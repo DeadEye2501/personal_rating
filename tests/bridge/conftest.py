@@ -120,6 +120,10 @@ class Asked:
         name = ".".join(self._path)
         self._log.append((name, args, kwargs))
         answer = self._answers.get(name)
+        if callable(answer):
+            # Ответ, который тест хочет задержать: без этого порядок событий на
+            # стыке двух операций не наблюдается вовсе — двойник отвечает сразу.
+            return answer(*args, **kwargs)
         return _raising(answer) if isinstance(answer, Exception) else ready(answer)
 
     async def aclose(self):

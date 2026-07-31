@@ -99,7 +99,10 @@ def test_the_same_title_check_stays_inside_one_kind(spy, asked):
 
     name, args, _ = log[0]
     assert name == "library.find_by_title"
-    assert args == (Kind.MOVIE, "Одиссея")
+    # Тождеством, а не равенством: тип содержимого — строковое перечисление,
+    # и `==` пропустило бы сырую строку, а живой отбор различает его `is`.
+    assert args[0] is Kind.MOVIE
+    assert args[1] == "Одиссея"
 
 
 def test_deletion_goes_through_the_backend_method(spy, asked):

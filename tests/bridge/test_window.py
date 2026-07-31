@@ -5,9 +5,21 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 import webview
 
-from bridge.window import RENDERER, _check_renderer, supported
+from bridge.api import Api
+from bridge.serve import Page
+from bridge.thread import Closed
+from bridge.window import (
+    BACKGROUND,
+    MIN_HEIGHT,
+    MIN_WIDTH,
+    RENDERER,
+    _check_renderer,
+    open_window,
+    supported,
+)
 
 
 def test_the_system_chromium_is_what_we_drew_the_mockup_in():
@@ -73,3 +85,42 @@ def test_the_log_reaches_its_file(tmp_path):
 
     written = (tmp_path / "app.log").read_text(encoding="utf-8")
     assert "строка дошла" in written
+
+
+def test_the_window_gets_the_bridge_and_our_own_page(spy, monkeypatch):
+    """Сборка — самое дырявое место проекта, и это уже третий раз: подмена моста
+    отдачей страницы, перепутанный минимальный размер и пропавшее закрытие
+    потока прошли бы при полностью зелёном наборе.
+
+    Окно здесь не поднимается: обе стороны pywebview подменены."""
+    seen = {}
+    monkeypatch.setattr(webview, "create_window",
+                        lambda title, **rest: seen.update(rest, title=title))
+    monkeypatch.setattr(webview, "start", lambda **rest: seen.update(start=rest))
+    closed = []
+    monkeypatch.setattr(spy, "close", lambda: closed.append(True))
+
+    open_window(spy)
+
+    assert isinstance(seen["js_api"], Api)
+    assert isinstance(seen["url"], Page)
+    assert seen["min_size"] == (MIN_WIDTH, MIN_HEIGHT)
+    assert seen["background_color"] == BACKGROUND
+    # Проверку движка ставит `start`: к моменту вызова библиотека уже выбрала,
+    # чем рисует, а до него смотреть не на что.
+    assert seen["start"]["func"] is _check_renderer
+    # Закрытие идёт после того, как окно закрылось: `start` блокирует.
+    assert closed == [True]
+
+
+def test_closing_the_window_closes_the_backend(spy, monkeypatch):
+    """Иначе процесс переживает окно: поток бэкенда держит цикл, соединения и
+    начатые запросы."""
+    monkeypatch.setattr(webview, "create_window", lambda title, **rest: None)
+    monkeypatch.setattr(webview, "start", lambda **rest: None)
+
+    open_window(spy)
+
+    # Наблюдается следствием: закрытый поток заявок больше не принимает.
+    with pytest.raises(Closed):
+        spy.run(lambda back: back.tags.list_for_kind(None))

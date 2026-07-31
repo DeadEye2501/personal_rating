@@ -25,6 +25,10 @@ MIN_HEIGHT = 600
 WIDTH = 1280
 HEIGHT = 820
 
+# Цвет до отрисовки страницы, единственный, который окно показывает само. Обязан
+# совпасть с фоном палитры — иначе каждый запуск начинается со вспышки.
+BACKGROUND = "#0a0a0a"
+
 
 def supported(renderer: str | None) -> bool:
     return renderer == RENDERER
@@ -39,7 +43,7 @@ def open_window(thread, debug: bool = False) -> None:
         width=WIDTH,
         height=HEIGHT,
         min_size=(MIN_WIDTH, MIN_HEIGHT),
-        background_color="#0d0d0d",
+        background_color=BACKGROUND,
     )
     webview.start(func=_check_renderer, debug=debug)
     # Окно закрыли — гасим начатое и закрываем бэкенд. Отдельного флага

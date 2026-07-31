@@ -34,8 +34,13 @@ def test_a_date_travels_as_iso():
 
 
 def test_a_delay_travels_as_seconds():
-    """`Refusal.retry_after` приезжает при каждом отказе источника."""
+    """`Refusal.retry_after` приезжает при каждом отказе источника.
+
+    Сутки проверяются отдельно: срок приходит числом от чужого сервера, а у
+    `timedelta` есть поле `seconds`, которое дни отбрасывает — на суточном
+    отказе оно ответило бы «ноль секунд»."""
     assert to_wire(timedelta(minutes=2, seconds=30)) == 150.0
+    assert to_wire(timedelta(days=1)) == 86400.0
 
 
 def test_a_dataclass_travels_as_a_dictionary():

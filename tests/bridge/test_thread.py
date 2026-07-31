@@ -168,6 +168,57 @@ def test_closing_cancels_instead_of_waiting_them_out(thread, backend):
     assert backend.running_at_close == 0
 
 
+def test_closing_waits_for_the_cancelled_before_closing_the_backend(backend):
+    """Уборка сорванной записи у настоящего бэкенда — это `await`, а не
+    инструкция: он ловит отмену и откатывает карточку. Закрой движок вперёд
+    отката — и в базе останется строка без жанров и состава, но со свежим
+    `synced_at`, то есть карточка, которая никогда не перезапросится.
+
+    Двойник для этого нужен свой: у обычного `slow` уборка доигрывает на первом
+    же пробуждении, и порядок закрытия на нём не наблюдается вовсе."""
+    class Unwinding(FakeBackend):
+        async def slow(self):
+            self.started += 1
+            try:
+                await asyncio.sleep(30)
+            finally:
+                await asyncio.sleep(0)
+                await asyncio.sleep(0)
+                self.finished += 1
+
+    unwinding = Unwinding()
+    running = BackendThread(lambda: ready(unwinding))
+    running.start()
+    running.run(lambda back: back.slow())
+    wait_until(lambda: unwinding.started == 1)
+
+    running.close()
+
+    assert unwinding.running_at_close == 0
+
+
+def test_a_request_that_raced_closing_is_refused(thread):
+    """Проверка в `run` идёт в чужом потоке и от гонки не спасает. Заявка,
+    попавшая между сбором живых и остановкой цикла, заводит задачу, которой уже
+    никто не дождётся, — и промис страницы висит навсегда."""
+    thread.close()
+    answer: concurrent.futures.Future = concurrent.futures.Future()
+
+    thread._begin(lambda back: back.echo(1), None, answer)
+
+    with pytest.raises(Closed):
+        answer.result(timeout=1)
+
+
+def test_cancelling_after_closing_is_quiet(thread):
+    """Окно закрывают, пока лента гасит свои порции. Разбуженный закрытый цикл
+    поднял бы ошибку прямо в теле обработчика страницы, откуда ей деться
+    некуда."""
+    thread.close()
+
+    thread.cancel([1, 2])
+
+
 def test_closing_ends_the_thread(thread):
     """Иначе окно закрывается на процессе, у которого крутится чужой цикл, — а
     держится это одним лишь флагом `daemon`."""
@@ -198,3 +249,26 @@ def test_the_thread_survives_a_backend_that_will_not_close():
     running = BackendThread(lambda: ready(Stubborn()))
     running.start()
     running.close()
+
+
+# Оборванная сборка обязана уронить поток — это и проверяется. pytest считает
+# улетевшее из чужого потока исключение поводом для предупреждения и вешает его
+# на случайного соседа; здесь оно и есть ожидаемое поведение, а не находка.
+@pytest.mark.filterwarnings(
+    "ignore::pytest.PytestUnhandledThreadExceptionWarning")
+def test_a_build_torn_off_by_something_worse_still_wakes_the_caller():
+    """Сборку может оборвать не только `Exception`. Не разбудив ждущего, мы
+    усадили бы его на весь срок сборки и не сказали бы ни слова о причине —
+    тот же класс, что однажды дала отмена посреди записи карточки."""
+    async def build():
+        raise KeyboardInterrupt
+
+    running = BackendThread(build)
+
+    with pytest.raises(Closed):
+        running.start()
+
+    # Дожидаемся конца потока здесь: иначе его падение всплывёт уже в чужом
+    # тесте, и жалоба повиснет на невиновном соседе.
+    wait_until(lambda: all(alive.name != "backend"
+                           for alive in threading.enumerate()))
