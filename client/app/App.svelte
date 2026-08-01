@@ -1,12 +1,15 @@
 <!-- Корень страницы: шапка, стопка разделов и плашка сообщений. -->
 <script>
+  import FiltersModal from './FiltersModal.svelte'
   import LibraryScreen from './LibraryScreen.svelte'
   import SearchScreen from './SearchScreen.svelte'
   import StatsScreen from './StatsScreen.svelte'
   import Topbar from './Topbar.svelte'
   import Snack from '$components/Snack.svelte'
   import { call, numbered } from '$api/bridge.js'
-  import { newSession, withMark, withSection } from '$state/session.js'
+  import { isEmpty } from '$state/filters.js'
+  import { newSession, withClearedFilter, withFilters, withMark, withSection }
+    from '$state/session.js'
   import { reported } from './trouble.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
@@ -48,6 +51,11 @@
   // она нужна корнем наблюдателя: иначе запас догрузки не действует.
   let content = $state()
 
+  // Какое наложение открыто, знает сборка: `null` либо признак с подписью.
+  // Подпись едет от кнопки, которая окно открыла: заголовок окна и есть её
+  // подпись, и вторым объявлением они разъехались бы молча.
+  let modal = $state(null)
+
   $effect(() => {
     numbered('world.expected', session.kind, { channel: 'expected' })
       .then((sources) => { expected = sources })
@@ -69,6 +77,17 @@
   // `search.by_person` — план 11 задачей 5.
   const idle = () => {}
 
+  /** Повторное нажатие по горящей кнопке сбрасывает свой признак, а не
+   *  открывает модалку: так в макете, где у каждого из трёх фильтров свой
+   *  `isActive()` и свой `reset()`. */
+  function filter(field, title) {
+    if (!isEmpty(session.filters, field)) {
+      session = withClearedFilter(session, field)
+      return
+    }
+    modal = { field, title }
+  }
+
   /** Ссылку открывает системный браузер: окно приложения без адресной строки, и
    *  вернуться из Кинопоиска было бы нечем. Отказ у этого свой — чужая схема
    *  адреса заведена в мосте отдельным классом ровно затем, чтобы плашка
@@ -85,7 +104,7 @@
             onsession={(next) => { session = next }}
             onsearch={(text) => { query = { text }
                                   session = withSection(session, 'search') }}
-            onadd={() => {}} onfilter={() => {}} />
+            onadd={() => {}} onfilter={filter} />
 
     <div class="content" bind:this={content}>
       <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
@@ -105,6 +124,19 @@
       {/key}
     </div>
   </main>
+
+  <!-- `{#key}` не украшение: без него смена признака переиспользует то же окно
+       вместе с уже прочитанным чужим списком, и щелчок по строке в этот
+       промежуток ставит фильтр по жанру номером тега. -->
+  {#if modal}
+    {#key modal.field}
+      <FiltersModal field={modal.field} title={modal.title} kind={session.kind}
+                    filters={session.filters}
+                    onfilters={(next) => { session = withFilters(session, next) }}
+                    ontrouble={(text) => { trouble = { text } }}
+                    onclose={() => { modal = null }} />
+    {/key}
+  {/if}
 
   <Snack message={trouble} />
 </div>

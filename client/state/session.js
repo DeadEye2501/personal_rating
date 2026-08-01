@@ -1,6 +1,6 @@
 /* Выбранное в приложении вместе с переходами между выборами. */
 
-import { EMPTY, marked } from '$state/filters.js'
+import { EMPTY, cleared, marked } from '$state/filters.js'
 import { nextSort } from '$state/sorting.js'
 
 /** При запуске карточек нет: приложение открывается на поиске. */
@@ -44,6 +44,13 @@ export const withNextSort = (session) =>
  *  здесь, и проверяются они тестами, а разметка — ничем. */
 export const withMark = (session, field, id) =>
   ({ ...session, filters: marked(session.filters, field, id) })
+
+/** Повторное нажатие по горящей кнопке фильтра гасит **свой** признак. */
+export const withClearedFilter = (session, field) =>
+  ({ ...session, filters: cleared(session.filters, field) })
+
+/** Перебор строки в списке уже сложил новые наборы — сеанс их принимает. */
+export const withFilters = (session, filters) => ({ ...session, filters })
 
 /** Тумблер всего приложения, а не настройка раздела. */
 export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY, cycled, isEmpty } from '$state/filters.js'
-import { newSession, withCollapsed, withKind, withMark, withNextSort,
-  withSection, withToggledSection } from '$state/session.js'
+import { EMPTY, chosen, cycled, isEmpty } from '$state/filters.js'
+import { newSession, withClearedFilter, withCollapsed, withFilters, withKind,
+  withMark, withNextSort, withSection, withToggledSection }
+  from '$state/session.js'
 
 const filtered = () => ({ ...newSession(), filters: cycled(EMPTY, 'tags', 3) })
 
@@ -143,5 +144,27 @@ describe('переключатель сортировки в состоянии'
     expect(after.section).toBe(before.section)
     expect(after.collapsed).toBe(true)
     expect(after.filters).toBe(before.filters)
+  })
+})
+
+describe('фильтры сеанса', () => {
+  it('гасит названный признак и не трогает соседний', () => {
+    // Кнопка фильтра гасит свой отбор: сбрасывая заодно чужой, «Жанры» стирали
+    // бы теговый, которого человек не трогал.
+    const both = cycled(cycled(EMPTY, 'genres', 7), 'tags', 3)
+    const after = withClearedFilter({ ...newSession(), filters: both }, 'genres')
+
+    expect(chosen(after.filters).genre_ids).toEqual([])
+    expect(chosen(after.filters).tag_ids).toEqual([3])
+  })
+
+  it('кладёт готовые фильтры и ничего, кроме них, не трогает', () => {
+    const before = { ...newSession(), section: 'rated', collapsed: true, sort: 2 }
+    const after = withFilters(before, cycled(EMPTY, 'scores', 9))
+
+    expect(chosen(after.filters).scores).toEqual([9])
+    expect(after.section).toBe('rated')
+    expect(after.collapsed).toBe(true)
+    expect(after.sort).toBe(2)
   })
 })

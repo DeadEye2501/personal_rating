@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY, chosen, cleared, cycled, isEmpty, marked, passes }
+import { EMPTY, stateOf, chosen, cleared, cycled, isEmpty, marked, passes }
   from '$state/filters.js'
 
 describe('строка фильтра', () => {
@@ -201,5 +201,24 @@ describe('метка на карточке', () => {
 
     expect(chosen(on).genre_ids).toEqual([7])
     expect(chosen(on).excluded_genre_ids).toEqual([])
+  })
+})
+
+describe('состояние строки в списке', () => {
+  it('называет все три состояния перебора', () => {
+    const on = cycled(EMPTY, 'genres', 7)
+    const ex = cycled(on, 'genres', 7)
+
+    expect(stateOf(EMPTY, 'genres', 7)).toBe('off')
+    expect(stateOf(on, 'genres', 7)).toBe('on')
+    expect(stateOf(ex, 'genres', 7)).toBe('ex')
+  })
+
+  it('спрашивает свой признак, а не любой', () => {
+    // Списки жанров и тегов нумеруются порознь, и седьмой тег — не седьмой
+    // жанр: спрошенное не по тому признаку показало бы чужую отметку.
+    const tagged = cycled(EMPTY, 'tags', 7)
+
+    expect(stateOf(tagged, 'genres', 7)).toBe('off')
   })
 })

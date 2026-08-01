@@ -8,11 +8,16 @@
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
-## app — 7 файлов
+## app — 8 файлов
 
-### app/App.svelte (110)
+### app/App.svelte (142)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
-- берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
+- берёт: ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
+
+### app/FiltersModal.svelte (62)
+- Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее.
+- принимает: field, kind, title, filters, onfilters, onclose, ontrouble
+- берёт: ./trouble.js
 
 ### app/LibraryScreen.svelte (115)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
@@ -127,9 +132,9 @@
 - Строки фактов карточки: длительность, сезоны и серии, состав.
 - отдаёт: castOf, plural, runtimeOf, seriesOf
 
-### state/filters.js (103)
+### state/filters.js (111)
 - Три состояния строки фильтра: не выбран, включён, исключён.
-- отдаёт: EMPTY, chosen, cleared, cycled, isEmpty, marked, passes
+- отдаёт: EMPTY, chosen, cleared, cycled, isEmpty, marked, passes, stateOf
 
 ### state/redraw.js (20)
 - Перезапуск анимации на узле, который обязан его пережить.
@@ -147,9 +152,9 @@
 - Запрос раздела: то, что уезжает мостом в `feed.page`.
 - отдаёт: requestOf
 
-### state/session.js (55)
+### state/session.js (62)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: collapsedOf, newSession, withCollapsed, withKind, withMark, withNextSort, withSection, withToggledSection
+- отдаёт: collapsedOf, newSession, withClearedFilter, withCollapsed, withFilters, withKind, withMark, withNextSort, withSection, withToggledSection
 
 ### state/sorting.js (70)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
@@ -270,7 +275,7 @@
 - селекторы (6): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
 - берёт: --fill-primary-14, --primary, --r-full, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75, --title-s
 
-### styles/snack.css (25)
+### styles/snack.css (27)
 - Единственное место, где приложение что-то сообщает: и отказ источника, и непредвиденный сбой. Уехавшая вниз плашка пустая — отсутствие сообщений само себя ничем не обозначает.
 - селекторы (2): .snack, .snack.is-shown
 - объявляет: --halo-h, --neon

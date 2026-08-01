@@ -30,6 +30,14 @@ export function cycled(filters, field, id) {
                      : without(filters.ex[field], id))
 }
 
+/** Состояние строки в списке. Читающая половина `cycled`: списанная по месту,
+ *  она уехала бы в разметку, которую не проверяет ничто, — а перебор и его
+ *  чтение обязаны понимать три состояния одинаково. */
+export function stateOf(filters, field, id) {
+  if (filters.on[field].includes(id)) return 'on'
+  return filters.ex[field].includes(id) ? 'ex' : 'off'
+}
+
 /** То, что уезжает мосту: шесть кортежей, как их ждёт `Filters`. */
 export function chosen(filters) {
   return {

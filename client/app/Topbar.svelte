@@ -121,7 +121,7 @@
       <ToolButton icon={filter.icon} label={filter.label}
                   active={!isEmpty(session.filters, filter.field)}
                   pressed={!isEmpty(session.filters, filter.field)}
-                  onclick={() => onfilter(filter.field)} />
+                  onclick={() => onfilter(filter.field, filter.label)} />
     {/each}
 
     <!-- Подсветки нет намеренно, и это макет: в этом ряду акцентом горит то,

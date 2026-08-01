@@ -16,6 +16,7 @@ from pathlib import Path
 from backend.model import (
     Rating,
     CompanyRole,
+    GenreKind,
     IdSource,
     Kind,
     PersonRole,
@@ -145,3 +146,20 @@ def test_sorting_is_offered_exactly_where_the_base_can_sort():
     assert cycles, "в client/state/sorting.js больше нет таблицы CYCLES"
     assert set(re.findall(r"^\s{2}(\w+):", cycles.group(1),
                           re.MULTILINE)) == set(Section)
+
+
+def test_the_page_maps_every_kind_to_a_genre_set_the_base_has():
+    """Наборов жанров два на три типа содержимого: фильмы и сериалы делят один.
+    Разъехавшись, таблица дала бы пустой список жанров в модалке — отказа тут
+    не будет, `GenreKind` неизвестного просто не найдёт в справочнике."""
+    table = keys_and_values("GENRE_KINDS", source("app/FiltersModal.svelte"))
+
+    assert set(table) == set(Kind)
+    assert set(table.values()) == set(GenreKind)
+
+
+def keys_and_values(table: str, text: str) -> dict[str, str]:
+    """Словарь строковых значений `const ИМЯ = { ключ: 'значение' }`."""
+    start = text.index(f"const {table} = {{")
+    body = text[start:text.index("}", start)]
+    return dict(re.findall(r"(\w+): '(\w+)'", body))

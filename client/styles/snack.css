@@ -8,7 +8,9 @@
   position: fixed;
   left: 50%;
   bottom: 24px;
-  z-index: 20;
+  /* Выше затемнения модалки: сообщение рождается и при открытом окне —
+     список фильтра не прочитался, — и притушенным его было бы не прочесть. */
+  z-index: 200;
   max-width: min(560px, calc(100vw - 48px));
   padding: 12px 24px;
   border-radius: var(--r-full);
