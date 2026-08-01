@@ -1,6 +1,6 @@
 /* Выбранное в приложении вместе с переходами между выборами. */
 
-import { EMPTY } from '$state/filters.js'
+import { EMPTY, marked } from '$state/filters.js'
 import { nextSort } from '$state/sorting.js'
 
 /** При запуске карточек нет: приложение открывается на поиске. */
@@ -38,6 +38,12 @@ export const withToggledSection = (session, section) =>
  *  по нему; нетронутый переключатель двигается с первого состояния. */
 export const withNextSort = (session) =>
   ({ ...session, sort: nextSort(session.section, session.sort) })
+
+/** Клик по метке на карточке включает фильтр по ней, повторный выключает.
+ *  Переход живёт здесь, а не в разметке: остальные пять его собратьев тоже
+ *  здесь, и проверяются они тестами, а разметка — ничем. */
+export const withMark = (session, field, id) =>
+  ({ ...session, filters: marked(session.filters, field, id) })
 
 /** Тумблер всего приложения, а не настройка раздела. */
 export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })

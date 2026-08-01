@@ -5,7 +5,8 @@
   import StatsScreen from './StatsScreen.svelte'
   import Topbar from './Topbar.svelte'
   import Snack from '$components/Snack.svelte'
-  import { newSession } from '$state/session.js'
+  import { call } from '$api/bridge.js'
+  import { newSession, withMark, withSection } from '$state/session.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
   // `undefined`, а Svelte на этом не жалуется. Значения обязаны совпадать с
@@ -26,8 +27,15 @@
 
   let session = $state(newSession())
 
-  // Плашка одна на всё приложение, и говорят в неё разделы. Сегодня они пусты,
-  // сообщать нечем, и она стоит за краем окна.
+  // Запрос живёт здесь, а не в разделе: набирают его в шапке, а показывает
+  // выдачу поиск, и общего у них только это состояние.
+  //
+  // Своим объектом, а не строкой: повторный Enter с той же строкой обязан
+  // спросить заново — иначе после отказа сети повторить поиск было бы нечем.
+  let query = $state(null)
+
+  // Плашка одна на всё приложение, и говорят в неё разделы: своей они не
+  // заводят.
   let trouble = $state(null)
 
   // Акцент красит всю страницу, поэтому ставит его тот, кто страницей владеет,
@@ -40,13 +48,29 @@
   })
 
   const Screen = $derived(SCREENS[session.section])
+
+  // Клик по человеку открывает поиск по нему; тело появится вместе с
+  // `search.by_person` — план 11 задачей 5.
+  const idle = () => {}
+
+  /** Ссылку открывает системный браузер: окно приложения без адресной строки, и
+   *  вернуться из Кинопоиска было бы нечем. Отказ у этого свой — чужая схема
+   *  адреса заведена в мосте отдельным классом ровно затем, чтобы плашка
+   *  назвала причину, а не промолчала. */
+  function open(url) {
+    call('world.open', url).catch((error) => {
+      if (!error.silent) trouble = { text: 'Не удалось открыть ссылку' }
+    })
+  }
 </script>
 
 <div class="app">
   <main class="app__main">
     <Topbar {session}
             onsession={(next) => { session = next }}
-            onsearch={() => {}} onadd={() => {}} onfilter={() => {}} />
+            onsearch={(text) => { query = { text }
+                                  session = withSection(session, 'search') }}
+            onadd={() => {}} onfilter={() => {}} />
 
     <div class="content">
       <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
@@ -54,7 +78,14 @@
            становится мгновенной подменой. -->
       {#key session.section}
         <section class="view is-shown">
-          <Screen />
+          <!-- Метка и человек решаются здесь, а не в разделе: клик по жанру
+               включает фильтр, клик по имени открывает поиск по человеку — и
+               то и другое меняет общее состояние. -->
+          <Screen {session} {query}
+                  ontrouble={(text) => { trouble = { text } }}
+                  onmark={(field, id) => { session = withMark(session, field, id) }}
+                  onperson={idle}
+                  onopen={open} />
         </section>
       {/key}
     </div>

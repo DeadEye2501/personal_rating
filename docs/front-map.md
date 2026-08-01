@@ -10,7 +10,7 @@
 
 ## app — 6 файлов
 
-### app/App.svelte (64)
+### app/App.svelte (95)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
 
@@ -18,8 +18,10 @@
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Черновик: раздел не выбирается, фильтры и сортировка не передаются — это задача 6.
 - берёт: ./visible.js
 
-### app/SearchScreen.svelte (2)
-- Раздел «Поиск»: сначала своя выдача, потом внешняя. Пока пуст.
+### app/SearchScreen.svelte (127)
+- Раздел «Поиск»: сначала своя выдача, потом внешняя.
+- принимает: session, query, ontrouble, onmark, onperson, onopen
+- берёт: ./visible.js
 
 ### app/StatsScreen.svelte (2)
 - Раздел «Статистика»: гистограмма своих оценок. Пока пуст.
@@ -108,9 +110,9 @@
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
 - отдаёт: ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
 
-### state/session.js (43)
+### state/session.js (49)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: newSession, withCollapsed, withKind, withNextSort, withSection, withToggledSection
+- отдаёт: newSession, withCollapsed, withKind, withMark, withNextSort, withSection, withToggledSection
 
 ### state/sorting.js (70)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { EMPTY, cycled, isEmpty } from '$state/filters.js'
-import { newSession, withCollapsed, withKind, withNextSort, withSection, withToggledSection }
-  from '$state/session.js'
+import { newSession, withCollapsed, withKind, withMark, withNextSort,
+  withSection, withToggledSection } from '$state/session.js'
 
 const filtered = () => ({ ...newSession(), filters: cycled(EMPTY, 'tags', 3) })
 
@@ -65,6 +65,28 @@ describe('состояние приложения', () => {
     // Ушёл с раздела — переключатель вернулся к порядку по умолчанию.
     const touched = { ...newSession(), section: 'wishlist', sort: 5 }
     expect(withSection(touched, 'rated').sort).toBe(null)
+  })
+})
+
+describe('клик по метке на карточке', () => {
+  it('включает фильтр по ней, повторный выключает', () => {
+    const on = withMark(newSession(), 'genres', 7)
+    expect(isEmpty(on.filters, 'genres')).toBe(false)
+
+    expect(isEmpty(withMark(on, 'genres', 7).filters)).toBe(true)
+  })
+
+  it('ничего, кроме фильтров, не трогает', () => {
+    // Считанный в разметке, этот переход молча терял бы раздел или свёрнутость:
+    // там его не сторожит ничто.
+    const before = { ...newSession(), section: 'rated', collapsed: true,
+                     sort: 3 }
+    const after = withMark(before, 'tags', 3)
+
+    expect(after.section).toBe('rated')
+    expect(after.collapsed).toBe(true)
+    expect(after.sort).toBe(3)
+    expect(after.kind).toBe(before.kind)
   })
 })
 
