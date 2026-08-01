@@ -3,26 +3,15 @@ import { describe, expect, it } from 'vitest'
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме этой проверки.
 import { onCardShown, stale } from '../../client/app/visible.js'
+import { fake } from './fake.js'
 
 const DAY = 24 * 60 * 60 * 1000
 
-/** Поддельный мост: записывает путь и доводы, отвечает тем, что положили. */
-function fake(answers = {}) {
-  const asked = []
-  const reply = (path) => (...args) => {
-    asked.push([path, args])
-    const answer = answers[path] ?? { ok: [] }
-    return typeof answer === 'function' ? answer(...args) : answer
-  }
-  globalThis.window = {
-    pywebview: {
-      api: { world: { enrich: reply('world.enrich'),
-                      refresh_series: reply('world.refresh_series') } },
-    },
-    addEventListener: () => {},
-  }
-  return asked
-}
+/** Обе ручки объявлены всегда: обогащение зовут парой, и отсутствие метода в
+ *  подделке читалось бы как «мост сломан», а не «источник ответил пусто». */
+const world = (answers = {}) =>
+  fake({ 'world.enrich': { ok: [] }, 'world.refresh_series': { ok: [] },
+         ...answers })
 
 /** Номер у каждой карточки свой: память спрошенных общая на весь сеанс, и
  *  повтор номера между тестами читался бы как «уже спрашивали». */
@@ -34,7 +23,7 @@ describe('карточка попала в поле зрения', () => {
   it('спрашивает оценки агрегаторов той ручкой и теми доводами', async () => {
     // Числа вызовов мало: переставленные доводы и подменённое имя ручки его не
     // меняют, а мост ответил бы не о той карточке.
-    const asked = fake()
+    const asked = world()
     const one = card({ kind: 'series' })
 
     await onCardShown(one, [])
@@ -48,7 +37,7 @@ describe('карточка попала в поле зрения', () => {
   it('отдаёт приехавшие оценки наверх', async () => {
     // Возврат обязателен: без него приехавшее некуда положить, и кружок на
     // месте оценки крутится до перезахода в раздел.
-    fake({ 'world.enrich': { ok: [{ source: 'imdb', value: 8.7 }] } })
+    world({ 'world.enrich': { ok: [{ source: 'imdb', value: 8.7 }] } })
 
     expect(await onCardShown(card(), []))
       .toEqual([{ source: 'imdb', value: 8.7 }])
@@ -57,7 +46,7 @@ describe('карточка попала в поле зрения', () => {
   it('отказ агрегатора не роняет показ и не приносит оценок', async () => {
     // Штатный путь: источник отказал, на месте оценки просто ничего — без
     // плашки и без следа на карточке.
-    fake({ 'world.enrich': { fail: 'refused', detail: 'квота' } })
+    world({ 'world.enrich': { fail: 'refused', detail: 'квота' } })
 
     expect(await onCardShown(card(), [])).toBe(null)
   })
@@ -65,7 +54,7 @@ describe('карточка попала в поле зрения', () => {
   it('просроченный сериал сперва перезапрашивает сезоны', async () => {
     // Перезапрос идёт своей ручкой и до обогащения: выключенный целиком, он
     // числа вызовов не менял бы, если смотреть только на длину.
-    const asked = fake()
+    const asked = world()
     const old = new Date(Date.now() - 60 * DAY).toISOString()
 
     await onCardShown(card({ kind: 'series', synced_at: old }), [])
@@ -76,7 +65,7 @@ describe('карточка попала в поле зрения', () => {
 
   it('о кандидате поиска не спрашивает вовсе', async () => {
     // У него нет номера строки: он ещё не в базе, и спрашивать о нём нечем.
-    const asked = fake()
+    const asked = world()
 
     expect(await onCardShown(card({ item_id: null }), [])).toBe(null)
     expect(asked).toHaveLength(0)
@@ -85,7 +74,7 @@ describe('карточка попала в поле зрения', () => {
   it('о той же карточке второй раз не спрашивает', async () => {
     // Прокрутка вверх-вниз иначе гоняла бы круги загрузки по кругу, тратя
     // квоты агрегаторов.
-    const asked = fake()
+    const asked = world()
     const one = card()
 
     await onCardShown(one, [])
@@ -96,7 +85,7 @@ describe('карточка попала в поле зрения', () => {
 
   it('кладёт номер операции в список отменяемых', async () => {
     // Иначе гасить при уходе с раздела нечего, и `cancel` зовётся с пустотой.
-    fake()
+    world()
     const ops = []
 
     await onCardShown(card(), ops)
@@ -110,7 +99,7 @@ describe('карточка попала в поле зрения', () => {
     // ответ. С общим каналом выжила бы последняя, а первая ушла бы родом
     // `stale`, который молчит.
     let first = true
-    fake({
+    world({
       'world.enrich': () => {
         if (!first) return { ok: [{ source: 'imdb', value: 2 }] }
         first = false

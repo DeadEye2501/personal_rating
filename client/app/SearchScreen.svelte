@@ -3,6 +3,7 @@
   import Feed from '$components/Feed.svelte'
   import { cancel, lastOp, numbered } from '$api/bridge.js'
   import { passes } from '$state/filters.js'
+  import { reported } from './trouble.js'
   import { onCardShown } from './visible.js'
 
   let { session, query = null, expected = [], root = null, ontrouble, onmark,
@@ -25,19 +26,16 @@
   // Страница владеет тем, что запустила, и отменяет это при уходе.
   $effect(() => () => { cancel(ops.splice(0)) })
 
+  // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
+  // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое
+  // правило отказов запрещает.
+  const lost = (error) =>
+    reported(error, 'поиск', () => ontrouble('Не удалось выполнить операцию'))
+
   $effect(() => {
     if (!query?.text) { views = []; return }
     look(query.text, kind).catch(lost)
   })
-
-  // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
-  // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое
-  // правило отказов запрещает.
-  function lost(error) {
-    if (error.silent) return
-    console.warn('поиск', error)
-    ontrouble('Не удалось выполнить операцию')
-  }
 
   async function look(text, forKind) {
     // Своё показывается сразу: локальная база отвечает за миллисекунды.
@@ -58,7 +56,8 @@
       // этом молчит: пустая лента и есть ответ.
       if (outer.refusals.length) ontrouble('Внешняя база недоступна')
     } catch (error) {
-      if (!error.silent) ontrouble('Внешняя база недоступна')
+      reported(error, 'внешняя выдача',
+               () => ontrouble('Внешняя база недоступна'))
     }
   }
 

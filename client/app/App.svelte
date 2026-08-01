@@ -7,6 +7,7 @@
   import Snack from '$components/Snack.svelte'
   import { call, numbered } from '$api/bridge.js'
   import { newSession, withMark, withSection } from '$state/session.js'
+  import { reported } from './trouble.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
   // `undefined`, а Svelte на этом не жалуется. Значения обязаны совпадать с
@@ -73,9 +74,8 @@
    *  адреса заведена в мосте отдельным классом ровно затем, чтобы плашка
    *  назвала причину, а не промолчала. */
   function open(url) {
-    call('world.open', url).catch((error) => {
-      if (!error.silent) trouble = { text: 'Не удалось открыть ссылку' }
-    })
+    call('world.open', url).catch((error) =>
+      reported(error, 'ссылка', () => { trouble = { text: 'Не удалось открыть ссылку' } }))
   }
 </script>
 

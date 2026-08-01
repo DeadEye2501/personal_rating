@@ -1,0 +1,46 @@
+/* Область со своей полосой прокрутки вместо системной. */
+
+/* Полоса своя, а не системная: Chromium не анимирует переходы на
+   ::-webkit-scrollbar, он её только мгновенно перерисовывает. */
+.scrollarea { position: relative }
+
+/* В макете прокрутка висела на самом списке. Здесь она уехала на обёртку:
+   областей с этим приёмом несколько, и привязывать общий приём к имени одной
+   из них значило бы писать его столько же раз.
+
+   Своей высоты у обёртки нет: потолок ставит содержимое, и у каждой области он
+   свой — у списка тегов один, у списка совпадений другой, у синопсиса его нет
+   вовсе. */
+.scrollarea__box {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.scrollarea__box::-webkit-scrollbar { display: none }
+
+.scrollbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.scrollbar.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scrollbar__thumb {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-radius: 4px;
+  background: var(--tint-16);
+  cursor: grab;
+  transition: background .18s;
+}
+.scrollbar__thumb:hover  { background: var(--tint-28) }
+.scrollbar__thumb:active { cursor: grabbing; background: var(--tint-34) }

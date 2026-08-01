@@ -6,6 +6,7 @@
   import { call, cancel, numbered } from '$api/bridge.js'
   import { requestOf } from '$state/section.js'
   import { collapsedOf } from '$state/session.js'
+  import { reported } from './trouble.js'
   import { onCardShown } from './visible.js'
 
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
@@ -27,6 +28,9 @@
   // ленту с начала, роняя прокрутку.
   const asked = $derived(JSON.stringify(requestOf(session)))
 
+  const lost = (error, text) => reported(error, 'раздел библиотеки',
+                                         () => ontrouble(text))
+
   $effect(() => () => { cancel(ops.splice(0)) })
 
   // Смена фильтра, сортировки, типа или раздела перезапрашивает ленту с
@@ -43,12 +47,6 @@
       })
       .catch((error) => lost(error, 'Не удалось прочитать библиотеку'))
   })
-
-  function lost(error, text) {
-    if (error.silent) return
-    console.warn('раздел библиотеки', error)
-    ontrouble(text)
-  }
 
   /** Отвечает, есть ли смысл просить ещё: конец знает тот, кто просил. */
   async function more() {

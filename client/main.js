@@ -22,5 +22,7 @@ import '$styles/facts.css'
 import '$styles/stars.css'
 import '$styles/aggr.css'
 import '$styles/acts.css'
+import '$styles/modal.css'
+import '$styles/scrollarea.css'
 
 export default mount(App, { target: document.getElementById('root') })

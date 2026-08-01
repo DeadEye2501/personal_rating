@@ -1,24 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Failed, call, cancel, lastOp, numbered, ready } from '$api/bridge.js'
-
-/** Поддельный мост: отвечает тем, что положили, и записывает, о чём спросили. */
-function fake(answers = {}) {
-  const asked = []
-  const api = {
-    cancel: (ops) => { asked.push(['cancel', ops]); return { ok: null } },
-  }
-  for (const [path, answer] of Object.entries(answers)) {
-    const [domain, method] = path.split('.')
-    api[domain] ??= {}
-    api[domain][method] = (...args) => {
-      asked.push([path, args])
-      return typeof answer === 'function' ? answer(...args) : answer
-    }
-  }
-  globalThis.window = { pywebview: { api }, addEventListener: () => {} }
-  return asked
-}
+import { fake } from './fake.js'
 
 beforeEach(() => { vi.restoreAllMocks() })
 

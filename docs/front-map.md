@@ -8,21 +8,21 @@
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
-## app — 6 файлов
+## app — 7 файлов
 
 ### app/App.svelte (110)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
-- берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
+- берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/LibraryScreen.svelte (117)
+### app/LibraryScreen.svelte (115)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, ontrouble, onmark, onperson, onopen
-- берёт: ./visible.js
+- берёт: ./trouble.js, ./visible.js
 
-### app/SearchScreen.svelte (121)
+### app/SearchScreen.svelte (120)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя.
 - принимает: session, query, expected, root, ontrouble, onmark, onperson, onopen
-- берёт: ./visible.js
+- берёт: ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (2)
 - Раздел «Статистика»: гистограмма своих оценок. Пока пуст.
@@ -31,11 +31,15 @@
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
 
-### app/visible.js (60)
+### app/trouble.js (15)
+- Единственный способ поступить с отказом операции.
+- отдаёт: reported
+
+### app/visible.js (61)
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 14 файлов
+## components — 16 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -53,7 +57,7 @@
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
 - принимает: view, onperson
 
-### components/Feed.svelte (82)
+### components/Feed.svelte (83)
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
@@ -65,9 +69,17 @@
 - Глиф Material Symbols.
 - принимает: name, extra
 
+### components/Modal.svelte (46)
+- Оболочка любого наложения: затемнение, окно и два способа его закрыть.
+- принимает: narrow, label, onclose, children
+
 ### components/Poster.svelte (28)
 - Обложка карточки с заглушкой.
 - принимает: item_id, source, poster_url
+
+### components/Scrollarea.svelte (89)
+- Область со своей полосой прокрутки.
+- принимает: children
 
 ### components/SearchField.svelte (30)
 - Поле поиска с кнопкой очистки.
@@ -93,7 +105,7 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, onclick, children
 
-## state — 8 файлов
+## state — 9 файлов
 
 ### state/facts.js (50)
 - Строки фактов карточки: длительность, сезоны и серии, состав.
@@ -111,6 +123,10 @@
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
 - отдаёт: ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
 
+### state/scroll.js (23)
+- Арифметика своей полосы прокрутки.
+- отдаёт: thumbOf
+
 ### state/section.js (20)
 - Запрос раздела: то, что уезжает мостом в `feed.page`.
 - отдаёт: requestOf
@@ -127,7 +143,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 18 файлов
+## styles — 20 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -149,10 +165,10 @@
 .app::after, .app::before, .app::after, .app__main, .content
 - берёт: --primary
 
-### styles/base.css (75)
+### styles/base.css (82)
 - Правила, у которых нет своего блока.
-- селекторы (10): *, *::before, *::after, [hidden], html, body, #root, body, button, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
-.is-on > .material-symbols-outlined, @media (prefers-reduced-motion: reduce)
+- селекторы (11): *, *::before, *::after, [hidden], html, body, #root, body, button, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
+.is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
 ### styles/chips.css (78)
@@ -189,6 +205,12 @@
 - объявляет: --icon-btn
 - берёт: --icon-btn, --r-full
 
+### styles/modal.css (88)
+- Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
+- селекторы (6): .overlay, .modal, .modal--narrow, .modal::before, .modal::after, @keyframes modal-in
+- объявляет: --neon
+- берёт: --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --tint-09, --tint-14
+
 ### styles/neon.css (49)
 - Общий приём: полоса по верхней кромке, гаснущая к краям, гало под ней и свечение текста. Цвет из --neon, высоту гало из --halo-h ставит тот, кто применяет класс.
 - селекторы (3): .neon, .neon::before, .neon::after
@@ -200,6 +222,11 @@
 - селекторы (2): @property --primary, :root
 - объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
+
+### styles/scrollarea.css (46)
+- Область со своей полосой прокрутки вместо системной.
+- селекторы (8): .scrollarea, .scrollarea__box, .scrollarea__box::-webkit-scrollbar, .scrollbar, .scrollbar.is-shown, .scrollbar__thumb, .scrollbar__thumb:hover, .scrollbar__thumb:active
+- берёт: --tint-16, --tint-28, --tint-34
 
 ### styles/search.css (63)
 - Поле поиска в левой зоне шапки.
@@ -236,6 +263,6 @@
 - объявляет: --corner, --side-w
 - берёт: --corner
 
-### styles/view.css (17)
+### styles/view.css (12)
 - Стопка разделов: виден один, переход между ними — проявление.
-- селекторы (3): .view, .view.is-shown, @keyframes screen-in
+- селекторы (2): .view, .view.is-shown

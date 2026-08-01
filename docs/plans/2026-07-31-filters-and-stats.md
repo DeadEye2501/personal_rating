@@ -99,7 +99,7 @@ personal_rating/
   `children`;
   `Scrollarea` с входным `children`.
 
-- [ ] **Шаг 1: Завести цвет исключения**
+- [x] **Шаг 1: Завести цвет исключения**
 
 Дописать в `client/styles/palette.css`, рядом с `--error`:
 
@@ -109,7 +109,7 @@ personal_rating/
   --exclude:            #ef4444;
 ```
 
-- [ ] **Шаг 2: Перенести оболочку**
+- [x] **Шаг 2: Перенести оболочку**
 
 Создать `client/styles/modal.css` — перенос `docs/design/index.html:831-907`:
 
@@ -205,7 +205,7 @@ personal_rating/
 Chromium 150, и там свойство давно без префикса. Это единственное расхождение с
 макетом в этом файле.
 
-- [ ] **Шаг 3: Перенести полосу прокрутки**
+- [x] **Шаг 3: Перенести полосу прокрутки**
 
 Создать `client/styles/scrollarea.css` — перенос `index.html:1188-1234`:
 
@@ -254,7 +254,7 @@ Chromium 150, и там свойство давно без префикса. Э�
 совпадений и снова список, — и привязывать общий приём к имени одного из них
 значило бы писать его четырежды.
 
-- [ ] **Шаг 4: Написать счёт ползунка**
+- [x] **Шаг 4: Написать счёт ползунка**
 
 Создать `tests/web/scroll.test.js`:
 
@@ -314,7 +314,7 @@ export function thumbOf(visible, total, passed) {
 export const scaleOf = (visible, total) => total / visible
 ```
 
-- [ ] **Шаг 5: Написать оболочку**
+- [x] **Шаг 5: Написать оболочку**
 
 `client/components/Modal.svelte`:
 
@@ -362,7 +362,7 @@ export const scaleOf = (visible, total) => total / visible
 </div>
 ```
 
-- [ ] **Шаг 6: Написать область со своей полосой**
+- [x] **Шаг 6: Написать область со своей полосой**
 
 `client/components/Scrollarea.svelte`:
 
@@ -425,7 +425,7 @@ export const scaleOf = (visible, total) => total / visible
 </div>
 ```
 
-- [ ] **Шаг 7: Подключить и посмотреть**
+- [x] **Шаг 7: Подключить и посмотреть**
 
 Дописать в `client/main.js`:
 
@@ -437,7 +437,7 @@ import '$styles/scrollarea.css'
 Смотреть пока не на чем — списка нет. Проверка оболочки идёт в задаче 3, вместе
 с первой настоящей модалкой.
 
-- [ ] **Шаг 8: Коммит**
+- [x] **Шаг 8: Коммит**
 
 ```bash
 git add client/styles/ client/components/ client/main.js
@@ -461,7 +461,11 @@ git commit -m "feat: оболочка модалки и своя полоса п
 - Создать: `client/styles/taglist.css`, `scorerow.css`, `newtag.css`
 - Создать: `client/components/TagBox.svelte`, `TagRow.svelte`,
   `ScoreRow.svelte`, `NewTag.svelte`
-- Изменить: `client/main.js`
+- Изменить: `client/main.js`, `client/styles/palette.css`
+
+**Из задачи 1 сюда переехал токен `--exclude`** (`#ef4444`, рядом с `--error`,
+с доводом «у беды свой красный, у исключения свой»): там у него не было ни одного
+потребителя, а здесь его читает `.tagbox[data-state="ex"]`.
 
 **Интерфейсы:**
 - Потребляет: `colorOf`, `LABELS` из `$state/scores.js`.

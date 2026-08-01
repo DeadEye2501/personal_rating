@@ -1,0 +1,88 @@
+/* Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--shade-32);
+  animation: fade-in .18s ease-out;
+}
+
+.modal {
+  /* Цвет кромки переменной: у подтверждения удаления она красная, а сам
+     градиент от этого не меняется — иначе он лёг бы вторым экземпляром. */
+  --neon: var(--primary);
+
+  position: relative;
+  width: min(560px, 100%);
+  min-height: 200px;
+  padding: 22px 24px 18px;
+  border: 1px solid var(--tint-09);
+  border-radius: var(--r-card);
+
+  /* Тёмное стекло: заливка чёрная и полупрозрачная, поэтому окно остаётся
+     тёмным и при этом размывает то, что под ним. */
+  background: var(--glass);
+  backdrop-filter: blur(8px) saturate(140%);
+
+  box-shadow:
+    inset 0 1px 0 var(--tint-14),
+    inset 0 -1px 0 var(--shade-25),
+    0 30px 90px var(--shade-60);
+
+  animation: modal-in .22s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Содержимое фиксированной ширины — тянуть окно не за чем. */
+.modal--narrow { width: min(400px, 100%) }
+
+/* Неоновая кромка. Приём `neon.css` тут не подходит по той же причине, что и
+   окну приложения: там кромка идёт по скруглению, а нить окна отступает от его
+   углов. Промежуточные точки: переход от цвета к прозрачности по прямой даёт
+   заметный обрыв, ступени его сглаживают. */
+.modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--neon) 18%, transparent) 14%,
+    color-mix(in srgb, var(--neon) 55%, transparent) 26%,
+    color-mix(in srgb, var(--neon) 88%, transparent) 38%,
+    var(--neon) 50%,
+    color-mix(in srgb, var(--neon) 88%, transparent) 62%,
+    color-mix(in srgb, var(--neon) 55%, transparent) 74%,
+    color-mix(in srgb, var(--neon) 18%, transparent) 86%,
+    transparent 100%);
+}
+
+/* Свечение отдельным слоем, а не тенью: тень легла бы ровной полосой во всю
+   ширину и торцы бы срезались. Здесь оно гаснет вместе с нитью. */
+.modal::after {
+  content: '';
+  position: absolute;
+  top: -11px;
+  left: 24px;
+  right: 24px;
+  height: 24px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--neon) 4%,  transparent) 18%,
+    color-mix(in srgb, var(--neon) 15%, transparent) 40%,
+    color-mix(in srgb, var(--neon) 15%, transparent) 60%,
+    color-mix(in srgb, var(--neon) 4%,  transparent) 82%,
+    transparent 100%);
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(.94) translateY(8px) }
+  to   { opacity: 1; transform: none }
+}

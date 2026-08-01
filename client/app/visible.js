@@ -5,6 +5,7 @@
  * `imdb_id`, и спросить агрегаторов о нём нечем. */
 
 import { numbered } from '$api/bridge.js'
+import { reported } from './trouble.js'
 
 // Через сколько дней карточка считается просроченной. Число из правила
 // перезапроса по сроку: обновляются только сезоны, серии и оценки.
@@ -54,7 +55,7 @@ async function quietly(path, ...args) {
   try {
     return await numbered(path, ...args)
   } catch (error) {
-    if (!error.silent) console.warn(path, error)
+    reported(error, path)
     return null
   }
 }
