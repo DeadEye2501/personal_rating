@@ -93,12 +93,6 @@
   color: var(--bg);
 }
 
-/* Круг, размер и центровка глифа — общие, из `iconbutton.css`: размер по
-   умолчанию там как раз 28. */
-.tagrow__del {
-  flex: 0 0 auto;
-  color: var(--tint-30);
-  transition: color .16s;
-}
+/* Круг, размер, центровка глифа и красный отклик — общие, из `iconbutton.css`:
+   размер по умолчанию там как раз 28. Здесь только величина самого глифа. */
 .tagrow__del .material-symbols-outlined { font-size: 18px }
-.tagrow__del:hover { color: var(--error) }

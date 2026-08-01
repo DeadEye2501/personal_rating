@@ -208,7 +208,7 @@
   <!-- Записывать форму пока нечем: окно только показывает поля, и «Сохранить»
        его просто закрывает. -->
   {#if adding}
-    <CardModal kind={session.kind}
+    <CardModal kind={session.kind} ontrouble={complain}
                onsave={() => { adding = false }}
                onclose={() => { adding = false }} />
   {/if}

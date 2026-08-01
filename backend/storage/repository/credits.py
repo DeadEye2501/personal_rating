@@ -207,14 +207,20 @@ class CreditRepository(Repository):
         )
         return [row.id for row in rows]
 
-    async def suggest(self, name: str, limit: int = 10) -> list[Suggestion]:
+    async def suggest(self, name: str, limit: int = 10,
+                      offset: int = 0) -> list[Suggestion]:
         """Строки подсказки при вводе имени. Тёзки различаются не
-        метаданными, а тем, чем каждый из них известен в твоей библиотеке."""
+        метаданными, а тем, чем каждый из них известен в твоей библиотеке.
+
+        Порциями, а не целиком: на каждую строку идёт свой запрос за узнаваемой
+        карточкой, и список из тысячи имён стоил бы тысячи запросов на один
+        щелчок. Следующую порцию страница просит смещением, докрутив список."""
         rows = await self._rows(
             select(self._entity.table.c.id, self._entity.table.c.name)
             .where(self._name_starts_with(name))
             .order_by(self._entity.table.c.name, self._entity.table.c.id)
             .limit(limit)
+            .offset(offset)
         )
 
         found = []

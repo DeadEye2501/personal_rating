@@ -117,8 +117,7 @@ def test_the_card_shows_every_role_the_base_stores():
     """Строки состава на карточке перечислены своей таблицей. Переименованная
     роль отказа не даёт — строка просто исчезает со всех карточек разом, а
     заметить это можно только глазами и только зная, что она там была."""
-    card = source("components/Facts.svelte")
-    named = set(re.findall(r"role: '(\w+)'", card))
+    named = set(re.findall(r"role: '(\w+)'", source("state/credits.js")))
 
     assert named == set(PersonRole) | set(CompanyRole)
 
@@ -142,16 +141,15 @@ def test_the_card_asks_the_right_two_shelves():
     Сверяется **привязка**, а не набор из двух имён: набор переживает обмен
     ролей местами, и до 01.08.2026 этот докстринг обещал больше, чем проверял.
     Кто где лежит, питон знает сам — по `PersonRole` и `CompanyRole`."""
-    asked = re.findall(r"from: '(\w+)', role: '(\w+)'",
-                       source("components/Facts.svelte"))
+    asked = re.findall(r"role: '(\w+)', +domain: '(\w+)'",
+                       source("state/credits.js"))
     shelves = {role: shelf
                for shelf, roles in (("people", PersonRole),
                                     ("companies", CompanyRole))
                for role in roles}
 
-    assert asked, "в client/components/Facts.svelte больше нет таблицы ролей"
-    assert {role: shelf for shelf, role in asked} == {
-        role: shelves[role] for _, role in asked}
+    assert asked, "в client/state/credits.js больше нет таблицы ролей"
+    assert dict(asked) == {role: shelves[role] for role, _ in asked}
 
 
 def test_sorting_is_offered_exactly_where_the_base_can_sort():
@@ -175,7 +173,7 @@ def test_the_page_maps_every_kind_to_a_genre_set_the_base_has():
     тесте расходится не с ожидаемым, а с самим собой. Тип, чьё имя есть и среди
     наборов жанров, берёт одноимённый; остальным достаётся единственный
     оставшийся."""
-    table = keys_and_values("GENRE_KINDS", source("app/FiltersModal.svelte"))
+    table = keys_and_values("GENRE_KINDS", source("state/genres.js"))
     own = {kind for kind in Kind if kind in set(GenreKind)}
     shared, = set(GenreKind) - {GenreKind(kind) for kind in own}
 
@@ -184,14 +182,33 @@ def test_the_page_maps_every_kind_to_a_genre_set_the_base_has():
     assert {table[kind] for kind in set(Kind) - own} == {shared}
 
 
-def test_the_page_actually_reads_the_genre_table():
+def test_every_reader_of_the_genre_table_reads_the_sworn_one():
     """Сверка таблицы не замечает, что её перестали читать: `GENRE_KINDS[kind]`,
     заменённое на голый `kind`, оставляет и её, и весь набор зелёными, а модалка
     жанров начинает спрашивать справочник несуществующим `movie`.
 
-    Проверяется исходником, а не следствием, потому что следствие живёт в
-    разметке, а разметка по решению проекта не проверяется вовсе."""
-    assert "GENRE_KINDS[kind]" in source("app/FiltersModal.svelte")
+    Читателей двое — модалка фильтров и окно карточки, — и сверена ровно одна
+    таблица. Объяви кто-нибудь свою рядом, сверка осталась бы зелёной, а
+    вкладка «Фильмы» привезла бы игровые жанры: поэтому проверяется, что
+    объявление одно и каждый читатель берёт его импортом.
+
+    Исходником, а не следствием: следствие живёт в разметке, а разметка по
+    решению проекта не проверяется вовсе."""
+    readers, declared = set(), set()
+    for path in WEB.rglob("*"):
+        if path.suffix not in {".js", ".svelte"} or "node_modules" in path.parts:
+            continue
+        body = path.read_text(encoding="utf-8")
+        if "GENRE_KINDS[" in body:
+            readers.add(path)
+        if "GENRE_KINDS =" in body:
+            declared.add(path.name)
+
+    assert readers, "страница больше не читает таблицу наборов жанров"
+    assert declared == {"genres.js"}
+    for path in readers:
+        assert "GENRE_KINDS } from '$state/genres.js'" in path.read_text(
+            encoding="utf-8"), f"{path.name} читает чужую таблицу"
 
 
 def keys_and_values(table: str, text: str) -> dict[str, str]:

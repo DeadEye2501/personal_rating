@@ -16,10 +16,14 @@ class Refs(Domain):
         return self._reply(
             lambda back: back.genres.list_for_kind(GenreKind(genre_kind)))
 
-    def suggest(self, domain: str, name: str) -> dict:
+    def suggest(self, domain: str, name: str, offset: int = 0) -> dict:
         """Строка подсказки несёт название самой высоко оценённой связанной
-        карточки — по нему человека и узнают."""
-        return self._reply(lambda back: _of(back, domain).suggest(name))
+        карточки — по нему человека и узнают.
+
+        Смещение приходит от страницы: список догружается прокруткой, а сколько
+        строк в порции — дело справочника, не её."""
+        return self._reply(
+            lambda back: _of(back, domain).suggest(name, offset=offset))
 
     def create_person(self, domain: str, name: str) -> dict:
         """Enter при неподсвеченном списке заводит нового — и человека, и

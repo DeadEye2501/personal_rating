@@ -12,15 +12,11 @@
   import { cycled, stateOf } from '$state/filters.js'
   import { dragging } from '$state/dragging.js'
   import { dragged } from '$state/reorder.js'
+  import { GENRE_KINDS } from '$state/genres.js'
   import { SCALE } from '$state/scores.js'
   import { created } from './tags.js'
   import { dropped, ordered, wearers } from './tagset.js'
   import { reported } from './trouble.js'
-
-  // Наборов жанров два на три типа содержимого: фильмы и сериалы делят один.
-  // Таблицей, а не тернарником: таблицу сторожит `test_page_contract.py` — это
-  // имена `Kind` и `GenreKind`, а страница питон не читает.
-  const GENRE_KINDS = { movie: 'film', series: 'film', game: 'game' }
 
   // Существительное — по открытой вкладке, как в макете: «3 фильма», «3 игры».
   const WEARS = ['имеет', 'имеют', 'имеют']

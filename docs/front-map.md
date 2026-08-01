@@ -18,16 +18,17 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/CardModal.svelte (53)
+### app/CardModal.svelte (166)
 - Окно создания и правки карточки: поля показываются своему типу.
-- принимает: kind, onsave, onclose
+- принимает: kind, onsave, onclose, ontrouble
+- берёт: ./trouble.js
 
 ### app/CardTagsModal.svelte (82)
 - Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
 - принимает: view, onview, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/FiltersModal.svelte (158)
+### app/FiltersModal.svelte (154)
 - Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
@@ -67,7 +68,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 26 файлов
+## components — 27 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -93,7 +94,7 @@
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
 - принимает: label, text, ok, danger, onyes, onclose
 
-### components/Facts.svelte (45)
+### components/Facts.svelte (43)
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
 - принимает: view, onperson
 
@@ -101,9 +102,9 @@
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
-### components/Field.svelte (25)
+### components/Field.svelte (30)
 - Строка ввода окна карточки: однострочная или абзацем.
-- принимает: value, placeholder, variant, area
+- принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
 ### components/Film.svelte (84)
 - Карточка ленты целиком.
@@ -124,6 +125,10 @@
 ### components/NewTag.svelte (36)
 - Форма заведения тега.
 - принимает: oncreate
+
+### components/Picker.svelte (204)
+- Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
+- принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
 ### components/Poster.svelte (28)
 - Обложка карточки с заглушкой.
@@ -165,7 +170,7 @@
 - Переключатель строки списка: не выбран, включён, исключён.
 - принимает: state, label, onclick
 
-### components/TagRow.svelte (29)
+### components/TagRow.svelte (30)
 - Строка списка: ручка, переключатель, имя, удаление.
 - принимает: name, state, moving, ontoggle, ondelete, ongrab
 
@@ -173,11 +178,15 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, disabled, onclick, children
 
-## state — 14 файлов
+## state — 17 файлов
 
-### state/card.js (29)
+### state/card.js (39)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
 - отдаёт: emptyCard, shownFor
+
+### state/credits.js (19)
+- Роли состава: какие бывают и в чьём справочнике живёт каждая.
+- отдаёт: ROLES
 
 ### state/dragging.js (23)
 - Таска указателем: захват, движение, отпускание.
@@ -191,6 +200,10 @@
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 
+### state/genres.js (6)
+- Пространство жанров у типа содержимого.
+- отдаёт: GENRE_KINDS
+
 ### state/histogram.js (9)
 - Доля каждого столбца от самого высокого.
 - отдаёт: heightsOf
@@ -198,6 +211,10 @@
 ### state/kinds.js (13)
 - Как тип содержимого называется человеку.
 - отдаёт: NOUNS
+
+### state/popup.js (15)
+- Место всплывающей картинки рядом с указателем.
+- отдаёт: beside
 
 ### state/redraw.js (21)
 - Перезапуск анимации на узле, который обязан его пережить.
@@ -231,7 +248,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 28 файлов
+## styles — 29 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -309,11 +326,11 @@
 - объявляет: --gutter, --icon-inset
 - берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
-### styles/iconbutton.css (31)
+### styles/iconbutton.css (40)
 - Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска.
-- селекторы (5): .icon-btn, .icon-btn .material-symbols-outlined, .icon-btn--accent, .icon-btn--accent .material-symbols-outlined, .icon-btn--accent:hover
-- объявляет: --accent, --icon-btn
-- берёт: --fill-primary-14, --icon-btn, --primary, --r-full
+- селекторы (7): .icon-btn, .icon-btn .material-symbols-outlined, .icon-btn--del, .icon-btn--del:hover, .icon-btn--accent, .icon-btn--accent .material-symbols-outlined, .icon-btn--accent:hover
+- объявляет: --accent, --del, --icon-btn
+- берёт: --error, --fill-primary-14, --icon-btn, --primary, --r-full, --tint-30
 
 ### styles/modal.css (106)
 - Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
@@ -342,6 +359,13 @@
 - селекторы (2): @property --primary, :root
 - объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
+
+### styles/picker.css (104)
+- Поле с подсказкой имён и выбранное рядом с ним.
+- селекторы (11): .cardform__pick, .cardform__pick .picker, .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
+.picker__hit.is-marked, .picker__poster, .picker__chosen, .picked, .picked__del, .picked__del .material-symbols-outlined
+- объявляет: --icon-btn
+- берёт: --body-m, --col-gap, --field-h, --fill-primary-hover, --poster-w, --primary, --shade-55, --surface-pop, --tint-09, --tint-75, --tint-80
 
 ### styles/scorerow.css (34)
 - Строка оценки в списке: десять звёзд и ярлык словом.
@@ -376,10 +400,10 @@
 .stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect
 - берёт: --body-m, --fill, --score, --tint-16, --tint-35, --title-s
 
-### styles/taglist.css (104)
+### styles/taglist.css (98)
 - Список наложения: строка, ручка перетаскивания и трёхпозиционный переключатель.
-- селекторы (16): .taglist, .tagrow, .tagrow__name, .taggrip, .taggrip:hover, .taggrip i, .tagrow.is-dragging, .tagrow.is-dragging .taggrip, .tagbox, .tagbox .material-symbols-outlined, .tagbox[data-state="off"]:hover, .tagbox[data-state="on"], .tagbox[data-state="ex"], .tagrow__del, .tagrow__del .material-symbols-outlined, .tagrow__del:hover
-- берёт: --bg, --body-l, --error, --exclude, --primary, --r-full, --text-bright, --tint-25, --tint-30, --tint-55
+- селекторы (14): .taglist, .tagrow, .tagrow__name, .taggrip, .taggrip:hover, .taggrip i, .tagrow.is-dragging, .tagrow.is-dragging .taggrip, .tagbox, .tagbox .material-symbols-outlined, .tagbox[data-state="off"]:hover, .tagbox[data-state="on"], .tagbox[data-state="ex"], .tagrow__del .material-symbols-outlined
+- берёт: --bg, --body-l, --exclude, --primary, --r-full, --text-bright, --tint-25, --tint-55
 
 ### styles/tools.css (86)
 - Ряд круглых кнопок в правой зоне шапки.

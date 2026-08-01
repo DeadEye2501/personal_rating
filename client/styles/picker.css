@@ -1,0 +1,104 @@
+/* Поле с подсказкой имён и выбранное рядом с ним. */
+
+/* Актёры и жанры: поле стоит под постером, той же ширины, а выбранное ложится
+   справа — в место, которое иначе пустует. */
+.cardform__pick {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--col-gap);
+}
+
+.cardform__pick .picker {
+  position: relative;
+  flex: 0 0 var(--poster-w);
+}
+
+/* Список совпадений висит над содержимым и ничего не сдвигает.
+
+   Шире поля намеренно: строка несёт имя и название карточки, по которой этого
+   человека узнают, и в 230 пикселей поля она переносится — а различать
+   однофамильцев надо взглядом, не разбирая перенос. Растёт по самой длинной
+   строке; потолок в 560 взят так, чтобы список не дошёл до правого края даже
+   на нём: 230 поля плюс 36 зазора плюс 560 против тысячи внутри окна. */
+.picker__hits {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: 560px;
+  z-index: 5;
+  margin: 4px 0 0;
+  padding: 4px;
+  max-height: 216px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--tint-09);
+  border-radius: 10px;
+  background: var(--surface-pop);
+  box-shadow: 0 18px 40px var(--shade-55);
+  scrollbar-width: none;
+}
+.picker__hits::-webkit-scrollbar { display: none }
+
+.picker__hit {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--tint-75);
+  font: var(--body-m);
+  text-align: left;
+  cursor: pointer;
+}
+/* Подсветка стрелками выглядит так же, как наведение мышью: жест различения
+   тёзок держится ровно на том, что подсветку видно, и два разных её вида
+   заставляли бы разбираться, которая из них считается. */
+.picker__hit:hover,
+.picker__hit.is-marked {
+  background: var(--fill-primary-hover);
+  color: var(--primary);
+}
+
+/* Держится за указателем, как всплывающий просмотр в заметках: строку, на
+   которую показывают, она не заслоняет. Место считает сам компонент — он же
+   задаёт ширину, потому что по ней считается и отступ от края окна. */
+.picker__poster {
+  position: absolute;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  z-index: 6;
+  border: 1px solid var(--tint-09);
+  border-radius: 10px;
+  background: var(--surface-pop);
+  box-shadow: 0 18px 40px var(--shade-55);
+  pointer-events: none;
+}
+
+/* Выбранное — не «таблетки», а имена подряд, у каждого крестик. */
+.picker__chosen {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--field-h);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 18px;
+}
+
+.picked {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--tint-80);
+  font: var(--body-m);
+}
+/* Круг, цвет и красный отклик — общие, из `iconbutton.css`; здесь только
+   размер: у имени в строке кружок мельче, чем у строки списка. */
+.picked__del { --icon-btn: 20px }
+.picked__del .material-symbols-outlined { font-size: 15px }

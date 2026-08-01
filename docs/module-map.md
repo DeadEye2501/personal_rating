@@ -708,14 +708,14 @@
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (7)
 
-### `backend/storage/repository/credits.py` — 266 строк
+### `backend/storage/repository/credits.py` — 272 строк
 
 Один репозиторий на людей и на студий — различает их только описатель.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
 
 - `def _outer(row) -> str | None` (14)
-- `class CreditRepository(Repository)` (211)
+- `class CreditRepository(Repository)` (217)
   - `def _link(self) -> Column` (2)
   - `def _folded_name(self) -> ColumnElement[str]` (2)
   - `def _same_name(self, name: str) -> ColumnElement[bool]` (2)
@@ -732,7 +732,7 @@
   - `async def credits_of(self, item_id: int) -> list[Credit]` (17)
   - `async def identity_of(self, entity_id: int) -> tuple[str, str | None] | None` (13)
   - `async def items_of(self, entity_id: int, kind: Kind) -> list[int]` (25)
-  - `async def suggest(self, name: str, limit: int=10) -> list[Suggestion]` (15)
+  - `async def suggest(self, name: str, limit: int=10, offset: int=0) -> list[Suggestion]` (21)
   - `def _linked(self, entity_id: int) -> Select` (12)
   - `async def _hint(self, entity_id: int) -> tuple[str, int | None]` (21)
 - `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
@@ -1040,15 +1040,15 @@
   - `def wish(self, item_id: int) -> dict` (3)
   - `def unwish(self, item_id: int) -> dict` (2)
 
-### `bridge/refs.py` — 37 строк
+### `bridge/refs.py` — 41 строк
 
 Мост: справочники — жанры, люди, студии.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Refs(Domain)` (17)
+- `class Refs(Domain)` (21)
   - `def genres(self, genre_kind: str) -> dict` (5)
-  - `def suggest(self, domain: str, name: str) -> dict` (4)
+  - `def suggest(self, domain: str, name: str, offset: int=0) -> dict` (8)
   - `def create_person(self, domain: str, name: str) -> dict` (5)
 - `def _of(backend, domain: str)` (7)
 
@@ -1795,13 +1795,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Base(DeclarativeBase)` (2)
 - `class Note(Base)` (5)
 
-### `tests/backend/test_suggestions.py` — 204 строк
+### `tests/backend/test_suggestions.py` — 229 строк
 
 Подсказка при вводе имени: тёзок различают по узнаваемой карточке.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.ratings`, `backend.storage.repository.wishlist`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 14
+Тестов: 16
 
 - `async def person_with(sessions, name: str, item_ids: list[int]) -> int` (6)
 
@@ -1932,13 +1932,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/bridge/test_bridge_refs.py` — 68 строк
+### `tests/bridge/test_bridge_refs.py` — 80 строк
 
 Мост: справочники — жанры, люди, студии.
 
 Зависит от: `backend.model`, `bridge.refs`
 
-Тестов: 5
+Тестов: 6
 
 
 ### `tests/bridge/test_bridge_search.py` — 230 строк
@@ -1984,7 +1984,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 4
 
 
-### `tests/bridge/test_page_contract.py` — 253 строк
+### `tests/bridge/test_page_contract.py` — 270 строк
 
 Имена, которые страница и мост обязаны называть одинаково.
 

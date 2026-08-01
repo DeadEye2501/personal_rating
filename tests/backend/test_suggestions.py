@@ -193,6 +193,31 @@ async def test_suggest_respects_the_limit_and_keeps_the_order(sessions):
     assert [s.name for s in found] == ["Человек 0", "Человек 1", "Человек 2"]
 
 
+async def test_the_next_portion_starts_where_the_previous_ended(sessions):
+    """Подсказка догружается прокруткой, и порции не должны ни перекрываться,
+    ни пропускать людей между собой.
+
+    Заводятся с конца по той же причине, что и у предела: при записи по порядку
+    смещение по алфавиту совпало бы со смещением по номеру строки."""
+    for index in reversed(range(5)):
+        await people(sessions).create_manual(f"Человек {index}")
+
+    first = await people(sessions).suggest("Человек", limit=2)
+    second = await people(sessions).suggest("Человек", limit=2, offset=2)
+
+    assert [s.name for s in first] == ["Человек 0", "Человек 1"]
+    assert [s.name for s in second] == ["Человек 2", "Человек 3"]
+
+
+async def test_a_portion_past_the_end_is_empty_not_a_repeat(sessions):
+    """Кончились строки — приезжает пустота, по ней страница и перестаёт
+    спрашивать. Смещение за конец, отданное с начала, крутило бы список
+    бесконечно."""
+    await people(sessions).create_manual("Единственный")
+
+    assert await people(sessions).suggest("Единственный", offset=1) == []
+
+
 async def test_studios_are_suggested_the_same_way(sessions, card):
     """Для приложения эти две сущности почти неразличимы."""
     game = await card(title="Ведьмак")

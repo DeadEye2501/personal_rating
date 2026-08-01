@@ -21,7 +21,8 @@
   <span class="tagrow__name">{name}</span>
 
   {#if ondelete}
-    <button type="button" class="icon-btn tagrow__del" aria-label="Удалить тег"
+    <button type="button" class="icon-btn icon-btn--del tagrow__del"
+            aria-label="Удалить тег"
             onclick={ondelete}>
       <Icon name="delete" />
     </button>

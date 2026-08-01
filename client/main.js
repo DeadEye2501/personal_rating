@@ -32,5 +32,6 @@ import '$styles/taglist.css'
 import '$styles/scorerow.css'
 import '$styles/newtag.css'
 import '$styles/cardform.css'
+import '$styles/picker.css'
 
 export default mount(App, { target: document.getElementById('root') })

@@ -33,6 +33,18 @@ def test_the_domain_chooses_the_repository(spy, asked, domain, asked_name):
     assert log[0][1] == ("Нолан",)
 
 
+def test_the_next_portion_is_asked_by_its_offset(spy, asked):
+    """Список догружается прокруткой, и страница называет, откуда продолжать.
+    Потеряйся смещение — вторая порция приехала бы первой же, и список крутился
+    бы по кругу из одних и тех же имён."""
+    answers, log = asked
+    answers["people.suggest"] = []
+
+    Refs(spy).suggest("people", "Нолан", 20)
+
+    assert log[0][1:] == (("Нолан",), {"offset": 20})
+
+
 def test_an_unknown_domain_is_a_failure_not_a_crash(spy, asked):
     """Опечатка на стороне страницы не должна становиться вечным промисом."""
     _, log = asked
