@@ -10,7 +10,7 @@
   import { passes } from '$state/filters.js'
   import { flipped } from '$state/session.js'
   import { rowTurns } from './inturn.js'
-  import { keyOf, refreshed, same, without } from './reread.js'
+  import { keyOf, merged, refreshed, same, without } from './reread.js'
   import { aspected, scored, wished } from './marks.js'
   import { complaining, reported } from './trouble.js'
   import { onCardShown } from './visible.js'
@@ -90,7 +90,7 @@
   /** Отказ источника — поле в ответе, а не исключение. Пустая выдача при этом
    *  молчит: пустая лента и есть ответ. */
   function arrived(answer) {
-    views = answer.views
+    views = merged(views, answer.views)
     if (answer.refusals.length) ontrouble('Внешняя база недоступна')
   }
 
@@ -187,7 +187,9 @@
     if (!full) return
 
     const external = await onCardShown(full, ops)
-    if (external) patch(full, { external })
+    // Признак ставится и когда не приехало ничего: он гасит кружки у тех, за
+    // кого спрашивать было нечем или некому.
+    patch(full, external ? { external, enriched: true } : { enriched: true })
   }
 
   async function loaded(view) {
