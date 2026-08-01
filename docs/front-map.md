@@ -171,7 +171,7 @@
 
 ### components/ToolButton.svelte (17)
 - Круглая кнопка ряда в шапке.
-- принимает: icon, dir, label, active, pressed, onclick, children
+- принимает: icon, dir, label, active, pressed, disabled, onclick, children
 
 ## state — 14 файлов
 
@@ -223,9 +223,9 @@
 - Выбранное в приложении вместе с переходами между выборами.
 - отдаёт: collapsedOf, newSession, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
 
-### state/sorting.js (70)
+### state/sorting.js (76)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
-- отдаёт: ADDED_AT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
+- отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
 ### state/sources.js (52)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
@@ -381,10 +381,10 @@
 - селекторы (16): .taglist, .tagrow, .tagrow__name, .taggrip, .taggrip:hover, .taggrip i, .tagrow.is-dragging, .tagrow.is-dragging .taggrip, .tagbox, .tagbox .material-symbols-outlined, .tagbox[data-state="off"]:hover, .tagbox[data-state="on"], .tagbox[data-state="ex"], .tagrow__del, .tagrow__del .material-symbols-outlined, .tagrow__del:hover
 - берёт: --bg, --body-l, --error, --exclude, --primary, --r-full, --text-bright, --tint-25, --tint-30, --tint-55
 
-### styles/tools.css (77)
+### styles/tools.css (86)
 - Ряд круглых кнопок в правой зоне шапки.
-- селекторы (13): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
-- берёт: --ease, --fill-primary-14, --primary, --r-full, --side-w, --tint-05, --tint-45, --tint-75
+- селекторы (14): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:disabled, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
+- берёт: --ease, --fill-primary-14, --primary, --r-full, --side-w, --tint-05, --tint-25, --tint-45, --tint-75
 
 ### styles/topbar.css (32)
 - Раскладка шапки: три зоны, из ширины которых выведен минимум окна.

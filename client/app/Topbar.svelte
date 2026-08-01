@@ -7,7 +7,7 @@
   import { redrawn } from '$state/redraw.js'
   import { withCollapsed, withKind, withNextSort, withToggledSection }
     from '$state/session.js'
-  import { hasSort, stateAt } from '$state/sorting.js'
+  import { IDLE_SORT, hasSort, stateAt } from '$state/sorting.js'
 
   let { session, onsession, onsearch, onadd, onfilter } = $props()
 
@@ -70,12 +70,11 @@
   ]
 
   // Вид кнопки — из состояния своего раздела: позиция 0 в отложенном и в
-  // оценённых означает разное. Раздел без переключателя даёт `null`, а не
-  // состояние: своего набора у него нет, и спрошенный за него `stateAt`
-  // обязан не отвечать вовсе.
-  const sort = $derived(hasSort(session.section)
-    ? stateAt(session.section, session.sort)
-    : null)
+  // оценённых означает разное. У раздела без переключателя своего набора нет, и
+  // спрошенный за него `stateAt` обязан не отвечать вовсе — поэтому вид ему
+  // достаётся готовый, из `IDLE_SORT`.
+  const off = $derived(!hasSort(session.section))
+  const sort = $derived(off ? IDLE_SORT : stateAt(session.section, session.sort))
 
   function chooseStats() {
     // Признак вешается на каждый заход, а не держится состоянием: иначе
@@ -132,14 +131,15 @@
                 pressed={session.collapsed}
                 onclick={() => onsession(withCollapsed(session, !session.collapsed))} />
 
-    <!-- Только там, где сортировка действует. В поиске порядок задан склейкой
-         двух половин, в статистике сортировать нечего — кнопка, которая
-         перебирает восемь состояний и не меняет ничего, обманывает. -->
-    {#if sort}
-      <ToolButton icon={sort.icon} dir={sort.dir}
-                  label={'Сортировка: ' + sort.label.toLowerCase()}
-                  onclick={() => onsession(withNextSort(session))} />
-    {/if}
+    <!-- Кнопка стоит в ряду всегда, а там, где сортировки нет, гаснет и молчит.
+         Снятая, она двигала бы восьмерых соседей на каждом переходе между
+         разделами; работающая — обманывала бы, перебирая восемь состояний без
+         последствий: в поиске порядок задан склейкой двух половин, в статистике
+         сортировать нечего. -->
+    <ToolButton icon={sort.icon} dir={sort.dir} disabled={off}
+                label={off ? 'В этом разделе сортировки нет'
+                           : 'Сортировка: ' + sort.label.toLowerCase()}
+                onclick={() => onsession(withNextSort(session))} />
 
     <ToolButton icon="add" label="Завести карточку" onclick={onadd} />
   </div>
