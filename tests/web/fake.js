@@ -21,3 +21,28 @@ export function fake(answers = {}) {
   globalThis.window = { pywebview: { api }, addEventListener: () => {} }
   return asked
 }
+
+/** Окно без моста: он ещё не внедрён, но подписаться уже можно. Возвращает
+ *  подписчиков, чтобы проверка могла позвать `pywebviewready` сама.
+ *
+ *  `api` кладётся, только если попросили: пустой объект — это первое из двух
+ *  внедрений pywebview, и обёртка обязана не считать его готовностью. */
+export function bare({ empty = false } = {}) {
+  const listeners = {}
+  globalThis.window = {
+    ...(empty ? { pywebview: { api: {} } } : {}),
+    addEventListener: (name, run) => { listeners[name] = run },
+  }
+  return listeners
+}
+
+/** Ответ, приезжающий позже: первый вызов ждёт, второй отвечает сразу. Так
+ *  проверяется всё, что про очерёдность, — устаревание и отмена. */
+export function slow(late, quick, ms = 20) {
+  let first = true
+  return () => {
+    if (!first) return quick
+    first = false
+    return new Promise((resolve) => setTimeout(() => resolve(late), ms))
+  }
+}

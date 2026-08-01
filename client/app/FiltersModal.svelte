@@ -139,7 +139,7 @@
     {:else}
       {#each rows as row, at (row.id)}
         <TagRow name={row.name} state={stateOf(filters, field, row.id)}
-                dragging={moving === row.id}
+                moving={moving === row.id}
                 ontoggle={() => toggle(row.id)}
                 ondelete={editable ? () => remove(row) : null}
                 ongrab={editable ? (event) => grab(event, at) : null} />

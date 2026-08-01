@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме этой проверки.
 import { onCardShown, stale } from '../../client/app/visible.js'
-import { fake } from './fake.js'
+import { fake, slow } from './fake.js'
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -98,21 +98,16 @@ describe('карточка попала в поле зрения', () => {
     // Наблюдается следствие: обе спрошенные разом карточки получают свой
     // ответ. С общим каналом выжила бы последняя, а первая ушла бы родом
     // `stale`, который молчит.
-    let first = true
     world({
-      'world.enrich': () => {
-        if (!first) return { ok: [{ source: 'imdb', value: 2 }] }
-        first = false
-        return new Promise((resolve) =>
-          setTimeout(() => resolve({ ok: [{ source: 'imdb', value: 1 }] }), 20))
-      },
+      'world.enrich': slow({ ok: [{ source: 'imdb', value: 1 }] },
+                           { ok: [{ source: 'imdb', value: 2 }] }),
     })
 
-    const slow = onCardShown(card(), [])
+    const late = onCardShown(card(), [])
     const quick = onCardShown(card(), [])
 
     expect(await quick).toEqual([{ source: 'imdb', value: 2 }])
-    expect(await slow).toEqual([{ source: 'imdb', value: 1 }])
+    expect(await late).toEqual([{ source: 'imdb', value: 1 }])
   })
 })
 

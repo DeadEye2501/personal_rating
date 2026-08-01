@@ -182,13 +182,18 @@
     {/key}
   {/if}
 
+  <!-- `{#key}` по той же причине, что у соседа: подмена карточки под окном
+       переиспользовала бы его вместе с уже прочитанным чужим набором и уже
+       проставленными отметками. -->
   {#if tagging}
-    <CardTagsModal view={tagging}
+    {#key tagging.item_id}
+      <CardTagsModal view={tagging}
                    onview={(tags) => { tagged = { asked,
                                                  cards: { ...marks,
                                                           [tagging.item_id]: tags } } }}
                    ontrouble={(text) => { trouble = { text } }}
-                   onclose={() => { tagging = null }} />
+                     onclose={() => { tagging = null }} />
+    {/key}
   {/if}
 
   <Snack message={trouble} />

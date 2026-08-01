@@ -93,7 +93,7 @@
 
   /** Приехавшие оценки кладутся в ту же карточку: иначе кружок на их месте
    *  крутится до конца сеанса, хотя оценки уже в базе. */
-  async function shownCard(view) {
+  async function enrich(view) {
     const external = await onCardShown(view, ops)
     if (external) replace({ ...view, external })
   }
@@ -110,7 +110,7 @@
      карточки. -->
 <Feed views={shown} collapsed={session.collapsed} {expected} {root}
       onmore={() => false}
-      onshown={(view) => shownCard(view).catch(lost)}
+      onshown={(view) => enrich(view).catch(lost)}
       on={session.filters.on} {onmark} {onperson} {onopen}
       onscore={(view) => add(view).catch(lost)}
       onaspect={(view) => add(view).catch(lost)}

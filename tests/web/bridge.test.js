@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Failed, call, cancel, lastOp, numbered, ready } from '$api/bridge.js'
-import { fake } from './fake.js'
+import { bare, fake, slow } from './fake.js'
 
 beforeEach(() => { vi.restoreAllMocks() })
 
@@ -22,10 +22,7 @@ describe('обёртка моста', () => {
     // `undefined` вместо `api`. Ожидание внутри вызова — первая из четырёх
     // обязанностей обёртки, и наблюдается она только отсюда: во всех
     // остальных проверках мост уже стоит к началу вызова.
-    const listeners = {}
-    globalThis.window = {
-      addEventListener: (name, handler) => { listeners[name] = handler },
-    }
+    const listeners = bare()
 
     const asked = []
     const answer = call('marks.tags', 'movie')
@@ -107,10 +104,7 @@ describe('обёртка моста', () => {
     // Половина поверхности — не половина обязанности: нумерованными идут как
     // раз первые запросы страницы, лента и поиск, а внедрение моста случается
     // после навигации.
-    const listeners = {}
-    globalThis.window = {
-      addEventListener: (name, handler) => { listeners[name] = handler },
-    }
+    const listeners = bare()
 
     const asked = []
     const answer = numbered('feed.page', {}, 0, 50)
@@ -172,14 +166,7 @@ describe('обёртка моста', () => {
   it('устаревший ответ не затирает свежий', async () => {
     // Набрал новый запрос, пока летел старый. Обещание старого обязано
     // отклониться, а не вернуть данные, которых уже никто не ждёт.
-    const slow = new Promise((resolve) => setTimeout(() => resolve({ ok: 'старое' }), 20))
-    let first = true
-    fake({
-      'search.local': () => {
-        if (first) { first = false; return slow }
-        return { ok: 'новое' }
-      },
-    })
+    fake({ 'search.local': slow({ ok: 'старое' }, { ok: 'новое' }) })
 
     const stale = numbered('search.local', 'movie', 'один', { channel: 'stale-search' })
     const fresh = await numbered('search.local', 'movie', 'два', { channel: 'stale-search' })
@@ -214,14 +201,7 @@ describe('обёртка моста', () => {
     // Пока это записанное поведение, а не решение: два одновременных вызова
     // одного метода без канала гасят друг друга, и вытесненный уходит молча.
     // Плановому обогащению видимых карточек это выйдет боком — вопрос отложен.
-    const slow = new Promise((resolve) => setTimeout(() => resolve({ ok: 'старое' }), 20))
-    let first = true
-    fake({
-      'world.enrich': () => {
-        if (first) { first = false; return slow }
-        return { ok: 'новое' }
-      },
-    })
+    fake({ 'world.enrich': slow({ ok: 'старое' }, { ok: 'новое' }) })
 
     const evicted = numbered('world.enrich', 1, 'movie')
     await expect(numbered('world.enrich', 2, 'movie')).resolves.toBe('новое')
@@ -275,11 +255,7 @@ describe('обёртка моста', () => {
     // `window.pywebview` с пустым `api`, второй заполняет его и только тогда
     // шлёт событие. Поверив первому, обёртка тут же позвала бы
     // `api.<домен>.<метод>` у пустоты — и это `TypeError` через границу.
-    const listeners = {}
-    globalThis.window = {
-      pywebview: { api: {} },
-      addEventListener: (name, handler) => { listeners[name] = handler },
-    }
+    const listeners = bare({ empty: true })
 
     let arrived = false
     ready().then(() => { arrived = true })
@@ -295,10 +271,7 @@ describe('обёртка моста', () => {
 
   it('ждёт готовности моста, а не падает на его отсутствии', async () => {
     // Инъекция идёт после навигации, и обращение до неё нашло бы undefined.
-    const listeners = {}
-    globalThis.window = {
-      addEventListener: (name, handler) => { listeners[name] = handler },
-    }
+    const listeners = bare()
 
     const waiting = ready()
     globalThis.window.pywebview = { api: {} }

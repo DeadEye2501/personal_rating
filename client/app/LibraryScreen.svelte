@@ -78,7 +78,7 @@
 
   /** Приехавшие оценки кладутся в ту же карточку: иначе кружок на их месте
    *  крутится до перезахода в раздел, хотя оценки уже в базе. */
-  async function shown(view) {
+  async function enrich(view) {
     const external = await onCardShown(view, ops)
     if (external) patch(view, { external })
   }
@@ -120,7 +120,7 @@
 </script>
 
 <Feed views={cards} {expected} {root} collapsed={session.collapsed} onmore={more}
-      onshown={(view) => shown(view).catch((error) =>
+      onshown={(view) => enrich(view).catch((error) =>
         lost(error, 'Не удалось прочитать библиотеку'))}
       onscore={(view, value) => score(view, value).catch((error) =>
         lost(error, 'Оценка не сохранилась'))}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf,
-  verdictOf } from '$state/scores.js'
+import { ASPECTS, LABELS, SCALE, average, colorOf, meanOf, partOf, stepOf,
+  toneOf, verdictOf } from '$state/scores.js'
 
 describe('нотация оценок', () => {
   it('десять ступеней, и ни одна не повторяется', () => {
@@ -123,5 +123,20 @@ describe('нотация оценок', () => {
     expect(partOf(7.33)).toBeCloseTo(0.33, 2)
     expect(partOf(7.67)).toBeCloseTo(0.67, 2)
     expect(partOf(7)).toBe(0)
+  })
+})
+
+describe('ступени шкалы', () => {
+  it('начинаются с первой, а не с нулевой', () => {
+    // Нулевая ступень — это `var(--score-0)`, которого в палитре нет вовсе:
+    // первая звезда покрасилась бы ничем, а ярлыка у неё не нашлось бы.
+    expect(SCALE.map(colorOf)).not.toContain('var(--score-0)')
+    expect(SCALE.every((step) => LABELS[step])).toBe(true)
+  })
+
+  it('покрывают всю нотацию и ничего сверх неё', () => {
+    // Разойдясь с ярлыками, шкала дала бы звезду без подписи или подпись без
+    // звезды: перебирают их порознь ряд звёзд и список фильтра.
+    expect(SCALE.map(String)).toEqual(Object.keys(LABELS).sort((a, b) => a - b))
   })
 })

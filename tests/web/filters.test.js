@@ -242,6 +242,15 @@ describe('забытая метка', () => {
     expect(chosen(forgotten(two, 'tags', 3)).tag_ids).toEqual([4])
   })
 
+  it('метка с карточки тоже ставится в свой признак, а не в любой', () => {
+    // Номера жанров и тегов независимы: третий тег — не третий жанр, и клик по
+    // жанру не смеет включить одноимённый по номеру тег.
+    const genre = marked(EMPTY, 'genres', 3)
+
+    expect(chosen(genre).genre_ids).toEqual([3])
+    expect(chosen(genre).tag_ids).toEqual([])
+  })
+
   it('чужой признак не трогает вовсе', () => {
     // Номера жанров и тегов независимы: третий тег — не третий жанр.
     const both = cycled(cycled(EMPTY, 'tags', 3), 'genres', 3)
