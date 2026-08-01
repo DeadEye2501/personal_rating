@@ -18,6 +18,11 @@
   // до самого дна список успел бы упереться раньше, чем приедет ответ.
   const EDGE = 40
 
+  // Зазор между полем и списком, он же отступ от края окна. Числом здесь, а не
+  // в оформлении: место списка считает разметка, и вторым объявлением зазор
+  // разъехался бы с ним.
+  const GAP = 4
+
   // Строка собирается целиком, а не разметкой из трёх кусков: пробел перед
   // маркером стоял бы на границе блока `{#if}`, а её Svelte подчищает — имя и
   // маркер слипались бы.
@@ -49,11 +54,62 @@
   // Открыт список или нет — отдельно от того, есть ли в нём строки: выбранное
   // закрывает его, не трогая совпадений, а уход из поля закрывает тем более.
   let open = $state(false)
+  // Место списка в координатах окна — по нему же считается его ширина: у поля
+  // она своя, а список обязан быть не уже.
+  let under = $state({ left: 0, top: 0, width: 0 })
   let anchor = $state()
   let list = $state()
+  let shot = $state()
+
+  const showing = $derived(open && offered.length > 0)
 
   const poster = $derived(hovered?.hint_item_id
     ? byItem(hovered.hint_item_id) : '')
+
+  // Обе всплывашки живут в верхнем слое браузера, а не рядом с полем: у области
+  // с полями своя прокрутка, и всё, что вылезает за её край, она обрезает —
+  // список совпадений обрывался на середине, а постер срезался наполовину.
+  // Верхний слой не обрезает ничто, и отсчёт в нём идёт от окна: место обеих
+  // считается в координатах окна.
+  const raise = (node) => { if (!node.matches(':popover-open')) node.showPopover() }
+  const lower = (node) => { if (node.matches(':popover-open')) node.hidePopover() }
+
+  // Место считается после показа, а не до: у спрятанного popover-а нет ни
+  // высоты, ни ширины, а без высоты не решить, влезает он под полем или нет.
+  // Оба действия идут в одном обороте, поэтому промежуточного места не видно.
+  $effect(() => {
+    if (!list) return
+    if (showing) { raise(list); place() } else lower(list)
+  })
+
+  // Постер показывается сразу, как появился: место у него своё, за указателем.
+  $effect(() => { if (shot) raise(shot) })
+
+  // Прокрутка области с полями увозит поле, а верхний слой стоит на месте: без
+  // пересчёта список остался бы висеть там, где поле было. Своя прокрутка
+  // списка сюда тоже приходит и пересчитывает то же самое — отсеивать её
+  // дороже, чем один замер.
+  $effect(() => {
+    if (!showing) return
+    const again = () => place()
+    window.addEventListener('scroll', again, true)
+    window.addEventListener('resize', again)
+    return () => {
+      window.removeEventListener('scroll', again, true)
+      window.removeEventListener('resize', again)
+    }
+  })
+
+  /** Под полем, а не влезает — над ним: у нижних полей окна карточки места вниз
+   *  нет вовсе, и список уходил бы за край окна, где его не достать. */
+  function place() {
+    const box = anchor.getBoundingClientRect()
+    const below = box.bottom + GAP
+    const fits = below + list.offsetHeight <= window.innerHeight - GAP
+    under = { left: box.left,
+              top: fits ? below : box.top - GAP - list.offsetHeight,
+              width: box.width }
+  }
 
   // Набранное расходится обработчиком, а не эффектом по `text`: эффект читал бы
   // и `ontype`, а его сборка пересоздаёт на каждой перерисовке — вышел бы
@@ -129,17 +185,11 @@
 
   /** Место считает `state/popup.js` в координатах окна — у края картинка обязана
    *  поджаться, и эта арифметика единственное, что тут проверяется тестом.
-   *
-   *  Дальше оно переводится в координаты поля, потому что `position: fixed`
-   *  здесь не годится: у наложения стоит `backdrop-filter`, а он делает само
-   *  наложение точкой отсчёта для `fixed` — картинка уезжала бы на смещение
-   *  окна и вылезала за край. */
+   *  Переводить его никуда не надо: верхний слой и отсчитывается от окна. */
   function follow(event, hit) {
     hovered = hit
-    const spot = beside({ x: event.clientX, y: event.clientY }, POSTER,
-                        { width: window.innerWidth, height: window.innerHeight })
-    const box = anchor.getBoundingClientRect()
-    at = { left: spot.left - box.left, top: spot.top - box.top }
+    at = beside({ x: event.clientX, y: event.clientY }, POSTER,
+                { width: window.innerWidth, height: window.innerHeight })
   }
 
   /** Следующая порция просится, не доходя до дна: список короткий, и упёршись в
@@ -160,8 +210,12 @@
     <Field bind:value={text} placeholder={label} oninput={typing}
            onkeydown={keydown} onfocus={focus}
            onblur={() => { open = false; hovered = null }} />
-    <ul class="picker__hits" hidden={!open || !offered.length}
-        bind:this={list} onscroll={scrolled}>
+    <!-- `popover` — не украшение: без него список обрезает прокрутка области с
+         полями. Показывает и прячет его эффект по `showing`, поэтому здесь нет
+         ни `hidden`, ни `{#if}`: у скрытого popover-а нет своего `display`. -->
+    <ul class="picker__hits" popover="manual" bind:this={list} onscroll={scrolled}
+        style:left={`${under.left}px`} style:top={`${under.top}px`}
+        style:min-width={`${under.width}px`}>
       {#each offered as hit, index (hit.id)}
         <li>
           <!-- `preventDefault` на mousedown держит фокус в поле: без него он
@@ -181,10 +235,11 @@
     <!-- Всплывает только постер: название уже стоит в самой строке, после
          маркера. Не приехал — строка живёт дальше, ничего не двигая.
 
-         Рядом с полем, а не внутри списка: у того своя прокрутка, а она
+         В верхнем слое, а не внутри списка: у того своя прокрутка, а она
          обрезает всё, что вылезает за его край. -->
     {#if poster && failed !== poster}
-      <img class="picker__poster" src={poster} alt=""
+      <img class="picker__poster" popover="manual" bind:this={shot}
+           src={poster} alt=""
            style:width={`${POSTER.width}px`}
            style:left={`${at.left}px`} style:top={`${at.top}px`}
            onerror={() => { failed = poster }}>

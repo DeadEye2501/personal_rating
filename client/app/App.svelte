@@ -2,17 +2,21 @@
 <script>
   import CardModal from './CardModal.svelte'
   import CardTagsModal from './CardTagsModal.svelte'
+  import Confirm from '$components/Confirm.svelte'
   import FiltersModal from './FiltersModal.svelte'
   import LibraryScreen from './LibraryScreen.svelte'
   import SearchScreen from './SearchScreen.svelte'
   import StatsScreen from './StatsScreen.svelte'
   import Topbar from './Topbar.svelte'
+  import Scrollarea from '$components/Scrollarea.svelte'
   import Snack from '$components/Snack.svelte'
   import { call, numbered } from '$api/bridge.js'
   import { chosen, isEmpty } from '$state/filters.js'
+  import { question } from '$state/removal.js'
   import { newSession, withClearedFilter, withFilters, withForgotten, withMark,
     withSection } from '$state/session.js'
-  import { reported } from './trouble.js'
+  import { complaining } from './trouble.js'
+  import { forgetCard } from './visible.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
   // `undefined`, а Svelte на этом не жалуется. Значения обязаны совпадать с
@@ -82,10 +86,28 @@
   // раздела — одинаково.
   const complain = (text) => { trouble = { text } }
 
+  // Своё сборка тоже не глотает: три её вызова моста — удаление, сводка и
+  // ссылка — идут той же связкой «в журнал и на плашку», что и у разделов.
+  const lost = complaining('сборка', complain)
+
   // Что открыто в окне карточки: `undefined` — закрыто, `null` — новая,
   // карточка — правка. Тремя состояниями, а не двумя: «окно открыто» и «окно
   // открыто на этой карточке» — разные вопросы, и признаком их не различить.
   let editing = $state(undefined)
+
+  // Карточка, у которой спросили подтверждение удаления, вместе со сводкой:
+  // что именно пропадёт, знает база, а не лента.
+  let removing = $state(null)
+
+  // Только что удалённая карточка: номер и момент. Раздел убирает её у себя, не
+  // перечитывая ленту — страница читается с начала, и в длинном списке человек
+  // потерял бы место, на котором стоял.
+  //
+  // Сигналом, а не списком удалённых: `item` заведён без `AUTOINCREMENT`, и
+  // номер SQLite выдаёт повторно — список прятал бы заведённую заново карточку,
+  // получившую номер покойницы. Момент нужен по той же причине, что и записи:
+  // удалив вторую карточку с тем же номером, номером эффект не разбудить.
+  let removed = $state(null)
 
   // Только что записанная карточка: номер и момент. Раздел обязан показать её
   // свежей, а перечитывать всю ленту нельзя — человек потерял бы место, на
@@ -142,13 +164,38 @@
     forgotten = [...forgotten, id]
   }
 
+  /** Сводка приходит от базы: сколько тегов, есть ли оценка и закладка.
+   *  Спрашивается до вопроса, а не после согласия, — иначе перечислять в
+   *  вопросе было бы нечего. Не приехала — вопроса не будет вовсе: удалять,
+   *  не сказав что пропадёт, хуже, чем не удалить. */
+  function askRemoval(view) {
+    call('library.deletion_summary', view.item_id)
+      .then((summary) => { removing = { view, summary } })
+      .catch((error) => lost(error, 'Не удалось прочитать карточку'))
+  }
+
+  /** Порядок двух файлов базы знает бэкенд: обложка уходит первой.
+   *
+   *  Номер забывается и памятью показанных: SQLite выдаёт его повторно, и
+   *  заведённая заново карточка иначе считалась бы уже спрошенной. */
+  function remove() {
+    const { item_id } = removing.view
+    removing = null
+    call('library.delete', item_id)
+      .then(() => {
+        forgetCard(item_id)
+        removed = { item_id, at: Date.now() }
+      })
+      .catch((error) => lost(error, 'Не удалось удалить карточку'))
+  }
+
   /** Ссылку открывает системный браузер: окно приложения без адресной строки, и
    *  вернуться из Кинопоиска было бы нечем. Отказ у этого свой — чужая схема
    *  адреса заведена в мосте отдельным классом ровно затем, чтобы плашка
    *  назвала причину, а не промолчала. */
   function open(url) {
     call('world.open', url).catch((error) =>
-      reported(error, 'ссылка', () => { trouble = { text: 'Не удалось открыть ссылку' } }))
+      lost(error, 'Не удалось открыть ссылку'))
   }
 </script>
 
@@ -160,32 +207,37 @@
                                   session = withSection(session, 'search') }}
             onadd={() => { editing = null }} onfilter={filter} />
 
-    <div class="content" bind:this={content}>
-      <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
-           секцию, проявление не проигрывается, и переход между разделами
-           становится мгновенной подменой. -->
-      <!-- Столбцы гистограммы отрастают из пола при каждом заходе на раздел, а
-           не один раз за всё время работы. Перезапускать анимацию руками не
-           надо: `{#key}` выше пересоздаёт секцию целиком, и вместе с ней —
-           каждый столбец. -->
-      {#key session.section}
-        <section class="view is-shown"
-                 class:is-drawing={session.section === 'stats'}>
-          <!-- Метка и человек решаются здесь, а не в разделе: клик по жанру
-               включает фильтр, клик по имени открывает поиск по человеку — и
-               то и другое меняет общее состояние. -->
-          <Screen {session} {query} {expected} root={content}
-                  ontrouble={complain}
-                  onmark={(field, id) => { session = withMark(session, field, id) }}
-                  onperson={idle}
-                  onopen={open}
-                  onedit={(view) => { editing = view }}
-                  {saved}
-                  tagged={marks} {forgotten}
-                  ontag={(view) => { tagging = view }} />
-        </section>
-      {/key}
-    </div>
+    <!-- Прокручивается содержимое, а не страница, и полоса у него своя: она
+         идёт у края окна, а не по краю колонки с карточками. -->
+    <Scrollarea bind:box={content}>
+      {#snippet children()}
+        <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
+             секцию, проявление не проигрывается, и переход между разделами
+             становится мгновенной подменой. -->
+        <!-- Столбцы гистограммы отрастают из пола при каждом заходе на раздел,
+             а не один раз за всё время работы. Перезапускать анимацию руками не
+             надо: `{#key}` выше пересоздаёт секцию целиком, и вместе с ней —
+             каждый столбец. -->
+        {#key session.section}
+          <section class="view is-shown"
+                   class:is-drawing={session.section === 'stats'}>
+            <!-- Метка и человек решаются здесь, а не в разделе: клик по жанру
+                 включает фильтр, клик по имени открывает поиск по человеку — и
+                 то и другое меняет общее состояние. -->
+            <Screen {session} {query} {expected} root={content}
+                    ontrouble={complain}
+                    onmark={(field, id) => { session = withMark(session, field, id) }}
+                    onperson={idle}
+                    onopen={open}
+                    onedit={(view) => { editing = view }}
+                    ondelete={askRemoval}
+                    {saved} {removed}
+                    tagged={marks} {forgotten}
+                    ontag={(view) => { tagging = view }} />
+          </section>
+        {/key}
+      {/snippet}
+    </Scrollarea>
   </main>
 
   <!-- `{#key}` не украшение: без него смена признака переиспользует то же окно
@@ -225,6 +277,14 @@
                                         editing = undefined }}
                  onclose={() => { editing = undefined }} />
     {/key}
+  {/if}
+
+  <!-- Красным светится необратимое: карточка уходит вместе с оценкой, тегами и
+       закладкой, и вернуть их нечем. -->
+  {#if removing}
+    <Confirm label="Удалить карточку" ok="Удалить" danger
+             text={question(removing.view, removing.summary)}
+             onyes={remove} onclose={() => { removing = null }} />
   {/if}
 
   <Snack message={trouble} />

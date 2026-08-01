@@ -5,7 +5,7 @@
   import TagBox from '$components/TagBox.svelte'
   import { call, lastOp, numbered } from '$api/bridge.js'
   import { nameOf } from '$state/sources.js'
-  import { reported } from './trouble.js'
+  import { complaining } from './trouble.js'
 
   // Единственный род отказа, который тут не поломка, а ответ: за этой ссылкой в
   // библиотеке уже есть карточка. Занятую идентичность человека (`IdentityTaken`)
@@ -37,8 +37,7 @@
       .catch((error) => lost(error, 'Не удалось разобрать ссылку'))
   }
 
-  const lost = (error, text) =>
-    reported(error, 'привязка', () => ontrouble(text))
+  const lost = complaining('привязка', ontrouble)
 
   /** Зовётся сохранением и после того, как карточка записана: у новой номер
    *  появляется только там. Ссылки нет — привязывать нечего, и молчание тут

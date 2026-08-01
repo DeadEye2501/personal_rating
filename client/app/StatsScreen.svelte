@@ -6,7 +6,7 @@
   import { owned } from '$api/owned.svelte.js'
   import { chosen } from '$state/filters.js'
   import { heightsOf } from '$state/histogram.js'
-  import { reported } from './trouble.js'
+  import { complaining } from './trouble.js'
 
   let { session, ontrouble } = $props()
 
@@ -27,12 +27,13 @@
   const kind = $derived(session.kind)
   const asked = $derived(JSON.stringify(chosen(session.filters)))
 
+  const lost = complaining('гистограмма', ontrouble)
+
   $effect(() => {
     histogram = NOTHING
     numbered('feed.histogram', kind, JSON.parse(asked), { channel: 'feed', ops })
       .then((answer) => { histogram = answer })
-      .catch((error) => reported(error, 'гистограмма',
-                                 () => ontrouble('Не удалось построить гистограмму')))
+      .catch((error) => lost(error, 'Не удалось построить гистограмму'))
   })
 
   const shares = $derived(heightsOf(histogram.buckets))

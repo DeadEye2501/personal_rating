@@ -1,14 +1,18 @@
 <!-- Раздел «Поиск»: сначала своя выдача, потом внешняя. -->
 <script>
+  import { untrack } from 'svelte'
+
   import Feed from '$components/Feed.svelte'
   import { lastOp, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
-  import { reported } from './trouble.js'
+  import { refreshed, without } from './reread.js'
+  import { complaining } from './trouble.js'
   import { onCardShown } from './visible.js'
 
-  let { session, query = null, expected = [], root = null, ontrouble, onmark,
-        onperson, onopen, ontag } = $props()
+  let { session, query = null, expected = [], root = null, saved = null,
+        removed = null, ontrouble, onmark, onperson, onopen, onedit, ondelete,
+        ontag } = $props()
 
   let views = $state([])
   const ops = owned()
@@ -27,8 +31,7 @@
   // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
   // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое
   // правило отказов запрещает.
-  const lost = (error, text = 'Не удалось выполнить операцию') =>
-    reported(error, 'поиск', () => ontrouble(text))
+  const lost = complaining('поиск', ontrouble)
 
   $effect(() => {
     if (!query?.text) { views = []; return }
@@ -54,8 +57,7 @@
       // этом молчит: пустая лента и есть ответ.
       if (outer.refusals.length) ontrouble('Внешняя база недоступна')
     } catch (error) {
-      reported(error, 'внешняя выдача',
-               () => ontrouble('Внешняя база недоступна'))
+      lost(error, 'Внешняя база недоступна')
     }
   }
 
@@ -91,6 +93,29 @@
         ? fresh : each)
   }
 
+  /** Оба эффекта слушают **только** свой сигнал: `views` они и читают, и пишут,
+   *  а такой круг проект уже ловил — эффект по своему же списку не кончается
+   *  никогда.
+   *
+   *  Правленую карточку выдача перечитывает у себя, а не спрашивает источник
+   *  заново: это поход в сеть ради того, что уже лежит в базе. */
+  $effect(() => {
+    const done = saved
+    if (done) untrack(() => again(done))
+  })
+
+  $effect(() => {
+    const gone = removed
+    if (gone) untrack(() => { views = without(views, gone.item_id) })
+  })
+
+  function again(done) {
+    if (!views.some((each) => each.item_id === done.item_id)) return
+
+    refreshed(done, ops, replace)
+      .catch((error) => lost(error, 'Не удалось перечитать карточку'))
+  }
+
   /** Приехавшие оценки кладутся в ту же карточку: иначе кружок на их месте
    *  крутится до конца сеанса, хотя оценки уже в базе. */
   async function enrich(view) {
@@ -114,5 +139,5 @@
       on={session.filters.on} {onmark} {onperson} {onopen}
       onscore={(view) => add(view).catch(lost)}
       onaspect={(view) => add(view).catch(lost)}
-      oncollapse={idle} onedit={idle} ondelete={idle} onwish={idle}
+      oncollapse={idle} {onedit} {ondelete} onwish={idle}
       {ontag} />

@@ -12,13 +12,13 @@
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
-## app — 13 файлов
+## app — 14 файлов
 
-### app/App.svelte (231)
+### app/App.svelte (291)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
-- берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
+- берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (313)
+### app/CardModal.svelte (312)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -28,27 +28,27 @@
 - принимает: view, onview, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/FiltersModal.svelte (154)
+### app/FiltersModal.svelte (148)
 - Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (159)
+### app/LibraryScreen.svelte (157)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
-- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ontag, saved
-- берёт: ./trouble.js, ./visible.js
+- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
+- берёт: ./reread.js, ./trouble.js, ./visible.js
 
-### app/LinkField.svelte (103)
+### app/LinkField.svelte (102)
 - Привязка карточки к внешней базе вставленной ссылкой — и отвязка.
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (118)
+### app/SearchScreen.svelte (143)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя.
-- принимает: session, query, expected, root, ontrouble, onmark, onperson, onopen, ontag
-- берёт: ./trouble.js, ./visible.js
+- принимает: session, query, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
+- берёт: ./reread.js, ./trouble.js, ./visible.js
 
-### app/StatsScreen.svelte (59)
+### app/StatsScreen.svelte (60)
 - Раздел «Статистика»: гистограмма своих оценок по тому же отфильтрованному набору, что и разделы с карточками.
 - принимает: session, ontrouble
 - берёт: ./trouble.js
@@ -56,6 +56,10 @@
 ### app/Topbar.svelte (146)
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
+
+### app/reread.js (24)
+- Что раздел делает со своим списком, когда карточку записали или удалили.
+- отдаёт: refreshed, without
 
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
@@ -65,19 +69,19 @@
 - Правка самого набора тегов: удалить и переставить.
 - отдаёт: dropped, ordered, wearers
 
-### app/trouble.js (15)
+### app/trouble.js (23)
 - Единственный способ поступить с отказом операции.
-- отдаёт: reported
+- отдаёт: complaining, reported
 
-### app/visible.js (61)
+### app/visible.js (67)
 - Что делать с карточкой, попавшей в поле зрения.
-- отдаёт: onCardShown, stale
+- отдаёт: forgetCard, onCardShown, stale
 
 ## components — 28 файлов
 
-### components/Acts.svelte (21)
+### components/Acts.svelte (27)
 - Ряд действий карточки: правка, удаление, закладка.
-- принимает: wished, onedit, ondelete, onwish
+- принимает: saved, wished, onedit, ondelete, onwish
 
 ### components/Aggregates.svelte (57)
 - Оценки агрегаторов: цифра, кружок ожидания или пустое место.
@@ -111,7 +115,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (87)
+### components/Film.svelte (89)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -131,7 +135,7 @@
 - Форма заведения тега.
 - принимает: oncreate
 
-### components/Picker.svelte (205)
+### components/Picker.svelte (260)
 - Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
 - принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
@@ -147,9 +151,9 @@
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
 - принимает: score, state, ontoggle
 
-### components/Scrollarea.svelte (16)
+### components/Scrollarea.svelte (20)
 - Область, которая прокручивается вместо страницы.
-- принимает: children
+- принимает: children, box
 
 ### components/Scrollbar.svelte (89)
 - Своя полоса прокрутки для того, что прокручивается.
@@ -187,7 +191,7 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, disabled, onclick, children
 
-## state — 18 файлов
+## state — 19 файлов
 
 ### state/card.js (107)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
@@ -233,6 +237,10 @@
 - Перезапуск анимации на узле, который обязан его пережить.
 - отдаёт: redrawn
 
+### state/removal.js (47)
+- Фразы, которыми спрашивают про удаление: что пропадёт и кого это заденет.
+- отдаёт: question, worn
+
 ### state/reorder.js (23)
 - Куда встаёт строка, которую тащат указателем.
 - отдаёт: dragged
@@ -263,12 +271,15 @@
 
 ## styles — 29 файлов
 
-### styles/acts.css (41)
+### styles/acts.css (45)
 - Ряд действий карточки: правка, удаление, закладка.
 - селекторы (8): .film__acts, .film__wish,
 .film__act, .film__wish .material-symbols-outlined,
 .film__act  .material-symbols-outlined, .film__wish:hover,
-.film__act:hover, .film__wish.is-on, .film__act[data-act="delete"]:hover, .film__act, .film:hover .film__act
+.film__act:hover, .film__wish.is-on, .film__act[data-act="delete"]:hover, .film__act,
+.film__wish, .film:hover .film__act,
+.film:hover .film__wish,
+.film__wish.is-on
 - берёт: --error, --gutter, --icon-inset, --primary, --tint-30
 
 ### styles/aggr.css (51)
@@ -277,10 +288,10 @@
 - объявляет: --flat
 - берёт: --body-m, --primary, --score, --tint-16, --tint-35, --tint-55
 
-### styles/app.css (59)
+### styles/app.css (61)
 - Оболочка окна: неоновая кромка сверху и место под содержимое.
 - селекторы (6): .app, .app::before,
-.app::after, .app::before, .app::after, .app__main, .content
+.app::after, .app::before, .app::after, .app__main, .app__main > .scrollarea
 - берёт: --primary
 
 ### styles/base.css (82)
@@ -374,7 +385,7 @@
 - объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
-### styles/picker.css (104)
+### styles/picker.css (105)
 - Поле с подсказкой имён и выбранное рядом с ним.
 - селекторы (11): .cardform__pick, .cardform__pick .picker, .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
 .picker__hit.is-marked, .picker__poster, .picker__chosen, .picked, .picked__del, .picked__del .material-symbols-outlined
@@ -386,7 +397,7 @@
 - селекторы (5): .scorerow, .scorerow__stars, .scorerow__stars .material-symbols-outlined, .scorerow__stars .is-empty, .scorerow__label
 - берёт: --score, --tint-14, --title-s
 
-### styles/scrollarea.css (45)
+### styles/scrollarea.css (46)
 - Область со своей полосой прокрутки вместо системной.
 - селекторы (8): .scrollarea, .scrollarea__box, .scrollarea__box::-webkit-scrollbar, .scrollbar, .scrollbar.is-shown, .scrollbar__thumb, .scrollbar__thumb:hover, .scrollbar__thumb:active
 - берёт: --tint-16, --tint-28, --tint-34

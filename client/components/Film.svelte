@@ -64,7 +64,8 @@
                 style:--score={toneOf(rating?.[aspect.key] ?? null)}
           >{verdictOf(rating?.[aspect.key] ?? null)}</span>
           {#if index === ASPECTS.length - 1}
-            <Acts wished={view.in_wishlist} onedit={() => onedit(view)}
+            <Acts saved={view.item_id !== null} wished={view.in_wishlist}
+                  onedit={() => onedit(view)}
                   ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
           {/if}
         </div>
@@ -79,7 +80,8 @@
         <Stars score={mean} onpick={(value) => onscore(view, value)} />
         <span class="film__verdict" style:--score={toneOf(mean)}
         >{verdictOf(mean)}</span>
-        <Acts wished={view.in_wishlist} onedit={() => onedit(view)}
+        <Acts saved={view.item_id !== null} wished={view.in_wishlist}
+              onedit={() => onedit(view)}
               ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
       </div>
     {/if}

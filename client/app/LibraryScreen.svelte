@@ -9,15 +9,16 @@
   import { owned } from '$api/owned.svelte.js'
   import { requestOf } from '$state/section.js'
   import { collapsedOf } from '$state/session.js'
-  import { reported } from './trouble.js'
+  import { refreshed, without } from './reread.js'
+  import { complaining } from './trouble.js'
   import { onCardShown } from './visible.js'
 
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
   const PAGE = 50
 
   let { session, expected = [], root = null, tagged = {}, forgotten = [],
-        ontrouble, onmark, onperson, onopen, onedit, ontag,
-        saved = null } = $props()
+        ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag,
+        saved = null, removed = null } = $props()
 
   let views = $state([])
   let done = $state(false)
@@ -43,8 +44,7 @@
       ? view : { ...view, tags }
   }))
 
-  const lost = (error, text) => reported(error, 'раздел библиотеки',
-                                         () => ontrouble(text))
+  const lost = complaining('раздел библиотеки', ontrouble)
 
   // Смена фильтра, сортировки, типа или раздела перезапрашивает ленту с
   // начала: догружать поверх чужого набора нечего.
@@ -119,30 +119,28 @@
       each.item_id === view.item_id ? { ...each, ...fields } : each)
   }
 
-  /** Правленую карточку раздел перечитывает одну, а не всю ленту: страница
-   *  читается с начала, и в длинном списке человек потерял бы место, на котором
-   *  стоял. Заведённой заново в списке ещё нет — тогда перечитывать нечего, она
-   *  придёт со следующей порцией.
+  /** Оба эффекта слушают **только** свой сигнал: `views` они и читают, и пишут,
+   *  а такой круг проект уже ловил — эффект по своему же списку не кончается
+   *  никогда.
    *
-   *  Эффект слушает **только** запись: `views` он и читает, и пишет, а такой
-   *  круг проект уже ловил — эффект по своему же списку не кончается никогда. */
+   *  Записанной заново в списке может не быть — тогда перечитывать нечего, она
+   *  придёт со следующей порцией. */
   $effect(() => {
     const done = saved
-    if (done) untrack(() => reread(done))
+    if (done) untrack(() => again(done))
   })
 
-  function reread({ item_id, at }) {
-    if (!views.some((each) => each.item_id === item_id)) return
+  $effect(() => {
+    const gone = removed
+    if (gone) untrack(() => { views = without(views, gone.item_id) })
+  })
 
-    numbered('feed.views_of', [item_id], { channel: 'views', ops })
-      // Метка момента сбрасывает кеш обложки: адрес ручки от содержимого не
-      // зависит, а отдаёт она сутки кеша — перезалитая картинка иначе осталась
-      // бы прежней до завтра.
-      .then(([fresh]) => { if (fresh) patch(fresh, { ...fresh, cover: at }) })
+  function again(done) {
+    if (!views.some((each) => each.item_id === done.item_id)) return
+
+    refreshed(done, ops, (fresh) => patch(fresh, fresh))
       .catch((error) => lost(error, 'Не удалось перечитать карточку'))
   }
-
-  const idle = () => {}
 </script>
 
 <Feed views={cards} {expected} {root} collapsed={session.collapsed} onmore={more}
@@ -156,4 +154,4 @@
         lost(error, 'Закладка не сохранилась'))}
       oncollapse={collapse}
       on={session.filters.on} {onmark} {onperson} {onopen}
-      {onedit} ondelete={idle} {ontag} />
+      {onedit} {ondelete} {ontag} />

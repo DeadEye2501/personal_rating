@@ -7,8 +7,7 @@
   import ScoreRow from '$components/ScoreRow.svelte'
   import TagRow from '$components/TagRow.svelte'
   import { call } from '$api/bridge.js'
-  import { plural } from '$state/facts.js'
-  import { NOUNS } from '$state/kinds.js'
+  import { worn } from '$state/removal.js'
   import { cycled, stateOf } from '$state/filters.js'
   import { dragging } from '$state/dragging.js'
   import { dragged } from '$state/reorder.js'
@@ -16,10 +15,7 @@
   import { SCALE } from '$state/scores.js'
   import { created } from './tags.js'
   import { dropped, ordered, wearers } from './tagset.js'
-  import { reported } from './trouble.js'
-
-  // Существительное — по открытой вкладке, как в макете: «3 фильма», «3 игры».
-  const WEARS = ['имеет', 'имеют', 'имеют']
+  import { complaining } from './trouble.js'
 
   // Список открывается на высоких оценках: их ищут чаще.
   const HIGH_FIRST = SCALE.toReversed()
@@ -49,7 +45,7 @@
       .catch((error) => lost(error, 'Не удалось прочитать список'))
   })
 
-  const lost = (error, text) => reported(error, title, () => ontrouble(text))
+  const lost = complaining(title, ontrouble)
 
   const toggle = (id) => onfilters(cycled(filters, field, id))
 
@@ -58,8 +54,8 @@
    *  нечего, и спрашивать не о чем. */
   async function remove(row) {
     try {
-      const worn = await wearers(row.id)
-      if (worn) { asking = { row, worn }; return }
+      const count = await wearers(row.id)
+      if (count) { asking = { row, count }; return }
     } catch (error) {
       lost(error, 'Не удалось удалить тег')
       return
@@ -146,9 +142,7 @@
 
 {#if asking}
   <Confirm label="Удалить тег" ok="Удалить" danger
-           text={`Удалить тег «${asking.row.name}»? ${asking.worn} `
-                 + `${plural(asking.worn, NOUNS[kind])} `
-                 + `${plural(asking.worn, WEARS)} этот тег.`}
+           text={worn(asking.row.name, asking.count, kind)}
            onyes={() => drop(asking.row)}
            onclose={() => { asking = null }} />
 {/if}

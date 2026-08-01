@@ -1990,13 +1990,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 4
 
 
-### `tests/bridge/test_page_contract.py` — 289 строк
+### `tests/bridge/test_page_contract.py` — 307 строк ⚠ подошёл к 300
 
 Имена, которые страница и мост обязаны называть одинаково.
 
 Зависит от: `backend.model`, `bridge.answer`, `bridge.api`, `bridge.feed`
 
-Тестов: 16
+Тестов: 17
 
 - `def source(path: str) -> str` (2)
 - `def named_in_chosen() -> set[str]` (4)

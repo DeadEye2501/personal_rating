@@ -278,6 +278,24 @@ def test_every_path_the_page_calls_exists_on_the_bridge():
     assert called <= surface, f"страница зовёт то, чего у моста нет: {called - surface}"
 
 
+def test_the_page_reads_exactly_what_the_summary_of_a_deletion_holds():
+    """Сводка удаления — единственная величина границы без своего класса: это
+    словарь, собранный литералами в репозитории. Переименуй в нём `in_wishlist`,
+    и закладка молча пропадёт из предупреждения перед необратимым — оба набора
+    останутся зелёными, а человек согласится, не зная, что теряет.
+
+    Читаются оба тела разом: имя, которого сторона не назвала, и есть
+    расхождение, в какую бы сторону оно ни случилось."""
+    given = re.search(r"async def deletion_summary\(.+?return \{(.+?)\n\s+\}",
+                      (Path(__file__).resolve().parents[2]
+                       / "backend/storage/repository/library.py")
+                      .read_text(encoding="utf-8"), re.DOTALL)
+
+    assert given, "у репозитория больше нет deletion_summary со словарём"
+    assert set(re.findall(r'"(\w+)":', given.group(1))) == set(
+        re.findall(r"summary\.(\w+)", source("state/removal.js")))
+
+
 def test_the_page_has_a_word_form_for_every_kind():
     """Формы склонения — по одной тройке на тип содержимого. Пропуск роняет
     `plural` на `undefined` прямо в подтверждении удаления тега, а лишний ключ

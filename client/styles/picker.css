@@ -8,10 +8,9 @@
   gap: var(--col-gap);
 }
 
-.cardform__pick .picker {
-  position: relative;
-  flex: 0 0 var(--poster-w);
-}
+/* Точкой отсчёта поле больше не служит: обе всплывашки ушли в верхний слой, и
+   отсчитываются они от окна. */
+.cardform__pick .picker { flex: 0 0 var(--poster-w) }
 
 /* Список совпадений висит над содержимым и ничего не сдвигает.
 
@@ -19,16 +18,16 @@
    человека узнают, и в 230 пикселей поля она переносится — а различать
    однофамильцев надо взглядом, не разбирая перенос. Растёт по самой длинной
    строке; потолок в 560 взят так, чтобы список не дошёл до правого края даже
-   на нём: 230 поля плюс 36 зазора плюс 560 против тысячи внутри окна. */
+   на нём: 230 поля плюс 36 зазора плюс 560 против тысячи внутри окна.
+
+   `inset: auto` и нулевые поля снимают то, что браузер даёт каждому popover-у
+   сам: он ставит его в середину окна. Место приезжает разметкой. */
 .picker__hits {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 100%;
+  position: fixed;
+  inset: auto;
   width: max-content;
   max-width: 560px;
-  z-index: 5;
-  margin: 4px 0 0;
+  margin: 0;
   padding: 4px;
   max-height: 216px;
   overflow-y: auto;
@@ -66,10 +65,12 @@
    которую показывают, она не заслоняет. Место считает сам компонент — он же
    задаёт ширину, потому что по ней считается и отступ от края окна. */
 .picker__poster {
-  position: absolute;
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  z-index: 6;
   border: 1px solid var(--tint-09);
   border-radius: 10px;
   background: var(--surface-pop);

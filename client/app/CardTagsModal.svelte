@@ -7,7 +7,7 @@
   import { call } from '$api/bridge.js'
   import { NOUNS } from '$state/kinds.js'
   import { created } from './tags.js'
-  import { reported } from './trouble.js'
+  import { complaining } from './trouble.js'
 
   // Заголовок собирается из общей таблицы форм, а не пишется вторым списком:
   // «Теги» плюс родительный падеж единственного числа.
@@ -30,7 +30,7 @@
       .catch((error) => lost(error, 'Не удалось прочитать теги'))
   })
 
-  const lost = (error, text) => reported(error, 'теги карточки', () => ontrouble(text))
+  const lost = complaining('теги карточки', ontrouble)
 
   /** Отметка ставится до ответа моста и снимается обратно, если он отказал.
    *

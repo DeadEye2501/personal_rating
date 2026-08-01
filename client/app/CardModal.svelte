@@ -14,7 +14,7 @@
   import { GENRE_KINDS } from '$state/genres.js'
   import { MANUAL } from '$state/sources.js'
   import LinkField from './LinkField.svelte'
-  import { reported } from './trouble.js'
+  import { complaining } from './trouble.js'
 
   let { view = null, kind, onsave, onclose, ontrouble } = $props()
 
@@ -67,8 +67,7 @@
   let genres = $state([])
   let typedGenre = $state('')
 
-  const lost = (error, text) =>
-    reported(error, 'окно карточки', () => ontrouble(text))
+  const lost = complaining('окно карточки', ontrouble)
 
   $effect(() => {
     call('refs.genres', GENRE_KINDS[form.kind])
