@@ -115,7 +115,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (94)
+### components/Film.svelte (102)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -171,9 +171,9 @@
 - Плашка сообщений: одна на всё приложение.
 - принимает: message
 
-### components/Stars.svelte (37)
+### components/Stars.svelte (70)
 - Ряд из десяти звёзд: кликабельный или неподвижный с дробной.
-- принимает: score, onpick
+- принимает: score, onpick, onhover
 
 ### components/Synopsis.svelte (28)
 - Описание карточки, обрезанное до трёх строк, с раскрытием.
@@ -420,10 +420,10 @@
 - объявляет: --halo-h, --neon
 - берёт: --body-m, --ease, --error, --glass-error, --r-full
 
-### styles/stars.css (70)
+### styles/stars.css (84)
 - Своя оценка: ряд звёзд, дробная звезда и ярлык словом.
-- селекторы (14): .film__scores, .film__aspect, .stars, .stars button,
-.stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect
+- селекторы (16): .film__scores, .film__aspect, .stars, .stars button,
+.stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars.is-flash .is-on .material-symbols-outlined, @keyframes star-flash, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect
 - берёт: --body-m, --fill, --score, --tint-16, --tint-35, --title-s
 
 ### styles/taglist.css (98)

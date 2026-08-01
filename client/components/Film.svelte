@@ -20,6 +20,12 @@
 
   const rating = $derived(view.rating)
   const mean = $derived(meanOf(rating, view.kind))
+
+  // Наведённое по шкалам: у кино одна, у игры три, и своё слово у каждой. Пока
+  // курсор над рядом, слово говорит о будущей оценке, а не о поставленной, —
+  // иначе непонятно, что получится от нажатия.
+  let over = $state({})
+  const showing = (key, real) => over[key] ?? real
 </script>
 
 <article class="film" class:is-collapsed={collapsed}>
@@ -60,13 +66,14 @@
           <div class="film__scores film__scores--aspect">
             <span class="film__aspect">{aspect.label}</span>
             <Stars score={rating?.[aspect.key] ?? null}
-                   onpick={(value) => onaspect(view, aspect.key, value)} />
+                   onpick={(value) => onaspect(view, aspect.key, value)}
+                   onhover={(step) => { over = { ...over, [aspect.key]: step } }} />
             <!-- Ярлык стоит у каждой стороны своим, а не один на все три: так в
                  макете, и иначе «Отлично» у визуала было бы неотличимо от
                  «Отлично» у геймплея. -->
             <span class="film__verdict"
-                  style:--score={toneOf(rating?.[aspect.key] ?? null)}
-            >{verdictOf(rating?.[aspect.key] ?? null)}</span>
+                  style:--score={toneOf(showing(aspect.key, rating?.[aspect.key]))}
+            >{verdictOf(showing(aspect.key, rating?.[aspect.key]))}</span>
             {#if index === ASPECTS.length - 1}
               <Acts saved={view.item_id !== null} wished={view.in_wishlist}
                     onedit={() => onedit(view)}
@@ -81,9 +88,10 @@
         </div>
       {:else}
         <div class="film__scores">
-          <Stars score={mean} onpick={(value) => onscore(view, value)} />
-          <span class="film__verdict" style:--score={toneOf(mean)}
-          >{verdictOf(mean)}</span>
+          <Stars score={mean} onpick={(value) => onscore(view, value)}
+                 onhover={(step) => { over = { ...over, score: step } }} />
+          <span class="film__verdict" style:--score={toneOf(showing('score', mean))}
+          >{verdictOf(showing('score', mean))}</span>
           <Acts saved={view.item_id !== null} wished={view.in_wishlist}
                 onedit={() => onedit(view)}
                 ondelete={() => ondelete(view)} onwish={() => onwish(view)} />

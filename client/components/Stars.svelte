@@ -6,21 +6,57 @@
   // Кликабельный ряд — своя оценка; неподвижный с дробной звездой —
   // усреднённая у свёрнутой игры. Двух компонентов тут не нужно: отличие в
   // одном свойстве, а строение и оформление общие.
-  let { score = null, onpick = null } = $props()
+  //
+  // Наведённое уходит наружу: слово-ярлык стоит рядом со звёздами, а не внутри
+  // них, и показать будущую оценку иначе нечем.
+  let { score = null, onpick = null, onhover = null } = $props()
 
-  const whole = $derived(Math.floor(score ?? 0))
+  // Наведённая звезда. Пока курсор над рядом, ряд показывает, что получится, а
+  // не то, что стоит.
+  let over = $state(null)
+  let row = $state()
+
+  const shown = $derived(over ?? score)
+  const whole = $derived(Math.floor(shown ?? 0))
+  // Дробная звезда бывает только у неподвижного ряда: у кликабельного оценка
+  // целая, а наведённая — тем более.
   const part = $derived(score ? partOf(score) : 0)
   const colour = $derived(colorOf(Math.max(1, whole)))
+
+  function mark(step) {
+    over = step
+    onhover?.(step)
+  }
+
+  /** Повторное нажатие по той же звезде снимает оценку: карточка при этом
+   *  остаётся. Вспышка тогда не нужна — у снятой оценки нет цвета, которым
+   *  вспыхивать.
+   *
+   *  Класс снимается и ставится заново с пересчётом между: без него второе
+   *  нажатие подряд не перезапустит анимацию — класс уже стоит, и браузеру
+   *  менять нечего. Своего срока здесь нет, длительность живёт в оформлении:
+   *  вторым объявлением она разошлась бы с ним молча. */
+  function pick(step) {
+    const value = step === score ? null : step
+    onpick(value)
+
+    row.classList.remove('is-flash')
+    if (value === null) return
+    void row.offsetWidth
+    row.classList.add('is-flash')
+  }
 </script>
 
-<div class="stars">
+<!-- Уход считается по всему ряду, а не по каждой звезде: между соседними
+     кнопками есть щель, и на ней подсветка мигала бы. -->
+<div class="stars" bind:this={row}
+     onmouseleave={onpick ? () => mark(null) : null}>
   {#each SCALE as step (step)}
     {#if onpick}
-      <!-- Повторное нажатие по той же звезде снимает оценку: карточка при этом
-           остаётся. -->
       <button type="button" class:is-on={step <= whole} style:--score={colour}
               aria-label={`Оценка ${step}`}
-              onclick={() => onpick(step === score ? null : step)}>
+              onmouseenter={() => mark(step)}
+              onclick={() => pick(step)}>
         <Icon name="star" />
       </button>
     {:else if step <= whole}
