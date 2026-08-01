@@ -32,17 +32,8 @@
 }
 .search:focus-within .search__icon { color: var(--primary) }
 
-.search__input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--text);
-  font: var(--body-l);
-  caret-color: var(--primary);
-  user-select: text;
-}
+/* Общее у строк ввода — в `field.css`; здесь только своё. */
+.search__input { color: var(--text) }
 .search__input::placeholder { color: var(--tint-28) }
 
 /* Своя кнопка очистки вместо системной: та рисуется цветом ОС. */
@@ -52,12 +43,7 @@
 }
 
 .search__clear {
-  --icon-btn: 26px;
-
   flex: 0 0 auto;
   margin-right: -6px;
-  color: var(--primary);
   transition: background .15s;
 }
-.search__clear .material-symbols-outlined { font-size: 18px }
-.search__clear:hover { background: var(--fill-primary-14) }

@@ -1,0 +1,104 @@
+/* Список наложения: строка, ручка перетаскивания и трёхпозиционный
+   переключатель. */
+
+.taglist {
+  margin: 0;
+  padding: 0 14px 0 0;      /* обнуляет и браузерный отступ списка слева */
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Тянемся по высоте окна, но не во всю: у списка есть свой потолок, дальше
+     он прокручивается. Прокруткой заведует `scrollarea.css`, потолок остаётся
+     здесь — у каждой области, которая прокручивается, он свой. */
+  max-height: min(calc(100vh - 140px), 640px);
+}
+
+.tagrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.tagrow__name {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-bright);
+  font: var(--body-l);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ручка перетаскивания: сетка 2×3 из квадратиков. Размер и шаг кратны четырём:
+   при масштабе 125% и 150% это целые физические пиксели, иначе квадраты
+   размывает по-разному. */
+.taggrip {
+  flex: 0 0 auto;
+  align-self: center;
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  gap: 4px;
+  opacity: .28;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity .16s;
+}
+.taggrip:hover { opacity: .7 }
+.taggrip i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: var(--text-bright);
+}
+
+/* Класс вешает само перетаскивание, из обработчика `ongrab`: строка едет за
+   курсором, а входным параметром это не выражается. */
+.tagrow.is-dragging { opacity: .55 }
+.tagrow.is-dragging .taggrip { cursor: grabbing }
+
+/* Три состояния: пусто, галочка, крестик. Подложку, рамку и курсор кнопке
+   сбрасывает `base.css`, здесь остаётся своё. */
+.tagbox {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--tint-25);
+  border-radius: var(--r-full);
+  /* Глиф невидим, пока состояние его не покрасит: у невыбранного пусто. */
+  color: transparent;
+  transition: border-color .16s, background .16s, color .16s;
+}
+.tagbox .material-symbols-outlined {
+  font-size: 15px;
+  font-variation-settings: 'wght' 600;
+}
+
+/* Реагирует только невыбранный: у включённого рамка уже цветная, и белая
+   поверх неё сказала бы не то. Состояние в селекторе, а не порядок правил
+   ниже, — иначе перестановка блоков молча сломала бы это. */
+.tagbox[data-state="off"]:hover { border-color: var(--tint-55) }
+
+.tagbox[data-state="on"] {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--bg);
+}
+.tagbox[data-state="ex"] {
+  border-color: var(--exclude);
+  background: var(--exclude);
+  color: var(--bg);
+}
+
+/* Круг, размер и центровка глифа — общие, из `iconbutton.css`: размер по
+   умолчанию там как раз 28. */
+.tagrow__del {
+  flex: 0 0 auto;
+  color: var(--tint-30);
+  transition: color .16s;
+}
+.tagrow__del .material-symbols-outlined { font-size: 18px }
+.tagrow__del:hover { color: var(--error) }

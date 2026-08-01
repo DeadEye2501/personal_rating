@@ -18,12 +18,12 @@
      внешней базе, а их квоты конечны. -->
 <label class="search">
   <Icon name="search" extra="search__icon" />
-  <input class="search__input" type="search" placeholder="Поиск" aria-label="Поиск"
+  <input class="field__input search__input" type="search" placeholder="Поиск" aria-label="Поиск"
          spellcheck="false" autocomplete="off"
          bind:this={field} bind:value
          onkeydown={(event) => event.key === 'Enter' && onsearch(value.trim())}>
   {#if value}
-    <button type="button" class="icon-btn search__clear" aria-label="Очистить" onclick={clear}>
+    <button type="button" class="icon-btn icon-btn--accent search__clear" aria-label="Очистить" onclick={clear}>
       <Icon name="close" />
     </button>
   {/if}

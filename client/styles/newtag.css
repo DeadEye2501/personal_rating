@@ -1,0 +1,41 @@
+/* Форма заведения тега под списком. */
+
+/* Без фона и рамки: в покое это просто серая надпись, при фокусе под ней
+   проступает акцентная полоса. */
+.newtag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  margin-top: 10px;
+  padding: 0 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color .18s;
+}
+.newtag:focus-within { border-bottom-color: var(--primary) }
+
+/* Общее у строк ввода — в `field.css`; здесь только своё. Подсказка тут живее,
+   чем у поиска: под курсором она светлеет, под фокусом исчезает совсем. */
+.newtag__input { color: var(--text-bright) }
+.newtag__input::placeholder {
+  color: var(--text-dim);
+  transition: color .16s;
+}
+.newtag__input:hover::placeholder { color: var(--text-bright) }
+.newtag__input:focus::placeholder { color: transparent }
+
+/* Вид общий, из `iconbutton.css`; здесь только появление — кнопка видна,
+   только когда есть что подтверждать. */
+.newtag__ok {
+  flex: 0 0 auto;
+  opacity: 0;
+  transform: scale(.7);
+  pointer-events: none;
+  transition: opacity .16s, transform .16s, background .15s;
+}
+
+.newtag.is-filled .newtag__ok {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}

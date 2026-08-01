@@ -1,14 +1,12 @@
 <!-- Ряд из десяти звёзд: кликабельный или неподвижный с дробной. -->
 <script>
   import Icon from '$components/Icon.svelte'
-  import { colorOf, partOf } from '$state/scores.js'
+  import { SCALE, colorOf, partOf } from '$state/scores.js'
 
   // Кликабельный ряд — своя оценка; неподвижный с дробной звездой —
   // усреднённая у свёрнутой игры. Двух компонентов тут не нужно: отличие в
   // одном свойстве, а строение и оформление общие.
   let { score = null, onpick = null } = $props()
-
-  const TEN = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
   const whole = $derived(Math.floor(score ?? 0))
   const part = $derived(score ? partOf(score) : 0)
@@ -16,7 +14,7 @@
 </script>
 
 <div class="stars">
-  {#each TEN as step (step)}
+  {#each SCALE as step (step)}
     {#if onpick}
       <!-- Повторное нажатие по той же звезде снимает оценку: карточка при этом
            остаётся. -->

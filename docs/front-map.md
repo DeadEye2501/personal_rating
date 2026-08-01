@@ -39,7 +39,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 16 файлов
+## components — 20 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -73,9 +73,17 @@
 - Оболочка любого наложения: затемнение, окно и два способа его закрыть.
 - принимает: narrow, label, onclose, children
 
+### components/NewTag.svelte (36)
+- Форма заведения тега.
+- принимает: oncreate
+
 ### components/Poster.svelte (28)
 - Обложка карточки с заглушкой.
 - принимает: item_id, source, poster_url
+
+### components/ScoreRow.svelte (24)
+- Строка оценки в списке: неподвижные звёзды и ярлык словом.
+- принимает: score, state, ontoggle
 
 ### components/Scrollarea.svelte (89)
 - Область со своей полосой прокрутки.
@@ -93,13 +101,21 @@
 - Плашка сообщений: одна на всё приложение.
 - принимает: message
 
-### components/Stars.svelte (39)
+### components/Stars.svelte (37)
 - Ряд из десяти звёзд: кликабельный или неподвижный с дробной.
 - принимает: score, onpick
 
 ### components/Synopsis.svelte (28)
 - Описание карточки, обрезанное до трёх строк, с раскрытием.
 - принимает: text
+
+### components/TagBox.svelte (18)
+- Переключатель строки списка: не выбран, включён, исключён.
+- принимает: state, label, onclick
+
+### components/TagRow.svelte (29)
+- Строка списка: ручка, переключатель, имя, удаление.
+- принимает: name, state, ontoggle, ondelete, ongrab
 
 ### components/ToolButton.svelte (17)
 - Круглая кнопка ряда в шапке.
@@ -119,9 +135,9 @@
 - Перезапуск анимации на узле, который обязан его пережить.
 - отдаёт: redrawn
 
-### state/scores.js (67)
+### state/scores.js (72)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
-- отдаёт: ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
+- отдаёт: ASPECTS, LABELS, SCALE, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
 
 ### state/scroll.js (23)
 - Арифметика своей полосы прокрутки.
@@ -143,7 +159,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 20 файлов
+## styles — 24 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -187,6 +203,11 @@
 - селекторы (1): .feed
 - берёт: --content-w
 
+### styles/field.css (15)
+- Строка ввода: общее у поиска в шапке и у формы нового тега.
+- селекторы (1): .field__input
+- берёт: --body-l, --primary
+
 ### styles/film.css (125)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
@@ -199,11 +220,11 @@
 - объявляет: --gutter, --icon-inset
 - берёт: --body-l, --body-m, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
-### styles/iconbutton.css (20)
+### styles/iconbutton.css (31)
 - Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска.
-- селекторы (2): .icon-btn, .icon-btn .material-symbols-outlined
-- объявляет: --icon-btn
-- берёт: --icon-btn, --r-full
+- селекторы (5): .icon-btn, .icon-btn .material-symbols-outlined, .icon-btn--accent, .icon-btn--accent .material-symbols-outlined, .icon-btn--accent:hover
+- объявляет: --accent, --icon-btn
+- берёт: --fill-primary-14, --icon-btn, --primary, --r-full
 
 ### styles/modal.css (88)
 - Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
@@ -217,23 +238,32 @@
 - объявляет: --halo-h
 - берёт: --halo-h, --neon, --opaque
 
-### styles/palette.css (107)
+### styles/newtag.css (41)
+- Форма заведения тега под списком.
+- селекторы (8): .newtag, .newtag:focus-within, .newtag__input, .newtag__input::placeholder, .newtag__input:hover::placeholder, .newtag__input:focus::placeholder, .newtag__ok, .newtag.is-filled .newtag__ok
+- берёт: --primary, --text-bright, --text-dim
+
+### styles/palette.css (110)
 - Единственное место, где есть цвет. По месту пишется только var().
 - селекторы (2): @property --primary, :root
-- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
+- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
+
+### styles/scorerow.css (34)
+- Строка оценки в списке: десять звёзд и ярлык словом.
+- селекторы (5): .scorerow, .scorerow__stars, .scorerow__stars .material-symbols-outlined, .scorerow__stars .is-empty, .scorerow__label
+- берёт: --score, --tint-14, --title-s
 
 ### styles/scrollarea.css (46)
 - Область со своей полосой прокрутки вместо системной.
 - селекторы (8): .scrollarea, .scrollarea__box, .scrollarea__box::-webkit-scrollbar, .scrollbar, .scrollbar.is-shown, .scrollbar__thumb, .scrollbar__thumb:hover, .scrollbar__thumb:active
 - берёт: --tint-16, --tint-28, --tint-34
 
-### styles/search.css (63)
+### styles/search.css (49)
 - Поле поиска в левой зоне шапки.
-- селекторы (11): .search, .search:hover, .search:focus-within, .search__icon, .search:focus-within .search__icon, .search__input, .search__input::placeholder, .search__input::-webkit-search-cancel-button,
-.search__input::-webkit-search-decoration, .search__clear, .search__clear .material-symbols-outlined, .search__clear:hover
-- объявляет: --icon-btn
-- берёт: --body-l, --fill-primary-14, --primary, --r-full, --side-w, --text, --tint-035, --tint-05, --tint-06, --tint-10, --tint-28, --tint-35
+- селекторы (9): .search, .search:hover, .search:focus-within, .search__icon, .search:focus-within .search__icon, .search__input, .search__input::placeholder, .search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration, .search__clear
+- берёт: --primary, --r-full, --side-w, --text, --tint-035, --tint-05, --tint-06, --tint-10, --tint-28, --tint-35
 
 ### styles/seg.css (43)
 - Капсула переключателя типа содержимого.
@@ -251,6 +281,11 @@
 - селекторы (14): .film__scores, .film__aspect, .stars, .stars button,
 .stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect
 - берёт: --body-m, --fill, --score, --tint-16, --tint-35, --title-s
+
+### styles/taglist.css (104)
+- Список наложения: строка, ручка перетаскивания и трёхпозиционный переключатель.
+- селекторы (16): .taglist, .tagrow, .tagrow__name, .taggrip, .taggrip:hover, .taggrip i, .tagrow.is-dragging, .tagrow.is-dragging .taggrip, .tagbox, .tagbox .material-symbols-outlined, .tagbox[data-state="off"]:hover, .tagbox[data-state="on"], .tagbox[data-state="ex"], .tagrow__del, .tagrow__del .material-symbols-outlined, .tagrow__del:hover
+- берёт: --bg, --body-l, --error, --exclude, --primary, --r-full, --text-bright, --tint-25, --tint-30, --tint-55
 
 ### styles/tools.css (80)
 - Ряд круглых кнопок в правой зоне шапки.

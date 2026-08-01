@@ -18,3 +18,14 @@
   line-height: var(--icon-btn);
   text-align: center;
 }
+
+/* Маленькая акцентная: крестик очистки поиска и подтверждение нового тега.
+   Переход и место в строке у каждой свои — общее тут только то, как она
+   выглядит. */
+.icon-btn--accent {
+  --icon-btn: 26px;
+
+  color: var(--primary);
+}
+.icon-btn--accent .material-symbols-outlined { font-size: 18px }
+.icon-btn--accent:hover { background: var(--fill-primary-14) }
