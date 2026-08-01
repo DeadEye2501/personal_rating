@@ -1,6 +1,7 @@
 /* Выбранное в приложении вместе с переходами между выборами. */
 
 import { EMPTY } from '$state/filters.js'
+import { nextSort } from '$state/sorting.js'
 
 /** При запуске карточек нет: приложение открывается на поиске. */
 export const newSession = () => ({
@@ -26,6 +27,17 @@ export function withSection(session, section) {
   if (section === session.section) return session
   return { ...session, section, sort: null }
 }
+
+/** Повторный щелчок по разделу возвращает простой список: раздел — это подмена
+ *  содержимого, а не переключатель с залипанием, и отдельной кнопки «обратно»
+ *  под него нет. */
+export const withToggledSection = (session, section) =>
+  withSection(session, section === session.section ? 'search' : section)
+
+/** Следующее состояние переключателя. Круг у раздела свой, и позиция считается
+ *  по нему; нетронутый переключатель двигается с первого состояния. */
+export const withNextSort = (session) =>
+  ({ ...session, sort: nextSort(session.section, session.sort) })
 
 /** Тумблер всего приложения, а не настройка раздела. */
 export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })

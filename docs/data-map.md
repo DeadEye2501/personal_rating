@@ -535,7 +535,7 @@
 - `logger` = `logging.getLogger(__name__)`
 - `TITLE` = `'Personal Rating'`
 - `RENDERER` = `'edgechromium'`
-- `MIN_WIDTH` = `900`
+- `MIN_WIDTH` = `1200`
 - `MIN_HEIGHT` = `600`
 - `WIDTH` = `1280`
 - `HEIGHT` = `820`

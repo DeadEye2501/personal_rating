@@ -1,12 +1,16 @@
-<!-- Корень страницы: показывает, дождалась ли она моста. -->
+<!-- Корень страницы: шапка и место под содержимое разделов. -->
 <script>
-  // Заглушка до задачи 5: там корень соберёт шапку и стопку разделов.
-  import { ready } from '$api/bridge.js'
+  import Topbar from './Topbar.svelte'
+  import { newSession } from '$state/session.js'
 
-  let here = $state(false)
-  ready().then(() => { here = true })
+  let session = $state(newSession())
 </script>
 
 <div class="app">
-  <p>{here ? 'мост на месте' : 'жду мост'}</p>
+  <main class="app__main">
+    <Topbar {session}
+            onsession={(next) => { session = next }}
+            onsearch={() => {}} onadd={() => {}} onfilter={() => {}} />
+    <div class="content"></div>
+  </main>
 </div>

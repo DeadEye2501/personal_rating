@@ -1,0 +1,46 @@
+/* Капсула переключателя типа содержимого. */
+
+/* Колонки в 1fr при авто-ширине контейнера выравниваются по самой широкой —
+   сегменты получаются одинаковыми без ручной ширины.
+   Колонку шапки держит обёртка `.topbar__seg`: её замеряет шапка, и своей
+   `grid-column` здесь быть не должно — иначе их две на одно место. */
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--r-full);
+  background: var(--tint-035);
+  border: 1px solid var(--tint-06);
+}
+
+.seg__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 16px;
+  white-space: nowrap;
+  border: none;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--tint-45);
+  font: var(--title-s);
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+.seg__btn .material-symbols-outlined { font-size: 19px }
+
+.seg__btn:hover {
+  background: var(--tint-05);
+  color: var(--tint-75);
+}
+
+.seg__btn.is-active {
+  background: var(--fill-primary-14);
+  color: var(--primary);
+}
+.seg__btn.is-active:hover {
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+}

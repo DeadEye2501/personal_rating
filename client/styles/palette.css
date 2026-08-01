@@ -20,6 +20,10 @@
      со вспышки другого оттенка. */
   --bg:                 #0a0a0a;
   --fill-primary-hover: color-mix(in srgb, var(--primary) 18%, transparent);
+  /* Подложка включённого: одна и та же у сегмента, у круглой кнопки и у
+     крестика очистки. Названа ступенью, а не ролью, по той же причине, что и
+     белое ниже: ролей у неё уже три. */
+  --fill-primary-14:    color-mix(in srgb, var(--primary) 14%, transparent);
   --error:              #ff4a45;
 
   --glass-error:        rgba(39,15,15,.55);

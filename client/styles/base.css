@@ -100,6 +100,14 @@ body {
   flex-direction: column;
 }
 
+/* Прокручивается область содержимого, а не лента: полоса идёт у края окна, а
+   не по краю колонки с карточками. */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

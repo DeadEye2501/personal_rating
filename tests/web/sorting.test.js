@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ADDED_AT, SORT_STATES, cycleOf, nextSort, orderFor, stateAt }
+import { ADDED_AT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt }
   from '$state/sorting.js'
 
 /** Круг раздела так, как его проходит человек: от нетронутого переключателя
@@ -71,6 +71,26 @@ describe('переключатель сортировки', () => {
     for (const section of ['rated', 'wishlist']) {
       const seen = walk(section).map(({ key, descending }) => `${key}:${descending}`)
       expect(new Set(seen).size).toBe(seen.length)
+    }
+  })
+})
+
+describe('где переключатель вообще есть', () => {
+  it('в обеих половинах библиотеки — да, в поиске и статистике — нет', () => {
+    // У поиска порядок задан склейкой своего и чужого, у статистики сортировать
+    // нечего. Кнопка, которая перебирает восемь состояний и не меняет ничего,
+    // обманывает.
+    expect(hasSort('rated')).toBe(true)
+    expect(hasSort('wishlist')).toBe(true)
+    expect(hasSort('search')).toBe(false)
+    expect(hasSort('stats')).toBe(false)
+  })
+
+  it('отвечает по тому же набору, из которого берёт состояния', () => {
+    // Вторым списком это разошлось бы молча: раздел получил бы круг состояний,
+    // но не получил бы кнопку — или наоборот, кнопку без круга.
+    for (const section of ['rated', 'wishlist', 'search', 'stats']) {
+      expect(hasSort(section)).toBe(cycleOf(section) !== undefined)
     }
   })
 })

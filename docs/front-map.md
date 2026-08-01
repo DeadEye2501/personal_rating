@@ -8,32 +8,59 @@
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
-## app — 1 файлов
+## app — 2 файлов
 
-### app/App.svelte (12)
-- Корень страницы: показывает, дождалась ли она моста.
+### app/App.svelte (16)
+- Корень страницы: шапка и место под содержимое разделов.
+- берёт: ./Topbar.svelte
 
-## state — 3 файлов
+### app/Topbar.svelte (147)
+- Сборка шапки: три зоны и всё, что в них нажимается.
+- принимает: session, onsession, onsearch, onadd, onfilter
+
+## components — 4 файлов
+
+### components/Icon.svelte (6)
+- Глиф Material Symbols.
+- принимает: name, extra
+
+### components/SearchField.svelte (30)
+- Поле поиска с кнопкой очистки.
+- принимает: onsearch
+
+### components/Segmented.svelte (17)
+- Капсульный переключатель: один выбранный из нескольких.
+- принимает: items, chosen, onchoose
+
+### components/ToolButton.svelte (17)
+- Круглая кнопка ряда в шапке.
+- принимает: icon, dir, label, active, pressed, onclick, children
+
+## state — 4 файлов
 
 ### state/filters.js (103)
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, isEmpty, marked, passes
 
-### state/session.js (31)
+### state/redraw.js (16)
+- Перезапуск анимации: снять признак, заставить браузер пересчитать стили и * вернуть признак обратно. * * Пересчёт посреди — не украшение, а весь смысл. Браузер сличает состояние на * конец задачи, и снятый в той же задаче класс для него не снимался вовсе. * Отложить возврат кадром не помогает: колбэк `requestAnimationFrame` * выполняется **до** пересчёта стилей того же кадра. Чтение `offsetWidth` * пересчёт вызывает принудительно — приём, которым это сделано и в макете. * * Вынесено сразу, потому что второй потребитель известен и близок: тем же * приёмом отрастает гистограмма в плане 8.
+- отдаёт: redrawn
+
+### state/session.js (43)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: newSession, withCollapsed, withKind, withSection
+- отдаёт: newSession, withCollapsed, withKind, withNextSort, withSection, withToggledSection
 
-### state/sorting.js (65)
+### state/sorting.js (70)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
-- отдаёт: ADDED_AT, SORT_STATES, cycleOf, nextSort, orderFor, stateAt
+- отдаёт: ADDED_AT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-## styles — 3 файлов
+## styles — 7 файлов
 
-### styles/base.css (110)
+### styles/base.css (118)
 - Правила, действующие на всю страницу сразу, а не на её блок.
-- селекторы (14): *, *::before, *::after, [hidden], html, body, #root, body, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
+- селекторы (15): *, *::before, *::after, [hidden], html, body, #root, body, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
 .is-on > .material-symbols-outlined, .app, .app::before,
-.app::after, .app::before, .app::after, .app__main, @media (prefers-reduced-motion: reduce)
+.app::after, .app::before, .app::after, .app__main, .content, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
 ### styles/neon.css (49)
@@ -42,8 +69,30 @@
 - объявляет: --halo-h
 - берёт: --halo-h, --neon, --opaque
 
-### styles/palette.css (103)
+### styles/palette.css (107)
 - Единственное место, где есть цвет. По месту пишется только var().
 - селекторы (2): @property --primary, :root
-- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
+- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
+
+### styles/search.css (78)
+- Поле поиска в левой зоне шапки.
+- селекторы (11): .search, .search:hover, .search:focus-within, .search__icon, .search:focus-within .search__icon, .search__input, .search__input::placeholder, .search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration, .search__clear, .search__clear .material-symbols-outlined, .search__clear:hover
+- берёт: --body-l, --fill-primary-14, --primary, --r-full, --side-w, --text, --tint-035, --tint-05, --tint-06, --tint-10, --tint-28, --tint-35
+
+### styles/seg.css (46)
+- Капсула переключателя типа содержимого.
+- селекторы (6): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
+- берёт: --fill-primary-14, --primary, --r-full, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75, --title-s
+
+### styles/tools.css (83)
+- Ряд круглых кнопок в правой зоне шапки.
+- селекторы (13): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
+- берёт: --fill-primary-14, --primary, --r-full, --side-w, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75
+
+### styles/topbar.css (27)
+- Раскладка шапки: три зоны, из ширины которых выведен минимум окна.
+- селекторы (2): .topbar, .topbar__seg
+- объявляет: --corner, --side-w
+- берёт: --corner

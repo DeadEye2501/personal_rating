@@ -1,0 +1,78 @@
+/* Поле поиска в левой зоне шапки. */
+
+.search {
+  grid-column: 1;
+  width: var(--side-w);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 42px;                /* вровень с капсулой переключателя */
+  padding: 0 16px;
+  border-radius: var(--r-full);
+  background: var(--tint-035);
+  border: 1px solid var(--tint-06);
+  transition: background .18s, border-color .18s;
+}
+
+.search:hover {
+  background: var(--tint-05);
+  border-color: var(--tint-10);
+}
+
+.search:focus-within {
+  background: var(--tint-05);
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.search__icon {
+  flex: 0 0 auto;
+  font-size: 20px;
+  color: var(--tint-35);
+  transition: color .18s;
+}
+.search:focus-within .search__icon { color: var(--primary) }
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: var(--body-l);
+  caret-color: var(--primary);
+  user-select: text;
+}
+.search__input::placeholder { color: var(--tint-28) }
+
+/* Своя кнопка очистки вместо системной: та рисуется цветом ОС. */
+.search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration {
+  appearance: none;
+}
+
+.search__clear {
+  flex: 0 0 auto;
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin-right: -6px;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background .15s;
+}
+
+/* Центрируем межстрочным интервалом: у иконочного шрифта глиф сидит на базовой
+   линии, и выравнивание по коробке уводит его вниз. */
+.search__clear .material-symbols-outlined {
+  display: block;
+  width: 26px;
+  font-size: 18px;
+  line-height: 26px;
+  text-align: center;
+}
+.search__clear:hover { background: var(--fill-primary-14) }

@@ -7,5 +7,9 @@ import App from './app/App.svelte'
 import '$styles/palette.css'
 import '$styles/base.css'
 import '$styles/neon.css'
+import '$styles/topbar.css'
+import '$styles/search.css'
+import '$styles/seg.css'
+import '$styles/tools.css'
 
 export default mount(App, { target: document.getElementById('root') })

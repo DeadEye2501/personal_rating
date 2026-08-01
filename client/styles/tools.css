@@ -1,0 +1,83 @@
+/* Ряд круглых кнопок в правой зоне шапки. */
+
+/* Подложка та же, что у переключателя; кнопка 34px плюс отступы даёт ровно те
+   же 42px высоты. */
+.tools {
+  grid-column: 3;
+  width: var(--side-w);
+  display: flex;
+  justify-content: space-between;
+  padding: 3px;
+  border-radius: var(--r-full);
+  background: var(--tint-035);
+  border: 1px solid var(--tint-06);
+}
+
+.tools__btn {
+  position: relative;
+  flex: 0 0 auto;             /* иконки не должны сплющиваться в овалы */
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--tint-45);
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+.tools__btn .material-symbols-outlined { font-size: 19px }
+
+.tools__btn:hover {
+  background: var(--tint-05);
+  color: var(--tint-75);
+}
+
+.tools__btn.is-active {
+  background: var(--fill-primary-14);
+  color: var(--primary);
+}
+
+/* Сортировка: критерий крупной иконкой, направление — стрелкой в углу.
+   Критерий сдвинут, чтобы стрелка не наезжала на него.
+
+   В макете кнопка отбиралась по `data-role="sort"` — зацепке его собственного
+   JS. Здесь такой зацепки нет и заводить её незачем: стрелку направления несёт
+   ровно одна кнопка из девяти, и это то же самое множество. */
+.tools__btn:has(.tools__dir) .material-symbols-outlined {
+  transform: translate(-3px,-2px);
+}
+.tools__dir {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  font-size: 13px !important;
+  transform: none !important;
+}
+
+/* Гистограмма — не шрифтовой глиф, а SVG: столбики должны расти поодиночке, а
+   у иконки шрифта частей нет. */
+.tools__chart {
+  width: 19px;
+  height: 19px;
+  display: block;
+  fill: currentColor;
+}
+.tools__chart rect {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;   /* растём от пола, а не от центра */
+}
+
+/* Класс вешается на каждый щелчок, а не держится состоянием — иначе анимация
+   играла бы только при включении. */
+.is-drawing .tools__chart rect {
+  animation: bar-grow .42s cubic-bezier(.2,.8,.2,1) both;
+}
+.is-drawing .tools__chart rect:nth-child(2) { animation-delay: .07s }
+.is-drawing .tools__chart rect:nth-child(3) { animation-delay: .14s }
+
+@keyframes bar-grow {
+  from { transform: scaleY(0) }
+  to   { transform: scaleY(1) }
+}

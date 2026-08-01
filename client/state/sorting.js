@@ -42,6 +42,11 @@ const CYCLES = {
 // упасть громко, а не выдать чужой круг из восьми состояний.
 export const cycleOf = (section) => CYCLES[section]
 
+/** Есть ли у раздела переключатель вообще. Спрашивают отсюда, а не вторым
+ *  списком на стороне шапки: разойдясь, они дали бы разделу круг состояний без
+ *  кнопки — или кнопку без круга. */
+export const hasSort = (section) => section in CYCLES
+
 export const nextSort = (section, position) =>
   ((position ?? 0) + 1) % cycleOf(section).length
 
