@@ -151,13 +151,32 @@ def test_sorting_is_offered_exactly_where_the_base_can_sort():
 
 
 def test_the_page_maps_every_kind_to_a_genre_set_the_base_has():
-    """Наборов жанров два на три типа содержимого: фильмы и сериалы делят один.
-    Разъехавшись, таблица дала бы пустой список жанров в модалке — отказа тут
-    не будет, `GenreKind` неизвестного просто не найдёт в справочнике."""
+    """Наборов жанров два на три типа содержимого: игры берут свой, кино и
+    сериалы делят оставшийся. Разъехавшись, таблица привезла бы во вкладку
+    «Фильмы» игровые жанры — отказа тут не будет, отбор просто уйдёт номерами,
+    которых у типа не бывает.
+
+    Привязка выводится из перечислений, а не переписывается списком: список в
+    тесте расходится не с ожидаемым, а с самим собой. Тип, чьё имя есть и среди
+    наборов жанров, берёт одноимённый; остальным достаётся единственный
+    оставшийся."""
     table = keys_and_values("GENRE_KINDS", source("app/FiltersModal.svelte"))
+    own = {kind for kind in Kind if kind in set(GenreKind)}
+    shared, = set(GenreKind) - {GenreKind(kind) for kind in own}
 
     assert set(table) == set(Kind)
-    assert set(table.values()) == set(GenreKind)
+    assert {table[kind] for kind in own} == {kind for kind in own}
+    assert {table[kind] for kind in set(Kind) - own} == {shared}
+
+
+def test_the_page_actually_reads_the_genre_table():
+    """Сверка таблицы не замечает, что её перестали читать: `GENRE_KINDS[kind]`,
+    заменённое на голый `kind`, оставляет и её, и весь набор зелёными, а модалка
+    жанров начинает спрашивать справочник несуществующим `movie`.
+
+    Проверяется исходником, а не следствием, потому что следствие живёт в
+    разметке, а разметка по решению проекта не проверяется вовсе."""
+    assert "GENRE_KINDS[kind]" in source("app/FiltersModal.svelte")
 
 
 def keys_and_values(table: str, text: str) -> dict[str, str]:

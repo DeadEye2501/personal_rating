@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { EMPTY, chosen, cycled, isEmpty } from '$state/filters.js'
-import { newSession, withClearedFilter, withCollapsed, withFilters,
+import { collapsedOf, newSession, withClearedFilter, withCollapsed,
+  withFilters,
   withForgotten, withKind, withMark, withNextSort, withSection,
   withToggledSection }
   from '$state/session.js'
@@ -175,5 +176,59 @@ describe('удалённый тег', () => {
     const session = { ...newSession(), filters: cycled(EMPTY, 'tags', 3) }
 
     expect(chosen(withForgotten(session, 'tags', 3).filters).tag_ids).toEqual([])
+  })
+
+  it('уносит только себя, а не весь признак', () => {
+    // Иначе удаление одного тега гасило бы отбор по соседям, которых человек не
+    // трогал: это `cleared`, а не забвение.
+    const two = cycled(cycled(EMPTY, 'tags', 3), 'tags', 4)
+    const after = withForgotten({ ...newSession(), filters: two }, 'tags', 3)
+
+    expect(chosen(after.filters).tag_ids).toEqual([4])
+  })
+
+  it('исключённый не становится включённым', () => {
+    // Под `marked` удалённая метка перешла бы во включённые, и лента
+    // отбиралась бы по мертвецу — а выключить его нечем, строки уже нет.
+    const excluded = cycled(cycled(EMPTY, 'tags', 3), 'tags', 3)
+    const after = withForgotten({ ...newSession(), filters: excluded }, 'tags', 3)
+
+    expect(chosen(after.filters).tag_ids).toEqual([])
+    expect(chosen(after.filters).excluded_tag_ids).toEqual([])
+  })
+})
+
+describe('переходы над фильтрами оставляют сеанс сеансом', () => {
+  // Снятый спред уносит вместе с фильтрами тип, раздел, сортировку и
+  // свёрнутость: у трёх собратьев этот сторож есть, у этих двух не было.
+  const full = () => ({ ...newSession(), kind: 'game', section: 'rated',
+                        sort: 3, collapsed: true,
+                        filters: cycled(EMPTY, 'tags', 3) })
+
+  for (const [name, run] of [
+    ['withClearedFilter', (one) => withClearedFilter(one, 'tags')],
+    ['withForgotten', (one) => withForgotten(one, 'tags', 3)],
+  ]) {
+    it(`${name} не трогает ничего, кроме фильтров`, () => {
+      const after = run(full())
+
+      expect([after.kind, after.section, after.sort, after.collapsed])
+        .toEqual(['game', 'rated', 3, true])
+    })
+  }
+})
+
+describe('свёрнутость карточки', () => {
+  it('своё сильнее общего в обе стороны', () => {
+    // Тумблер шапки — состояние всего приложения, шеврон карточки — её
+    // собственное. Поменяй их местами, и шеврон перестанет значить что-либо:
+    // общее значение всегда булево, то есть всегда «сказано».
+    expect(collapsedOf({ collapsed: true }, false)).toBe(true)
+    expect(collapsedOf({ collapsed: false }, true)).toBe(false)
+  })
+
+  it('нетронутая карточка слушается тумблера', () => {
+    expect(collapsedOf({ collapsed: null }, true)).toBe(true)
+    expect(collapsedOf({}, false)).toBe(false)
   })
 })

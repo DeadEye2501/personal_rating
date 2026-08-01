@@ -13,8 +13,8 @@
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
   const PAGE = 50
 
-  let { session, expected = [], root = null, tagged = {}, ontrouble, onmark,
-        onperson, onopen, ontag } = $props()
+  let { session, expected = [], root = null, tagged = {}, forgotten = [],
+        ontrouble, onmark, onperson, onopen, ontag } = $props()
 
   let views = $state([])
   let done = $state(false)
@@ -29,11 +29,16 @@
   // ленту с начала, роняя прокрутку.
   const asked = $derived(JSON.stringify(requestOf(session)))
 
-  // Метки, только что проставленные в модалке, накладываются поверх прочитанного:
-  // перечитывать страницу ленты ради одной строки незачем, а следующее чтение
-  // привезёт их уже из базы, и наложение станет пустым делом.
-  const cards = $derived(views.map((view) =>
-    tagged[view.item_id] ? { ...view, tags: tagged[view.item_id] } : view))
+  // Правки набора накладываются поверх прочитанного: перечитывать страницу
+  // ленты ради одной метки незачем, а следующее чтение привезёт их уже из базы.
+  // Проставленное в модалке заменяет метки карточки целиком, удалённое
+  // вычитается у всех — оно приехало из базы вместе с карточками.
+  const cards = $derived(views.map((view) => {
+    const tags = (tagged[view.item_id] ?? view.tags)
+      .filter((tag) => !forgotten.includes(tag.id))
+    return tags.length === view.tags.length && !tagged[view.item_id]
+      ? view : { ...view, tags }
+  }))
 
   const lost = (error, text) => reported(error, 'раздел библиотеки',
                                          () => ontrouble(text))

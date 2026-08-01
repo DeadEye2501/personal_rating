@@ -14,7 +14,7 @@
 
 ## app — 10 файлов
 
-### app/App.svelte (173)
+### app/App.svelte (180)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
@@ -28,9 +28,9 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/LibraryScreen.svelte (120)
+### app/LibraryScreen.svelte (125)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
-- принимает: session, expected, root, tagged, ontrouble, onmark, onperson, onopen, ontag
+- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, ontag
 - берёт: ./trouble.js, ./visible.js
 
 ### app/SearchScreen.svelte (118)
