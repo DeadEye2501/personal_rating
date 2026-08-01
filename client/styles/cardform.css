@@ -43,9 +43,7 @@
 .cardform__row .field { flex: 1 }
 .cardform__row .field--short { flex: 0 0 92px }
 
-/* Пропорция та же, что у обложки в ленте: постер обрезается под 2:3. Отзыв на
-   наведение придёт вместе с выбором картинки — пока коробка ни на что не
-   откликается, и обещать обратное ей нечем. */
+/* Пропорция та же, что у обложки в ленте: постер обрезается под 2:3. */
 .cardform__poster {
   flex: 0 0 var(--poster-w);
   align-self: flex-start;
@@ -55,4 +53,13 @@
   border: 1px solid var(--tint-18);
   border-radius: 8px;
   color: var(--tint-22);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .16s, color .16s;
+}
+.cardform__poster .material-symbols-outlined { font-size: 56px }
+
+.cardform__poster:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }

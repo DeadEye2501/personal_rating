@@ -1,14 +1,15 @@
 <!-- Обложка карточки с заглушкой. -->
 <script>
   import Icon from '$components/Icon.svelte'
-
-  let { item_id = null, source = '', poster_url = '' } = $props()
+  import { bySource, byItem } from '$state/covers.js'
 
   // У кандидата номера нет — он ещё не в базе, и обложку тогда не сохраняют.
   // Ручка одна, различаются только доводы.
+  let { item_id = null, source = '', poster_url = '' } = $props()
+
   const address = $derived(item_id
-    ? `/poster?item=${item_id}`
-    : poster_url && `/poster?source=${source}&url=${encodeURIComponent(poster_url)}`)
+    ? byItem(item_id)
+    : poster_url && bySource(source, poster_url))
 
   // Помнится сорвавшийся адрес, а не признак «сломано»: признак заглушку уже
   // не снял бы никогда. А снимать надо — бэкенд обещает повторить попытку при

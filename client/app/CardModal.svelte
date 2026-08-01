@@ -4,6 +4,7 @@
   import Field from '$components/Field.svelte'
   import Modal from '$components/Modal.svelte'
   import Picker from '$components/Picker.svelte'
+  import PosterPick from '$components/PosterPick.svelte'
   import { call } from '$api/bridge.js'
   import { emptyCard, shownFor } from '$state/card.js'
   import { ROLES } from '$state/credits.js'
@@ -16,6 +17,11 @@
   // Тип берётся из тумблера шапки и отдельно не спрашивается. Смениться под
   // открытым окном он не может: тумблер закрыт наложением.
   let form = $state(emptyCard(kind))
+
+  // Выбранная обложка, base64. Рядом с формой, а не в ней: записывается она
+  // отдельным вызовом и после карточки — хранилище обложек ключуется по номеру,
+  // а у новой карточки номера ещё нет.
+  let picture = $state(null)
 
   const shown = new Set(shownFor(kind))
 
@@ -107,7 +113,11 @@
 <Modal card label="Карточка" {onclose}>
   {#snippet children()}
     <div class="cardform__top">
-      <div class="cardform__poster"></div>
+      <!-- Картинка лежит рядом с формой, а не в ней: поля формы — это поля
+           карточки, а обложка живёт вторым файлом базы и уезжает отдельным
+           вызовом уже после записи, когда у карточки появился номер. -->
+      <PosterPick onpicked={(data) => { picture = data }}
+                  ontrouble={(text) => ontrouble(text)} />
 
       <div class="cardform__fields">
         <Field bind:value={form.title} placeholder="Название" variant="field--title" />

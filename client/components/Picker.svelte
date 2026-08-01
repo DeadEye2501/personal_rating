@@ -2,6 +2,7 @@
 <script>
   import Field from '$components/Field.svelte'
   import Icon from '$components/Icon.svelte'
+  import { byItem } from '$state/covers.js'
   import { beside } from '$state/popup.js'
 
   // Разделитель строки подсказки: `U+2022 BULLET`. Обычная точка не годится —
@@ -52,7 +53,7 @@
   let list = $state()
 
   const poster = $derived(hovered?.hint_item_id
-    ? `/poster?item=${hovered.hint_item_id}` : '')
+    ? byItem(hovered.hint_item_id) : '')
 
   // Набранное расходится обработчиком, а не эффектом по `text`: эффект читал бы
   // и `ontype`, а его сборка пересоздаёт на каждой перерисовке — вышел бы

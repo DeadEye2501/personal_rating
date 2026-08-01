@@ -18,7 +18,7 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/CardModal.svelte (166)
+### app/CardModal.svelte (176)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: kind, onsave, onclose, ontrouble
 - берёт: ./trouble.js
@@ -68,7 +68,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 27 файлов
+## components — 28 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -126,13 +126,17 @@
 - Форма заведения тега.
 - принимает: oncreate
 
-### components/Picker.svelte (204)
+### components/Picker.svelte (205)
 - Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
 - принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
-### components/Poster.svelte (28)
+### components/Poster.svelte (29)
 - Обложка карточки с заглушкой.
 - принимает: item_id, source, poster_url
+
+### components/PosterPick.svelte (93)
+- Обложка карточки: выбрать файлом, перетаскиванием или из буфера.
+- принимает: onpicked, ontrouble
 
 ### components/ScoreRow.svelte (24)
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
@@ -178,11 +182,15 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, disabled, onclick, children
 
-## state — 17 файлов
+## state — 18 файлов
 
-### state/card.js (39)
+### state/card.js (40)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
 - отдаёт: emptyCard, shownFor
+
+### state/covers.js (10)
+- Адрес обложки у своей ручки.
+- отдаёт: byItem, bySource
 
 ### state/credits.js (19)
 - Роли состава: какие бывают и в чьём справочнике живёт каждая.
@@ -276,11 +284,11 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
-### styles/cardform.css (58)
+### styles/cardform.css (65)
 - Раскладка окна создания и правки карточки.
-- селекторы (7): .modal--card, .cardform__top, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__poster
+- селекторы (9): .modal--card, .cardform__top, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover
 - объявляет: --col-gap, --field-h, --poster-w, --row-gap
-- берёт: --col-gap, --poster-w, --row-gap, --tint-18, --tint-22
+- берёт: --col-gap, --poster-w, --primary, --row-gap, --tint-18, --tint-22
 
 ### styles/chart.css (92)
 - Гистограмма оценок и её подвал.
@@ -314,7 +322,7 @@
 .newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (125)
+### styles/film.css (130)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
 .film.is-collapsed .film__poster,
@@ -322,7 +330,8 @@
 .film.is-collapsed .film__facts,
 .film.is-collapsed .film__synopsis,
 .film.is-collapsed .film__aggr,
-.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film.is-collapsed .film__scores, .film__poster, .film__poster .material-symbols-outlined, .film__poster img, .film__body, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
+.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film.is-collapsed .film__scores, .film__poster, .film__poster .material-symbols-outlined, .film__poster img,
+.cardform__poster img, .film__body, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
 - объявляет: --gutter, --icon-inset
 - берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
