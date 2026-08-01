@@ -12,7 +12,7 @@ Vitest не читает `bridge/`. Ломаются они по-разному,
 import re
 from pathlib import Path
 
-from backend.model import Kind, Section, Sort
+from backend.model import IdSource, Kind, RatingSource, Section, Sort
 from bridge.feed import FILTER_FIELDS
 
 WEB = Path(__file__).resolve().parents[2] / "client"
@@ -37,6 +37,23 @@ def values_of(table: str, text: str) -> set[str]:
     return set(re.findall(r"value: '(\w+)'", text[start:text.index("]", start)]))
 
 
+def keys_of(table: str, text: str) -> set[str]:
+    """Ключи словаря `const ИМЯ = { ... }`.
+
+    Скобки считаются, а не ищутся первой закрывающей: `${...}` внутри шаблонной
+    строки оборвал бы словарь на середине. Сами шаблоны выкидываются до разбора
+    — иначе `https:` в адресе читается ключом."""
+    opened = text.index("{", text.index(f"const {table} = {{"))
+    depth, end = 0, len(text)
+    for index in range(opened, len(text)):
+        depth += {"{": 1, "}": -1}.get(text[index], 0)
+        if not depth:
+            end = index
+            break
+    return set(re.findall(r"[{,]\s*(\w+):",
+                          re.sub(r"`[^`]*`", "''", text[opened:end])))
+
+
 def test_the_page_names_exactly_what_the_bridge_reads():
     assert named_in_chosen() == set(FILTER_FIELDS)
 
@@ -56,6 +73,27 @@ def test_the_switch_offers_exactly_the_orders_the_base_supports():
     keys = set(re.findall(r"key: '?(\w+)'?,", source("state/sorting.js")))
     # `ADDED_AT` в таблице стоит именем константы, а не строкой.
     assert (keys - {"ADDED_AT"}) | {Sort.ADDED_AT} == set(Sort)
+
+
+def test_every_rating_source_has_a_scale_and_a_name():
+    """Оценки приезжают ключами `RatingSource`, а страница берёт по ним шкалу и
+    подпись. Разъехавшись, они молчат вдвойне: неизвестная шкала уходит в
+    запасную десятибалльную, неизвестное имя показывается сырым ключом."""
+    page = source("state/sources.js")
+
+    assert keys_of("MAX", page) == set(RatingSource)
+    assert keys_of("NAMES", page) == set(RatingSource)
+
+
+def test_pages_are_built_only_for_ids_that_are_actually_stored():
+    """Адрес собирается по чужому идентификатору, а чужими сегодня приезжают
+    только IMDb и Кинопоиск: `IdSource` знает ещё Steam и GOG, но их не пишет
+    ни один клиент. Строка про источник, которого в перечислении нет вовсе, —
+    это ссылка в никуда."""
+    built = keys_of("PAGES", source("state/sources.js"))
+
+    assert built <= set(IdSource)
+    assert built == {IdSource.IMDB, IdSource.KINOPOISK}
 
 
 def test_sorting_is_offered_exactly_where_the_base_can_sort():
