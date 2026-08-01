@@ -115,7 +115,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (89)
+### components/Film.svelte (94)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -338,7 +338,7 @@
 .newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (131)
+### styles/film.css (151)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
 .film.is-collapsed .film__poster,
@@ -346,10 +346,11 @@
 .film.is-collapsed .film__facts,
 .film.is-collapsed .film__synopsis,
 .film.is-collapsed .film__aggr,
-.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film.is-collapsed .film__scores, .film__poster, .film__poster .material-symbols-outlined, .film__poster img,
-.cardform__poster img, .film__body, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
-- объявляет: --gutter, --icon-inset
-- берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
+.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film__poster, .film__poster .material-symbols-outlined, .film__poster img,
+.cardform__poster img, .film__body, .film__top,
+.film__bottom, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
+- объявляет: --gutter, --icon-inset, --row-gap
+- берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --row-gap, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
 ### styles/iconbutton.css (40)
 - Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска.

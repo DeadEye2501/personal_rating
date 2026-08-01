@@ -34,56 +34,61 @@
   <Poster item_id={view.item_id} source={view.source} poster_url={view.poster_url}
           cover={view.cover} />
 
+  <!-- Две группы вместо строк подряд: зачем — в `film.css`, у раскладки тела. -->
   <div class="film__body">
-    <h2 class="film__title">{title}</h2>
+    <div class="film__top">
+      <h2 class="film__title">{title}</h2>
 
-    <Chips genres={view.genres} tags={view.tags} {on} {onmark}
-           ontag={view.item_id ? () => ontag(view) : null} />
-    <Facts {view} {onperson} />
-    <Synopsis text={view.synopsis} />
+      <Chips genres={view.genres} tags={view.tags} {on} {onmark}
+             ontag={view.item_id ? () => ontag(view) : null} />
+      <Facts {view} {onperson} />
+      <Synopsis text={view.synopsis} />
+    </div>
 
-    <!-- Кружок ожидания — только у того, кого действительно спрашивают. У
-         кандидата поиска номера строки нет, оценки агрегаторов за него никто
-         не просит, и пять колец крутились бы вечно на главном экране. -->
-    <Aggregates external={view.external} expected={view.item_id ? expected : []}
-                ids={view.external_ids} {onopen} />
+    <div class="film__bottom">
+      <!-- Кружок ожидания — только у того, кого действительно спрашивают. У
+           кандидата поиска номера строки нет, оценки агрегаторов за него никто
+           не просит, и пять колец крутились бы вечно на главном экране. -->
+      <Aggregates external={view.external} expected={view.item_id ? expected : []}
+                  ids={view.external_ids} {onopen} />
 
-    <!-- Ряд действий живёт внутри строки оценки, а не рядом с телом: он
-         отсчитывает своё место от её правого края, и вынесенный выше уезжает
-         за карточку. У игры это последняя из трёх строк. -->
-    {#if view.kind === 'game'}
-      {#each ASPECTS as aspect, index (aspect.key)}
-        <div class="film__scores film__scores--aspect">
-          <span class="film__aspect">{aspect.label}</span>
-          <Stars score={rating?.[aspect.key] ?? null}
-                 onpick={(value) => onaspect(view, aspect.key, value)} />
-          <!-- Ярлык стоит у каждой стороны своим, а не один на все три: так в
-               макете, и иначе «Отлично» у визуала было бы неотличимо от
-               «Отлично» у геймплея. -->
-          <span class="film__verdict"
-                style:--score={toneOf(rating?.[aspect.key] ?? null)}
-          >{verdictOf(rating?.[aspect.key] ?? null)}</span>
-          {#if index === ASPECTS.length - 1}
-            <Acts saved={view.item_id !== null} wished={view.in_wishlist}
-                  onedit={() => onedit(view)}
-                  ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
-          {/if}
+      <!-- Ряд действий живёт внутри строки оценки, а не рядом с телом: он
+           отсчитывает своё место от её правого края, и вынесенный выше уезжает
+           за карточку. У игры это последняя из трёх строк. -->
+      {#if view.kind === 'game'}
+        {#each ASPECTS as aspect, index (aspect.key)}
+          <div class="film__scores film__scores--aspect">
+            <span class="film__aspect">{aspect.label}</span>
+            <Stars score={rating?.[aspect.key] ?? null}
+                   onpick={(value) => onaspect(view, aspect.key, value)} />
+            <!-- Ярлык стоит у каждой стороны своим, а не один на все три: так в
+                 макете, и иначе «Отлично» у визуала было бы неотличимо от
+                 «Отлично» у геймплея. -->
+            <span class="film__verdict"
+                  style:--score={toneOf(rating?.[aspect.key] ?? null)}
+            >{verdictOf(rating?.[aspect.key] ?? null)}</span>
+            {#if index === ASPECTS.length - 1}
+              <Acts saved={view.item_id !== null} wished={view.in_wishlist}
+                    onedit={() => onedit(view)}
+                    ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+            {/if}
+          </div>
+        {/each}
+        <div class="film__scores film__scores--avg">
+          <Stars score={mean} />
+          <span class="film__verdict" style:--score={toneOf(mean)}
+          >{verdictOf(mean)}</span>
         </div>
-      {/each}
-      <div class="film__scores film__scores--avg">
-        <Stars score={mean} />
-        <span class="film__verdict" style:--score={toneOf(mean)}
-        >{verdictOf(mean)}</span>
-      </div>
-    {:else}
-      <div class="film__scores">
-        <Stars score={mean} onpick={(value) => onscore(view, value)} />
-        <span class="film__verdict" style:--score={toneOf(mean)}
-        >{verdictOf(mean)}</span>
-        <Acts saved={view.item_id !== null} wished={view.in_wishlist}
-              onedit={() => onedit(view)}
-              ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
-      </div>
-    {/if}
+      {:else}
+        <div class="film__scores">
+          <Stars score={mean} onpick={(value) => onscore(view, value)} />
+          <span class="film__verdict" style:--score={toneOf(mean)}
+          >{verdictOf(mean)}</span>
+          <Acts saved={view.item_id !== null} wished={view.in_wishlist}
+                onedit={() => onedit(view)}
+                ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+        </div>
+      {/if}
+    </div>
   </div>
 </article>
