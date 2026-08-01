@@ -58,7 +58,7 @@
            отработал, ждать нечего — спросить могло оказаться нечем (нет
            `imdb_id`) или некого (источник отказал), и строки в базе не
            появится. И там и там кольца крутились бы вечно. -->
-      <Aggregates external={view.external} ids={view.external_ids} {onopen}
+      <Aggregates {view} {onopen}
                   expected={view.item_id && !view.enriched ? expected : []} />
 
       <!-- Ряд действий живёт внутри строки оценки, а не рядом с телом: он

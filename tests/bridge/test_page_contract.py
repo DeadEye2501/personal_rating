@@ -104,6 +104,28 @@ def test_every_rating_source_has_a_scale_and_a_name():
     assert keys_of("NAMES", page) == set(RatingSource)
 
 
+def test_every_rating_source_has_a_place_in_the_row():
+    """Порядок в ряду оценок назван списком, и в нём обязаны стоять все семь.
+    Пропущенный уходит в конец — это задумано для восьмого, которого ещё нет, —
+    и потому пропажа знакомого прошла бы молча, поменяв ряд местами."""
+    page = source("state/sources.js")
+    start = page.index("const ORDER = [")
+
+    listed = re.findall(r"'([a-z]+)'", page[start:page.index("]", start)])
+
+    assert set(listed) == set(RatingSource)
+    assert len(listed) == len(set(listed))
+
+
+def test_the_tmdb_link_is_built_for_kinds_the_backend_knows():
+    """У TMDB фильмы и сериалы нумеруются порознь, и путь у них разный. Ключ,
+    разъехавшийся с `Kind`, оставил бы карточку без ссылки — молча."""
+    built = keys_of("TMDB_PATHS", source("state/sources.js"))
+
+    assert built <= set(Kind)
+    assert built == {Kind.MOVIE, Kind.SERIES}
+
+
 def test_pages_are_built_only_for_ids_that_are_actually_stored():
     """Адрес собирается по чужому идентификатору, а чужими сегодня приезжают
     только IMDb и Кинопоиск: `IdSource` знает ещё Steam и GOG, но их не пишет

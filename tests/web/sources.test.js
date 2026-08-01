@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { stepOf } from '$state/scores.js'
-import { nameOf, pagesOf, shownValue, stepOfSource } from '$state/sources.js'
+import {
+  inOrder, nameOf, pagesOf, shownValue, stepOfSource,
+} from '$state/sources.js'
 
 describe('оценка агрегатора в строке', () => {
   it('десятибалльная всегда с десятой долей', () => {
@@ -81,30 +83,87 @@ describe('имя источника', () => {
   })
 })
 
+describe('порядок оценок в ряду', () => {
+  it('один и тот же, каким бы ни был порядок прихода', () => {
+    // Решено пользователем 02.08.2026: TMDB, IMDb, Кинопоиск, Metacritic,
+    // Rotten Tomatoes. Раньше порядок выводился из объявлений оценочных
+    // клиентов и ехал от их перестановки в сборке.
+    expect(inOrder(['rotten', 'imdb', 'tmdb', 'metacritic', 'kinopoisk']))
+      .toEqual(['tmdb', 'imdb', 'kinopoisk', 'metacritic', 'rotten'])
+  })
+
+  it('у игр свои источники, и магазин идёт впереди агрегатора', () => {
+    // Список один на все семь, а карточка бывает либо кино, либо игрой:
+    // столкнуться источникам негде.
+    expect(inOrder(['metacritic', 'gog', 'steam']))
+      .toEqual(['steam', 'gog', 'metacritic'])
+  })
+
+  it('незнакомый уходит в конец, не роняя остальных', () => {
+    // Восьмой источник когда-нибудь появится, и до правки списка он обязан
+    // просто показаться, а не пропасть и не встать в середину.
+    expect(inOrder(['кто-то новый', 'imdb', 'tmdb']))
+      .toEqual(['tmdb', 'imdb', 'кто-то новый'])
+  })
+})
+
 describe('адрес страницы источника', () => {
+  const view = (fields) => ({ source: 'tmdb', source_id: '157336',
+                              kind: 'movie', external_ids: [], ...fields })
+
   it('собирает адрес там, где идентификатор хранится', () => {
     // Адрес целиком, а не по кусочку: перепутанный путь `/name/` вместо
     // `/title/` даёт живую ссылку в никуда, и видно это только там, куда
     // человек уже ушёл.
-    const found = pagesOf([{ source: 'imdb', value: 'tt0816692' }])
+    const found = pagesOf(view({
+      external_ids: [{ source: 'imdb', value: 'tt0816692' }],
+    }))
 
     expect(found.get('imdb')).toBe('https://www.imdb.com/title/tt0816692/')
   })
 
   it('каждый источник ведёт на свой сайт', () => {
-    const found = pagesOf([
-      { source: 'imdb', value: 'tt0816692' },
-      { source: 'kinopoisk', value: '258687' },
-    ])
+    const found = pagesOf(view({
+      external_ids: [
+        { source: 'imdb', value: 'tt0816692' },
+        { source: 'kinopoisk', value: '258687' },
+      ],
+    }))
 
     expect(found.get('kinopoisk')).toBe('https://www.kinopoisk.ru/film/258687/')
-    expect(found.size).toBe(2)
+  })
+
+  it('у карточки из TMDB адрес собирается из неё самой', () => {
+    // Номер TMDB не чужой: он собственный номер карточки, и в списке чужих
+    // идентификаторов его нет вовсе. Отсюда и не было ссылки на основной для
+    // нас источник.
+    expect(pagesOf(view({})).get('tmdb'))
+      .toBe('https://www.themoviedb.org/movie/157336')
+  })
+
+  it('у сериала путь другой, чем у фильма', () => {
+    // У TMDB фильмы и сериалы нумеруются порознь, и номера пересекаются:
+    // общий путь увёл бы на чужую карточку, а не в никуда.
+    expect(pagesOf(view({ kind: 'series', source_id: '83867' })).get('tmdb'))
+      .toBe('https://www.themoviedb.org/tv/83867')
+  })
+
+  it('у карточки из магазина адреса TMDB нет', () => {
+    // Номер там свой, магазинный, и подставить его в адрес TMDB значит увести
+    // человека на чужую карточку.
+    const found = pagesOf(view({ source: 'steam', source_id: '292030',
+                                 kind: 'game' }))
+
+    expect(found.has('tmdb')).toBe(false)
   })
 
   it('молчит там, где идентификатора нет вовсе', () => {
     // У Rotten и Metacritic оценки приезжают внутри чужого ответа, своего
     // идентификатора мы не храним — и адреса у них нет.
-    const found = pagesOf([{ source: 'rotten', value: 'что угодно' }])
+    const found = pagesOf(view({
+      source: 'steam', kind: 'game',
+      external_ids: [{ source: 'rotten', value: 'что угодно' }],
+    }))
 
     expect(found.has('rotten')).toBe(false)
     expect(found.size).toBe(0)
@@ -113,7 +172,10 @@ describe('адрес страницы источника', () => {
   it('молчит и там, где идентификатор есть, а собрать из него нечего', () => {
     // У GOG в адресе стоит слаг, а хранится номер каталога. Сам номер при этом
     // настоящий и нужен — им спрашивают каталог.
-    const found = pagesOf([{ source: 'gog', value: '1207658930' }])
+    const found = pagesOf(view({
+      source: 'steam', kind: 'game',
+      external_ids: [{ source: 'gog', value: '1207658930' }],
+    }))
 
     expect(found.has('gog')).toBe(false)
   })

@@ -28,17 +28,39 @@ const NAMES = { imdb: 'IMDb', kinopoisk: 'Кинопоиск', tmdb: 'TMDB',
                 rotten: 'Rotten Tomatoes', metacritic: 'Metacritic',
                 steam: 'Steam', gog: 'GOG' }
 
+/* Порядок в ряду, один и тот же всегда — решено пользователем 02.08.2026:
+ * TMDB, IMDb, Кинопоиск, Metacritic, Rotten Tomatoes. Раньше он выводился из
+ * того, что объявляют оценочные клиенты, и ехал от их перестановки в сборке.
+ *
+ * Список один на все семь. Кино и игры делят из них только Metacritic, и место
+ * ему выбрано так, чтобы годилось обоим: у кино он между Кинопоиском и Rotten,
+ * у игр — после магазина. Порядок игр решён исполнителем, а не пользователем:
+ * тот назвал только пятёрку кино. */
+const ORDER = ['tmdb', 'imdb', 'kinopoisk', 'steam', 'gog', 'metacritic',
+               'rotten']
+
+/** Источники в постоянном порядке. Незнакомый уходит в конец, а не пропадает:
+ *  восьмой когда-нибудь появится, и до правки списка он обязан показаться. */
+export const inOrder = (sources) =>
+  [...sources].sort((one, other) => _place(one) - _place(other))
+
+const _place = (source) => {
+  const at = ORDER.indexOf(source)
+  return at === -1 ? ORDER.length : at
+}
+
 /* Адрес есть только там, где его есть из чего собрать, и это не то же самое,
- * что «оценка приехала». Оценок семь, а собираемых адресов два:
+ * что «оценка приехала». Оценок семь, а собираемых адресов три, и берутся они
+ * из двух разных мест:
  *
  * - у Rotten и Metacritic идентификатора нет вовсе — их оценки приезжают
  *   внутри чужого ответа;
  * - `IdSource` знает ещё Steam и GOG, но не пишет их сегодня ни один клиент:
  *   чужими идентификаторами приезжают только IMDb и Кинопоиск. У GOG вдобавок
  *   в адресе стоит слаг, а хранится номер каталога — собрать из номера нечего;
- * - у TMDB, Steam и GOG номер бывает у самой карточки, а не среди чужих:
- *   это её собственный источник, и лежит он в `source_id`. Оттуда адрес и
- *   соберётся, когда карточка появится.
+ * - у TMDB номер не чужой, а собственный номер карточки, и лежит он в
+ *   `source_id`. Отсюда и не было ссылки на основной для нас источник: её
+ *   искали среди чужих идентификаторов, где её нет и быть не может.
  *
  * Имя без адреса остаётся подписью: оно не подсвечивается и не отзывается ни
  * на наведение, ни на щелчок. */
@@ -46,6 +68,10 @@ const PAGES = {
   imdb: (value) => `https://www.imdb.com/title/${value}/`,
   kinopoisk: (value) => `https://www.kinopoisk.ru/film/${value}/`,
 }
+
+// У TMDB фильмы и сериалы нумеруются порознь, и номера пересекаются: общий путь
+// увёл бы на чужую карточку, а не в никуда.
+const TMDB_PATHS = { movie: 'movie', series: 'tv' }
 
 export const stepOfSource = (value, source) => stepOf(value, MAX[source] ?? 10)
 
@@ -67,11 +93,18 @@ export const shownValue = (value, source) =>
 /** Незнакомый показывается как есть: пустая подпись хуже неказистой. */
 export const nameOf = (source) => NAMES[source] ?? source
 
-/** Источник → адрес, только для тех, у кого он собирается. */
-export function pagesOf(externals) {
+/** Источник → адрес, только для тех, у кого он собирается.
+ *
+ *  Берёт карточку целиком, а не список чужих идентификаторов: у своего
+ *  источника номер лежит в ней самой. */
+export function pagesOf(view) {
   const found = new Map()
-  for (const { source, value } of externals) {
+  for (const { source, value } of view.external_ids ?? []) {
     if (PAGES[source]) found.set(source, PAGES[source](value))
+  }
+  const path = view.source === 'tmdb' ? TMDB_PATHS[view.kind] : null
+  if (path) {
+    found.set('tmdb', `https://www.themoviedb.org/${path}/${view.source_id}`)
   }
   return found
 }

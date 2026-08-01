@@ -91,9 +91,9 @@
 - Ряд действий карточки: правка, удаление, закладка.
 - принимает: wished, onedit, ondelete, onwish
 
-### components/Aggregates.svelte (68)
+### components/Aggregates.svelte (70)
 - Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой.
-- принимает: external, expected, ids, onopen
+- принимает: view, expected, onopen
 
 ### components/Bar.svelte (16)
 - Столбец гистограммы: заливка, число над верхушкой и подпись оценки.
@@ -273,9 +273,9 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (77)
+### state/sources.js (110)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
-- отдаёт: MANUAL, nameOf, pagesOf, shownValue, stepOfSource
+- отдаёт: MANUAL, inOrder, nameOf, pagesOf, shownValue, stepOfSource
 
 ## styles — 29 файлов
 
