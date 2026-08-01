@@ -8,14 +8,15 @@
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
-## app — 5 файлов
+## app — 6 файлов
 
 ### app/App.svelte (64)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
 
-### app/LibraryScreen.svelte (33)
-- Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Черновик: спрашивает одно и то же и ничем не управляет — настоящий раздел собирает задача 6.
+### app/LibraryScreen.svelte (53)
+- Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Черновик: раздел не выбирается, фильтры и сортировка не передаются — это задача 6.
+- берёт: ./visible.js
 
 ### app/SearchScreen.svelte (2)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Пока пуст.
@@ -27,7 +28,11 @@
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
 
-## components — 13 файлов
+### app/visible.js (60)
+- Что делать с карточкой, попавшей в поле зрения.
+- отдаёт: onCardShown, stale
+
+## components — 14 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -44,6 +49,10 @@
 ### components/Facts.svelte (45)
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
 - принимает: view, onperson
+
+### components/Feed.svelte (75)
+- Список карточек, который растёт порциями и не знает своей полной длины.
+- принимает: views, collapsed, expected, onmore, onshown, ...card
 
 ### components/Film.svelte (81)
 - Карточка ленты целиком.
