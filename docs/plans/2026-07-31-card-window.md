@@ -47,10 +47,10 @@
 personal_rating/
 ├─ client/
 │  ├─ styles/
-│  │  ├─ field.css               поле ввода: подчёркивание, подсказка
+│  │  ├─ field.css               **уже есть** (план 8): общее у строк ввода
 │  │  ├─ cardform.css            раскладка окна карточки
 │  │  ├─ picker.css              поле с подсказкой и выбранным
-│  │  └─ btn.css                 кнопки подвала окна
+│  │  └─ modalfoot.css           **уже есть** (план 8): ряд кнопок окна
 │  ├─ components/
 │  │  ├─ Field.svelte            строка ввода
 │  │  ├─ Picker.svelte           поле с подсказкой имён
@@ -62,7 +62,7 @@ personal_rating/
 │  └─ app/
 │     ├─ CardModal.svelte        окно создания и правки
 │     ├─ LinkField.svelte        вставка ссылки и привязка
-│     └─ Confirm.svelte          подтверждение и предупреждение
+│     └─ (Confirm.svelte **уже есть**, план 8: client/components/)
 └─ tests/web/
    ├─ card.test.js               поля по типу, пустое и занятое
    └─ removal.test.js            фраза потери: только непустое, склонение
@@ -87,7 +87,10 @@ personal_rating/
 подсказкой: десяток линий разом превращает окно в бланк.
 
 **Файлы:**
-- Создать: `client/styles/field.css`, `cardform.css`, `btn.css`
+- Создать: `client/styles/cardform.css`
+- **Не создавать:** `field.css` и `modalfoot.css` (бывший `btn.css`) заведены
+  планом 8 — второй экземпляр каждого стоял в проекте раньше, чем дошёл
+  план 9
 - Создать: `client/components/Field.svelte`, `Button.svelte`
 - Создать: `client/state/card.js`, `tests/web/card.test.js`
 - Создать: `client/app/CardModal.svelte`
@@ -204,7 +207,9 @@ export const emptyCard = (kind) => ({
 
 - [ ] **Шаг 4: Перенести поле ввода**
 
-Создать `client/styles/field.css` — перенос `docs/design/index.html:996-1054`.
+`client/styles/field.css` **уже создан планом 8** — общее у строки поиска и
+формы нового тега. Окну карточки остаётся применить класс `field__input` и
+дописать своё; переносить заново нечего.
 Правила `.newtag__input` из плана 8 **удаляются из `newtag.css`** и переезжают
 сюда: в макете строка ввода одна на всё окно и на форму нового тега, отличаются
 только обёртки.
@@ -370,7 +375,9 @@ export const emptyCard = (kind) => ({
 Правило `img` обрезает залитый постер по рамке: приехавший из источника уже
 2:3, а выбранный руками какой угодно.
 
-Создать `client/styles/btn.css` — перенос `index.html:1162-1184`:
+`client/styles/modalfoot.css` **уже создан планом 8** — ряд ответных кнопок
+окна вместе с `.btn`, `.btn--cancel`, `.btn--go`, `.btn--danger`. Ниже —
+то, что было бы перенесено; сверить и не заводить второй раз:
 
 ```css
 /* Ни подложки, ни рамки в покое — кнопка это надпись, и обе одинаково блёклы.
@@ -507,7 +514,7 @@ export const emptyCard = (kind) => ({
 ```js
 import '$styles/field.css'
 import '$styles/cardform.css'
-import '$styles/btn.css'
+import '$styles/modalfoot.css'  // уже подключён планом 8
 ```
 
 Открыть окно кнопкой «+» шапки (`onadd` в `App.svelte`).
@@ -994,7 +1001,9 @@ git commit -m "feat: постер тремя способами вставки"
 фильмов с одинаковыми названиями много. Молчать тоже нельзя: так плодятся дубли.
 
 **Файлы:**
-- Создать: `client/app/Confirm.svelte`
+- **Не создавать:** `Confirm` заведён планом 8 в `client/components/` вместе с
+  первым потребителем — удалением тега с носителями. Его входные:
+  `label`, `text`, `ok`, `danger`, `onyes`, `onclose`
 - Изменить: `client/app/CardModal.svelte`, `client/app/App.svelte`
 
 **Интерфейсы:**
@@ -1004,7 +1013,7 @@ git commit -m "feat: постер тремя способами вставки"
 
 - [ ] **Шаг 1: Написать подтверждение**
 
-`client/app/Confirm.svelte` — одна оболочка на предупреждение о совпадении и на
+`client/components/Confirm.svelte` — одна оболочка на предупреждение о совпадении и на
 подтверждение удаления: спрашивают они разное, а устроены одинаково.
 
 Перенос `docs/design/index.html:1761-1771` — окно в макете нарисовано, и

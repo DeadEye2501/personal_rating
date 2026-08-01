@@ -738,6 +738,7 @@
 
 - `WEB` = `Path(__file__).resolve().parents[2] / 'client'`
 - `CHOSEN` = `re.compile('export function chosen\\(filters\\) …`
+- `CALLED` = `re.compile("(?:call|numbered)\\('(\\w+)\\.(\\w+)…`
 
 ### `tests/bridge/test_serve.py`
 

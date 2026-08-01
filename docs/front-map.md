@@ -8,34 +8,34 @@
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
-### api/owned.svelte.js (17)
+### api/owned.svelte.js (18)
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
 ## app — 10 файлов
 
-### app/App.svelte (180)
+### app/App.svelte (195)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/CardTagsModal.svelte (76)
+### app/CardTagsModal.svelte (80)
 - Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
 - принимает: view, onview, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/FiltersModal.svelte (155)
+### app/FiltersModal.svelte (156)
 - Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/LibraryScreen.svelte (125)
+### app/LibraryScreen.svelte (133)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, ontag
 - берёт: ./trouble.js, ./visible.js
 
 ### app/SearchScreen.svelte (118)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя.
-- принимает: session, query, expected, root, ontrouble, onmark, onperson, onopen
+- принимает: session, query, expected, root, ontrouble, onmark, onperson, onopen, ontag
 - берёт: ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (59)
@@ -73,7 +73,7 @@
 - Столбец гистограммы: заливка, число над верхушкой и подпись оценки.
 - принимает: score, count, share, index
 
-### components/Chips.svelte (26)
+### components/Chips.svelte (29)
 - Метки карточки: жанры, теги и кнопка добавления тега.
 - принимает: genres, tags, on, onmark, ontag
 
@@ -85,7 +85,7 @@
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
 - принимает: view, onperson
 
-### components/Feed.svelte (83)
+### components/Feed.svelte (84)
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
@@ -309,7 +309,7 @@
 - селекторы (5): .scorerow, .scorerow__stars, .scorerow__stars .material-symbols-outlined, .scorerow__stars .is-empty, .scorerow__label
 - берёт: --score, --tint-14, --title-s
 
-### styles/scrollarea.css (46)
+### styles/scrollarea.css (45)
 - Область со своей полосой прокрутки вместо системной.
 - селекторы (8): .scrollarea, .scrollarea__box, .scrollarea__box::-webkit-scrollbar, .scrollbar, .scrollbar.is-shown, .scrollbar__thumb, .scrollbar__thumb:hover, .scrollbar__thumb:active
 - берёт: --tint-16, --tint-28, --tint-34
