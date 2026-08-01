@@ -144,7 +144,7 @@
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
 
-### `backend/model/query.py` — 89 строк
+### `backend/model/query.py` — 97 строк
 
 Язык, которым лента разговаривает с базой о разделах.
 
@@ -153,7 +153,7 @@
 - `class Section(StrEnum)` (6)
 - `class Sort(StrEnum)` (11)
 - `class Order` (6)
-- `class Filters` (15)
+- `class Filters` (23)
 - `class Feed` (11)
 - `class Bucket` (5)
 - `class Histogram` (10)
@@ -816,14 +816,15 @@
   - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
-### `backend/storage/repository/sections.py` — 152 строк
+### `backend/storage/repository/sections.py` — 177 строк
 
 Вопросы к отфильтрованному набору раздела.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.session`, `backend.storage.tables`
 
-- `def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (4)
-- `def _included(query: Select, filters: Filters) -> Select` (13)
+- `def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (6)
+- `def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (16)
+- `def _included(query: Select, filters: Filters) -> Select` (18)
 - `def _excluded(query: Select, filters: Filters) -> Select` (23)
 - `class SectionsRepository(Repository)` (72)
   - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (12)
@@ -1224,7 +1225,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 81 модулей
+## tests — 82 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1529,6 +1530,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
+### `tests/backend/test_filters.py` — 296 строк
+
+Отбор ленты фильтрами: включённые, исключённые и их сочетания.
+
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+
+Тестов: 13
+
+- `async def library(sessions)` (2)
+
 ### `tests/backend/test_genre_reference.py` — 241 строк
 
 Справочник жанров из миграции против записанного эталона.
@@ -1784,13 +1795,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def search(sessions)` (5)
 
-### `tests/backend/test_sections.py` — 426 строк ⚠ подошёл к 300
+### `tests/backend/test_sections.py` — 229 строк
 
-Запросы разделов: фильтры, сортировки и порции.
+Запросы разделов: что раздел показывает, в каком порядке и какой порцией.
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 23
+Тестов: 13
 
 - `async def library(sessions)` (2)
 

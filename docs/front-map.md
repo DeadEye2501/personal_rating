@@ -33,7 +33,7 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (148)
+### app/LibraryScreen.svelte (151)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
 - берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
@@ -43,7 +43,7 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (241)
+### app/SearchScreen.svelte (243)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -65,9 +65,9 @@
 - Свои отметки на карточке: оценка и закладка.
 - отдаёт: aspected, scored, wished
 
-### app/reread.js (35)
+### app/reread.js (51)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
-- отдаёт: keyOf, refreshed, same, without
+- отдаёт: keyOf, merged, refreshed, same, without
 
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
@@ -91,8 +91,8 @@
 - Ряд действий карточки: правка, удаление, закладка.
 - принимает: wished, onedit, ondelete, onwish
 
-### components/Aggregates.svelte (55)
-- Оценки агрегаторов: цифра, кружок ожидания или пустое место.
+### components/Aggregates.svelte (64)
+- Оценки агрегаторов: цифра или кружок ожидания.
 - принимает: external, expected, ids, onopen
 
 ### components/Bar.svelte (16)
@@ -123,7 +123,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (102)
+### components/Film.svelte (105)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -221,7 +221,7 @@
 - Строки фактов карточки: длительность, сезоны и серии, состав.
 - отдаёт: castOf, hiddenOf, plural, runtimeOf, seriesOf
 
-### state/filters.js (119)
+### state/filters.js (127)
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 

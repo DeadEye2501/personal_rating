@@ -96,13 +96,21 @@ export function isEmpty(filters, field = null) {
  *  ответ приходит целиком, а отсев идёт здесь.
  *
  *  В разделах библиотеки этим не пользуются: там то же самое делает база, и
- *  делает лучше — она не тащит через границу то, что всё равно скроют. */
+ *  делает лучше — она не тащит через границу то, что всё равно скроют. Правило
+ *  при этом одно на обе стороны, и разъехаться им нельзя: две выбранные метки
+ *  давали бы в поиске один список, а в библиотеке другой.
+ *
+ *  Включённые складываются по «и» — решение пользователя 02.08.2026. Оценка
+ *  исключение, и не по решению, а по устройству: она у карточки одна, и «семь и
+ *  восемь разом» не бывает ни у чего. Исключённые вычитаются последними и
+ *  означают «ни одного из этих», а не «не все сразу». */
 export function passes(view, filters) {
   return FIELDS.every((field) => {
     const has = ownedBy(view, field)
     if (filters.ex[field].some((id) => has.includes(id))) return false
     if (!filters.on[field].length) return true
-    return filters.on[field].some((id) => has.includes(id))
+    const together = field === 'scores' ? 'some' : 'every'
+    return filters.on[field][together]((id) => has.includes(id))
   })
 }
 

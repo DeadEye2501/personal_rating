@@ -125,9 +125,34 @@ describe('отсев выдачи поиска', () => {
     expect(passes(view({ genres: [{ id: 9 }] }), only)).toBe(false)
   })
 
-  it('внутри признака складывает по «или»', () => {
+  it('внутри признака складывает по «и»', () => {
+    // Решение пользователя 02.08.2026, и правило одно на обе стороны: в
+    // разделах отбирает база, в поиске — эта функция. Разойдись они, две
+    // выбранные метки давали бы в поиске один список, а в библиотеке другой.
     const two = cycled(cycled(EMPTY, 'genres', 7), 'genres', 9)
-    expect(passes(view({ genres: [{ id: 9 }] }), two)).toBe(true)
+
+    expect(passes(view({ genres: [{ id: 7 }, { id: 9 }] }), two)).toBe(true)
+    expect(passes(view({ genres: [{ id: 9 }] }), two)).toBe(false)
+  })
+
+  it('оценка остаётся «или», и не по решению, а по устройству', () => {
+    // Она у карточки одна, и «семь и восемь разом» не бывает ни у чего: «и»
+    // здесь опустошало бы выдачу всегда.
+    const two = cycled(cycled(EMPTY, 'scores', 7), 'scores', 8)
+
+    expect(passes(view({ rating: { score: 7.4 } }), two)).toBe(true)
+    expect(passes(view({ rating: { score: 8 } }), two)).toBe(true)
+    expect(passes(view({ rating: { score: 9 } }), two)).toBe(false)
+  })
+
+  it('исключение остаётся «ни одного из этих»', () => {
+    // Не «нет всех сразу»: карточка с одним из двух исключённых жанров тоже
+    // уходит.
+    const neither = cycled(cycled(cycled(cycled(EMPTY, 'genres', 7), 'genres', 7),
+                                  'genres', 9), 'genres', 9)
+
+    expect(passes(view({ genres: [{ id: 7 }] }), neither)).toBe(false)
+    expect(passes(view({ genres: [{ id: 5 }] }), neither)).toBe(true)
   })
 
   it('между признаками складывает по «и»', () => {

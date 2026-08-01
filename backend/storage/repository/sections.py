@@ -33,20 +33,45 @@ _KEYS = {
 
 
 def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select:
-    """Номера карточек, у которых есть хоть одна из этих метк или жанров.
-    Внутри признака отобранное складывается по «или» — это и есть `in_`."""
+    """Номера карточек, у которых есть хоть одна из этих меток или жанров.
+
+    Годится исключению, а не включению: «нет ни одной из этих» — это и есть
+    отрицание «есть хоть одна»."""
     return select(link.c.item_id).where(key.in_(ids))
 
 
+def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select:
+    """Номера карточек, у которых есть **все** эти метки или жанры.
+
+    Решение пользователя 02.08.2026: каждая добавленная метка сужает набор.
+    Раньше внутри признака стояло «или», и вторая метка приводила карточки,
+    которых с первой не было, — то есть отбор расширялся отбором.
+
+    От повтора в самом отборе — одна и та же метка выбрана дважды — защищает
+    `set(ids)`, а не `distinct`: `IN (5, 5)` счёт не поднимает. `distinct` стоит
+    ради второго: он делает счёт независимым от того, сторожит ли уникальность
+    пары сама таблица связи."""
+    return (
+        _carrying(link, key, ids)
+        .group_by(link.c.item_id)
+        .having(func.count(func.distinct(key)) == len(set(ids)))
+    )
+
+
 def _included(query: Select, filters: Filters) -> Select:
-    """Между признаками «и»: каждый добавляет своё условие к остальным."""
+    """«И» и между признаками, и внутри признака: каждый выбранный добавляет
+    своё условие к остальным.
+
+    Оценка — исключение, и не по решению, а по устройству: она у карточки одна,
+    и «семь и восемь разом» не бывает ни у чего. Там выбранные столбцы
+    складываются по «или», как в гистограмме."""
     if filters.tag_ids:
         query = query.where(item.c.id.in_(
-            _carrying(item_tag, item_tag.c.tag_id, filters.tag_ids)
+            _carrying_all(item_tag, item_tag.c.tag_id, filters.tag_ids)
         ))
     if filters.genre_ids:
         query = query.where(item.c.id.in_(
-            _carrying(item_genre, item_genre.c.genre_id, filters.genre_ids)
+            _carrying_all(item_genre, item_genre.c.genre_id, filters.genre_ids)
         ))
     if filters.scores:
         query = query.where(_COLUMN.in_(filters.scores))
