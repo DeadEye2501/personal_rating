@@ -1,13 +1,18 @@
 <!-- Список карточек, который растёт порциями и не знает своей полной длины. -->
 <script>
   import Film from '$components/Film.svelte'
+  import { collapsedOf } from '$state/session.js'
 
   // Насколько заранее просить следующую порцию. Экран с запасом: догрузка
   // обязана начаться до того, как человек упрётся в дно.
   const AHEAD = '600px'
 
-  let { views = [], collapsed = false, expected = [], onmore, onshown,
-        ...card } = $props()
+  // `root` — тот элемент, который прокручивается. Без него наблюдатель считает
+  // от области просмотра, а лента лежит внутри своего скроллера: клип
+  // применяется раньше запаса, и догрузка начинается ровно на дне, а не за
+  // шестьсот пикселей до него. Кто прокручивается, знает сборка страницы.
+  let { views = [], collapsed = false, expected = [], root = null, onmore,
+        onshown, ...card } = $props()
 
   let asking = $state(false)
   // Видна ли метка дна прямо сейчас. Наблюдатель сообщает о пересечении, а не
@@ -27,10 +32,11 @@
    */
   function watched(node, onseen) {
     const eye = new IntersectionObserver(
-      ([entry]) => onseen(entry.isIntersecting), { rootMargin: AHEAD })
+      ([entry]) => onseen(entry.isIntersecting), { root, rootMargin: AHEAD })
     eye.observe(node)
     return { destroy: () => eye.disconnect() }
   }
+
 
   async function more() {
     // Не просим повторно, пока предыдущая порция не приехала.
@@ -66,7 +72,8 @@
     <!-- О показе сообщаем на каждое появление; один раз на карточку это делает
          тот, кто ходит через мост: там же и память о спрошенных. -->
     <div use:watched={(visible) => visible && onshown(view)}>
-      <Film {view} {collapsed} {expected} {...card} />
+      <Film {view} collapsed={collapsedOf(view, collapsed)} {expected}
+            {...card} />
     </div>
   {/each}
   <!-- Метка дна: попала в поле зрения — значит пора просить следующую порцию. -->

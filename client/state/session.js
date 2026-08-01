@@ -47,3 +47,9 @@ export const withMark = (session, field, id) =>
 
 /** Тумблер всего приложения, а не настройка раздела. */
 export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
+
+/** Свёрнута ли карточка. Свёрнутость приходит с двух сторон: тумблер шапки —
+ *  состояние всего приложения, шеврон карточки — свойство её самой. Своё
+ *  сильнее общего, и правило это одно на обе стороны — лента им рисует,
+ *  раздел им переключает. */
+export const collapsedOf = (view, collapsed) => view.collapsed ?? collapsed

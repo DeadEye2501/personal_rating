@@ -5,7 +5,7 @@
   import StatsScreen from './StatsScreen.svelte'
   import Topbar from './Topbar.svelte'
   import Snack from '$components/Snack.svelte'
-  import { call } from '$api/bridge.js'
+  import { call, numbered } from '$api/bridge.js'
   import { newSession, withMark, withSection } from '$state/session.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
@@ -37,6 +37,21 @@
   // Плашка одна на всё приложение, и говорят в неё разделы: своей они не
   // заводят.
   let trouble = $state(null)
+
+  // Сколько оценок агрегаторов ждать. Спрашивается здесь, а не в каждом
+  // разделе: зависит это от типа содержимого, а он общий, и два одинаковых
+  // запроса разошлись бы молча.
+  let expected = $state([])
+
+  // Прокручивается область содержимого, и знает об этом только сборка. Ленте
+  // она нужна корнем наблюдателя: иначе запас догрузки не действует.
+  let content = $state()
+
+  $effect(() => {
+    numbered('world.expected', session.kind, { channel: 'expected' })
+      .then((sources) => { expected = sources })
+      .catch(idle)
+  })
 
   // Акцент красит всю страницу, поэтому ставит его тот, кто страницей владеет,
   // а не шапка: она про свои три зоны. И следует он за состоянием, а не за
@@ -72,7 +87,7 @@
                                   session = withSection(session, 'search') }}
             onadd={() => {}} onfilter={() => {}} />
 
-    <div class="content">
+    <div class="content" bind:this={content}>
       <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
            секцию, `screen-in` не проигрывается, и переход между разделами
            становится мгновенной подменой. -->
@@ -81,7 +96,7 @@
           <!-- Метка и человек решаются здесь, а не в разделе: клик по жанру
                включает фильтр, клик по имени открывает поиск по человеку — и
                то и другое меняет общее состояние. -->
-          <Screen {session} {query}
+          <Screen {session} {query} {expected} root={content}
                   ontrouble={(text) => { trouble = { text } }}
                   onmark={(field, id) => { session = withMark(session, field, id) }}
                   onperson={idle}

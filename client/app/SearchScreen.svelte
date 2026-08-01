@@ -5,10 +5,10 @@
   import { passes } from '$state/filters.js'
   import { onCardShown } from './visible.js'
 
-  let { session, query = null, ontrouble, onmark, onperson, onopen } = $props()
+  let { session, query = null, expected = [], root = null, ontrouble, onmark,
+        onperson, onopen } = $props()
 
   let views = $state([])
-  let expected = $state([])
   const ops = []
 
   // Тип содержимого отдельной величиной, а не чтением `session` в эффекте:
@@ -24,12 +24,6 @@
 
   // Страница владеет тем, что запустила, и отменяет это при уходе.
   $effect(() => () => { cancel(ops.splice(0)) })
-
-  $effect(() => {
-    numbered('world.expected', kind, { channel: 'expected', ops })
-      .then((sources) => { expected = sources })
-      .catch(lost)
-  })
 
   $effect(() => {
     if (!query?.text) { views = []; return }
@@ -117,7 +111,7 @@
      Оценка кандидата сначала заводит карточку: `item_id` у него нет, и звать
      `marks.score` не с чем. Оценка вторым действием появится вместе с окном
      карточки. -->
-<Feed views={shown} collapsed={session.collapsed} {expected}
+<Feed views={shown} collapsed={session.collapsed} {expected} {root}
       onmore={() => false}
       onshown={(view) => shownCard(view).catch(lost)}
       on={session.filters.on} {onmark} {onperson} {onopen}

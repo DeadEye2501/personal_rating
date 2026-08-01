@@ -10,17 +10,18 @@
 
 ## app — 6 файлов
 
-### app/App.svelte (95)
+### app/App.svelte (110)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
 
-### app/LibraryScreen.svelte (53)
-- Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Черновик: раздел не выбирается, фильтры и сортировка не передаются — это задача 6.
+### app/LibraryScreen.svelte (117)
+- Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
+- принимает: session, expected, root, ontrouble, onmark, onperson, onopen
 - берёт: ./visible.js
 
-### app/SearchScreen.svelte (127)
+### app/SearchScreen.svelte (121)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя.
-- принимает: session, query, ontrouble, onmark, onperson, onopen
+- принимает: session, query, expected, root, ontrouble, onmark, onperson, onopen
 - берёт: ./visible.js
 
 ### app/StatsScreen.svelte (2)
@@ -52,9 +53,9 @@
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
 - принимает: view, onperson
 
-### components/Feed.svelte (75)
+### components/Feed.svelte (82)
 - Список карточек, который растёт порциями и не знает своей полной длины.
-- принимает: views, collapsed, expected, onmore, onshown, ...card
+- принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
 ### components/Film.svelte (81)
 - Карточка ленты целиком.
@@ -92,7 +93,7 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, onclick, children
 
-## state — 7 файлов
+## state — 8 файлов
 
 ### state/facts.js (50)
 - Строки фактов карточки: длительность, сезоны и серии, состав.
@@ -110,9 +111,13 @@
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
 - отдаёт: ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
 
-### state/session.js (49)
+### state/section.js (20)
+- Запрос раздела: то, что уезжает мостом в `feed.page`.
+- отдаёт: requestOf
+
+### state/session.js (55)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: newSession, withCollapsed, withKind, withMark, withNextSort, withSection, withToggledSection
+- отдаёт: collapsedOf, newSession, withCollapsed, withKind, withMark, withNextSort, withSection, withToggledSection
 
 ### state/sorting.js (70)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
