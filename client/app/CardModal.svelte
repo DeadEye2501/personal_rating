@@ -6,11 +6,14 @@
   import Modal from '$components/Modal.svelte'
   import Picker from '$components/Picker.svelte'
   import PosterPick from '$components/PosterPick.svelte'
+  import Scrollarea from '$components/Scrollarea.svelte'
   import { call } from '$api/bridge.js'
   import { emptyCard, fieldsOf, formOf, shownFor, wrongNumbers }
     from '$state/card.js'
   import { ROLES } from '$state/credits.js'
   import { GENRE_KINDS } from '$state/genres.js'
+  import { MANUAL } from '$state/sources.js'
+  import LinkField from './LinkField.svelte'
   import { reported } from './trouble.js'
 
   let { view = null, kind, onsave, onclose, ontrouble } = $props()
@@ -36,6 +39,12 @@
   // карточку: запись начинается с похода через границу потоков, и до возврата
   // номера кнопка остаётся живой.
   let saving = $state(false)
+
+  // Поле ссылки и текущий источник карточки. Привязку выполняет само поле, но
+  // зовёт её сохранение: у новой карточки номер появляется только после записи,
+  // а привязывать нечего к тому, чего в базе нет.
+  let linker = $state()
+  let source = $state(view && view.source !== MANUAL ? view.source : '')
 
   const shown = new Set(shownFor(form.kind))
 
@@ -179,6 +188,17 @@
     await writeCredits(item_id)
     if (picture) await call('covers.store_upload', item_id, picture)
 
+    // Привязка последней: внешнее доливает только пустое, и долить оно должно
+    // поверх уже записанного человеком, а не наоборот.
+    //
+    // Её срыв записи не отменяет: карточка уже в базе, и говорить «не
+    // сохранилась» значило бы врать. О самой привязке скажет она сама.
+    try {
+      await linker?.link(item_id)
+    } catch (error) {
+      lost(error, 'Не удалось привязать к внешней базе')
+    }
+
     onsave(item_id)
   }
 
@@ -228,33 +248,45 @@
           {/if}
         </div>
 
+        <LinkField bind:this={linker} item_id={form.item_id} kind={form.kind}
+                   {source} onunlinked={() => { source = '' }}
+                   ontrouble={(text) => ontrouble(text)} />
+
         <Field bind:value={form.synopsis} placeholder="Синопсис"
                variant="field--area" area />
       </div>
     </div>
 
-    <!-- Роли одним перебором, а не пятью почти одинаковыми блоками: различаются
-         они подписью, доменом и ключом роли — то есть данными, а не разметкой. -->
-    {#each ROLES as one (one.role)}
-      {#if shown.has(one.role)}
-        <Picker label={one.label} hits={suggested[one.role] ?? []}
-                chosen={form[one.role]}
-                ontype={(text) => suggest(one.role, one.domain, text)
-                  .catch((error) => lost(error, 'Не удалось спросить подсказку'))}
-                onmore={() => more(one.role, one.domain)
-                  .catch((error) => lost(error, 'Не удалось спросить подсказку'))}
-                oncreate={(made) => pick(one.role, [...form[one.role], made])}
-                onchosen={(list) => pick(one.role, list)} />
-      {/if}
-    {/each}
+    <!-- Поля с подсказкой прокручиваются вместе: у сериала состав бывает в три
+         сотни имён, и без этого окно вырастало за экран, а ряд кнопок уезжал за
+         нижний край. -->
+    <Scrollarea>
+      {#snippet children()}
+        <!-- Роли одним перебором, а не пятью почти одинаковыми блоками:
+             различаются они подписью, доменом и ключом роли — то есть данными,
+             а не разметкой. -->
+        {#each ROLES as one (one.role)}
+          {#if shown.has(one.role)}
+            <Picker label={one.label} hits={suggested[one.role] ?? []}
+                    chosen={form[one.role]}
+                    ontype={(text) => suggest(one.role, one.domain, text)
+                      .catch((error) => lost(error, 'Не удалось спросить подсказку'))}
+                    onmore={() => more(one.role, one.domain)
+                      .catch((error) => lost(error, 'Не удалось спросить подсказку'))}
+                    oncreate={(made) => pick(one.role, [...form[one.role], made])}
+                    onchosen={(list) => pick(one.role, list)} />
+          {/if}
+        {/each}
 
-    <!-- Тем же полем, и второго поведения у него от этого не появляется: оно не
-         знает, откуда взялись совпадения. Заводить новое умеет тот, кому
-         передали `oncreate`, — набор жанров зашит в миграцию, своего жанра не
-         бывает, и здесь его не передают вовсе. -->
-    <Picker label="Жанры" hits={matching} chosen={form.genres}
-            ontype={(text) => { typedGenre = text }}
-            onchosen={(list) => pick('genres', list)} />
+        <!-- Тем же полем, и второго поведения у него от этого не появляется:
+             оно не знает, откуда взялись совпадения. Заводить новое умеет тот,
+             кому передали `oncreate`, — набор жанров зашит в миграцию, своего
+             жанра не бывает, и здесь его не передают вовсе. -->
+        <Picker label="Жанры" hits={matching} chosen={form.genres}
+                ontype={(text) => { typedGenre = text }}
+                onchosen={(list) => pick('genres', list)} />
+      {/snippet}
+    </Scrollarea>
 
     <!-- Кнопки «удалить» внутри окна нет: удаление живёт на карточке, и второго
          входа ему не нужно. -->

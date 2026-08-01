@@ -19,11 +19,13 @@ from backend.model import (
     CompanyRole,
     GenreKind,
     IdSource,
+    ItemExists,
     Kind,
     PersonRole,
     RatingSource,
     Section,
     Sort,
+    Source,
 )
 from bridge.answer import Domain, kebab
 from bridge.api import Api
@@ -219,14 +221,31 @@ def keys_and_values(table: str, text: str) -> dict[str, str]:
     return dict(re.findall(r"(\w+): '(\w+)'", body_of(table, text)))
 
 
-def test_the_page_knows_the_only_refusal_it_tells_apart():
-    """Занятое имя тега — единственный отказ, который страница разбирает по
-    роду: он штатный, и говорят о нём иначе, чем о поломке. Разъехавшись,
-    «Такой тег уже есть» молча превратится в «Не удалось завести тег»."""
+def test_the_page_knows_the_refusals_it_tells_apart():
+    """Два отказа страница разбирает по роду, потому что они штатные и говорят
+    о них иначе, чем о поломке: занятое имя тега и занятая ссылка. Разъехавшись,
+    «Такой тег уже есть» молча станет «Не удалось завести тег», а «Эта карточка
+    уже есть» — «Не удалось привязать».
+
+    Род берётся из имени класса, и оба имени живут в питоне: страница их только
+    повторяет, и сверять надо повторение."""
     named = re.search(r"const TAG_EXISTS = '([\w-]+)'", source("app/tags.js"))
+    taken = re.search(r"const TAKEN = '([\w-]+)'", source("app/LinkField.svelte"))
 
     assert named, "в client/app/tags.js больше нет константы TAG_EXISTS"
+    assert taken, "в client/app/LinkField.svelte больше нет константы TAKEN"
     assert named.group(1) == kebab(TagExists.__name__)
+    assert taken.group(1) == kebab(ItemExists.__name__)
+
+
+def test_the_page_calls_a_hand_made_card_what_the_base_calls_it():
+    """Ручная карточка помечена источником `manual`, и по нему окно решает,
+    показывать поле ссылки или имя источника с крестиком. Разъехавшись, оно
+    предложит привязать уже привязанную и не даст отвязать — молча."""
+    named = re.search(r"const MANUAL = '(\w+)'", source("state/sources.js"))
+
+    assert named, "в client/state/sources.js больше нет константы MANUAL"
+    assert named.group(1) == Source.MANUAL
 
 
 # `call('домен.метод')` и `numbered('домен.метод')` — единственный способ, каким

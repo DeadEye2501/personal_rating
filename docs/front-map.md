@@ -12,16 +12,16 @@
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
-## app — 12 файлов
+## app — 13 файлов
 
 ### app/App.svelte (231)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/CardModal.svelte (281)
+### app/CardModal.svelte (313)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
-- берёт: ./trouble.js
+- берёт: ./LinkField.svelte, ./trouble.js
 
 ### app/CardTagsModal.svelte (82)
 - Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
@@ -37,6 +37,11 @@
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ontag, saved
 - берёт: ./trouble.js, ./visible.js
+
+### app/LinkField.svelte (103)
+- Привязка карточки к внешней базе вставленной ссылкой — и отвязка.
+- принимает: item_id, kind, source, onunlinked, ontrouble
+- берёт: ./trouble.js
 
 ### app/SearchScreen.svelte (118)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя.
@@ -252,9 +257,9 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (52)
+### state/sources.js (57)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
-- отдаёт: nameOf, pagesOf, stepOfSource
+- отдаёт: MANUAL, nameOf, pagesOf, stepOfSource
 
 ## styles — 29 файлов
 
@@ -284,11 +289,11 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
-### styles/cardform.css (65)
+### styles/cardform.css (114)
 - Раскладка окна создания и правки карточки.
-- селекторы (9): .modal--card, .cardform__top, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover
+- селекторы (14): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover
 - объявляет: --col-gap, --field-h, --poster-w, --row-gap
-- берёт: --col-gap, --poster-w, --primary, --row-gap, --tint-18, --tint-22
+- берёт: --body-l, --col-gap, --poster-w, --primary, --row-gap, --text-bright, --tint-18, --tint-22
 
 ### styles/chart.css (92)
 - Гистограмма оценок и её подвал.
@@ -341,7 +346,7 @@
 - объявляет: --accent, --del, --icon-btn
 - берёт: --error, --fill-primary-14, --icon-btn, --primary, --r-full, --tint-30
 
-### styles/modal.css (106)
+### styles/modal.css (111)
 - Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
 - селекторы (9): .overlay, .modal, .modal--narrow, .modal--ask, .modal--danger, .ask__text, .modal::before, .modal::after, @keyframes modal-in
 - объявляет: --neon
