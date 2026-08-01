@@ -1,0 +1,92 @@
+/* Гистограмма оценок и её подвал. */
+
+/* Ширина равна содержимому шапки: график живёт в той же колонке, что поиск,
+   переключатель и кнопки. Величину замеряет и ставит шапка. */
+.chart {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: var(--content-w);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  /* Сверху запас под число над самым высоким столбцом. */
+  padding: 34px 0 16px;
+}
+
+.chart__bars {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+}
+
+/* Цвет столбца — из шкалы в палитре, той же, что у звёзд. */
+.bar {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  gap: 7px;
+}
+
+.bar__plot {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar__fill {
+  position: relative;
+  width: 100%;
+  height: max(var(--h), 6px);
+  border-radius: 5px 5px 0 0;
+  background: var(--score);
+}
+
+/* Число привязано к верхушке своего столбца, а не к общей строке. */
+.bar__count {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 5px;
+  text-align: center;
+  font: var(--label-l);
+  font-weight: 700;
+  color: var(--score);
+}
+
+.bar__value {
+  font: var(--title-s);
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.chart__foot {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--tint-07);
+  text-align: center;
+  font: var(--body-m);
+  color: var(--tint-45);
+}
+.chart__foot b {
+  color: var(--tint-80);
+  font-weight: 600;
+}
+
+/* Столбцы вырастают из пола при каждом заходе на раздел. Растёт высота, а не
+   масштаб: масштаб сплющил бы и число над столбцом. */
+.view.is-drawing .bar__fill {
+  animation: bar-rise .5s var(--ease) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+@keyframes bar-rise {
+  from { height: 0 }
+  to   { height: max(var(--h), 6px) }
+}

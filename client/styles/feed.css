@@ -3,7 +3,7 @@
 /* Те же границы, что у гистограммы и у содержимого шапки. */
 .feed {
   width: 100%;
-  max-width: var(--content-w, 1146px);
+  max-width: var(--content-w);
   margin: 0 auto;
   padding: 18px 0 28px;
   display: flex;

@@ -30,7 +30,7 @@
 }
 .film__toggle .material-symbols-outlined {
   font-size: 22px;
-  transition: transform .22s cubic-bezier(.2,.8,.2,1);
+  transition: transform .22s var(--ease);
 }
 .film__toggle:hover { color: var(--text-bright) }
 

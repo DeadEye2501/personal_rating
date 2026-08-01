@@ -1,7 +1,8 @@
 <!-- Раздел «Поиск»: сначала своя выдача, потом внешняя. -->
 <script>
   import Feed from '$components/Feed.svelte'
-  import { cancel, lastOp, numbered } from '$api/bridge.js'
+  import { lastOp, numbered } from '$api/bridge.js'
+  import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
   import { reported } from './trouble.js'
   import { onCardShown } from './visible.js'
@@ -10,7 +11,7 @@
         onperson, onopen } = $props()
 
   let views = $state([])
-  const ops = []
+  const ops = owned()
 
   // Тип содержимого отдельной величиной, а не чтением `session` в эффекте:
   // прочитанный там, он пометил бы эффект грязным на любую пересборку сеанса —
@@ -22,9 +23,6 @@
   // магазинов нет ни наших тегов, ни наших оценок, — поэтому ответ приходит
   // целиком, а отсев идёт здесь, тем же правилом, что и в ленте.
   const shown = $derived(views.filter((view) => passes(view, session.filters)))
-
-  // Страница владеет тем, что запустила, и отменяет это при уходе.
-  $effect(() => () => { cancel(ops.splice(0)) })
 
   // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
   // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое

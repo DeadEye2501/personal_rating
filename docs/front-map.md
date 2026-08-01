@@ -2,15 +2,19 @@
 
 Собрана из кода. Число в скобках — строк в файле.
 
-## api — 1 файлов
+## api — 2 файлов
 
 ### api/bridge.js (119)
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
+### api/owned.svelte.js (17)
+- Что раздел запустил, то он и гасит при уходе.
+- отдаёт: owned
+
 ## app — 10 файлов
 
-### app/App.svelte (168)
+### app/App.svelte (173)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
@@ -24,18 +28,20 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/LibraryScreen.svelte (121)
+### app/LibraryScreen.svelte (120)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, ontrouble, onmark, onperson, onopen, ontag
 - берёт: ./trouble.js, ./visible.js
 
-### app/SearchScreen.svelte (120)
+### app/SearchScreen.svelte (118)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя.
 - принимает: session, query, expected, root, ontrouble, onmark, onperson, onopen
 - берёт: ./trouble.js, ./visible.js
 
-### app/StatsScreen.svelte (2)
-- Раздел «Статистика»: гистограмма своих оценок. Пока пуст.
+### app/StatsScreen.svelte (59)
+- Раздел «Статистика»: гистограмма своих оценок по тому же отфильтрованному набору, что и разделы с карточками.
+- принимает: session, ontrouble
+- берёт: ./trouble.js
 
 ### app/Topbar.svelte (146)
 - Сборка шапки: три зоны и всё, что в них нажимается.
@@ -53,7 +59,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 22 файлов
+## components — 23 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -62,6 +68,10 @@
 ### components/Aggregates.svelte (57)
 - Оценки агрегаторов: цифра, кружок ожидания или пустое место.
 - принимает: external, expected, ids, onopen
+
+### components/Bar.svelte (16)
+- Столбец гистограммы: заливка, число над верхушкой и подпись оценки.
+- принимает: score, count, share, index
 
 ### components/Chips.svelte (26)
 - Метки карточки: жанры, теги и кнопка добавления тега.
@@ -143,7 +153,7 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, onclick, children
 
-## state — 11 файлов
+## state — 12 файлов
 
 ### state/dragging.js (23)
 - Таска указателем: захват, движение, отпускание.
@@ -157,7 +167,11 @@
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 
-### state/redraw.js (20)
+### state/histogram.js (9)
+- Доля каждого столбца от самого высокого.
+- отдаёт: heightsOf
+
+### state/redraw.js (21)
 - Перезапуск анимации на узле, который обязан его пережить.
 - отдаёт: redrawn
 
@@ -165,7 +179,7 @@
 - Куда встаёт строка, которую тащат указателем.
 - отдаёт: dragged
 
-### state/scores.js (72)
+### state/scores.js (74)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
 - отдаёт: ASPECTS, LABELS, SCALE, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
 
@@ -189,7 +203,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 25 файлов
+## styles — 26 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -216,6 +230,11 @@
 - селекторы (11): *, *::before, *::after, [hidden], html, body, #root, body, button, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
+
+### styles/chart.css (92)
+- Гистограмма оценок и её подвал.
+- селекторы (11): .chart, .chart__bars, .bar, .bar__plot, .bar__fill, .bar__count, .bar__value, .chart__foot, .chart__foot b, .view.is-drawing .bar__fill, @keyframes bar-rise
+- берёт: --body-m, --content-w, --ease, --h, --i, --label-l, --score, --text-bright, --tint-07, --tint-45, --tint-80, --title-s
 
 ### styles/chips.css (78)
 - Метки карточки: жанры, теги и кнопка «± Тег».
@@ -248,7 +267,7 @@
 .film.is-collapsed .film__aggr,
 .film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film.is-collapsed .film__scores, .film__poster, .film__poster .material-symbols-outlined, .film__poster img, .film__body, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
 - объявляет: --gutter, --icon-inset
-- берёт: --body-l, --body-m, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
+- берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
 ### styles/iconbutton.css (31)
 - Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска.
@@ -260,7 +279,7 @@
 - Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
 - селекторы (9): .overlay, .modal, .modal--narrow, .modal--ask, .modal--danger, .ask__text, .modal::before, .modal::after, @keyframes modal-in
 - объявляет: --neon
-- берёт: --body-l, --error, --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --text, --tint-09, --tint-14
+- берёт: --body-l, --ease, --error, --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --text, --tint-09, --tint-14
 
 ### styles/modalfoot.css (42)
 - Ряд ответных кнопок внизу окна.
@@ -279,10 +298,10 @@
 - селекторы (8): .newtag, .newtag:focus-within, .newtag__input, .newtag__input::placeholder, .newtag__input:hover::placeholder, .newtag__input:focus::placeholder, .newtag__ok, .newtag.is-filled .newtag__ok
 - берёт: --primary, --text-bright, --text-dim
 
-### styles/palette.css (110)
+### styles/palette.css (119)
 - Единственное место, где есть цвет. По месту пишется только var().
 - селекторы (2): @property --primary, :root
-- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
+- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
 ### styles/scorerow.css (34)
@@ -310,7 +329,7 @@
 - Единственное место, где приложение что-то сообщает: и отказ источника, и непредвиденный сбой. Уехавшая вниз плашка пустая — отсутствие сообщений само себя ничем не обозначает.
 - селекторы (2): .snack, .snack.is-shown
 - объявляет: --halo-h, --neon
-- берёт: --body-m, --error, --glass-error, --r-full
+- берёт: --body-m, --ease, --error, --glass-error, --r-full
 
 ### styles/stars.css (70)
 - Своя оценка: ряд звёзд, дробная звезда и ярлык словом.
@@ -326,7 +345,7 @@
 ### styles/tools.css (80)
 - Ряд круглых кнопок в правой зоне шапки.
 - селекторы (13): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
-- берёт: --fill-primary-14, --primary, --r-full, --side-w, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75
+- берёт: --ease, --fill-primary-14, --primary, --r-full, --side-w, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75
 
 ### styles/topbar.css (28)
 - Раскладка шапки: три зоны, из ширины которых выведен минимум окна.

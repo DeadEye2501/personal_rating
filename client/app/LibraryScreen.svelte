@@ -3,7 +3,8 @@
      копией, которую планы 8 и 9 правили бы дважды. -->
 <script>
   import Feed from '$components/Feed.svelte'
-  import { call, cancel, numbered } from '$api/bridge.js'
+  import { call, numbered } from '$api/bridge.js'
+  import { owned } from '$api/owned.svelte.js'
   import { requestOf } from '$state/section.js'
   import { collapsedOf } from '$state/session.js'
   import { reported } from './trouble.js'
@@ -20,7 +21,7 @@
   // Пока первая страница нового запроса не приехала, догружать нечего: у ленты
   // ещё старое содержимое, и её длина — смещение в чужой набор.
   let ready = $state(false)
-  const ops = []
+  const ops = owned()
 
   // Ключ запроса строкой, а не объектом: производная сличает строгим
   // равенством, а `requestOf` отдаёт каждый раз новый объект — эффект
@@ -36,8 +37,6 @@
 
   const lost = (error, text) => reported(error, 'раздел библиотеки',
                                          () => ontrouble(text))
-
-  $effect(() => () => { cancel(ops.splice(0)) })
 
   // Смена фильтра, сортировки, типа или раздела перезапрашивает ленту с
   // начала: догружать поверх чужого набора нечего.

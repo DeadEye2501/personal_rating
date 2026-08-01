@@ -69,7 +69,7 @@
 /* Класс вешается на каждый щелчок, а не держится состоянием — иначе анимация
    играла бы только при включении. */
 .is-drawing .tools__chart rect {
-  animation: bar-grow .42s cubic-bezier(.2,.8,.2,1) both;
+  animation: bar-grow .42s var(--ease) both;
 }
 .is-drawing .tools__chart rect:nth-child(2) { animation-delay: .07s }
 .is-drawing .tools__chart rect:nth-child(3) { animation-delay: .14s }

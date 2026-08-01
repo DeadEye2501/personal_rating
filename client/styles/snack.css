@@ -21,7 +21,7 @@
   backdrop-filter: blur(14px) saturate(125%);
 
   transform: translate(-50%, calc(100% + 32px));
-  transition: transform .22s cubic-bezier(.2,.8,.2,1);
+  transition: transform .22s var(--ease);
 }
 
 .snack.is-shown { transform: translate(-50%, 0) }

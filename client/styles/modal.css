@@ -33,7 +33,7 @@
     inset 0 -1px 0 var(--shade-25),
     0 30px 90px var(--shade-60);
 
-  animation: modal-in .22s cubic-bezier(.2,.8,.2,1);
+  animation: modal-in .22s var(--ease);
 }
 
 /* Содержимое фиксированной ширины — тянуть окно не за чем. */
