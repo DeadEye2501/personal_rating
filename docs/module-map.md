@@ -15,7 +15,7 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (22)
 
-## backend — 77 модулей
+## backend — 78 модулей
 
 ### `backend/app.py` — 154 строк
 
@@ -219,13 +219,14 @@
 - `def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...]=(), external: tuple[ExternalRating, ...]=()) -> CardView` (19)
 - `def view_from_item(item: Item) -> CardView` (18)
 
-### `backend/service/asking.py` — 23 строк
+### `backend/service/asking.py` — 39 строк
 
 Запрос к источнику, из которого не вылетает исключение.
 
 Зависит от: `backend.sources.errors`
 
 - `async def answered(awaitable, source: str)` (14)
+- `async def answered_all(requests: Iterable[tuple]) -> list` (12)
 
 ### `backend/service/card_parts.py` — 52 строк
 
@@ -247,21 +248,32 @@
   - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (39)
   - `async def _write_the_rest(self, item_id: int, card: SourceCard, poster: bytes | None) -> None` (13)
 
-### `backend/service/enrich.py` — 156 строк
+### `backend/service/enrich.py` — 154 строк
 
 Чужие оценки у карточки.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.sources.registry`, `backend.storage.repository.external`, `backend.unique`
 
 - `class _Harvest` (10)
-- `class Enricher` (114)
-  - `async def enrich(self, item_id: int, kind: Kind) -> list[ExternalRating]` (28)
+- `class Enricher` (113)
+  - `async def enrich(self, item_id: int, kind: Kind) -> list[ExternalRating]` (27)
   - `def expected(self, kind: Kind) -> list[RatingSource]` (9)
   - `async def _imdb_id(self, item_id: int) -> str | None` (5)
   - `async def _harvested(self, item_id: int, asked: list, outcomes: list) -> _Harvest` (16)
   - `def _take(harvest: _Harvest, values: tuple[ExternalRating, ...], provides: tuple[RatingSource, ...]) -> None` (16)
   - `async def _record(self, item_id: int, harvest: _Harvest, stale: list[RatingSource], now: datetime) -> None` (13)
   - `async def _keep(self, item_id: int, external: ExternalId) -> None` (5)
+
+### `backend/service/filmography.py` — 61 строк
+
+Чужие работы человека: спросить о них источник.
+
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.hits`, `backend.sources.registry`
+
+- `class Filmographies` (47)
+  - `async def of_person(self, source_id: str, kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (8)
+  - `async def of_name(self, name: str, kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (19)
+  - `async def _works(self, client, person_ids: list[str], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (11)
 
 ### `backend/service/genres.py` — 28 строк
 
@@ -271,12 +283,13 @@
 
 - `async def resolved_genres(genres: GenresRepository, marked: tuple[tuple[GenreSource, str], ...]) -> list[int]` (21)
 
-### `backend/service/hits.py` — 75 строк
+### `backend/service/hits.py` — 88 строк
 
-Приведение того, что ответили источники, к виду выдачи.
+Приведение того, что ответили источники, к тому виду, в котором это
 
 Зависит от: `backend.model`, `backend.sources.convert`, `backend.storage.repository.genres`, `backend.unique`
 
+- `def once(refusals: list[Refusal]) -> list[Refusal]` (10)
 - `def split(outcomes: Iterable[Outcome]) -> tuple[list[list[SearchHit]], list[Refusal]]` (19)
 - `async def to_views(hits: list[SearchHit], genres: GenresRepository, clock: Callable[[], datetime]) -> list[CardView]` (16)
 - `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (11)
@@ -327,18 +340,16 @@
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/people.py` — 114 строк
+### `backend/service/people.py` — 74 строк
 
 Что найдётся по человеку или студии.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.views`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.views`
 
-- `def _once(refusals: list[Refusal]) -> list[Refusal]` (7)
-- `class PeopleSearch` (77)
-  - `async def by_entity(self, domain: str, entity_id: int, kind: Kind) -> ExternalSearch` (11)
+- `class PeopleSearch` (48)
+  - `async def by_entity(self, domain: str, entity_id: int, kind: Kind) -> ExternalSearch` (12)
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
-  - `async def _outside(self, domain: str, identity: tuple[str, str | None], kind: Kind) -> tuple[list[CardView], list[Refusal]]` (30)
-  - `async def _works(self, client, person_ids: list[str], kind: Kind) -> tuple[list[CardView], list[Refusal]]` (12)
+  - `async def _outside(self, domain: str, identity: tuple[str, str | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (13)
 
 ### `backend/service/posters.py` — 136 строк
 
@@ -367,16 +378,16 @@
 
 - `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (17)
 
-### `backend/service/search.py` — 79 строк
+### `backend/service/search.py` — 90 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
 
-- `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (16)
-- `class SearchService` (37)
+- `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (18)
+- `class SearchService` (45)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
-  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (17)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (24)
 
 ### `backend/service/series.py` — 62 строк
 
@@ -1213,7 +1224,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 80 модулей
+## tests — 81 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1656,6 +1667,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
+### `tests/backend/test_merge_results.py` — 92 строк
+
+Складывание своей выдачи с чужой: порядок половин и снятие близнецов.
+
+Зависит от: `backend.model`, `tests.conftest`
+
+Тестов: 8
+
+- `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
+
 ### `tests/backend/test_migrations.py` — 126 строк
 
 Схема из миграций против схемы из объявлений.
@@ -1701,20 +1722,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 3
 
 
-### `tests/backend/test_people_search.py` — 356 строк ⚠ подошёл к 300
+### `tests/backend/test_people_search.py` — 394 строк ⚠ подошёл к 300
 
 Клик по человеку и студии: внутренняя половина и внешняя.
 
-Зависит от: `backend.model`, `backend.service.people`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.people`, `backend.service.search`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 18
+Тестов: 21
 
-- `class FakePerson(FakeClient)` (17)
-  - `async def credits_of(self, person_id: str, kind: Kind)` (5)
-  - `async def find_people(self, name: str)` (3)
 - `def parts(sessions)` (8)
 - `def finder_on(parts, client) -> PeopleSearch` (5)
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
+- `def outside_questions(asked: list[tuple]) -> list[tuple]` (4)
 
 ### `tests/backend/test_poster_service.py` — 226 строк
 
@@ -1744,17 +1763,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search.py` — 457 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 486 строк ⚠ подошёл к 300
 
-Поиск по чужим базам: выдача, отказы и склейка со своей.
+Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
 
 Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 32
+Тестов: 31
 
-- `class FakeSearch(FakeClient)` (9)
-  - `async def search(self, query: str, kind: Kind)` (5)
-- `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 - `async def service(sessions)` (8)
   - `def build(*clients) -> SearchService` (6)
 
@@ -2058,13 +2074,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
 
-### `tests/conftest.py` — 241 строк
+### `tests/conftest.py` — 243 строк
 
 Фикстуры тестов и поверхность общего.
 
 Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
 
-Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSources`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `responding`, `unreachable`
+Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `responding`, `unreachable`
 
 - `def ours(caplog) -> list[str]` (8)
 - `async def film_genres(engine) -> None` (11)
@@ -2080,7 +2096,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def stored(engine)` (12)
   - `async def put(name: str, **values) -> int` (7)
 
-### `tests/fakes.py` — 137 строк
+### `tests/fakes.py` — 175 строк
 
 Подставные заменители внешнего мира: клиенты источников, транспорты, часы.
 
@@ -2089,6 +2105,10 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class FakeClient` (12)
 - `class FakeCatalog(FakeClient)` (7)
   - `async def card(self, source_id: str, kind: Kind)` (3)
+- `class FakeSearch(FakeClient)` (36)
+  - `async def search(self, query: str, kind: Kind)` (7)
+  - `async def find_people(self, name: str)` (5)
+  - `async def credits_of(self, person_id: str, kind: Kind)` (7)
 - `class FakeSources` (30)
   - `def catalog_for(self, _kind: Kind) -> list` (4)
   - `def people_for(self, kind: Kind)` (6)
@@ -2118,6 +2138,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `BackendThread` — наследник один: `Watched`
 - `Base` — наследник один: `Note`
 - `FakeCatalog` — наследник один: `FakeCatalogWithSlug`
-- `FakePerson` — наследник один: `Broken`
 - `FakeRatings` — наследник один: `Breaking`
+- `FakeSearch` — наследник один: `Broken`
 - `ViewsRepository` — наследник один: `Forgetful`

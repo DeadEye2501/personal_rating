@@ -1,6 +1,5 @@
 """Чужие оценки у карточки."""
 
-import asyncio
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -15,7 +14,7 @@ from backend.model import (
     RatingSource,
     Refusal,
 )
-from backend.service.asking import answered
+from backend.service.asking import answered_all
 from backend.sources.registry import Sources
 from backend.storage.repository.external import (
     ExternalIdsRepository,
@@ -75,9 +74,8 @@ class Enricher:
 
         asked = [client for client in self._sources.rating_sources(kind)
                  if set(client.PROVIDES) & set(stale)]
-        outcomes = await asyncio.gather(
-            *(answered(client.ratings(imdb_id, kind), client.name)
-              for client in asked)
+        outcomes = await answered_all(
+            (client.ratings(imdb_id, kind), client.name) for client in asked
         )
 
         harvest = await self._harvested(item_id, asked, outcomes)

@@ -1,6 +1,8 @@
 """Запрос к источнику, из которого не вылетает исключение."""
 
+import asyncio
 import logging
+from collections.abc import Iterable
 
 from backend.sources.errors import broken
 
@@ -21,3 +23,17 @@ async def answered(awaitable, source: str):
     except Exception as error:
         logger.exception("%s: запрос сорвался", source)
         return broken(source, error)
+
+
+async def answered_all(requests: Iterable[tuple]) -> list:
+    """Несколько запросов разом, и ни один не вылетает исключением.
+
+    Пары «корутина и имя источника», а не клиенты с методом: спрашивают этим
+    трое, и спрашивают разное — выдачу магазинов, фильмографии тёзок, чужие
+    оценки. Общее у них не запрос, а правило: мимо `answered` к источнику не
+    ходит никто, и держаться оно должно не перепиской руками — забытая обёртка
+    в четвёртой копии оставила бы набор зелёным, а исключение ушло бы через
+    границу потоков."""
+    return await asyncio.gather(
+        *(answered(awaitable, source) for awaitable, source in requests)
+    )

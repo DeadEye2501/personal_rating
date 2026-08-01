@@ -9,16 +9,16 @@ from datetime import datetime, timedelta
 
 import httpx
 
-from backend.model import Kind, Source
+from backend.model import Found, Kind, Source
 
 
 class FakeClient:
     """Клиент источника с заданным ответом.
 
-    Что у него спрашивают, дописывают наследники: у каталожного это выдача
-    поиска и детальная карточка, у перезапроса — сезоны с сериями. Общее у всех
-    трёх одно: заданный исход, имя источника для отказа и список того, о чём
-    спросили."""
+    Что у него спрашивают, дописывают наследники: у каталожного детальную
+    карточку, у поискового — выдачу, у перезапроса — сезоны с сериями, у
+    оценочного — чужие оценки. Общее у всех четверых одно: заданный исход, имя
+    источника для отказа и список того, о чём спросили."""
 
     def __init__(self, outcome, name: str = "tmdb") -> None:
         self.outcome = outcome
@@ -33,6 +33,44 @@ class FakeCatalog(FakeClient):
     async def card(self, source_id: str, kind: Kind):
         self.asked.append((source_id, kind))
         return self.outcome
+
+
+class FakeSearch(FakeClient):
+    """Клиент, у которого спрашивают выдачу: по названию, по имени человека и
+    работы найденного.
+
+    Три ручки — три заданных исхода: у настоящего TMDB это три разных запроса, и
+    слепив их в один, тест не различил бы, какая половина привезла находку.
+    Магазинам достаётся одна ручка из трёх, и это не поблажка фикстуре: людей
+    они не отдают вовсе."""
+
+    def __init__(self, outcome=None, name: str = "tmdb", *,
+                 people=None, works=None) -> None:
+        super().__init__(outcome, name)
+        self.people = people
+        self.works = works
+
+    async def search(self, query: str, kind: Kind):
+        """Заданное исключение он бросает, а не возвращает: сервис обязан
+        пережить и это."""
+        self.asked.append((query, kind))
+        if isinstance(self.outcome, BaseException):
+            raise self.outcome
+        return self.outcome
+
+    async def find_people(self, name: str):
+        self.asked.append(("find_people", name))
+        if isinstance(self.people, BaseException):
+            raise self.people
+        return self.people
+
+    async def credits_of(self, person_id: str, kind: Kind):
+        """Словарём задают ответы, когда тёзок несколько и работы у них
+        разные."""
+        self.asked.append(("credits_of", person_id, kind))
+        if isinstance(self.works, dict):
+            return self.works.get(person_id, Found([]))
+        return self.works
 
 
 class FakeSources:

@@ -1,4 +1,5 @@
-"""Приведение того, что ответили источники, к виду выдачи.
+"""Приведение того, что ответили источники, к тому виду, в котором это
+показывают: находки — выдачей, отказы — плашкой.
 
 Вынесено на втором потребителе: так собирает выдачу и поиск по строке, и поиск
 по человеку. Разойдись эти две сборки — у одной из двух выдач пропали бы жанры
@@ -20,7 +21,19 @@ from backend.model import (
 )
 from backend.sources.convert import from_search
 from backend.storage.repository.genres import GenresRepository
-from backend.unique import unique
+from backend.unique import unique, unique_by
+
+
+def once(refusals: list[Refusal]) -> list[Refusal]:
+    """Один отказ на источник и причину.
+
+    Спросили пятерых найденных тёзок, лёг источник — плашка внизу всё равно
+    говорит про источник, а он тут один. Тот же случай у строки поиска: обе её
+    половины спрашивают один и тот же TMDB.
+
+    Ключом, а не целиком: у сетевого отказа в `detail` стоит текст ошибки с
+    адресом, и пять одинаковых по сути отказов вышли бы пятью разными."""
+    return unique_by(refusals, lambda one: (one.source, one.reason))
 
 
 def split(

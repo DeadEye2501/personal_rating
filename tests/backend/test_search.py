@@ -1,112 +1,27 @@
-"""Поиск по чужим базам: выдача, отказы и склейка со своей."""
+"""Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
+магазинов, так и двух половин одного источника.
+
+Складывание своей выдачи с чужой — у `merge_results`, в своём модуле: оно живёт
+в модели и зовётся ещё и с той стороны границы, мостом."""
 
 import pytest
 
 from backend.model import (
-    CardView,
     Found,
     GenreSource,
     Kind,
     Missing,
+    PersonHit,
     RatingSource,
     Reason,
     Refusal,
     Source,
-    merge_results,
-    view_from_hit,
 )
 from backend.service.search import SEARCH_SIZE, SearchService
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
-from tests.conftest import MOMENT, FakeClient, FakeSources, hit, seed
-
-
-class FakeSearch(FakeClient):
-    """Спрашивают у него только выдачу поиска. Заданное исключение он бросает, а
-    не возвращает: сервис обязан пережить и это."""
-
-    async def search(self, query: str, kind: Kind):
-        self.asked.append((query, kind))
-        if isinstance(self.outcome, BaseException):
-            raise self.outcome
-        return self.outcome
-
-
-def local_view(source_id="157336", title="Интерстеллар") -> CardView:
-    return CardView(item_id=7, kind=Kind.MOVIE, source=Source.TMDB,
-                    source_id=source_id, title=title)
-
-
-def test_a_local_card_comes_first_and_its_twin_does_not_repeat():
-    """Своё идёт впереди всего чужого, а чужой близнец вторым разом не
-    показывается: карточка одна, и показать надо ту, у которой есть оценка."""
-    external = [view_from_hit(hit("1", "Первый")), view_from_hit(hit("157336"))]
-    merged = merge_results([local_view()], external)
-
-    assert [v.source_id for v in merged] == ["157336", "1"]
-    assert merged[0].item_id == 7
-
-
-def test_what_is_found_only_locally_comes_first_too():
-    external = [view_from_hit(hit("1", "Первый"))]
-    merged = merge_results([local_view("999", "Только у меня")], external)
-
-    assert [v.source_id for v in merged] == ["999", "1"]
-
-
-def test_the_order_of_the_local_half_is_kept():
-    """Своя половина приходит уже упорядоченной — по оценке у клика, по
-    названию у строки, — и склейка этого порядка не трогает."""
-    mine = [local_view("999", "Своё первое"), local_view("998", "Своё второе")]
-    merged = merge_results(mine, [view_from_hit(hit("1", "Чужое"))])
-
-    assert [v.source_id for v in merged] == ["999", "998", "1"]
-
-
-def test_duplicates_inside_one_answer_are_dropped():
-    external = [view_from_hit(hit("157336")), view_from_hit(hit("157336"))]
-
-    assert len(merge_results([], external)) == 1
-
-
-def test_the_same_game_in_two_stores_shows_up_twice():
-    """Общего ключа между Steam и GOG нет — склейки в выдаче тоже. Решает
-    человек.
-
-    Идентификатор нарочно один и тот же: диапазоны номеров у магазинов
-    пересекаются, и ключ обязан быть составным. При склейке по одному
-    `source_id` одна из двух игр молча пропала бы."""
-    external = [
-        view_from_hit(hit("100", "The Witcher 3", source=Source.STEAM)),
-        view_from_hit(hit("100", "The Witcher 3", source=Source.GOG)),
-    ]
-
-    assert len(merge_results([], external)) == 2
-
-
-def test_a_local_card_of_another_source_does_not_take_the_place():
-    """Тот же составной ключ с другой стороны: своя карточка из Steam не
-    подменяет собой кандидата из GOG под тем же номером."""
-    mine = CardView(item_id=7, kind=Kind.GAME, source=Source.STEAM,
-                    source_id="100", title="Ведьмак у меня")
-    external = [view_from_hit(hit("100", "Ведьмак в GOG", source=Source.GOG,
-                                  kind=Kind.GAME))]
-
-    merged = merge_results([mine], external)
-
-    assert [v.title for v in merged] == ["Ведьмак у меня", "Ведьмак в GOG"]
-
-
-def test_order_of_the_source_is_kept():
-    external = [view_from_hit(hit(str(n), f"Фильм {n}")) for n in range(5)]
-    merged = merge_results([], external)
-
-    assert [v.source_id for v in merged] == ["0", "1", "2", "3", "4"]
-
-
-def test_nothing_found_anywhere_is_an_empty_answer():
-    assert merge_results([], []) == []
+from tests.conftest import MOMENT, FakeSearch, FakeSources, hit, seed
 
 
 @pytest.fixture
@@ -148,14 +63,128 @@ async def test_the_free_rating_reaches_the_candidate(sessions, service):
     ]
 
 
-async def test_the_query_and_the_kind_reach_the_source(sessions, service):
+async def test_the_query_and_the_kind_reach_both_halves(sessions, service):
     """Что спросили снаружи, то и уехало в источник: подмена типа содержимого
-    молча дала бы выдачу не того раздела."""
-    client = FakeSearch(Found([hit()]))
+    молча дала бы выдачу не того раздела.
+
+    Обе половины, а не только названия: вкладка — первичный фильтр и для работ
+    человека, иначе клик по вкладке фильмов привёз бы его сериалы."""
+    client = FakeSearch(Found([hit()]), people=Found([PersonHit("525")]),
+                        works=Found([]))
 
     await service(client).external(Kind.SERIES, "андор")
 
-    assert client.asked == [("андор", Kind.SERIES)]
+    # Набор целиком и его длина, а не членство: лишний вопрос — повторный
+    # запрос к каталогу или фильмография того, кого не находили — прошёл бы
+    # молча. Порядком половины не связаны: они уходят разом.
+    assert len(client.asked) == 3
+    assert set(client.asked) == {
+        ("андор", Kind.SERIES),
+        ("find_people", "андор"),
+        ("credits_of", "525", Kind.SERIES),
+    }
+
+
+async def test_a_name_in_the_query_brings_the_works_of_that_person(sessions,
+                                                                   service):
+    """Строка ищет и по имени — всегда, а не «если названием ничего не
+    нашлось»: решение пользователя 01.08.2026. До него «Джон Траволта» не
+    находил снаружи ничего вовсе."""
+    client = FakeSearch(Found([]), people=Found([PersonHit("8891")]),
+                        works=Found([hit("680", "Криминальное чтиво")]))
+
+    result = await service(client).external(Kind.MOVIE, "джон траволта")
+
+    assert [v.title for v in result.views] == ["Криминальное чтиво"]
+
+
+async def test_titles_and_people_come_woven(sessions, service):
+    """Тем же переплетением, что и два магазина: подряд это значит, что
+    фильмография одного актёра вытеснит всё найденное по названию — у неё две
+    сотни строк, а порция одна."""
+    client = FakeSearch(
+        Found([hit(f"t{n}", f"Название {n}") for n in range(2)]),
+        people=Found([PersonHit("8891")]),
+        works=Found([hit(f"p{n}", f"Работа {n}") for n in range(2)]),
+    )
+
+    result = await service(client).external(Kind.MOVIE, "траволта")
+
+    assert [v.source_id for v in result.views] == ["t0", "p0", "t1", "p1"]
+
+
+async def test_the_filmography_is_cut_to_the_portion_too(sessions, service):
+    """Порция считается по выдаче, и половина людей не исключение: работ у
+    тёзок бывают сотни, а показанная строка ложится в базу.
+
+    Тёзки нарочно двое: с одним срез, уехавший внутрь запроса по человеку, лёг
+    бы на каждого порознь и остался бы незамеченным — двое дали бы сорок
+    строк."""
+    client = FakeSearch(Found([]),
+                        people=Found([PersonHit("1"), PersonHit("2")]),
+                        works={"1": Found([hit(f"a{n}") for n in range(15)]),
+                               "2": Found([hit(f"b{n}") for n in range(15)])})
+
+    result = await service(client).external(Kind.MOVIE, "траволта")
+
+    assert len(result.views) == SEARCH_SIZE
+
+
+async def test_a_refusal_of_the_name_search_travels_as_a_refusal(sessions,
+                                                                 service):
+    """Отказ половины людей — поле в результате, а не исключение: у границы
+    потоков второго канала доставки нет. Найденное по названию при этом
+    доезжает."""
+    client = FakeSearch(Found([hit()]),
+                        people=Refusal(source="tmdb", reason=Reason.NETWORK))
+
+    result = await service(client).external(Kind.MOVIE, "траволта")
+
+    assert [v.title for v in result.views] == ["Интерстеллар"]
+    assert [r.reason for r in result.refusals] == [Reason.NETWORK]
+
+
+async def test_one_source_refusing_both_halves_says_so_once(sessions, service):
+    """Обе половины строки спрашивают один TMDB, и легла сеть — плашка внизу
+    говорит про источник, а он тут один.
+
+    Отказы нарочно разные подробностью: в жизни они и расходятся — первый же
+    сбой взводит предохранитель, и вторая половина возвращает уже его. Сверка
+    целиком показала бы один TMDB двумя строками."""
+    client = FakeSearch(
+        Refusal(source="tmdb", reason=Reason.NETWORK, detail="не дозвонились"),
+        people=Refusal(source="tmdb", reason=Reason.NETWORK,
+                       detail="предохранитель взведён"),
+    )
+
+    result = await service(client).external(Kind.MOVIE, "траволта")
+
+    assert [(r.source, r.reason) for r in result.refusals] == [
+        ("tmdb", Reason.NETWORK)
+    ]
+
+
+async def test_two_stores_down_by_the_same_reason_stay_two(sessions, service):
+    """Схлопывание идёт по паре «источник и причина», а не по одной причине, и
+    это самый частый случай из всех: сеть легла — оба магазина отвечают одним и
+    тем же. Потеряй ключ источник, GOG исчез бы из плашки."""
+    steam = FakeSearch(Refusal(source="steam", reason=Reason.NETWORK),
+                       name="steam")
+    gog = FakeSearch(Refusal(source="gog", reason=Reason.NETWORK), name="gog")
+
+    result = await service(steam, gog).external(Kind.GAME, "ведьмак")
+
+    assert sorted(r.source for r in result.refusals) == ["gog", "steam"]
+
+
+async def test_games_never_go_outside_for_people(sessions, service):
+    """Кого спрашивать про людей — решает реестр, и сервис обязан его
+    слушаться: у игр такого клиента нет вовсе."""
+    client = FakeSearch(Found([]), people=Found([PersonHit("1")]), name="steam")
+
+    await service(client).external(Kind.GAME, "ведьмак")
+
+    assert [one for one in client.asked if one[0] == "find_people"] == []
 
 
 async def test_genres_are_unfolded_from_the_reference(sessions, reference, service):

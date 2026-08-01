@@ -10,8 +10,9 @@ from backend.model import (
     Kind,
     SearchHit,
 )
-from backend.service.asking import answered
-from backend.service.hits import split, to_views
+from backend.service.asking import answered_all
+from backend.service.filmography import Filmographies
+from backend.service.hits import once, split, to_views
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
@@ -23,15 +24,17 @@ SEARCH_SIZE = 20
 
 
 def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]:
-    """Выдачи нескольких источников — вперемешку, по одному кандидату по кругу.
+    """Несколько выдач — вперемешку, по одному кандидату по кругу.
 
-    У игр магазина два, и склеить их подряд нельзя: поиск GOG никогда не
-    отвечает «не найдено» и на бессмыслицу отдаёт два десятка несвязанных игр.
-    Подряд это значит, что вторая половина страницы — всегда мусор GOG, а его
-    настоящие находки начинаются там, куда никто не доскроллит.
+    Выдач бывает две по двум разным причинам. У игр это два магазина, и склеить
+    их подряд нельзя: поиск GOG никогда не отвечает «не найдено» и на
+    бессмыслицу отдаёт два десятка несвязанных игр — подряд это значит, что
+    вторая половина страницы всегда мусор GOG, а настоящие его находки
+    начинаются там, куда никто не доскроллит. У кино источник один, но половины
+    у строки две — названия и работы найденных людей, — и подряд фильмография
+    одного актёра вытеснила бы за экран всё найденное по названию.
 
-    Порядок внутри каждой выдачи сохраняется: он задан источником, и на
-    единственной выдаче — у кино источник один — переплетение её и возвращает."""
+    Порядок внутри каждой выдачи сохраняется: он задан источником."""
     woven = []
     for position in range(max((len(answer) for answer in answers), default=0)):
         for answer in answers:
@@ -50,6 +53,7 @@ class SearchService:
         self._library = library
         self._views = views
         self._sources = sources
+        self._works = Filmographies(sources)
         self._genres = genres
         # Часы внедряются, как во всех записях проекта: отметка бесплатной оценки
         # кандидата в базу не попадает, но брать время изнутри — путь к тому, что
@@ -61,19 +65,26 @@ class SearchService:
         return await self._views.in_order(item_ids)
 
     async def external(self, kind: Kind, query: str) -> ExternalSearch:
-        """У игр магазина два, и спрашиваем их разом. Отказ одного не скрывает
-        ответ другого."""
-        clients = self._sources.catalog_for(kind)
-        outcomes = await asyncio.gather(
-            *(answered(client.search(query, kind), client.name)
-              for client in clients)
+        """Строка ищет и по названию, и по имени человека — всегда, а не «если
+        названием ничего не нашлось»: решение пользователя 01.08.2026.
+
+        Обе половины уходят разом: сроки ожидания у них свои, и спроси их по
+        очереди — выдача ждала бы их сумму. У игр в первой половине два
+        магазина, и отказ одного не скрывает ответ другого."""
+        outcomes, (works, refused) = await asyncio.gather(
+            answered_all((client.search(query, kind), client.name)
+                         for client in self._sources.catalog_for(kind)),
+            self._works.of_name(query, kind),
         )
 
         answers, refusals = split(outcomes)
-        # Порция считается по источнику: одна страница — один запрос.
-        woven = _weave([answer[:SEARCH_SIZE] for answer in answers])
+        # Порция считается по выдаче, а не по странице: у каталога она стоит
+        # одного запроса, у работ — одного на всех найденных тёзок разом, а их
+        # бывают сотни, и показанная строка ложится в базу.
+        woven = _weave([answer[:SEARCH_SIZE] for answer in answers]
+                       + [works[:SEARCH_SIZE]])
 
         return ExternalSearch(
             views=tuple(await to_views(woven, self._genres, self._clock)),
-            refusals=tuple(refusals),
+            refusals=tuple(once(refusals + refused)),
         )
