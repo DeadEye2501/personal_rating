@@ -1,7 +1,42 @@
 import { describe, expect, it } from 'vitest'
 
 import { stepOf } from '$state/scores.js'
-import { nameOf, pagesOf, stepOfSource } from '$state/sources.js'
+import { nameOf, pagesOf, shownValue, stepOfSource } from '$state/sources.js'
+
+describe('оценка агрегатора в строке', () => {
+  it('десятибалльная всегда с десятой долей', () => {
+    // «IMDb 8» рядом с «Кинопоиск 8.7» читается как другая шкала, а не как
+    // круглая оценка.
+    expect(shownValue(8, 'imdb')).toBe('8.0')
+    expect(shownValue(8.7, 'kinopoisk')).toBe('8.7')
+  })
+
+  it('лишняя точность отрезается до десятой', () => {
+    // У TMDB приезжает 8.483, и три знака после запятой читаются как чужая
+    // точность, а не как оценка.
+    expect(shownValue(8.483, 'imdb')).toBe('8.5')
+  })
+
+  it('у Rotten Tomatoes доля со знаком процента', () => {
+    // У них это доля положительных рецензий, а не балл: «86» рядом с
+    // «Metacritic 74» читается как оценка той же природы, хотя природа разная.
+    expect(shownValue(86, 'rotten')).toBe('86%')
+  })
+
+  it('у TMDB она стобалльная и без дроби', () => {
+    // Обе стороны пишут её сотней: своё `vote_average` клиент приводит, MDBList
+    // отдаёт так сразу. Дробь здесь выдумывала бы точность чужой шкалы.
+    expect(shownValue(88, 'tmdb')).toBe('88')
+    expect(stepOfSource(88, 'tmdb')).toBe(9)
+  })
+
+  it('стобалльная и пятидесятибалльная — целыми', () => {
+    // Проценты дробей не имеют: «Rotten Tomatoes 73.0» — это выдумка точности,
+    // которой у источника нет.
+    expect(shownValue(46, 'gog')).toBe('46')
+    expect(shownValue(87.4, 'steam')).toBe('87')
+  })
+})
 
 describe('шкала источника', () => {
   it('у GOG она пятидесятибалльная, и 46 — девятая ступень', () => {

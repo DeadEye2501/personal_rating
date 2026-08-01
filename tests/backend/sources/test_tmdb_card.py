@@ -62,6 +62,17 @@ def test_genres_come_from_the_named_block_not_the_search_one(fixture):
     assert {space for space, _ in card.genre_ext_ids} == {GenreSource.TMDB}
 
 
+def test_the_tmdb_rating_is_stored_on_the_hundred_scale():
+    """Шкала TMDB стобалльная — решено пользователем 02.08.2026. Собственное
+    `vote_average` приезжает десятибалльным, а MDBList отдаёт ту же оценку
+    сотней: не приведи одно к другому, и в ленте рядом встанут «TMDB 8.4» и
+    «TMDB 84», означающие одно и то же."""
+    payload = {"id": 1, "title": "Одиссея", "vote_average": 8.4,
+               "credits": {"cast": [], "crew": []}}
+
+    assert parse_movie(payload).ratings[0].value == 84
+
+
 def test_a_film_nobody_rated_has_no_rating():
     """У неоценённого `vote_average` приходит нулём, и записать его значило бы
     объявить, что фильм оценили в ноль."""
@@ -96,7 +107,7 @@ def test_tmdb_own_rating_survives_into_the_card(fixture):
     card = parse_movie(fixture("tmdb/movie_detail.json"))
 
     own = [one for one in card.ratings if one.source is RatingSource.TMDB]
-    assert own and 0 < own[0].value <= 10
+    assert own and 10 < own[0].value <= 100
 
 
 def test_every_person_carries_the_tmdb_identity(fixture):

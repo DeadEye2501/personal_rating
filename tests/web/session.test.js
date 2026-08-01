@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { EMPTY, chosen, cycled, isEmpty } from '$state/filters.js'
-import { collapsedOf, newSession, withClearedFilter, withCollapsed,
+import { collapsedOf, flipped, newSession, withClearedFilter, withCollapsed,
   withFilters,
   withForgotten, withKind, withMark, withNextSort, withSection,
   withToggledSection }
@@ -230,5 +230,19 @@ describe('свёрнутость карточки', () => {
   it('нетронутая карточка слушается тумблера', () => {
     expect(collapsedOf({ collapsed: null }, true)).toBe(true)
     expect(collapsedOf({}, false)).toBe(false)
+  })
+})
+
+describe('свёрнутость строки', () => {
+  it('переворачивает своё, когда своё есть', () => {
+    expect(flipped({ collapsed: true }, false)).toEqual({ collapsed: false })
+    expect(flipped({ collapsed: false }, true)).toEqual({ collapsed: true })
+  })
+
+  it('без своего отталкивается от общего', () => {
+    // Первый щелчок по шеврону обязан спорить с тумблером шапки, а не
+    // повторять его: своё сильнее общего.
+    expect(flipped({}, true)).toEqual({ collapsed: false })
+    expect(flipped({}, false)).toEqual({ collapsed: true })
   })
 })

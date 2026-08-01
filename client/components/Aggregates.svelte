@@ -1,7 +1,7 @@
 <!-- Оценки агрегаторов: цифра, кружок ожидания или пустое место. -->
 <script>
   import { colorOf } from '$state/scores.js'
-  import { nameOf, pagesOf, stepOfSource } from '$state/sources.js'
+  import { nameOf, pagesOf, shownValue, stepOfSource } from '$state/sources.js'
 
   let { external = [], expected = [], ids = [], onopen } = $props()
 
@@ -45,10 +45,8 @@
         <span class="aggr aggr--flat">{nameOf(one.source)}</span>
       {/if}
       {#if one.value !== null}
-        <!-- До десятой доли: у TMDB приезжает 8.483, и три знака после запятой
-             рядом с «IMDb 8.7» читаются как чужая точность, а не как оценка. -->
         <b style:--score={colorOf(stepOfSource(one.value, one.source))}
-        >{Math.round(one.value * 10) / 10}</b>
+        >{shownValue(one.value, one.source)}</b>
       {:else if !one.asked}
         <i class="aggr-wait" aria-hidden="true"></i>
       {/if}

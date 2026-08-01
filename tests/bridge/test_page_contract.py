@@ -304,8 +304,8 @@ def test_the_page_sends_the_three_scales_in_the_order_the_bridge_reads_them():
 
     Сверяются имена доводов моста с тем порядком, в каком их собирает страница.
     Первый довод у моста — номер карточки, и шкалы идут за ним."""
-    named = re.search(r"const ASPECT_KEYS = \[(.+?)\]", source("app/rating.js"))
-    assert named, "в client/app/rating.js больше нет списка ASPECT_KEYS"
+    named = re.search(r"const ASPECT_KEYS = \[(.+?)\]", source("app/marks.js"))
+    assert named, "в client/app/marks.js больше нет списка ASPECT_KEYS"
 
     bridge = (Path(__file__).resolve().parents[2] / "bridge/marks.py")
     signature = re.search(r"def aspects\(self, item_id: int, (.+?)\) -> dict",

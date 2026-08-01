@@ -64,3 +64,9 @@ export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })
  *  сильнее общего, и правило это одно на обе стороны — лента им рисует,
  *  раздел им переключает. */
 export const collapsedOf = (view, collapsed) => view.collapsed ?? collapsed
+
+/** Щелчок по шеврону: своё сильнее общего. У строки, которая своего ещё не
+ *  имеет, первый щелчок обязан спорить с тумблером шапки, а не повторять
+ *  его — иначе он выглядит несработавшим. */
+export const flipped = (view, collapsed) =>
+  ({ collapsed: !collapsedOf(view, collapsed) })

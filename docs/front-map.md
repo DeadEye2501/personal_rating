@@ -33,20 +33,20 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (152)
+### app/LibraryScreen.svelte (148)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
-- берёт: ./rating.js, ./reread.js, ./trouble.js, ./visible.js
+- берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
 
 ### app/LinkField.svelte (102)
 - Привязка карточки к внешней базе вставленной ссылкой — и отвязка.
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (240)
+### app/SearchScreen.svelte (241)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
-- берёт: ./inturn.js, ./reread.js, ./rating.js, ./trouble.js, ./visible.js
+- берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (60)
 - Раздел «Статистика»: гистограмма своих оценок по тому же отфильтрованному набору, что и разделы с карточками.
@@ -61,9 +61,9 @@
 - Порядок операций по одной строке выдачи.
 - отдаёт: rowTurns
 
-### app/rating.js (28)
-- Запись своей оценки: балл у кино и сериала, три шкалы у игры.
-- отдаёт: aspected, scored
+### app/marks.js (41)
+- Свои отметки на карточке: оценка и закладка.
+- отдаёт: aspected, scored, wished
 
 ### app/reread.js (35)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
@@ -91,7 +91,7 @@
 - Ряд действий карточки: правка, удаление, закладка.
 - принимает: wished, onedit, ondelete, onwish
 
-### components/Aggregates.svelte (57)
+### components/Aggregates.svelte (55)
 - Оценки агрегаторов: цифра, кружок ожидания или пустое место.
 - принимает: external, expected, ids, onopen
 
@@ -265,17 +265,17 @@
 - Запрос раздела: то, что уезжает мостом в `feed.page`.
 - отдаёт: requestOf
 
-### state/session.js (66)
+### state/session.js (72)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: collapsedOf, newSession, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
+- отдаёт: collapsedOf, flipped, newSession, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
 
 ### state/sorting.js (76)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (57)
+### state/sources.js (77)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
-- отдаёт: MANUAL, nameOf, pagesOf, stepOfSource
+- отдаёт: MANUAL, nameOf, pagesOf, shownValue, stepOfSource
 
 ## styles — 29 файлов
 

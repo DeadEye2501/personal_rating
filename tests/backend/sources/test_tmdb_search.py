@@ -46,12 +46,17 @@ def test_genres_arrive_as_identifiers_without_names(fixture):
 
 
 def test_tmdb_rating_comes_free_with_the_search(fixture):
-    """vote_average приезжает в том же ответе — за него не платим запросом."""
+    """vote_average приезжает в том же ответе — за него не платим запросом.
+
+    Шкала у оценки TMDB стобалльная — решено пользователем 02.08.2026. Своё
+    `vote_average` десятибалльное, и приводится оно здесь: MDBList отдаёт ту же
+    оценку сразу сотней, а две шкалы у одного источника значат, что «TMDB 8.4»
+    и «TMDB 84» стоят в ленте рядом и означают одно и то же."""
     hits = parse_search(fixture("tmdb/search_movie.json"), Kind.MOVIE)
 
     rated = [hit for hit in hits if hit.source_rating is not None]
     assert rated, "ни у одного кандидата нет оценки TMDB"
-    assert 0 < rated[0].source_rating <= 10
+    assert 10 < rated[0].source_rating <= 100
 
 
 def test_series_are_parsed_from_their_own_fields(fixture):

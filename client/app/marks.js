@@ -1,4 +1,4 @@
-/* Запись своей оценки: балл у кино и сериала, три шкалы у игры. */
+/* Свои отметки на карточке: оценка и закладка. */
 
 import { call } from '$api/bridge.js'
 
@@ -11,6 +11,19 @@ const ASPECT_KEYS = ['visual', 'narrative', 'gameplay']
 export async function scored(view, value) {
   await call('marks.score', view.item_id, value)
   return { rating: { ...view.rating, score: value } }
+}
+
+/** Закладка ставится и снимается одним жестом: у карточки в списке дел кнопка
+ *  горит, и она же её и гасит. Какой из двух путей звать, решает нынешнее
+ *  состояние карточки. */
+export async function wished(view) {
+  // Два вызова литералами, а не один с выбором пути строкой: сторож границы
+  // «страница → мост» читает путь прямо из вызова и составленного не видит —
+  // опечатка в нём осталась бы зелёной на обоих наборах.
+  await (view.in_wishlist
+    ? call('marks.unwish', view.item_id)
+    : call('marks.wish', view.item_id))
+  return { in_wishlist: !view.in_wishlist }
 }
 
 /** Три шкалы уезжают вместе, потому что средний балл считает база: у игры

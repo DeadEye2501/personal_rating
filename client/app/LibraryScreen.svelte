@@ -5,11 +5,11 @@
   import { untrack } from 'svelte'
 
   import Feed from '$components/Feed.svelte'
-  import { call, numbered } from '$api/bridge.js'
+  import { numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { requestOf } from '$state/section.js'
-  import { collapsedOf } from '$state/session.js'
-  import { aspected, scored } from './rating.js'
+  import { flipped } from '$state/session.js'
+  import { aspected, scored, wished } from './marks.js'
   import { refreshed, without } from './reread.js'
   import { complaining } from './trouble.js'
   import { onCardShown } from './visible.js'
@@ -94,15 +94,11 @@
   const aspect = async (view, key, value) =>
     patch(view, await aspected(view, key, value))
 
-  async function wish(view) {
-    await call(view.in_wishlist ? 'marks.unwish' : 'marks.wish', view.item_id)
-    patch(view, { in_wishlist: !view.in_wishlist })
-  }
+  const wish = async (view) => patch(view, await wished(view))
 
   // Свёрнутость принадлежит элементу ленты: тумблер шапки — состояние всего
-  // приложения, шеврон карточки — свойство её самой, и своё сильнее общего.
-  const collapse = (view) =>
-    patch(view, { collapsed: !collapsedOf(view, session.collapsed) })
+  // приложения, шеврон карточки — свойство её самой.
+  const collapse = (view) => patch(view, flipped(view, session.collapsed))
 
   /** Замена идёт по номеру строки, а не по ссылке: список мог смениться, пока
    *  запись доезжала до базы. */

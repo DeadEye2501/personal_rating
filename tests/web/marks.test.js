@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме проверок.
-import { aspected, scored } from '../../client/app/rating.js'
+import { aspected, scored, wished } from '../../client/app/marks.js'
 import { fake } from './fake.js'
 
 const film = { item_id: 7, rating: { score: 5 } }
 const game = { item_id: 9, rating: { visual: 8, narrative: null, gameplay: 6 } }
 
-describe('своя оценка', () => {
+describe('свои отметки на карточке', () => {
   it('пишет балл и отдаёт поля для строки', async () => {
     // Строку обновляет тот, кто ею владеет: у ленты она ищется по номеру, у
     // выдачи поиска — по паре «источник плюс идентификатор». Здесь только то,
@@ -55,6 +55,20 @@ describe('своя оценка', () => {
     expect(fields.rating.gameplay).toBe(6)
   })
 
+  it('закладка ставится и снимается тем же жестом', async () => {
+    // Один жест на два действия: у карточки в списке дел кнопка горит, и она же
+    // её и гасит. Какой из двух путей моста звать, решает нынешнее состояние.
+    const put = fake({ 'marks.wish': { ok: null } })
+    expect(await wished({ item_id: 7, in_wishlist: false }))
+      .toEqual({ in_wishlist: true })
+    expect(put).toEqual([['marks.wish', [7]]])
+
+    const off = fake({ 'marks.unwish': { ok: null } })
+    expect(await wished({ item_id: 7, in_wishlist: true }))
+      .toEqual({ in_wishlist: false })
+    expect(off).toEqual([['marks.unwish', [7]]])
+  })
+
   it('отказ записи доходит до просителя, а не глотается', async () => {
     // Молчание тут запрещено правилом отказов: не дошло до базы — человек
     // обязан узнать, а журнал получить след. Обещание отклоняется, и ловит его
@@ -62,6 +76,13 @@ describe('своя оценка', () => {
     fake({ 'marks.score': { fail: 'timeout' } })
 
     await expect(scored(film, 8)).rejects.toMatchObject({ kind: 'timeout' })
+  })
+
+  it('отказ закладки доходит так же', async () => {
+    fake({ 'marks.wish': { fail: 'timeout' } })
+
+    await expect(wished({ item_id: 7, in_wishlist: false }))
+      .rejects.toMatchObject({ kind: 'timeout' })
   })
 
   it('отказ записи шкал доходит так же', async () => {

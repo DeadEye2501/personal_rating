@@ -633,7 +633,7 @@
   - `async def series_counts(self, source_id: str) -> Outcome` (6)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 218 строк
+### `backend/sources/tmdb/parse.py` — 226 строк
 
 Перевод ответов TMDB в наши типы.
 
@@ -643,6 +643,7 @@
 - `def _released(value: str | None) -> date | None` (7)
 - `def _poster(payload: dict) -> str` (3)
 - `def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (2)
+- `def _hundred(value: float | None) -> float | None` (2)
 - `def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]` (2)
 - `def _person(row: dict, role: PersonRole, position: int | None=None) -> Credit` (10)
 - `def _cast(rows: list[dict]) -> list[Credit]` (5)
@@ -1340,13 +1341,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_tmdb_card.py` — 418 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_tmdb_card.py` — 429 строк ⚠ подошёл к 300
 
 Второй круг загрузки: карточка, которую уже можно записать.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`
 
-Тестов: 32
+Тестов: 33
 
 
 ### `tests/backend/sources/test_tmdb_failures.py` — 187 строк
@@ -1368,7 +1369,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 13
 
 
-### `tests/backend/sources/test_tmdb_search.py` — 182 строк
+### `tests/backend/sources/test_tmdb_search.py` — 187 строк
 
 Первый круг загрузки: кандидат выдачи — ещё не карточка.
 

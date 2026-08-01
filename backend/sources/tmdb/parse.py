@@ -52,8 +52,16 @@ def _genres(payload: dict) -> tuple[tuple[GenreSource, str], ...]:
     return genres(GenreSource.TMDB, payload.get("genres", []))
 
 
+# Шкала оценки TMDB у нас стобалльная — решено пользователем 02.08.2026. Своё
+# `vote_average` приезжает десятибалльным, а MDBList отдаёт ту же оценку сразу
+# сотней; не приведи одно к другому — и в ленте рядом встанут «TMDB 8.4» и
+# «TMDB 84», означающие одно и то же.
+def _hundred(value: float | None) -> float | None:
+    return None if value is None else value * 10
+
+
 def _own_rating(payload: dict, now: datetime) -> tuple[ExternalRating, ...]:
-    return rating(RatingSource.TMDB, payload.get("vote_average"), now)
+    return rating(RatingSource.TMDB, _hundred(payload.get("vote_average")), now)
 
 
 def _person(row: dict, role: PersonRole, position: int | None = None) -> Credit:
@@ -161,7 +169,7 @@ def _hits(rows: list[dict], kind: Kind) -> list[SearchHit]:
                     (GenreSource.TMDB, str(genre_id))
                     for genre_id in row.get("genre_ids", [])
                 ),
-                source_rating=row.get("vote_average") or None,
+                source_rating=_hundred(row.get("vote_average") or None),
             )
         )
     return hits

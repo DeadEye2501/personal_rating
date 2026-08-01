@@ -8,9 +8,10 @@
   import { lastOp, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
+  import { flipped } from '$state/session.js'
   import { rowTurns } from './inturn.js'
   import { keyOf, refreshed, same, without } from './reread.js'
-  import { aspected, scored } from './rating.js'
+  import { aspected, scored, wished } from './marks.js'
   import { complaining, reported } from './trouble.js'
   import { onCardShown } from './visible.js'
 
@@ -114,7 +115,7 @@
     // молча, и строка осталась бы кандидатом навсегда.
     const [fresh] = await numbered('feed.views_of', [outcome.value],
                                    { channel: `views:${keyOf(view)}`, ops })
-    if (fresh) replace(fresh)
+    if (fresh) patch(fresh, fresh)
     return { fresh }
   }
 
@@ -138,15 +139,15 @@
 
   const adopting = (view) => turns.once(view, () => adopt(view))
 
-  /** Замена целиком — для заведённой карточки: она и есть правда о строке. */
-  function replace(fresh) {
-    views = views.map((each) => same(each, fresh) ? fresh : each)
-  }
-
-  /** Долив полей — для всего остального. Ответы кругов и нажатие человека идут
-   *  вперегонки, и снимок строки, взятый до `await`, затирает то, что случилось
-   *  после него: так пропадала поставленная оценка — в базе она оставалась, а с
-   *  экрана исчезала ровно в тот миг, когда доезжали оценки агрегаторов. */
+  /** Долив полей, а не замена строки целиком. Ответы кругов и нажатие человека
+   *  идут вперегонки, и снимок строки, взятый до `await`, затирает то, что
+   *  случилось после него: так пропадала поставленная оценка — в базе она
+   *  оставалась, а с экрана исчезала ровно в тот миг, когда доезжали оценки
+   *  агрегаторов.
+   *
+   *  Заведённая карточка кладётся тем же доливом: она правда обо всём, что
+   *  лежит в базе, но не о свёрнутости — та живёт только на странице, и заменой
+   *  целиком свёрнутая строка разворачивалась бы сама, едва догрузившись. */
   function patch(view, fields) {
     views = views.map((each) => same(each, view) ? { ...each, ...fields } : each)
   }
@@ -170,7 +171,7 @@
   function again(done) {
     if (!views.some((each) => each.item_id === done.item_id)) return
 
-    refreshed(done, ops, replace)
+    refreshed(done, ops, (fresh) => patch(fresh, fresh))
       .catch((error) => lost(error, 'Не удалось перечитать карточку'))
   }
 
@@ -195,20 +196,23 @@
     return fresh ?? null
   }
 
-  /** Оценка ставится по карточке, а карточки у кандидата ещё нет: сначала
-   *  заводим, потом ставим. Второе нажатие по той же строке заведения уже не
-   *  требует — у неё есть номер.
+  /** Отметка ставится по карточке — оценка, шкала, закладка, — а карточки у
+   *  кандидата ещё нет: сначала заводим, потом отмечаем. Второе нажатие по той
+   *  же строке заведения уже не требует — у неё есть номер.
    *
    *  Записи по строке идут по очереди, и каждая берёт строку заново: у игры три
    *  шкалы уезжают одним вызовом, и вторая, посчитанная от снимка, взятого до
    *  `await`, затирает первую — в базе остаётся последняя. */
-  const rate = (view, put) => turns.inTurn(view, async () => {
+  const applying = (view, put) => turns.inTurn(view, async () => {
     const full = view.item_id ? view : await asked(view)
     if (!full) return
 
     const now = views.find((each) => same(each, full)) ?? full
     patch(now, await put(now))
   })
+
+  // Ждать заведения свёрнутости незачем: это показ, а не запись.
+  const collapse = (view) => patch(view, flipped(view, session.collapsed))
 
   /** Правка кандидата открывает окно на заведённой карточке, а не на пустой
    *  форме: иначе «Сохранить» завело бы вторую, ручную карточку того же
@@ -218,23 +222,20 @@
     if (full) onedit(full)
   }
 
-  const idle = () => {}
 </script>
 
 <!-- Порции в поиске не догружаются, и `onmore` отвечает «больше нет» намеренно:
      у TMDB страница выдачи это ровно двадцать кандидатов и один запрос, у игр
      два магазина по двадцать. Второй страницы в спеке нет.
 
-     Нажатие по звезде у кандидата сначала заводит карточку, а потом ставит
-     оценку: `marks.score` зовётся по номеру, а номер появляется только после
-     заведения. -->
+     Отметки у недогруженной строки ждут её заведения — см. `applying`. -->
 <Feed views={cards} collapsed={session.collapsed} {expected} {root}
       onmore={() => false}
       onshown={(view) => shown(view).catch(lost)}
       on={session.filters.on} {onmark} {onperson} {onopen}
-      onscore={(view, value) => rate(view, (full) => scored(full, value)).catch(lost)}
+      onscore={(view, value) => applying(view, (full) => scored(full, value)).catch(lost)}
       onaspect={(view, key, value) =>
-        rate(view, (full) => aspected(full, key, value)).catch(lost)}
-      oncollapse={idle} onedit={(view) => edit(view).catch(lost)}
-      {ondelete} onwish={idle}
+        applying(view, (full) => aspected(full, key, value)).catch(lost)}
+      oncollapse={collapse} onedit={(view) => edit(view).catch(lost)}
+      {ondelete} onwish={(view) => applying(view, wished).catch(lost)}
       {ontag} />
