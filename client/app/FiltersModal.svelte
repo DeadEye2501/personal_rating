@@ -14,6 +14,7 @@
   import { dragged } from '$state/reorder.js'
   import { SCALE } from '$state/scores.js'
   import { created } from './tags.js'
+  import { dropped, ordered, wearers } from './tagset.js'
   import { reported } from './trouble.js'
 
   // Наборов жанров два на три типа содержимого: фильмы и сериалы делят один.
@@ -61,7 +62,7 @@
    *  нечего, и спрашивать не о чем. */
   async function remove(row) {
     try {
-      const worn = await call('marks.tag_usage', row.id)
+      const worn = await wearers(row.id)
       if (worn) { asking = { row, worn }; return }
     } catch (error) {
       lost(error, 'Не удалось удалить тег')
@@ -73,12 +74,11 @@
   async function drop(row) {
     asking = null
     try {
-      await call('marks.delete_tag', row.id)
+      rows = await dropped(rows, row.id)
     } catch (error) {
       lost(error, 'Не удалось удалить тег')
       return
     }
-    rows = rows.filter((each) => each.id !== row.id)
     // Номер, оставшийся в фильтре или на карточке ленты, показывал бы отбор по
     // мертвецу, и выключить его было бы нечем: строки в списке уже нет.
     onforget(row.id)
@@ -95,7 +95,11 @@
   /** Порядок ручной, и пережить перезапуск он обязан: без вызова перестановка
    *  живёт до закрытия окна. */
   function grab(event, at) {
-    const list = event.currentTarget.closest('.taglist')
+    // Список берётся строением, а не по имени класса: класс принадлежит чужой
+    // разметке — списку наложения и строке, — и переименование в ней молча
+    // убило бы перетаскивание. Строение своё: строка это `li`, а список — то,
+    // что её содержит.
+    const list = event.currentTarget.closest('li').parentElement
     const before = rows
     const row = rows[at]
     let from = at
@@ -106,7 +110,7 @@
     document.body.style.cursor = 'grabbing'
 
     dragging(list, event, (point) => {
-      const middles = [...list.querySelectorAll('.tagrow')].map((node) => {
+      const middles = [...list.children].map((node) => {
         const box = node.getBoundingClientRect()
         return box.top + box.height / 2
       })
@@ -116,7 +120,7 @@
       moving = null
       document.body.style.cursor = ''
       if (from === at) return
-      call('marks.reorder_tags', kind, rows.map((row) => row.id))
+      ordered(rows, kind)
         .catch((error) => { rows = before; lost(error, 'Порядок не сохранился') })
     })
   }
