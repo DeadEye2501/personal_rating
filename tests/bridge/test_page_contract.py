@@ -25,7 +25,8 @@ from backend.model import (
     Section,
     Sort,
 )
-from bridge.answer import kebab
+from bridge.answer import Domain, kebab
+from bridge.api import Api
 from bridge.feed import FILTER_FIELDS
 
 WEB = Path(__file__).resolve().parents[2] / "client"
@@ -133,10 +134,21 @@ def test_the_page_names_the_same_three_aspects_as_the_base():
 def test_the_card_asks_the_right_two_shelves():
     """Люди и студии лежат в разных репозиториях, и мост зовёт их по имени
     домена. Перепутанные местами, они дали бы режиссёра среди студий — ровно та
-    ошибка, которую проект уже ловил мутациями в сборке бэкенда."""
-    card = source("components/Facts.svelte")
+    ошибка, которую проект уже ловил мутациями в сборке бэкенда.
 
-    assert set(re.findall(r"from: '(\w+)'", card)) == {"people", "companies"}
+    Сверяется **привязка**, а не набор из двух имён: набор переживает обмен
+    ролей местами, и до 01.08.2026 этот докстринг обещал больше, чем проверял.
+    Кто где лежит, питон знает сам — по `PersonRole` и `CompanyRole`."""
+    asked = re.findall(r"from: '(\w+)', role: '(\w+)'",
+                       source("components/Facts.svelte"))
+    shelves = {role: shelf
+               for shelf, roles in (("people", PersonRole),
+                                    ("companies", CompanyRole))
+               for role in roles}
+
+    assert asked, "в client/components/Facts.svelte больше нет таблицы ролей"
+    assert {role: shelf for shelf, role in asked} == {
+        role: shelves[role] for _, role in asked}
 
 
 def test_sorting_is_offered_exactly_where_the_base_can_sort():
@@ -194,3 +206,33 @@ def test_the_page_knows_the_only_refusal_it_tells_apart():
 
     assert named, "в client/app/tags.js больше нет константы TAG_EXISTS"
     assert named.group(1) == kebab(TagExists.__name__)
+
+
+# `call('домен.метод')` и `numbered('домен.метод')` — единственный способ, каким
+# страница называет мост. Путь пишется строкой, и опечатка в нём не роняет ни
+# сборку, ни один тест фронта: промис отклоняется в бегущем приложении.
+CALLED = re.compile(r"(?:call|numbered)\('(\w+)\.(\w+)'")
+
+
+def paths_of_the_page() -> set[tuple[str, str]]:
+    found = set()
+    for path in WEB.rglob("*"):
+        if path.suffix not in {".js", ".svelte"} or "node_modules" in path.parts:
+            continue
+        found |= set(CALLED.findall(path.read_text(encoding="utf-8")))
+    return found
+
+
+def test_every_path_the_page_calls_exists_on_the_bridge():
+    """Обратная половина `test_bridge_surface.py`: тот сверяет «мост → бэкенд»,
+    этот — «страница → мост». Без него `marks.tag_usage`, написанное как
+    `marks.tag_uses`, оставляет оба набора зелёными, а удаление тега перестаёт
+    спрашивать про носителей — молча."""
+    surface = {(domain, method)
+               for domain, side in vars(Api(None)).items()
+               if isinstance(side, Domain)
+               for method in dir(side) if not method.startswith("_")}
+    called = paths_of_the_page()
+
+    assert called, "страница больше не зовёт мост ни одним путём"
+    assert called <= surface, f"страница зовёт то, чего у моста нет: {called - surface}"
