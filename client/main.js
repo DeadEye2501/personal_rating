@@ -11,5 +11,7 @@ import '$styles/topbar.css'
 import '$styles/search.css'
 import '$styles/seg.css'
 import '$styles/tools.css'
+import '$styles/view.css'
+import '$styles/snack.css'
 
 export default mount(App, { target: document.getElementById('root') })

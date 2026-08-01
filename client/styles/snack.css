@@ -1,0 +1,25 @@
+/* Единственное место, где приложение что-то сообщает: и отказ источника, и
+   непредвиденный сбой. Уехавшая вниз плашка пустая — отсутствие сообщений само
+   себя ничем не обозначает. */
+.snack {
+  --neon: var(--error);
+  --halo-h: 30px;
+
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 20;
+  max-width: min(560px, calc(100vw - 48px));
+  padding: 12px 24px;
+  border-radius: var(--r-full);
+  font: var(--body-m);
+  text-align: center;
+
+  background: var(--glass-error);
+  backdrop-filter: blur(14px) saturate(125%);
+
+  transform: translate(-50%, calc(100% + 32px));
+  transition: transform .22s cubic-bezier(.2,.8,.2,1);
+}
+
+.snack.is-shown { transform: translate(-50%, 0) }

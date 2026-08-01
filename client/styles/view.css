@@ -1,0 +1,17 @@
+/* Стопка разделов: виден один, переход между ними — проявление. */
+
+.view { display: none }
+
+/* Высота именно задана, а не минимальна: содержимое считает свои проценты
+   от неё. */
+.view.is-shown {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  animation: screen-in .16s ease-out;
+}
+
+@keyframes screen-in {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
