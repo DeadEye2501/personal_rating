@@ -12,11 +12,15 @@
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
-## app — 11 файлов
+## app — 12 файлов
 
-### app/App.svelte (204)
+### app/App.svelte (217)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
-- берёт: ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
+- берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
+
+### app/CardModal.svelte (53)
+- Окно создания и правки карточки: поля показываются своему типу.
+- принимает: kind, onsave, onclose
 
 ### app/CardTagsModal.svelte (82)
 - Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
@@ -63,7 +67,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 23 файлов
+## components — 26 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -77,11 +81,15 @@
 - Столбец гистограммы: заливка, число над верхушкой и подпись оценки.
 - принимает: score, count, share, index
 
+### components/Button.svelte (6)
+- Кнопка ответного ряда внизу окна.
+- принимает: variant, onclick, children
+
 ### components/Chips.svelte (29)
 - Метки карточки: жанры, теги и кнопка добавления тега.
 - принимает: genres, tags, on, onmark, ontag
 
-### components/Confirm.svelte (18)
+### components/Confirm.svelte (22)
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
 - принимает: label, text, ok, danger, onyes, onclose
 
@@ -92,6 +100,10 @@
 ### components/Feed.svelte (84)
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
+
+### components/Field.svelte (25)
+- Строка ввода окна карточки: однострочная или абзацем.
+- принимает: value, placeholder, variant, area
 
 ### components/Film.svelte (84)
 - Карточка ленты целиком.
@@ -107,7 +119,7 @@
 
 ### components/Modal.svelte (54)
 - Оболочка любого наложения: затемнение, окно и два способа его закрыть.
-- принимает: narrow, ask, danger, label, onclose, children
+- принимает: narrow, ask, danger, card, label, onclose, children
 
 ### components/NewTag.svelte (36)
 - Форма заведения тега.
@@ -121,9 +133,13 @@
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
 - принимает: score, state, ontoggle
 
-### components/Scrollarea.svelte (85)
-- Область со своей полосой прокрутки.
+### components/Scrollarea.svelte (16)
+- Область, которая прокручивается вместо страницы.
 - принимает: children
+
+### components/Scrollbar.svelte (89)
+- Своя полоса прокрутки для того, что прокручивается.
+- принимает: box, area
 
 ### components/SearchField.svelte (30)
 - Поле поиска с кнопкой очистки.
@@ -157,7 +173,11 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, onclick, children
 
-## state — 13 файлов
+## state — 14 файлов
+
+### state/card.js (29)
+- Форма карточки: из каких полей она состоит у каждого типа содержимого.
+- отдаёт: emptyCard, shownFor
 
 ### state/dragging.js (23)
 - Таска указателем: захват, движение, отпускание.
@@ -211,7 +231,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 27 файлов
+## styles — 28 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -239,6 +259,12 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
+### styles/cardform.css (58)
+- Раскладка окна создания и правки карточки.
+- селекторы (7): .modal--card, .cardform__top, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__poster
+- объявляет: --col-gap, --field-h, --poster-w, --row-gap
+- берёт: --col-gap, --poster-w, --row-gap, --tint-18, --tint-22
+
 ### styles/chart.css (92)
 - Гистограмма оценок и её подвал.
 - селекторы (11): .chart, .chart__bars, .bar, .bar__plot, .bar__fill, .bar__count, .bar__value, .chart__foot, .chart__foot b, .view.is-drawing .bar__fill, @keyframes bar-rise
@@ -260,10 +286,16 @@
 - селекторы (1): .feed
 - берёт: --content-w
 
-### styles/field.css (15)
-- Строка ввода: общее у поиска в шапке и у формы нового тега.
-- селекторы (1): .field__input
-- берёт: --body-l, --primary
+### styles/field.css (74)
+- Строка ввода: общее у поиска в шапке, формы нового тега и полей карточки.
+- селекторы (12): .field,
+.newtag, .field:focus-within,
+.newtag:focus-within, .field, .field__input, .field .field__input,
+.newtag__input, .field .field__input::placeholder,
+.newtag__input::placeholder, .field:hover .field__input::placeholder,
+.newtag__input:hover::placeholder, .field .field__input:focus::placeholder,
+.newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
+- берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
 ### styles/film.css (125)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
@@ -301,10 +333,9 @@
 - объявляет: --halo-h
 - берёт: --halo-h, --neon, --opaque
 
-### styles/newtag.css (41)
+### styles/newtag.css (25)
 - Форма заведения тега под списком.
-- селекторы (8): .newtag, .newtag:focus-within, .newtag__input, .newtag__input::placeholder, .newtag__input:hover::placeholder, .newtag__input:focus::placeholder, .newtag__ok, .newtag.is-filled .newtag__ok
-- берёт: --primary, --text-bright, --text-dim
+- селекторы (3): .newtag, .newtag__ok, .newtag.is-filled .newtag__ok
 
 ### styles/palette.css (119)
 - Единственное место, где есть цвет. По месту пишется только var().

@@ -1,0 +1,58 @@
+/* Раскладка окна создания и правки карточки. */
+
+/* Окно создания и правки — одно и то же: пустое заводит, заполненное правит.
+   Раскладка считается от постера, поэтому его ширина, высота строки и оба
+   отступа — переменные, а не числа по месту. */
+.modal--card {
+  --poster-w: 230px;
+  --field-h: 46px;
+  --row-gap: 14px;
+  --col-gap: 36px;
+
+  width: min(1080px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--row-gap);
+  padding: 34px 40px 28px;
+}
+
+/* Постер слева, поля справа от него. */
+.cardform__top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--col-gap);
+}
+
+/* Высота задана постером, а не соседней колонкой: иначе каждое новое поле слева
+   растягивало бы синопсис и уводило режиссёра вниз. */
+.cardform__fields {
+  flex: 1;
+  min-width: 0;
+  height: calc(var(--poster-w) * 1.5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--row-gap);
+}
+
+/* Строка из нескольких полей: длинное тянется, короткое стоит по своей ширине. */
+.cardform__row {
+  display: flex;
+  gap: 20px;
+}
+.cardform__row .field { flex: 1 }
+.cardform__row .field--short { flex: 0 0 92px }
+
+/* Пропорция та же, что у обложки в ленте: постер обрезается под 2:3. Отзыв на
+   наведение придёт вместе с выбором картинки — пока коробка ни на что не
+   откликается, и обещать обратное ей нечем. */
+.cardform__poster {
+  flex: 0 0 var(--poster-w);
+  align-self: flex-start;
+  aspect-ratio: 2 / 3;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--tint-18);
+  border-radius: 8px;
+  color: var(--tint-22);
+}

@@ -1,8 +1,28 @@
-/* Строка ввода: общее у поиска в шапке и у формы нового тега. */
+/* Строка ввода: общее у поиска в шапке, формы нового тега и полей карточки. */
 
-/* Цвета тут нет намеренно: у поиска текст приглушённый, у нового тега белый —
-   так в макете, и это единственное, чем два поля различаются. Ставит его блок,
-   который применил класс. */
+/* Обёртка строки: у карточки это `.field`, у формы нового тега `.newtag`. Черта
+   проступает только под фокусом — в покое поле обозначает себя подсказкой, а
+   десяток линий разом превращает окно в бланк. */
+.field,
+.newtag {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color .18s;
+}
+.field:focus-within,
+.newtag:focus-within { border-bottom-color: var(--primary) }
+
+.field {
+  /* Без этого поле не сожмётся ниже собственной ширины input, и заданная ширина
+     короткого поля не сработает. */
+  min-width: 0;
+  min-height: var(--field-h, 46px);
+}
+
+/* Голая строка ввода — без цвета: у поиска в шапке он свой, приглушённый, и
+   ставит его `search.css`. */
 .field__input {
   flex: 1;
   min-width: 0;
@@ -13,3 +33,42 @@
   caret-color: var(--primary);
   user-select: text;        /* body запрещает выделение, полю оно нужно */
 }
+
+/* Белый текст и живая подсказка — у карточки и у нового тега. Обёртка в
+   селекторе не для веса, а для отбора: `.field__input` эти двое делят со
+   строкой поиска, а у той и цвет, и подсказка свои. */
+.field .field__input,
+.newtag__input { color: var(--text-bright) }
+
+.field .field__input::placeholder,
+.newtag__input::placeholder {
+  color: var(--text-dim);
+  transition: color .16s;
+}
+.field:hover .field__input::placeholder,
+.newtag__input:hover::placeholder { color: var(--text-bright) }
+
+.field .field__input:focus::placeholder,
+.newtag__input:focus::placeholder { color: transparent }
+
+/* Название — главное поле карточки, поэтому крупнее остальных. */
+.field--title .field__input { font: var(--title-l) }
+
+/* Синопсис. Подчёркивания нет намеренно: под абзацем оно читается как черта, а
+   не как поле. Рамки и фона тоже нет — только подсказка, которая уступает
+   место курсору. */
+.field--area {
+  flex: 1;
+  align-items: stretch;
+  padding-top: 12px;
+  border-bottom: none;
+}
+/* Системная полоса убрана: вместо неё своя, та же, что в списках тегов. Отступ
+   справа — место под неё. */
+.field--area .field__input {
+  resize: none;
+  line-height: 22px;
+  padding-right: 14px;
+  scrollbar-width: none;
+}
+.field--area .field__input::-webkit-scrollbar { display: none }

@@ -1,5 +1,6 @@
 <!-- Корень страницы: шапка, стопка разделов и плашка сообщений. -->
 <script>
+  import CardModal from './CardModal.svelte'
   import CardTagsModal from './CardTagsModal.svelte'
   import FiltersModal from './FiltersModal.svelte'
   import LibraryScreen from './LibraryScreen.svelte'
@@ -81,6 +82,10 @@
   // раздела — одинаково.
   const complain = (text) => { trouble = { text } }
 
+  // Открыто ли окно карточки. Признаком, а не карточкой: пустое окно заводит
+  // новую, и показывать ему нечего.
+  let adding = $state(false)
+
   // Какое наложение открыто, знает сборка: `null` либо признак с подписью.
   // Подпись едет от кнопки, которая окно открыла: заголовок окна и есть её
   // подпись, и вторым объявлением они разъехались бы молча.
@@ -144,7 +149,7 @@
             onsession={(next) => { session = next }}
             onsearch={(text) => { query = { text }
                                   session = withSection(session, 'search') }}
-            onadd={() => {}} onfilter={filter} />
+            onadd={() => { adding = true }} onfilter={filter} />
 
     <div class="content" bind:this={content}>
       <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
@@ -198,6 +203,14 @@
                    ontrouble={complain}
                      onclose={() => { tagging = null }} />
     {/key}
+  {/if}
+
+  <!-- Записывать форму пока нечем: окно только показывает поля, и «Сохранить»
+       его просто закрывает. -->
+  {#if adding}
+    <CardModal kind={session.kind}
+               onsave={() => { adding = false }}
+               onclose={() => { adding = false }} />
   {/if}
 
   <Snack message={trouble} />

@@ -1,28 +1,12 @@
 /* Форма заведения тега под списком. */
 
-/* Без фона и рамки: в покое это просто серая надпись, при фокусе под ней
-   проступает акцентная полоса. */
+/* Общее с полем карточки — в `field.css`; здесь только своё: форма ниже, стоит
+   под списком и держит кнопку рядом со строкой. */
 .newtag {
-  display: flex;
-  align-items: center;
   gap: 8px;
   min-height: 34px;
   margin-top: 10px;
-  padding: 0 2px;
-  border-bottom: 2px solid transparent;
-  transition: border-color .18s;
 }
-.newtag:focus-within { border-bottom-color: var(--primary) }
-
-/* Общее у строк ввода — в `field.css`; здесь только своё. Подсказка тут живее,
-   чем у поиска: под курсором она светлеет, под фокусом исчезает совсем. */
-.newtag__input { color: var(--text-bright) }
-.newtag__input::placeholder {
-  color: var(--text-dim);
-  transition: color .16s;
-}
-.newtag__input:hover::placeholder { color: var(--text-bright) }
-.newtag__input:focus::placeholder { color: transparent }
 
 /* Вид общий, из `iconbutton.css`; здесь только появление — кнопка видна,
    только когда есть что подтверждать. */
