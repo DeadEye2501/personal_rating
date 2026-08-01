@@ -1,7 +1,8 @@
-<!-- Строки фактов карточки: длительность или сезоны, кто сделал, кто играл. -->
+<!-- Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
+     Длинный состав свёрнут до пятерых, пока не развернут. -->
 <script>
   import { ROLES } from '$state/credits.js'
-  import { castOf, runtimeOf, seriesOf } from '$state/facts.js'
+  import { castOf, hiddenOf, runtimeOf, seriesOf } from '$state/facts.js'
 
   let { view, onperson } = $props()
 
@@ -12,6 +13,10 @@
   const ROWS = ROLES.map((one) =>
     one.role === 'actor' ? { ...one, label: CAST } : one)
 
+  // Роли, которые человек развернул. Свёрнуто по умолчанию, а не наоборот:
+  // почему — сказано у предела в `state/facts.js`.
+  let opened = $state([])
+
   const length = $derived(view.kind === 'series'
     ? seriesOf(view.seasons_count, view.episodes_count)
     : runtimeOf(view.runtime))
@@ -19,7 +24,13 @@
   // Строки несут не имена, а сами титры: клик по имени зовёт поиск по
   // **номеру строки** человека — имя тёзку не различает.
   const rows = $derived(ROWS
-    .map((row) => ({ ...row, credits: castOf(view[row.domain] ?? [], row.role) }))
+    .map((row) => {
+      const credits = view[row.domain] ?? []
+      return opened.includes(row.role)
+        ? { ...row, credits: castOf(credits, row.role, Infinity), hidden: 0 }
+        : { ...row, credits: castOf(credits, row.role),
+            hidden: hiddenOf(credits, row.role) }
+    })
     .filter((row) => row.credits.length))
 </script>
 
@@ -38,6 +49,13 @@
                 onclick={() => onperson(row.domain, credit.entity_id)}
         >{credit.name}</button>
       {/each}
+      <!-- Разворачивается насовсем: обратной кнопки нет, и список остаётся
+           полным, пока карточку не перечитают. -->
+      {#if row.hidden}
+        <button type="button" class="more"
+                onclick={() => { opened = [...opened, row.role] }}
+        >… ещё {row.hidden}</button>
+      {/if}
     </dd>
   {/each}
 </dl>

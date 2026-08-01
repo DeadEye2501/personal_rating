@@ -94,8 +94,8 @@
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
 - принимает: label, text, ok, danger, onyes, onclose
 
-### components/Facts.svelte (43)
-- Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
+### components/Facts.svelte (61)
+- Строки фактов карточки: длительность или сезоны, кто сделал, кто играл. Длинный состав свёрнут до пятерых, пока не развернут.
 - принимает: view, onperson
 
 ### components/Feed.svelte (84)
@@ -200,9 +200,9 @@
 - Таска указателем: захват, движение, отпускание.
 - отдаёт: dragging
 
-### state/facts.js (50)
+### state/facts.js (57)
 - Строки фактов карточки: длительность, сезоны и серии, состав.
-- отдаёт: castOf, plural, runtimeOf, seriesOf
+- отдаёт: castOf, hiddenOf, plural, runtimeOf, seriesOf
 
 ### state/filters.js (119)
 - Три состояния строки фильтра: не выбран, включён, исключён.
@@ -322,7 +322,7 @@
 .newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (130)
+### styles/film.css (131)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
 .film.is-collapsed .film__poster,

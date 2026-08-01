@@ -31,11 +31,18 @@ export function seriesOf(seasons, episodes) {
  *  номеру строки человека, и без него звать было бы нечего — имя тёзку не
  *  различает. */
 export function castOf(credits, role, limit = TOP) {
-  return credits
-    .filter((credit) => credit.role === role)
+  return ofRole(credits, role)
     .toSorted((one, other) => (one.position ?? 0) - (other.position ?? 0))
     .slice(0, limit)
 }
+
+/** Сколько людей этой роли не поместилось. Ноль значит «все на виду», и кнопки
+ *  «… ещё» тогда не бывает: обещать ею нечего. */
+export const hiddenOf = (credits, role) =>
+  Math.max(0, ofRole(credits, role).length - TOP)
+
+const ofRole = (credits, role) =>
+  credits.filter((credit) => credit.role === role)
 
 /** Русский счёт: 11–14 идут по правилу «много», а не по последней цифре.
  *  Открыт наружу со второго потребителя: тем же считает план 8 носителей тега

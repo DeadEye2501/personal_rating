@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { castOf, plural, runtimeOf, seriesOf } from '$state/facts.js'
+import { castOf, hiddenOf, plural, runtimeOf, seriesOf } from '$state/facts.js'
 
 const named = (credit) => credit.name
+
+// Состав заданной длины, по порядку титров. Длина у каждой проверки своя, и
+// она же предмет: пятеро на виду, шестой уже спрятан.
+const cast = (count) => Array.from({ length: count }, (_, index) =>
+  ({ entity_id: index, name: `Актёр ${index}`, role: 'actor', position: index }))
 
 describe('строки фактов', () => {
   it('длительность показывается часами и минутами', () => {
@@ -89,22 +94,52 @@ describe('строки фактов', () => {
     // У сериала состав приезжает из aggregate_credits — у «Andor» это 302
     // человека, и вся лента превратилась бы в список имён. Длины тут мало:
     // срез с хвоста даёт ту же пятёрку, но из статистов вместо главных.
-    const many = Array.from({ length: 20 }, (_, index) =>
-      ({ entity_id: index, name: `Актёр ${index}`, role: 'actor',
-         position: index }))
-
-    expect(castOf(many, 'actor', 5).map(named))
+    expect(castOf(cast(20), 'actor', 5).map(named))
       .toEqual(['Актёр 0', 'Актёр 1', 'Актёр 2', 'Актёр 3', 'Актёр 4'])
   })
 
   it('и по умолчанию тоже показывает первых пятерых', () => {
     // Забытый довод у актёров вывалил бы в ленту весь состав, и заметить это
     // было бы негде: у режиссёра и студий их всё равно единицы.
-    const many = Array.from({ length: 20 }, (_, index) =>
-      ({ entity_id: index, name: `Актёр ${index}`, role: 'actor',
-         position: index }))
-
-    expect(castOf(many, 'actor').map(named))
+    expect(castOf(cast(20), 'actor').map(named))
       .toEqual(['Актёр 0', 'Актёр 1', 'Актёр 2', 'Актёр 3', 'Актёр 4'])
+  })
+})
+
+describe('спрятанные за «ещё»', () => {
+  it('считает тех, кто не поместился', () => {
+    // По этому числу и решается, показывать ли «… ещё»: без него карточка
+    // молча теряет весь состав после пятого.
+    expect(hiddenOf(cast(20), 'actor')).toBe(15)
+  })
+
+  it('все на виду — прятать нечего', () => {
+    expect(hiddenOf(cast(3), 'actor')).toBe(0)
+  })
+
+  it('ровно предел — тоже нечего', () => {
+    // Граница: шестой прячется, пятый нет. Ошибись она на единицу — кнопка
+    // висела бы у полного состава и обещала то, чего нет.
+    expect(hiddenOf(cast(5), 'actor')).toBe(0)
+    expect(hiddenOf(cast(6), 'actor')).toBe(1)
+  })
+
+  it('считает только свою роль', () => {
+    // Восемь актёров и режиссёр: считай оно всех подряд, у режиссёра вышло бы
+    // четверо спрятанных — кнопка появилась бы у роли, где человек один.
+    const mixed = [...cast(8),
+                   { entity_id: 99, name: 'Нолан', role: 'director' }]
+
+    expect(hiddenOf(mixed, 'actor')).toBe(3)
+    expect(hiddenOf(mixed, 'director')).toBe(0)
+  })
+
+  it('развёрнутый состав отдаётся целиком', () => {
+    // Ровно то, ради чего «… ещё» и заведено: без предела приезжают все, и
+    // порядок по титрам не ломается.
+    const shown = castOf(cast(20), 'actor', Infinity)
+
+    expect(shown).toHaveLength(20)
+    expect(shown.at(-1).name).toBe('Актёр 19')
   })
 })
