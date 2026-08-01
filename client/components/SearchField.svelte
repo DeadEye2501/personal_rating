@@ -16,7 +16,7 @@
 
 <!-- Поиск идёт по Enter, а не на каждую букву: одна буква — это запрос к
      внешней базе, а их квоты конечны. -->
-<label class="search">
+<label class="zone search">
   <Icon name="search" extra="search__icon" />
   <input class="field__input search__input" type="search" placeholder="Поиск" aria-label="Поиск"
          spellcheck="false" autocomplete="off"

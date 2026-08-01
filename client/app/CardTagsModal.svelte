@@ -5,10 +5,12 @@
   import NewTag from '$components/NewTag.svelte'
   import TagRow from '$components/TagRow.svelte'
   import { call } from '$api/bridge.js'
+  import { NOUNS } from '$state/kinds.js'
   import { created } from './tags.js'
   import { reported } from './trouble.js'
 
-  const TITLE = { movie: 'Теги фильма', series: 'Теги сериала', game: 'Теги игры' }
+  // Заголовок собирается из общей таблицы форм, а не пишется вторым списком:
+  // «Теги» плюс родительный падеж единственного числа.
 
   let { view, onview, onclose, ontrouble } = $props()
 
@@ -70,7 +72,7 @@
 
 {#snippet form()}<NewTag oncreate={create} />{/snippet}
 
-<ListModal label={TITLE[kind]} {onclose} footer={form}>
+<ListModal label={`Теги ${NOUNS[kind][1]}`} {onclose} footer={form}>
   {#snippet items()}
     {#each rows as row (row.id)}
       <TagRow name={row.name} state={mine.has(row.id) ? 'on' : 'off'}

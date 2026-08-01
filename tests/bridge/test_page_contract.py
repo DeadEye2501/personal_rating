@@ -236,3 +236,14 @@ def test_every_path_the_page_calls_exists_on_the_bridge():
 
     assert called, "страница больше не зовёт мост ни одним путём"
     assert called <= surface, f"страница зовёт то, чего у моста нет: {called - surface}"
+
+
+def test_the_page_has_a_word_form_for_every_kind():
+    """Формы склонения — по одной тройке на тип содержимого. Пропуск роняет
+    `plural` на `undefined` прямо в подтверждении удаления тега, а лишний ключ
+    остаётся мёртвым: типов ровно три, и новый заводится не здесь."""
+    forms = re.search(r"export const NOUNS = \{(.+?)\n\}",
+                      source("state/kinds.js"), re.DOTALL)
+
+    assert forms, "в client/state/kinds.js больше нет таблицы NOUNS"
+    assert set(re.findall(r"^  (\w+):", forms.group(1), re.MULTILINE)) == set(Kind)

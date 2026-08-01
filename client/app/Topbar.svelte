@@ -98,7 +98,7 @@
                onchoose={(kind) => onsession(withKind(session, kind))} />
   </div>
 
-  <div class="tools" bind:this={tools}>
+  <div class="zone tools" bind:this={tools}>
     {#each VIEWS as view (view.value)}
       <ToolButton icon={view.icon} label={view.label}
                   active={session.section === view.value}

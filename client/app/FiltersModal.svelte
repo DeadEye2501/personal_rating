@@ -8,6 +8,7 @@
   import TagRow from '$components/TagRow.svelte'
   import { call } from '$api/bridge.js'
   import { plural } from '$state/facts.js'
+  import { NOUNS } from '$state/kinds.js'
   import { cycled, stateOf } from '$state/filters.js'
   import { dragging } from '$state/dragging.js'
   import { dragged } from '$state/reorder.js'
@@ -21,9 +22,6 @@
   const GENRE_KINDS = { movie: 'film', series: 'film', game: 'game' }
 
   // Существительное — по открытой вкладке, как в макете: «3 фильма», «3 игры».
-  const NOUNS = { movie: ['фильм', 'фильма', 'фильмов'],
-                  series: ['сериал', 'сериала', 'сериалов'],
-                  game: ['игра', 'игры', 'игр'] }
   const WEARS = ['имеет', 'имеют', 'имеют']
 
   // Список открывается на высоких оценках: их ищут чаще.

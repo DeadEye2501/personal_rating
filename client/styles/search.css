@@ -8,9 +8,6 @@
   gap: 10px;
   height: 42px;                /* вровень с капсулой переключателя */
   padding: 0 16px;
-  border-radius: var(--r-full);
-  background: var(--tint-035);
-  border: 1px solid var(--tint-06);
   transition: background .18s, border-color .18s;
 }
 

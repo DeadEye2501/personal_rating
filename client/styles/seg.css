@@ -10,9 +10,6 @@
   grid-auto-columns: 1fr;
   gap: 2px;
   padding: 3px;
-  border-radius: var(--r-full);
-  background: var(--tint-035);
-  border: 1px solid var(--tint-06);
 }
 
 .seg__btn {

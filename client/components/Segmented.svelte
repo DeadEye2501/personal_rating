@@ -5,7 +5,7 @@
   let { items, chosen, onchoose } = $props()
 </script>
 
-<nav class="seg">
+<nav class="zone seg">
   {#each items as item (item.value)}
     <button type="button" class="seg__btn" class:is-active={item.value === chosen}
             aria-pressed={item.value === chosen}

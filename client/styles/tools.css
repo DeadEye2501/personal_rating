@@ -1,16 +1,13 @@
 /* Ряд круглых кнопок в правой зоне шапки. */
 
-/* Подложка та же, что у переключателя; кнопка 34px плюс отступы даёт ровно те
-   же 42px высоты. */
+/* Подложка общая, из `zone.css`; кнопка 34px плюс отступы даёт ровно те же
+   42px высоты, что у поиска и переключателя. */
 .tools {
   grid-column: 3;
   width: var(--side-w);
   display: flex;
   justify-content: space-between;
   padding: 3px;
-  border-radius: var(--r-full);
-  background: var(--tint-035);
-  border: 1px solid var(--tint-06);
 }
 
 .tools__btn {
