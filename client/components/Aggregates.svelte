@@ -1,4 +1,4 @@
-<!-- Оценки агрегаторов: цифра или кружок ожидания. -->
+<!-- Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой. -->
 <script>
   import { colorOf } from '$state/scores.js'
   import { nameOf, pagesOf, shownValue, stepOfSource } from '$state/sources.js'
@@ -22,22 +22,25 @@
   // крутился кружок. Ряд при этом всё же сдвигается — но один раз, когда круг
   // кончился и ответившие пустотой из него ушли.
   //
-  // Показываются два вида: кружок, пока ответа нет, и цифра, когда он есть.
-  // Источник, ответивший пустотой, уходит из ряда целиком — решено
-  // пользователем 02.08.2026: одно имя без цифры и без кружка выглядит вечным
-  // ожиданием, которого уже не будет.
+  // Видов три, и все решены пользователем 02.08.2026: кружок, пока ответа нет;
+  // цифра, когда он есть; прочерк у того, чьё имя ведёт на страницу источника.
+  // Имя без цифры и без кружка выглядит вечным ожиданием, которого уже не
+  // будет, — но у тех двоих, чей адрес мы умеем собрать, оно ещё и
+  // единственный способ открыть у них карточку. Прочерк говорит, что оценки
+  // нет, и ссылку оставляет; остальные уходят из ряда целиком.
   //
-  // Просроченная пустая строка попадает в «цифры нет» и из ряда уходит, хотя
-  // источник спрашивают прямо сейчас: у показа нет способа отличить её от
-  // свежей, а `stale_sources` есть только у бэкенда. Цена — мигание раз в
-  // неделю на карточке, у которой оценки и так не нашлось.
+  // Просроченная пустая строка попадает в «цифры нет»: у показа нет способа
+  // отличить её от свежей, а `stale_sources` есть только у бэкенда. Раз в
+  // неделю на карточке без оценки это стоит мигания — прочерком у тех, чьё имя
+  // со ссылкой, и исчезновением у остальных.
   const shown = $derived([...new Set([...expected, ...arrived.keys()])]
     .map((source) => ({
       source,
+      page: pages.get(source) ?? null,
       value: arrived.get(source)?.value ?? null,
       waiting: !arrived.has(source),
     }))
-    .filter((one) => one.value !== null || one.waiting))
+    .filter((one) => one.value !== null || one.waiting || one.page))
 </script>
 
 <div class="film__aggr">
@@ -45,10 +48,9 @@
     <span>
       <!-- Открывает системный браузер, а не саму страницу: окно приложения без
            адресной строки, и вернуться из Кинопоиска было бы нечем. -->
-      {#if pages.get(one.source)}
-        <a class="aggr" href={pages.get(one.source)}
-           onclick={(event) => { event.preventDefault()
-                                 onopen(pages.get(one.source)) }}
+      {#if one.page}
+        <a class="aggr" href={one.page}
+           onclick={(event) => { event.preventDefault(); onopen(one.page) }}
         >{nameOf(one.source)}</a>
       {:else}
         <span class="aggr aggr--flat">{nameOf(one.source)}</span>
@@ -56,8 +58,10 @@
       {#if one.value !== null}
         <b style:--score={colorOf(stepOfSource(one.value, one.source))}
         >{shownValue(one.value, one.source)}</b>
-      {:else}
+      {:else if one.waiting}
         <i class="aggr-wait" aria-hidden="true"></i>
+      {:else}
+        <b class="aggr-none">—</b>
       {/if}
     </span>
   {/each}

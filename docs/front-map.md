@@ -91,8 +91,8 @@
 - Ряд действий карточки: правка, удаление, закладка.
 - принимает: wished, onedit, ondelete, onwish
 
-### components/Aggregates.svelte (64)
-- Оценки агрегаторов: цифра или кружок ожидания.
+### components/Aggregates.svelte (68)
+- Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой.
 - принимает: external, expected, ids, onopen
 
 ### components/Bar.svelte (16)
@@ -290,9 +290,9 @@
 .film__wish.is-on
 - берёт: --error, --gutter, --icon-inset, --primary, --tint-30
 
-### styles/aggr.css (51)
+### styles/aggr.css (61)
 - Оценки агрегаторов и кружок на месте неприехавшей.
-- селекторы (9): .film__aggr, .film__aggr span, .aggr, .aggr:hover, .aggr--flat, .aggr--flat:hover, .film__aggr b, .aggr-wait, @keyframes aggr-spin
+- селекторы (10): .film__aggr, .film__aggr span, .aggr, .aggr:hover, .aggr--flat, .aggr--flat:hover, .film__aggr b, .film__aggr .aggr-none, .aggr-wait, @keyframes aggr-spin
 - объявляет: --flat
 - берёт: --body-m, --primary, --score, --tint-16, --tint-35, --tint-55
 
