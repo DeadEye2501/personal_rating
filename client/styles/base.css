@@ -25,6 +25,20 @@ body {
   user-select: none;
 }
 
+/* Кнопку в этом приложении рисует её собственный блок, а не браузер: своей
+   подложки, рамки и отступов у неё нет нигде. Сбрасывалось это порознь семью
+   местами — от капсулы переключателя до имени в титрах, — и восьмой раз отвести
+   повтор было нечем. Шрифт и цвет наследуются, а не назначаются: у метки,
+   у круглой кнопки и у имени они свои. */
+button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 3px;

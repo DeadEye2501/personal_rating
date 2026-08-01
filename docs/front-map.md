@@ -14,8 +14,8 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
 
-### app/LibraryScreen.svelte (3)
-- Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос. Пока пуст.
+### app/LibraryScreen.svelte (21)
+- Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Черновик: спрашивает одно и то же и ничем не управляет — настоящий раздел собирает задача 6.
 
 ### app/SearchScreen.svelte (2)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Пока пуст.
@@ -23,15 +23,31 @@
 ### app/StatsScreen.svelte (2)
 - Раздел «Статистика»: гистограмма своих оценок. Пока пуст.
 
-### app/Topbar.svelte (133)
+### app/Topbar.svelte (146)
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
 
-## components — 5 файлов
+## components — 10 файлов
+
+### components/Chips.svelte (26)
+- Метки карточки: жанры, теги и кнопка добавления тега.
+- принимает: genres, tags, on, onmark, ontag
+
+### components/Facts.svelte (45)
+- Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
+- принимает: view, onperson
+
+### components/Film.svelte (34)
+- Карточка ленты целиком.
+- принимает: view, collapsed, on, oncollapse, onmark, onperson, ontag
 
 ### components/Icon.svelte (6)
 - Глиф Material Symbols.
 - принимает: name, extra
+
+### components/Poster.svelte (28)
+- Обложка карточки с заглушкой.
+- принимает: item_id, source, poster_url
 
 ### components/SearchField.svelte (30)
 - Поле поиска с кнопкой очистки.
@@ -44,6 +60,10 @@
 ### components/Snack.svelte (41)
 - Плашка сообщений: одна на всё приложение.
 - принимает: message
+
+### components/Synopsis.svelte (28)
+- Описание карточки, обрезанное до трёх строк, с раскрытием.
+- принимает: text
 
 ### components/ToolButton.svelte (17)
 - Круглая кнопка ряда в шапке.
@@ -79,7 +99,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 10 файлов
+## styles — 14 файлов
 
 ### styles/app.css (59)
 - Оболочка окна: неоновая кромка сверху и место под содержимое.
@@ -87,11 +107,39 @@
 .app::after, .app::before, .app::after, .app__main, .content
 - берёт: --primary
 
-### styles/base.css (61)
+### styles/base.css (75)
 - Правила, у которых нет своего блока.
-- селекторы (9): *, *::before, *::after, [hidden], html, body, #root, body, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
+- селекторы (10): *, *::before, *::after, [hidden], html, body, #root, body, button, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
 .is-on > .material-symbols-outlined, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
+
+### styles/chips.css (78)
+- Метки карточки: жанры, теги и кнопка «± Тег».
+- селекторы (14): .film__chips, .chip::first-letter, .chip, .chip--tag, .chip::before, .chip:hover, .chip:hover::before, .chip--add:hover, .chip--add:hover::before, .chip.is-on, .chip.is-on::before, .chip.is-on:hover, .chip.is-on:hover::before, .chip--add
+- объявляет: --add
+- берёт: --label-m, --primary, --r-full, --text-bright, --tint-06, --tint-09, --tint-30, --tint-55
+
+### styles/facts.css (29)
+- Строки фактов карточки и имена в них.
+- селекторы (6): .film__facts, .film__facts dt, .film__facts dd, .film__role, .person, .person:hover
+- берёт: --body-m, --primary, --tint-35, --tint-85
+
+### styles/feed.css (12)
+- Лента: полоса по ширине шапки и промежутки между карточками.
+- селекторы (1): .feed
+- берёт: --content-w
+
+### styles/film.css (133)
+- Карточка ленты: рама, сворачивание, постер, текстовая колонка.
+- селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
+.film.is-collapsed .film__poster,
+.film.is-collapsed .film__chips,
+.film.is-collapsed .film__facts,
+.film.is-collapsed .film__synopsis,
+.film.is-collapsed .film__aggr,
+.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film.is-collapsed .film__scores, .film__poster, .film__poster .material-symbols-outlined, .film__poster img, .film__body, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
+- объявляет: --gutter, --icon-inset
+- берёт: --body-l, --body-m, --gutter, --icon-inset, --primary, --r-full, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
 ### styles/neon.css (49)
 - Общий приём: полоса по верхней кромке, гаснущая к краям, гало под ней и свечение текста. Цвет из --neon, высоту гало из --halo-h ставит тот, кто применяет класс.
@@ -105,13 +153,13 @@
 - объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
-### styles/search.css (78)
+### styles/search.css (74)
 - Поле поиска в левой зоне шапки.
 - селекторы (11): .search, .search:hover, .search:focus-within, .search__icon, .search:focus-within .search__icon, .search__input, .search__input::placeholder, .search__input::-webkit-search-cancel-button,
 .search__input::-webkit-search-decoration, .search__clear, .search__clear .material-symbols-outlined, .search__clear:hover
 - берёт: --body-l, --fill-primary-14, --primary, --r-full, --side-w, --text, --tint-035, --tint-05, --tint-06, --tint-10, --tint-28, --tint-35
 
-### styles/seg.css (46)
+### styles/seg.css (43)
 - Капсула переключателя типа содержимого.
 - селекторы (6): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
 - берёт: --fill-primary-14, --primary, --r-full, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75, --title-s
@@ -122,7 +170,7 @@
 - объявляет: --halo-h, --neon
 - берёт: --body-m, --error, --glass-error, --r-full
 
-### styles/tools.css (83)
+### styles/tools.css (80)
 - Ряд круглых кнопок в правой зоне шапки.
 - селекторы (13): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
 - берёт: --fill-primary-14, --primary, --r-full, --side-w, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75

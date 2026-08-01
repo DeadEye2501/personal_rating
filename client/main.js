@@ -14,5 +14,9 @@ import '$styles/seg.css'
 import '$styles/tools.css'
 import '$styles/view.css'
 import '$styles/snack.css'
+import '$styles/feed.css'
+import '$styles/film.css'
+import '$styles/chips.css'
+import '$styles/facts.css'
 
 export default mount(App, { target: document.getElementById('root') })

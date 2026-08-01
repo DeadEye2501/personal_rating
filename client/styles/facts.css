@@ -1,0 +1,29 @@
+/* Строки фактов карточки и имена в них. */
+
+.film__facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  font: var(--body-m);
+}
+.film__facts dt {
+  color: var(--tint-35);
+  white-space: nowrap;
+}
+.film__facts dd {
+  margin: 0;
+  color: var(--tint-85);
+}
+
+/* Подпись роли внутри строки — выглядит как заголовок в левой колонке. */
+.film__role {
+  margin: 0 8px 0 20px;
+  color: var(--tint-35);
+}
+
+/* Каждое имя — отдельная цель: по нему можно найти остальное с его участием. */
+.person {
+  transition: color .16s ease;
+}
+.person:hover { color: var(--primary) }

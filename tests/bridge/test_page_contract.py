@@ -12,7 +12,15 @@ Vitest не читает `bridge/`. Ломаются они по-разному,
 import re
 from pathlib import Path
 
-from backend.model import IdSource, Kind, RatingSource, Section, Sort
+from backend.model import (
+    CompanyRole,
+    IdSource,
+    Kind,
+    PersonRole,
+    RatingSource,
+    Section,
+    Sort,
+)
 from bridge.feed import FILTER_FIELDS
 
 WEB = Path(__file__).resolve().parents[2] / "client"
@@ -94,6 +102,25 @@ def test_pages_are_built_only_for_ids_that_are_actually_stored():
 
     assert built <= set(IdSource)
     assert built == {IdSource.IMDB, IdSource.KINOPOISK}
+
+
+def test_the_card_shows_every_role_the_base_stores():
+    """Строки состава на карточке перечислены своей таблицей. Переименованная
+    роль отказа не даёт — строка просто исчезает со всех карточек разом, а
+    заметить это можно только глазами и только зная, что она там была."""
+    card = source("components/Facts.svelte")
+    named = set(re.findall(r"role: '(\w+)'", card))
+
+    assert named == set(PersonRole) | set(CompanyRole)
+
+
+def test_the_card_asks_the_right_two_shelves():
+    """Люди и студии лежат в разных репозиториях, и мост зовёт их по имени
+    домена. Перепутанные местами, они дали бы режиссёра среди студий — ровно та
+    ошибка, которую проект уже ловил мутациями в сборке бэкенда."""
+    card = source("components/Facts.svelte")
+
+    assert set(re.findall(r"from: '(\w+)'", card)) == {"people", "companies"}
 
 
 def test_sorting_is_offered_exactly_where_the_base_can_sort():

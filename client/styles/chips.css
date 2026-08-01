@@ -1,0 +1,78 @@
+/* Метки карточки: жанры, теги и кнопка «± Тег». */
+
+.film__chips {
+  display: flex;
+  flex-wrap: wrap;
+  /* Оправа вылезает на 10px в каждую сторону, ещё 4 — воздух между соседними
+     пилюлями. */
+  gap: 8px 24px;
+  /* Без оправы строка стала легче — подтягиваем её к названию. Сдвиг вправо на
+     вылет оправы: иначе она торчит за левый край колонки, где все остальные
+     строки начинаются вровень. */
+  margin: 2px 0 0 7px;
+}
+
+/* Внешняя база отдаёт жанры строчными — поднимаем первую букву стилями, чтобы
+   не зависеть от источника. */
+.chip::first-letter { text-transform: uppercase }
+
+/* Метки кликабельны — клик включает фильтр по этому жанру или тегу, — поэтому
+   они кнопки, а не надписи: иначе жест недоступен с клавиатуры. Своей подложки
+   и рамки у кнопки нет, оправу рисует ::before. */
+.chip {
+  position: relative;
+  font: var(--label-m);
+  color: var(--tint-55);
+  transition: color .18s ease;
+}
+
+/* Свои теги отличаются от жанров из внешней базы. */
+.chip--tag { color: var(--text-bright) }
+
+/* Оправа рисуется псевдоэлементом с отрицательными отступами: она выходит за
+   границы слова, не занимая места, поэтому соседи при наведении не
+   разъезжаются. */
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: -3px -10px;
+  border: 1px solid var(--tint-09);
+  border-radius: var(--r-full);
+  background: transparent;
+  pointer-events: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+/* Наведение — белым, включённый фильтр — акцентом. Разводит их цвет, а не
+   форма: акцент означает «этот жанр сейчас выбран», белый — «сюда можно
+   нажать». */
+.chip:hover { color: var(--text-bright) }
+.chip:hover::before {
+  border-color: var(--tint-55);
+  background: var(--tint-06);
+}
+
+/* Кнопка тега — действие, а не отбор, поэтому наведение у неё осталось
+   акцентным целиком, каким было до фильтров: и текст, и оправа. */
+.chip--add:hover { color: var(--primary) }
+.chip--add:hover::before {
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+/* Включённая метка. Оправа заметно плотнее, чем при наведении: состояние
+   держится само, а наведение уходит вместе с курсором, и путать их нельзя. */
+.chip.is-on { color: var(--primary) }
+.chip.is-on::before {
+  border-color: color-mix(in srgb, var(--primary) 70%, transparent);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+.chip.is-on:hover { color: var(--primary) }
+.chip.is-on:hover::before {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+/* Видна всегда и приглушённой: спрятанная кнопка — ловушка, про которую надо
+   догадаться. */
+.chip--add { color: var(--tint-30) }

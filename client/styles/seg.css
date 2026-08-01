@@ -22,12 +22,9 @@
   gap: 8px;
   padding: 7px 16px;
   white-space: nowrap;
-  border: none;
   border-radius: var(--r-full);
-  background: transparent;
   color: var(--tint-45);
   font: var(--title-s);
-  cursor: pointer;
   transition: background .18s, color .18s;
 }
 .seg__btn .material-symbols-outlined { font-size: 19px }

@@ -1,0 +1,133 @@
+/* Карточка ленты: рама, сворачивание, постер, текстовая колонка. */
+
+.film {
+  /* Колонка под угловые иконки: шеврон сверху, закладка снизу. */
+  --gutter: 52px;
+  --icon-inset: 14px;
+
+  position: relative;
+  display: flex;
+  gap: 20px;
+  padding: 18px var(--gutter) 18px 18px;
+  border: 1px solid var(--tint-07);
+  border-radius: 14px;
+  background: var(--tint-035);
+
+  /* Карточка за краем экрана не рисуется, а место под неё держится по
+     последней измеренной высоте. Запасное число выведено из макета: постер
+     158 × 1.5 плюс отступы 18 сверху и снизу. Оно нужно ровно до первого
+     показа, дальше браузер помнит настоящее. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 273px;
+}
+
+.film__toggle {
+  position: absolute;
+  top: 10px;
+  right: var(--icon-inset);
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-full);
+  color: var(--tint-30);
+  transition: background .16s, color .16s;
+}
+.film__toggle .material-symbols-outlined {
+  display: block;
+  width: 28px;
+  font-size: 22px;
+  line-height: 28px;
+  text-align: center;
+  transition: transform .22s cubic-bezier(.2,.8,.2,1);
+}
+.film__toggle:hover { color: var(--text-bright) }
+
+.film.is-collapsed .film__toggle .material-symbols-outlined {
+  transform: rotate(180deg);
+}
+
+/* Свёрнутая карточка — одна строка: название и оценка. */
+.film.is-collapsed .film__acts,
+.film.is-collapsed .film__poster,
+.film.is-collapsed .film__chips,
+.film.is-collapsed .film__facts,
+.film.is-collapsed .film__synopsis,
+.film.is-collapsed .film__aggr,
+.film.is-collapsed .film__verdict { display: none }
+
+.film.is-collapsed { padding: 12px var(--gutter) 12px 18px }
+
+.film.is-collapsed .film__body {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+.film.is-collapsed .film__title { font: var(--body-l) }
+.film.is-collapsed .film__scores { margin-left: auto }
+
+.film__poster {
+  flex: 0 0 auto;
+  /* Без этого флекс растянул бы постер на всю высоту карточки и соотношение
+     сторон не сработало бы. */
+  align-self: flex-start;
+  width: 158px;             /* 158 × 1.5 = 237 — высота текстовой колонки */
+  aspect-ratio: 2 / 3;      /* пропорция афиши */
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(160deg, var(--tint-09), var(--tint-02));
+  color: var(--tint-16);
+  overflow: hidden;
+}
+.film__poster .material-symbols-outlined { font-size: 38px }
+
+/* Картинка ложится поверх подложки-заглушки и обрезается по её рамке. Обрезать
+   почти нечего — до 2:3 доводит бэкенд, и залитую руками тоже, — но
+   `object-fit` держит рамку при любом расхождении на пиксель. В макете этого
+   правила нет: там постер был пустой подложкой с иконкой. */
+.film__poster img { width: 100%; height: 100%; object-fit: cover }
+
+.film__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* Остаток высоты раскладывается по промежуткам, поэтому последняя строка
+     встаёт вровень с нижним краем постера. */
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.film__title {
+  margin: 0;
+  font: var(--title-l);
+  font-weight: 600;
+  letter-spacing: -.2px;
+  color: var(--text-bright);
+}
+
+.film__synopsis {
+  margin: 0;
+  font: var(--body-m);
+  line-height: 1.55;
+  color: var(--tint-55);
+}
+
+/* Обрезка до трёх строк: четвёртая уже уводит карточку ниже постера. В макете
+   обрезки нет вовсе — там синопсис короткий, — а состоянием она отдельно
+   потому, что раскрытие её снимает. */
+.film__synopsis.is-cut {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Раскрывает обрезанный текст. Появляется только когда содержимое не
+   поместилось. */
+.more {
+  margin-left: 5px;
+  color: var(--tint-40);
+  transition: color .16s ease;
+}
+.more:hover { color: var(--primary) }

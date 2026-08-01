@@ -34,6 +34,19 @@
     if (!seg || !bar) return
     const watch = new ResizeObserver(() => {
       bar.style.setProperty('--side-w', `${Math.ceil(seg.offsetWidth)}px`)
+      // Содержимое шириной с полосу шапки: иначе лента разъедется с ней ровно
+      // на столько, на сколько замер поправил боковые зоны.
+      //
+      // Считается из зон, а не из самой шапки: `.topbar` — растянутый элемент
+      // колоночного флекса, и его ширина это ширина окна. Полоса — три зоны по
+      // ширине капсулы плюс два зазора между ними; зазор читается из
+      // оформления, чтобы не оказаться числом в двух местах.
+      //
+      // Величина уходит на корень документа, а не на шапку: читают её разделы,
+      // а шапка ею только владеет — она единственная, кто знает свою ширину.
+      const gap = parseFloat(getComputedStyle(bar).columnGap) || 0
+      document.documentElement.style.setProperty(
+        '--content-w', `${Math.ceil(seg.offsetWidth * 3 + gap * 2)}px`)
     })
     watch.observe(seg)
     return () => watch.disconnect()

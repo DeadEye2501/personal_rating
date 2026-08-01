@@ -57,12 +57,8 @@
   width: 26px;
   height: 26px;
   margin-right: -6px;
-  padding: 0;
-  border: none;
   border-radius: var(--r-full);
-  background: transparent;
   color: var(--primary);
-  cursor: pointer;
   transition: background .15s;
 }
 
