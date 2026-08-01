@@ -1,29 +1,43 @@
 <!-- Окно создания и правки карточки: поля показываются своему типу. -->
 <script>
   import Button from '$components/Button.svelte'
+  import Confirm from '$components/Confirm.svelte'
   import Field from '$components/Field.svelte'
   import Modal from '$components/Modal.svelte'
   import Picker from '$components/Picker.svelte'
   import PosterPick from '$components/PosterPick.svelte'
   import { call } from '$api/bridge.js'
-  import { emptyCard, shownFor } from '$state/card.js'
+  import { emptyCard, fieldsOf, formOf, shownFor, wrongNumbers }
+    from '$state/card.js'
   import { ROLES } from '$state/credits.js'
   import { GENRE_KINDS } from '$state/genres.js'
   import { reported } from './trouble.js'
 
-  let { kind, onsave, onclose, ontrouble } = $props()
+  let { view = null, kind, onsave, onclose, ontrouble } = $props()
 
-  // Одно окно на создание и на правку: пустое заводит, заполненное правит.
-  // Тип берётся из тумблера шапки и отдельно не спрашивается. Смениться под
-  // открытым окном он не может: тумблер закрыт наложением.
-  let form = $state(emptyCard(kind))
+  // Одно окно на создание и на правку: пустое заводит, заполненное правит, и
+  // «Сохранить» само решает, что из двух. У новой тип берётся из тумблера
+  // шапки, у открытой на правку — её собственный: тумблер мог с тех пор
+  // переключиться, а карточка тип не меняет.
+  let form = $state(view ? formOf(view) : emptyCard(kind))
 
   // Выбранная обложка, base64. Рядом с формой, а не в ней: записывается она
   // отдельным вызовом и после карточки — хранилище обложек ключуется по номеру,
   // а у новой карточки номера ещё нет.
   let picture = $state(null)
 
-  const shown = new Set(shownFor(kind))
+  // Найденный тёзка по названию и название, на которое согласие уже дано.
+  // Совпадение — это предупреждение, а не запрет: фильмов с одинаковыми
+  // названиями много.
+  let twin = $state(null)
+  let agreed = $state(null)
+
+  // Идёт ли запись. Без этого второе нажатие «Сохранить» заводит вторую
+  // карточку: запись начинается с похода через границу потоков, и до возврата
+  // номера кнопка остаётся живой.
+  let saving = $state(false)
+
+  const shown = new Set(shownFor(form.kind))
 
   // За мостом ходит сборка, а не поле: у компонента своего источника данных не
   // бывает. Роль здесь ключом, потому что полей на экране до трёх, и у каждого
@@ -48,7 +62,7 @@
     reported(error, 'окно карточки', () => ontrouble(text))
 
   $effect(() => {
-    call('refs.genres', GENRE_KINDS[kind])
+    call('refs.genres', GENRE_KINDS[form.kind])
       .then((rows) => { genres = rows })
       .catch((error) => lost(error, 'Не удалось прочитать список жанров'))
   })
@@ -108,6 +122,86 @@
   }
 
   const pick = (role, list) => { form[role] = list }
+
+  /** Единственный вход в запись: и кнопка, и согласие на тёзку идут сюда. Пока
+   *  запись летит, второго захода не бывает — иначе их будет две карточки. */
+  async function keep() {
+    if (saving) return
+    saving = true
+    try {
+      await save()
+    } catch (error) {
+      lost(error, 'Карточка не сохранилась')
+    } finally {
+      saving = false
+    }
+  }
+
+  /** Совпадение названия — предупреждение, а не запрет. Своя же карточка из
+   *  находок вычёркивается: правя её, о самой себе спрашивать незачем.
+   *
+   *  Согласие помнится вместе с названием, на которое его дали: переписав
+   *  название после «Вы точно уверены?», человек спрашивает о другом. */
+  async function save() {
+    const fields = fieldsOf(form)
+    if (fields.title === null) {
+      ontrouble('У карточки должно быть название')
+      return
+    }
+
+    const wrong = wrongNumbers(form)
+    if (wrong.length) {
+      ontrouble('Год, минуты, сезоны и серии — это числа')
+      return
+    }
+
+    const same = await call('library.same_title', form.kind, fields.title)
+    const others = same.filter((one) => one.id !== form.item_id)
+    if (others.length && agreed !== fields.title) {
+      twin = others[0]
+      return
+    }
+    await write(fields)
+  }
+
+  /** Порядок записи принадлежит странице: у новой карточки номер появляется
+   *  только после первой записи, а жанрам, составу и обложке без него писать
+   *  некуда. Мост тонкий и не оркеструет — это решение плана 5.
+   *
+   *  Номер запоминается сразу: сорвись состав или обложка, повтор обязан
+   *  дописать ту же карточку, а не завести вторую. */
+  async function write(fields) {
+    if (!form.item_id) form.item_id = await call('library.create', fields)
+    else await call('library.replace', form.item_id, fields)
+
+    const item_id = form.item_id
+    await call('refs.set_genres', item_id, form.genres.map((one) => one.id))
+    await writeCredits(item_id)
+    if (picture) await call('covers.store_upload', item_id, picture)
+
+    onsave(item_id)
+  }
+
+  /** Состав правится целиком: снять всё и расставить заново. Сличать построчно
+   *  значило бы решать за человека, что именно он поменял.
+   *
+   *  Новый заводится по ходу — номера у него нет, потому что его не выбирали из
+   *  подсказки, а набрали и подтвердили Enter. */
+  async function writeCredits(item_id) {
+    for (const domain of ['people', 'companies']) {
+      await call('refs.detach_all', domain, item_id)
+    }
+
+    for (const { role, domain } of ROLES) {
+      let position = 0
+      for (const one of form[role]) {
+        const entity_id = one.id
+          ?? await call('refs.create_person', domain, one.name)
+        await call('refs.attach', domain, item_id, entity_id, role, position)
+        position += 1
+      }
+    }
+  }
 </script>
 
 <Modal card label="Карточка" {onclose}>
@@ -116,7 +210,7 @@
       <!-- Картинка лежит рядом с формой, а не в ней: поля формы — это поля
            карточки, а обложка живёт вторым файлом базы и уезжает отдельным
            вызовом уже после записи, когда у карточки появился номер. -->
-      <PosterPick onpicked={(data) => { picture = data }}
+      <PosterPick item_id={form.item_id} onpicked={(data) => { picture = data }}
                   ontrouble={(text) => ontrouble(text)} />
 
       <div class="cardform__fields">
@@ -168,9 +262,20 @@
       <Button variant="btn--cancel" onclick={onclose}>
         {#snippet children()}Отмена{/snippet}
       </Button>
-      <Button variant="btn--go" onclick={() => onsave(form)}>
+      <Button variant="btn--go" disabled={saving} onclick={keep}>
         {#snippet children()}Сохранить{/snippet}
       </Button>
     </div>
   {/snippet}
 </Modal>
+
+<!-- Тем же окном, что и подтверждение удаления, но акцентным: красное отведено
+     тому, что пропадает навсегда, а тут ничего не пропадает. -->
+{#if twin}
+  <Confirm label="Такое уже есть" ok="OK"
+           text={`«${twin.title}» уже есть в библиотеке. Вы точно уверены?`}
+           onyes={() => { agreed = fieldsOf(form).title
+                          twin = null
+                          keep() }}
+           onclose={() => { twin = null }} />
+{/if}

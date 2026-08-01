@@ -14,13 +14,13 @@
 
 ## app — 12 файлов
 
-### app/App.svelte (217)
+### app/App.svelte (231)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/CardModal.svelte (176)
+### app/CardModal.svelte (281)
 - Окно создания и правки карточки: поля показываются своему типу.
-- принимает: kind, onsave, onclose, ontrouble
+- принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./trouble.js
 
 ### app/CardTagsModal.svelte (82)
@@ -33,9 +33,9 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (133)
+### app/LibraryScreen.svelte (159)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
-- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, ontag
+- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ontag, saved
 - берёт: ./trouble.js, ./visible.js
 
 ### app/SearchScreen.svelte (118)
@@ -82,9 +82,9 @@
 - Столбец гистограммы: заливка, число над верхушкой и подпись оценки.
 - принимает: score, count, share, index
 
-### components/Button.svelte (6)
+### components/Button.svelte (8)
 - Кнопка ответного ряда внизу окна.
-- принимает: variant, onclick, children
+- принимает: variant, disabled, onclick, children
 
 ### components/Chips.svelte (29)
 - Метки карточки: жанры, теги и кнопка добавления тега.
@@ -106,7 +106,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (84)
+### components/Film.svelte (87)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -132,11 +132,11 @@
 
 ### components/Poster.svelte (29)
 - Обложка карточки с заглушкой.
-- принимает: item_id, source, poster_url
+- принимает: item_id, source, poster_url, cover
 
-### components/PosterPick.svelte (93)
+### components/PosterPick.svelte (96)
 - Обложка карточки: выбрать файлом, перетаскиванием или из буфера.
-- принимает: onpicked, ontrouble
+- принимает: item_id, onpicked, ontrouble
 
 ### components/ScoreRow.svelte (24)
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
@@ -184,11 +184,11 @@
 
 ## state — 18 файлов
 
-### state/card.js (40)
+### state/card.js (107)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
-- отдаёт: emptyCard, shownFor
+- отдаёт: emptyCard, fieldsOf, formOf, shownFor, wrongNumbers
 
-### state/covers.js (10)
+### state/covers.js (15)
 - Адрес обложки у своей ручки.
 - отдаёт: byItem, bySource
 
@@ -347,11 +347,11 @@
 - объявляет: --neon
 - берёт: --body-l, --ease, --error, --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --text, --tint-09, --tint-14
 
-### styles/modalfoot.css (42)
+### styles/modalfoot.css (51)
 - Ряд ответных кнопок внизу окна.
-- селекторы (5): .modalfoot, .btn, .btn--cancel:hover, .btn--go:hover, .btn--danger:hover
+- селекторы (6): .modalfoot, .btn, .btn--cancel:hover, .btn--go:hover, .btn--danger:hover, .btn:disabled
 - объявляет: --cancel, --danger, --go
-- берёт: --error, --label-l, --primary, --r-full, --text-bright, --text-dim
+- берёт: --error, --label-l, --primary, --r-full, --text-bright, --text-dim, --tint-25
 
 ### styles/neon.css (49)
 - Общий приём: полоса по верхней кромке, гаснущая к краям, гало под ней и свечение текста. Цвет из --neon, высоту гало из --halo-h ставит тот, кто применяет класс.

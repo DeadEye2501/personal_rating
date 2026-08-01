@@ -516,6 +516,7 @@
 ### `bridge/refs.py`
 
 - `DOMAINS` = `набор из 2`
+- `ROLES` = `словарь из 2`
 
 ### `bridge/serve.py`
 

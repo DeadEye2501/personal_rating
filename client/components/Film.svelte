@@ -29,7 +29,10 @@
     <Icon name="expand_less" />
   </button>
 
-  <Poster item_id={view.item_id} source={view.source} poster_url={view.poster_url} />
+  <!-- `cover` — метка перезаливки: её ставит раздел, перечитавший карточку
+       после правки, и только она сбрасывает суточный кеш ручки. -->
+  <Poster item_id={view.item_id} source={view.source} poster_url={view.poster_url}
+          cover={view.cover} />
 
   <div class="film__body">
     <h2 class="film__title">{title}</h2>

@@ -1,8 +1,9 @@
 """Мост: карточка целиком — заведение, правка, отвязка, удаление."""
 
+from dataclasses import replace
 from datetime import date
 
-from backend.model import Kind, new_manual_item
+from backend.model import Denied, Kind, new_manual_item
 from bridge.answer import Domain
 
 
@@ -22,12 +23,15 @@ class Library(Domain):
         return self._reply(lambda back: back.library.create(_manual(fields)))
 
     def replace(self, item_id: int, fields: dict) -> dict:
-        """Тот же `_manual`, что и у заведения: свежий `synced_at`, который он
-        подставляет, до базы не доезжает — `replace_fields` его не пишет.
+        """Правка ложится **поверх** существующей строки, а не вместо неё:
+        `replace_fields` пишет все колонки разом, а окно карточки знает не все
+        поля — даты выхода в нём нет вовсе, адрес обложки приходит от источника.
+        Без наложения правка названия стирала бы и то, и другое молча.
+
+        Свежий `synced_at` до базы не доезжает — `replace_fields` его не пишет.
         Правка руками не разговор с источником, и объявить карточку только что
         обновлённой значило бы отложить перезапрос сезонов на месяц."""
-        return self._reply(
-            lambda back: back.library.replace_fields(item_id, _manual(fields)))
+        return self._reply(lambda back: _over(back, item_id, fields))
 
     def same_title(self, kind: str, title: str) -> dict:
         """Совпадение названия — предупреждение, а не запрет: фильмов с
@@ -48,15 +52,37 @@ class Library(Domain):
         return self._reply(lambda back: back.delete_card(item_id))
 
 
-def _manual(fields: dict):
+async def _over(back, item_id: int, fields: dict) -> None:
+    """Карточку могли удалить из другого окна, пока форма была открыта. Писать
+    поверх нечего, и молчать нельзя: человек решил бы, что правка сохранилась."""
+    current = await back.library.get(item_id)
+    if current is None:
+        raise Denied("такой карточки больше нет")
+
+    await back.library.replace_fields(
+        item_id, replace(current, title=fields["title"], **_known(fields)))
+
+
+def _known(fields: dict) -> dict:
     """Незаполненное в форме — это «не знаю», а не «пусто»: до бэкенда оно не
-    доходит, и поле остаётся тем, что объявлено по умолчанию.
+    доходит, и поле остаётся тем, что было.
 
     Незаполненным считается `None`, и только он. Пустая строка — это заполненное
     пустым, и она доедет до базы как есть; пустая строка в дате доедет до
-    `fromisoformat` и станет отказом. Страница обязана слать `null`, а не `""`."""
+    `fromisoformat` и станет отказом. Страница обязана слать `null`, а не `""`.
+
+    Тип содержимого и название сюда не попадают: у заведения они обязательные
+    доводы сборщика, у правки — название кладётся отдельно, а тип карточка не
+    меняет вовсе."""
     known = {name: value for name, value in fields.items()
              if name not in ("kind", "title") and value is not None}
     if "released_at" in known:
         known["released_at"] = date.fromisoformat(known["released_at"])
-    return new_manual_item(Kind(fields["kind"]), fields["title"], **known)
+    return known
+
+
+def _manual(fields: dict):
+    """Поля формы в новую ручную карточку: `new_manual_item` уже умеет и
+    `manual`, и свой идентификатор, и момент создания."""
+    return new_manual_item(Kind(fields["kind"]), fields["title"],
+                           **_known(fields))

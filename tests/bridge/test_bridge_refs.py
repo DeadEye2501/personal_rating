@@ -2,7 +2,7 @@
 
 import pytest
 
-from backend.model import GenreKind
+from backend.model import GenreKind, PersonRole
 from bridge.refs import Refs
 
 
@@ -68,6 +68,54 @@ def test_enter_on_nothing_highlighted_creates_a_new_one(spy, asked, domain,
 
     assert Refs(spy).create_person(domain, "Василий Пупкин") == {"ok": 9}
     assert log[0] == (asked_name, ("Василий Пупкин",), {})
+
+
+def test_genres_of_a_card_are_written_as_a_whole(spy, asked):
+    """Набор жанров правится целиком, а не по одному: сличать построчно значило
+    бы решать за страницу, что именно человек поменял."""
+    answers, log = asked
+    answers["genres.set_for_item"] = None
+
+    Refs(spy).set_genres(7, [3, 9])
+
+    assert log[0] == ("genres.set_for_item", (7, [3, 9]), {})
+
+
+@pytest.mark.parametrize(("domain", "asked_name"),
+                         [("people", "people.detach_all"),
+                          ("companies", "companies.detach_all")])
+def test_the_cast_is_dropped_from_the_shelf_it_lies_on(spy, asked, domain,
+                                                       asked_name):
+    """Состав правится тем же приёмом: снять всё и расставить заново. Домены
+    проверяются оба — сняв людей вместо студий, страница потеряла бы состав
+    молча."""
+    answers, log = asked
+    answers[asked_name] = None
+
+    Refs(spy).detach_all(domain, 7)
+
+    assert [name for name, _, _ in log] == [asked_name]
+
+
+def test_a_role_reaches_the_base_as_its_own_type(spy, asked):
+    """Роль приходит строкой, а база держит перечисление. Перевод стоит внутри
+    заявки: снаружи оболочки негодная роль ушла бы исключением через границу
+    потоков, где ловить его некому."""
+    answers, log = asked
+    answers["people.attach"] = None
+
+    Refs(spy).attach("people", 7, 12, "director", 0)
+
+    assert log[0] == ("people.attach", (7, 12, PersonRole.DIRECTOR, 0), {})
+
+
+def test_a_role_the_shelf_does_not_keep_is_a_failure(spy, asked):
+    """Студия режиссёром не бывает: `CompanyRole` такого значения не знает, и
+    отказ обязан прийти отказом, а не вечным промисом."""
+    _, log = asked
+
+    assert Refs(spy).attach("companies", 7, 12, "director", 0)["fail"] == "broken"
+    assert log == []
 
 
 def test_an_unknown_set_of_genres_is_a_failure_too(spy, asked):

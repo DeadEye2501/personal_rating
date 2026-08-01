@@ -82,9 +82,18 @@
   // раздела — одинаково.
   const complain = (text) => { trouble = { text } }
 
-  // Открыто ли окно карточки. Признаком, а не карточкой: пустое окно заводит
-  // новую, и показывать ему нечего.
-  let adding = $state(false)
+  // Что открыто в окне карточки: `undefined` — закрыто, `null` — новая,
+  // карточка — правка. Тремя состояниями, а не двумя: «окно открыто» и «окно
+  // открыто на этой карточке» — разные вопросы, и признаком их не различить.
+  let editing = $state(undefined)
+
+  // Только что записанная карточка: номер и момент. Раздел обязан показать её
+  // свежей, а перечитывать всю ленту нельзя — человек потерял бы место, на
+  // котором стоял.
+  //
+  // Объектом, а не номером: правя ту же карточку второй раз, номером эффект не
+  // разбудить — значение то же самое, и раздел остался бы со старой.
+  let saved = $state(null)
 
   // Какое наложение открыто, знает сборка: `null` либо признак с подписью.
   // Подпись едет от кнопки, которая окно открыла: заголовок окна и есть её
@@ -149,7 +158,7 @@
             onsession={(next) => { session = next }}
             onsearch={(text) => { query = { text }
                                   session = withSection(session, 'search') }}
-            onadd={() => { adding = true }} onfilter={filter} />
+            onadd={() => { editing = null }} onfilter={filter} />
 
     <div class="content" bind:this={content}>
       <!-- `{#key}` здесь не украшение: без него Svelte переиспользует ту же
@@ -170,6 +179,8 @@
                   onmark={(field, id) => { session = withMark(session, field, id) }}
                   onperson={idle}
                   onopen={open}
+                  onedit={(view) => { editing = view }}
+                  {saved}
                   tagged={marks} {forgotten}
                   ontag={(view) => { tagging = view }} />
         </section>
@@ -205,12 +216,15 @@
     {/key}
   {/if}
 
-  <!-- Записывать форму пока нечем: окно только показывает поля, и «Сохранить»
-       его просто закрывает. -->
-  {#if adding}
-    <CardModal kind={session.kind} ontrouble={complain}
-               onsave={() => { adding = false }}
-               onclose={() => { adding = false }} />
+  <!-- `{#key}` по той же причине, что у соседей: без него правка второй
+       карточки переиспользовала бы окно вместе с уже набранной формой первой. -->
+  {#if editing !== undefined}
+    {#key editing?.item_id ?? 'new'}
+      <CardModal view={editing} kind={session.kind} ontrouble={complain}
+                 onsave={(item_id) => { saved = { item_id, at: Date.now() }
+                                        editing = undefined }}
+                 onclose={() => { editing = undefined }} />
+    {/key}
   {/if}
 
   <Snack message={trouble} />

@@ -1,7 +1,10 @@
 """Мост: карточка целиком — заведение, правка, отвязка, удаление."""
 
+from datetime import date
+
 from backend.model import Kind, Source
 from bridge.library import Library
+from tests.builders import an_item
 
 
 def test_a_manual_card_is_built_by_the_bridge(spy, asked):
@@ -71,14 +74,44 @@ def test_editing_names_the_card_and_keeps_the_fields(spy, asked):
     """Правка идёт по номеру строки, а поля собираются тем же путём, что у
     заведения."""
     answers, log = asked
+    answers["library.get"] = an_item("1", "Прежнее")
     answers["library.replace_fields"] = None
 
     Library(spy).replace(12, {"kind": "movie", "title": "Одиссея"})
 
-    name, args, _ = log[0]
+    name, args, _ = log[-1]
     assert name == "library.replace_fields"
     assert args[0] == 12
     assert args[1].title == "Одиссея"
+
+
+def test_editing_does_not_wipe_what_the_page_never_saw(spy, asked):
+    """Окно карточки знает не все поля: даты выхода в нём нет вовсе, а адрес
+    обложки приходит от источника. `replace_fields` пишет все колонки разом, и
+    без наложения на существующую строку правка названия стирала бы и то, и
+    другое — молча."""
+    answers, log = asked
+    answers["library.get"] = an_item("1", "Прежнее",
+                                     poster_url="https://x/p.jpg",
+                                     released_at=date(1997, 3, 14))
+    answers["library.replace_fields"] = None
+
+    Library(spy).replace(12, {"kind": "movie", "title": "Одиссея"})
+
+    _, args, _ = log[-1]
+    assert args[1].poster_url == "https://x/p.jpg"
+    assert args[1].released_at == date(1997, 3, 14)
+
+
+def test_editing_a_card_that_is_gone_is_a_failure(spy, asked):
+    """Карточку могли удалить из другого окна, пока эта форма была открыта.
+    Записать поверх нечего, и молчать об этом нельзя: человек решил бы, что
+    правка сохранилась."""
+    answers, _ = asked
+    answers["library.get"] = None
+
+    assert Library(spy).replace(12, {"kind": "movie",
+                                     "title": "Одиссея"})["fail"] == "denied"
 
 
 def test_unlinking_names_the_card(spy, asked):

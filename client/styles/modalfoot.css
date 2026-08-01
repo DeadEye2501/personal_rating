@@ -40,3 +40,12 @@
   border-color: var(--error);
   color: var(--error);
 }
+
+/* Пока запись летит, кнопка молчит и не откликается. Правило стоит после
+   наведения намеренно: `:hover` срабатывает и на отключённой, вес у них
+   одинаковый, и решает порядок. */
+.btn:disabled {
+  border-color: transparent;
+  color: var(--tint-25);
+  cursor: default;
+}

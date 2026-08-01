@@ -1,6 +1,7 @@
 <!-- Обложка карточки: выбрать файлом, перетаскиванием или из буфера. -->
 <script>
   import Icon from '$components/Icon.svelte'
+  import { byItem } from '$state/covers.js'
 
   // Предел на заливаемую картинку. Обложке хватает и десятой доли: рамка 230
   // пикселей шириной, а бэкенд обрезает её до 2:3 и хранит как есть. Предел
@@ -8,12 +9,14 @@
   // держит её строкой целиком.
   const LIMIT = 8 * 1024 * 1024
 
-  let { onpicked, ontrouble } = $props()
+  let { item_id = null, onpicked, ontrouble } = $props()
 
-  // Что показывать: только что выбранное. Сохранённая обложка приезжает не
-  // сюда — её показывает ручка по номеру, а у новой карточки номера нет.
+  // Что показывать: только что выбранное, а до того — уже сохранённое. У новой
+  // карточки номера ещё нет, и тогда показывать нечего.
   let preview = $state(null)
   let failed = $state(false)
+
+  const shown = $derived(preview ?? (item_id ? byItem(item_id) : null))
 
   /** Внутрь картинка идёт base64: доводы уезжают мосту текстом, и бинарным этот
    *  канал не бывает. Обрезку по центру до 2:3 делает бэкенд — там же, где
@@ -84,8 +87,8 @@
                                     take(event.dataTransfer?.files?.[0]) }} />
 
 <label class="cardform__poster">
-  {#if preview && !failed}
-    <img src={preview} alt="" onerror={() => { failed = true }}>
+  {#if shown && !failed}
+    <img src={shown} alt="" onerror={() => { failed = true }}>
   {:else}
     <Icon name="photo_camera" />
   {/if}

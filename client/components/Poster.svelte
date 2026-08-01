@@ -5,10 +5,10 @@
 
   // У кандидата номера нет — он ещё не в базе, и обложку тогда не сохраняют.
   // Ручка одна, различаются только доводы.
-  let { item_id = null, source = '', poster_url = '' } = $props()
+  let { item_id = null, source = '', poster_url = '', cover = 0 } = $props()
 
   const address = $derived(item_id
-    ? byItem(item_id)
+    ? byItem(item_id, cover)
     : poster_url && bySource(source, poster_url))
 
   // Помнится сорвавшийся адрес, а не признак «сломано»: признак заглушку уже

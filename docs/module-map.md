@@ -1003,20 +1003,22 @@
   - `def put(self, op: int, value) -> None` (3)
   - `def taken(self, op: int)` (4)
 
-### `bridge/library.py` — 62 строк
+### `bridge/library.py` — 88 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Library(Domain)` (40)
+- `class Library(Domain)` (43)
   - `def create(self, fields: dict) -> dict` (9)
-  - `def replace(self, item_id: int, fields: dict) -> dict` (7)
+  - `def replace(self, item_id: int, fields: dict) -> dict` (10)
   - `def same_title(self, kind: str, title: str) -> dict` (5)
   - `def unlink(self, item_id: int) -> dict` (2)
   - `def deletion_summary(self, item_id: int) -> dict` (2)
   - `def delete(self, item_id: int) -> dict` (5)
-- `def _manual(fields: dict)` (12)
+- `async def _over(back, item_id: int, fields: dict) -> None` (9)
+- `def _known(fields: dict) -> dict` (16)
+- `def _manual(fields: dict)` (5)
 
 ### `bridge/marks.py` — 66 строк
 
@@ -1040,16 +1042,20 @@
   - `def wish(self, item_id: int) -> dict` (3)
   - `def unwish(self, item_id: int) -> dict` (2)
 
-### `bridge/refs.py` — 41 строк
+### `bridge/refs.py` — 74 строк
 
 Мост: справочники — жанры, люди, студии.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Refs(Domain)` (21)
+- `class Refs(Domain)` (43)
   - `def genres(self, genre_kind: str) -> dict` (5)
   - `def suggest(self, domain: str, name: str, offset: int=0) -> dict` (8)
+  - `def set_genres(self, item_id: int, genre_ids: list) -> dict` (7)
+  - `def detach_all(self, domain: str, item_id: int) -> dict` (5)
+  - `def attach(self, domain: str, item_id: int, entity_id: int, role: str, position: int) -> dict` (7)
   - `def create_person(self, domain: str, name: str) -> dict` (5)
+- `def _role(domain: str, role: str)` (4)
 - `def _of(backend, domain: str)` (7)
 
 ### `bridge/search.py` — 78 строк
@@ -1914,13 +1920,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 11
 
 
-### `tests/bridge/test_bridge_library.py` — 125 строк
+### `tests/bridge/test_bridge_library.py` — 158 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
-Зависит от: `backend.model`, `bridge.library`
+Зависит от: `backend.model`, `bridge.library`, `tests.builders`
 
-Тестов: 9
+Тестов: 11
 
 
 ### `tests/bridge/test_bridge_marks.py` — 200 строк
@@ -1932,13 +1938,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/bridge/test_bridge_refs.py` — 80 строк
+### `tests/bridge/test_bridge_refs.py` — 128 строк
 
 Мост: справочники — жанры, люди, студии.
 
 Зависит от: `backend.model`, `bridge.refs`
 
-Тестов: 6
+Тестов: 10
 
 
 ### `tests/bridge/test_bridge_search.py` — 230 строк

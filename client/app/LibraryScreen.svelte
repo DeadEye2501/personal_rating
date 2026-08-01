@@ -2,6 +2,8 @@
      `session.section`, он же уезжает в запрос; второй файл был бы дословной
      копией, которую планы 8 и 9 правили бы дважды. -->
 <script>
+  import { untrack } from 'svelte'
+
   import Feed from '$components/Feed.svelte'
   import { call, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
@@ -14,7 +16,8 @@
   const PAGE = 50
 
   let { session, expected = [], root = null, tagged = {}, forgotten = [],
-        ontrouble, onmark, onperson, onopen, ontag } = $props()
+        ontrouble, onmark, onperson, onopen, onedit, ontag,
+        saved = null } = $props()
 
   let views = $state([])
   let done = $state(false)
@@ -116,6 +119,29 @@
       each.item_id === view.item_id ? { ...each, ...fields } : each)
   }
 
+  /** Правленую карточку раздел перечитывает одну, а не всю ленту: страница
+   *  читается с начала, и в длинном списке человек потерял бы место, на котором
+   *  стоял. Заведённой заново в списке ещё нет — тогда перечитывать нечего, она
+   *  придёт со следующей порцией.
+   *
+   *  Эффект слушает **только** запись: `views` он и читает, и пишет, а такой
+   *  круг проект уже ловил — эффект по своему же списку не кончается никогда. */
+  $effect(() => {
+    const done = saved
+    if (done) untrack(() => reread(done))
+  })
+
+  function reread({ item_id, at }) {
+    if (!views.some((each) => each.item_id === item_id)) return
+
+    numbered('feed.views_of', [item_id], { channel: 'views', ops })
+      // Метка момента сбрасывает кеш обложки: адрес ручки от содержимого не
+      // зависит, а отдаёт она сутки кеша — перезалитая картинка иначе осталась
+      // бы прежней до завтра.
+      .then(([fresh]) => { if (fresh) patch(fresh, { ...fresh, cover: at }) })
+      .catch((error) => lost(error, 'Не удалось перечитать карточку'))
+  }
+
   const idle = () => {}
 </script>
 
@@ -130,4 +156,4 @@
         lost(error, 'Закладка не сохранилась'))}
       oncollapse={collapse}
       on={session.filters.on} {onmark} {onperson} {onopen}
-      onedit={idle} ondelete={idle} {ontag} />
+      {onedit} ondelete={idle} {ontag} />
