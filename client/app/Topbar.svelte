@@ -9,7 +9,8 @@
     from '$state/session.js'
   import { IDLE_SORT, hasSort, stateAt } from '$state/sorting.js'
 
-  let { session, onsession, onsearch, onadd, onfilter } = $props()
+  let { session, typed = $bindable(''), onsession, onsearch, onadd,
+        onfilter } = $props()
 
   let bar = $state()
   let seg = $state()
@@ -87,7 +88,7 @@
 </script>
 
 <header class="topbar" bind:this={bar}>
-  <SearchField {onsearch} />
+  <SearchField {onsearch} bind:value={typed} />
 
   <!-- Замеряется обёртка, а не сам переключатель: ссылку на свой корень
        компонент наружу не отдаёт, и просить её значило бы завести ему входной

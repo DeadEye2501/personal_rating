@@ -44,6 +44,15 @@
   // спросить заново — иначе после отказа сети повторить поиск было бы нечем.
   let query = $state(null)
 
+  // Клик по имени: домен и строка сущности. Живёт рядом с запросом и по той же
+  // причине — жест делают в карточке, а показывает выдачу поиск.
+  let person = $state(null)
+
+  // Набранное в шапке. Обычно оно её собственное, но снять его вправе сборка:
+  // клик по имени отменяет строку, и оставшийся в поле текст утверждал бы, что
+  // выдача по нему.
+  let typed = $state('')
+
   // Плашка одна на всё приложение, и говорят в неё разделы: своей они не
   // заводят.
   let trouble = $state(null)
@@ -139,9 +148,22 @@
 
   const Screen = $derived(SCREENS[session.section])
 
-  // Клик по человеку открывает поиск по нему; тело появится вместе с
-  // `search.by_person` — план 11 задачей 5.
   const idle = () => {}
+
+  /** Клик по имени открывает поиск по человеку, а не отдельный вид: та же
+   *  лента, те же карточки, сначала своё и потом чужое.
+   *
+   *  Строка снимается вместе с набранным: пока человек стоит, раздел её не
+   *  читает — но сними человека, и старая строка воскресила бы свою выдачу, а
+   *  поле бы утверждало, что показано найденное по ней. Набранная после клика
+   *  строка симметрично снимает человека: она отменяет жест, а не складывается
+   *  с ним. */
+  function byPerson(domain, entity_id) {
+    query = null
+    typed = ''
+    person = { domain, entity_id }
+    session = withSection(session, 'search')
+  }
 
   /** Повторное нажатие по горящей кнопке сбрасывает свой признак, а не
    *  открывает модалку: так в макете, где у каждого из трёх фильтров свой
@@ -201,9 +223,10 @@
 
 <div class="app">
   <main class="app__main">
-    <Topbar {session}
+    <Topbar {session} bind:typed
             onsession={(next) => { session = next }}
-            onsearch={(text) => { query = { text }
+            onsearch={(text) => { person = null
+                                  query = { text }
                                   session = withSection(session, 'search') }}
             onadd={() => { editing = null }} onfilter={filter} />
 
@@ -224,10 +247,10 @@
             <!-- Метка и человек решаются здесь, а не в разделе: клик по жанру
                  включает фильтр, клик по имени открывает поиск по человеку — и
                  то и другое меняет общее состояние. -->
-            <Screen {session} {query} {expected} root={content}
+            <Screen {session} {query} {person} {expected} root={content}
                     ontrouble={complain}
                     onmark={(field, id) => { session = withMark(session, field, id) }}
-                    onperson={idle}
+                    onperson={byPerson}
                     onopen={open}
                     onedit={(view) => { editing = view }}
                     ondelete={askRemoval}

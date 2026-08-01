@@ -1556,7 +1556,7 @@ git commit -m "feat: удаление карточки с подтвержден
 - Потребляет: `Backend.finder.by_entity`; `numbered` из `$api/bridge.js`.
 - Отдаёт: `Search.by_person(op, domain, entity_id, kind)` на мосту.
 
-- [ ] **Шаг 1: Написать падающий тест**
+- [x] **Шаг 1: Написать падающий тест**
 
 Дописать в `tests/bridge/test_bridge_search.py`:
 
@@ -1577,12 +1577,12 @@ def test_a_person_search_is_remembered_like_any_other(spy, asked):
                                                     "value": 12}}
 ```
 
-- [ ] **Шаг 2: Прогнать и увидеть красное**
+- [x] **Шаг 2: Прогнать и увидеть красное**
 
 Запустить: `pipenv run pytest tests/bridge/test_bridge_search.py -v`
 Ожидание: FAIL, `AttributeError: 'Search' object has no attribute 'by_person'`.
 
-- [ ] **Шаг 3: Дописать домен моста**
+- [x] **Шаг 3: Дописать домен моста**
 
 В `bridge/search.py`:
 
@@ -1609,7 +1609,7 @@ def test_a_person_search_is_remembered_like_any_other(spy, asked):
 **`_asked` тут не пишется намеренно:** это запрос строкой, а у клика второго
 шага нет — `search.external` за ним не зовётся вовсе.
 
-- [ ] **Шаг 4: Провести клик**
+- [x] **Шаг 4: Провести клик**
 
 В `App.svelte` клик переключает раздел на поиск и отдаёт запрос вниз, **сняв
 строку поиска**:
@@ -1636,7 +1636,7 @@ def test_a_person_search_is_remembered_like_any_other(spy, asked):
 Канал остаётся `'search'`: новый жест обязан отменять предыдущий, а разные
 каналы оставили бы обе выдачи в гонке.
 
-- [ ] **Шаг 5: Прогнать и посмотреть**
+- [x] **Шаг 5: Прогнать и посмотреть**
 
 ```bash
 pipenv run pytest
@@ -1653,7 +1653,7 @@ cd .. && pipenv run python main.py
 - набранная после клика строка отменяет выдачу по человеку, а не смешивается с
   ней.
 
-- [ ] **Шаг 6: Коммит**
+- [x] **Шаг 6: Коммит**
 
 ```bash
 git add bridge/search.py client/app/ tests/bridge/test_bridge_search.py

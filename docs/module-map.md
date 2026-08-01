@@ -993,14 +993,14 @@
 - `def _feed(feed: dict) -> Feed` (10)
 - `def _filters(filters: dict) -> Filters` (5)
 
-### `bridge/kept.py` — 24 строк
+### `bridge/kept.py` — 31 строк
 
 То, что не пролезает обратно через JSON.
 
 Зависит от: —
 
-- `class Kept` (13)
-  - `def put(self, op: int, value) -> None` (3)
+- `class Kept` (20)
+  - `def put(self, op: int, value) -> None` (10)
   - `def taken(self, op: int)` (4)
 
 ### `bridge/library.py` — 88 строк
@@ -1058,18 +1058,20 @@
 - `def _role(domain: str, role: str)` (4)
 - `def _of(backend, domain: str)` (7)
 
-### `bridge/search.py` — 78 строк
+### `bridge/search.py` — 99 строк
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.answer`, `bridge.kept`, `bridge.wire`
 
-- `class Search(Domain)` (57)
+- `class Search(Domain)` (78)
   - `def local(self, op: int, kind: str, query: str) -> dict` (7)
-  - `def external(self, op: int) -> dict` (12)
+  - `def external(self, op: int) -> dict` (16)
+  - `def by_person(self, op: int, domain: str, entity_id: int, kind: str) -> dict` (11)
   - `def ensure(self, op: int, source: str, source_id: str) -> dict` (8)
   - `async def _own(self, back, op, kind, query)` (6)
   - `async def _outer(self, back, op, kind, query)` (11)
+  - `async def _person(self, back, op, domain, entity_id, kind)` (4)
   - `async def _added(self, back, candidate)` (2)
 - `def _found(views, source: str, source_id: str)` (7)
 
@@ -1947,13 +1949,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/test_bridge_search.py` — 230 строк
+### `tests/bridge/test_bridge_search.py` — 304 строк ⚠ подошёл к 300
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.search`
 
-Тестов: 13
+Тестов: 18
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
 
@@ -1981,13 +1983,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/bridge/test_kept.py` — 43 строк
+### `tests/bridge/test_kept.py` — 60 строк
 
 То, что не пролезает обратно через JSON, мост помнит у себя.
 
 Зависит от: `bridge.kept`
 
-Тестов: 4
+Тестов: 5
 
 
 ### `tests/bridge/test_page_contract.py` — 307 строк ⚠ подошёл к 300

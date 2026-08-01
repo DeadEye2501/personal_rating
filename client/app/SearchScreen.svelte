@@ -1,4 +1,6 @@
-<!-- Раздел «Поиск»: сначала своя выдача, потом внешняя. -->
+<!-- Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя
+     жестами — строкой в шапке и кликом по имени в карточке, — и показывает она
+     их одинаково. -->
 <script>
   import { untrack } from 'svelte'
 
@@ -10,9 +12,9 @@
   import { complaining } from './trouble.js'
   import { onCardShown } from './visible.js'
 
-  let { session, query = null, expected = [], root = null, saved = null,
-        removed = null, ontrouble, onmark, onperson, onopen, onedit, ondelete,
-        ontag } = $props()
+  let { session, query = null, person = null, expected = [], root = null,
+        saved = null, removed = null, ontrouble, onmark, onperson, onopen,
+        onedit, ondelete, ontag } = $props()
 
   let views = $state([])
   const ops = owned()
@@ -33,10 +35,31 @@
   // правило отказов запрещает.
   const lost = complaining('поиск', ontrouble)
 
+  // Жест ровно один за раз: строка снимает человека, клик по имени снимает
+  // строку — оба снятия делает сборка, здесь остаётся выбор ветки. Ранняя
+  // ветка и есть то, что делает жест единственным: при непустом человеке
+  // строка не читается вовсе.
   $effect(() => {
+    const clicked = person
+    if (clicked) { about(clicked, kind).catch(lost); return }
     if (!query?.text) { views = []; return }
     look(query.text, kind).catch(lost)
   })
+
+  /** Выдача по клику на имя приезжает собранной: своя половина и чужая сложены
+   *  на стороне бэкенда, и второго шага у этого жеста нет.
+   *
+   *  Лента гасится до запроса, а не после: своей половины, которая у строки
+   *  приезжает мгновенно, здесь нет, и до двадцати секунд ожидания под пустым
+   *  полем поиска висела бы выдача прошлого жеста.
+   *
+   *  Канал тот же, что у строки: новый жест обязан отменять предыдущий, а
+   *  разные каналы оставили бы обе выдачи в гонке. */
+  async function about({ domain, entity_id }, forKind) {
+    views = []
+    arrived(await numbered('search.by_person', domain, entity_id, forKind,
+                          { channel: 'search', ops }))
+  }
 
   async function look(text, forKind) {
     // Своё показывается сразу: локальная база отвечает за миллисекунды.
@@ -50,15 +73,18 @@
     // Тем же номером, что и первый шаг: мостовая память узнаёт выдачу по нему,
     // и с новым номером сюда всегда приходило бы «устарело».
     try {
-      const outer = await numbered('search.external',
-                                   { channel: 'search', op: lastOp('search') })
-      views = outer.views
-      // Отказ источника — поле в ответе, а не исключение. Пустая выдача при
-      // этом молчит: пустая лента и есть ответ.
-      if (outer.refusals.length) ontrouble('Внешняя база недоступна')
+      arrived(await numbered('search.external',
+                            { channel: 'search', op: lastOp('search') }))
     } catch (error) {
       lost(error, 'Внешняя база недоступна')
     }
+  }
+
+  /** Отказ источника — поле в ответе, а не исключение. Пустая выдача при этом
+   *  молчит: пустая лента и есть ответ. */
+  function arrived(answer) {
+    views = answer.views
+    if (answer.refusals.length) ontrouble('Внешняя база недоступна')
   }
 
   async function add(view) {

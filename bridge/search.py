@@ -30,12 +30,28 @@ class Search(Domain):
         клиенту, и второго его объявления быть не должно.
 
         Запрос снимается здесь, а не внутри заявки: pywebview зовёт каждый метод
-        в своём потоке, и к моменту ответа человек мог допечатать строку."""
-        if self._kept.taken(op) is None:
+        в своём потоке, и к моменту ответа человек мог допечатать строку.
+
+        Пустая память запроса — это выдача по клику на имя: у неё второго шага
+        нет вовсе, и разворачивать тут нечего. Без проверки это `TypeError` за
+        пределами заявки, то есть исключение через границу потоков."""
+        if self._kept.taken(op) is None or self._asked is None:
             return stale()
         kind, query = self._asked
         return self._reply(lambda back: self._outer(back, op, kind, query),
                            op=op)
+
+    def by_person(self, op: int, domain: str, entity_id: int,
+                  kind: str) -> dict:
+        """Выдача по клику на имя — обычная выдача поиска, и помнится она так
+        же: из неё добавляют карточку тем же `ensure`. Имя бывает и студией —
+        домен приезжает доводом, поэтому у бэкенда ручка и зовётся `by_entity`.
+
+        Запрос не запоминается: второго шага у клика нет — обе половины
+        приезжают собранными, и `external` за ним не зовётся вовсе."""
+        return self._reply(
+            lambda back: self._person(back, op, domain, entity_id, Kind(kind)),
+            op=op)
 
     def ensure(self, op: int, source: str, source_id: str) -> dict:
         """Кандидат берётся из помнимой выдачи: `CardView` собрать из JSON
@@ -64,6 +80,11 @@ class Search(Domain):
             self._kept.put(op, merged)
         return ExternalSearch(views=tuple(merged),
                               refusals=found.refusals)
+
+    async def _person(self, back, op, domain, entity_id, kind):
+        answer = await back.finder.by_entity(domain, entity_id, kind)
+        self._kept.put(op, list(answer.views))
+        return answer
 
     async def _added(self, back, candidate):
         return outcome(await back.loader.ensure(candidate))

@@ -14,7 +14,7 @@
 
 ## app — 14 файлов
 
-### app/App.svelte (291)
+### app/App.svelte (314)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
@@ -43,9 +43,9 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (143)
-- Раздел «Поиск»: сначала своя выдача, потом внешняя.
-- принимает: session, query, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
+### app/SearchScreen.svelte (169)
+- Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
+- принимает: session, query, person, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
 - берёт: ./reread.js, ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (60)
@@ -53,9 +53,9 @@
 - принимает: session, ontrouble
 - берёт: ./trouble.js
 
-### app/Topbar.svelte (146)
+### app/Topbar.svelte (147)
 - Сборка шапки: три зоны и всё, что в них нажимается.
-- принимает: session, onsession, onsearch, onadd, onfilter
+- принимает: session, typed, onsession, onsearch, onadd, onfilter
 
 ### app/reread.js (24)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
@@ -159,9 +159,9 @@
 - Своя полоса прокрутки для того, что прокручивается.
 - принимает: box, area
 
-### components/SearchField.svelte (30)
+### components/SearchField.svelte (28)
 - Поле поиска с кнопкой очистки.
-- принимает: onsearch
+- принимает: onsearch, value
 
 ### components/Segmented.svelte (17)
 - Капсульный переключатель: один выбранный из нескольких.
