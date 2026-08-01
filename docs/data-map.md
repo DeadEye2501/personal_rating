@@ -734,10 +734,10 @@
 - `DOMAINS` = `набор из 7`
 - `CHOOSER` = `'_of'`
 
-### `tests/bridge/test_filters_contract.py`
+### `tests/bridge/test_page_contract.py`
 
-- `CHOSEN` = `Path(__file__).resolve().parents[2] / 'client' /…`
-- `BODY` = `re.compile('export function chosen\\(filters\\) …`
+- `WEB` = `Path(__file__).resolve().parents[2] / 'client'`
+- `CHOSEN` = `re.compile('export function chosen\\(filters\\) …`
 
 ### `tests/bridge/test_serve.py`
 

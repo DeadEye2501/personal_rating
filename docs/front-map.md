@@ -4,13 +4,13 @@
 
 ## api — 1 файлов
 
-### api/bridge.js (105)
+### api/bridge.js (119)
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
 ## app — 5 файлов
 
-### app/App.svelte (50)
+### app/App.svelte (64)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
 
@@ -23,7 +23,7 @@
 ### app/StatsScreen.svelte (2)
 - Раздел «Статистика»: гистограмма своих оценок. Пока пуст.
 
-### app/Topbar.svelte (147)
+### app/Topbar.svelte (133)
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
 
@@ -67,13 +67,18 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-## styles — 9 файлов
+## styles — 10 файлов
 
-### styles/base.css (118)
-- Правила, действующие на всю страницу сразу, а не на её блок.
-- селекторы (15): *, *::before, *::after, [hidden], html, body, #root, body, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
-.is-on > .material-symbols-outlined, .app, .app::before,
-.app::after, .app::before, .app::after, .app__main, .content, @media (prefers-reduced-motion: reduce)
+### styles/app.css (59)
+- Оболочка окна: неоновая кромка сверху и место под содержимое.
+- селекторы (6): .app, .app::before,
+.app::after, .app::before, .app::after, .app__main, .content
+- берёт: --primary
+
+### styles/base.css (61)
+- Правила, у которых нет своего блока.
+- селекторы (9): *, *::before, *::after, [hidden], html, body, #root, body, :focus-visible, ::selection, .material-symbols-outlined, .is-active > .material-symbols-outlined,
+.is-on > .material-symbols-outlined, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
 ### styles/neon.css (49)
@@ -110,7 +115,7 @@
 - селекторы (13): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
 - берёт: --fill-primary-14, --primary, --r-full, --side-w, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75
 
-### styles/topbar.css (27)
+### styles/topbar.css (28)
 - Раскладка шапки: три зоны, из ширины которых выведен минимум окна.
 - селекторы (2): .topbar, .topbar__seg
 - объявляет: --corner, --side-w

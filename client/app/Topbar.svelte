@@ -45,11 +45,6 @@
     { value: 'game',   icon: 'sports_esports',  label: 'Игры' },
   ]
 
-  // Фильмам достаётся значение по умолчанию из палитры, поэтому его тут нет:
-  // положить одно значение в два места значит дать ему разойтись. Остальные два
-  // подставляются токенами, а не литералами — цвет живёт в палитре.
-  const ACCENTS = { series: 'var(--accent-series)', game: 'var(--accent-game)' }
-
   const VIEWS = [
     { value: 'rated',    icon: 'thumb_up', label: 'Оценённые' },
     { value: 'wishlist', icon: 'bookmark', label: 'Хочу посмотреть' },
@@ -68,15 +63,6 @@
   const sort = $derived(hasSort(session.section)
     ? stateAt(session.section, session.sort)
     : null)
-
-  // Акцент следует за состоянием, а не за нажатием: перекрась его в
-  // обработчике — и тип, восстановленный откуда-то ещё, приедет со старым
-  // цветом, а расхождения не увидит никто.
-  $effect(() => {
-    const root = document.documentElement.style
-    const accent = ACCENTS[session.kind]
-    accent ? root.setProperty('--primary', accent) : root.removeProperty('--primary')
-  })
 
   function chooseStats() {
     // Признак вешается на каждый заход, а не держится состоянием: иначе

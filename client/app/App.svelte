@@ -19,11 +19,25 @@
     stats: StatsScreen,
   }
 
+  // Фильмам достаётся значение по умолчанию из палитры, поэтому его тут нет:
+  // положить одно значение в два места значит дать ему разойтись. Остальные два
+  // подставляются токенами, а не литералами — цвет живёт в палитре.
+  const ACCENTS = { series: 'var(--accent-series)', game: 'var(--accent-game)' }
+
   let session = $state(newSession())
 
   // Плашка одна на всё приложение, и говорят в неё разделы. Сегодня они пусты,
   // сообщать нечем, и она стоит за краем окна.
   let trouble = $state(null)
+
+  // Акцент красит всю страницу, поэтому ставит его тот, кто страницей владеет,
+  // а не шапка: она про свои три зоны. И следует он за состоянием, а не за
+  // нажатием — иначе тип, пришедший откуда-то ещё, приехал бы со старым цветом.
+  $effect(() => {
+    const root = document.documentElement.style
+    const accent = ACCENTS[session.kind]
+    accent ? root.setProperty('--primary', accent) : root.removeProperty('--primary')
+  })
 
   const Screen = $derived(SCREENS[session.section])
 </script>

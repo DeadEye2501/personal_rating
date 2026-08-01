@@ -1975,16 +1975,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/bridge/test_filters_contract.py` — 28 строк
-
-Шесть имён фильтра совпадают у страницы и у моста.
-
-Зависит от: `bridge.feed`
-
-Тестов: 1
-
-- `def named() -> set[str]` (4)
-
 ### `tests/bridge/test_kept.py` — 43 строк
 
 То, что не пролезает обратно через JSON, мост помнит у себя.
@@ -1993,6 +1983,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 4
 
+
+### `tests/bridge/test_page_contract.py` — 69 строк
+
+Имена, которые страница и мост обязаны называть одинаково.
+
+Зависит от: `backend.model`, `bridge.feed`
+
+Тестов: 5
+
+- `def source(path: str) -> str` (2)
+- `def named_in_chosen() -> set[str]` (4)
+- `def values_of(table: str, text: str) -> set[str]` (4)
 
 ### `tests/bridge/test_serve.py` — 226 строк
 

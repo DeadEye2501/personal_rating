@@ -39,7 +39,7 @@ export function ready() {
 /** Вызов без номера: мгновенные операции, которые нечем отменять. */
 export async function call(path, ...args) {
   await ready()
-  return unwrap(await at(path)(...args))
+  return unwrap(await asked(path, args))
 }
 
 /**
@@ -60,7 +60,7 @@ export async function numbered(path, ...args) {
   options.ops?.push(op)
 
   await ready()
-  const answer = await at(path)(op, ...args)
+  const answer = await asked(path, [op, ...args])
 
   // Номер читается в момент доставки, а не отправки: пока летел ответ,
   // страница могла спросить заново.
@@ -80,6 +80,20 @@ export function cancel(ops) {
   // Проверка тем же `arrived()`, что и везде: между двумя внедрениями объект
   // уже есть, а `api.cancel` ещё нет.
   if (ops.length && arrived()) window.pywebview.api.cancel(ops)
+}
+
+/** Мост отвечает своим форматом не всегда: опечатку в пути, лишний довод и
+ *  неизвестный домен pywebview ловит у себя и отклоняет промис голым `Error` —
+ *  ни рода, ни признака молчания у такого нет. Род ему даём тот же, каким мост
+ *  называет непредвиденное у себя, иначе разметка покажет плашку со словом
+ *  `undefined`. */
+async function asked(path, args) {
+  try {
+    return await at(path)(...args)
+  } catch (error) {
+    if (error instanceof Failed) throw error
+    throw new Failed('broken', error.message)
+  }
 }
 
 function at(path) {

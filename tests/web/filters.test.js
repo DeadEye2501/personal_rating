@@ -55,6 +55,40 @@ describe('строка фильтра', () => {
     expect(isEmpty(cycled(EMPTY, 'tags', 3))).toBe(false)
   })
 
+  it('кнопка горит и от одного исключённого, без единого включённого', () => {
+    // «Всё, кроме ужасов» — законный отбор, и кнопка обязана гореть: иначе
+    // лента отфильтрована, кнопка тёмная, и снять отбор человеку нечем.
+    const noHorror = cycled(cycled(EMPTY, 'genres', 9), 'genres', 9)
+
+    expect(chosen(noHorror).genre_ids).toEqual([])
+    expect(isEmpty(noHorror)).toBe(false)
+    expect(isEmpty(noHorror, 'genres')).toBe(false)
+  })
+
+  it('сброс признака убирает и включённое, и исключённое', () => {
+    // Половину сброса не видно ниоткуда: включённое исчезло, кнопка погасла, а
+    // исключённое молча продолжает резать выдачу.
+    const mixed = cycled(cycled(cycled(EMPTY, 'tags', 3), 'tags', 5), 'tags', 5)
+    expect(chosen(mixed).tag_ids).toEqual([3])
+    expect(chosen(mixed).excluded_tag_ids).toEqual([5])
+
+    const clean = cleared(mixed, 'tags')
+
+    expect(chosen(clean).tag_ids).toEqual([])
+    expect(chosen(clean).excluded_tag_ids).toEqual([])
+  })
+
+  it('исключённые оценки уезжают своим полем', () => {
+    // Шестое поле запроса — единственное, которое ни один тест не наполнял:
+    // перепутанное с соседним, оно вычло бы не оценки, а теги.
+    const noThree = cycled(cycled(EMPTY, 'scores', 3), 'scores', 3)
+    const request = chosen(noThree)
+
+    expect(request.excluded_scores).toEqual([3])
+    expect(request.excluded_tag_ids).toEqual([])
+    expect(request.scores).toEqual([])
+  })
+
   it('кнопка фильтра горит и гаснет за свой признак', () => {
     // Три кнопки, и каждая про своё: общая проверка сделала бы сочетание
     // «жанр и тег» недостижимым — сброс одного стирал бы второй.

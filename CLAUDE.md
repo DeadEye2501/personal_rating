@@ -928,7 +928,8 @@ Python 3.13, зависимости через pipenv.
 ```powershell
 pipenv install --dev          # поставить зависимости вместе с pytest
 pipenv run alembic upgrade head        # поднять схему
-pipenv run python <файл>      # запуск в окружении
+pipenv run pytest -q          # прогнать тесты питона
+pipenv run python main.py     # поднять окно
 pipenv --venv                 # путь к venv
 ```
 

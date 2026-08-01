@@ -68,6 +68,47 @@ describe('обёртка моста', () => {
     })
   })
 
+  it('пустой удачный ответ — это удача, а не отказ', async () => {
+    // Мост заворачивает в `{"ok": ...}` и `None`: у девятнадцати методов
+    // хранилища возврата нет вовсе, и через мост на них выходят записи меток,
+    // оценок и закладок. Смотреть на значение вместо наличия ключа значит
+    // поднимать плашку на каждой удачной записи.
+    fake({ 'marks.assign': { ok: null } })
+
+    await expect(call('marks.assign', 1, 3)).resolves.toBe(null)
+  })
+
+  it('обычный отказ не молчит', async () => {
+    // Молчание — это про уход со страницы, а не про беду. Зашей его всем
+    // отказам, и приложение перестанет сообщать хоть что-нибудь: плашка
+    // читает именно этот признак.
+    fake({ 'marks.rename_tag': { fail: 'tag-exists', detail: 'драма' } })
+
+    await call('marks.rename_tag', 3, 'драма').catch((error) => {
+      expect(error.silent).toBe(false)
+    })
+  })
+
+  it('чужое исключение моста приезжает тем же родом, что и его отказ', async () => {
+    // Опечатку в пути, лишний довод и неизвестный домен pywebview ловит у
+    // себя и отклоняет промис голым `Error`: ни рода, ни признака молчания у
+    // него нет. Разметка ветвится по признаку — и показала бы плашку со
+    // словом `undefined`.
+    globalThis.window = {
+      pywebview: {
+        api: { marks: { tags: () => Promise.reject(new Error('нет такого метода')) } },
+      },
+      addEventListener: () => {},
+    }
+
+    await expect(call('marks.tags', 'movie')).rejects.toThrow(Failed)
+    await call('marks.tags', 'movie').catch((error) => {
+      expect(error.kind).toBe('broken')
+      expect(error.detail).toBe('нет такого метода')
+      expect(error.silent).toBe(false)
+    })
+  })
+
   it('нумерованная операция получает свой номер первым доводом', async () => {
     const asked = fake({ 'world.enrich': { ok: [] } })
 
@@ -77,6 +118,39 @@ describe('обёртка моста', () => {
     expect(path).toBe('world.enrich')
     expect(typeof args[0]).toBe('number')
     expect(args.slice(1)).toEqual([12, 'movie'])
+  })
+
+  it('нумерованный вызов до внедрения моста тоже ждёт', async () => {
+    // Половина поверхности — не половина обязанности: нумерованными идут как
+    // раз первые запросы страницы, лента и поиск, а внедрение моста случается
+    // после навигации.
+    const listeners = {}
+    globalThis.window = {
+      addEventListener: (name, handler) => { listeners[name] = handler },
+    }
+
+    const asked = []
+    const answer = numbered('feed.page', {}, 0, 50)
+
+    globalThis.window.pywebview = {
+      api: { feed: { page: (...args) => { asked.push(args); return { ok: [] } } } },
+    }
+    listeners.pywebviewready()
+
+    await expect(answer).resolves.toEqual([])
+    expect(asked).toHaveLength(1)
+  })
+
+  it('снятые настройки не съедают запрос с головы', async () => {
+    // Настройки — хвост доводов, и срезаются с хвоста. Срежь их с головы, и
+    // мост получит вызов со сдвинутыми доводами: смещения он не заметит, а
+    // ответит не на то.
+    const ops = []
+    const asked = fake({ 'feed.page': { ok: [] } })
+
+    await numbered('feed.page', { tag_ids: [3] }, 40, 20, { channel: 'feed', ops })
+
+    expect(asked[0][1].slice(1)).toEqual([{ tag_ids: [3] }, 40, 20])
   })
 
   it('номера не повторяются', async () => {
@@ -129,9 +203,12 @@ describe('обёртка моста', () => {
 
     expect(fresh).toBe('новое')
     await expect(stale).rejects.toThrow(Failed)
-    // Молча: плашка на каждую букву набранного запроса — это не сообщение об
-    // ошибке, а мигающий экран.
-    await stale.catch((error) => { expect(error.silent).toBe(true) })
+    // Молча и своим родом: плашка на каждую букву набранного запроса — это не
+    // сообщение об ошибке, а мигающий экран.
+    await stale.catch((error) => {
+      expect(error.kind).toBe('stale')
+      expect(error.silent).toBe(true)
+    })
   })
 
   it('ответы разных каналов друг друга не гасят', async () => {
@@ -148,6 +225,24 @@ describe('обёртка моста', () => {
 
     await expect(page).resolves.toEqual([])
     await expect(histogram).resolves.toEqual([])
+  })
+
+  it('без канала вытесняет само себя по пути вызова', async () => {
+    // Пока это записанное поведение, а не решение: два одновременных вызова
+    // одного метода без канала гасят друг друга, и вытесненный уходит молча.
+    // Плановому обогащению видимых карточек это выйдет боком — вопрос отложен.
+    const slow = new Promise((resolve) => setTimeout(() => resolve({ ok: 'старое' }), 20))
+    let first = true
+    fake({
+      'world.enrich': () => {
+        if (first) { first = false; return slow }
+        return { ok: 'новое' }
+      },
+    })
+
+    const evicted = numbered('world.enrich', 1, 'movie')
+    await expect(numbered('world.enrich', 2, 'movie')).resolves.toBe('новое')
+    await expect(evicted).rejects.toThrow(Failed)
   })
 
   it('словарь запроса не съедается как настройки вызова', async () => {

@@ -1,0 +1,59 @@
+/* Оболочка окна: неоновая кромка сверху и место под содержимое. */
+
+.app {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  /* Тихое свечение от верхней кромки — стеклу есть что преломлять. */
+  background: radial-gradient(
+    ellipse at 50% 5%,
+    color-mix(in srgb, var(--primary) 3%, transparent) 0%,
+    transparent 45%);
+}
+
+.app::before,
+.app::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+/* Нить во всю ширину окна, гаснущая к краям. Приём `neon.css` тут не подходит:
+   там кромка идёт по скруглению капсулы, а гало сидит над ней. */
+.app::before {
+  top: 0;
+  height: 1px;
+  z-index: 2;
+  background: linear-gradient(90deg, transparent,
+    var(--primary) 22%, var(--primary) 78%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+/* Гало центром сидит на самой кромке, поэтому разлив уходит вниз, на страницу. */
+.app::after {
+  top: -8px;
+  height: 16px;
+  z-index: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 38%, transparent);
+  filter: blur(12px);
+}
+
+.app__main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Прокручивается область содержимого, а не лента: полоса идёт у края окна, а
+   не по краю колонки с карточками. */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
