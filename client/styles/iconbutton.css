@@ -1,0 +1,20 @@
+/* Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска. */
+
+/* Глиф иконочного шрифта сидит на базовой линии, и выравнивание по коробке
+   уводит его вниз — центрируем межстрочным интервалом. Размер ставит тот, кто
+   применяет: у карточки он 28, у поля поиска 26. */
+.icon-btn {
+  --icon-btn: 28px;
+
+  display: block;
+  width: var(--icon-btn);
+  height: var(--icon-btn);
+  border-radius: var(--r-full);
+}
+
+.icon-btn .material-symbols-outlined {
+  display: block;
+  width: var(--icon-btn);
+  line-height: var(--icon-btn);
+  text-align: center;
+}

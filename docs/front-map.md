@@ -14,7 +14,7 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte
 
-### app/LibraryScreen.svelte (21)
+### app/LibraryScreen.svelte (33)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Черновик: спрашивает одно и то же и ничем не управляет — настоящий раздел собирает задача 6.
 
 ### app/SearchScreen.svelte (2)
@@ -27,7 +27,15 @@
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
 
-## components — 10 файлов
+## components — 13 файлов
+
+### components/Acts.svelte (21)
+- Ряд действий карточки: правка, удаление, закладка.
+- принимает: wished, onedit, ondelete, onwish
+
+### components/Aggregates.svelte (57)
+- Оценки агрегаторов: цифра, кружок ожидания или пустое место.
+- принимает: external, expected, ids, onopen
 
 ### components/Chips.svelte (26)
 - Метки карточки: жанры, теги и кнопка добавления тега.
@@ -37,9 +45,9 @@
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
 - принимает: view, onperson
 
-### components/Film.svelte (34)
+### components/Film.svelte (81)
 - Карточка ленты целиком.
-- принимает: view, collapsed, on, oncollapse, onmark, onperson, ontag
+- принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
 ### components/Icon.svelte (6)
 - Глиф Material Symbols.
@@ -60,6 +68,10 @@
 ### components/Snack.svelte (41)
 - Плашка сообщений: одна на всё приложение.
 - принимает: message
+
+### components/Stars.svelte (39)
+- Ряд из десяти звёзд: кликабельный или неподвижный с дробной.
+- принимает: score, onpick
 
 ### components/Synopsis.svelte (28)
 - Описание карточки, обрезанное до трёх строк, с раскрытием.
@@ -83,9 +95,9 @@
 - Перезапуск анимации на узле, который обязан его пережить.
 - отдаёт: redrawn
 
-### state/scores.js (45)
+### state/scores.js (67)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
-- отдаёт: LABELS, average, colorOf, partOf, stepOf, verdictOf
+- отдаёт: ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
 
 ### state/session.js (43)
 - Выбранное в приложении вместе с переходами между выборами.
@@ -99,7 +111,21 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 14 файлов
+## styles — 18 файлов
+
+### styles/acts.css (41)
+- Ряд действий карточки: правка, удаление, закладка.
+- селекторы (8): .film__acts, .film__wish,
+.film__act, .film__wish .material-symbols-outlined,
+.film__act  .material-symbols-outlined, .film__wish:hover,
+.film__act:hover, .film__wish.is-on, .film__act[data-act="delete"]:hover, .film__act, .film:hover .film__act
+- берёт: --error, --gutter, --icon-inset, --primary, --tint-30
+
+### styles/aggr.css (51)
+- Оценки агрегаторов и кружок на месте неприехавшей.
+- селекторы (9): .film__aggr, .film__aggr span, .aggr, .aggr:hover, .aggr--flat, .aggr--flat:hover, .film__aggr b, .aggr-wait, @keyframes aggr-spin
+- объявляет: --flat
+- берёт: --body-m, --primary, --score, --tint-16, --tint-35, --tint-55
 
 ### styles/app.css (59)
 - Оболочка окна: неоновая кромка сверху и место под содержимое.
@@ -129,7 +155,7 @@
 - селекторы (1): .feed
 - берёт: --content-w
 
-### styles/film.css (133)
+### styles/film.css (125)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
 .film.is-collapsed .film__poster,
@@ -139,7 +165,13 @@
 .film.is-collapsed .film__aggr,
 .film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film.is-collapsed .film__scores, .film__poster, .film__poster .material-symbols-outlined, .film__poster img, .film__body, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
 - объявляет: --gutter, --icon-inset
-- берёт: --body-l, --body-m, --gutter, --icon-inset, --primary, --r-full, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
+- берёт: --body-l, --body-m, --gutter, --icon-inset, --primary, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
+
+### styles/iconbutton.css (20)
+- Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска.
+- селекторы (2): .icon-btn, .icon-btn .material-symbols-outlined
+- объявляет: --icon-btn
+- берёт: --icon-btn, --r-full
 
 ### styles/neon.css (49)
 - Общий приём: полоса по верхней кромке, гаснущая к краям, гало под ней и свечение текста. Цвет из --neon, высоту гало из --halo-h ставит тот, кто применяет класс.
@@ -153,10 +185,11 @@
 - объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --error, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
-### styles/search.css (74)
+### styles/search.css (63)
 - Поле поиска в левой зоне шапки.
 - селекторы (11): .search, .search:hover, .search:focus-within, .search__icon, .search:focus-within .search__icon, .search__input, .search__input::placeholder, .search__input::-webkit-search-cancel-button,
 .search__input::-webkit-search-decoration, .search__clear, .search__clear .material-symbols-outlined, .search__clear:hover
+- объявляет: --icon-btn
 - берёт: --body-l, --fill-primary-14, --primary, --r-full, --side-w, --text, --tint-035, --tint-05, --tint-06, --tint-10, --tint-28, --tint-35
 
 ### styles/seg.css (43)
@@ -169,6 +202,12 @@
 - селекторы (2): .snack, .snack.is-shown
 - объявляет: --halo-h, --neon
 - берёт: --body-m, --error, --glass-error, --r-full
+
+### styles/stars.css (70)
+- Своя оценка: ряд звёзд, дробная звезда и ярлык словом.
+- селекторы (14): .film__scores, .film__aspect, .stars, .stars button,
+.stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect
+- берёт: --body-m, --fill, --score, --tint-16, --tint-35, --title-s
 
 ### styles/tools.css (80)
 - Ряд круглых кнопок в правой зоне шапки.

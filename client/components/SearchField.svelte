@@ -23,7 +23,7 @@
          bind:this={field} bind:value
          onkeydown={(event) => event.key === 'Enter' && onsearch(value.trim())}>
   {#if value}
-    <button type="button" class="search__clear" aria-label="Очистить" onclick={clear}>
+    <button type="button" class="icon-btn search__clear" aria-label="Очистить" onclick={clear}>
       <Icon name="close" />
     </button>
   {/if}

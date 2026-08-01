@@ -1,0 +1,41 @@
+/* Ряд действий карточки: правка, удаление, закладка. */
+
+/* Ряд вынесен из потока: он выше строки со звёздами и иначе растягивал бы её,
+   разводя строки оценки на разное расстояние. Закладка встаёт в ту же колонку,
+   что и шеврон, а правка с удалением уходят левее, внутрь карточки. */
+.film__acts {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--icon-inset) - var(--gutter));
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Круг, размер и центрирование глифа приходят из `iconbutton.css`, подложку
+   с рамкой снимает `base.css`; здесь остаётся своё. */
+.film__wish,
+.film__act {
+  color: var(--tint-30);
+  transition: color .16s, opacity .16s;
+}
+.film__wish .material-symbols-outlined,
+.film__act  .material-symbols-outlined { font-size: 20px }
+.film__wish:hover,
+.film__act:hover { color: var(--primary) }
+.film__wish.is-on { color: var(--primary) }
+
+/* Удаление — единственное необратимое действие на карточке. */
+.film__act[data-act="delete"]:hover { color: var(--error) }
+
+/* Правка и удаление показываются только под курсором: в покое карточка
+   остаётся чистой. */
+.film__act {
+  opacity: 0;
+  pointer-events: none;
+}
+.film:hover .film__act {
+  opacity: 1;
+  pointer-events: auto;
+}

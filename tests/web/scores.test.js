@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { LABELS, average, colorOf, partOf, stepOf, verdictOf }
-  from '$state/scores.js'
+import { ASPECTS, LABELS, average, colorOf, meanOf, partOf, stepOf, toneOf,
+  verdictOf } from '$state/scores.js'
 
 describe('нотация оценок', () => {
   it('десять ступеней, и ни одна не повторяется', () => {
@@ -73,6 +73,47 @@ describe('нотация оценок', () => {
   it('ноль в шкале — это оценка, а не пустое место', () => {
     // Ноль ложный, и отброшенный вместе с пустотой он поднял бы среднее.
     expect(average([0, 10])).toBe(5)
+  })
+
+  it('у кино оценка своя, у игры — среднее сторон', () => {
+    // Одна функция на оба случая: карточка не должна знать, что у игры их три.
+    expect(meanOf({ score: 8 }, 'movie')).toBe(8)
+    expect(meanOf({ score: 8 }, 'series')).toBe(8)
+    expect(meanOf({ visual: 8, narrative: 7, gameplay: 7 }, 'game'))
+      .toBeCloseTo(7.333, 3)
+  })
+
+  it('у игры считаются выставленные стороны, а не поле оценки', () => {
+    // База кладёт среднее в `score` сама, но приезжает оно позже нажатия. Взяв
+    // его, число под ползунками не менялось бы до ответа.
+    expect(meanOf({ score: 3, visual: 9, narrative: null, gameplay: null },
+                  'game')).toBe(9)
+  })
+
+  it('неоценённое не имеет числа ни у кино, ни у игры', () => {
+    expect(meanOf(null, 'movie')).toBe(null)
+    expect(meanOf(null, 'game')).toBe(null)
+    expect(meanOf({ visual: null, narrative: null, gameplay: null }, 'game'))
+      .toBe(null)
+  })
+
+  it('сторон у игры три, и ключи у них те же, что в базе', () => {
+    expect(ASPECTS.map((one) => one.key))
+      .toEqual(['visual', 'narrative', 'gameplay'])
+  })
+
+  it('цвет своей оценки берётся по целой части', () => {
+    // Ярлык и цифра красятся одним и тем же: разъехавшись, они дали бы
+    // «Интересно» восьмой ступенью.
+    expect(toneOf(7.9)).toBe(colorOf(7))
+    expect(toneOf(10)).toBe(colorOf(10))
+  })
+
+  it('у снятой оценки цвет всё равно есть', () => {
+    // Неопределённая переменная не красит ничем, и ярлык — пустой строкой —
+    // пропал бы вместе с ней, а с ним и место под него.
+    expect(toneOf(null)).toBe(colorOf(1))
+    expect(toneOf(0)).toBe(colorOf(1))
   })
 
   it('доля дробной звезды — остаток, а не сама оценка', () => {

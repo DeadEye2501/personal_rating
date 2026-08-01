@@ -25,19 +25,11 @@
   position: absolute;
   top: 10px;
   right: var(--icon-inset);
-  display: block;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--r-full);
   color: var(--tint-30);
   transition: background .16s, color .16s;
 }
 .film__toggle .material-symbols-outlined {
-  display: block;
-  width: 28px;
   font-size: 22px;
-  line-height: 28px;
-  text-align: center;
   transition: transform .22s cubic-bezier(.2,.8,.2,1);
 }
 .film__toggle:hover { color: var(--text-bright) }

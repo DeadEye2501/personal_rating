@@ -1,0 +1,70 @@
+/* Своя оценка: ряд звёзд, дробная звезда и ярлык словом. */
+
+/* Порядок в строке: звёзды, ярлык словом, ряд действий у правого края. */
+.film__scores {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 0;
+}
+
+/* Подпись стороны оценки у игр. Ширина общая, чтобы звёзды в трёх строках
+   стояли по одной вертикали. */
+.film__aspect {
+  flex: 0 0 auto;
+  width: 86px;
+  font: var(--body-m);
+  color: var(--tint-35);
+}
+
+.stars { display: flex; gap: 2px }
+
+/* Подложку, рамку и отступы у кнопки снимает общее правило в `base.css`; здесь
+   остаётся только своё. */
+.stars button,
+.stars > span {
+  display: grid;
+  place-items: center;
+  color: var(--tint-16);
+}
+
+/* Дробная часть: поверх контурной звезды лежит закрашенная, обрезанная по
+   ширине. */
+.stars .star--part { position: relative }
+.stars .star--part i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--fill);
+  overflow: hidden;
+  color: var(--score);
+}
+.stars .star--part i .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}
+.stars .material-symbols-outlined {
+  font-size: 21px;
+  font-variation-settings: 'FILL' 0;
+  transition: color .12s, font-variation-settings .12s;
+}
+.stars .is-on { color: var(--score) }
+
+/* Повтор общего правила из `base.css` — вынужденный, а не забытый: у обоих
+   специфичность 0,2,0, а `.stars .material-symbols-outlined` выше по файлу
+   ставит `FILL 0` и, идя позже, перебивает общее. Снятая, эта строка оставляет
+   все звёзды контурными. Проверено запуском. */
+.stars .is-on .material-symbols-outlined { font-variation-settings: 'FILL' 1 }
+
+.film__verdict {
+  margin-left: 8px;
+  font: var(--title-s);
+  color: var(--score);
+}
+
+/* У игры три шкалы сворачиваются в одну усреднённую. Селектор двойной: иначе
+   общее правило .film__scores перебьёт скрытие. */
+.film__scores.film__scores--avg { display: none }
+.film.is-collapsed .film__scores--avg { display: flex }
+.film.is-collapsed .film__scores--aspect { display: none }

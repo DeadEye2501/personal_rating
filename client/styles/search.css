@@ -52,23 +52,12 @@
 }
 
 .search__clear {
+  --icon-btn: 26px;
+
   flex: 0 0 auto;
-  display: block;
-  width: 26px;
-  height: 26px;
   margin-right: -6px;
-  border-radius: var(--r-full);
   color: var(--primary);
   transition: background .15s;
 }
-
-/* Центрируем межстрочным интервалом: у иконочного шрифта глиф сидит на базовой
-   линии, и выравнивание по коробке уводит его вниз. */
-.search__clear .material-symbols-outlined {
-  display: block;
-  width: 26px;
-  font-size: 18px;
-  line-height: 26px;
-  text-align: center;
-}
+.search__clear .material-symbols-outlined { font-size: 18px }
 .search__clear:hover { background: var(--fill-primary-14) }

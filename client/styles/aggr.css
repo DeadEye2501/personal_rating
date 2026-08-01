@@ -1,0 +1,51 @@
+/* Оценки агрегаторов и кружок на месте неприехавшей. */
+
+/* Значения красятся по той же шкале, что и свои оценки: 0–10 и 0–100
+   приводятся к десятибалльной. */
+.film__aggr {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font: var(--body-m);
+}
+.film__aggr span { color: var(--tint-35) }
+
+/* Название источника ведёт на страницу карточки у него. */
+.aggr {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color .16s ease;
+}
+.aggr:hover { color: var(--primary) }
+
+/* Имя без адреса — подпись, а не ссылка: у Rotten и Metacritic идентификатора
+   не хранится вовсе, и щёлкать там не по чему. Курсор и наведение снимаются,
+   иначе человек выясняет это опытом. В макете такого состояния нет: там у
+   каждого имени был адрес. */
+.aggr--flat { cursor: default }
+.aggr--flat:hover { color: inherit }
+
+.film__aggr b {
+  margin-left: 5px;
+  font-weight: 600;
+  color: var(--score);
+}
+
+/* Оценка ещё едет. Имя источника остаётся на месте, число заменено кольцом —
+   так строка не прыгает, когда цифра приедет. */
+.aggr-wait {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: 6px;
+  vertical-align: -1px;
+  border: 2px solid var(--tint-16);
+  border-top-color: var(--tint-55);
+  border-radius: 50%;
+  animation: aggr-spin .8s linear infinite;
+}
+
+@keyframes aggr-spin {
+  to { transform: rotate(360deg) }
+}

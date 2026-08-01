@@ -1,21 +1,29 @@
 <!-- Карточка ленты целиком. -->
 <script>
+  import Acts from '$components/Acts.svelte'
+  import Aggregates from '$components/Aggregates.svelte'
   import Chips from '$components/Chips.svelte'
   import Facts from '$components/Facts.svelte'
   import Icon from '$components/Icon.svelte'
   import Poster from '$components/Poster.svelte'
+  import Stars from '$components/Stars.svelte'
   import Synopsis from '$components/Synopsis.svelte'
+  import { ASPECTS, meanOf, toneOf, verdictOf } from '$state/scores.js'
 
-  let { view, collapsed = false, on, oncollapse, onmark, onperson, ontag }
-    = $props()
+  let { view, collapsed = false, expected = [], on, oncollapse, onmark,
+        onperson, onopen, ontag, onscore, onaspect, onedit, ondelete,
+        onwish } = $props()
 
   // Год приклеивается здесь, а не в разметке: ведущий пробел текстового узла в
   // блоке `{#if}` Svelte срезает, и получается «Интерстеллар(2014)».
   const title = $derived(view.year ? `${view.title} (${view.year})` : view.title)
+
+  const rating = $derived(view.rating)
+  const mean = $derived(meanOf(rating, view.kind))
 </script>
 
 <article class="film" class:is-collapsed={collapsed}>
-  <button type="button" class="film__toggle" aria-expanded={!collapsed}
+  <button type="button" class="icon-btn film__toggle" aria-expanded={!collapsed}
           aria-label={collapsed ? 'Развернуть' : 'Свернуть'}
           onclick={() => oncollapse(view)}>
     <Icon name="expand_less" />
@@ -30,5 +38,44 @@
            ontag={() => ontag(view)} />
     <Facts {view} {onperson} />
     <Synopsis text={view.synopsis} />
+
+    <Aggregates external={view.external} {expected}
+                ids={view.external_ids} {onopen} />
+
+    <!-- Ряд действий живёт внутри строки оценки, а не рядом с телом: он
+         отсчитывает своё место от её правого края, и вынесенный выше уезжает
+         за карточку. У игры это последняя из трёх строк. -->
+    {#if view.kind === 'game'}
+      {#each ASPECTS as aspect, index (aspect.key)}
+        <div class="film__scores film__scores--aspect">
+          <span class="film__aspect">{aspect.label}</span>
+          <Stars score={rating?.[aspect.key] ?? null}
+                 onpick={(value) => onaspect(view, aspect.key, value)} />
+          <!-- Ярлык стоит у каждой стороны своим, а не один на все три: так в
+               макете, и иначе «Отлично» у визуала было бы неотличимо от
+               «Отлично» у геймплея. -->
+          <span class="film__verdict"
+                style:--score={toneOf(rating?.[aspect.key] ?? null)}
+          >{verdictOf(rating?.[aspect.key] ?? null)}</span>
+          {#if index === ASPECTS.length - 1}
+            <Acts wished={view.in_wishlist} onedit={() => onedit(view)}
+                  ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+          {/if}
+        </div>
+      {/each}
+      <div class="film__scores film__scores--avg">
+        <Stars score={mean} />
+        <span class="film__verdict" style:--score={toneOf(mean)}
+        >{verdictOf(mean)}</span>
+      </div>
+    {:else}
+      <div class="film__scores">
+        <Stars score={mean} onpick={(value) => onscore(view, value)} />
+        <span class="film__verdict" style:--score={toneOf(mean)}
+        >{verdictOf(mean)}</span>
+        <Acts wished={view.in_wishlist} onedit={() => onedit(view)}
+              ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+      </div>
+    {/if}
   </div>
 </article>

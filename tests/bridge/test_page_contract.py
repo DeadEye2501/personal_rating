@@ -10,9 +10,11 @@ Vitest не читает `bridge/`. Ломаются они по-разному,
 имена обязаны совпадать и до неё."""
 
 import re
+from dataclasses import fields
 from pathlib import Path
 
 from backend.model import (
+    Rating,
     CompanyRole,
     IdSource,
     Kind,
@@ -112,6 +114,17 @@ def test_the_card_shows_every_role_the_base_stores():
     named = set(re.findall(r"role: '(\w+)'", card))
 
     assert named == set(PersonRole) | set(CompanyRole)
+
+
+def test_the_page_names_the_same_three_aspects_as_the_base():
+    """Три стороны оценки игры уезжают мосту именами полей: `wire.py` кладёт
+    датакласс на провод как есть. Переименованная сторона отказа не даёт —
+    строка шкалы гаснет на всех играх молча, а среднее считается по двум."""
+    named = set(re.findall(r"key: '(\w+)'", source("state/scores.js")))
+    stored = {field.name for field in fields(Rating)} - {"item_id", "score",
+                                                         "review"}
+
+    assert named == stored
 
 
 def test_the_card_asks_the_right_two_shelves():
