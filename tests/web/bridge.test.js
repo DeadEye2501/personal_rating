@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Failed, call, cancel, lastOp, numbered, ready } from '$api/bridge.js'
+import {
+  Failed, call, cancel, drop, lastOp, numbered, ready,
+} from '$api/bridge.js'
 import { bare, fake, slow } from './fake.js'
 
 beforeEach(() => { vi.restoreAllMocks() })
@@ -179,6 +181,30 @@ describe('обёртка моста', () => {
       expect(error.kind).toBe('stale')
       expect(error.silent).toBe(true)
     })
+  })
+
+  it('снятый канал не ждёт больше никого', async () => {
+    // Выдачу снимают и без нового запроса — очисткой строки и сменой вкладки.
+    // Номер канала при этом меняться некому, и ответ прежней операции считался
+    // бы своевременным: выдача по игровому запросу легла бы во вкладку
+    // сериалов через двадцать секунд после того, как её очистили.
+    fake({ 'search.local': slow({ ok: 'старое' }, { ok: 'никем не ждано' }) })
+
+    const flying = numbered('search.local', 'game', 'fallout',
+                            { channel: 'dropped-search' })
+    drop('dropped-search')
+
+    await expect(flying).rejects.toMatchObject({ kind: 'stale', silent: true })
+  })
+
+  it('снятый канал не мешает следующему запросу', async () => {
+    // Снятие — это не закрытие: следом человек набирает новую строку, и её
+    // ответ обязан доехать.
+    fake({ 'search.local': { ok: 'новое' } })
+    drop('dropped-twice')
+
+    await expect(numbered('search.local', 'movie', 'дюна',
+                          { channel: 'dropped-twice' })).resolves.toBe('новое')
   })
 
   it('ответы разных каналов друг друга не гасят', async () => {

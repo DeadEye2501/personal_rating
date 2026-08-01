@@ -4,9 +4,9 @@
 
 ## api — 2 файлов
 
-### api/bridge.js (119)
+### api/bridge.js (133)
 - Единственное место страницы, которое знает про `window.pywebview`.
-- отдаёт: Failed, call, cancel, lastOp, numbered, ready
+- отдаёт: Failed, call, cancel, drop, lastOp, numbered, ready
 
 ### api/owned.svelte.js (18)
 - Что раздел запустил, то он и гасит при уходе.
@@ -14,7 +14,7 @@
 
 ## app — 16 файлов
 
-### app/App.svelte (327)
+### app/App.svelte (356)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
@@ -43,7 +43,7 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (243)
+### app/SearchScreen.svelte (255)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -167,7 +167,7 @@
 - Своя полоса прокрутки для того, что прокручивается.
 - принимает: box, area
 
-### components/SearchField.svelte (28)
+### components/SearchField.svelte (33)
 - Поле поиска с кнопкой очистки.
 - принимает: onsearch, value
 

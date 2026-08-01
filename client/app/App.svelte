@@ -165,10 +165,41 @@
    *  строка симметрично снимает человека: она отменяет жест, а не складывается
    *  с ним. */
   function byPerson(domain, entity_id) {
-    query = null
-    typed = ''
+    forgetQuery()
     person = { domain, entity_id }
     session = withSection(session, 'search')
+  }
+
+  /** Набранная строка отменяет клик по имени: это другой жест, а не добавка к
+   *  нему. */
+  function searched(text) {
+    person = null
+    query = { text }
+    session = withSection(session, 'search')
+  }
+
+  /** Строку снимают в трёх местах, и всюду одинаково: набранное и запрос — это
+   *  одна вещь, показанная дважды.
+   *
+   *  Человека при этом не трогаем: поле у его выдачи и так пусто, а очистка
+   *  начатого и брошенного поиска не повод убирать показанное. Сняв заодно и
+   *  его, мы оставили бы раздел пустым навсегда — карточки, по имени с которой
+   *  кликали, на экране уже нет. */
+  function forgetQuery() {
+    query = null
+    typed = ''
+  }
+
+  /** Смена вкладки снимает набранную строку: поиски разных типов экранированы
+   *  друг от друга — строка искала игры, и во вкладке сериалов её выдача уже
+   *  про другое. Решено пользователем 02.08.2026 на живом приложении, где
+   *  очищенное поле показывало сериалы по игровому запросу.
+   *
+   *  Клик по имени вкладку переживает, и это подтверждено тогда же: работы
+   *  человека другого типа смотрят именно переключением вкладки. */
+  function switched(next) {
+    if (next.kind !== session.kind) forgetQuery()
+    session = next
   }
 
   /** Повторное нажатие по горящей кнопке сбрасывает свой признак, а не
@@ -237,10 +268,8 @@
 <div class="app">
   <main class="app__main">
     <Topbar {session} bind:typed
-            onsession={(next) => { session = next }}
-            onsearch={(text) => { person = null
-                                  query = { text }
-                                  session = withSection(session, 'search') }}
+            onsession={switched}
+            onsearch={(text) => { if (text) { searched(text) } else { forgetQuery() } }}
             onadd={() => { editing = null }} onfilter={filter} />
 
     <!-- Прокручивается содержимое, а не страница, и полоса у него своя: она

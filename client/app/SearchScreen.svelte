@@ -5,7 +5,7 @@
   import { untrack } from 'svelte'
 
   import Feed from '$components/Feed.svelte'
-  import { lastOp, numbered } from '$api/bridge.js'
+  import { cancel, drop, lastOp, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
   import { flipped } from '$state/session.js'
@@ -49,9 +49,21 @@
     // «устаревшим» — молча.
     turns = rowTurns()
     if (clicked) { about(clicked, kind).catch(lost); return }
-    if (!query?.text) { views = []; return }
+    if (!query?.text) { forget(); return }
     look(query.text, kind).catch(lost)
   })
+
+  /** Спрашивать нечего — но начатое прежде обязано перестать доезжать.
+   *
+   *  Устаревшее отбрасывается сравнением с номером канала, а тот меняется
+   *  только при новом вызове: сними строку без него, и ответ прежней операции
+   *  доедет своевременным. Так игровая выдача ложилась во вкладку сериалов
+   *  через двадцать секунд после того, как её очистили. */
+  function forget() {
+    drop('search')
+    cancel(ops)
+    views = []
+  }
 
   /** Выдача по клику на имя приезжает собранной: своя половина и чужая сложены
    *  на стороне бэкенда, и второго шага у этого жеста нет.
