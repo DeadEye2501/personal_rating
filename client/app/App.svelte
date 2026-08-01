@@ -1,5 +1,6 @@
 <!-- Корень страницы: шапка, стопка разделов и плашка сообщений. -->
 <script>
+  import CardTagsModal from './CardTagsModal.svelte'
   import FiltersModal from './FiltersModal.svelte'
   import LibraryScreen from './LibraryScreen.svelte'
   import SearchScreen from './SearchScreen.svelte'
@@ -8,8 +9,8 @@
   import Snack from '$components/Snack.svelte'
   import { call, numbered } from '$api/bridge.js'
   import { isEmpty } from '$state/filters.js'
-  import { newSession, withClearedFilter, withFilters, withMark, withSection }
-    from '$state/session.js'
+  import { newSession, withClearedFilter, withFilters, withForgotten, withMark,
+    withSection } from '$state/session.js'
   import { reported } from './trouble.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
@@ -51,6 +52,13 @@
   // она нужна корнем наблюдателя: иначе запас догрузки не действует.
   let content = $state()
 
+  // Карточка, которой правят теги, и её метки, уже сохранённые.
+  let tagging = $state(null)
+  // Метки, доехавшие до ленты раньше, чем она перечитается: карточка обязана
+  // показать их сразу. Накладываются производной, а не эффектом по ленте:
+  // эффект, читающий и пишущий один список, — это бесконечный круг.
+  let tagged = $state({})
+
   // Какое наложение открыто, знает сборка: `null` либо признак с подписью.
   // Подпись едет от кнопки, которая окно открыла: заголовок окна и есть её
   // подпись, и вторым объявлением они разъехались бы молча.
@@ -88,6 +96,14 @@
     modal = { field, title }
   }
 
+  /** Тега больше нет в наборе, и помнить его номер не должен никто: ни отбор
+   *  ленты, ни метки, доехавшие до неё раньше базы. */
+  function forget(id) {
+    session = withForgotten(session, 'tags', id)
+    tagged = Object.fromEntries(Object.entries(tagged).map(
+      ([item, tags]) => [item, tags.filter((tag) => tag.id !== id)]))
+  }
+
   /** Ссылку открывает системный браузер: окно приложения без адресной строки, и
    *  вернуться из Кинопоиска было бы нечем. Отказ у этого свой — чужая схема
    *  адреса заведена в мосте отдельным классом ровно затем, чтобы плашка
@@ -119,7 +135,9 @@
                   ontrouble={(text) => { trouble = { text } }}
                   onmark={(field, id) => { session = withMark(session, field, id) }}
                   onperson={idle}
-                  onopen={open} />
+                  onopen={open}
+                  {tagged}
+                  ontag={(view) => { tagging = view }} />
         </section>
       {/key}
     </div>
@@ -133,9 +151,17 @@
       <FiltersModal field={modal.field} title={modal.title} kind={session.kind}
                     filters={session.filters}
                     onfilters={(next) => { session = withFilters(session, next) }}
+                    onforget={forget}
                     ontrouble={(text) => { trouble = { text } }}
                     onclose={() => { modal = null }} />
     {/key}
+  {/if}
+
+  {#if tagging}
+    <CardTagsModal view={tagging}
+                   onview={(tags) => { tagged = { ...tagged, [tagging.item_id]: tags } }}
+                   ontrouble={(text) => { trouble = { text } }}
+                   onclose={() => { tagging = null }} />
   {/if}
 
   <Snack message={trouble} />

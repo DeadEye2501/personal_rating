@@ -1,6 +1,6 @@
 /* Выбранное в приложении вместе с переходами между выборами. */
 
-import { EMPTY, cleared, marked } from '$state/filters.js'
+import { EMPTY, cleared, forgotten, marked } from '$state/filters.js'
 import { nextSort } from '$state/sorting.js'
 
 /** При запуске карточек нет: приложение открывается на поиске. */
@@ -51,6 +51,10 @@ export const withClearedFilter = (session, field) =>
 
 /** Перебор строки в списке уже сложил новые наборы — сеанс их принимает. */
 export const withFilters = (session, filters) => ({ ...session, filters })
+
+/** Тег удалили из набора — сеанс обязан его забыть. */
+export const withForgotten = (session, field, id) =>
+  ({ ...session, filters: forgotten(session.filters, field, id) })
 
 /** Тумблер всего приложения, а не настройка раздела. */
 export const withCollapsed = (session, collapsed) => ({ ...session, collapsed })

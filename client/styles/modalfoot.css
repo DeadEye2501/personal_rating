@@ -1,0 +1,42 @@
+/* Ряд ответных кнопок внизу окна. */
+
+/* Ряд один на все окна: у карточки он прижат книзу флексом, у подтверждения
+   стоит следом за вопросом. */
+.modalfoot {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+/* Ни подложки, ни рамки в покое — кнопка это надпись, и обе одинаково блёклы.
+   Под курсором проступает рамка и светлеет текст; разводит их только цвет:
+   отмена белым, согласие — цветом окна. */
+.btn {
+  min-width: 150px;
+  padding: 12px 26px;
+  /* Рамка стоит всегда и только красится: заводить её под курсором значило бы
+     двигать соседей в момент наведения. */
+  border: 1px solid transparent;
+  border-radius: var(--r-full);
+  font: var(--label-l);
+  color: var(--text-dim);
+  transition: color .16s, border-color .16s;
+}
+
+.btn--cancel:hover {
+  border-color: var(--text-bright);
+  color: var(--text-bright);
+}
+
+.btn--go:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Удаление светится тем же цветом, что и кромка своего окна: у согласия и у
+   окна ответ один, и разными цветами они бы спорили. */
+.btn--danger:hover {
+  border-color: var(--error);
+  color: var(--error);
+}

@@ -3,11 +3,11 @@
   import Icon from '$components/Icon.svelte'
   import TagBox from '$components/TagBox.svelte'
 
-  let { name, state = 'off', ontoggle, ondelete = null, ongrab = null }
-    = $props()
+  let { name, state = 'off', dragging = false, ontoggle, ondelete = null,
+        ongrab = null } = $props()
 </script>
 
-<li class="tagrow">
+<li class="tagrow" class:is-dragging={dragging}>
   {#if ongrab}
     <!-- Порядок хранит база: `marks.reorder_tags` пишет `position`, и он
          переживает перезапуск. -->

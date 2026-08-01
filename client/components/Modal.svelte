@@ -5,7 +5,8 @@
 </script>
 
 <script>
-  let { narrow = false, label, onclose, children } = $props()
+  let { narrow = false, ask = false, danger = false, label, onclose,
+        children } = $props()
 
   // Место в стопке занимается при создании, а не в эффекте: слушатель окна
   // ставится синхронно, и между созданием и первым эффектом окно уже ловит
@@ -39,7 +40,8 @@
 <!-- Затемнение — не кнопка: клавиатуре тут делать нечего, окно закрывает
      Escape. Предупреждения сняты адресно, а не настройкой на весь проект. -->
 <div class="overlay" onpointerdown={press} onclick={outside}>
-  <div class="modal" class:modal--narrow={narrow} role="dialog" aria-modal="true"
+  <div class="modal" class:modal--narrow={narrow} class:modal--ask={ask}
+       class:modal--danger={danger} role="dialog" aria-modal="true"
        aria-label={label}>
     {@render children()}
   </div>

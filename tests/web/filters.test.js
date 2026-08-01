@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY, stateOf, chosen, cleared, cycled, isEmpty, marked, passes }
+import { EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes,
+  stateOf }
   from '$state/filters.js'
 
 describe('строка фильтра', () => {
@@ -220,5 +221,31 @@ describe('состояние строки в списке', () => {
     const tagged = cycled(EMPTY, 'tags', 7)
 
     expect(stateOf(tagged, 'genres', 7)).toBe('off')
+  })
+})
+
+describe('забытая метка', () => {
+  it('убирает метку из обеих половин признака', () => {
+    // Тег удалили из набора: номер, оставшийся в фильтре, отбирал бы ленту по
+    // мертвецу, и выключить его было бы нечем — строки-то больше нет.
+    const on = cycled(EMPTY, 'tags', 3)
+    const ex = cycled(cycled(on, 'tags', 5), 'tags', 5)
+    const after = forgotten(forgotten(ex, 'tags', 3), 'tags', 5)
+
+    expect(chosen(after).tag_ids).toEqual([])
+    expect(chosen(after).excluded_tag_ids).toEqual([])
+  })
+
+  it('соседей по признаку не трогает', () => {
+    const two = cycled(cycled(EMPTY, 'tags', 3), 'tags', 4)
+
+    expect(chosen(forgotten(two, 'tags', 3)).tag_ids).toEqual([4])
+  })
+
+  it('чужой признак не трогает вовсе', () => {
+    // Номера жанров и тегов независимы: третий тег — не третий жанр.
+    const both = cycled(cycled(EMPTY, 'tags', 3), 'genres', 3)
+
+    expect(chosen(forgotten(both, 'tags', 3)).genre_ids).toEqual([3])
   })
 })

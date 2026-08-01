@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { EMPTY, chosen, cycled, isEmpty } from '$state/filters.js'
-import { newSession, withClearedFilter, withCollapsed, withFilters, withKind,
-  withMark, withNextSort, withSection, withToggledSection }
+import { newSession, withClearedFilter, withCollapsed, withFilters,
+  withForgotten, withKind, withMark, withNextSort, withSection,
+  withToggledSection }
   from '$state/session.js'
 
 const filtered = () => ({ ...newSession(), filters: cycled(EMPTY, 'tags', 3) })
@@ -166,5 +167,13 @@ describe('фильтры сеанса', () => {
     expect(after.section).toBe('rated')
     expect(after.collapsed).toBe(true)
     expect(after.sort).toBe(2)
+  })
+})
+
+describe('удалённый тег', () => {
+  it('уходит из фильтров сеанса', () => {
+    const session = { ...newSession(), filters: cycled(EMPTY, 'tags', 3) }
+
+    expect(chosen(withForgotten(session, 'tags', 3).filters).tag_ids).toEqual([])
   })
 })

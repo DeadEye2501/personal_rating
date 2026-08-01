@@ -12,8 +12,8 @@
   // Порция ленты. Число из спеки: читается с диска и стоит дёшево.
   const PAGE = 50
 
-  let { session, expected = [], root = null, ontrouble, onmark, onperson,
-        onopen } = $props()
+  let { session, expected = [], root = null, tagged = {}, ontrouble, onmark,
+        onperson, onopen, ontag } = $props()
 
   let views = $state([])
   let done = $state(false)
@@ -27,6 +27,12 @@
   // срабатывал бы на любую пересборку сеанса, и «Свернуть всё» перечитывало бы
   // ленту с начала, роняя прокрутку.
   const asked = $derived(JSON.stringify(requestOf(session)))
+
+  // Метки, только что проставленные в модалке, накладываются поверх прочитанного:
+  // перечитывать страницу ленты ради одной строки незачем, а следующее чтение
+  // привезёт их уже из базы, и наложение станет пустым делом.
+  const cards = $derived(views.map((view) =>
+    tagged[view.item_id] ? { ...view, tags: tagged[view.item_id] } : view))
 
   const lost = (error, text) => reported(error, 'раздел библиотеки',
                                          () => ontrouble(text))
@@ -101,7 +107,7 @@
   const idle = () => {}
 </script>
 
-<Feed {views} {expected} {root} collapsed={session.collapsed} onmore={more}
+<Feed views={cards} {expected} {root} collapsed={session.collapsed} onmore={more}
       onshown={(view) => shown(view).catch((error) =>
         lost(error, 'Не удалось прочитать библиотеку'))}
       onscore={(view, value) => score(view, value).catch((error) =>
@@ -112,4 +118,4 @@
         lost(error, 'Закладка не сохранилась'))}
       oncollapse={collapse}
       on={session.filters.on} {onmark} {onperson} {onopen}
-      onedit={idle} ondelete={idle} ontag={idle} />
+      onedit={idle} ondelete={idle} {ontag} />

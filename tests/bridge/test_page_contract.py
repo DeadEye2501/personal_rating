@@ -15,6 +15,7 @@ from pathlib import Path
 
 from backend.model import (
     Rating,
+    TagExists,
     CompanyRole,
     GenreKind,
     IdSource,
@@ -24,6 +25,7 @@ from backend.model import (
     Section,
     Sort,
 )
+from bridge.answer import kebab
 from bridge.feed import FILTER_FIELDS
 
 WEB = Path(__file__).resolve().parents[2] / "client"
@@ -163,3 +165,13 @@ def keys_and_values(table: str, text: str) -> dict[str, str]:
     start = text.index(f"const {table} = {{")
     body = text[start:text.index("}", start)]
     return dict(re.findall(r"(\w+): '(\w+)'", body))
+
+
+def test_the_page_knows_the_only_refusal_it_tells_apart():
+    """Занятое имя тега — единственный отказ, который страница разбирает по
+    роду: он штатный, и говорят о нём иначе, чем о поломке. Разъехавшись,
+    «Такой тег уже есть» молча превратится в «Не удалось завести тег»."""
+    named = re.search(r"const TAG_EXISTS = '([\w-]+)'", source("app/tags.js"))
+
+    assert named, "в client/app/tags.js больше нет константы TAG_EXISTS"
+    assert named.group(1) == kebab(TagExists.__name__)

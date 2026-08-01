@@ -8,20 +8,25 @@
 - Единственное место страницы, которое знает про `window.pywebview`.
 - отдаёт: Failed, call, cancel, lastOp, numbered, ready
 
-## app — 8 файлов
+## app — 10 файлов
 
-### app/App.svelte (142)
+### app/App.svelte (168)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
-- берёт: ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
+- берёт: ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/FiltersModal.svelte (62)
-- Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее.
-- принимает: field, kind, title, filters, onfilters, onclose, ontrouble
-- берёт: ./trouble.js
+### app/CardTagsModal.svelte (76)
+- Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
+- принимает: view, onview, onclose, ontrouble
+- берёт: ./tags.js, ./trouble.js
 
-### app/LibraryScreen.svelte (115)
+### app/FiltersModal.svelte (155)
+- Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
+- принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
+- берёт: ./tags.js, ./trouble.js
+
+### app/LibraryScreen.svelte (121)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
-- принимает: session, expected, root, ontrouble, onmark, onperson, onopen
+- принимает: session, expected, root, tagged, ontrouble, onmark, onperson, onopen, ontag
 - берёт: ./trouble.js, ./visible.js
 
 ### app/SearchScreen.svelte (120)
@@ -36,6 +41,10 @@
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, onsession, onsearch, onadd, onfilter
 
+### app/tags.js (33)
+- Заведение тега с общим отказом.
+- отдаёт: created
+
 ### app/trouble.js (15)
 - Единственный способ поступить с отказом операции.
 - отдаёт: reported
@@ -44,7 +53,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: onCardShown, stale
 
-## components — 20 файлов
+## components — 22 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -57,6 +66,10 @@
 ### components/Chips.svelte (26)
 - Метки карточки: жанры, теги и кнопка добавления тега.
 - принимает: genres, tags, on, onmark, ontag
+
+### components/Confirm.svelte (18)
+- Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
+- принимает: label, text, ok, danger, onyes, onclose
 
 ### components/Facts.svelte (45)
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл.
@@ -74,9 +87,13 @@
 - Глиф Material Symbols.
 - принимает: name, extra
 
-### components/Modal.svelte (46)
+### components/ListModal.svelte (19)
+- Окно со списком строк: прокручиваемый список и, если есть, форма под ним.
+- принимает: label, narrow, onclose, items, footer
+
+### components/Modal.svelte (48)
 - Оболочка любого наложения: затемнение, окно и два способа его закрыть.
-- принимает: narrow, label, onclose, children
+- принимает: narrow, ask, danger, label, onclose, children
 
 ### components/NewTag.svelte (36)
 - Форма заведения тега.
@@ -90,7 +107,7 @@
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
 - принимает: score, state, ontoggle
 
-### components/Scrollarea.svelte (89)
+### components/Scrollarea.svelte (85)
 - Область со своей полосой прокрутки.
 - принимает: children
 
@@ -120,25 +137,33 @@
 
 ### components/TagRow.svelte (29)
 - Строка списка: ручка, переключатель, имя, удаление.
-- принимает: name, state, ontoggle, ondelete, ongrab
+- принимает: name, state, dragging, ontoggle, ondelete, ongrab
 
 ### components/ToolButton.svelte (17)
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, onclick, children
 
-## state — 9 файлов
+## state — 11 файлов
+
+### state/dragging.js (23)
+- Таска указателем: захват, движение, отпускание.
+- отдаёт: dragging
 
 ### state/facts.js (50)
 - Строки фактов карточки: длительность, сезоны и серии, состав.
 - отдаёт: castOf, plural, runtimeOf, seriesOf
 
-### state/filters.js (111)
+### state/filters.js (119)
 - Три состояния строки фильтра: не выбран, включён, исключён.
-- отдаёт: EMPTY, chosen, cleared, cycled, isEmpty, marked, passes, stateOf
+- отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 
 ### state/redraw.js (20)
 - Перезапуск анимации на узле, который обязан его пережить.
 - отдаёт: redrawn
+
+### state/reorder.js (23)
+- Куда встаёт строка, которую тащат указателем.
+- отдаёт: dragged
 
 ### state/scores.js (72)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
@@ -152,9 +177,9 @@
 - Запрос раздела: то, что уезжает мостом в `feed.page`.
 - отдаёт: requestOf
 
-### state/session.js (62)
+### state/session.js (66)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: collapsedOf, newSession, withClearedFilter, withCollapsed, withFilters, withKind, withMark, withNextSort, withSection, withToggledSection
+- отдаёт: collapsedOf, newSession, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
 
 ### state/sorting.js (70)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
@@ -164,7 +189,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 24 файлов
+## styles — 25 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -231,11 +256,17 @@
 - объявляет: --accent, --icon-btn
 - берёт: --fill-primary-14, --icon-btn, --primary, --r-full
 
-### styles/modal.css (88)
+### styles/modal.css (106)
 - Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
-- селекторы (6): .overlay, .modal, .modal--narrow, .modal::before, .modal::after, @keyframes modal-in
+- селекторы (9): .overlay, .modal, .modal--narrow, .modal--ask, .modal--danger, .ask__text, .modal::before, .modal::after, @keyframes modal-in
 - объявляет: --neon
-- берёт: --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --tint-09, --tint-14
+- берёт: --body-l, --error, --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --text, --tint-09, --tint-14
+
+### styles/modalfoot.css (42)
+- Ряд ответных кнопок внизу окна.
+- селекторы (5): .modalfoot, .btn, .btn--cancel:hover, .btn--go:hover, .btn--danger:hover
+- объявляет: --cancel, --danger, --go
+- берёт: --error, --label-l, --primary, --r-full, --text-bright, --text-dim
 
 ### styles/neon.css (49)
 - Общий приём: полоса по верхней кромке, гаснущая к краям, гало под ней и свечение текста. Цвет из --neon, высоту гало из --halo-h ставит тот, кто применяет класс.

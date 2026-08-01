@@ -1,5 +1,6 @@
 <!-- Область со своей полосой прокрутки. -->
 <script>
+  import { dragging } from '$state/dragging.js'
   import { thumbOf } from '$state/scroll.js'
 
   // Сколько полоса висит после того, как прокрутка кончилась.
@@ -57,31 +58,26 @@
   }
 
   function drag(event) {
-    event.preventDefault()
-    const grip = event.currentTarget
-    grip.setPointerCapture(event.pointerId)
-
     const start = event.clientY
     const from = box.scrollTop
     const { scale } = thumb
 
-    const move = (moved) => {
+    dragging(event.currentTarget, event, (moved) => {
       box.scrollTop = from + (moved.clientY - start) * scale
-    }
-    grip.addEventListener('pointermove', move)
-    // Отпускание считаем по потере захвата, а не по `pointerup`: кнопку могут
-    // отпустить за окном приложения, и `pointerup` тогда не придёт вовсе.
-    grip.addEventListener('lostpointercapture',
-                          () => grip.removeEventListener('pointermove', move),
-                          { once: true })
+    })
   }
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- Наведение только показывает полосу, а тащат её мышью: с клавиатуры
+     область прокручивают стрелками, и роль ей не нужна. Предупреждения
+     сняты адресно, а не настройкой на весь проект. -->
 <div class="scrollarea" onmouseenter={enter} onmouseleave={leave}>
   <div class="scrollarea__box" bind:this={box} onscroll={scrolled}>
     {@render children()}
   </div>
   <div class="scrollbar" class:is-shown={shown} hidden={thumb === null}>
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="scrollbar__thumb" onpointerdown={drag}
          style:height={`${thumb?.height ?? 0}px`}
          style:transform={`translateY(${thumb?.offset ?? 0}px)`}></div>
