@@ -57,7 +57,7 @@
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
-### components/Film.svelte (81)
+### components/Film.svelte (84)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 

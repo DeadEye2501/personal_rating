@@ -39,7 +39,10 @@
     <Facts {view} {onperson} />
     <Synopsis text={view.synopsis} />
 
-    <Aggregates external={view.external} {expected}
+    <!-- Кружок ожидания — только у того, кого действительно спрашивают. У
+         кандидата поиска номера строки нет, оценки агрегаторов за него никто
+         не просит, и пять колец крутились бы вечно на главном экране. -->
+    <Aggregates external={view.external} expected={view.item_id ? expected : []}
                 ids={view.external_ids} {onopen} />
 
     <!-- Ряд действий живёт внутри строки оценки, а не рядом с телом: он
