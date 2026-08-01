@@ -1,6 +1,5 @@
 """Вопросы к отфильтрованному набору раздела."""
 
-from dataclasses import replace
 
 from sqlalchemy import Column, Integer, Select, Table, cast, func, select
 
@@ -107,20 +106,20 @@ class SectionsRepository(Repository):
         Раздел здесь всегда «Оценённые»: гистограмма строится по выставленным
         оценкам, и в «Хочу посмотреть» считать нечего.
 
-        Фильтр по оценке снимаем — и включение, и исключение: он выражен теми же
-        столбцами, что и сама гистограмма, и применённый к себе схлопнул бы её в
-        один столбец."""
-        narrowed = replace(filters, scores=(), excluded_scores=())
+        Фильтры действуют целиком, включая фильтр по оценке: гистограмма
+        показывает тот же набор, что и список карточек, и ничем от него не
+        отличается. То, что отбор по оценке оставляет от неё выбранные столбцы,
+        и есть ответ. Решено пользователем 01.08.2026."""
         counted = self._narrow(
             select(_COLUMN.label("bucket"), func.count().label("total")),
-            Section.RATED, kind, narrowed,
+            Section.RATED, kind, filters,
         ).group_by("bucket")
         # Средняя считается по неокруглённым оценкам: у игр score — среднее трёх
         # шкал, и сумма по столбцам занизила бы её почти на полбалла. Всего же
         # считать вторым запросом нечего: это сумма столбцов.
         mean = self._narrow(
             select(func.avg(rating.c.score).label("mean")),
-            Section.RATED, kind, narrowed,
+            Section.RATED, kind, filters,
         )
 
         counts = dict.fromkeys(range(1, 11), 0)

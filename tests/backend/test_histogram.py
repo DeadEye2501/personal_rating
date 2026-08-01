@@ -104,19 +104,22 @@ async def test_the_histogram_obeys_the_same_filters_as_the_feed(
     assert (buckets[8], buckets[9]) == (1, 0)
 
 
-async def test_the_histogram_does_not_filter_itself_by_score(sessions, sections):
-    """Фильтр по оценке — это те же десять столбцов. Применив его к себе,
-    гистограмма показала бы ровно то, что ты в ней и выбрал."""
+async def test_the_histogram_obeys_the_score_filter_like_any_other(sessions,
+                                                                  sections):
+    """Фильтры действуют на гистограмму ровно так же, как на список карточек, —
+    включая фильтр по оценке. Решено пользователем 01.08.2026 по виду
+    предшественника: то, что она схлопывается в выбранные столбцы, и есть
+    ответ, а не поломка."""
     await rated(sessions, "1", 7.0)
     await rated(sessions, "2", 9.0)
 
     buckets = await columns(sections, scores=(7,))
 
-    assert (buckets[7], buckets[9]) == (1, 1)
+    assert (buckets[7], buckets[9]) == (1, 0)
 
 
-async def test_the_histogram_ignores_an_excluded_score_too(sessions, sections):
-    """Снимается весь признак целиком, обе его стороны."""
+async def test_the_histogram_obeys_an_excluded_score_too(sessions, sections):
+    """Признак слушается целиком, обеими сторонами."""
     await rated(sessions, "1", 7.0)
     await rated(sessions, "2", 9.0)
 
@@ -124,33 +127,44 @@ async def test_the_histogram_ignores_an_excluded_score_too(sessions, sections):
                                          Filters(excluded_scores=(7,)))
     buckets = {b.score: b.count for b in histogram.buckets}
 
-    assert (buckets[7], buckets[9]) == (1, 1)
-    assert histogram.total == 2
+    assert (buckets[7], buckets[9]) == (0, 1)
+    assert histogram.total == 1
+
+
+async def test_the_footer_counts_the_same_set_the_columns_do(sessions, sections):
+    """Средняя и «всего» считаются по тому же отбору: разойдясь со столбцами,
+    подвал утверждал бы о наборе, которого на экране нет."""
+    await rated(sessions, "1", 7.0)
+    await rated(sessions, "2", 9.0)
+
+    histogram = await sections.histogram(Kind.MOVIE, Filters(scores=(9,)))
+
+    assert (histogram.total, histogram.average) == (1, 9.0)
 
 
 async def test_a_tag_filter_still_narrows_the_histogram(sessions, sections):
-    """Снимается только фильтр по оценке — прочие признаки гистограмма слушает."""
+    """Гистограмма слушает все признаки отбора."""
     tags = TagsRepository(sessions)
     tagged_id = await rated(sessions, "1", 7.0)
     await rated(sessions, "2", 9.0)
     tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
     await tags.assign(tagged_id, tag_id)
 
-    buckets = await columns(sections, tag_ids=(tag_id,), scores=(7,))
+    buckets = await columns(sections, tag_ids=(tag_id,))
 
     assert (buckets[7], buckets[9]) == (1, 0)
 
 
 async def test_an_excluded_tag_still_narrows_the_histogram(sessions, sections):
-    """Снимается фильтр по оценке — и только он. Обе стороны прочих признаков
-    гистограмма слушает, иначе исключение метки в ней бы не отражалось."""
+    """Обе стороны признака гистограмма слушает, иначе исключение метки в ней бы
+    не отражалось."""
     tags = TagsRepository(sessions)
     tagged_id = await rated(sessions, "1", 7.0)
     await rated(sessions, "2", 9.0)
     tag_id = await tags.create(Kind.MOVIE, "не хочу видеть")
     await tags.assign(tagged_id, tag_id)
 
-    buckets = await columns(sections, excluded_tag_ids=(tag_id,), scores=(7,))
+    buckets = await columns(sections, excluded_tag_ids=(tag_id,))
 
     assert (buckets[7], buckets[9]) == (0, 1)
 

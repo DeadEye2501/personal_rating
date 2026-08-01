@@ -804,7 +804,7 @@
   - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
-### `backend/storage/repository/sections.py` — 153 строк
+### `backend/storage/repository/sections.py` — 152 строк
 
 Вопросы к отфильтрованному набору раздела.
 
@@ -1541,13 +1541,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/backend/test_histogram.py` — 199 строк
+### `tests/backend/test_histogram.py` — 213 строк
 
 Гистограмма своих оценок по отфильтрованному набору.
 
 Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 17
+Тестов: 18
 
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 
