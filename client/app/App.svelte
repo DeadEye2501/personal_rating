@@ -77,6 +77,10 @@
 
   const marks = $derived(tagged.asked === asked ? tagged.cards : {})
 
+  // Плашка одна на приложение, и говорят в неё все трое наложений и все четыре
+  // раздела — одинаково.
+  const complain = (text) => { trouble = { text } }
+
   // Какое наложение открыто, знает сборка: `null` либо признак с подписью.
   // Подпись едет от кнопки, которая окно открыла: заголовок окна и есть её
   // подпись, и вторым объявлением они разъехались бы молча.
@@ -157,7 +161,7 @@
                включает фильтр, клик по имени открывает поиск по человеку — и
                то и другое меняет общее состояние. -->
           <Screen {session} {query} {expected} root={content}
-                  ontrouble={(text) => { trouble = { text } }}
+                  ontrouble={complain}
                   onmark={(field, id) => { session = withMark(session, field, id) }}
                   onperson={idle}
                   onopen={open}
@@ -177,7 +181,7 @@
                     filters={session.filters}
                     onfilters={(next) => { session = withFilters(session, next) }}
                     onforget={forget}
-                    ontrouble={(text) => { trouble = { text } }}
+                    ontrouble={complain}
                     onclose={() => { modal = null }} />
     {/key}
   {/if}
@@ -191,7 +195,7 @@
                    onview={(tags) => { tagged = { asked,
                                                  cards: { ...marks,
                                                           [tagging.item_id]: tags } } }}
-                   ontrouble={(text) => { trouble = { text } }}
+                   ontrouble={complain}
                      onclose={() => { tagging = null }} />
     {/key}
   {/if}

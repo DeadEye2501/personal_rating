@@ -51,12 +51,12 @@ def values_of(table: str, text: str) -> set[str]:
     return set(re.findall(r"value: '(\w+)'", text[start:text.index("]", start)]))
 
 
-def keys_of(table: str, text: str) -> set[str]:
-    """Ключи словаря `const ИМЯ = { ... }`.
+def body_of(table: str, text: str) -> str:
+    """Тело словаря `const ИМЯ = { ... }` вместе со скобками.
 
     Скобки считаются, а не ищутся первой закрывающей: `${...}` внутри шаблонной
-    строки оборвал бы словарь на середине. Сами шаблоны выкидываются до разбора
-    — иначе `https:` в адресе читается ключом."""
+    строки оборвал бы словарь на середине. Сами шаблоны выкидываются — иначе
+    `https:` в адресе читается ключом."""
     opened = text.index("{", text.index(f"const {table} = {{"))
     depth, end = 0, len(text)
     for index in range(opened, len(text)):
@@ -64,8 +64,11 @@ def keys_of(table: str, text: str) -> set[str]:
         if not depth:
             end = index
             break
-    return set(re.findall(r"[{,]\s*(\w+):",
-                          re.sub(r"`[^`]*`", "''", text[opened:end])))
+    return re.sub(r"`[^`]*`", "''", text[opened:end])
+
+
+def keys_of(table: str, text: str) -> set[str]:
+    return set(re.findall(r"[{,]\s*(\w+):", body_of(table, text)))
 
 
 def test_the_page_names_exactly_what_the_bridge_reads():
@@ -192,10 +195,11 @@ def test_the_page_actually_reads_the_genre_table():
 
 
 def keys_and_values(table: str, text: str) -> dict[str, str]:
-    """Словарь строковых значений `const ИМЯ = { ключ: 'значение' }`."""
-    start = text.index(f"const {table} = {{")
-    body = text[start:text.index("}", start)]
-    return dict(re.findall(r"(\w+): '(\w+)'", body))
+    """Словарь строковых значений `const ИМЯ = { ключ: 'значение' }`.
+
+    Тело берётся общим `body_of`: наивный поиск первой закрывающей скобки уже
+    однажды обрывал словарь на середине, и заводить его второй раз незачем."""
+    return dict(re.findall(r"(\w+): '(\w+)'", body_of(table, text)))
 
 
 def test_the_page_knows_the_only_refusal_it_tells_apart():

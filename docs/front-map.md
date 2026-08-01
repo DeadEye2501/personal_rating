@@ -12,21 +12,21 @@
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
-## app — 10 файлов
+## app — 11 файлов
 
-### app/App.svelte (195)
+### app/App.svelte (204)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js
 
-### app/CardTagsModal.svelte (80)
+### app/CardTagsModal.svelte (82)
 - Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
 - принимает: view, onview, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/FiltersModal.svelte (156)
+### app/FiltersModal.svelte (158)
 - Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
-- берёт: ./tags.js, ./trouble.js
+- берёт: ./tags.js, ./tagset.js, ./trouble.js
 
 ### app/LibraryScreen.svelte (133)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
@@ -50,6 +50,10 @@
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
 - отдаёт: created
+
+### app/tagset.js (30)
+- Правка самого набора тегов: удалить и переставить.
+- отдаёт: dropped, ordered, wearers
 
 ### app/trouble.js (15)
 - Единственный способ поступить с отказом операции.
@@ -101,7 +105,7 @@
 - Окно со списком строк: прокручиваемый список и, если есть, форма под ним.
 - принимает: label, narrow, onclose, items, footer
 
-### components/Modal.svelte (48)
+### components/Modal.svelte (54)
 - Оболочка любого наложения: затемнение, окно и два способа его закрыть.
 - принимает: narrow, ask, danger, label, onclose, children
 
@@ -147,13 +151,13 @@
 
 ### components/TagRow.svelte (29)
 - Строка списка: ручка, переключатель, имя, удаление.
-- принимает: name, state, dragging, ontoggle, ondelete, ongrab
+- принимает: name, state, moving, ontoggle, ondelete, ongrab
 
 ### components/ToolButton.svelte (17)
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, onclick, children
 
-## state — 12 файлов
+## state — 13 файлов
 
 ### state/dragging.js (23)
 - Таска указателем: захват, движение, отпускание.
@@ -170,6 +174,10 @@
 ### state/histogram.js (9)
 - Доля каждого столбца от самого высокого.
 - отдаёт: heightsOf
+
+### state/kinds.js (13)
+- Как тип содержимого называется человеку.
+- отдаёт: NOUNS
 
 ### state/redraw.js (21)
 - Перезапуск анимации на узле, который обязан его пережить.
@@ -203,7 +211,7 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: nameOf, pagesOf, stepOfSource
 
-## styles — 26 файлов
+## styles — 27 файлов
 
 ### styles/acts.css (41)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -314,16 +322,16 @@
 - селекторы (8): .scrollarea, .scrollarea__box, .scrollarea__box::-webkit-scrollbar, .scrollbar, .scrollbar.is-shown, .scrollbar__thumb, .scrollbar__thumb:hover, .scrollbar__thumb:active
 - берёт: --tint-16, --tint-28, --tint-34
 
-### styles/search.css (49)
+### styles/search.css (46)
 - Поле поиска в левой зоне шапки.
 - селекторы (9): .search, .search:hover, .search:focus-within, .search__icon, .search:focus-within .search__icon, .search__input, .search__input::placeholder, .search__input::-webkit-search-cancel-button,
 .search__input::-webkit-search-decoration, .search__clear
-- берёт: --primary, --r-full, --side-w, --text, --tint-035, --tint-05, --tint-06, --tint-10, --tint-28, --tint-35
+- берёт: --primary, --side-w, --text, --tint-05, --tint-10, --tint-28, --tint-35
 
-### styles/seg.css (43)
+### styles/seg.css (40)
 - Капсула переключателя типа содержимого.
 - селекторы (6): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
-- берёт: --fill-primary-14, --primary, --r-full, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75, --title-s
+- берёт: --fill-primary-14, --primary, --r-full, --tint-05, --tint-45, --tint-75, --title-s
 
 ### styles/snack.css (27)
 - Единственное место, где приложение что-то сообщает: и отказ источника, и непредвиденный сбой. Уехавшая вниз плашка пустая — отсутствие сообщений само себя ничем не обозначает.
@@ -342,12 +350,12 @@
 - селекторы (16): .taglist, .tagrow, .tagrow__name, .taggrip, .taggrip:hover, .taggrip i, .tagrow.is-dragging, .tagrow.is-dragging .taggrip, .tagbox, .tagbox .material-symbols-outlined, .tagbox[data-state="off"]:hover, .tagbox[data-state="on"], .tagbox[data-state="ex"], .tagrow__del, .tagrow__del .material-symbols-outlined, .tagrow__del:hover
 - берёт: --bg, --body-l, --error, --exclude, --primary, --r-full, --text-bright, --tint-25, --tint-30, --tint-55
 
-### styles/tools.css (80)
+### styles/tools.css (77)
 - Ряд круглых кнопок в правой зоне шапки.
 - селекторы (13): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
-- берёт: --ease, --fill-primary-14, --primary, --r-full, --side-w, --tint-035, --tint-05, --tint-06, --tint-45, --tint-75
+- берёт: --ease, --fill-primary-14, --primary, --r-full, --side-w, --tint-05, --tint-45, --tint-75
 
-### styles/topbar.css (28)
+### styles/topbar.css (32)
 - Раскладка шапки: три зоны, из ширины которых выведен минимум окна.
 - селекторы (2): .topbar, .topbar__seg
 - объявляет: --corner, --side-w
@@ -356,3 +364,8 @@
 ### styles/view.css (12)
 - Стопка разделов: виден один, переход между ними — проявление.
 - селекторы (2): .view, .view.is-shown
+
+### styles/zone.css (11)
+- Подложка зоны шапки: капсула с тонкой рамкой.
+- селекторы (1): .zone
+- берёт: --r-full, --tint-035, --tint-06
