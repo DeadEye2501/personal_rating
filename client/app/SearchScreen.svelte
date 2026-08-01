@@ -8,7 +8,7 @@
   import { onCardShown } from './visible.js'
 
   let { session, query = null, expected = [], root = null, ontrouble, onmark,
-        onperson, onopen } = $props()
+        onperson, onopen, ontag } = $props()
 
   let views = $state([])
   const ops = owned()
@@ -115,4 +115,4 @@
       onscore={(view) => add(view).catch(lost)}
       onaspect={(view) => add(view).catch(lost)}
       oncollapse={idle} onedit={idle} ondelete={idle} onwish={idle}
-      ontag={idle} />
+      {ontag} />

@@ -8,7 +8,7 @@
   import Topbar from './Topbar.svelte'
   import Snack from '$components/Snack.svelte'
   import { call, numbered } from '$api/bridge.js'
-  import { isEmpty } from '$state/filters.js'
+  import { chosen, isEmpty } from '$state/filters.js'
   import { newSession, withClearedFilter, withFilters, withForgotten, withMark,
     withSection } from '$state/session.js'
   import { reported } from './trouble.js'
@@ -57,12 +57,25 @@
   // Метки, доехавшие до ленты раньше, чем она перечитается: карточка обязана
   // показать их сразу. Накладываются производной, а не эффектом по ленте:
   // эффект, читающий и пишущий один список, — это бесконечный круг.
-  let tagged = $state({})
+  //
+  // Живут ровно до смены запроса и помнят его вместе с собой: перечитанная
+  // лента привозит метки из базы, и держать поверх неё своё значит спорить с
+  // ней. Ключом, а не эффектом по нему: эффект гасил бы наложение в тот же миг,
+  // когда забвение меняет фильтры, то есть раньше, чем оно применилось.
+  let tagged = $state({ asked: null, cards: {} })
   // Номера тегов, которых больше нет в наборе. Отдельно от `tagged`, потому что
   // метка обычно приехала из базы вместе с карточкой, и вычесть её надо у всех,
   // а не только у тронутых модалкой. Список не устаревает: удалённый тег не
   // возвращается, а его номер SQLite выдаст только новому тегу.
   let forgotten = $state([])
+
+  // То, от чего лента перечитывается. Собирается здесь, а не общим `requestOf`:
+  // у поиска и статистики нет ни порядка, ни страницы, и `requestOf` за них
+  // падает намеренно.
+  const asked = $derived(JSON.stringify(
+    [session.kind, session.section, session.sort, chosen(session.filters)]))
+
+  const marks = $derived(tagged.asked === asked ? tagged.cards : {})
 
   // Какое наложение открыто, знает сборка: `null` либо признак с подписью.
   // Подпись едет от кнопки, которая окно открыла: заголовок окна и есть её
@@ -148,7 +161,7 @@
                   onmark={(field, id) => { session = withMark(session, field, id) }}
                   onperson={idle}
                   onopen={open}
-                  {tagged} {forgotten}
+                  tagged={marks} {forgotten}
                   ontag={(view) => { tagging = view }} />
         </section>
       {/key}
@@ -171,7 +184,9 @@
 
   {#if tagging}
     <CardTagsModal view={tagging}
-                   onview={(tags) => { tagged = { ...tagged, [tagging.item_id]: tags } }}
+                   onview={(tags) => { tagged = { asked,
+                                                 cards: { ...marks,
+                                                          [tagging.item_id]: tags } } }}
                    ontrouble={(text) => { trouble = { text } }}
                    onclose={() => { tagging = null }} />
   {/if}

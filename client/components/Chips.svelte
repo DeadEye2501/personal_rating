@@ -21,6 +21,9 @@
             aria-pressed={on.tags.includes(tag.id)}
             onclick={() => onmark('tags', tag.id)}>{tag.name}</button>
   {/each}
-  <!-- Кнопка всегда последняя и всегда видна. -->
-  <button type="button" class="chip chip--add" onclick={ontag}>± Тег</button>
+  <!-- Кнопка всегда последняя. У кандидата поиска её нет вовсе: теги держатся
+       за номер карточки, а его у него ещё не существует. -->
+  {#if ontag}
+    <button type="button" class="chip chip--add" onclick={ontag}>± Тег</button>
+  {/if}
 </div>

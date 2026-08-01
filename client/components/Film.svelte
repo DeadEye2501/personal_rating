@@ -35,7 +35,7 @@
     <h2 class="film__title">{title}</h2>
 
     <Chips genres={view.genres} tags={view.tags} {on} {onmark}
-           ontag={() => ontag(view)} />
+           ontag={view.item_id ? () => ontag(view) : null} />
     <Facts {view} {onperson} />
     <Synopsis text={view.synopsis} />
 

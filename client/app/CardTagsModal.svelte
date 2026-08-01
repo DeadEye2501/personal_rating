@@ -36,10 +36,9 @@
    *  отмечено» и оба шлют `assign`: состояние страницы разъезжается с базой на
    *  ровном месте. Заодно строка отзывается сразу, а не через границу потоков. */
   async function toggle(tag) {
-    const was = mine
-    const on = was.has(tag.id)
+    const on = mine.has(tag.id)
 
-    const next = new Set(was)
+    const next = new Set(mine)
     on ? next.delete(tag.id) : next.add(tag.id)
     picked = next
     // Карточка в ленте обязана показать метку сразу: перечитывать её целиком
@@ -49,8 +48,13 @@
     try {
       await call(on ? 'marks.unassign' : 'marks.assign', itemId, tag.id)
     } catch (error) {
-      picked = was
-      onview(rows.filter((row) => was.has(row.id)))
+      // Возвращаем свою метку в то, что стало **сейчас**, а не слепок до
+      // границы потоков: соседний щелчок мог успеть записаться, и слепком мы
+      // стёрли бы удавшееся вместе с неудавшимся.
+      const back = new Set(mine)
+      on ? back.add(tag.id) : back.delete(tag.id)
+      picked = back
+      onview(rows.filter((row) => back.has(row.id)))
       lost(error, 'Метка не сохранилась')
     }
   }

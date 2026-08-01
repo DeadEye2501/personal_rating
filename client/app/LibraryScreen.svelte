@@ -61,11 +61,19 @@
   /** Отвечает, есть ли смысл просить ещё: конец знает тот, кто просил. */
   async function more() {
     if (done || !ready) return false
-    const next = await numbered('feed.page', JSON.parse(asked), views.length,
-                                PAGE, { channel: 'feed', ops })
-    done = next.length < PAGE
-    views = [...views, ...next]
-    return !done
+    // Отказ разбирается здесь, а не в ленте: `silent` — поле отказа моста, а
+    // мост компонентам закрыт. Лента от этого не замирает — «больше нет»
+    // отвечает и сорвавшаяся догрузка.
+    try {
+      const next = await numbered('feed.page', JSON.parse(asked), views.length,
+                                  PAGE, { channel: 'feed', ops })
+      done = next.length < PAGE
+      views = [...views, ...next]
+      return !done
+    } catch (error) {
+      lost(error, 'Не удалось прочитать библиотеку')
+      return false
+    }
   }
 
   /** Приехавшие оценки кладутся в ту же карточку: иначе кружок на их месте
