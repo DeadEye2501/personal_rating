@@ -296,6 +296,26 @@ def test_the_page_reads_exactly_what_the_summary_of_a_deletion_holds():
         re.findall(r"summary\.(\w+)", source("state/removal.js")))
 
 
+def test_the_page_sends_the_three_scales_in_the_order_the_bridge_reads_them():
+    """Три шкалы игры уезжают позиционными доводами, и мост читает их по месту:
+    переставь местами `visual` и `narrative` на любой стороне — оценка визуала
+    молча ляжет в нарратив, а обе стороны останутся зелёными. Сторож путей это
+    не ловит: путь тот же, число доводов то же.
+
+    Сверяются имена доводов моста с тем порядком, в каком их собирает страница.
+    Первый довод у моста — номер карточки, и шкалы идут за ним."""
+    named = re.search(r"const ASPECT_KEYS = \[(.+?)\]", source("app/rating.js"))
+    assert named, "в client/app/rating.js больше нет списка ASPECT_KEYS"
+
+    bridge = (Path(__file__).resolve().parents[2] / "bridge/marks.py")
+    signature = re.search(r"def aspects\(self, item_id: int, (.+?)\) -> dict",
+                          bridge.read_text(encoding="utf-8"), re.DOTALL)
+    assert signature, "у моста больше нет метода aspects с тремя шкалами"
+
+    assert re.findall(r"'(\w+)'", named.group(1)) == re.findall(
+        r"(\w+): int \| None", signature.group(1))
+
+
 def test_the_page_has_a_word_form_for_every_kind():
     """Формы склонения — по одной тройке на тип содержимого. Пропуск роняет
     `plural` на `undefined` прямо в подтверждении удаления тега, а лишний ключ

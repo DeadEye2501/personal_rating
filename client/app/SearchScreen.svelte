@@ -8,8 +8,10 @@
   import { lastOp, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
-  import { refreshed, without } from './reread.js'
-  import { complaining } from './trouble.js'
+  import { rowTurns } from './inturn.js'
+  import { keyOf, refreshed, same, without } from './reread.js'
+  import { aspected, scored } from './rating.js'
+  import { complaining, reported } from './trouble.js'
   import { onCardShown } from './visible.js'
 
   let { session, query = null, person = null, expected = [], root = null,
@@ -28,7 +30,7 @@
   // Фильтры работают и в поиске. Спросить источник с фильтром нечем — у TMDB и
   // магазинов нет ни наших тегов, ни наших оценок, — поэтому ответ приходит
   // целиком, а отсев идёт здесь, тем же правилом, что и в ленте.
-  const shown = $derived(views.filter((view) => passes(view, session.filters)))
+  const cards = $derived(views.filter((view) => passes(view, session.filters)))
 
   // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
   // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое
@@ -41,6 +43,10 @@
   // строка не читается вовсе.
   $effect(() => {
     const clicked = person
+    // Начатое по прежней выдаче новой не касается: её строки мост помнит под
+    // старым номером, и обещание, отданное новому жесту, отвергнется
+    // «устаревшим» — молча.
+    turns = rowTurns()
     if (clicked) { about(clicked, kind).catch(lost); return }
     if (!query?.text) { views = []; return }
     look(query.text, kind).catch(lost)
@@ -87,36 +93,62 @@
     if (answer.refusals.length) ontrouble('Внешняя база недоступна')
   }
 
-  async function add(view) {
-    // Предупреждения о совпадении названия здесь пока нет. Окно для него уже
-    // есть — `components/Confirm.svelte`, план 8, — не хватает самой проверки
-    // на совпадение; её заводит план 9 вместе с окном карточки. Спека требует его именно тут — у игр два магазина, и одна игра лежит
-    // в обоих двумя кандидатами.
-
+  /** Кандидат становится карточкой: детальный ответ источника и обложка, запись
+   *  в базу целиком, перечитывание строки. Отдаёт свежую карточку либо род
+   *  отказа — говорить о нём или молчать, решает тот, кто позвал.
+   *
+   *  Предупреждения о совпадении названия здесь пока нет. Окно для него уже
+   *  есть — `components/Confirm.svelte`, план 8, — не хватает самой проверки на
+   *  совпадение; спека требует её именно тут: у игр два магазина, и одна игра
+   *  лежит в обоих двумя кандидатами. */
+  async function adopt(view) {
     // Тот же номер: кандидата мост берёт из выдачи, которую помнит под ним.
     const outcome = await numbered('search.ensure', view.source, view.source_id,
                                    { channel: 'search', op: lastOp('search') })
-    if (outcome.outcome === 'refusal') {
-      ontrouble('Внешняя база недоступна')
-      return
-    }
-    if (outcome.outcome === 'missing') {
-      ontrouble('Источник больше не знает такой карточки')
-      return
-    }
-    // Карточка записана целиком: перечитываем её одну, чтобы в ленте появились
-    // жанры, состав и длительность, которых у кандидата не было.
+    if (outcome.outcome !== 'found') return { refused: outcome.outcome }
+
+    // Перечитываем одну строку: у кандидата не было ни жанров словами, ни
+    // состава, ни длительности.
+    // Канал на строку, а не общий: у двадцати одновременных догрузок общий
+    // пропустил бы только последний ответ, а остальные ушли бы «устаревшими» —
+    // молча, и строка осталась бы кандидатом навсегда.
     const [fresh] = await numbered('feed.views_of', [outcome.value],
-                                   { channel: 'views', ops })
-    replace(fresh)
+                                   { channel: `views:${keyOf(view)}`, ops })
+    if (fresh) replace(fresh)
+    return { fresh }
   }
 
-  /** Замена идёт по паре «источник плюс идентификатор», а не по ссылке: список
-   *  мог смениться, пока карточка заводилась. */
+  const REFUSED = {
+    refusal: 'Внешняя база недоступна',
+    missing: 'Источник больше не знает такой карточки',
+  }
+
+  /** Жест человека: отказ говорится плашкой. Показ карточки — не жест, и там
+   *  отказ молчит; см. `shown`. */
+  async function asked(view) {
+    const { fresh, refused } = await adopting(view)
+    if (refused) ontrouble(REFUSED[refused])
+    return fresh ?? null
+  }
+
+  // Порядок операций по строке: заведение одно на всех, записи идут по
+  // очереди. Своя память на каждую выдачу — смена запроса приносит другие
+  // строки, и начатое по старым их не касается.
+  let turns = rowTurns()
+
+  const adopting = (view) => turns.once(view, () => adopt(view))
+
+  /** Замена целиком — для заведённой карточки: она и есть правда о строке. */
   function replace(fresh) {
-    views = views.map((each) =>
-      each.source === fresh.source && each.source_id === fresh.source_id
-        ? fresh : each)
+    views = views.map((each) => same(each, fresh) ? fresh : each)
+  }
+
+  /** Долив полей — для всего остального. Ответы кругов и нажатие человека идут
+   *  вперегонки, и снимок строки, взятый до `await`, затирает то, что случилось
+   *  после него: так пропадала поставленная оценка — в базе она оставалась, а с
+   *  экрана исчезала ровно в тот миг, когда доезжали оценки агрегаторов. */
+  function patch(view, fields) {
+    views = views.map((each) => same(each, view) ? { ...each, ...fields } : each)
   }
 
   /** Оба эффекта слушают **только** свой сигнал: `views` они и читают, и пишут,
@@ -132,7 +164,7 @@
 
   $effect(() => {
     const gone = removed
-    if (gone) untrack(() => { views = without(views, gone.item_id) })
+    if (gone) untrack(() => { views = without(views, gone) })
   })
 
   function again(done) {
@@ -142,11 +174,48 @@
       .catch((error) => lost(error, 'Не удалось перечитать карточку'))
   }
 
-  /** Приехавшие оценки кладутся в ту же карточку: иначе кружок на их месте
-   *  крутится до конца сеанса, хотя оценки уже в базе. */
-  async function enrich(view) {
-    const external = await onCardShown(view, ops)
-    if (external) replace({ ...view, external })
+  /** Показанная строка догружается целиком: сначала карточка от источника и
+   *  запись в базу, потом оценки агрегаторов. Их спрашивают по `imdb_id`, а он
+   *  приезжает только с детальным ответом, — раньше круга 2 круг 3 не начать.
+   *
+   *  Отказ здесь молчит: двадцать плашек на одну прокрутку — шум, из которого
+   *  не видно ни одной настоящей беды. В журнал он идёт всё равно, потому что
+   *  ни один вызов моста не остаётся без следа. */
+  async function shown(view) {
+    const full = view.item_id ? view : await loaded(view)
+    if (!full) return
+
+    const external = await onCardShown(full, ops)
+    if (external) patch(full, { external })
+  }
+
+  async function loaded(view) {
+    const { fresh, refused } = await adopting(view)
+    if (refused) reported({ kind: refused }, 'догрузка кандидата')
+    return fresh ?? null
+  }
+
+  /** Оценка ставится по карточке, а карточки у кандидата ещё нет: сначала
+   *  заводим, потом ставим. Второе нажатие по той же строке заведения уже не
+   *  требует — у неё есть номер.
+   *
+   *  Записи по строке идут по очереди, и каждая берёт строку заново: у игры три
+   *  шкалы уезжают одним вызовом, и вторая, посчитанная от снимка, взятого до
+   *  `await`, затирает первую — в базе остаётся последняя. */
+  const rate = (view, put) => turns.inTurn(view, async () => {
+    const full = view.item_id ? view : await asked(view)
+    if (!full) return
+
+    const now = views.find((each) => same(each, full)) ?? full
+    patch(now, await put(now))
+  })
+
+  /** Правка кандидата открывает окно на заведённой карточке, а не на пустой
+   *  форме: иначе «Сохранить» завело бы вторую, ручную карточку того же
+   *  фильма. */
+  async function edit(view) {
+    const full = view.item_id ? view : await asked(view)
+    if (full) onedit(full)
   }
 
   const idle = () => {}
@@ -156,14 +225,16 @@
      у TMDB страница выдачи это ровно двадцать кандидатов и один запрос, у игр
      два магазина по двадцать. Второй страницы в спеке нет.
 
-     Оценка кандидата сначала заводит карточку: `item_id` у него нет, и звать
-     `marks.score` не с чем. Оценка вторым действием появится вместе с окном
-     карточки. -->
-<Feed views={shown} collapsed={session.collapsed} {expected} {root}
+     Нажатие по звезде у кандидата сначала заводит карточку, а потом ставит
+     оценку: `marks.score` зовётся по номеру, а номер появляется только после
+     заведения. -->
+<Feed views={cards} collapsed={session.collapsed} {expected} {root}
       onmore={() => false}
-      onshown={(view) => enrich(view).catch(lost)}
+      onshown={(view) => shown(view).catch(lost)}
       on={session.filters.on} {onmark} {onperson} {onopen}
-      onscore={(view) => add(view).catch(lost)}
-      onaspect={(view) => add(view).catch(lost)}
-      oncollapse={idle} {onedit} {ondelete} onwish={idle}
+      onscore={(view, value) => rate(view, (full) => scored(full, value)).catch(lost)}
+      onaspect={(view, key, value) =>
+        rate(view, (full) => aspected(full, key, value)).catch(lost)}
+      oncollapse={idle} onedit={(view) => edit(view).catch(lost)}
+      {ondelete} onwish={idle}
       {ontag} />

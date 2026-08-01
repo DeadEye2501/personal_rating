@@ -12,9 +12,9 @@
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
-## app — 14 файлов
+## app — 16 файлов
 
-### app/App.svelte (314)
+### app/App.svelte (327)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
@@ -33,20 +33,20 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (157)
+### app/LibraryScreen.svelte (152)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
-- берёт: ./reread.js, ./trouble.js, ./visible.js
+- берёт: ./rating.js, ./reread.js, ./trouble.js, ./visible.js
 
 ### app/LinkField.svelte (102)
 - Привязка карточки к внешней базе вставленной ссылкой — и отвязка.
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (169)
+### app/SearchScreen.svelte (240)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
-- берёт: ./reread.js, ./trouble.js, ./visible.js
+- берёт: ./inturn.js, ./reread.js, ./rating.js, ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (60)
 - Раздел «Статистика»: гистограмма своих оценок по тому же отфильтрованному набору, что и разделы с карточками.
@@ -57,9 +57,17 @@
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, typed, onsession, onsearch, onadd, onfilter
 
-### app/reread.js (24)
+### app/inturn.js (55)
+- Порядок операций по одной строке выдачи.
+- отдаёт: rowTurns
+
+### app/rating.js (28)
+- Запись своей оценки: балл у кино и сериала, три шкалы у игры.
+- отдаёт: aspected, scored
+
+### app/reread.js (35)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
-- отдаёт: refreshed, without
+- отдаёт: keyOf, refreshed, same, without
 
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
@@ -79,9 +87,9 @@
 
 ## components — 28 файлов
 
-### components/Acts.svelte (27)
+### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
-- принимает: saved, wished, onedit, ondelete, onwish
+- принимает: wished, onedit, ondelete, onwish
 
 ### components/Aggregates.svelte (57)
 - Оценки агрегаторов: цифра, кружок ожидания или пустое место.
@@ -171,7 +179,7 @@
 - Плашка сообщений: одна на всё приложение.
 - принимает: message
 
-### components/Stars.svelte (70)
+### components/Stars.svelte (73)
 - Ряд из десяти звёзд: кликабельный или неподвижный с дробной.
 - принимает: score, onpick, onhover
 

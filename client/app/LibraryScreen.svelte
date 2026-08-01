@@ -9,6 +9,7 @@
   import { owned } from '$api/owned.svelte.js'
   import { requestOf } from '$state/section.js'
   import { collapsedOf } from '$state/session.js'
+  import { aspected, scored } from './rating.js'
   import { refreshed, without } from './reread.js'
   import { complaining } from './trouble.js'
   import { onCardShown } from './visible.js'
@@ -88,19 +89,10 @@
 
   // Записи идут без номера: отменять запись нельзя. Отказ у них показывается
   // плашкой, а не гасится — человек должен знать, что оценка не сохранилась.
-  async function score(view, value) {
-    await call('marks.score', view.item_id, value)
-    patch(view, { rating: { ...view.rating, score: value } })
-  }
+  const score = async (view, value) => patch(view, await scored(view, value))
 
-  async function aspect(view, key, value) {
-    const next = { ...view.rating, [key]: value }
-    // Ответ — выведенный балл: у игр оценка это среднее выставленных шкал, и
-    // считает его база.
-    next.score = await call('marks.aspects', view.item_id, next.visual,
-                            next.narrative, next.gameplay)
-    patch(view, { rating: next })
-  }
+  const aspect = async (view, key, value) =>
+    patch(view, await aspected(view, key, value))
 
   async function wish(view) {
     await call(view.in_wishlist ? 'marks.unwish' : 'marks.wish', view.item_id)
@@ -130,9 +122,12 @@
     if (done) untrack(() => again(done))
   })
 
+  // Только удаление по номеру: строка без номера — это кандидат выдачи поиска,
+  // и убирается он там же. Здесь такой сигнал попал бы по паре «источник плюс
+  // идентификатор» в свою карточку той же вещи, которая никуда не девалась.
   $effect(() => {
     const gone = removed
-    if (gone) untrack(() => { views = without(views, gone.item_id) })
+    if (gone?.item_id) untrack(() => { views = without(views, gone) })
   })
 
   function again(done) {

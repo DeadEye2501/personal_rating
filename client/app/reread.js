@@ -2,8 +2,22 @@
 
 import { numbered } from '$api/bridge.js'
 
+/** Чем строка выдачи отличается от соседки. Номера у неё может не быть вовсе —
+ *  до того, как круг загрузки доехал, — а пара «источник плюс идентификатор»
+ *  есть всегда, и по ней же её узнаёт мостовая память.
+ *
+ *  Половиной ключа нельзя: `157336` есть и у TMDB, и у Steam, и это разные
+ *  вещи. */
+export const keyOf = (view) => `${view.source}:${view.source_id}`
+
+export const same = (each, view) => keyOf(each) === keyOf(view)
+
 /** Удалённую карточку раздел убирает у себя: перечитывать ленту ради одной
  *  пропавшей значило бы потерять место, на котором человек стоял. */
+export const without = (views, gone) =>
+  views.filter((each) => gone.item_id != null
+    ? each.item_id !== gone.item_id
+    : !same(each, gone))
 
 /** Перечитывает одну правленую карточку, а не всю ленту: страница читается с
  *  начала, и в длинном списке человек потерял бы место, на котором стоял.
@@ -15,9 +29,6 @@ import { numbered } from '$api/bridge.js'
  *  Кладёт приехавшее не сама: у ленты строка ищется по номеру, у выдачи поиска —
  *  по паре «источник плюс идентификатор», потому что там она могла быть
  *  кандидатом без номера вовсе. */
-export const without = (views, item_id) =>
-  views.filter((each) => each.item_id !== item_id)
-
 export function refreshed({ item_id, at }, ops, put) {
   return numbered('feed.views_of', [item_id], { channel: 'views', ops })
     .then(([fresh]) => { if (fresh) put({ ...fresh, cover: at }) })

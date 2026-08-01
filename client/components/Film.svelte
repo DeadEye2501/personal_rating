@@ -75,7 +75,7 @@
                   style:--score={toneOf(showing(aspect.key, rating?.[aspect.key]))}
             >{verdictOf(showing(aspect.key, rating?.[aspect.key]))}</span>
             {#if index === ASPECTS.length - 1}
-              <Acts saved={view.item_id !== null} wished={view.in_wishlist}
+              <Acts wished={view.in_wishlist}
                     onedit={() => onedit(view)}
                     ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
             {/if}
@@ -92,7 +92,7 @@
                  onhover={(step) => { over = { ...over, score: step } }} />
           <span class="film__verdict" style:--score={toneOf(showing('score', mean))}
           >{verdictOf(showing('score', mean))}</span>
-          <Acts saved={view.item_id !== null} wished={view.in_wishlist}
+          <Acts wished={view.in_wishlist}
                 onedit={() => onedit(view)}
                 ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
         </div>
