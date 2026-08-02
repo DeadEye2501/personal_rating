@@ -8,6 +8,7 @@
   import PosterPick from '$components/PosterPick.svelte'
   import Scrollarea from '$components/Scrollarea.svelte'
   import { call } from '$api/bridge.js'
+  import { stampOf } from '$state/covers.js'
   import { emptyCard, fieldsOf, formOf, shownFor, wrongNumbers }
     from '$state/card.js'
   import { ROLES } from '$state/credits.js'
@@ -229,7 +230,11 @@
       <!-- Картинка лежит рядом с формой, а не в ней: поля формы — это поля
            карточки, а обложка живёт вторым файлом базы и уезжает отдельным
            вызовом уже после записи, когда у карточки появился номер. -->
-      <PosterPick item_id={form.item_id} onpicked={(data) => { picture = data }}
+      <!-- Момент едет вместе с карточкой: ручка обложки отдаёт сутки кеша, а
+           её адрес от содержимого не зависит — без метки перезалитая картинка
+           осталась бы в окне правки прежней, пока лента показывает новую. -->
+      <PosterPick item_id={form.item_id} stamp={stampOf(view)}
+                  onpicked={(data) => { picture = data }}
                   ontrouble={(text) => ontrouble(text)} />
 
       <div class="cardform__fields">

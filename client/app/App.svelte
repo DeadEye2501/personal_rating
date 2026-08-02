@@ -15,7 +15,7 @@
   import { question } from '$state/removal.js'
   import { newSession, withClearedFilter, withFilters, withForgotten, withMark,
     withSection } from '$state/session.js'
-  import { complaining } from './trouble.js'
+  import { complaining, reported } from './trouble.js'
   import { forgetCard } from './visible.js'
 
   // Раздел, которого здесь нет, откроется пустым и молча: `Screen` станет
@@ -143,10 +143,15 @@
   // подпись, и вторым объявлением они разъехались бы молча.
   let modal = $state(null)
 
+  // Плашки тут нет намеренно: список ожидаемых правит только кружки ожидания, и
+  // говорить человеку про них нечего. Запись есть, как у всех: без неё «у моих
+  // фильмов нет оценок агрегаторов» и «список ожидаемых не доехал» с экрана
+  // неразличимы. Отказ при этом оставляет прежний список — если тип успели
+  // сменить, кружки будут от прежнего типа, и найти это можно только в журнале.
   $effect(() => {
     numbered('world.expected', session.kind, { channel: 'expected' })
       .then((sources) => { expected = sources })
-      .catch(idle)
+      .catch((error) => reported(error, 'ожидаемые оценки'))
   })
 
   // Акцент красит всю страницу, поэтому ставит его тот, кто страницей владеет,
@@ -160,7 +165,6 @@
 
   const Screen = $derived(SCREENS[session.section])
 
-  const idle = () => {}
 
   /** Клик по имени открывает поиск по человеку, а не отдельный вид: та же
    *  лента, те же карточки, сначала своё и потом чужое.

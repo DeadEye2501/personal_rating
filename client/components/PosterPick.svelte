@@ -9,14 +9,14 @@
   // держит её строкой целиком.
   const LIMIT = 8 * 1024 * 1024
 
-  let { item_id = null, onpicked, ontrouble } = $props()
+  let { item_id = null, stamp = 0, onpicked, ontrouble } = $props()
 
   // Что показывать: только что выбранное, а до того — уже сохранённое. У новой
   // карточки номера ещё нет, и тогда показывать нечего.
   let preview = $state(null)
   let failed = $state(false)
 
-  const shown = $derived(preview ?? (item_id ? byItem(item_id) : null))
+  const shown = $derived(preview ?? (item_id ? byItem(item_id, stamp) : null))
 
   /** Внутрь картинка идёт base64: доводы уезжают мосту текстом, и бинарным этот
    *  канал не бывает. Обрезку по центру до 2:3 делает бэкенд — там же, где

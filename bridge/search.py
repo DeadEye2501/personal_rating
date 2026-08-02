@@ -14,14 +14,19 @@ class Search(Domain):
     def __init__(self, thread) -> None:
         super().__init__(thread)
         self._kept = Kept()
-        self._asked: tuple[Kind, str] | None = None
+        self._asked: tuple[int, str, str] | None = None
 
     def local(self, op: int, kind: str, query: str) -> dict:
         """Своё показывается сразу: локальная база отвечает за миллисекунды.
 
         Запрос запоминается строкой, а переводится в тип внутри заявки: перевод
-        снаружи оболочки ушёл бы исключением через границу потоков."""
-        self._asked = (kind, query)
+        снаружи оболочки ушёл бы исключением через границу потоков.
+
+        Вместе с номером, а не сам по себе: pywebview зовёт каждый метод в своём
+        потоке, и допечатанная строка попадает сюда, пока первый шаг прежней
+        операции ещё едет. Своей выдачи она в этот миг не запомнила, так что по
+        ней старый второй шаг не отсечь, — и он ушёл бы в сеть с чужой строкой."""
+        self._asked = (op, kind, query)
         return self._reply(lambda back: self._own(back, op, kind, query), op=op)
 
     def external(self, op: int) -> dict:
@@ -37,7 +42,9 @@ class Search(Domain):
         пределами заявки, то есть исключение через границу потоков."""
         if self._kept.taken(op) is None or self._asked is None:
             return stale()
-        kind, query = self._asked
+        asked_op, kind, query = self._asked
+        if asked_op != op:
+            return stale()
         return self._reply(lambda back: self._outer(back, op, kind, query),
                            op=op)
 

@@ -1085,15 +1085,15 @@
 - `def _role(domain: str, role: str)` (4)
 - `def _of(backend, domain: str)` (7)
 
-### `bridge/search.py` — 99 строк
+### `bridge/search.py` — 106 строк
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.answer`, `bridge.kept`, `bridge.wire`
 
-- `class Search(Domain)` (78)
-  - `def local(self, op: int, kind: str, query: str) -> dict` (7)
-  - `def external(self, op: int) -> dict` (16)
+- `class Search(Domain)` (85)
+  - `def local(self, op: int, kind: str, query: str) -> dict` (12)
+  - `def external(self, op: int) -> dict` (18)
   - `def by_person(self, op: int, domain: str, entity_id: int, kind: str) -> dict` (11)
   - `def ensure(self, op: int, source: str, source_id: str) -> dict` (8)
   - `async def _own(self, back, op, kind, query)` (6)
@@ -2028,13 +2028,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/test_bridge_search.py` — 304 строк ⚠ подошёл к 300
+### `tests/bridge/test_bridge_search.py` — 343 строк ⚠ подошёл к 300
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.search`
 
-Тестов: 18
+Тестов: 19
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
 

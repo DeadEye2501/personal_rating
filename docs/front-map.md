@@ -14,11 +14,11 @@
 
 ## app — 16 файлов
 
-### app/App.svelte (362)
+### app/App.svelte (366)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (312)
+### app/CardModal.svelte (317)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -153,7 +153,7 @@
 
 ### components/PosterPick.svelte (96)
 - Обложка карточки: выбрать файлом, перетаскиванием или из буфера.
-- принимает: item_id, onpicked, ontrouble
+- принимает: item_id, stamp, onpicked, ontrouble
 
 ### components/ScoreRow.svelte (24)
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
@@ -205,9 +205,9 @@
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
 - отдаёт: emptyCard, fieldsOf, formOf, shownFor, wrongNumbers
 
-### state/covers.js (15)
+### state/covers.js (25)
 - Адрес обложки у своей ручки.
-- отдаёт: byItem, bySource
+- отдаёт: byItem, bySource, stampOf
 
 ### state/credits.js (19)
 - Роли состава: какие бывают и в чьём справочнике живёт каждая.

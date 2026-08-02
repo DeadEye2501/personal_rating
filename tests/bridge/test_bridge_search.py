@@ -82,6 +82,45 @@ def test_the_query_is_asked_once(spy, asked):
     assert args[1] == "ведьмак"
 
 
+def test_the_second_step_never_goes_out_with_a_newer_query(spy, asked):
+    """Строку допечатывают, пока первый шаг ещё едет, а pywebview зовёт каждый
+    метод в своём потоке: новый `local` записывает свой запрос раньше, чем
+    старый `external` его прочтёт. Запомненного запроса мало — нужен запомненный
+    **номер**, иначе второй шаг старой операции уходит в сеть с новой строкой:
+    ответ страница отбросит, а круг по всем источникам уже оплачен.
+
+    Окно ловится задержкой: первый шаг новой операции ещё внутри заявки, свою
+    выдачу не запомнил, а строку мост уже переписал. Наблюдается тем, что
+    внешнего запроса не было вовсе."""
+    answers, log = asked
+    started = threading.Event()
+    release = threading.Event()
+
+    async def slow_local(kind, query):
+        if query == "одиссея 2001":
+            started.set()
+            await asyncio.to_thread(release.wait)
+        return []
+
+    answers["search.local"] = slow_local
+    answers["search.external"] = ExternalSearch(views=(), refusals=())
+
+    search = Search(spy)
+    search.local(1, "movie", "одиссея")
+    newer = threading.Thread(target=search.local,
+                             args=(2, "movie", "одиссея 2001"))
+    newer.start()
+    try:
+        assert started.wait(5), "второй запрос не начался"
+        answer = search.external(1)
+    finally:
+        release.set()
+        newer.join(5)
+
+    assert answer["fail"] == "stale"
+    assert [name for name, _, _ in log] == ["search.local", "search.local"]
+
+
 def test_an_unknown_kind_is_a_failure_not_a_crash(spy, asked):
     """Перевод запроса в тип идёт внутри заявки: снаружи оболочки он ушёл бы
     исключением через границу потоков, где ловить его некому."""
