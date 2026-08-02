@@ -5,6 +5,7 @@ import logging
 
 from backend.model import ItemExists, Refusal, SourceCard
 from backend.service.card_parts import CardParts
+from backend.service.creation import fresh_item
 from backend.service.genres import resolved_genres
 from backend.service.removal import remove_card
 from backend.sources.errors import broken
@@ -26,11 +27,9 @@ class CardWriter(CardParts):
                 # Не скачалась — не пишем ничего, повторим при следующем показе.
                 return poster
 
-        try:
-            item_id = await self._library.create(card.item)
-        except ItemExists as error:
-            logger.warning("карточка уже в библиотеке: %s", error)
-            return broken(str(card.item.source), error)
+        item_id = await self._started(card)
+        if isinstance(item_id, Refusal):
+            return item_id
 
         try:
             await self._write_the_rest(item_id, card, poster)
@@ -56,6 +55,23 @@ class CardWriter(CardParts):
             return broken(str(card.item.source), error)
 
         return item_id
+
+    async def _started(self, card: SourceCard) -> int | Refusal:
+        """Строка карточки — или отказ, если завести её не вышло.
+
+        Наружу из писателя летит отказ, а не исключение: у границы потоков
+        второго канала доставки нет. Ловится не один `ItemExists`, потому что
+        заведение — это две базы, и вторая отвечает своими бедами: занятый файл,
+        закрытое хранилище. Убирает за собой `fresh_item`, здесь остаётся
+        назвать причину."""
+        try:
+            return await fresh_item(self._library, self.posters, card.item)
+        except ItemExists as error:
+            logger.warning("карточка уже в библиотеке: %s", error)
+            return broken(str(card.item.source), error)
+        except Exception as error:
+            logger.exception("карточку %s завести не удалось", card.item.title)
+            return broken(str(card.item.source), error)
 
     async def _write_the_rest(self, item_id: int, card: SourceCard,
                               poster: bytes | None) -> None:

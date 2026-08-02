@@ -4,9 +4,8 @@ import logging
 
 import pytest
 
-from sqlalchemy.exc import IntegrityError
 
-from backend.model import GenreKind, GenreSource, Kind
+from backend.model import Dangling, GenreKind, GenreSource, Kind
 from backend.storage.repository.genres import GenresRepository
 from tests.conftest import ours
 
@@ -176,9 +175,11 @@ async def test_a_failed_replacement_keeps_the_old_set(sessions, reference, card)
     before = [one.id for one in await repository.genres_of(item_id)]
     assert before, "фикстура пуста — проверять нечего"
 
-    # Ловим именно нарушение целостности: широкий `Exception` провёл бы тест
-    # зелёным и на опечатке в нём самом, не дойдя до проверяемого места.
-    with pytest.raises(IntegrityError):
+    # Ловим именно сорванную ссылку: широкий `Exception` провёл бы тест зелёным
+    # и на опечатке в нём самом, не дойдя до проверяемого места. `IntegrityError`
+    # сюда больше не долетает — репозиторий переводит его в свой отказ, чтобы
+    # знание о SQLAlchemy не ехало вверх по слоям.
+    with pytest.raises(Dangling):
         await repository.set_for_item(item_id, [999999])
 
     assert [one.id for one in await repository.genres_of(item_id)] == before

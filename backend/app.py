@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from backend.config import Config
 from backend.model import Item
 from backend.service.cards import CardWriter
+from backend.service.creation import fresh_item
 from backend.service.enrich import Enricher
 from backend.service.library import LibraryService
 from backend.service.linking import Linker
@@ -73,9 +74,9 @@ class Backend:
         Метод здесь, а не у репозитория библиотеки: закладка живёт в соседней
         таблице со своим репозиторием, и требовать его от вызывающего значило бы
         менять правило заведения в каждом, кто заводит. Заводит его один — мост,
-        по кнопке «+»; кандидат выдачи и карточка от источника идут мимо, прямо
-        в `library.create`, и закладки не получают."""
-        item_id = await self.library.create(item)
+        по кнопке «+»; кандидат выдачи и карточка от источника идут общим
+        `fresh_item` мимо этого метода и закладки не получают."""
+        item_id = await fresh_item(self.library, self.posters, item)
         await self.wishlist.add(item_id, now)
         return item_id
 

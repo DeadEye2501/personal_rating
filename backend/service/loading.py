@@ -71,12 +71,15 @@ class Loader:
             self._posters.fetch(view.source, view.poster_url),
         )
 
+        # Ответ карточки старше ответа обложки: упасть могут оба разом — они и
+        # спрашиваются разом, — но «повторите позже» про исчезнувшую у источника
+        # карточку это совет, которому нельзя последовать.
+        if not isinstance(card, Found):
+            return card
         if isinstance(poster, Refusal):
             # Не скачалась — карточка не пишется вовсе: повторим при следующем
             # показе. Отдельного случая тут нет, это общее правило.
             return poster
-        if not isinstance(card, Found):
-            return card
 
         return await self._writer.save(card.value, poster)
 

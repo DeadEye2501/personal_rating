@@ -5,6 +5,7 @@ from backend.model.credit import Credit
 from backend.model.denied import (
     BadImage,
     Denied,
+    Dangling,
     IdentityTaken,
     ItemExists,
     TagExists,
@@ -61,6 +62,7 @@ __all__ = [
     "CompanyRole",
     "Credit",
     "Denied",
+    "Dangling",
     "ExternalId",
     "ExternalLink",
     "ExternalRating",

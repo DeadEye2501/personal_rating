@@ -4,7 +4,16 @@ from collections.abc import Callable
 
 from sqlalchemy import Executable, Row, Table, select
 from sqlalchemy.exc import IntegrityError
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from backend.model import Dangling
+
+# Имя ошибки SQLite для сорванной ссылки. Драйвер кладёт его в `sqlite_errorname`
+# с версии Python 3.11; у нас 3.13, но `getattr` со значением по умолчанию
+# оставлен нарочно: чужая обёртка над драйвером этого поля может не иметь, и
+# тогда отказ поедет наружу как прежде, а не превратится в чужой род.
+_NO_TARGET = "SQLITE_CONSTRAINT_FOREIGNKEY"
 
 
 class Repository:
@@ -70,8 +79,24 @@ class Repository:
 
     async def _run(self, *statements: Executable) -> None:
         """Всё переданное — одной транзакцией: замена набора это удаление и
-        вставка, и половина такой замены хуже, чем ничего."""
+        вставка, и половина такой замены хуже, чем ничего.
+
+        Сорванная ссылка переводится в свой отказ по тому же доводу, что записан
+        у `_created`. До этого он ехал наружу как есть: оценка, закладка и
+        доехавшее обогащение удалённой карточки отвечали странице
+        «непредвиденное» с текстом SQLite в подробностях.
+
+        Занятый ключ уникальности так не переводится: он законный отказ
+        вызывающего, и ловит его `_written`. Различаются они именем ошибки
+        SQLite, а не текстом сообщения: текст у `IntegrityError` включает
+        параметры запроса, и подстрока из чужого значения выдала бы одно за
+        другое."""
         async with self._sessions() as session:
-            for statement in statements:
-                await session.execute(statement)
-            await session.commit()
+            try:
+                for statement in statements:
+                    await session.execute(statement)
+                await session.commit()
+            except IntegrityError as error:
+                if getattr(error.orig, "sqlite_errorname", "") != _NO_TARGET:
+                    raise
+                raise Dangling("запись не к чему привязать") from error

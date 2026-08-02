@@ -182,6 +182,38 @@ async def test_a_vanished_card_is_missing_and_not_a_refusal(sessions, loader):
     assert isinstance(await rig.load.ensure(candidate()), Missing)
 
 
+async def test_a_vanished_card_stays_missing_even_if_the_poster_fell_too(
+    sessions, loader
+):
+    """Обложка и карточка спрашиваются разом, и упасть может обложка, пока
+    источник отвечает «такого у меня больше нет». Ответ карточки при этом
+    старше: «повторите позже» человеку про исчезнувшую карточку — совет,
+    которому нельзя последовать, а плашка про недоступную базу уводит от
+    настоящей причины.
+
+    Адрес обложки приезжает ещё с выдачей поиска, так что обе половины и правда
+    приходят вперегонки."""
+    rig = loader(Missing(), poster_status=500)
+
+    assert isinstance(await rig.load.ensure(candidate()), Missing)
+
+
+async def test_two_refusals_at_once_name_the_source_and_not_its_cdn(
+    sessions, loader
+):
+    """Главный случай — выключенная сеть: падают обе половины разом. Наверх
+    обязан ехать отказ карточки, а не обложки: плашка называет человеку
+    источник, и «сеть до CDN не дошла» вместо «источник недоступен» уводит от
+    настоящей причины."""
+    rig = loader(Refusal(source="tmdb", reason=Reason.NETWORK),
+                 poster_status=500)
+
+    result = await rig.load.ensure(candidate())
+
+    assert isinstance(result, Refusal)
+    assert result.source == "tmdb"
+
+
 async def test_a_broken_client_becomes_a_refusal(sessions, loader, caplog):
     """Сорвалось исключением — наружу оно не летит: у границы потоков второго
     канала доставки нет."""

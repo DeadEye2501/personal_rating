@@ -296,6 +296,10 @@
 
 - `logger` = `logging.getLogger(__name__)`
 
+### `backend/service/creation.py`
+
+- `logger` = `logging.getLogger(__name__)`
+
 ### `backend/service/enrich.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -464,6 +468,10 @@
 - `metadata` = `MetaData()`
 - `poster` = `Table('poster', metadata, Column('item_id', Inte…`
 
+### `backend/storage/repository/base.py`
+
+- `_NO_TARGET` = `'SQLITE_CONSTRAINT_FOREIGNKEY'`
+
 ### `backend/storage/repository/external.py`
 
 - `VALUE_TTL` = `timedelta(days=30)`
@@ -630,7 +638,7 @@
 
 ### `tests/backend/test_denied.py`
 
-- `FIVE` = `набор из 5`
+- `SIX` = `набор из 6`
 
 ### `tests/backend/test_external_ratings.py`
 

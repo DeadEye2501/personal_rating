@@ -147,6 +147,27 @@ async def test_a_hand_made_card_lands_in_the_wishlist(offline):
     assert [view.title for view in page] == ["Своё, руками"]
 
 
+async def test_a_new_card_does_not_inherit_a_cover_left_by_a_deleted_one(offline):
+    """`item` заведён без `AUTOINCREMENT`, и удалённый номер SQLite выдаёт
+    повторно. Обложка лежит во втором файле базы, где внешних ключей не бывает,
+    и пережить свою карточку она может: скачивание живёт до двадцати секунд, а
+    доехавшие байты записываются уже после удаления.
+
+    Найденную в хранилище обложку никто не перекачивает, поэтому чужая осталась
+    бы у новой карточки навсегда. Проверяется на собранном бэкенде: порознь
+    репозиторий и хранилище друг о друге не знают вовсе."""
+    gone = await offline.library.create(mine("Ушедшая"))
+    await offline.delete_card(gone)
+    # Обложка, доехавшая после удаления: карточки уже нет, помешать некому.
+    await offline.posters.save(gone, PICTURE, now=MOMENT)
+    assert await offline.posters.has(gone) is True, "сирота не легла — нечего убирать"
+
+    fresh = await offline.create_manual_card(mine("Свежая"), now=MOMENT)
+
+    assert fresh == gone, "номер не выдался повторно — проверка ни о чём"
+    assert await offline.posters.has(fresh) is False
+
+
 async def test_tags_are_edited(offline):
     item_id = await offline.library.create(mine("Своё"))
     tag_id = await offline.tags.create(Kind.MOVIE, "пересмотреть")

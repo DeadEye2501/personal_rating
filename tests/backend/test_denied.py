@@ -3,6 +3,7 @@
 import pytest
 
 from backend.model import (
+    Dangling,
     BadImage,
     Denied,
     IdentityTaken,
@@ -16,7 +17,7 @@ from backend.storage.posters import NotOpened
 from backend.storage.repository.external import ExternalIdTaken
 from backend.storage.repository.tags import TagsRepository
 
-FIVE = [ItemExists, TagExists, WrongTagKind, IdentityTaken, BadImage]
+SIX = [ItemExists, TagExists, WrongTagKind, IdentityTaken, BadImage, Dangling]
 
 
 async def test_a_repository_raises_the_ancestor(sessions):
@@ -44,7 +45,7 @@ async def test_two_denials_of_different_operations_keep_different_types(sessions
     assert type(taken.value) is not type(broken.value)
 
 
-def test_the_denials_of_the_model_are_five_and_all_of_them_are_here():
+def test_the_denials_of_the_model_are_six_and_all_of_them_are_here():
     """Список набран руками, и сверяется он с настоящим потомством предка: отказ,
     заведённый шестым, иначе не попал бы ни в одну проверку — а ради того, чтобы
     мост ловил один тип вместо перечисления, предок и заведён.
@@ -60,8 +61,8 @@ def test_the_denials_of_the_model_are_five_and_all_of_them_are_here():
     ours = {kind for kind in Denied.__subclasses__()
             if kind.__module__.startswith("backend.model")}
 
-    assert ours == set(FIVE)
-    assert len(set(FIVE)) == 5
+    assert ours == set(SIX)
+    assert len(set(SIX)) == 6
 
 
 def test_a_closed_poster_store_is_not_a_denial():

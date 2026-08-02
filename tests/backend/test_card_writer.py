@@ -314,6 +314,46 @@ async def test_the_rollback_takes_the_poster_with_it(writer, monkeypatch):
         "постер откаченной карточки остался и достанется следующей"
 
 
+async def test_the_writer_clears_the_place_under_the_cover_too(writer,
+                                                               monkeypatch):
+    """Уборка чужой обложки на этом номере — общая у обоих путей заведения, и
+    писатель обязан идти тем же путём, что и ручная карточка: `id` SQLite выдаёт
+    повторно, а обложка лежит во втором файле базы без внешних ключей.
+
+    Наблюдается вызовом, а не следствием: у писателя обложка пишется своим
+    последним шагом, и следствие уборки он затирает сам."""
+    cleared: list[int] = []
+
+    async def note(item_id):
+        cleared.append(item_id)
+
+    monkeypatch.setattr(writer.posters, "delete", note)
+
+    item_id = await writer.save(source_card())
+
+    assert cleared == [item_id], "писатель завёл строку мимо общей уборки"
+
+
+async def test_the_rollback_undoes_a_failed_clearing(writer, sessions,
+                                                     monkeypatch):
+    """Уборка — второй заход в базу после закоммиченной строки, и сорваться он
+    может: занятый файл хранилища, отмена при закрытии окна. Без отката осталась
+    бы строка со свежим `synced_at`, без жанров, состава и обложки, — та самая
+    частичная карточка, которой «не бывает», и перезапроса у неё не будет
+    никогда."""
+    async def refuse(item_id):
+        raise OSError("хранилище занято")
+
+    monkeypatch.setattr(writer.posters, "delete", refuse)
+
+    result = await writer.save(source_card())
+
+    assert isinstance(result, Refusal), "наружу из писателя летит отказ"
+    assert await LibraryRepository(sessions).find_by_source(
+        Source.TMDB, "157336"
+    ) is None, "строка осталась без обложки, состава и жанров"
+
+
 async def test_cancelling_the_write_takes_the_card_with_it(writer, sessions,
                                                            monkeypatch):
     """Отмена — не поломка, а штатный путь: так гасится загрузка при закрытии
