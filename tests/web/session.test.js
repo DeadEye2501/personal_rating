@@ -198,12 +198,45 @@ describe('удалённый тег', () => {
   })
 })
 
-describe('переходы над фильтрами оставляют сеанс сеансом', () => {
-  // Снятый спред уносит вместе с фильтрами тип, раздел, сортировку и
-  // свёрнутость: у трёх собратьев этот сторож есть, у этих двух не было.
+describe('переходы оставляют сеанс сеансом', () => {
+  // Снятый спред уносит всё, чего переход не касается: тип, раздел, сортировку,
+  // свёрнутость, фильтры. Сторож семейный нарочно — у семьи он либо есть у
+  // всех, либо не значит ничего: разъезжается он молча, и находили это дважды,
+  // оба раза ревью, а не прогоном.
   const full = () => ({ ...newSession(), kind: 'game', section: 'rated',
                         sort: 3, collapsed: true,
                         filters: cycled(EMPTY, 'tags', 3) })
+
+  it('withCollapsed не трогает ничего, кроме свёрнутости', () => {
+    // Своим случаем, а не в общем переборе: у остальных проверяется всё, кроме
+    // фильтров, а этот меняет как раз не их — и фильтры обязан сохранить.
+    const after = withCollapsed(full(), false)
+
+    expect([after.kind, after.section, after.sort]).toEqual(['game', 'rated', 3])
+    expect(after.filters).toEqual(cycled(EMPTY, 'tags', 3))
+    expect(after.collapsed).toBe(false)
+  })
+
+  it('withSection не трогает ничего, кроме раздела и сортировки', () => {
+    // Сортировку сбрасывает нарочно: круг состояний у разделов разный. А тип,
+    // свёрнутость и фильтры к разделу отношения не имеют — отфильтрованную
+    // гистограмму иначе не увидеть никогда.
+    const after = withSection(full(), 'wishlist')
+
+    expect([after.kind, after.collapsed]).toEqual(['game', true])
+    expect(after.filters).toEqual(cycled(EMPTY, 'tags', 3))
+    expect([after.section, after.sort]).toEqual(['wishlist', null])
+  })
+
+  it('withKind не трогает ничего, кроме типа и фильтров', () => {
+    // Фильтры сбрасывает нарочно: наборы тегов у трёх типов независимы. А
+    // раздел, сортировка и свёрнутость к типу отношения не имеют.
+    const after = withKind(full(), 'series')
+
+    expect([after.section, after.sort, after.collapsed])
+      .toEqual(['rated', 3, true])
+    expect([after.kind, after.filters]).toEqual(['series', EMPTY])
+  })
 
   for (const [name, run] of [
     ['withClearedFilter', (one) => withClearedFilter(one, 'tags')],

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме этой проверки.
-import { onCardShown, stale } from '../../client/app/visible.js'
+import { forgetCard, onCardShown, stale } from '../../client/app/visible.js'
 import { fake, slow } from './fake.js'
 
 const DAY = 24 * 60 * 60 * 1000
@@ -78,6 +78,32 @@ describe('карточка попала в поле зрения', () => {
     const one = card()
 
     await onCardShown(one, [])
+    await onCardShown(one, [])
+
+    expect(asked).toHaveLength(1)
+  })
+
+  it('забытую карточку спрашивает заново', async () => {
+    // Номер `item` SQLite выдаёт повторно: заведённая заново карточка получает
+    // номер удалённой. Не забыв покойницу, память приняла бы новую за уже
+    // спрошенную — кольца на месте оценок крутились бы до конца сеанса.
+    const asked = world()
+    const one = card()
+
+    await onCardShown(one, [])
+    forgetCard(one.item_id)
+    await onCardShown(one, [])
+
+    expect(asked).toHaveLength(2)
+  })
+
+  it('забвение чужого номера памяти не трогает', async () => {
+    // Иначе удаление одной карточки открывало бы круг всем соседям разом.
+    const asked = world()
+    const one = card()
+
+    await onCardShown(one, [])
+    forgetCard(one.item_id + 1)
     await onCardShown(one, [])
 
     expect(asked).toHaveLength(1)
