@@ -8,6 +8,7 @@
   import { cancel, drop, lastOp, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
+  import { retagged } from '$state/marking.js'
   import { flipped } from '$state/session.js'
   import { rowTurns } from './inturn.js'
   import { keyOf, merged, refreshed, same, without } from './reread.js'
@@ -16,8 +17,8 @@
   import { onCardShown } from './visible.js'
 
   let { session, query = null, person = null, expected = [], root = null,
-        saved = null, removed = null, ontrouble, onmark, onperson, onopen,
-        onedit, ondelete, ontag } = $props()
+        tagged = {}, forgotten = [], saved = null, removed = null,
+        ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag } = $props()
 
   let views = $state([])
   const ops = owned()
@@ -31,7 +32,11 @@
   // Фильтры работают и в поиске. Спросить источник с фильтром нечем — у TMDB и
   // магазинов нет ни наших тегов, ни наших оценок, — поэтому ответ приходит
   // целиком, а отсев идёт здесь, тем же правилом, что и в ленте.
-  const cards = $derived(views.filter((view) => passes(view, session.filters)))
+  //
+  // Правки набора тегов накладываются до отсева: отбор идёт по меткам, и
+  // фильтровать надо по тем, что человек видит, а не по приехавшим из базы.
+  const cards = $derived(retagged(views, tagged, forgotten)
+    .filter((view) => passes(view, session.filters)))
 
   // Ни один вызов моста не остаётся без обработчика: невыполненное обещание в
   // JS не даёт ни плашки, ни записи — то есть ровно то молчание, которое

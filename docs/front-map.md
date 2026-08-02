@@ -33,7 +33,7 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (151)
+### app/LibraryScreen.svelte (143)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
 - берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
@@ -43,9 +43,9 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (255)
+### app/SearchScreen.svelte (260)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
-- принимает: session, query, person, expected, root, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
+- принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (60)
@@ -199,7 +199,7 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, disabled, onclick, children
 
-## state — 20 файлов
+## state — 21 файлов
 
 ### state/card.js (107)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
@@ -236,6 +236,10 @@
 ### state/kinds.js (13)
 - Как тип содержимого называется человеку.
 - отдаёт: NOUNS
+
+### state/marking.js (30)
+- Метки карточек, наложенные поверх прочитанного из базы.
+- отдаёт: retagged
 
 ### state/popup.js (15)
 - Место всплывающей картинки рядом с указателем.

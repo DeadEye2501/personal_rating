@@ -7,6 +7,7 @@
   import Feed from '$components/Feed.svelte'
   import { numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
+  import { retagged } from '$state/marking.js'
   import { requestOf } from '$state/section.js'
   import { flipped } from '$state/session.js'
   import { aspected, scored, wished } from './marks.js'
@@ -34,16 +35,7 @@
   // ленту с начала, роняя прокрутку.
   const asked = $derived(JSON.stringify(requestOf(session)))
 
-  // Правки набора накладываются поверх прочитанного: перечитывать страницу
-  // ленты ради одной метки незачем, а следующее чтение привезёт их уже из базы.
-  // Проставленное в модалке заменяет метки карточки целиком, удалённое
-  // вычитается у всех — оно приехало из базы вместе с карточками.
-  const cards = $derived(views.map((view) => {
-    const tags = (tagged[view.item_id] ?? view.tags)
-      .filter((tag) => !forgotten.includes(tag.id))
-    return tags.length === view.tags.length && !tagged[view.item_id]
-      ? view : { ...view, tags }
-  }))
+  const cards = $derived(retagged(views, tagged, forgotten))
 
   const lost = complaining('раздел библиотеки', ontrouble)
 
