@@ -1,0 +1,206 @@
+[
+ {
+  "query": "Anno 1602",
+  "clusters": [
+   {
+    "ids": ["S2820130", "G1438168222", "O328"],
+    "why": "одна игра 1998 года под тремя названиями: GOG даёт оригинальное 'Anno 1602 A.D.', old-games — североамериканское издание GT Interactive '1602 A.D.' с подзаголовком 'Creation of a New World', Steam — History Edition, переиздание того же оригинала (Ubisoft держит права); год 2024 у Steam — дата выхода в магазине, а не год игры"
+   }
+  ]
+ },
+ {
+  "query": "Anno 1800",
+  "clusters": [
+   {"ids": ["S916440"]},
+   {"ids": ["G1423218604"], "why": "Victoria Complete — чужая игра Paradox, к Anno отношения не имеет"},
+   {"ids": ["G1118180511"], "why": "Annals of Rome 1986 — чужая игра, попала по созвучию 'Anno/Annals'"},
+   {"ids": ["G1379373014"], "why": "Secret Government — чужая игра"}
+  ]
+ },
+ {
+  "query": "Cities Skylines",
+  "clusters": [
+   {"ids": ["S949230"], "why": "Cities: Skylines II — другая часть серии"},
+   {"ids": ["S255710"]},
+   {"ids": ["G1556747210"], "why": "Reus 2 — чужая игра"},
+   {"ids": ["G1104699058"], "why": "демо, а не игра"},
+   {"ids": ["G1862881164"], "why": "Highrise City — чужая игра"}
+  ]
+ },
+ {
+  "query": "Prison Architect",
+  "clusters": [
+   {
+    "ids": ["S233450", "G1441974651"],
+    "why": "одна игра: совпали название, дата выхода 06.10.2015 и разработчик Introversion Software с издателем Paradox"
+   },
+   {"ids": ["S1257610"], "why": "Prison Architect 2 — другая часть серии"},
+   {"ids": ["S1983910"], "why": "Prison Survival: Architect of Crime Simulator — чужая игра-подражатель"}
+  ]
+ },
+ {
+  "query": "Factorio",
+  "clusters": [
+   {
+    "ids": ["S427520", "G1238653230"],
+    "why": "одна игра Wube Software; у строки Steam полей нет вовсе, но название точное и единственное"
+   },
+   {"ids": ["G1299285879"], "why": "Impostor Factory — чужая игра Freebird Games"},
+   {"ids": ["G1606532397"], "why": "сборник Freebird Games, а не издание Impostor Factory"}
+  ]
+ },
+ {
+  "query": "Satisfactory",
+  "clusters": [
+   {"ids": ["S526870"]},
+   {"ids": ["S3187030"], "why": "Satisfactory Modeler — инструмент по игре, а не игра"},
+   {"ids": ["G1436435983"], "why": "Infinifactory — чужая игра Zachtronics"},
+   {"ids": ["G2061764115"], "why": "Power Struggle 1988 — чужая игра"},
+   {"ids": ["G1455617752"], "why": "The Solus Project — чужая игра"}
+  ]
+ },
+ {
+  "query": "RimWorld",
+  "clusters": [
+   {
+    "ids": ["S294100", "G1094900565"],
+    "why": "одна игра Ludeon Studios; у Steam полей нет, но название точное и тёзок у него не бывает"
+   }
+  ]
+ },
+ {
+  "query": "Dwarf Fortress",
+  "clusters": [
+   {"ids": ["S975370"]},
+   {"ids": ["S2346660"], "why": "DFHack — инструмент моддинга, а не игра"},
+   {"ids": ["G1904471287"], "why": "чужой сборник"},
+   {"ids": ["G1356213510"], "why": "чужой сборник"},
+   {"ids": ["G1425364326"], "why": "The Universim — чужая игра"}
+  ]
+ },
+ {
+  "query": "Terraria",
+  "clusters": [
+   {
+    "ids": ["S105600", "G1207665503"],
+    "why": "одна игра Re-Logic; у Steam полей нет, но название точное"
+   },
+   {"ids": ["G2074192460"], "why": "Terrain of Magical Expertise — чужая игра, попала по созвучию"}
+  ]
+ },
+ {
+  "query": "Minecraft",
+  "clusters": [
+   {"ids": ["S1672970"], "why": "Minecraft Dungeons — отдельная игра серии, не сам Minecraft"},
+   {"ids": ["S1928870"], "why": "Minecraft Legends — отдельная игра серии"},
+   {"ids": ["S1912410"], "why": "Minecraft Dungeons II — другая часть"},
+   {"ids": ["G1878398964"], "why": "Lifecraft — чужая игра"}
+  ]
+ },
+ {
+  "query": "Stardew Valley",
+  "clusters": [
+   {
+    "ids": ["S413150", "G1453375253"],
+    "why": "одна игра: совпали название, дата 26.02.2016 и ConcernedApe как разработчик и издатель"
+   }
+  ]
+ },
+ {
+  "query": "Graveyard Keeper",
+  "clusters": [
+   {
+    "ids": ["S599140", "G1780408621"],
+    "why": "одна игра: совпали название, дата 15.08.2018, Lazy Bear Games и tinyBuild"
+   },
+   {
+    "ids": ["S2099990"],
+    "why": "спорно: написание совпадает с точностью до регистра, но это отдельный номер Steam, а двух записей одного продукта в магазине не бывает — значит либо тёзка-подражатель, либо сопутствующий товар; данных нет вовсе, по правилу 'сомневаешься — разные'"
+   },
+   {"ids": ["S4358690"], "why": "Graveyard Keeper 2 — другая часть серии"}
+  ]
+ },
+ {
+  "query": "Hollow Knight",
+  "clusters": [
+   {
+    "ids": ["S367520", "G1308320804"],
+    "why": "одна игра Team Cherry, название точное"
+   },
+   {
+    "ids": ["S1030300", "G1558393671"],
+    "why": "одна игра — Silksong, Team Cherry; отдельная от Hollow Knight, это самостоятельное продолжение"
+   },
+   {"ids": ["G2098204440"], "why": "игра плюс саундтрек — набор, а не издание Silksong"}
+  ]
+ },
+ {
+  "query": "Ori and the Blind Forest",
+  "clusters": [
+   {
+    "ids": ["S387290", "S261570", "G1384944984"],
+    "why": "Definitive Edition — переиздание того же 2015 года, а не переделка с нуля; по правилу об изданиях склеиваю с оригиналом. Спорно тем, что в Steam это два продаваемых номера, и человек может хотеть оценить их порознь"
+   },
+   {"ids": ["S1894100"], "why": "Days with Evraco — чужая игра, попала по словам 'Blind' и 'Forest'"}
+  ]
+ },
+ {
+  "query": "Celeste",
+  "clusters": [
+   {"ids": ["S504230"]},
+   {"ids": ["S3779560"], "why": "Celeste Blue Wizard Luna — чужая игра, Celeste тут женское имя"},
+   {"ids": ["S3429040"], "why": "чужая игра со случайным совпадением имени"},
+   {"ids": ["G1823091894"], "why": "SUPERHOT — чужая игра"},
+   {"ids": ["G1809056267"], "why": "Brave Alchemist Colette — чужая игра, попала по созвучию Colette/Celeste"}
+  ]
+ },
+ {
+  "query": "Cuphead",
+  "clusters": [
+   {
+    "ids": ["S268910", "G1963513391"],
+    "why": "одна игра StudioMDHR, название точное"
+   },
+   {"ids": ["G2094268531"], "why": "GUNHEAD — чужая игра Alientrap"}
+  ]
+ },
+ {
+  "query": "Shovel Knight",
+  "clusters": [
+   {
+    "ids": ["S589500", "G1441664298"],
+    "why": "одна игра — 'Shovel of Hope', основная кампания, Yacht Club Games"
+   },
+   {
+    "ids": ["S250760"],
+    "why": "Treasure Trove — набор из четырёх самостоятельных кампаний, то есть сборник, а не издание Shovel of Hope"
+   },
+   {"ids": ["S1416050"], "why": "Shovel Knight Dig — отдельная игра серии"},
+   {"ids": ["G1328485946"], "why": "Showdown — отдельная игра серии, файтинг"},
+   {"ids": ["G1921492046"], "why": "King of Cards — отдельная кампания серии"}
+  ]
+ },
+ {
+  "query": "Dead Cells",
+  "clusters": [
+   {"ids": ["S588650"]},
+   {"ids": ["G1724436620"], "why": "набор игры с дополнениями, а не издание самой игры"},
+   {"ids": ["G1203167864"], "why": "набор игры с дополнением, а не издание самой игры"},
+   {"ids": ["G1942714997"], "why": "набор дополнений, самой игры в нём может не быть вовсе"}
+  ]
+ },
+ {
+  "query": "Hades",
+  "clusters": [
+   {"ids": ["S1145350"], "why": "Hades II — другая часть серии"},
+   {"ids": ["S1145360"]},
+   {"ids": ["S755800"], "why": "Hades' Star — чужая космическая стратегия"},
+   {"ids": ["G1819469826"], "why": "Hand of Fate 2 — чужая игра"},
+   {"ids": ["G1452776767"], "why": "Moon Hunters — чужая игра"},
+   {"ids": ["G1207664983"], "why": "DROD RPG — чужая игра"},
+   {"ids": ["O14181"], "why": "Disney's Hades Challenge 1998 — чужая детская игра"},
+   {"ids": ["O5117"], "why": "Hades 1995, LG Software, DOS — полный тёзка Hades от Supergiant 2020, но другой год, другой издатель и другая платформа"},
+   {"ids": ["O5122"], "why": "Hades 2 2001, Espaço Informática — тёзка Hades II от Supergiant, ничего общего"}
+  ]
+ }
+]

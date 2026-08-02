@@ -1,0 +1,275 @@
+[
+ {
+  "query": "Capitalism",
+  "clusters": [
+   {
+    "ids": ["S638200", "G1207658722"],
+    "why": "Capitalism 2, один разработчик Enlight; год Steam — дата переиздания"
+   },
+   {
+    "ids": ["S450120", "G1207658721", "O11548"],
+    "why": "Capitalism Plus: Steam и GOG от Enlight, old-games числит издателем Interactive Magic — тот же продукт 1996/1997"
+   },
+   {
+    "ids": ["O405"],
+    "why": "Capitalism 1995 — первая игра; Plus 1996 продаётся отдельной строкой во всех магазинах, поэтому не склеиваю. Сомнение: Plus может быть просто расширенным переизданием"
+   },
+   {
+    "ids": ["S4885980"],
+    "why": "playtest другой игры другого разработчика"
+   }
+  ]
+ },
+ {
+  "query": "The Settlers II",
+  "clusters": [
+   {
+    "ids": ["G1207658786", "O313", "O3699"],
+    "why": "Settlers II 1996 и её Gold Edition — одна игра в разной упаковке, Blue Byte"
+   },
+   {
+    "ids": ["G1207659163"],
+    "why": "10th Anniversary 2006 — переделка на новом движке, а не издание оригинала 1996; сомнение: слово Anniversary обычно означает издание"
+   },
+   {
+    "ids": ["O3700"],
+    "why": "Mission CD — дополнение с картами, не сама игра"
+   }
+  ]
+ },
+ {
+  "query": "Populous",
+  "clusters": [
+   {
+    "ids": ["S2203860", "G1207658963", "O327"],
+    "why": "Populous 1989, Bullfrog/EA; год Steam — дата переиздания 2024"
+   },
+   {
+    "ids": ["S2616450", "G1207658981", "O324"],
+    "why": "Populous II, Bullfrog/EA"
+   },
+   {
+    "ids": ["S2616430", "G1207659027", "O223"],
+    "why": "Populous: The Beginning 1998, Bullfrog/EA"
+   }
+  ]
+ },
+ {
+  "query": "Dungeon Keeper",
+  "clusters": [
+   {
+    "ids": ["S1996630", "G1207658934", "O81", "O453"],
+    "why": "Dungeon Keeper 1997 и его Gold Edition — одна игра; у old-games две строки на неё же (обе с подзаголовком Dungeon Keeper Gold)"
+   },
+   {
+    "ids": ["S2616460", "G1207658959", "O452"],
+    "why": "Dungeon Keeper 2, 1999, Bullfrog/EA"
+   },
+   {"ids": ["S978520"], "why": "Legend of Keepers — другая игра другой студии"},
+   {"ids": ["G1084933262"], "why": "Core Keeper — другая игра"}
+  ]
+ },
+ {
+  "query": "Black and White",
+  "clusters": [
+   {"ids": ["S1998450"], "why": "китайская инди 2023 года, не Bullfrog"},
+   {"ids": ["S2461240"], "why": "Lite — отдельный урезанный продукт того же разработчика, не издание"},
+   {"ids": ["S3237030"]},
+   {"ids": ["G1234266916"]},
+   {"ids": ["G1297443605"]},
+   {"ids": ["G1454498998"]},
+   {"ids": ["O14177"]}
+  ]
+ },
+ {
+  "query": "Sid Meiers Pirates",
+  "clusters": [
+   {
+    "ids": ["S3920", "G1445250653"],
+    "why": "Sid Meier's Pirates! 2004, Firaxis/2K; год Steam — дата выхода в магазине"
+   },
+   {
+    "ids": ["S327380"],
+    "why": "Pirates! Gold Plus — версия MicroProse 1993 года, оригинал, а не переделка 2004"
+   }
+  ]
+ },
+ {
+  "query": "Ultima VII",
+  "clusters": [
+   {
+    "ids": ["G1207658984", "O6466"],
+    "why": "Complete Ultima VII / Ultima 7 Complete Edition — один и тот же сборник обеих частей от EA"
+   },
+   {
+    "ids": ["O69"],
+    "why": "Ultima VII: The Black Gate — первая часть отдельно, Complete держу отдельно как сборник двух игр"
+   },
+   {"ids": ["O70"], "why": "Ultima VII Part Two: Serpent Isle — отдельная игра"},
+   {"ids": ["S553330"]},
+   {"ids": ["G1262450080"], "why": "набор ресурсов к Ys VIII, попал по слову Ultimate"}
+  ]
+ },
+ {
+  "query": "Ultima Underworld",
+  "clusters": [
+   {"ids": ["G1207658937"], "why": "1+2 — сборник двух игр, а не издание одной"},
+   {"ids": ["O307"], "why": "Ultima Underworld: The Stygian Abyss, 1992"},
+   {"ids": ["O308"], "why": "Ultima Underworld II, 1993 — другая часть"}
+  ]
+ },
+ {
+  "query": "Wasteland",
+  "clusters": [
+   {
+    "ids": ["S719040", "G1960562196"],
+    "why": "Wasteland 3 и Colorado Collection — игра плюс её дополнения, то есть та же игра в другой упаковке; сомнение: слово Collection обычно значит набор"
+   },
+   {"ids": ["S240760"], "why": "Wasteland 2 — другая часть"},
+   {"ids": ["G2029021402"], "why": "Series Bundle — набор из нескольких игр серии"},
+   {"ids": ["G1687336800"], "why": "Expansion Pass — дополнения, не игра"},
+   {"ids": ["O471"], "why": "Wasteland 1988 — оригинал, в этом запросе без пары"},
+   {"ids": ["S1831250"]},
+   {"ids": ["O1520"], "why": "Wasteland Rebels — тёзка по слову, симулятор 1994"}
+  ]
+ },
+ {
+  "query": "Wasteland 2",
+  "clusters": [
+   {
+    "ids": ["S240760", "G1207665713", "G1207665153"],
+    "why": "Wasteland 2: Director's Cut, Classic и Deluxe — издания одной игры inXile 2014"
+   },
+   {"ids": ["G1207660163"], "why": "Wasteland 1 — другая часть"},
+   {"ids": ["S4480380"], "why": "другая игра, совпало слово Wasteland и цифра 2"}
+  ]
+ },
+ {
+  "query": "Gothic",
+  "clusters": [
+   {
+    "ids": ["G1207658682", "O10995"],
+    "why": "Gothic 2001, Piranha Bytes; old-games даёт издателя Xicat и русское «Готика»"
+   },
+   {
+    "ids": ["S1297900", "G1537831577"],
+    "why": "Gothic 1 Remake, Alkimia/THQ Nordic 2026 — переделка с нуля, поэтому не с оригиналом"
+   },
+   {"ids": ["S39510"], "why": "Gothic II — другая часть"},
+   {"ids": ["S39500"], "why": "Gothic 3 — другая часть"},
+   {"ids": ["G1427876514"], "why": "Elminage Gothic — другая игра"},
+   {"ids": ["O6900"]},
+   {"ids": ["O650"]}
+  ]
+ },
+ {
+  "query": "Gothic II",
+  "clusters": [
+   {
+    "ids": ["S39510", "G1207658718", "O11101", "O11088"],
+    "why": "Gothic II 2002 и её Gold Edition — одна игра; у old-games обе строки под «Готика II»"
+   },
+   {
+    "ids": ["O11280"],
+    "why": "Die Nacht des Raben / Ночь Ворона — дополнение, отдельная строка"
+   },
+   {
+    "ids": ["S573100", "G1471253378", "G1977534128"],
+    "why": "Battlefleet Gothic: Armada 2, Tindalos/Focus 2019; Complete Edition — то же с дополнениями"
+   },
+   {"ids": ["S39500"], "why": "Gothic 3 — другая часть"}
+  ]
+ },
+ {
+  "query": "Risen",
+  "clusters": [
+   {"ids": ["S40300"], "why": "Risen 2009"},
+   {"ids": ["S40390"], "why": "Risen 2 — другая часть"},
+   {"ids": ["S249230"], "why": "Risen 3 — другая часть"},
+   {"ids": ["G1598055675"], "why": "совпало по слову Rise"},
+   {"ids": ["G1909925234"]},
+   {"ids": ["G1302942296"]}
+  ]
+ },
+ {
+  "query": "Morrowind",
+  "clusters": [
+   {
+    "ids": ["S22320", "G1440163901", "O10345"],
+    "why": "The Elder Scrolls III: Morrowind 2002, Bethesda; GOTY — издание с дополнениями"
+   }
+  ]
+ },
+ {
+  "query": "Oblivion",
+  "clusters": [
+   {
+    "ids": ["S22330", "G1242989820", "S2623190"],
+    "why": "Oblivion 2006: GOTY, GOTY Deluxe и Remastered 2025. Ремастер по правилу — переиздание, а не переделка; сомнение сильное — разрыв 19 лет и другой движок картинки"
+   },
+   {
+    "ids": ["G1157250159", "G1317619868"],
+    "why": "Flint: Treasure of Oblivion, обычное и Deluxe — одна игра Savage Level/Microids"
+   },
+   {"ids": ["S1952370"], "why": "Oblivion Override — другая игра"},
+   {"ids": ["O9237"], "why": "набор уровней к Quake II"},
+   {"ids": ["O2099"], "why": "Space Station Oblivion (Driller) 1987 — другая игра"}
+  ]
+ },
+ {
+  "query": "Skyrim",
+  "clusters": [
+   {
+    "ids": ["S489830", "G1711230643", "G1801825368"],
+    "why": "Skyrim: Special Edition и Anniversary Edition — издания одной игры Bethesda"
+   },
+   {
+    "ids": ["S611670"],
+    "why": "Skyrim VR — отдельный продукт под шлем, не издание обычной версии"
+   },
+   {"ids": ["S1946180"], "why": "Creation Kit — инструмент, не игра"},
+   {"ids": ["G1730909031"], "why": "Heroes of Spyria — другая игра"}
+  ]
+ },
+ {
+  "query": "Vampire The Masquerade Bloodlines",
+  "clusters": [
+   {
+    "ids": ["S2600", "G1207659240", "O4944"],
+    "why": "Bloodlines 2004, Troika/Activision; год Steam — дата выхода в магазине"
+   },
+   {
+    "ids": ["S532790", "G1308733567", "G1851649095"],
+    "why": "Bloodlines 2, The Chinese Room/Paradox 2025; Premium — издание той же игры"
+   },
+   {"ids": ["S559680"], "why": "Redemption — другая игра серии, Nihilistic 2000"}
+  ]
+ },
+ {
+  "query": "Divine Divinity",
+  "clusters": [
+   {
+    "ids": ["S214170", "G1207658805", "O2105"],
+    "why": "Divine Divinity 2002, Larian; old-games даёт издателя CDV и русское «Рождение легенды»"
+   },
+   {
+    "ids": ["G1330235937"],
+    "why": "Divinity: Original Sin 2 Divine Edition — другая игра, совпало слово Divine"
+   }
+  ]
+ },
+ {
+  "query": "Divinity Original Sin",
+  "clusters": [
+   {
+    "ids": ["S373420", "S230230", "G2049660654"],
+    "why": "Divinity: Original Sin — Classic и Enhanced Edition, издания одной игры Larian 2014"
+   },
+   {
+    "ids": ["S435150", "G1584823040"],
+    "why": "Divinity: Original Sin 2; Definitive Edition — издание той же игры"
+   },
+   {"ids": ["G1714213170"], "why": "The Source Saga — набор из двух игр серии"}
+  ]
+ }
+]

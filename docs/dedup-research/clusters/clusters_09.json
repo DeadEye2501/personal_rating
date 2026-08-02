@@ -1,0 +1,257 @@
+[
+ {
+  "query": "Grim Fandango",
+  "clusters": [
+   {
+    "ids": ["S316790", "G1207667183", "O833"],
+    "why": "одна игра: LucasArts 1998, ремастер Double Fine 2015 — переиздание, не переделка"
+   }
+  ]
+ },
+ {
+  "query": "Full Throttle",
+  "clusters": [
+   {
+    "ids": ["S228360", "G1325415523", "O154"],
+    "why": "одна игра: LucasArts 1995, ремастер Double Fine 2017 — переиздание"
+   }
+  ]
+ },
+ {
+  "query": "Day of the Tentacle",
+  "clusters": [
+   {
+    "ids": ["G1456922969", "O707"],
+    "why": "одна игра: LucasArts 1993, ремастер Double Fine 2016 — переиздание"
+   },
+   {"ids": ["S3220060"], "why": "чужая игра, совпало слово Days"},
+   {"ids": ["S2138610"], "why": "чужая игра, совпало слово Day"},
+   {"ids": ["S2668430"], "why": "чужая игра, совпало слово Day"}
+  ]
+ },
+ {
+  "query": "Monkey Island",
+  "clusters": [
+   {
+    "ids": ["S730820", "G1528148981", "O505"],
+    "why": "The Curse of Monkey Island 1997, LucasArts — одна игра во всех трёх"
+   },
+   {
+    "ids": ["S2060130", "G1436760537"],
+    "why": "Return to Monkey Island 2022, Terrible Toybox — одна игра"
+   },
+   {"ids": ["S32360"], "why": "первая часть (Special Edition); её нет в других источниках выдачи"},
+   {"ids": ["G1207659066"], "why": "Tales of Monkey Island — отдельная эпизодическая игра"},
+   {"ids": ["O1726"], "why": "Escape from Monkey Island — четвёртая часть"},
+   {"ids": ["O504"], "why": "вторая часть серии"}
+  ]
+ },
+ {
+  "query": "Broken Sword",
+  "clusters": [
+   {
+    "ids": ["S2544110", "G1207658900", "O432"],
+    "why": "первая часть, Shadow of the Templars 1996: Director's Cut и Reforged — переиздания того же (Reforged — перерисованная HD-версия, а не переделка с нуля; тут есть сомнение)"
+   },
+   {
+    "ids": ["S33600", "G1207658707", "O433"],
+    "why": "вторая часть, The Smoking Mirror 1997, и её ремастер 2010"
+   },
+   {
+    "ids": ["G1207658708", "O13092"],
+    "why": "третья часть, The Sleeping Dragon 2003, Revolution Software"
+   },
+   {"ids": ["S262940"], "why": "пятая часть"}
+  ]
+ },
+ {
+  "query": "Syberia",
+  "clusters": [
+   {
+    "ids": ["S46500", "G1221479835", "O12492"],
+    "why": "первая часть 2002 (у old-games «Сибирь»); Syberia - Remastered назван переизданием, хотя разрыв в 23 года и Microids пересобрала её на новом движке — решение спорное"
+   },
+   {
+    "ids": ["S464340", "G1965973671"],
+    "why": "Syberia 3 2017; The Complete Journey — издание с дополнениями"
+   },
+   {"ids": ["S1410640"], "why": "The World Before — четвёртая часть"},
+   {"ids": ["G1454939961"], "why": "The Syberia Collection — сборник, а не издание"},
+   {"ids": ["O12509"], "why": "вторая часть"}
+  ]
+ },
+ {
+  "query": "Myst",
+  "clusters": [
+   {
+    "ids": ["G1207658818", "O6425", "O6426"],
+    "why": "Myst 1993: две строки old-games — та же игра под Macintosh и под Windows, Masterpiece Edition — переиздание"
+   },
+   {"ids": ["S1584090"], "why": "чужая игра, совпало Myst внутри слова Mystia"},
+   {"ids": ["S3837350"], "why": "чужая игра, совпало Mystery"},
+   {"ids": ["S3037410"], "why": "чужая игра, совпало Mystery"},
+   {"ids": ["G1471706990"], "why": "Schizm — другая игра, совпало Mysterious"},
+   {"ids": ["G1207659593"], "why": "другая игра, попала в выдачу по жанру"},
+   {"ids": ["O11988"], "why": "третья часть серии"}
+  ]
+ },
+ {
+  "query": "Riven",
+  "clusters": [
+   {
+    "ids": ["S63610", "O1730"],
+    "why": "Riven: The Sequel to Myst 1997 — оригинал"
+   },
+   {"ids": ["S1712350"], "why": "Riven 2024 — переделка с нуля, отдельная игра"},
+   {"ids": ["S909660"], "why": "чужая игра, совпало слово Riven"},
+   {"ids": ["G1228964594"], "why": "чужая игра, выдача по студии Raven"},
+   {"ids": ["G1828104558"], "why": "чужая игра, выдача по студии Raven"},
+   {"ids": ["G1581756945"], "why": "чужая игра, выдача по студии Raven"}
+  ]
+ },
+ {
+  "query": "Sanitarium",
+  "clusters": [
+   {
+    "ids": ["S284050", "G1207658811", "O1706"],
+    "why": "Sanitarium 1998, DreamForge; у old-games второе название «Шизариум»"
+   },
+   {"ids": ["S647080"], "why": "чужая игра, совпало слово Sanitarium"},
+   {"ids": ["S1125450"], "why": "чужая игра, совпало слово Sanitarium"}
+  ]
+ },
+ {
+  "query": "I Have No Mouth",
+  "clusters": [
+   {
+    "ids": ["S245390", "G1207659593", "O153"],
+    "why": "I Have No Mouth, and I Must Scream 1995 — одна игра, разное написание"
+   },
+   {"ids": ["S4323140"], "why": "чужая игра, совпали общие слова длинного названия"},
+   {"ids": ["S3426150"], "why": "чужая игра, совпало I Have No"}
+  ]
+ },
+ {
+  "query": "Blade Runner",
+  "clusters": [
+   {
+    "ids": ["S1678420", "G1370811355", "G1898192656", "O1104"],
+    "why": "Blade Runner 1997, Westwood; Enhanced Edition — переиздание Nightdive, у GOG обе упаковки одной игры"
+   },
+   {"ids": ["S2942430"], "why": "чужая игра, совпали слова Runner и Blade"}
+  ]
+ },
+ {
+  "query": "Alone in the Dark",
+  "clusters": [
+   {
+    "ids": ["S1310410", "G1177195295", "G1273196341"],
+    "why": "Alone in the Dark 2024, Pieces Interactive; Digital Deluxe — то же издание"
+   },
+   {"ids": ["O147"], "why": "оригинал 1992, Infogrames — по отношению к версии 2024 это переделка с нуля через тридцать лет"},
+   {"ids": ["O148"], "why": "вторая часть"},
+   {"ids": ["O149"], "why": "третья часть"},
+   {"ids": ["G1207658874"], "why": "The New Nightmare — отдельная игра 2001"},
+   {"ids": ["S2239710"], "why": "чужая игра, совпало Dark"},
+   {"ids": ["S1567020"], "why": "чужая игра, совпало Dark"}
+  ]
+ },
+ {
+  "query": "Resident Evil",
+  "clusters": [
+   {
+    "ids": ["G1580232252", "O279"],
+    "why": "Resident Evil 1997, версия для PC (у old-games второе название Biohazard)"
+   },
+   {
+    "ids": ["G1266089300", "O1285"],
+    "why": "Resident Evil 3: Nemesis 1999/2000, версия для PC"
+   },
+   {"ids": ["S883710"], "why": "Resident Evil 2 2019 — переделка с нуля, отдельно от оригинала 1998"},
+   {"ids": ["O353"], "why": "оригинал Resident Evil 2 1998"},
+   {"ids": ["S2050650"], "why": "четвёртая часть"},
+   {"ids": ["S3764200"], "why": "Requiem — отдельная часть"},
+   {"ids": ["G1923260625"], "why": "Bundle — сборник, а не издание"}
+  ]
+ },
+ {
+  "query": "Silent Hill",
+  "clusters": [
+   {
+    "ids": ["S2124490", "G2051029707"],
+    "why": "SILENT HILL 2 2024, Bloober Team — одна игра"
+   },
+   {
+    "ids": ["G1141086411", "O8754"],
+    "why": "Silent Hill 4: The Room 2004, Konami"
+   },
+   {"ids": ["O1521"], "why": "оригинал Silent Hill 2 2002, Team Silent — версия 2024 переделана с нуля"},
+   {"ids": ["S2947440"], "why": "SILENT HILL f — отдельная часть"},
+   {"ids": ["S19000"], "why": "Homecoming — отдельная часть"},
+   {"ids": ["O6506"], "why": "третья часть"},
+   {"ids": ["G1528867138"], "why": "чужая игра, совпало слово Silent"}
+  ]
+ },
+ {
+  "query": "Amnesia The Dark Descent",
+  "clusters": [
+   {
+    "ids": ["S57300", "G1207659259"],
+    "why": "Amnesia: The Dark Descent 2010, Frictional; у GOG русское название «Амнезия: Призрак прошлого»"
+   },
+   {"ids": ["S1611070"], "why": "чужая игра, совпали слова Descent и Dark"},
+   {"ids": ["S3210400"], "why": "чужая игра и притом playtest, а не игра"}
+  ]
+ },
+ {
+  "query": "Penumbra",
+  "clusters": [
+   {"ids": ["S22180"], "why": "Overture — первая часть"},
+   {"ids": ["S22120"], "why": "Black Plague — вторая часть"},
+   {"ids": ["S22140"], "why": "Requiem — дополнение/третья вещь серии, отдельно"},
+   {"ids": ["G1207659255"], "why": "The Penumbra Collection — сборник трёх, а не издание одной"}
+  ]
+ },
+ {
+  "query": "Prince of Persia",
+  "clusters": [
+   {
+    "ids": ["S13500", "G1207659082"],
+    "why": "Prince of Persia: Warrior Within 2004, Ubisoft"
+   },
+   {"ids": ["G1207659109"], "why": "Prince of Persia 2008 — перезапуск, отдельная игра от оригинала 1990"},
+   {"ids": ["O62"], "why": "оригинал 1990, Brøderbund"},
+   {"ids": ["O63"], "why": "вторая часть 1993"},
+   {"ids": ["O6503"], "why": "4D Prince of Persia — сторонняя переделка, издатель не указан; отдельно"},
+   {"ids": ["G1207659091"], "why": "The Two Thrones — отдельная часть"},
+   {"ids": ["S2751000"], "why": "The Lost Crown — отдельная часть"},
+   {"ids": ["S2717880"], "why": "The Rogue Prince of Persia — отдельная игра"}
+  ]
+ },
+ {
+  "query": "Prince of Persia Sands of Time",
+  "clusters": [
+   {
+    "ids": ["S13600", "G1207658747", "O10242"],
+    "why": "Prince of Persia: The Sands of Time 2003, Ubisoft; у old-games «Принц Персии: Пески времени»"
+   },
+   {"ids": ["S33320"], "why": "The Forgotten Sands — отдельная игра 2010"}
+  ]
+ },
+ {
+  "query": "Tomb Raider",
+  "clusters": [
+   {
+    "ids": ["S203160", "G1724969043"],
+    "why": "Tomb Raider 2013, Crystal Dynamics; GOTY — издание той же игры"
+   },
+   {"ids": ["O98"], "why": "оригинал 1996, Eidos — отдельно от перезапуска 2013"},
+   {"ids": ["S391220"], "why": "Rise of the Tomb Raider — отдельная часть"},
+   {"ids": ["S750920"], "why": "Shadow of the Tomb Raider — отдельная часть"},
+   {"ids": ["G2089114674"], "why": "Definitive Survivor Trilogy — сборник трёх игр"},
+   {"ids": ["G1446538488"], "why": "Tomb Raider I-VI Remastered — сборник шести игр"},
+   {"ids": ["O8975"], "why": "The Angel of Darkness — отдельная часть 2003"},
+   {"ids": ["O9477"], "why": "The Action Adventure на DVDi — интерактивное издание, не игра серии"}
+  ]
+ }
+]

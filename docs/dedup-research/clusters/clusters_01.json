@@ -1,0 +1,182 @@
+[
+ {
+  "query": "Fallout",
+  "clusters": [
+   {"ids": ["S377160", "G1998527297"], "why": "Fallout 4 и его GOTY — одна игра, издание"},
+   {"ids": ["S1151340"], "why": "Fallout 76 — отдельная часть серии"},
+   {"ids": ["S22380", "G1312824873"], "why": "New Vegas и его Ultimate Edition — одна игра"},
+   {"ids": ["G1440166436", "O439"], "why": "Fallout 2 1998, Interplay — одна игра в двух источниках"},
+   {"ids": ["O5251"], "why": "тёзка: 1991, жанр Puzzle, издатель неизвестен — не Fallout 1997"},
+   {"ids": ["O30"], "why": "оригинальный Fallout 1997; ни у Steam, ни у GOG в этой выдаче пары нет"}
+  ]
+ },
+ {
+  "query": "Fallout 2",
+  "clusters": [
+   {"ids": ["S38410", "G1440166436", "O439"], "why": "Fallout 2 в трёх источниках; год Steam — дата выхода в Steam"},
+   {"ids": ["G1207660523"], "why": "FlatOut 2 — гонка, совпадение по написанию случайное"},
+   {"ids": ["G1491728574"], "why": "Fallout: London — отдельная игра другой команды"}
+  ]
+ },
+ {
+  "query": "Fallout 3",
+  "clusters": [
+   {"ids": ["S22370", "S22300", "G1248282609"], "why": "Fallout 3 и GOTY — одна игра, три записи"},
+   {"ids": ["G1491728574", "G1897848199"], "why": "Fallout: London, обычное и One-click издание — одна игра"}
+  ]
+ },
+ {
+  "query": "Fallout New Vegas",
+  "clusters": [
+   {"ids": ["S22380", "G1312824873"], "why": "New Vegas и Ultimate Edition — одна игра"},
+   {"ids": ["S22490"], "why": "PCR — служебная запись Steam без года, компаний и жанров; не карточка игры"}
+  ]
+ },
+ {
+  "query": "Fallout Tactics",
+  "clusters": [
+   {"ids": ["S38420", "G1440163405", "O8733"], "why": "Fallout Tactics: Brotherhood of Steel 2001 — одна игра в трёх источниках"}
+  ]
+ },
+ {
+  "query": "Doom",
+  "clusters": [
+   {"ids": ["S379720", "G1390579243"], "why": "DOOM 2016 — одна игра, GOG уточняет год в названии"},
+   {"ids": ["S782330", "G2027417122"], "why": "DOOM Eternal и его Deluxe Edition — одна игра"},
+   {"ids": ["S3017860"], "why": "DOOM: The Dark Ages — отдельная часть"},
+   {"ids": ["G1317223010"], "why": "DOOM + DOOM II — сборник из двух игр"},
+   {"ids": ["O9151"]},
+   {"ids": ["O706"], "why": "Akalabeth — другая игра, попала по слову Doom во втором названии"},
+   {"ids": ["O1567"]}
+  ]
+ },
+ {
+  "query": "Doom II",
+  "clusters": [
+   {"ids": ["S2280", "G1317223010"], "why": "один и тот же сборник DOOM + DOOM II в двух магазинах"},
+   {"ids": ["S208200"], "why": "DOOM 3: BFG Edition — другая часть"},
+   {"ids": ["S1418140"]},
+   {"ids": ["G1390579243"], "why": "DOOM 2016 — другая игра"},
+   {"ids": ["G2027417122"], "why": "DOOM Eternal — другая игра"},
+   {"ids": ["O23"], "why": "DOOM II: Hell on Earth 1994 сам по себе; сборник — не он"},
+   {"ids": ["O5641"], "why": "Master Levels — набор уровней, дополнение"}
+  ]
+ },
+ {
+  "query": "Quake",
+  "clusters": [
+   {"ids": ["S2310", "G1440166133"], "why": "Quake 1996 — одна игра; слаг GOG the_offering, год Steam — дата выхода в Steam"},
+   {"ids": ["O7057", "O7807"], "why": "Aftershock for Quake, обычное и Deluxe издание — одно и то же дополнение"},
+   {"ids": ["S282440"], "why": "Quake Live — отдельная сетевая игра"},
+   {"ids": ["S611500"], "why": "Quake Champions — отдельная игра"},
+   {"ids": ["G1108791957"], "why": "Quake 4 — другая часть"},
+   {"ids": ["G1443696817"], "why": "Quake II — другая часть"},
+   {"ids": ["O7039"], "why": "Abyss of Pandemonium — дополнение к Quake"}
+  ]
+ },
+ {
+  "query": "Quake II",
+  "clusters": [
+   {"ids": ["S2320", "G1443696817", "O535"], "why": "Quake II 1997 в трёх источниках"},
+   {"ids": ["S2200", "G1443696086"], "why": "Quake III Arena в двух магазинах"},
+   {"ids": ["S1089130"], "why": "Quake II RTX — отдельный бесплатный продукт NVIDIA, не издание Quake II; сомнение"},
+   {"ids": ["G1108791957"], "why": "Quake 4 — другая часть"},
+   {"ids": ["O1851"], "why": "Juggernaut — дополнение"},
+   {"ids": ["O7714"], "why": "Net Pack — дополнение"}
+  ]
+ },
+ {
+  "query": "Duke Nukem 3D",
+  "clusters": [
+   {"ids": ["S434050", "O4479"], "why": "20th Anniversary World Tour — переиздание Duke Nukem 3D 1996; сомнение из-за добавленного эпизода"},
+   {"ids": ["G1601643636"]},
+   {"ids": ["G1078502543"], "why": "сборник SUPERHOT, к запросу отношения не имеет"},
+   {"ids": ["G1723278812"], "why": "Phantom Fury — другая игра"},
+   {"ids": ["O857"], "why": "Caribbean: Life's a Beach — дополнение"},
+   {"ids": ["O1926"], "why": "Duke it out in D.C. — дополнение"}
+  ]
+ },
+ {
+  "query": "Wolfenstein 3D",
+  "clusters": [
+   {"ids": ["S2270", "G1441705226", "O10584", "O6068"], "why": "Wolfenstein 3D 1992 и её порты на PC-98 и Macintosh — одна игра, разные платформы; сомнение: порты можно счесть отдельными изданиями"},
+   {"ids": ["G1443699418"], "why": "Return to Castle Wolfenstein — другая игра"},
+   {"ids": ["G1615271665"], "why": "эпизод дополнения к Wolfenstein II"},
+   {"ids": ["O1433"], "why": "Spear of Destiny — отдельное самостоятельное дополнение"}
+  ]
+ },
+ {
+  "query": "Return to Castle Wolfenstein",
+  "clusters": [
+   {"ids": ["S9010", "G1443699418", "O1640"], "why": "RtCW 2001 в трёх источниках"},
+   {"ids": ["S4054940"], "why": "Return to Dark Castle — другая игра 2026 года"}
+  ]
+ },
+ {
+  "query": "Half-Life",
+  "clusters": [
+   {"ids": ["S220"], "why": "Half-Life 2"},
+   {"ids": ["S70"], "why": "Half-Life"},
+   {"ids": ["S546560"], "why": "Half-Life: Alyx"},
+   {"ids": ["G1948328636"]},
+   {"ids": ["G2056019722"]},
+   {"ids": ["G2098644729"]},
+   {"ids": ["O13732"]},
+   {"ids": ["O13452"]},
+   {"ids": ["O14513"]}
+  ]
+ },
+ {
+  "query": "Half-Life 2",
+  "clusters": [
+   {"ids": ["S220", "O14839"], "why": "Half-Life 2 2004 — одна игра, у old-games написание с пробелами"},
+   {"ids": ["S320"], "why": "Deathmatch — отдельный сетевой продукт"},
+   {"ids": ["G1948328636"]},
+   {"ids": ["G1196438244"]},
+   {"ids": ["G1295082534"]},
+   {"ids": ["O13740"]},
+   {"ids": ["O754"], "why": "Half-Life 1998 — первая часть"}
+  ]
+ },
+ {
+  "query": "Deus Ex",
+  "clusters": [
+   {"ids": ["S238010", "G1370227705"], "why": "Human Revolution Director's Cut — одна игра"},
+   {"ids": ["S337000", "G2138058393"], "why": "Mankind Divided, обычное и Digital Deluxe — одна игра"},
+   {"ids": ["S6910", "O809"], "why": "Deus Ex 2000 и его GOTY — одна игра"},
+   {"ids": ["G1298659718"], "why": "Bundle — набор игр"},
+   {"ids": ["O9117"], "why": "Invisible War — другая часть"}
+  ]
+ },
+ {
+  "query": "System Shock",
+  "clusters": [
+   {"ids": ["S482400", "G1439637285"], "why": "System Shock 2023 — переделка с нуля, одна игра в двух магазинах"},
+   {"ids": ["S866570", "G2049411947", "O739"], "why": "System Shock 2 1999 и её ремастер — по правилу одна игра; сомнение, ремастер отстоит на 26 лет"},
+   {"ids": ["S410710", "O301"], "why": "System Shock 1994 и Enhanced Edition — одна игра; ремейк 2023 к ней не относится"},
+   {"ids": ["G2116300560"], "why": "демоверсия"}
+  ]
+ },
+ {
+  "query": "System Shock 2",
+  "clusters": [
+   {"ids": ["S866570", "G2049411947", "O739"], "why": "System Shock 2 1999 и её 25th Anniversary Remaster — одна игра"}
+  ]
+ },
+ {
+  "query": "Thief The Dark Project",
+  "clusters": [
+   {"ids": ["S4200960", "G1477689565", "O360"], "why": "Thief: The Dark Project 1998 и его Remastered — одна игра; сомнение, ремастер ещё не вышел"},
+   {"ids": ["S533040"], "why": "Dark Parables — другая игра"},
+   {"ids": ["S1929810"], "why": "The Thief In The Dark — инди 2022, тёзка по словам"}
+  ]
+ },
+ {
+  "query": "Baldurs Gate",
+  "clusters": [
+   {"ids": ["S1086940", "G1456460669"], "why": "Baldur's Gate 3 в двух магазинах"},
+   {"ids": ["S228280", "G1207666353"], "why": "Baldur's Gate: Enhanced Edition в двух магазинах"},
+   {"ids": ["S257350", "G1207666373"], "why": "Baldur's Gate II: Enhanced Edition в двух магазинах"}
+  ]
+ }
+]

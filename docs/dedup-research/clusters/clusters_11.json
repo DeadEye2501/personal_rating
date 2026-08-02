@@ -1,0 +1,202 @@
+[
+ {
+  "query": "Il-2 Sturmovik",
+  "clusters": [
+   {"ids": ["S15320", "G1207658749"], "why": "IL-2 Sturmovik: 1946 — один и тот же выпуск 2006 года, GOG под русским названием «Платиновая коллекция»"},
+   {"ids": ["S307960"], "why": "Battle of Stalingrad — отдельная игра серии 2014 года"},
+   {"ids": ["S754530"], "why": "Cliffs of Dover Blitz — отдельная игра серии"},
+   {"ids": ["O14735"], "why": "оригинальный Ил-2 Штурмовик 2001 года; «1946» — более поздний расширенный выпуск, оцениваются порознь"}
+  ]
+ },
+ {
+  "query": "Operation Flashpoint",
+  "clusters": [
+   {"ids": ["G1533430343"]},
+   {"ids": ["G1207658998"]},
+   {"ids": ["G1734211869"]},
+   {"ids": ["O7784"], "why": "оригинальная Cold War Crisis 2001"},
+   {"ids": ["O7785"], "why": "Gold Upgrade / Red Hammer — дополнительная кампания, а не издание базовой игры; сомнение отмечаю"}
+  ]
+ },
+ {
+  "query": "Rainbow Six",
+  "clusters": [
+   {"ids": ["G1207658752", "O486"], "why": "Tom Clancy's Rainbow Six 1998 года, Red Storm — одна игра"},
+   {"ids": ["S359550"]},
+   {"ids": ["S15120"]},
+   {"ids": ["S2379390"]},
+   {"ids": ["O8728"], "why": "Athena Sword — дополнение к Rainbow Six 3"},
+   {"ids": ["O8729"], "why": "Iron Wrath — дополнение к Rainbow Six 3"}
+  ]
+ },
+ {
+  "query": "Postal 2",
+  "clusters": [
+   {"ids": ["S223470", "G1207658755", "O10994"], "why": "POSTAL 2 2003 года, Running With Scissors; «Postal²» — то же название другим написанием"},
+   {"ids": ["S3839180"], "why": "Redux — отдельный товар, похоже на переделку, а не переупаковку; сомнение отмечаю"},
+   {"ids": ["S3534150"], "why": "VR-версия отдельным товаром"},
+   {"ids": ["G1423059062"], "why": "сборник Mortal Kombat, к запросу отношения не имеет"},
+   {"ids": ["G1403485498"], "why": "сборник Mortal Kombat Trilogy"},
+   {"ids": ["O11070"], "why": "Apocalypse Weekend — дополнение"},
+   {"ids": ["O11069"], "why": "Share the Pain — многопользовательское дополнение"}
+  ]
+ },
+ {
+  "query": "Serious Sam",
+  "clusters": [
+   {"ids": ["S204340", "O12960"], "why": "Serious Sam 2 2005 года, «Крутой Сэм II» — русское название"},
+   {"ids": ["G1207658876", "O12958"], "why": "Serious Sam: The First Encounter 2001 года, «Крутой Сэм: Первая кровь» — русское название"},
+   {"ids": ["S4577930"], "why": "Playtest — не игра, а тестовый доступ"},
+   {"ids": ["S257420"]},
+   {"ids": ["G1074303835"], "why": "Heading Out, совпало только имя студии Serious Sim"},
+   {"ids": ["G1402180912"]},
+   {"ids": ["O12959"], "why": "The Second Encounter — отдельная игра серии"}
+  ]
+ },
+ {
+  "query": "Painkiller",
+  "clusters": [
+   {"ids": ["S39530", "G1207658715", "O8227"], "why": "Painkiller 2004 года; Black Edition — полное издание той же игры"},
+   {"ids": ["S214870"], "why": "Hell & Damnation 2012 — отдельная игра (переосмысление на новом движке)"},
+   {"ids": ["S2300120"], "why": "Painkiller без подзаголовка и без года — свежий перезапуск серии, не оригинал; сомнение отмечаю"},
+   {"ids": ["G1879874988"], "why": "Overdose — отдельная игра"},
+   {"ids": ["O8253"], "why": "Battle Out of Hell — дополнение"}
+  ]
+ },
+ {
+  "query": "Unreal",
+  "clusters": [
+   {"ids": ["S351700", "G1291808164"], "why": "UnReal World; на GOG та же игра в наборе с саундтреком, то есть расширенное издание"},
+   {"ids": ["O1948", "O715"], "why": "Unreal 1998 года; Unreal Gold — золотое издание той же игры"},
+   {"ids": ["S2573100"]},
+   {"ids": ["S1335560"]},
+   {"ids": ["G1167796534"]},
+   {"ids": ["G1161315595"]},
+   {"ids": ["O3085"], "why": "Unreal 1991 года на DOS от Ubi Soft — тёзка, другая игра"}
+  ]
+ },
+ {
+  "query": "Unreal Tournament",
+  "clusters": [
+   {"ids": ["G1601643636"]},
+   {"ids": ["G1434372124"]},
+   {"ids": ["G1762190036"]},
+   {"ids": ["O716"]},
+   {"ids": ["O8182"], "why": "UT 2003 — отдельная часть серии"},
+   {"ids": ["O8184"], "why": "UT 2004 — отдельная часть серии"}
+  ]
+ },
+ {
+  "query": "Blood",
+  "clusters": [
+   {"ids": ["S692850", "G1133514031"], "why": "Bloodstained: Ritual of the Night — одна игра"},
+   {"ids": ["S3199170"]},
+   {"ids": ["S924970"]},
+   {"ids": ["G1942346586"]},
+   {"ids": ["G1207658916"]},
+   {"ids": ["O940"]},
+   {"ids": ["O12948"], "why": "Blood of Sahara — отдельный выпуск Bet on Soldier"},
+   {"ids": ["O7613"], "why": "Blood Sport — базовая Bet on Soldier"}
+  ]
+ },
+ {
+  "query": "Shadow Warrior",
+  "clusters": [
+   {"ids": ["S324800", "G1434021265"], "why": "Shadow Warrior 2 — одна игра"},
+   {"ids": ["S1036890", "G1650413893", "G1310736571"], "why": "Shadow Warrior 3; Definitive и Deluxe Definitive — издания одной игры"},
+   {"ids": ["S233130"], "why": "Shadow Warrior 2013 — переделка с нуля, не оригинал 1997"},
+   {"ids": ["O2689"], "why": "Master Ninja 1987 — совпало слово в названии"},
+   {"ids": ["O255"], "why": "оригинал 1997 года на DOS"},
+   {"ids": ["O5071"], "why": "Twin Dragon — дополнение"}
+  ]
+ },
+ {
+  "query": "Heretic",
+  "clusters": [
+   {"ids": ["S3286930", "G1572667751"], "why": "Heretic + Hexen 2025 — один и тот же товар в двух магазинах"},
+   {"ids": ["S2181610"]},
+   {"ids": ["S2877540"]},
+   {"ids": ["G1207660283"], "why": "Heretic Kingdoms — другая серия"},
+   {"ids": ["G1810410369"], "why": "совпало имя студии Code Heretic"},
+   {"ids": ["O36"], "why": "оригинальный Heretic 1994; набор 2025 — сборник двух игр, склеивать нельзя"},
+   {"ids": ["O1072"], "why": "Heretic II — отдельная часть"},
+   {"ids": ["O37"], "why": "Hexen: Beyond Heretic — другая игра"}
+  ]
+ },
+ {
+  "query": "Hexen",
+  "clusters": [
+   {"ids": ["S3286930", "G1572667751"], "why": "Heretic + Hexen 2025 — один и тот же товар в двух магазинах"},
+   {"ids": ["S9060", "G1798886022", "O138"], "why": "Hexen II 1997 года, Raven/Activision — одна игра"},
+   {"ids": ["S4255900"], "why": "модульный синтезатор, не игра"},
+   {"ids": ["O1864"], "why": "Portal of Praevus — дополнение к Hexen II"},
+   {"ids": ["O37"], "why": "Hexen: Beyond Heretic 1995 — первая часть"}
+  ]
+ },
+ {
+  "query": "Descent",
+  "clusters": [
+   {"ids": ["G1207663083", "O103"], "why": "Descent 1995 года, Interplay — одна игра"},
+   {"ids": ["S1150440"]},
+   {"ids": ["S3929630"]},
+   {"ids": ["S57300"]},
+   {"ids": ["G1207658657"], "why": "Descent 3 — отдельная часть"},
+   {"ids": ["G1207663093"], "why": "Descent 2 — отдельная часть"},
+   {"ids": ["O1596"]},
+   {"ids": ["O525"]}
+  ]
+ },
+ {
+  "query": "Crusader No Remorse",
+  "clusters": [
+   {"ids": ["G1207658933", "O1000"], "why": "Crusader: No Remorse 1995 года, Origin/EA — одна игра"}
+  ]
+ },
+ {
+  "query": "Little Big Adventure",
+  "clusters": [
+   {"ids": ["S398000", "G1207658974", "O454"], "why": "Little Big Adventure 2 (Twinsen's Odyssey) 1997 года; GOG-издание названо Classic"},
+   {"ids": ["S2318070", "G1597401098", "G1663384649"], "why": "Twinsen's Quest 2024 — одна игра, Digital Deluxe — её издание"},
+   {"ids": ["S397330", "O43"], "why": "оригинальная Little Big Adventure 1994 года; Twinsen's Quest — переделка с нуля, к ней не присоединяется"}
+  ]
+ },
+ {
+  "query": "Another World",
+  "clusters": [
+   {"ids": ["G1207658845", "O10"], "why": "Another World 1991 года; 20th Anniversary Edition — юбилейное издание той же игры"},
+   {"ids": ["S2419800"]},
+   {"ids": ["S3642010"]},
+   {"ids": ["S1277510"]},
+   {"ids": ["G1409253341"]},
+   {"ids": ["G1905319640"]},
+   {"ids": ["O15187"], "why": "Another World Memory 2003 — головоломка, тёзка"},
+   {"ids": ["O52"], "why": "Might and Magic II — другая игра"}
+  ]
+ },
+ {
+  "query": "Flashback",
+  "clusters": [
+   {"ids": ["S961620", "G1486529526", "O31"], "why": "классический Flashback Поля Кюиссе; даты 2018 у обоих магазинов — даты выпуска в магазине, а не год игры. Сомнение: если под витринным именем стоит полная переделка 2013 года, склейка ошибочна"},
+   {"ids": ["S1505700"]},
+   {"ids": ["S256010"]},
+   {"ids": ["G2035081143"], "why": "Flashback 2 — отдельная игра"},
+   {"ids": ["G1386792474"], "why": "совпало имя студии Flashback Games"},
+   {"ids": ["O292"], "why": "Fade to Black — продолжение, отдельная игра"}
+  ]
+ },
+ {
+  "query": "Oddworld Abes Oddysee",
+  "clusters": [
+   {"ids": ["S15700", "G1207658705"], "why": "Oddworld: Abe's Oddysee 1997 года — одна игра"}
+  ]
+ },
+ {
+  "query": "Earthworm Jim",
+  "clusters": [
+   {"ids": ["S41600", "G1207658649", "O3092"], "why": "Earthworm Jim 3D — одна игра"},
+   {"ids": ["S38480", "G1207663103", "O109"], "why": "первая Earthworm Jim; Special Edition — расширенное издание той же игры"},
+   {"ids": ["S38490", "O110"], "why": "Earthworm Jim 2 — одна игра"},
+   {"ids": ["G1115629403"], "why": "Collection — сборник нескольких игр"}
+  ]
+ }
+]

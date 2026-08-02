@@ -1,0 +1,280 @@
+[
+ {
+  "query": "Civilization III",
+  "clusters": [
+   {
+    "ids": ["S3910", "G1471405734", "O8970"],
+    "why": "Sid Meier's Civilization III: Complete — издание оригинала 2001 года (Firaxis), old-games даёт тот же оригинал"
+   },
+   {
+    "ids": ["S226860", "G1443629331", "G1223987333"],
+    "why": "Galactic Civilizations III, Ultimate Edition — то же самое издание (Stardock, 2015-05-14 в обеих витринах)"
+   },
+   {
+    "ids": ["S1975810"],
+    "why": "Girls' civilization 3 — посторонняя игра, совпало только слово"
+   }
+  ]
+ },
+ {
+  "query": "Master of Orion",
+  "clusters": [
+   {
+    "ids": ["S298050", "G1441029515"],
+    "why": "перезапуск 2016 года (NGD Studios / Wargaming), в обеих витринах одна дата"
+   },
+   {
+    "ids": ["S410970", "O58"],
+    "why": "оригинал 1993 года (SimTex/MicroProse); в Steam стоит с датой переиздания 2016"
+   },
+   {
+    "ids": ["S410980", "O78"],
+    "why": "Master of Orion II: Battle at Antares, 1996; Steam-дата — дата переиздания"
+   },
+   {
+    "ids": ["G1207658854"],
+    "why": "1+2 — сборник из двух разных частей серии, не издание одной"
+   },
+   {
+    "ids": ["G2108222323"],
+    "why": "Race Pack — дополнение, не игра"
+   }
+  ]
+ },
+ {
+  "query": "Master of Orion II",
+  "clusters": [
+   {
+    "ids": ["S298050", "G1441029515"],
+    "why": "перезапуск 2016 года, обе витрины"
+   },
+   {
+    "ids": ["S410980", "O78"],
+    "why": "Master of Orion II: Battle at Antares, 1996"
+   },
+   {
+    "ids": ["S2131640"],
+    "why": "Metal Gear Solid 2 — посторонняя игра, совпало слово Master"
+   },
+   {
+    "ids": ["G1207658854"],
+    "why": "сборник из двух частей"
+   },
+   {
+    "ids": ["G2108222323"],
+    "why": "дополнение"
+   }
+  ]
+ },
+ {
+  "query": "Master of Magic",
+  "clusters": [
+   {
+    "ids": ["S1146370", "O56"],
+    "why": "оригинал 1994 года (SimTex/MicroProse); Classic в Steam — переиздание той же игры"
+   },
+   {
+    "ids": ["S1623070"],
+    "why": "Master of Magic 2022 (MuHa Games) — переделка с нуля, 28 лет разницы и другой разработчик"
+   },
+   {
+    "ids": ["S4345260"],
+    "why": "Masters of Magic (GC Soft, 2026) — тёзка, другая игра"
+   },
+   {"ids": ["G1456460669"]},
+   {"ids": ["G1344895033"]},
+   {"ids": ["G1091409855"]}
+  ]
+ },
+ {
+  "query": "Heroes of Might and Magic II",
+  "clusters": [
+   {
+    "ids": ["G1207658785", "O165"],
+    "why": "Heroes of Might and Magic II Gold (New World Computing) — одно и то же издание"
+   },
+   {"ids": ["S3105440"], "why": "Olden Era — другая часть серии"},
+   {"ids": ["S297000"], "why": "третья часть, не вторая"},
+   {"ids": ["S15370"], "why": "пятая часть, дополнение"},
+   {"ids": ["G1718139055"], "why": "модификация к третьей части"}
+  ]
+ },
+ {
+  "query": "Heroes of Might and Magic III",
+  "clusters": [
+   {
+    "ids": ["S297000", "G1207658787", "O1747"],
+    "why": "HoMM III: Complete и HD Edition — издания одной игры 1999 года, не переделка с нуля. Спорно: HD Edition сделан Dotemu без аддонов, и его можно счесть отдельным продуктом"
+   },
+   {"ids": ["S3105440"], "why": "Olden Era — другая часть"},
+   {"ids": ["S15370"], "why": "пятая часть, дополнение"},
+   {"ids": ["G1718139055"], "why": "Horn of the Abyss — фанатская модификация, отдельный продукт"}
+  ]
+ },
+ {
+  "query": "Might and Magic VI",
+  "clusters": [
+   {"ids": ["O474"], "why": "Might and Magic VI: The Mandate of Heaven, 1998 — единственная строка про саму игру"},
+   {"ids": ["G1207658788"], "why": "6-pack Limited Edition — сборник из шести игр серии, а не шестая часть"},
+   {"ids": ["S321960"], "why": "Heroes VII — другая серия и часть"},
+   {"ids": ["S48220"], "why": "Heroes VI — стратегия серии Heroes, не Might and Magic VI"},
+   {"ids": ["S445310"], "why": "дополнение к Heroes VII"}
+  ]
+ },
+ {
+  "query": "Disciples II",
+  "clusters": [
+   {
+    "ids": ["G1207658697", "O14835"],
+    "why": "Disciples II: Dark Prophecy — базовая игра; Gold на GOG её издание. Спорно: Gold включает и аддон"
+   },
+   {
+    "ids": ["S1630", "O14838"],
+    "why": "Disciples II: Rise of the Elves — один и тот же самостоятельный аддон в двух витринах"
+   },
+   {"ids": ["S1640"], "why": "Gallean's Return — отдельный самостоятельный аддон"},
+   {"ids": ["O14836"], "why": "Guardians of the Light — отдельная половина аддона, издавалась самостоятельно"},
+   {"ids": ["S10270"], "why": "третья часть серии"}
+  ]
+ },
+ {
+  "query": "X-COM UFO Defense",
+  "clusters": [
+   {
+    "ids": ["S7760", "G1445250340", "O77"],
+    "why": "X-COM: UFO Defense (MicroProse, 1993/94), она же UFO: Enemy Unknown — одна игра во всех трёх витринах"
+   }
+  ]
+ },
+ {
+  "query": "Jagged Alliance 2",
+  "clusters": [
+   {
+    "ids": ["S1620", "G1207658696", "G1285799072", "O1713", "O9858"],
+    "why": "Jagged Alliance 2 1999 года и её издания — Classic Deluxe и Gold Pack. Спорно: Gold Pack включает Unfinished Business"
+   },
+   {
+    "ids": ["S215930", "G1207658743"],
+    "why": "Wildfire (I-Deal Games / TopWare) — самостоятельный аддон, одна и та же вещь в двух витринах"
+   },
+   {"ids": ["O1716"], "why": "Unfinished Business — отдельный самостоятельный аддон (JA 2.5)"}
+  ]
+ },
+ {
+  "query": "Silent Storm",
+  "clusters": [
+   {
+    "ids": ["S254960", "O13209"],
+    "why": "«Операция Silent Storm» (1С/Nival, 2003) — русское название той же игры"
+   },
+   {"ids": ["O13210"], "why": "Sentinels — самостоятельное продолжение/аддон 2004 года"},
+   {"ids": ["G1211776926"], "why": "Dead Age — посторонняя игра, совпало имя студии Silent Dreams"},
+   {"ids": ["G1452682147"]},
+   {"ids": ["G2051029707"]}
+  ]
+ },
+ {
+  "query": "Commandos",
+  "clusters": [
+   {
+    "ids": ["S6800", "O193"],
+    "why": "Commandos: Behind Enemy Lines, 1998 (Pyro Studios/Eidos)"
+   },
+   {
+    "ids": ["S1100410", "O8271"],
+    "why": "Commandos 2: Men of Courage 2001 и её HD Remaster — переиздание той же игры. Спорно: ремастер 2020 года перерисован целиком"
+   },
+   {"ids": ["S1479730"], "why": "Origins 2025 — другая игра серии"},
+   {"ids": ["O436"], "why": "Beyond the Call of Duty — аддон к первой части"},
+   {"ids": ["G2070676386"]},
+   {"ids": ["G1207658880"]},
+   {"ids": ["G1478736295"]}
+  ]
+ },
+ {
+  "query": "Commandos 2",
+  "clusters": [
+   {
+    "ids": ["S6830", "S1100410", "O8271"],
+    "why": "Commandos 2: Men of Courage 2001 и её HD Remaster — переиздание той же игры. Спорно: в Steam это два раздельных продукта"
+   },
+   {"ids": ["G1207658803"], "why": "2+3 — сборник из двух частей серии"},
+   {"ids": ["G2070676386"]},
+   {"ids": ["G2018399941"]}
+  ]
+ },
+ {
+  "query": "Syndicate",
+  "clusters": [
+   {
+    "ids": ["S292410", "G1417159445", "O12259"],
+    "why": "Street Racing Syndicate (Eutechnyx, 2004) во всех трёх витринах"
+   },
+   {
+    "ids": ["G1207658992", "O185"],
+    "why": "Syndicate 1993 (Bullfrog/EA); Plus — издание с дополнением American Revolt"
+   },
+   {"ids": ["S368500"], "why": "Assassin's Creed Syndicate — посторонняя игра"},
+   {"ids": ["S1833570"]},
+   {"ids": ["G1496535867"]},
+   {"ids": ["O5385"], "why": "Pizza Syndicate — посторонняя игра"}
+  ]
+ },
+ {
+  "query": "Theme Hospital",
+  "clusters": [
+   {
+    "ids": ["G1207659026", "O361"],
+    "why": "Theme Hospital 1997 (Bullfrog/EA), old-games под русским названием «Частная клиника»"
+   }
+  ]
+ },
+ {
+  "query": "Theme Park",
+  "clusters": [
+   {
+    "ids": ["G1207660423", "O826"],
+    "why": "Theme Park 1994 (Bullfrog/EA)"
+   },
+   {"ids": ["G1207659026"], "why": "Theme Hospital — другая игра той же студии"},
+   {"ids": ["O7459"], "why": "Theme Park World 1999 — другая часть серии"},
+   {"ids": ["O3074"], "why": "Theme Park Mystery — тёзка, квест 1990 года от Image Works"},
+   {"ids": ["S2832220"]},
+   {"ids": ["S1202780"]},
+   {"ids": ["S642070"]},
+   {"ids": ["G2065955024"]}
+  ]
+ },
+ {
+  "query": "Transport Tycoon",
+  "clusters": [
+   {
+    "ids": ["S3766810", "G2080930095", "O67", "O6743"],
+    "why": "Transport Tycoon (1994) и Deluxe — расширенное издание той же игры Криса Сойера. Спорно: TTD часто считают отдельным продуктом"
+   },
+   {"ids": ["O6744"], "why": "комплект игры с редактором мира — отдельная позиция каталога, не уверен, что это то же издание"},
+   {"ids": ["S1513580"]},
+   {"ids": ["S2501160"]}
+  ]
+ },
+ {
+  "query": "SimCity 2000",
+  "clusters": [
+   {
+    "ids": ["G1207658969", "O11545", "O137"],
+    "why": "SimCity 2000 (Maxis, 1993/94) и её Special Edition — издание той же игры"
+   },
+   {"ids": ["G2086050016"], "why": "SimCity 3000 — другая часть серии"}
+  ]
+ },
+ {
+  "query": "Railroad Tycoon II",
+  "clusters": [
+   {
+    "ids": ["S7620", "G1445250876", "O1722", "O2168"],
+    "why": "Railroad Tycoon II 1998 (PopTop) и Platinum — издание той же игры"
+   },
+   {"ids": ["S7610"], "why": "третья часть серии"}
+  ]
+ }
+]

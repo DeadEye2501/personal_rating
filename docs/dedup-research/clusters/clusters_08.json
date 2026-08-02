@@ -1,0 +1,164 @@
+[
+ {
+  "query": "Slay the Spire",
+  "clusters": [
+   {"ids": ["S646570", "G1950754973"], "why": "одна игра Mega Crit, одинаковое название в двух магазинах"},
+   {"ids": ["S2868840"], "why": "вторая часть серии"}
+  ]
+ },
+ {
+  "query": "Into the Breach",
+  "clusters": [
+   {"ids": ["S590380", "G2004253604"], "why": "одна игра Subset Games в двух магазинах"}
+  ]
+ },
+ {
+  "query": "FTL Faster Than Light",
+  "clusters": [
+   {"ids": ["S212680"]},
+   {"ids": ["G1431127790"], "why": "Redout: Space Assault — посторонняя выдача GOG"},
+   {"ids": ["G1811651647"], "why": "BLAZING STAR — посторонняя выдача GOG"},
+   {"ids": ["G1207659693"], "why": "Stargunner — посторонняя выдача GOG"}
+  ]
+ },
+ {
+  "query": "Darkest Dungeon",
+  "clusters": [
+   {"ids": ["S262060", "G1450711444", "G1902657506"], "why": "первая часть Red Hook; Ancestral Edition — издание той же игры"},
+   {"ids": ["S1940340", "G2101205430"], "why": "вторая часть; Resolute Edition — издание той же игры"}
+  ]
+ },
+ {
+  "query": "Binding of Isaac",
+  "clusters": [
+   {"ids": ["S250900", "G1205572215"], "why": "Rebirth в двух магазинах, издатель Nicalis"},
+   {"ids": ["S113200"], "why": "оригинал 2011 года на Flash; Rebirth — переделка с нуля другой студией, оценивают порознь"}
+  ]
+ },
+ {
+  "query": "Enter the Gungeon",
+  "clusters": [
+   {"ids": ["S311690", "G1456912569"], "why": "одна игра Dodge Roll в двух магазинах"},
+   {"ids": ["S2339840"], "why": "вторая часть серии"}
+  ]
+ },
+ {
+  "query": "Risk of Rain",
+  "clusters": [
+   {"ids": ["S248820", "G1207660563"], "why": "оригинал 2013 года, год GOG совпадает с пометкой в названии Steam"},
+   {"ids": ["S632360"], "why": "вторая часть серии"},
+   {"ids": ["S1337520"], "why": "Returns — переделка оригинала спустя десять лет, судим как отдельную"}
+  ]
+ },
+ {
+  "query": "Undertale",
+  "clusters": [
+   {"ids": ["S391540", "G1456487183"], "why": "одна игра Toby Fox в двух магазинах"}
+  ]
+ },
+ {
+  "query": "Outer Wilds",
+  "clusters": [
+   {"ids": ["S753640"]},
+   {"ids": ["G1207660473"], "why": "SpellForce 2 — посторонняя выдача GOG"},
+   {"ids": ["G1207665813"], "why": "Reprisal Universe — посторонняя выдача GOG"},
+   {"ids": ["G1800647409"], "why": "Asdivine Kamura — посторонняя выдача GOG"}
+  ]
+ },
+ {
+  "query": "Return of the Obra Dinn",
+  "clusters": [
+   {"ids": ["S653530", "G1108393852"], "why": "одна игра Lucas Pope в двух магазинах"}
+  ]
+ },
+ {
+  "query": "Papers Please",
+  "clusters": [
+   {"ids": ["S239030", "G1207659209"], "why": "одна игра Lucas Pope в двух магазинах"},
+   {"ids": ["S804320"], "why": "короткометражный фильм, не игра"},
+   {"ids": ["G1455704410"], "why": "Codename Panzers — посторонняя выдача GOG"},
+   {"ids": ["G1455704049"], "why": "Codename Panzers — посторонняя выдача GOG"}
+  ]
+ },
+ {
+  "query": "The Talos Principle",
+  "clusters": [
+   {"ids": ["S257510", "G1577265251"], "why": "первая часть; Gold Edition — издание той же игры"},
+   {"ids": ["S835960", "G2069406260", "G1544796469"], "why": "вторая часть; Deluxe Edition — её издание"},
+   {"ids": ["S2806640"], "why": "Reawakened — переделка первой части на новом движке спустя одиннадцать лет; сомнение между «переизданием» и «ремейком», по правилу сомнения считаю отдельной"}
+  ]
+ },
+ {
+  "query": "Portal",
+  "clusters": [
+   {"ids": ["S400"], "why": "Portal от Valve; одноимённая игра 1986 года — тёзка, не склеивается"},
+   {"ids": ["S620"], "why": "вторая часть серии"},
+   {"ids": ["S374040"], "why": "Portal Knights — другая игра"},
+   {"ids": ["G2091584841"], "why": "посторонняя выдача GOG"},
+   {"ids": ["G1343806495"], "why": "посторонняя выдача GOG, к тому же сборник"},
+   {"ids": ["G1207658880"], "why": "посторонняя выдача GOG, к тому же сборник"},
+   {"ids": ["O1864"], "why": "дополнение к Hexen II"},
+   {"ids": ["O3239"], "why": "Portal 1986 года от Activision — тёзка игры Valve"},
+   {"ids": ["O2603"], "why": "дополнение к WarCraft II"}
+  ]
+ },
+ {
+  "query": "Portal 2",
+  "clusters": [
+   {"ids": ["S620"]},
+   {"ids": ["S2194590"], "why": "Roads Of Rome — другая игра"},
+   {"ids": ["S104600"], "why": "The Final Hours — документальное приложение, не игра"},
+   {"ids": ["G1423059062"], "why": "сборник Mortal Kombat, посторонняя выдача"},
+   {"ids": ["G1403485498"], "why": "сборник Mortal Kombat, посторонняя выдача"},
+   {"ids": ["G1207658755"], "why": "POSTAL 2 — посторонняя выдача GOG"},
+   {"ids": ["O1864"], "why": "дополнение к Hexen II"},
+   {"ids": ["O2603"], "why": "дополнение к WarCraft II"}
+  ]
+ },
+ {
+  "query": "Braid",
+  "clusters": [
+   {"ids": ["S499180", "S26800"], "why": "Anniversary Edition — переиздание той же игры Джонатана Блоу; правило прямо относит Anniversary к изданиям"},
+   {"ids": ["G1178844003"], "why": "посторонняя выдача GOG"},
+   {"ids": ["G2059810391"], "why": "посторонняя выдача GOG"},
+   {"ids": ["G1554935533"], "why": "посторонняя выдача GOG"}
+  ]
+ },
+ {
+  "query": "Limbo",
+  "clusters": [
+   {"ids": ["S48000"], "why": "LIMBO от Playdead, пары в GOG нет"},
+   {"ids": ["S2246470", "G1588369373"], "why": "Kulebra and the Souls of Limbo; Closure Edition — её издание"},
+   {"ids": ["G1396420224", "G1564444477"], "why": "одна игра, тот же год и те же компании; Premium Supporter Edition — издание"},
+   {"ids": ["S568400"], "why": "Depths of Limbo — другая игра"}
+  ]
+ },
+ {
+  "query": "Inside",
+  "clusters": [
+   {"ids": ["S304430"], "why": "INSIDE от Playdead, пары в выдаче нет"},
+   {"ids": ["S1987080"], "why": "Inside the Backrooms — другая игра"},
+   {"ids": ["S3609750"], "why": "Organized Inside — другая игра"},
+   {"ids": ["G1673367037"], "why": "посторонняя выдача GOG"},
+   {"ids": ["G1420813264"], "why": "посторонняя выдача GOG"},
+   {"ids": ["G1222133130"], "why": "Inside Jennifer — другая игра"},
+   {"ids": ["O1527"], "why": "The Devil Inside — другая игра"},
+   {"ids": ["O13987"], "why": "второе название «Castelo Virtual» совпадает с O13135, но год, издатель и жанр разные — считаю разными играми одной серии обучающих дисков"},
+   {"ids": ["O13135"], "why": "см. выше: та же подпись «Castelo Virtual», но 1996 год и другой издатель"}
+  ]
+ },
+ {
+  "query": "Machinarium",
+  "clusters": [
+   {"ids": ["S40700", "G1207659017"], "why": "одна игра Amanita Design; Collector's Edition — её издание"}
+  ]
+ },
+ {
+  "query": "Samorost",
+  "clusters": [
+   {"ids": ["S1580970", "G2006298293", "O14007"], "why": "первая часть; у old-games второе название прямо «Samorost 1», издатель Amanita Design"},
+   {"ids": ["S40720", "G1435321049"], "why": "вторая часть в двух магазинах"},
+   {"ids": ["S421120", "G1452686647"], "why": "третья часть в двух магазинах"}
+  ]
+ }
+]

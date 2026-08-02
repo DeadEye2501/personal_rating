@@ -1,0 +1,192 @@
+[
+ {
+  "query": "Baldurs Gate II",
+  "clusters": [
+   {"ids": ["S1086940"], "why": "другая часть серии, не BG II"},
+   {"ids": ["S257350", "G1207666373"], "why": "одна игра: Baldur's Gate II: Enhanced Edition, Beamdog, обе строки 15.11.2013"},
+   {"ids": ["S1889930", "G1745438757"], "why": "одна игра: Dark Alliance II, переиздание 20.07.2022, Black Isle/Interplay в обеих"}
+  ]
+ },
+ {
+  "query": "Baldurs Gate 3",
+  "clusters": [
+   {"ids": ["S1086940", "G1456460669"], "why": "одна игра: Larian, обе 03.08.2023"},
+   {"ids": ["G2100574330"], "why": "инструмент моддинга, не игра"}
+  ]
+ },
+ {
+  "query": "Planescape Torment",
+  "clusters": [
+   {"ids": ["S466300", "G1203613131", "O845"], "why": "одна игра: Enhanced Edition — переиздание оригинала 1999 года, а не переделка с нуля"}
+  ]
+ },
+ {
+  "query": "Icewind Dale",
+  "clusters": [
+   {"ids": ["S321800", "G1207666683", "O10710"], "why": "одна игра: Icewind Dale 2000 года и её Enhanced Edition — издания одной игры"},
+   {"ids": ["G1207658891", "O10893"], "why": "одна игра: Icewind Dale II 2002 года, Complete — издание с дополнениями"},
+   {"ids": ["O10892"], "why": "Heart of Winter — дополнение, не отдельная игра базы"}
+  ]
+ },
+ {
+  "query": "Neverwinter Nights",
+  "clusters": [
+   {"ids": ["S704450", "O8743"], "why": "одна игра: NWN 2002 года и её Enhanced Edition"},
+   {"ids": ["S2738630", "G1993442013", "G1207659162"], "why": "одна игра: Neverwinter Nights 2 — Complete и Enhanced Edition суть издания одной игры; спорно, EE 2025 от Aspyr далеко ушла от Complete 2006"},
+   {"ids": ["G1779769517"], "why": "сборник из двух игр (1 + 2)"},
+   {"ids": ["O1052"], "why": "тёзка: Neverwinter Nights 1991 года от SSI, DOS, другая игра"}
+  ]
+ },
+ {
+  "query": "Arcanum",
+  "clusters": [
+   {"ids": ["S500810", "G1207658829", "O1257"], "why": "одна игра: Arcanum: Of Steamworks and Magick Obscura, Troika 2001; год Steam — дата переиздания, издатель у old-games назван Sierra, но игра та же"},
+   {"ids": ["S3593520"]},
+   {"ids": ["S1148480"]},
+   {"ids": ["G1665461923"]},
+   {"ids": ["G1282519889"], "why": "ArcaniA — другая серия, только похожее написание"}
+  ]
+ },
+ {
+  "query": "Fallout Brotherhood of Steel",
+  "clusters": [
+   {"ids": ["S38420", "O8733"], "why": "одна игра: Fallout Tactics: Brotherhood of Steel 2001, Steam-строка с укороченным названием и датой переиздания"},
+   {"ids": ["G2096457918"]},
+   {"ids": ["G1207660163"]},
+   {"ids": ["G1207659114"]}
+  ]
+ },
+ {
+  "query": "Diablo",
+  "clusters": [
+   {"ids": ["S2344520"]},
+   {"ids": ["S2536520", "O808"], "why": "Diablo II: Resurrected — ремастер оригинала 2000 года, не переделка с нуля; решение спорное, между строками 20 лет"},
+   {"ids": ["S4411600"], "why": "китайская idle-игра, только слово в названии"},
+   {"ids": ["G1412601690", "O232"], "why": "одна игра: Diablo 1996, Blizzard; Hellfire в названии GOG — включённое дополнение, а не второй товар"},
+   {"ids": ["G1313680012"]},
+   {"ids": ["G1158113613"], "why": "мод, не игра"},
+   {"ids": ["O2126"], "why": "Lord of Destruction — дополнение к Diablo II"}
+  ]
+ },
+ {
+  "query": "Diablo II",
+  "clusters": [
+   {"ids": ["S2536520", "O808"], "why": "Diablo II: Resurrected — ремастер Diablo II 2000 года; решение спорное"},
+   {"ids": ["G1311748232"]},
+   {"ids": ["G1292215016"]},
+   {"ids": ["G1709066762"]},
+   {"ids": ["O2126"], "why": "дополнение Lord of Destruction, не база"}
+  ]
+ },
+ {
+  "query": "Warcraft II",
+  "clusters": [
+   {"ids": ["G1870324793"]},
+   {"ids": ["O469", "O73"], "why": "Battle.net Edition — переиздание Tides of Darkness; спорно, издание везёт с собой и Beyond the Dark Portal"},
+   {"ids": ["O2603"], "why": "Beyond the Dark Portal — дополнение"}
+  ]
+ },
+ {
+  "query": "StarCraft",
+  "clusters": [
+   {"ids": ["S3476660"]},
+   {"ids": ["S4768360"], "why": "пролог, отдельный бесплатный кусок"},
+   {"ids": ["S2431590"]},
+   {"ids": ["G1427876902"]},
+   {"ids": ["G1466267085"], "why": "сборник"},
+   {"ids": ["G1445609012"]},
+   {"ids": ["O1763"], "why": "StarCraft 1998, база"},
+   {"ids": ["O582"], "why": "Brood War — дополнение"},
+   {"ids": ["O5634"], "why": "Insurrection — сторонний набор кампаний от Aztech, не Blizzard"}
+  ]
+ },
+ {
+  "query": "Age of Empires",
+  "clusters": [
+   {"ids": ["S813780", "O612"], "why": "одна игра: Age of Empires II: The Age of Kings 1999 и её Definitive Edition"},
+   {"ids": ["S1466860"]},
+   {"ids": ["S933110"]},
+   {"ids": ["G1576420196"]},
+   {"ids": ["G1761114940"]},
+   {"ids": ["G1999861490"]},
+   {"ids": ["O235"], "why": "первая часть, её переиздания в выдаче нет"},
+   {"ids": ["O2133"], "why": "The Conquerors — дополнение к AoE II"}
+  ]
+ },
+ {
+  "query": "Age of Empires II",
+  "clusters": [
+   {"ids": ["S813780", "O612"], "why": "одна игра: The Age of Kings 1999 и Definitive Edition"},
+   {"ids": ["S1466860"]},
+   {"ids": ["S933110"]},
+   {"ids": ["G1576420196"]},
+   {"ids": ["G1761114940"]},
+   {"ids": ["G1999861490"]},
+   {"ids": ["O2133"], "why": "The Conquerors — дополнение"}
+  ]
+ },
+ {
+  "query": "Command and Conquer",
+  "clusters": [
+   {"ids": ["S2229850"], "why": "Red Alert 2 с дополнением — другая часть, чем Generals"},
+   {"ids": ["S2732960"], "why": "Zero Hour — дополнение к Generals, не сама Generals"},
+   {"ids": ["S1213210"], "why": "Remastered Collection — сборник из нескольких игр"},
+   {"ids": ["G1187946593"]},
+   {"ids": ["G1988084980"]},
+   {"ids": ["G2031637647"]},
+   {"ids": ["O5258"], "why": "Command & Conquer: Generals 2003, база"}
+  ]
+ },
+ {
+  "query": "Red Alert",
+  "clusters": [
+   {"ids": ["S2229850"], "why": "Red Alert 2, а old-games даёт только первую часть"},
+   {"ids": ["S17480"]},
+   {"ids": ["S24800"], "why": "Uprising — дополнение к Red Alert 3"},
+   {"ids": ["G2065188580"]},
+   {"ids": ["G2047907642"]},
+   {"ids": ["G1679659438"]},
+   {"ids": ["O980"], "why": "Red Alert 1996, первая часть"},
+   {"ids": ["O988"], "why": "Counterstrike — дополнение"},
+   {"ids": ["O981"], "why": "The Aftermath — дополнение"}
+  ]
+ },
+ {
+  "query": "Dune II",
+  "clusters": [
+   {"ids": ["G1540356382"]},
+   {"ids": ["G2065207431"]},
+   {"ids": ["G1301333630"]},
+   {"ids": ["O1482"], "why": "единственная строка про саму игру"}
+  ]
+ },
+ {
+  "query": "Dune 2000",
+  "clusters": [
+   {"ids": ["G1282350952"]},
+   {"ids": ["G1983428436"]},
+   {"ids": ["G1207665863"]},
+   {"ids": ["O861"], "why": "единственная строка про саму игру"}
+  ]
+ },
+ {
+  "query": "Emperor Battle for Dune",
+  "clusters": [
+   {"ids": ["G1345207570"]},
+   {"ids": ["G1999861490"]},
+   {"ids": ["G1207659202"]},
+   {"ids": ["O2131"], "why": "единственная строка про саму игру"}
+  ]
+ },
+ {
+  "query": "Civilization II",
+  "clusters": [
+   {"ids": ["S3910", "G1471405734"], "why": "одна игра: Sid Meier's Civilization III Complete, Firaxis/2K"},
+   {"ids": ["S226860", "G1443629331", "G1223987333"], "why": "одна игра: Galactic Civilizations III, Stardock 14.05.2015; Ultimate Edition — издание с дополнениями"},
+   {"ids": ["S202200"], "why": "вторая часть Galactic Civilizations, другая игра"},
+   {"ids": ["O6953"], "why": "Fantastic Worlds — дополнение к Civ II"},
+   {"ids": ["O319"], "why": "издание Civ II, но самой базовой Civ II в выдаче нет"},
+   {"ids": ["O625"], "why": "Test of Time — самостоятельная игра 1999 года, не издание Civ II"}
+  ]
+ }
+]

@@ -1,0 +1,197 @@
+[
+ {
+  "query": "Divinity Original Sin 2",
+  "clusters": [
+   {
+    "ids": ["S435150", "G1584823040", "G1330235937", "G1879910422"],
+    "why": "Divinity: Original Sin 2 и три её издания на GOG (Definitive, Divine, Eternal) — тот же Larian, та же дата 14.09.2017"
+   },
+   {
+    "ids": ["S373420", "S230230"],
+    "why": "первая Original Sin: Classic 2014 и Enhanced Edition 2015 — переиздание той же игры, а не следующая часть"
+   }
+  ]
+ },
+ {
+  "query": "Sacred",
+  "clusters": [
+   {
+    "ids": ["S12320"],
+    "why": "Sacred Gold — первая часть, отдельная игра от Sacred 2"
+   },
+   {
+    "ids": ["S3906660", "S225640"],
+    "why": "Sacred 2 Remaster 2025 — переиздание Sacred 2, не переделка с нуля; издатель тот же THQ Nordic, новые студии делали порт. Сомнение: у ремастера свой список разработчиков"
+   },
+   {"ids": ["G1207658862"]},
+   {"ids": ["G2069488821"]},
+   {"ids": ["G1628811838"]},
+   {"ids": ["O6921"], "why": "Aztec — попал в выдачу по слову Sacred во втором названии, к Sacred отношения нет"},
+   {
+    "ids": ["O623", "O10635"],
+    "why": "Disciples: Sacred Lands и его Gold Edition — издание той же игры. Сомнение: во втором названии Gold-строки стоит чужой текст про Гэбриэла Найта, а издатель другой (Strategy First против GT Interactive) — похоже на порчу данных, а не на другую игру"
+   }
+  ]
+ },
+ {
+  "query": "Titan Quest",
+  "clusters": [
+   {"ids": ["S1154030"], "why": "Titan Quest II — другая часть серии"},
+   {
+    "ids": ["S475150", "G1196955511"],
+    "why": "одно и то же Anniversary Edition в двух магазинах, дата 31.08.2016 совпадает"
+   }
+  ]
+ },
+ {
+  "query": "Torchlight",
+  "clusters": [
+   {"ids": ["S1974050"], "why": "Torchlight: Infinite — отдельная free-to-play игра другого разработчика (XD)"},
+   {"ids": ["S200710", "G1958228073"], "why": "Torchlight II в двух магазинах, дата 20.09.2012 совпадает"},
+   {"ids": ["S41500", "G1207659069"], "why": "Torchlight в двух магазинах, дата 27.10.2009 совпадает"}
+  ]
+ },
+ {
+  "query": "Grim Dawn",
+  "clusters": [
+   {
+    "ids": ["S219990", "G2023885455", "G1449651388"],
+    "why": "Grim Dawn и её Definitive Edition — одна игра, Crate Entertainment, 25.02.2016 у всех трёх строк"
+   }
+  ]
+ },
+ {
+  "query": "Path of Exile",
+  "clusters": [
+   {"ids": ["S238960"]},
+   {"ids": ["S2694490"], "why": "Path of Exile 2 — другая часть"},
+   {"ids": ["G1897215961"]},
+   {"ids": ["G1207666943"]},
+   {"ids": ["G1630938840"]}
+  ]
+ },
+ {
+  "query": "Dark Souls",
+  "clusters": [
+   {"ids": ["S374320"]},
+   {"ids": ["S570940"], "why": "Dark Souls: Remastered — оригинала первой части в выдаче нет, склеивать не с чем"},
+   {"ids": ["S335300"]},
+   {"ids": ["G1948328636"]},
+   {"ids": ["G2098644729"]},
+   {"ids": ["G1295082534"]}
+  ]
+ },
+ {
+  "query": "Elden Ring",
+  "clusters": [
+   {"ids": ["S1245620"]},
+   {"ids": ["S2622380"], "why": "Nightreign — самостоятельная игра, а не издание Elden Ring"},
+   {"ids": ["G1726399793"]},
+   {"ids": ["G1849448908"]},
+   {"ids": ["G1559432081"]}
+  ]
+ },
+ {
+  "query": "Sekiro",
+  "clusters": [
+   {"ids": ["S814380"]},
+   {"ids": ["G1683385187"]}
+  ]
+ },
+ {
+  "query": "Bloodborne",
+  "clusters": [
+   {"ids": ["G1498491684"]},
+   {"ids": ["G1544899074"]},
+   {"ids": ["G1974785923"]}
+  ]
+ },
+ {
+  "query": "Nier Automata",
+  "clusters": [
+   {"ids": ["S524220"]},
+   {"ids": ["G1437149977"]},
+   {"ids": ["G1334130696"]},
+   {"ids": ["G1967252508"], "why": "Season Pass — набор дополнений, не сама Relayer Advanced"}
+  ]
+ },
+ {
+  "query": "Final Fantasy VII",
+  "clusters": [
+   {"ids": ["S2909400"], "why": "Rebirth — вторая часть ремейк-трилогии, самостоятельная игра"},
+   {"ids": ["S1462040"], "why": "Remake Intergrade — переделка с нуля 2020 года, оценивается порознь с оригиналом"},
+   {
+    "ids": ["S3837340", "G1698970154", "O1493"],
+    "why": "оригинальная Final Fantasy VII: ПК-переиздания в Steam и GOG (совпадают компании, включая FINE Co.) и исходный ПК-выпуск 1998 года на old-games"
+   },
+   {"ids": ["G1086370078"], "why": "восьмая часть, попала в выдачу по общему названию серии"}
+  ]
+ },
+ {
+  "query": "Final Fantasy VIII",
+  "clusters": [
+   {
+    "ids": ["S1026680", "S39150", "G1086370078", "O1983"],
+    "why": "Final Fantasy VIII: ПК-переиздание 2013 года, ремастер 2019 в двух магазинах и исходный ПК-выпуск на old-games — ремастер по правилу считается изданием, а не переделкой"
+   }
+  ]
+ },
+ {
+  "query": "Chrono Trigger",
+  "clusters": [
+   {"ids": ["S613830"]},
+   {"ids": ["G1695853338"]},
+   {"ids": ["G1633484204"]},
+   {"ids": ["G1968374657"]}
+  ]
+ },
+ {
+  "query": "Disco Elysium",
+  "clusters": [
+   {
+    "ids": ["S632470", "G1771589310"],
+    "why": "The Final Cut — расширенное издание той же игры, слаг GOG прямо disco_elysium, дата 15.10.2019 совпадает"
+   },
+   {"ids": ["G1820315840"], "why": "Bundle — набор, по правилу не издание; отделено при сомнении"}
+  ]
+ },
+ {
+  "query": "Pillars of Eternity",
+  "clusters": [
+   {"ids": ["S291650", "G1344895033"], "why": "Definitive Edition — издание той же первой части"},
+   {
+    "ids": ["S560130", "G1805250275", "G1970407416"],
+    "why": "Pillars of Eternity II: Deadfire и её Obsidian Edition, дата 08.05.2018 у всех трёх"
+   }
+  ]
+ },
+ {
+  "query": "Tyranny",
+  "clusters": [
+   {
+    "ids": ["S362960", "G1270048047", "G2095755635"],
+    "why": "Tyranny: обычная строка Steam, Standard и Gold издания GOG — одна игра Obsidian/Paradox"
+   },
+   {"ids": ["S2466790"], "why": "KIYO - Bunny Tyranny — совпало слово, другая игра"},
+   {"ids": ["S2781730"], "why": "Tank Tyranny — совпало слово, другая игра"},
+   {"ids": ["G1565239305"], "why": "Tyrant's Blessing — другая игра"}
+  ]
+ },
+ {
+  "query": "Wasteland 3",
+  "clusters": [
+   {"ids": ["S719040", "G1136650022"], "why": "Wasteland 3 в двух магазинах, дата выхода совпадает с точностью до часового пояса"},
+   {"ids": ["S3165280"], "why": "3D PUZZLE - Apocalyptic Wasteland — совпало слово"},
+   {"ids": ["G1960562196"], "why": "Colorado Collection — по правилу Collection считается набором; по существу это игра с обоими дополнениями, и склейка была бы допустима, но при сомнении оставлено отдельно"},
+   {"ids": ["G1687336800"], "why": "Expansion Pass — дополнения, не игра"}
+  ]
+ },
+ {
+  "query": "Pathfinder Kingmaker",
+  "clusters": [
+   {"ids": ["S640820", "G1127581981"], "why": "Enhanced Plus Edition — издание той же игры, дата 25.09.2018 совпадает"},
+   {"ids": ["G1311748232"], "why": "Royal Ascension — DLC"},
+   {"ids": ["G2147483057"], "why": "Season Pass Bundle — набор дополнений"}
+  ]
+ }
+]

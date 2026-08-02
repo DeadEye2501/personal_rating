@@ -1,0 +1,277 @@
+[
+ {
+  "query": "Solasta",
+  "clusters": [
+   {
+    "ids": ["S1096530", "G1735910522", "G2035493674"],
+    "why": "одна игра: Lightbringers Edition — издание Crown of the Magister, тот же разработчик и жанры"
+   },
+   {
+    "ids": ["S2975950"],
+    "why": "Solasta II — следующая часть серии, отдельная игра"
+   }
+  ]
+ },
+ {
+  "query": "Kingdom Come Deliverance",
+  "clusters": [
+   {
+    "ids": ["S379430", "G1182943037", "G1719198803"],
+    "why": "одна игра 2018 года: Royal Edition — издание Kingdom Come: Deliverance"
+   },
+   {
+    "ids": ["S1771300", "G1485720934"],
+    "why": "одна игра: KCD II и её Royal Edition, обе 2025"
+   },
+   {
+    "ids": ["S1059340"],
+    "why": "Festival Suite — жанр Movie, не игра, а дополнительный материал"
+   }
+  ]
+ },
+ {
+  "query": "Witcher",
+  "clusters": [
+   {
+    "ids": ["S292030", "G1640424747"],
+    "why": "одна игра: Complete Edition — издание Ведьмака 3"
+   },
+   {
+    "ids": ["S20900", "G1207658924"],
+    "why": "одна игра: первый «Ведьмак» в Enhanced Edition, GOG под русским названием"
+   },
+   {
+    "ids": ["S20920"],
+    "why": "Ведьмак 2 — другая часть серии"
+   },
+   {
+    "ids": ["G1297352383"],
+    "why": "Thronebreaker — отдельная игра во вселенной, стратегия"
+   }
+  ]
+ },
+ {
+  "query": "Witcher 2",
+  "clusters": [
+   {
+    "ids": ["S20920", "G1207658930"],
+    "why": "одна игра, GOG под русским названием «Ведьмак 2: Убийцы королей»"
+   },
+   {"ids": ["G1165555973"]},
+   {"ids": ["G1421124555"]}
+  ]
+ },
+ {
+  "query": "Witcher 3",
+  "clusters": [
+   {
+    "ids": ["S292030", "G1640424747", "G1207664663"],
+    "why": "одна игра: Ведьмак 3 и его Complete Edition"
+   },
+   {
+    "ids": ["S2684660", "G1441199941"],
+    "why": "один продукт — REDkit, инструмент разработки, а не сама игра; строки Steam и GOG про одно и то же"
+   }
+  ]
+ },
+ {
+  "query": "Cyberpunk 2077",
+  "clusters": [
+   {
+    "ids": ["S1091500", "G1274966284", "G2093619782"],
+    "why": "одна игра: Ultimate Edition — полное издание Cyberpunk 2077"
+   }
+  ]
+ },
+ {
+  "query": "Mass Effect",
+  "clusters": [
+   {
+    "ids": ["S1328670"],
+    "why": "Legendary Edition — переиздание трилогии, отдельная строка; совпасть не с чем"
+   },
+   {"ids": ["S1238000"]},
+   {"ids": ["S1238020"]},
+   {"ids": ["G1454313816"]},
+   {"ids": ["G10"]},
+   {"ids": ["G1443629331"]}
+  ]
+ },
+ {
+  "query": "Dragon Age Origins",
+  "clusters": [
+   {
+    "ids": ["S47810", "G1949616134"],
+    "why": "одна игра, одно и то же Ultimate Edition, BioWare/EA"
+   }
+  ]
+ },
+ {
+  "query": "Star Wars Knights of the Old Republic",
+  "clusters": [
+   {
+    "ids": ["S32370", "G1207666283", "O3286"],
+    "why": "одна игра 2003 года; год Steam — дата переиздания"
+   },
+   {
+    "ids": ["S208580", "G1421404581", "O5128"],
+    "why": "одна игра — вторая часть, The Sith Lords; расхождение 2004/2005 у old-games — дата местного релиза"
+   }
+  ]
+ },
+ {
+  "query": "Jedi Knight Dark Forces II",
+  "clusters": [
+   {
+    "ids": ["S32380", "G1421405068", "O194"],
+    "why": "одна игра 1997 года, LucasArts; год Steam — дата переиздания"
+   }
+  ]
+ },
+ {
+  "query": "X-Wing",
+  "clusters": [
+   {"ids": ["S354430"]},
+   {"ids": ["S361670"], "why": "X-Wing Alliance — другая игра серии"},
+   {"ids": ["S361690"], "why": "X-Wing vs TIE Fighter — другая игра серии"},
+   {"ids": ["G1433527110"]},
+   {"ids": ["G1159880091"]},
+   {"ids": ["G1186556064"]},
+   {"ids": ["O14152"]},
+   {"ids": ["O3777"]},
+   {"ids": ["O10255"]}
+  ]
+ },
+ {
+  "query": "TIE Fighter",
+  "clusters": [
+   {
+    "ids": ["S355250", "G1207666273", "O95", "O2026"],
+    "why": "одна игра 1994 года и её издания: Special Edition в магазинах и Collector's CD-ROM у old-games; сомнение — Collector's CD-ROM заметно переработан (SVGA, озвучка), но это переиздание, а не переделка"
+   },
+   {
+    "ids": ["S361690", "O186"],
+    "why": "одна игра: Steam-продукт Balance of Power Campaigns — это X-Wing vs. TIE Fighter вместе с дополнением, единственный способ купить базовую игру; сомнение из-за имени дополнения в названии"
+   },
+   {"ids": ["G1390159891"]},
+   {"ids": ["G1895051901"]}
+  ]
+ },
+ {
+  "query": "Freespace",
+  "clusters": [
+   {
+    "ids": ["S273620", "G5", "O2045"],
+    "why": "одна игра — Freespace 2 (1999); год Steam — дата переиздания"
+   },
+   {
+    "ids": ["S273600", "G4", "O618"],
+    "why": "одна игра — Descent: FreeSpace – The Great War (1998); у GOG слаг freespace_expansion, но название и год — базовой игры"
+   },
+   {
+    "ids": ["O737"],
+    "why": "Silent Threat — дополнение к The Great War, не сама игра"
+   }
+  ]
+ },
+ {
+  "query": "Homeworld",
+  "clusters": [
+   {
+    "ids": ["S244160", "G2114871440"],
+    "why": "один продукт — Remastered Collection в двух магазинах"
+   },
+   {
+    "ids": ["O683"],
+    "why": "оригинальный Homeworld 1999 года; Remastered Collection — сборник из двух игр, а не издание первой"
+   },
+   {
+    "ids": ["G1766413869", "O950"],
+    "why": "одна игра: Homeworld: Cataclysm 2000 года переиздан на GOG под именем Emergence из-за торговой марки; совпадают год и жанр"
+   },
+   {"ids": ["S1840080"], "why": "Homeworld 3 — другая часть серии"},
+   {
+    "ids": ["S281610", "G2115713947"],
+    "why": "одна игра — Deserts of Kharak, 2016, Blackbird Interactive"
+   },
+   {"ids": ["O1162"], "why": "Gateway 2: Homeworld — совпало слово в названии, игра чужая"}
+  ]
+ },
+ {
+  "query": "Total Annihilation",
+  "clusters": [
+   {
+    "ids": ["S298030", "G1207658880", "O224"],
+    "why": "одна игра 1997 года; Commander Pack — издание базовой игры с дополнениями, как Gold"
+   },
+   {
+    "ids": ["G1207658912", "O670"],
+    "why": "одна игра — TA: Kingdoms 1999; Iron Plague в названии GOG — дополнение в составе издания"
+   },
+   {
+    "ids": ["O1352"],
+    "why": "Battle Tactics — дополнение к Total Annihilation, отдельная строка"
+   }
+  ]
+ },
+ {
+  "query": "Supreme Commander",
+  "clusters": [
+   {
+    "ids": ["S9350", "G1448050501"],
+    "why": "одна игра: Gold Edition — издание Supreme Commander"
+   },
+   {
+    "ids": ["S40100", "G1702120068"],
+    "why": "одна игра — Supreme Commander 2, 2010"
+   },
+   {
+    "ids": ["S9420"],
+    "why": "Forged Alliance — самостоятельное дополнение, оценивают отдельно"
+   }
+  ]
+ },
+ {
+  "query": "Company of Heroes",
+  "clusters": [
+   {"ids": ["S1677280"]},
+   {"ids": ["S231430"]},
+   {"ids": ["S228200"]},
+   {"ids": ["G1207660643"]},
+   {"ids": ["G2061764115"]},
+   {"ids": ["G1838869055"]}
+  ]
+ },
+ {
+  "query": "Frostpunk",
+  "clusters": [
+   {
+    "ids": ["S323190", "G1750252381", "G1648559910"],
+    "why": "одна игра 2018 года и её Game of the Year Edition"
+   },
+   {
+    "ids": ["S1601580", "G1728870436"],
+    "why": "одна игра — Frostpunk 2, 2024"
+   },
+   {
+    "ids": ["S3645160"],
+    "why": "Frostpunk: 1886 — отдельная игра (2027), переделка первой части"
+   }
+  ]
+ },
+ {
+  "query": "This War of Mine",
+  "clusters": [
+   {
+    "ids": ["S282070", "G1207666873", "G1689362899"],
+    "why": "одна игра 2014 года и её Complete Edition"
+   },
+   {"ids": ["S655730"]},
+   {"ids": ["S813290"], "why": "демо чужой игры"},
+   {
+    "ids": ["G1722846437"],
+    "why": "Stories - Season Pass — набор дополнений, не сама игра"
+   }
+  ]
+ }
+]
