@@ -24,6 +24,13 @@ CATALOG = "https://catalog.gog.com/v1/catalog"
 # единственная у GOG умеет сказать «такого продукта нет».
 PRODUCT = "https://api.gog.com/products/{source_id}"
 
+# Дополнения и саундтреки отсеивает сам запрос: замерено, что по «Baldur's Gate»
+# четырнадцать строк превращаются в шесть, по «baldurs gate 3» тринадцать в пять.
+# Именно `game,pack`, а не `game` — добрую половину классики GOG продаёт
+# комплектом, и `in:game` выбросил бы «Fallout 2», «Ведьмака 3», «Tyranny» и
+# «Wasteland 2» вместе с DLC.
+PRODUCT_TYPES = "in:game,pack"
+
 
 class GogClient:
     """Поиск GOG никогда не отвечает «не найдено»: на бессмыслицу приезжает
@@ -50,27 +57,35 @@ class GogClient:
         который соберёт не он сам, а поймавший его исключение сервис."""
         return self._http.name
 
-    async def _payload(self, query: str) -> dict | Refusal:
+    async def _payload(self, query: str,
+                       product_types: str | None = None) -> dict | Refusal:
         """Тело ответа каталога. Разбирают его двое и по-разному: поиску нужны
-        кандидаты, привязке — номер по слагу."""
+        кандидаты, привязке — номер по слагу.
+
+        Отсев рода товара спрашивает только поиск. У `card` и `resolve_slug`
+        спрашивают не «что похоже», а «есть ли ровно это», и суженный вопрос
+        превратил бы ссылку на дополнение в честное «такого нет» — то есть в
+        ложный отрицательный факт."""
+        narrow = {"productType": product_types} if product_types else {}
         response = await asked(
             self._http, CATALOG,
-            {"query": f"like:{query}", "locale": "ru-RU"},
+            {"query": f"like:{query}", "locale": "ru-RU", **narrow},
         )
         if isinstance(response, Refusal):
             return response
         return parsed(logger, "gog", "тело каталога не разобралось",
                       response.json)
 
-    async def _catalog(self, query: str) -> list | Refusal:
-        payload = await self._payload(query)
+    async def _catalog(self, query: str,
+                       product_types: str | None = None) -> list | Refusal:
+        payload = await self._payload(query, product_types)
         if isinstance(payload, Refusal):
             return payload
         return parsed(logger, "gog", "каталог не разобрался",
                       lambda: parse_catalog(payload))
 
     async def search(self, query: str, kind: Kind) -> Outcome:
-        cards = await self._catalog(query)
+        cards = await self._catalog(query, PRODUCT_TYPES)
         if isinstance(cards, Refusal):
             return cards
         return Found([to_hit(card) for card in cards])

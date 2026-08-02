@@ -396,3 +396,49 @@ async def test_unexpected_shape_does_not_crash_the_parser():
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.BROKEN
+
+
+async def test_the_catalog_is_asked_only_for_games_and_packs(fixture, gog_catalog):
+    """Отсев дополнений делает сам запрос: у каталога есть `productType`.
+
+    Наблюдается по выдаче, а не по объявлению константы, и выдача эта не
+    подменяется готовой: иначе `in:game` вместо `in:game,pack` дал бы ту же
+    выдачу, и потеря комплектов — «Fallout 2», «Ведьмак 3», — ради которых
+    выбран второй, не наблюдалась бы ничем."""
+    # Эмуляция сверяется с тем, что живой каталог ответил на самом деле, иначе
+    # она проверяла бы наше представление о параметре, а не сам параметр.
+    recorded = {one["title"]
+                for one in fixture("gog/catalog_filtered.json")["products"]}
+    client = GogClient(
+        SourceHttp("gog", transport=httpx.MockTransport(gog_catalog)))
+
+    result = await client.search("Baldur's Gate", Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    titles = {hit.title for hit in result.value}
+    assert titles == recorded
+    # Комплекты остаются: `Toolkit` у GOG — это `pack`.
+    assert "Baldur's Gate 3 Toolkit" in titles
+    assert not [one for one in titles if "Soundtrack" in one]
+
+
+async def test_an_add_on_card_is_still_reachable_by_its_number(gog_catalog):
+    """Отсев спрашивает только поиск. Путь вставленной ссылки двухшаговый —
+    слаг в номер, номер в карточку, — и суженный вопрос на втором шаге отвечал
+    бы «каталог не вернул этот номер», то есть отказом на существующий продукт.
+
+    Сторож на `resolve_slug` этого не покрывает: он проверяет первый шаг."""
+    def handler(request: httpx.Request) -> httpx.Response:
+        if "api.gog.com/products" in str(request.url):
+            return httpx.Response(
+                200, json={"title": "Baldur's Gate: Siege of Dragonspear"})
+        return gog_catalog(request)
+
+    client = GogClient(SourceHttp("gog", transport=httpx.MockTransport(handler)))
+
+    result = await client.card("1459335293", Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value.item.source_id == "1459335293"

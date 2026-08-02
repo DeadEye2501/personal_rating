@@ -29,6 +29,13 @@ ANDOR_TMDB = 83867
 INTERSTELLAR_IMDB = "tt0816692"
 WITCHER_APPID = 292030
 
+# Четыре игры, у которых разошёлся и род товара, и форма имени обложки: игра с
+# хешем в имени файла, инструмент с голым именем, игра с `portrait.png` и без
+# `library_capsule_2x` вовсе, и playtest. На одном appid отсева не наблюдается.
+REDKIT_APPID = 2684660
+ARCANUM_APPID = 500810
+PLAYTEST_APPID = 4926960
+
 # Режиссёр и актёр: у первого работы лежат в crew, у второго в cast, и разбор
 # обязан видеть оба списка.
 NOLAN_TMDB = 525
@@ -110,27 +117,49 @@ async def record_steam(client: httpx.AsyncClient) -> None:
         params={"appids": 999999999, "l": "russian"}))
     save("steam", "appdetails_broken", await client.get(
         "https://store.steampowered.com/api/appdetails", params={"l": "russian"}))
-    # Теги живут отдельно: в appdetails их нет вовсе. `country_code` только US —
-    # с RU ответ приходит пустым, с `visible: false`.
+
+
+async def record_steam_items(client: httpx.AsyncClient) -> None:
+    """Ответы `GetItems`: в `appdetails` нет ни тегов, ни рода товара, ни
+    настоящего имени файла обложки. `country_code` только US — с RU ответ
+    приходит пустым, с `visible: false`."""
+    print("Steam, GetItems")
     tags = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 
-    def ask(ids: list[dict]) -> str:
+    def ask(appids: list[int], wanted: dict) -> str:
         return json.dumps({
-            "ids": ids,
+            "ids": [{"appid": one} for one in appids],
             "context": {"language": "russian", "country_code": "US",
                         "steam_realm": 1},
-            "data_request": {"include_tag_count": 20},
+            "data_request": wanted,
         })
 
+    of_tags = {"include_tag_count": 20}
     save("steam", "store_items", await client.get(
-        tags, params={"input_json": ask([{"appid": WITCHER_APPID}])}))
+        tags, params={"input_json": ask([WITCHER_APPID], of_tags)}))
     save("steam", "store_items_missing", await client.get(
-        tags, params={"input_json": ask([{"appid": 999999999}])}))
+        tags, params={"input_json": ask([999999999], of_tags)}))
     save("steam", "store_items_empty", await client.get(
-        tags, params={"input_json": ask([])}))
+        tags, params={"input_json": ask([], of_tags)}))
     # Единственный ответ за весь прогон, который не JSON: страница ошибки.
     save("steam", "store_items_broken", await client.get(
         tags, params={"input_json": "{не json"}))
+    # Тот же запрос на весь список найденных appid: им выдача поиска узнаёт род
+    # товара и настоящий адрес вертикальной обложки. Тегов он не просит — они
+    # нужны карточке, а не выдаче.
+    save("steam", "store_items_many", await client.get(
+        tags, params={"input_json": ask(
+            [WITCHER_APPID, REDKIT_APPID, ARCANUM_APPID, PLAYTEST_APPID],
+            {"include_assets": True},
+        )}))
+    # А это то, что просит карточка: теги и картинки одним ответом. Записано
+    # отдельно, потому что на пару Steam мог бы ответить иначе, чем на каждое
+    # порознь, и проверять карточку на половинчатых ответах значило бы не
+    # проверять её вовсе.
+    save("steam", "store_items_card", await client.get(
+        tags, params={"input_json": ask(
+            [WITCHER_APPID], {"include_assets": True, "include_tag_count": 20},
+        )}))
 
 
 async def record_gog(client: httpx.AsyncClient) -> None:
@@ -138,6 +167,12 @@ async def record_gog(client: httpx.AsyncClient) -> None:
     save("gog", "catalog", await client.get(
         "https://catalog.gog.com/v1/catalog",
         params={"query": "like:Baldur's Gate", "locale": "ru-RU"}))
+    # Тот же запрос с отсевом дополнений. Пара с `catalog` выше нужна целиком:
+    # порознь не видно, что именно ушло.
+    save("gog", "catalog_filtered", await client.get(
+        "https://catalog.gog.com/v1/catalog",
+        params={"query": "like:Baldur's Gate", "locale": "ru-RU",
+                "productType": "in:game,pack"}))
     # Заведомая бессмыслица: приедет 200 и десятка два несвязанных игр.
     save("gog", "catalog_nonsense", await client.get(
         "https://catalog.gog.com/v1/catalog",
@@ -208,6 +243,7 @@ async def main() -> None:
     async with httpx.AsyncClient(headers=HEADERS, timeout=30,
                                  follow_redirects=True) as client:
         await record_steam(client)
+        await record_steam_items(client)
         await record_gog(client)
 
         pairs = (

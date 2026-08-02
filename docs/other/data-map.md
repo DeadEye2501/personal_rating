@@ -356,6 +356,7 @@
 - `logger` = `logging.getLogger(__name__)`
 - `CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `PRODUCT` = `'https://api.gog.com/products/{source_id}'`
+- `PRODUCT_TYPES` = `'in:game,pack'`
 
 ### `backend/sources/http.py`
 
@@ -426,13 +427,16 @@
 - `logger` = `logging.getLogger(__name__)`
 - `SEARCH` = `'https://steamcommunity.com/actions/SearchApps'`
 - `DETAILS` = `'https://store.steampowered.com/api/appdetails'`
-- `TAGS` = `'https://api.steampowered.com/IStoreBrowseServic…`
-- `TAGS_CONTEXT` = `словарь из 3`
-- `TAGS_WANTED` = `словарь из 1`
+- `ITEMS` = `'https://api.steampowered.com/IStoreBrowseServic…`
+- `ITEMS_CONTEXT` = `словарь из 3`
+- `SIFT_WANTED` = `словарь из 1`
+- `CARD_WANTED` = `SIFT_WANTED | {'include_tag_count': 20}`
 
 ### `backend/sources/steam/parse.py`
 
 - `ASSETS` = `'https://shared.akamai.steamstatic.com/store_ite…`
+- `TYPE_GAME` = `0`
+- `ANSWERED` = `1`
 - `YEAR` = `re.compile('(?:19|20)\\d{2}')`
 
 ### `backend/sources/tmdb/client.py`
@@ -595,6 +599,9 @@
 - `ANDOR_TMDB` = `83867`
 - `INTERSTELLAR_IMDB` = `'tt0816692'`
 - `WITCHER_APPID` = `292030`
+- `REDKIT_APPID` = `2684660`
+- `ARCANUM_APPID` = `500810`
+- `PLAYTEST_APPID` = `4926960`
 - `NOLAN_TMDB` = `525`
 - `MURPHY_TMDB` = `2037`
 
@@ -620,6 +627,10 @@
 
 - `SILENT` = `responding(json={})`
 - `CATALOG_OWNERS` = `набор из 3`
+
+### `tests/backend/sources/test_steam_items.py`
+
+- `FOUND` = `набор из 4`
 
 ### `tests/backend/test_config.py`
 

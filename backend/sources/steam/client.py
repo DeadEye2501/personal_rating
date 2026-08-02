@@ -7,23 +7,41 @@ from urllib.parse import quote
 
 import httpx
 
-from backend.model import Found, GenreSource, Kind, Missing, Outcome, Reason, Refusal
-from backend.sources.errors import BROKEN_BY_PARSING, broken, parsed
+from backend.model import (
+    Found,
+    GenreSource,
+    Kind,
+    Missing,
+    Outcome,
+    Reason,
+    Refusal,
+    SearchHit,
+)
+from backend.sources.errors import BROKEN_BY_PARSING, broken, parsed, parsed_or
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import asked
-from backend.sources.steam.parse import parse_card, parse_search, parse_tags
+from backend.sources.steam.parse import (
+    cover_of,
+    parse_card,
+    parse_search,
+    parse_tags,
+    sifted,
+)
 
 logger = logging.getLogger(__name__)
 
 SEARCH = "https://steamcommunity.com/actions/SearchApps"
 DETAILS = "https://store.steampowered.com/api/appdetails"
-# Теги живут отдельно от карточки: в `appdetails` их нет вовсе.
-TAGS = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
+# Ни тегов, ни рода товара, ни настоящего имени файла обложки в `appdetails`
+# нет — всё это живёт здесь.
+ITEMS = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 
-# `country_code: RU` отдаёт пустой ответ — `visible: false`,
-# `unvailable_for_country_restriction: true`, проверено живьём. Нужен `US`.
-TAGS_CONTEXT = {"language": "russian", "country_code": "US", "steam_realm": 1}
-TAGS_WANTED = {"include_tag_count": 20}
+# `country_code: RU` отдаёт `success: 15`, `visible: false` и ответ без рода
+# товара — на живую игру, а не на несуществующую. Проверено 03.08.2026. Нужен US.
+ITEMS_CONTEXT = {"language": "russian", "country_code": "US", "steam_realm": 1}
+# Выдаче нужен род товара и адрес обложки; карточке — то же и теги.
+SIFT_WANTED = {"include_assets": True}
+CARD_WANTED = SIFT_WANTED | {"include_tag_count": 20}
 
 
 class SteamClient:
@@ -47,8 +65,26 @@ class SteamClient:
         answer = await asked(self._http, f"{SEARCH}/{quote(query, safe='')}")
         if not isinstance(answer, httpx.Response):
             return answer
-        return parsed(logger, "steam", "выдача поиска не разобралась",
-                      lambda: Found(parse_search(answer.json())))
+        hits = parsed(logger, "steam", "выдача поиска не разобралась",
+                      lambda: parse_search(answer.json()))
+        if isinstance(hits, Refusal):
+            return hits
+        return Found(await self._narrowed(hits))
+
+    async def _narrowed(self, hits: list[SearchHit]) -> list[SearchHit]:
+        """Дополнения, инструменты и playtest-ы убираются до показа, а не после:
+        показанная строка заводится в базу сама, и мелькнувшая успела бы. Тем же
+        ответом приезжает настоящий адрес вертикальной обложки.
+
+        Не ответили — отдаём выдачу как есть: потерять настоящую игру хуже, чем
+        показать лишнее дополнение."""
+        if not hits:
+            return hits
+        payload = await self._items([hit.source_id for hit in hits], SIFT_WANTED)
+        if payload is None:
+            return hits
+        return parsed_or(logger, "steam", "род товара не разобрался",
+                         lambda: sifted(hits, payload), hits)
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         # Отсутствия Steam кодом не выражает: битый или отсутствующий appids
@@ -80,41 +116,59 @@ class SteamClient:
             logger.warning("steam: карточка %s не разобралась — %s", source_id, error)
             return broken("steam", error)
 
-        # Теги добираются вне общего `try`: карточка уже собрана и годится, и
-        # уронить её из-за них было бы обменом целого на украшение.
-        return Found(
-            replace(
-                card, genre_ext_ids=card.genre_ext_ids + await self._tags(source_id)
-            )
-        )
+        # Уточнения добираются вне общего `try`: карточка уже собрана и годится,
+        # и уронить её из-за них было бы обменом целого на украшение.
+        tags, cover = await self._beyond_details(source_id)
+        item = replace(card.item, poster_url=cover) if cover else card.item
+        return Found(replace(card, item=item,
+                             genre_ext_ids=card.genre_ext_ids + tags))
 
-    async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]:
-        """Теги отдельным запросом: в `appdetails` их нет вовсе.
+    async def _items(self, appids: list[str], wanted: dict) -> dict | None:
+        """Ответ `GetItems` на список appid. Ручкой пользуются двое — карточка и
+        выдача, — и различаются они только тем, что просят и что читают.
 
-        Отказ здесь карточку не роняет — жанров у Steam всего двенадцать на
-        весь магазин, так что без тегов карточка беднее, а не сломана."""
-        try:
-            wanted = {
-                "ids": [{"appid": int(source_id)}],
-                "context": TAGS_CONTEXT,
-                "data_request": TAGS_WANTED,
-            }
-            response = await self._http.get(
-                TAGS, params={"input_json": json.dumps(wanted)}
-            )
-            if not isinstance(response, httpx.Response):
-                return ()
-            if response.status_code != 200:
-                logger.warning(
-                    "steam: теги %s не приехали, код %s",
-                    source_id,
-                    response.status_code,
-                )
-                return ()
-            return parse_tags(response.json(), source_id)
-        except BROKEN_BY_PARSING as error:
-            logger.warning("steam: теги %s не разобрались — %s", source_id, error)
-            return ()
+        Отказ здесь ничего не роняет, поэтому наружу идёт `None`, а не
+        `Refusal`: обоим потребителям есть чем обойтись.
+
+        Идёт мимо `asked()` намеренно: неописанный код ответа не должен глушить
+        Steam на пять минут из-за уточнения к уже собранному. Сетевой сбой при
+        этом предохранитель взводит, как везде, — его ставит сам `SourceHttp`, и
+        пустая сеть остаётся бедой всех следующих запросов, а не одного."""
+        # Нечисловой appid не спрашивается вовсе: `int()` вокруг сборки запроса
+        # потребовал бы своего `except`, а результат тот же — Steam про такую
+        # строку не ответит, и она останется в выдаче как неспрошенная.
+        request = json.dumps({
+            "ids": [{"appid": int(one)} for one in appids if one.isdigit()],
+            "context": ITEMS_CONTEXT,
+            "data_request": wanted,
+        })
+        response = await self._http.get(ITEMS, params={"input_json": request})
+        if not isinstance(response, httpx.Response):
+            return None
+        if response.status_code != 200:
+            logger.warning("steam: GetItems про %s не приехал, код %s",
+                           appids, response.status_code)
+            return None
+        return parsed_or(logger, "steam", f"ответ GetItems про {appids} не разобрался",
+                         response.json, None)
+
+    async def _beyond_details(
+        self, source_id: str
+    ) -> tuple[tuple[tuple[GenreSource, str], ...], str]:
+        """Теги и настоящий адрес обложки: ни того, ни другого в `appdetails`
+        нет, а живут они в одном ответе — значит и запрос один.
+
+        Отказ карточку не роняет. Без тегов она беднее: своих жанров у Steam
+        двенадцать на весь магазин. Без адреса — остаётся угаданный, и он верен
+        в 62% случаев."""
+        payload = await self._items([source_id], CARD_WANTED)
+        if payload is None:
+            return (), ""
+        tags = parsed_or(logger, "steam", f"теги {source_id} не разобрались",
+                         lambda: parse_tags(payload, source_id), ())
+        cover = parsed_or(logger, "steam", f"обложка {source_id} не разобралась",
+                          lambda: cover_of(payload, source_id), "")
+        return tags, cover
 
     async def aclose(self) -> None:
         await self._http.aclose()

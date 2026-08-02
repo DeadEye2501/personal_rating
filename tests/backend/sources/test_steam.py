@@ -219,7 +219,9 @@ async def test_search_uses_the_community_endpoint(fixture):
     seen = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen["url"] = str(request.url)
+        # Первый, а не последний: за поиском идёт второй запрос — про род
+        # товара, — и он в этих двух проверках не участвует.
+        seen.setdefault("url", str(request.url))
         return httpx.Response(200, json=fixture("steam/search.json"))
 
     client = SteamClient(SourceHttp("steam", transport=httpx.MockTransport(handler)))
@@ -238,7 +240,7 @@ async def test_a_query_with_url_punctuation_survives(fixture):
     seen = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen["url"] = str(request.url)
+        seen.setdefault("url", str(request.url))
         return httpx.Response(200, json=fixture("steam/search.json"))
 
     client = SteamClient(SourceHttp("steam", transport=httpx.MockTransport(handler)))

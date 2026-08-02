@@ -75,3 +75,17 @@ def parsed[T](log: Logger, source: str, note: str,
     except BROKEN_BY_PARSING as error:
         log.warning("%s: %s — %s", source, note, error)
         return broken(source, error)
+
+
+def parsed_or[T](log: Logger, source: str, note: str,
+                 produce: Callable[[], T], fallback: T) -> T:
+    """То же, но для тех, кто без разобранного ответа обходится: сорвалось —
+    записываем и отдаём запасное вместо отказа.
+
+    Заведено на трёх копиях в клиенте Steam: там ручка `GetItems` уточняет уже
+    собранное — теги, род товара, адрес обложки, — и отказ её ничего не роняет.
+
+    Годится только тому, кто сам `Refusal` не возвращает: свой отказ здесь
+    неотличим от сорвавшегося разбора."""
+    answer = parsed(log, source, note, produce)
+    return fallback if isinstance(answer, Refusal) else answer

@@ -441,7 +441,7 @@
 - `def from_search(source: Source, value: float | None, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
 
-### `backend/sources/errors.py` — 77 строк
+### `backend/sources/errors.py` — 91 строк
 
 Как источник отвечает, когда верить ответу нельзя.
 
@@ -452,17 +452,18 @@
 - `def refuse_code(source: str, status: int) -> Refusal` (5)
 - `def is_json(response: httpx.Response) -> bool` (12)
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
+- `def parsed_or(log: Logger, source: str, note: str, produce: Callable[[], T], fallback: T) -> T` (12)
 
-### `backend/sources/gog/client.py` — 156 строк
+### `backend/sources/gog/client.py` — 171 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (129)
+- `class GogClient` (137)
   - `def name(self) -> str` (4)
-  - `async def _payload(self, query: str) -> dict | Refusal` (11)
-  - `async def _catalog(self, query: str) -> list | Refusal` (6)
+  - `async def _payload(self, query: str, product_types: str | None=None) -> dict | Refusal` (18)
+  - `async def _catalog(self, query: str, product_types: str | None=None) -> list | Refusal` (7)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
   - `async def _title(self, source_id: str) -> str | Outcome` (20)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (21)
@@ -613,31 +614,38 @@
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `async def aclose(self) -> None` (3)
 
-### `backend/sources/steam/client.py` — 120 строк
+### `backend/sources/steam/client.py` — 174 строк
 
 Разговор со Steam по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`, `backend.sources.undocumented`
 
-- `class SteamClient` (92)
+- `class SteamClient` (128)
   - `def name(self) -> str` (4)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (10)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (37)
-  - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (13)
+  - `async def _narrowed(self, hits: list[SearchHit]) -> list[SearchHit]` (14)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (36)
+  - `async def _items(self, appids: list[str], wanted: dict) -> dict | None` (28)
+  - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str]` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 120 строк
+### `backend/sources/steam/parse.py` — 199 строк
 
 Перевод ответов Steam в наши типы.
 
 Зависит от: `backend.model`, `backend.sources.convert`
 
-- `def poster_url(appid: str) -> str` (4)
+- `def poster_url(appid: str) -> str` (7)
 - `def parse_search(payload: list[dict]) -> list[SearchHit]` (11)
+- `def _store_items(payload: dict) -> list[dict]` (10)
+- `def _poster(row: dict, appid: str) -> str` (16)
+- `def _answered(payload: dict) -> dict[str, dict]` (10)
+- `def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]` (17)
+- `def cover_of(payload: dict, appid: str) -> str` (8)
 - `def _year(value: str | None) -> int | None` (7)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def parse_card(data: dict) -> SourceCard` (25)
-- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (36)
+- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (32)
 
 ### `backend/sources/tmdb/client.py` — 158 строк
 
@@ -1224,7 +1232,7 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
-### `scripts/record_fixtures.py` — 228 строк
+### `scripts/record_fixtures.py` — 264 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -1232,15 +1240,16 @@
 
 - `def save(source: str, case: str, response: httpx.Response) -> None` (23)
 - `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (34)
-- `async def record_steam(client: httpx.AsyncClient) -> None` (35)
-  - `def ask(ids: list[dict]) -> str` (7)
-- `async def record_gog(client: httpx.AsyncClient) -> None` (18)
+- `async def record_steam(client: httpx.AsyncClient) -> None` (14)
+- `async def record_steam_items(client: httpx.AsyncClient) -> None` (41)
+  - `def ask(appids: list[int], wanted: dict) -> str` (7)
+- `async def record_gog(client: httpx.AsyncClient) -> None` (24)
 - `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
 - `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (19)
-- `async def main() -> None` (20)
+- `async def main() -> None` (21)
 
-## tests — 89 модулей
+## tests — 90 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1273,7 +1282,7 @@
 - `def found(*pairs) -> Found` (4)
 - `async def stored_ratings(sessions, item_id) -> dict` (3)
 
-### `tests/backend/sources/conftest.py` — 58 строк
+### `tests/backend/sources/conftest.py` — 82 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
@@ -1282,6 +1291,8 @@
 - `def _meta(relative: str) -> dict` (3)
 - `def fixture()` (3)
 - `def meta()` (2)
+- `def gog_catalog()` (21)
+  - `def handler(request: httpx.Request) -> httpx.Response` (6)
 - `def replay()` (33)
   - `def build(*relatives: str) -> httpx.MockTransport` (21)
     - `def handler(request: httpx.Request) -> httpx.Response` (7)
@@ -1295,23 +1306,23 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 398 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 444 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 28
+Тестов: 30
 
 - `def answering(body) -> SourceHttp` (3)
 
-### `tests/backend/sources/test_gog_slug.py` — 147 строк
+### `tests/backend/sources/test_gog_slug.py` — 161 строк
 
 Слаг из адреса GOG в номер каталога.
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`
 
-Тестов: 14
+Тестов: 15
 
 - `def client(handler) -> GogClient` (2)
 
@@ -1390,7 +1401,7 @@ OMDB: единственный источник, у которого отказ 
 - `async def registry()` (9)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 263 строк
+### `tests/backend/sources/test_steam.py` — 265 строк
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
@@ -1399,6 +1410,19 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 20
 
 - `def block_of(payload: dict) -> dict` (2)
+
+### `tests/backend/sources/test_steam_items.py` — 308 строк ⚠ подошёл к 300
+
+Ответ `GetItems`: род товара в выдаче и настоящий адрес обложки.
+
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
+
+Тестов: 15
+
+- `def two_answers(first: list | dict, items, opens: str='SearchApps')` (13)
+  - `def handler(request: httpx.Request) -> httpx.Response` (5)
+- `async def searched(transport: httpx.MockTransport, query: str='arcanum')` (5)
+- `def assets_of(payload: dict, appid: str) -> dict` (4)
 
 ### `tests/backend/sources/test_steam_tags.py` — 206 строк
 

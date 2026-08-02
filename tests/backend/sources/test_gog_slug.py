@@ -145,3 +145,17 @@ async def test_a_dead_network_is_a_refusal():
 
     assert isinstance(result, Refusal)
     assert result.reason is Reason.NETWORK
+
+
+async def test_a_pasted_add_on_link_still_resolves(gog_catalog):
+    """Отсев дополнений спрашивает только поиск. Здесь спрашивают не «что
+    похоже», а «есть ли ровно такой слаг», и суженный вопрос превратил бы
+    вставленную ссылку на дополнение в честное «такого нет» — то есть записал бы
+    ложный отрицательный факт про существующий продукт."""
+    gog = client(gog_catalog)
+
+    result = await gog.resolve_slug("baldurs_gate_siege_of_dragonspear")
+    await gog.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value == "1459335293"

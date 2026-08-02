@@ -1,6 +1,7 @@
 """Перевод ответов Steam в наши типы."""
 
 import re
+from dataclasses import replace
 from datetime import datetime
 
 from backend.model import (
@@ -15,15 +16,26 @@ from backend.model import (
 )
 from backend.sources.convert import companies, genres, rating
 
-ASSETS = "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps"
+ASSETS = "https://shared.akamai.steamstatic.com/store_item_assets/"
+
+# Род товара числом: `0` игра, `4` дополнение, `6` инструмент, `12` playtest.
+# `appdetails` его не различает вовсе — у REDkit там `type: 'game'`, то есть по
+# карточке инструмент от игры не отличить.
+TYPE_GAME = 0
+
+# Ответ про товар, а не отговорка. Число, а не флаг: `15` истинно.
+ANSWERED = 1
 
 YEAR = re.compile(r"(?:19|20)\d{2}")
 
 
 def poster_url(appid: str) -> str:
-    """Вертикальной обложки в ответе API нет, но она лежит по предсказуемому
-    адресу. Вариант без `_2x` отдаёт 300×450, вдвое меньше своего имени."""
-    return f"{ASSETS}/{appid}/library_600x900_2x.jpg"
+    """Запасной адрес вертикальной обложки: настоящее имя файла приезжает в
+    `assets`, а без него остаётся угаданное. Оно верно в 62% случаев — лучше,
+    чем обложки нет вовсе.
+
+    Вариант без `_2x` отдаёт 300×450, вдвое меньше своего имени."""
+    return f"{ASSETS}steam/apps/{appid}/library_600x900_2x.jpg"
 
 
 def parse_search(payload: list[dict]) -> list[SearchHit]:
@@ -37,6 +49,77 @@ def parse_search(payload: list[dict]) -> list[SearchHit]:
         )
         for row in payload
     ]
+
+
+def _store_items(payload: dict) -> list[dict]:
+    """Строки ответа `GetItems`.
+
+    Без `store_items` Steam отвечает на пустой `ids` — это наш промах, а не
+    «ничего не нашлось», и молча принять его за пустоту нельзя ни одному из двух
+    потребителей: у карточки так пропали бы теги, у выдачи — отсев."""
+    items = (payload.get("response") or {}).get("store_items")
+    if not items:
+        raise ValueError("ответ без store_items")
+    return items
+
+
+def _poster(row: dict, appid: str) -> str:
+    """Настоящее имя файла обложки лежит в `assets`, и одним шаблоном его формы
+    не покрываются: голое `library_600x900_2x.jpg`, `portrait.png`,
+    `<хеш>/library_capsule_2x.jpg` и локализованное
+    `<хеш>/library_600x900_russian_2x.jpg`. Замерено, что угаданный адрес не
+    отвечает у 38% строк.
+
+    `library_capsule_2x` есть не у всех: у «Arcanum» только одинарный
+    `portrait.png`. Двойной предпочитается ему, а не наоборот, — одинарный
+    вдвое меньше."""
+    assets = row.get("assets") or {}
+    name = assets.get("library_capsule_2x") or assets.get("library_capsule")
+    template = assets.get("asset_url_format")
+    if not name or not template:
+        return poster_url(appid)
+    return ASSETS + template.replace("${FILENAME}", name)
+
+
+def _answered(payload: dict) -> dict[str, dict]:
+    """Строки ответа по appid, о котором они, — и только те, что о товаре.
+
+    Отговорку от ответа отличает `success`, а не наличие полей. Замерено
+    03.08.2026: на живой «Ведьмак 3» при `country_code: RU` приезжает
+    `success: 15`, `visible: false` и **`type` отсутствует вовсе**. Считать это
+    «род не игра» значит выбросить из выдачи настоящую игру — а при неверном
+    контексте сразу все, потому что так Steam отвечает про каждую."""
+    return {str(row["appid"]): row for row in _store_items(payload)
+            if row.get("success") == ANSWERED}
+
+
+def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]:
+    """Выдача, из которой убрано всё, что магазин назвал не игрой, и с
+    настоящим адресом обложки. И то, и другое — из одного ответа `GetItems`.
+
+    Строка, про которую Steam не ответил, остаётся. Убирается только то, про что
+    он ответил прямо, — отсюда и `TYPE_GAME` умолчанием: ответ без рода товара
+    это молчание о роде, а не «род не игра», и обойтись с ним надо так же.
+    Потерять настоящую игру хуже, чем показать лишнее дополнение."""
+    known = _answered(payload)
+    kept = []
+    for hit in hits:
+        row = known.get(hit.source_id)
+        if row is None:
+            kept.append(hit)
+        elif row.get("type", TYPE_GAME) == TYPE_GAME:
+            kept.append(replace(hit, poster_url=_poster(row, hit.source_id)))
+    return kept
+
+
+def cover_of(payload: dict, appid: str) -> str:
+    """Настоящий адрес обложки одной игры — для карточки, а не для выдачи.
+
+    Пустая строка значит «Steam про неё не ответил»: подставлять сюда угаданный
+    адрес нельзя, он у карточки уже стоит, и разобрать, откуда он взялся, было
+    бы негде."""
+    row = _answered(payload).get(appid)
+    return _poster(row, appid) if row else ""
 
 
 def _year(value: str | None) -> int | None:
@@ -100,11 +183,7 @@ def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]
 
     `success` тут число, а не флаг: `15` истинно, и проверка на истинность
     посчитала бы несуществующую игру найденной."""
-    items = (payload.get("response") or {}).get("store_items")
-    if not items:
-        raise ValueError(f"ответ без store_items на appid {appid}")
-
-    item = items[0]
+    item = _store_items(payload)[0]
     if item.get("success") != 1:
         raise ValueError(f"ответ на теги под success {item.get('success')}")
     # Запрос уходит списком, и ответ на список — тоже список: без сверки в жанры
