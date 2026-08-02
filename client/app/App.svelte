@@ -11,7 +11,7 @@
   import Scrollarea from '$components/Scrollarea.svelte'
   import Snack from '$components/Snack.svelte'
   import { call, numbered } from '$api/bridge.js'
-  import { chosen, isEmpty } from '$state/filters.js'
+  import { isEmpty } from '$state/filters.js'
   import { question } from '$state/removal.js'
   import { newSession, withClearedFilter, withFilters, withForgotten, withMark,
     withSection } from '$state/session.js'
@@ -83,11 +83,17 @@
   // возвращается, а его номер SQLite выдаст только новому тегу.
   let forgotten = $state([])
 
-  // То, от чего лента перечитывается. Собирается здесь, а не общим `requestOf`:
-  // у поиска и статистики нет ни порядка, ни страницы, и `requestOf` за них
-  // падает намеренно.
+  // То, после чего метки приедут из базы сами. Собирается здесь, а не общим
+  // `requestOf`: у поиска и статистики нет ни порядка, ни страницы, и
+  // `requestOf` за них падает намеренно.
+  //
+  // Фильтров тут нет, и это не упущение. На их смену перечитывается лента, а
+  // выдача поиска — нет: она отсеивается на месте, из того же списка. Считай
+  // фильтр сменой запроса — и щелчок по метке, которую человек только что
+  // поставил, гасил бы наложение: карточка возвращалась бы к прочитанным
+  // меткам, не проходила бы собственный фильтр и пропадала из выдачи.
   const asked = $derived(JSON.stringify(
-    [session.kind, session.section, session.sort, chosen(session.filters)]))
+    [session.kind, session.section, session.sort]))
 
   const marks = $derived(tagged.asked === asked ? tagged.cards : {})
 
