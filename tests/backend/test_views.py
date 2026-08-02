@@ -8,7 +8,6 @@ from backend.model import (
     ExternalId,
     ExternalRating,
     GenreKind,
-    GenreSource,
     IdSource,
     Kind,
     PersonRole,
@@ -26,7 +25,7 @@ from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT, an_item
+from tests.conftest import ACTION, DRAMA, MOMENT, an_item
 
 
 @pytest.fixture
@@ -60,9 +59,9 @@ async def test_genres_come_with_the_card(sessions, reference, item_id):
     одним жанром на карточке порядок по имени не наблюдался бы вовсе, а в карточке
     жанры стоят в ряд и перетасовываться между показами не должны."""
     genres = GenresRepository(sessions)
-    # 28 — «Боевик», 18 — «Драма»: записываем обратно алфавиту.
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18", "28"])
-    await genres.set_for_item(item_id, sorted(genre_ids, reverse=True))
+    # «Боевик» — это 1, «Драма» — 3: записываем обратно алфавиту, чтобы
+    # сортировка по номеру строки дала другой порядок и была видна.
+    await genres.set_for_item(item_id, sorted([DRAMA, ACTION], reverse=True))
 
     views = await ViewsRepository(sessions).views_for([item_id])
 
@@ -301,8 +300,8 @@ async def test_what_came_from_the_source_does_not_mix_between_cards(
     other_id = await LibraryRepository(sessions).create(an_item("27205", "Начало"))
 
     genres = GenresRepository(sessions)
-    await genres.set_for_item(item_id, await genres.resolve(GenreSource.TMDB, ["18"]))
-    await genres.set_for_item(other_id, await genres.resolve(GenreSource.TMDB, ["28"]))
+    await genres.set_for_item(item_id, [DRAMA])
+    await genres.set_for_item(other_id, [ACTION])
     cast, studios = people(sessions), companies(sessions)
     await cast.attach(item_id, await cast.create("Мэттью Макконахи"),
                       PersonRole.ACTOR, 0)

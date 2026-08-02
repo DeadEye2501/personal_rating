@@ -12,7 +12,7 @@ from backend.model.denied import (
     WrongTagKind,
 )
 from backend.model.external import ExternalId, ExternalRating
-from backend.model.genre import Genre
+from backend.model.genre import Genre, GenreRule
 from backend.model.item import (
     Item,
     SeriesCounts,
@@ -72,6 +72,7 @@ __all__ = [
     "Found",
     "Genre",
     "GenreKind",
+    "GenreRule",
     "GenreSource",
     "Histogram",
     "IdSource",

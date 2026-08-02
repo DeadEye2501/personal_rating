@@ -63,44 +63,45 @@ def test_the_year_is_read_from_a_dotted_date(fixture):
 
 def test_genres_come_as_slugs(fixture):
     """У GOG идентификатор жанра — слаг, а не число. Сопоставляем по нему:
-    в самом слаге у них опечатка, rougelike вместо roguelike."""
+    название GOG переводит, слаг нет."""
     cards = parse_catalog(fixture("gog/catalog.json"))
 
     marked = [pair for card in cards for pair in card.genre_ext_ids]
     assert marked, "жанры не разобраны"
     assert not any(slug.isdigit() for _space, slug in marked)
-    # Оба пространства, а не одно: теги GOG приезжают тем же ответом.
-    assert {space for space, _ in marked} == {GenreSource.GOG, GenreSource.GOG_TAG}
+    # Пространство одно: жанры и теги GOG слиты решением пользователя.
+    assert {space for space, _ in marked} == {GenreSource.GOG}
 
 
-def test_a_genre_and_a_tag_with_the_same_slug_stay_apart(fixture):
-    """`fantasy` у GOG — и жанр, и тег одновременно, и в справочнике это
-    разные строки: слитые в одно пространство, они дали бы один жанр вместо
-    двух разных соответствий."""
+def test_a_genre_and_a_tag_with_the_same_slug_merge(fixture):
+    """`fantasy` у GOG — и жанр, и тег одновременно, и в один список он входит
+    один раз: «смешиваем их в один список, попутно убирая дубликаты»."""
     card = parse_catalog(fixture("gog/catalog.json"))[0]
 
-    assert (GenreSource.GOG, "fantasy") in card.genre_ext_ids
-    assert (GenreSource.GOG_TAG, "fantasy") in card.genre_ext_ids
+    assert [slug for _space, slug in card.genre_ext_ids].count("fantasy") == 1
 
 
-def test_a_genre_is_not_labelled_as_a_tag():
-    """На `fantasy` перестановка пространств незаметна — он и жанр, и тег.
-    Проверять надо на метках, которые есть только с одной стороны: иначе
-    справочник переведёт жанр по теговой строке и молча выдаст другой."""
+def test_both_spellings_of_one_mark_become_the_same_slug():
+    """Одно и то же у GOG пишется по-разному в жанрах и в тегах: жанр
+    `role-playing` и тег `point-and-click` в справочнике зовутся `rpg` и
+    `pointandclick`. Без приведения сочетание `action` + `rpg` не сработало бы
+    там, где ролевая приехала жанром."""
     payload = {
         "products": [
             {
                 "id": 1,
                 "title": "Baldur's Gate 3",
-                "genres": [{"slug": "rpg"}],
-                "tags": [{"slug": "story-rich"}],
+                "genres": [{"slug": "role-playing"}, {"slug": "roguelike"}],
+                "tags": [{"slug": "point-and-click"}],
             }
         ]
     }
 
     marked = parse_catalog(payload)[0].genre_ext_ids
 
-    assert marked == ((GenreSource.GOG, "rpg"), (GenreSource.GOG_TAG, "story-rich"))
+    assert [slug for _space, slug in marked] == [
+        "rpg", "rougelike", "pointandclick"
+    ]
 
 
 def test_both_studio_roles_are_companies(fixture):

@@ -19,10 +19,9 @@ class SearchHit:
     year: int | None = None
     synopsis: str = ""
     poster_url: str = ""
-    # Пара «чьё пространство и идентификатор в нём»: у магазинов жанр и тег
-    # нумеруются порознь, и `9` у Steam — это жанр «Гонки» и тег «Стратегия»
-    # одновременно. Плоский список их не различит, а `GenresRepository.resolve`
-    # принимает `GenreSource` именно поэтому.
+    # Пара «чьё пространство и метка в нём»: справочник у каждого источника свой,
+    # и `19` у Steam — это Action, а у GOG такой метки нет вовсе. Плоский список
+    # пространства не несёт, и правила пришлось бы искать наугад.
     genre_ext_ids: tuple[tuple[GenreSource, str], ...] = field(default_factory=tuple)
     source_rating: float | None = None
 

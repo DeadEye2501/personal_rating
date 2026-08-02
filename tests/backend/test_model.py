@@ -156,7 +156,7 @@ SCHEMA = [
     (PersonRole, {"director", "actor", "showrunner"}),
     (CompanyRole, {"developer", "publisher"}),
     (GenreKind, {"film", "game"}),
-    (GenreSource, {"tmdb", "steam", "steam_tag", "gog", "gog_tag"}),
+    (GenreSource, {"tmdb", "steam", "gog", "old_games"}),
 ]
 
 

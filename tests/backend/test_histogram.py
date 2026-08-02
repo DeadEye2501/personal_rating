@@ -2,11 +2,11 @@
 
 import pytest
 
-from backend.model import Filters, GenreSource, Kind, Source
+from backend.model import Filters, Kind, Source
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT, rated
+from tests.conftest import DRAMA, MOMENT, rated
 
 
 async def columns(sections, kind: Kind = Kind.MOVIE, **filters) -> dict[int, int]:
@@ -96,7 +96,7 @@ async def test_the_histogram_obeys_the_same_filters_as_the_feed(
     genres = GenresRepository(sessions)
     drama_id = await rated(sessions, "1", 8.0)
     await rated(sessions, "2", 9.0)
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
+    genre_ids = [DRAMA]
     await genres.set_for_item(drama_id, genre_ids)
 
     buckets = await columns(sections, genre_ids=tuple(genre_ids))
@@ -204,7 +204,7 @@ async def test_the_footer_obeys_the_filters(sessions, reference, sections):
     genres = GenresRepository(sessions)
     drama_id = await rated(sessions, "1", 6.0)
     await rated(sessions, "2", 10.0)
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
+    genre_ids = [DRAMA]
     await genres.set_for_item(drama_id, genre_ids)
 
     histogram = await sections.histogram(Kind.MOVIE,

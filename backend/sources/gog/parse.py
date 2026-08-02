@@ -12,16 +12,38 @@ from backend.model import (
     SourceCard,
 )
 from backend.sources.convert import companies, genres, rating, year
+from backend.unique import unique
+
+
+# Одно и то же у GOG пишется по-разному в жанрах и в тегах, а метка в
+# справочнике одна. Приводится здесь, а не там: сочетание `action` + `rpg` иначе
+# не сработало бы на игре, у которой ролевая приехала жанром `role-playing`.
+#
+# Строк пять, а не восемь: у спеки в таблице написаний есть ещё `real-time`,
+# `sci-fi` и `turn-based`, но ни одного из этих слагов справочник не знает ни в
+# каком написании — приводить их не для кого.
+SPELLING = {
+    "point-and-click": "pointandclick",
+    "team-sport": "teamsport",
+    "virtual-life": "virtuallife",
+    # Опечатка самого GOG в жанре, проверено живьём.
+    "roguelike": "rougelike",
+    "role-playing": "rpg",
+}
 
 
 def _marks(row: dict) -> tuple[tuple[GenreSource, str], ...]:
-    """Жанры и теги приезжают одним ответом и разными пространствами: `fantasy`
-    у GOG — и жанр, и тег, а в справочнике это разные строки. Идентификатор —
-    слаг, и в нём у них живёт опечатка `rougelike`: сопоставляем по слагу, а не
-    по названию, потому что название переводится, а слаг нет."""
-    return genres(GenreSource.GOG, row.get("genres", []), key="slug") + genres(
-        GenreSource.GOG_TAG, row.get("tags", []), key="slug"
+    """Жанры и теги приезжают одним ответом и сливаются в одно пространство:
+    решение пользователя 02.08.2026 — «смешиваем их в один список, попутно
+    убирая дубликаты».
+
+    Сопоставляем по слагу, а не по названию: название GOG переводит, слаг нет."""
+    marked = genres(GenreSource.GOG, row.get("genres", []), key="slug") + genres(
+        GenreSource.GOG, row.get("tags", []), key="slug"
     )
+    return tuple(unique(
+        (space, SPELLING.get(slug, slug)) for space, slug in marked
+    ))
 
 
 def parse_catalog(payload: dict) -> list[SourceCard]:

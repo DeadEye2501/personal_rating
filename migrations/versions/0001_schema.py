@@ -1,11 +1,11 @@
-"""Схема целиком: четырнадцать таблиц каталога и моих данных.
+"""Схема целиком: пятнадцать таблиц каталога и моих данных.
 
 Revision ID: 0001
 Revises:
 Create Date: 2026-07-29
 
 Тело `upgrade` длиннее предела в сорок строк намеренно: это машинный вывод
-автогенерации, сверенный с объявлениями прогоном. Разнести четырнадцать таблиц
+автогенерации, сверенный с объявлениями прогоном. Разнести пятнадцать таблиц
 по функциям значило бы переписать сгенерированное руками — и получить файл,
 который уже не сверить с новым выводом автогенерации.
 """
@@ -94,12 +94,21 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['item_id'], ['item.id'], name=op.f('fk_external_rating_item_id'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('item_id', 'source', name=op.f('pk_external_rating'))
     )
-    op.create_table('genre_map',
+    op.create_table('genre_rule',
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('source', sa.Text(), nullable=False),
-    sa.Column('ext_id', sa.Text(), nullable=False),
     sa.Column('genre_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['genre_id'], ['genre.id'], name=op.f('fk_genre_map_genre_id'), ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('source', 'ext_id', 'genre_id', name=op.f('pk_genre_map'))
+    sa.Column('alone', sa.Boolean(), nullable=False),
+    sa.ForeignKeyConstraint(['genre_id'], ['genre.id'], name=op.f('fk_genre_rule_genre_id'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_genre_rule'))
+    )
+    op.create_index('ix_genre_rule_source', 'genre_rule', ['source'], unique=False)
+    op.create_table('genre_rule_mark',
+    sa.Column('rule_id', sa.Integer(), nullable=False),
+    sa.Column('ext_id', sa.Text(), nullable=False),
+    sa.Column('forbidden', sa.Boolean(), nullable=False),
+    sa.ForeignKeyConstraint(['rule_id'], ['genre_rule.id'], name=op.f('fk_genre_rule_mark_rule_id'), ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('rule_id', 'ext_id', name=op.f('pk_genre_rule_mark'))
     )
     op.create_table('item_genre',
     sa.Column('item_id', sa.Integer(), nullable=False),
@@ -162,7 +171,9 @@ def downgrade() -> None:
     op.drop_table('item_tag')
     op.drop_index('ix_item_genre_genre_id', table_name='item_genre')
     op.drop_table('item_genre')
-    op.drop_table('genre_map')
+    op.drop_table('genre_rule_mark')
+    op.drop_index('ix_genre_rule_source', table_name='genre_rule')
+    op.drop_table('genre_rule')
     op.drop_table('external_rating')
     op.drop_table('external_id')
     op.drop_index('ix_company_credit_company_id', table_name='company_credit')

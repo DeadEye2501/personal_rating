@@ -14,8 +14,8 @@ class SourceCard:
     что у `new_manual_item`."""
 
     item: Item
-    # Пары «пространство и идентификатор» — по той же причине, что у
-    # `SearchHit`: у Steam и GOG жанры и теги нумеруются порознь.
+    # Пары «пространство и метка» — по той же причине, что у `SearchHit`:
+    # справочник у каждого источника свой, и метка без него не разбирается.
     genre_ext_ids: tuple[tuple[GenreSource, str], ...] = field(default_factory=tuple)
     people: tuple[Credit, ...] = field(default_factory=tuple)
     # Люди приходят только от TMDB, студии — только от магазинов, и пусто у

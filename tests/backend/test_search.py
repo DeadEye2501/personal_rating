@@ -4,7 +4,6 @@
 Складывание своей выдачи с чужой — у `merge_results`, в своём модуле: оно живёт
 в модели и зовётся ещё и с той стороны границы, мостом."""
 
-import pytest
 
 from backend.model import (
     Found,
@@ -18,12 +17,8 @@ from backend.model import (
 )
 from backend.service.search import SEARCH_SIZE
 from tests.conftest import MOMENT, FakeSearch, hit
-from tests.wiring import search_service
 
 
-@pytest.fixture
-async def service(sessions):
-    return lambda *clients: search_service(sessions, *clients)
 
 
 async def test_the_external_answer_becomes_candidates(sessions, service):

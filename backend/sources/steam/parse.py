@@ -28,6 +28,25 @@ ANSWERED = 1
 
 YEAR = re.compile(r"(?:19|20)\d{2}")
 
+# Жанр магазина и его тег нумеруются порознь и сталкиваются числами: жанр `9` —
+# это «Гонки», а тег `9` — «Стратегия». В справочнике пространство одно, и жанр
+# приводится к номеру тега-двойника здесь: дальше происхождение метки неизвестно,
+# и общей таблицей написаний это уже не починить — она превратила бы тег `9` в
+# «Гонки» у каждой стратегии.
+#
+# Жанр без двойника отбрасывается: жанр несут ровно эти восемь из двенадцати,
+# остальные четыре — «Инди», «Казуальные», «Ранний доступ» и «Бесплатно».
+GENRE_TWIN = {
+    "1": "19",  # Action
+    "2": "9",  # Strategy
+    "3": "122",  # RPG
+    "9": "699",  # Racing
+    "18": "701",  # Sports
+    "25": "21",  # Adventure
+    "28": "599",  # Simulation
+    "29": "128",  # Massively Multiplayer
+}
+
 
 def poster_url(appid: str) -> str:
     """Запасной адрес вертикальной обложки: настоящее имя файла приезжает в
@@ -131,6 +150,14 @@ def _year(value: str | None) -> int | None:
     return int(found.group()) if found else None
 
 
+def _genres(data: dict) -> tuple[tuple[GenreSource, str], ...]:
+    """Жанры карточки — номерами тегов-двойников: пространство меток у Steam
+    одно на весь справочник."""
+    marked = genres(GenreSource.STEAM, data.get("genres", []))
+    return tuple((space, GENRE_TWIN[ext_id]) for space, ext_id in marked
+                 if ext_id in GENRE_TWIN)
+
+
 def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]:
     """Metascore принадлежит Metacritic, а не Steam: у Valve с ними лицензия."""
     return rating(
@@ -159,7 +186,7 @@ def parse_card(data: dict) -> SourceCard:
             poster_url=poster_url(appid),
             year=_year((data.get("release_date") or {}).get("date")),
         ),
-        genre_ext_ids=genres(GenreSource.STEAM, data.get("genres", [])),
+        genre_ext_ids=_genres(data),
         companies=companies(data),
         ratings=_metascore(data, now),
     )
@@ -176,10 +203,11 @@ def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]
     приехала, то есть игра заведомо есть.
 
     Карточку это не меняет — `_tags` ловит исключение и отдаёт пустой набор, как
-    и прежде, — меняется наблюдаемость. На тегах держатся 177 соответствий
-    справочника из 326, и обеднённая игра ложится в базу навсегда: перезапроса
-    у игр не бывает вовсе, только удалить и завести заново. Без записи в лог
-    такая карточка выглядит исправной.
+    и прежде, — меняется наблюдаемость. Правил у Steam в справочнике 219, и без
+    тегов сработать могут девять: своих жанров у магазина двенадцать на весь
+    каталог, и жанр несут восемь. Обеднённая игра ложится в базу навсегда —
+    перезапроса у игр не бывает вовсе, только удалить и завести заново, — и без
+    записи в лог такая карточка выглядит исправной.
 
     `success` тут число, а не флаг: `15` истинно, и проверка на истинность
     посчитала бы несуществующую игру найденной."""
@@ -196,4 +224,4 @@ def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]
     if item.get("appid") != int(appid):
         raise ValueError(f"теги не про {appid}, а про {item.get('appid')}")
 
-    return genres(GenreSource.STEAM_TAG, item.get("tags", []), key="tagid")
+    return genres(GenreSource.STEAM, item.get("tags", []), key="tagid")

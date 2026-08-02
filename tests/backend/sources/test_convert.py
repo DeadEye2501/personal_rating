@@ -54,11 +54,11 @@ def test_studios_carry_no_identity():
 
 
 def test_the_space_travels_with_the_identifier():
-    """`9` у Steam — это жанр «Гонки» и тег «Стратегия» одновременно. Номер без
-    пространства справочник переведёт не в тот жанр."""
-    marked = genres(GenreSource.STEAM_TAG, [{"id": 9}])
+    """Пространство едет с меткой: `19` у Steam — это Action, а у GOG такого
+    слага нет вовсе, и метка без пространства попала бы в чужой справочник."""
+    marked = genres(GenreSource.STEAM, [{"id": 19}])
 
-    assert marked == ((GenreSource.STEAM_TAG, "9"),)
+    assert marked == ((GenreSource.STEAM, "19"),)
 
 
 def test_the_identifier_key_is_chosen_by_the_source():

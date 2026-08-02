@@ -114,8 +114,8 @@ COMPOSITE = [
     # Роль в ключе: один человек бывает на карточке и режиссёром, и актёром.
     ("person_credit", ("item_id", "person_id", "role")),
     ("company_credit", ("item_id", "company_id", "role")),
-    # Жанр в ключе: сборный жанр TMDB разворачивается в два наших.
-    ("genre_map", ("source", "ext_id", "genre_id")),
+    # Метка в ключе правила одна: и требуемой, и запрещённой она не бывает.
+    ("genre_rule_mark", ("rule_id", "ext_id")),
     ("item_genre", ("item_id", "genre_id")),
     ("item_tag", ("item_id", "tag_id")),
     ("external_id", ("item_id", "source")),
@@ -164,7 +164,7 @@ async def test_deleting_an_item_takes_everything_hanging_on_it(engine, stored):
 
 PARENTS = [
     ("genre", "item_genre", {"genre_id": None}),
-    ("genre", "genre_map", {"source": "tmdb", "ext_id": "18", "genre_id": None}),
+    ("genre", "genre_rule", {"source": "tmdb", "alone": False, "genre_id": None}),
     ("person", "person_credit", {"person_id": None, "role": "actor"}),
     ("company", "company_credit", {"company_id": None, "role": "publisher"}),
     ("tag", "item_tag", {"tag_id": None}),

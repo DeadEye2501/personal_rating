@@ -1,6 +1,7 @@
 """Таблицы каталога: то, что наполняется из источников."""
 
 from sqlalchemy import (
+    Boolean,
     Column,
     Date,
     DateTime,
@@ -45,14 +46,27 @@ genre = Table(
     UniqueConstraint("name", "kind", name="uq_genre_name_kind"),
 )
 
-# Ключ включает genre_id: один внешний идентификатор разворачивается в два
-# наших, потому что у TMDB в сериалах есть сборные жанры.
-genre_map = Table(
-    "genre_map", metadata,
+# Правило, а не строка «метка — жанр»: одиночная метка означает жанр не всегда,
+# и условие ставится на весь набор меток игры сразу. `alone` — «и никаких других
+# известных меток этого источника»; перечислять их запретами пришлось бы сотнями.
+genre_rule = Table(
+    "genre_rule", metadata,
+    Column("id", Integer, primary_key=True),
     Column("source", Text, nullable=False),
-    Column("ext_id", Text, nullable=False),
     genre_fk(nullable=False),
-    PrimaryKeyConstraint("source", "ext_id", "genre_id"),
+    Column("alone", Boolean, nullable=False),
+    Index("ix_genre_rule_source", "source"),
+)
+
+# Метка правила: либо требуется, либо запрещена. Роль в ключ не входит — одна и
+# та же метка в одном правиле не бывает и требуемой, и запрещённой.
+genre_rule_mark = Table(
+    "genre_rule_mark", metadata,
+    Column("rule_id", Integer, ForeignKey("genre_rule.id", ondelete="CASCADE"),
+           nullable=False),
+    Column("ext_id", Text, nullable=False),
+    Column("forbidden", Boolean, nullable=False),
+    PrimaryKeyConstraint("rule_id", "ext_id"),
 )
 
 item_genre = Table(

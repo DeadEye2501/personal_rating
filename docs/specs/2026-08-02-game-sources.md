@@ -489,6 +489,12 @@ Avernum 4, Bloodwych, Darkstone, то есть подземельные RPG. Н�
 сливаются в один словарь, нежанровое выбрасывается, врущая одиночная метка
 разбирается сочетанием.
 
+**Слияние здесь — прочтение плана, а не слова пользователя:** 03.08.2026 он
+уточнил, что имел в виду только GOG, «потому что они там фактически неразделимы,
+а для стима нет», и тогда же решил оставить сделанное как есть. Почему у Steam
+слияние вышло формальным и разделение фактически сохранено — `docs/other/deferred.md`,
+раздел «Слияние жанров и тегов у Steam».
+
 ### Слияние: у Steam номера жанров и тегов сталкиваются
 
 Пространства идентификаторов разные и пересекаются числами — жанр `9` это
@@ -531,6 +537,13 @@ Avernum 4, Bloodwych, Darkstone, то есть подземельные RPG. Н�
 | Sport | `701` Sports · `1254546` Football (Soccer) · `1254552` Football (American) · `1746` Basketball · `324176` Hockey · `5727` Baseball · `49213` Rugby · `847164` Volleyball · `158638` Cricket · `7038` Golf · `22955` Mini Golf · `5914` Tennis · `1753` Skateboarding · `96359` Skating · `12190` Boxing · `47827` Wrestling · `7309` Skiing · `28444` Snowboarding · `7328` Bowling · `13382` Archery · `15564` Fishing · `17927` Pool · `363767` Snooker · `4852` Billiards |
 | Tabletop | `17389` Tabletop · `1770` Board Game · `1666` Card Game · `9271` Trading Card Game · `32322` Deckbuilding · `4184` Chess · `13070` Solitaire · `33572` Mahjong · `7556` Dice · `6835` Poker · `16250` Gambling · `791774` Card Battler · `1091588` Roguelike Deckbuilder |
 | Multiplayer | `128` Massively Multiplayer · `3859` Multiplayer · `1685` Co-op · `1775` PvP · `176981` Battle Royale · `1718` MOBA · `3843` Online Co-Op · `7368` Local Multiplayer · `3841` Local Co-Op · `4508` Co-op Campaign · `4840` 4 Player Local · `10816` Split Screen · `7178` Party Game · `17770` Asynchronous Multiplayer · `5711` Team-Based · `745697` Social Deduction · `1754` MMORPG · `5055` eSports · `10437` Trivia |
+
+**Запрет `4231` в строке `RPG` колонка не пишет, а он там есть** — и это не
+расхождение: он следует из раздела «`4231` Action RPG гасит свои части» ниже.
+Правила `122` **без** `19` и `4434` **без** `19` запрещают ещё и `4231`, иначе
+игра с тегом `4231` и `122` получила бы `RPG` вдобавок к `Action-RPG`, а решено
+обратное. Дописано 03.08.2026, чтобы следующий проход не «выровнял» код по
+колонке в неверную сторону.
 
 Метка, дающая два жанра, стоит в обеих строках: `17305` Strategy RPG,
 `21725` Tactical RPG, `5537` Puzzle Platformer, `42804` Action Roguelike,

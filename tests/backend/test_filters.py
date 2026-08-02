@@ -8,13 +8,13 @@ from dataclasses import replace
 
 import pytest
 
-from backend.model import Filters, GenreSource, Kind
+from backend.model import Filters, Kind
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT, RATED, WANTED, an_item
+from tests.conftest import ACTION, ADVENTURE, DRAMA, MOMENT, RATED, WANTED, an_item
 
 
 @pytest.fixture
@@ -76,7 +76,7 @@ async def test_a_genre_filter_narrows_the_section(sessions, reference, library,
     other_id = await library.create(an_item("2", "Не драма", year=2010))
     for item_id in (drama_id, other_id):
         await ratings.set_score(item_id, 8.0, now=MOMENT)
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
+    genre_ids = [DRAMA]
     await genres.set_for_item(drama_id, genre_ids)
 
     found = await sections.ids(
@@ -92,18 +92,18 @@ async def test_two_genres_are_joined_by_and(sessions, reference, library,
     """Жанры сужают так же, как метки: выбрал боевик и приключения — получил то,
     что и то и другое разом.
 
-    Пара выбрана сборная: `10759` разворачивается в оба жанра, `28` — только в
-    боевик. Карточка со сборным жанром обязана пройти, с одиночным — нет."""
+    У одной карточки оба жанра, у другой только боевик: первая обязана пройти,
+    вторая — нет."""
     ratings = RatingsRepository(sessions)
     genres = GenresRepository(sessions)
     both_id = await library.create(an_item("1", "Боевик и приключения"))
     one_id = await library.create(an_item("2", "Только боевик"))
     for item_id in (both_id, one_id):
         await ratings.set_score(item_id, 8.0, now=MOMENT)
-    pair = await genres.resolve(GenreSource.TMDB, ["10759"])
+    pair = [ACTION, ADVENTURE]
     await genres.set_for_item(both_id, pair)
     await genres.set_for_item(
-        one_id, await genres.resolve(GenreSource.TMDB, ["28"]))
+        one_id, [ACTION])
 
     found = await sections.ids(
         replace(RATED, filters=Filters(genre_ids=tuple(pair))),
@@ -124,7 +124,7 @@ async def test_a_tag_and_a_genre_are_joined_by_and(sessions, reference, library,
     for item_id in (both_id, only_tag_id):
         await ratings.set_score(item_id, 8.0, now=MOMENT)
 
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
+    genre_ids = [DRAMA]
     await genres.set_for_item(both_id, genre_ids)
     tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
     await tags.assign(both_id, tag_id)
@@ -186,13 +186,12 @@ async def test_an_excluded_tag_wins_over_an_included_genre(
     only_genre_id = await library.create(an_item("2", "Только драма", year=2010))
     for item_id in (both_id, only_genre_id):
         await ratings.set_score(item_id, 8.0, now=MOMENT)
-        await genres.set_for_item(item_id,
-                                  await genres.resolve(GenreSource.TMDB, ["18"]))
+        await genres.set_for_item(item_id, [DRAMA])
 
     tag_id = await tags.create(Kind.MOVIE, "не хочу видеть")
     await tags.assign(both_id, tag_id)
 
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
+    genre_ids = [DRAMA]
     found = await sections.ids(
         replace(RATED, filters=Filters(genre_ids=tuple(genre_ids),
                                        excluded_tag_ids=(tag_id,))),
@@ -212,7 +211,7 @@ async def test_an_excluded_genre_removes_the_card(
     for item_id in (drama_id, plain_id):
         await ratings.set_score(item_id, 8.0, now=MOMENT)
 
-    genre_ids = await genres.resolve(GenreSource.TMDB, ["18"])
+    genre_ids = [DRAMA]
     await genres.set_for_item(drama_id, genre_ids)
 
     found = await sections.ids(

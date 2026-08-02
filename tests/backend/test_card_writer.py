@@ -370,24 +370,28 @@ async def test_an_unknown_genre_does_not_stop_the_card(writer, sessions):
     assert names == {"фантастика"}
 
 
-async def test_two_spaces_of_one_card_are_asked_apart(writer, sessions, engine):
-    """У магазина жанры и теги нумеруются порознь: `9` у Steam — это жанр
-    «Гонки» и тег «Стратегия» одновременно. Спрошенные вместе, они дали бы
-    карточке чужой жанр."""
+async def test_the_marks_of_a_card_are_read_by_the_rules_of_its_source(
+    writer, sessions, engine
+):
+    """Метка сама по себе жанра не означает: `9` у Steam даёт «Гонки» только
+    без `1662`. Правило, а не строка соответствия, — и до записи карточки
+    доезжает именно его ответ."""
     await seed(
         engine,
         "INSERT INTO genre (id, name, kind) VALUES "
-        "(10, 'Racing', 'game'), (11, 'Strategy', 'game')",
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('steam', '9', 10), ('steam_tag', '9', 11)",
+        "(10, 'Racing', 'game'), (11, 'Survival', 'game')",
+        "INSERT INTO genre_rule (id, source, genre_id, alone) VALUES "
+        "(20, 'steam', 10, 0), (21, 'steam', 11, 0)",
+        "INSERT INTO genre_rule_mark (rule_id, ext_id, forbidden) VALUES "
+        "(20, '9', 0), (20, '1662', 1), (21, '1662', 0)",
     )
 
     item_id = await writer.save(game_card(genre_ext_ids=(
-        (GenreSource.STEAM, "9"), (GenreSource.STEAM_TAG, "9"),
+        (GenreSource.STEAM, "9"), (GenreSource.STEAM, "1662"),
     )), POSTER)
 
     names = {g.name for g in await GenresRepository(sessions).genres_of(item_id)}
-    assert names == {"Racing", "Strategy"}
+    assert names == {"Survival"}
 
 
 async def test_the_poster_is_dated_by_the_moment_of_the_card(writer, tmp_path):

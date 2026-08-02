@@ -43,13 +43,13 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/model/__init__.py` — 109 строк
+### `backend/model/__init__.py` — 110 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.denied`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.tag`, `backend.model.view`
 
-Отдаёт наружу: `BadImage`, `Bucket`, `CardView`, `CompanyRole`, `Credit`, `Denied`, `Dangling`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreSource`, `Histogram`, `IdSource`, `IdentityTaken`, `Item`, `ItemExists`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonHit`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `TagExists`, `WrongTagKind`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `BadImage`, `Bucket`, `CardView`, `CompanyRole`, `Credit`, `Denied`, `Dangling`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreRule`, `GenreSource`, `Histogram`, `IdSource`, `IdentityTaken`, `Item`, `ItemExists`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonHit`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `TagExists`, `WrongTagKind`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 25 строк
@@ -91,13 +91,14 @@
 - `class ExternalId` (3)
 - `class ExternalRating` (4)
 
-### `backend/model/genre.py` — 12 строк
+### `backend/model/genre.py` — 30 строк
 
-Жанр на границе слоёв.
+Жанр на границе слоёв и правило, которое к нему ведёт.
 
 Зависит от: `backend.model.kinds`
 
 - `class Genre` (4)
+- `class GenreRule` (15)
 
 ### `backend/model/item.py` — 56 строк
 
@@ -110,7 +111,7 @@
 - `def new_source_id() -> str` (5)
 - `def new_manual_item(kind: Kind, title: str, **fields) -> Item` (13)
 
-### `backend/model/kinds.py` — 70 строк
+### `backend/model/kinds.py` — 68 строк
 
 Закрытые наборы значений, которыми описывается карточка.
 
@@ -118,7 +119,7 @@
 
 - `class Kind(StrEnum)` (4)
 - `class Source(StrEnum)` (7)
-- `class GenreSource(StrEnum)` (10)
+- `class GenreSource(StrEnum)` (8)
 - `class IdSource(StrEnum)` (7)
 - `class RatingSource(StrEnum)` (11)
 - `class PersonRole(StrEnum)` (4)
@@ -186,13 +187,13 @@
 - `class ExternalSearch` (6)
 - `def merge_results(local: list[CardView], external: list[CardView]) -> list[CardView]` (23)
 
-### `backend/model/search.py` — 41 строк
+### `backend/model/search.py` — 40 строк
 
 Кандидат в выдаче поиска — то, чем карточка ещё не стала.
 
 Зависит от: `backend.model.kinds`
 
-- `class SearchHit` (19)
+- `class SearchHit` (18)
 - `class PersonHit` (11)
 
 ### `backend/model/suggestion.py` — 15 строк
@@ -286,24 +287,27 @@
   - `async def of_name(self, name: str, kind: Kind) -> tuple[list[list[SearchHit]], list[Refusal]]` (20)
   - `async def _works(self, client, person_ids: list[str], kind: Kind) -> tuple[list[list[SearchHit]], list[Refusal]]` (19)
 
-### `backend/service/genres.py` — 28 строк
+### `backend/service/genres.py` — 69 строк
 
-Чужие метки жанров в наши идентификаторы.
+Чужие метки жанров в наши жанры.
 
 Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.unique`
 
-- `async def resolved_genres(genres: GenresRepository, marked: tuple[tuple[GenreSource, str], ...]) -> list[int]` (21)
+- `def _fires(rule: GenreRule, marks: frozenset[str], known: frozenset[str]) -> bool` (4)
+- `def matched(rules: tuple[GenreRule, ...], marks: Iterable[str]) -> list[Genre]` (19)
+- `async def book_for(genres: GenresRepository, spaces: Iterable[GenreSource]) -> Book` (7)
+- `def genres_of(book: Book, marked: Marked) -> tuple[Genre, ...]` (14)
+- `async def resolved_genres(genres: GenresRepository, marked: Marked) -> list[int]` (5)
 
-### `backend/service/hits.py` — 88 строк
+### `backend/service/hits.py` — 73 строк
 
 Приведение того, что ответили источники, к тому виду, в котором это
 
-Зависит от: `backend.model`, `backend.sources.convert`, `backend.storage.repository.genres`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.genres`, `backend.sources.convert`, `backend.storage.repository.genres`, `backend.unique`
 
 - `def once(refusals: list[Refusal]) -> list[Refusal]` (10)
 - `def split(outcomes: Iterable[Outcome]) -> tuple[list[list[SearchHit]], list[Refusal]]` (19)
-- `async def to_views(hits: list[SearchHit], genres: GenresRepository, clock: Callable[[], datetime]) -> list[CardView]` (16)
-- `def _genres_of(hit: SearchHit, index: dict[GenreSource, dict[str, tuple[Genre, ...]]]) -> tuple[Genre, ...]` (11)
+- `async def to_views(hits: list[SearchHit], genres: GenresRepository, clock: Callable[[], datetime]) -> list[CardView]` (15)
 
 ### `backend/service/images.py` — 49 строк
 
@@ -428,14 +432,14 @@
 - `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
   - `def http(name: str) -> SourceHttp` (7)
 
-### `backend/sources/convert.py` — 85 строк
+### `backend/sources/convert.py` — 88 строк
 
 Куски чужого ответа, которые все источники переводят одинаково.
 
 Зависит от: `backend.model`
 
 - `def identifier(source: IdSource, value) -> tuple[ExternalId, ...]` (12)
-- `def genres(space: GenreSource, rows: list[dict], key: str='id') -> tuple[tuple[GenreSource, str], ...]` (7)
+- `def genres(space: GenreSource, rows: list[dict], key: str='id') -> tuple[tuple[GenreSource, str], ...]` (10)
 - `def year(value: str | None) -> int | None` (5)
 - `def companies(payload: dict) -> tuple[Credit, ...]` (11)
 - `def from_search(source: Source, value: float | None, now: datetime) -> tuple[ExternalRating, ...]` (5)
@@ -470,13 +474,13 @@
   - `async def resolve_slug(self, slug: str) -> Outcome` (33)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/gog/parse.py` — 88 строк
+### `backend/sources/gog/parse.py` — 110 строк
 
 Перевод ответов GOG в наши типы.
 
-Зависит от: `backend.model`, `backend.sources.convert`
+Зависит от: `backend.model`, `backend.sources.convert`, `backend.unique`
 
-- `def _marks(row: dict) -> tuple[tuple[GenreSource, str], ...]` (8)
+- `def _marks(row: dict) -> tuple[tuple[GenreSource, str], ...]` (12)
 - `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
 - `def to_hit(card: SourceCard) -> SearchHit` (12)
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
@@ -629,7 +633,7 @@
   - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str]` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 199 строк
+### `backend/sources/steam/parse.py` — 227 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -643,9 +647,10 @@
 - `def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]` (17)
 - `def cover_of(payload: dict, appid: str) -> str` (8)
 - `def _year(value: str | None) -> int | None` (7)
+- `def _genres(data: dict) -> tuple[tuple[GenreSource, str], ...]` (6)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def parse_card(data: dict) -> SourceCard` (25)
-- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (32)
+- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (33)
 
 ### `backend/sources/tmdb/client.py` — 158 строк
 
@@ -789,15 +794,15 @@
   - `async def ratings_of(self, item_id: int) -> list[ExternalRating]` (7)
   - `async def stale_sources(self, item_id: int, wanted: list[RatingSource], now: datetime) -> list[RatingSource]` (16)
 
-### `backend/storage/repository/genres.py` — 89 строк
+### `backend/storage/repository/genres.py` — 86 строк
 
-Жанры в базе: свои, и чужие метки, ведущие к ним.
+Жанры в базе: свои, и правила из чужих меток, ведущие к ним.
 
-Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`, `backend.unique`
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`
 
-- `class GenresRepository(Repository)` (74)
-  - `async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]` (20)
-  - `async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]` (17)
+- `def _rule(marks: list[Row]) -> GenreRule` (9)
+- `class GenresRepository(Repository)` (60)
+  - `async def rules(self, source: GenreSource) -> tuple[GenreRule, ...]` (24)
   - `async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None` (14)
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
@@ -941,13 +946,13 @@
 - `def clearing(table: Table, item_id: int) -> Delete` (6)
 - `def upserting(table: Table, values: dict, key: list[Column]) -> Insert` (14)
 
-### `backend/storage/tables/__init__.py` — 34 строк
+### `backend/storage/tables/__init__.py` — 36 строк
 
 Поверхность схемы: отсюда таблицы берут репозитории.
 
 Зависит от: `backend.storage.tables.base`, `backend.storage.tables.catalog`, `backend.storage.tables.mine`
 
-Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_map`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `tag`, `wishlist`
+Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_rule`, `genre_rule_mark`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `tag`, `wishlist`
 
 
 ### `backend/storage/tables/base.py` — 32 строк
@@ -959,7 +964,7 @@
 - `def item_fk(**kwargs: Any) -> Column` (6)
 - `def genre_fk(**kwargs: Any) -> Column` (5)
 
-### `backend/storage/tables/catalog.py` — 127 строк
+### `backend/storage/tables/catalog.py` — 141 строк
 
 Таблицы каталога: то, что наполняется из источников.
 
@@ -1187,7 +1192,7 @@
 - `def _link(raw: str, kind: str | None)` (8)
 - `def _kind(kind: str | None) -> Kind | None` (4)
 
-## migrations — 3 модулей
+## migrations — 9 модулей
 
 ### `migrations/env.py` — 56 строк
 
@@ -1200,22 +1205,69 @@
 - `def migrate() -> None` (15)
   - `def prepare(dbapi_connection, _record)` (2)
 
-### `migrations/versions/0001_schema.py` — 176 строк
+### `migrations/reference/gog.py` — 134 строк
 
-Схема целиком: четырнадцать таблиц каталога и моих данных.
+Соответствия GOG: жанры и теги магазина одним пространством.
 
-Зависит от: —
+Зависит от: `migrations.reference.rule`
 
-- `def upgrade() -> None` (131)
-- `def downgrade() -> None` (24)
 
-### `migrations/versions/0002_genres.py` — 401 строк ⚠ подошёл к 300
+### `migrations/reference/names.py` — 20 строк
 
-Справочник жанров и соответствия к нему.
+Имена наших жанров: два набора, кино и игры.
 
 Зависит от: —
 
-- `def upgrade() -> None` (29)
+
+### `migrations/reference/old_games.py` — 26 строк
+
+Соответствия old-games.ru: пятнадцать жанров на весь сайт, у игры один.
+
+Зависит от: `migrations.reference.rule`
+
+
+### `migrations/reference/rule.py` — 29 строк
+
+Форма правила справочника: как оно записано в объявлениях.
+
+Зависит от: —
+
+- `class Rule(NamedTuple)` (20)
+  - `def required(self) -> list[str]` (2)
+  - `def forbidden(self) -> list[str]` (2)
+- `def _split(written: str) -> list[str]` (2)
+
+### `migrations/reference/steam.py` — 252 строк
+
+Соответствия Steam: жанры и теги магазина одним пространством.
+
+Зависит от: `migrations.reference.rule`
+
+
+### `migrations/reference/tmdb.py` — 40 строк
+
+Соответствия TMDB: чужой номер жанра — наш киножанр.
+
+Зависит от: `migrations.reference.rule`
+
+
+### `migrations/versions/0001_schema.py` — 187 строк
+
+Схема целиком: пятнадцать таблиц каталога и моих данных.
+
+Зависит от: —
+
+- `def upgrade() -> None` (140)
+- `def downgrade() -> None` (26)
+
+### `migrations/versions/0002_genres.py` — 76 строк
+
+Справочник жанров и правила, ведущие к ним.
+
+Зависит от: `migrations.reference.gog`, `migrations.reference.names`, `migrations.reference.old_games`, `migrations.reference.steam`, `migrations.reference.tmdb`
+
+- `def upgrade() -> None` (23)
+- `def _marks(connection, rule_id: int, rule) -> None` (10)
 - `def downgrade() -> None` (5)
 
 ## scripts — 2 модулей
@@ -1249,7 +1301,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (19)
 - `async def main() -> None` (21)
 
-## tests — 90 модулей
+## tests — 91 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1259,13 +1311,14 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/conftest.py` — 40 строк
+### `tests/backend/conftest.py` — 49 строк
 
 Фикстуры проверок бэкенда, общие у соседних модулей.
 
-Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`, `tests.wiring`
 
 - `async def item_id(sessions)` (8)
+- `async def service(sessions)` (5)
 - `async def enrich(sessions)` (12)
   - `def build(*clients) -> Enricher` (7)
 
@@ -1306,7 +1359,7 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 444 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 445 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
@@ -1401,17 +1454,17 @@ OMDB: единственный источник, у которого отказ 
 - `async def registry()` (9)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 265 строк
+### `tests/backend/sources/test_steam.py` — 279 строк
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`, `tests.conftest`
 
-Тестов: 20
+Тестов: 22
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_steam_items.py` — 308 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam_items.py` — 309 строк ⚠ подошёл к 300
 
 Ответ `GetItems`: род товара в выдаче и настоящий адрес обложки.
 
@@ -1424,7 +1477,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def searched(transport: httpx.MockTransport, query: str='arcanum')` (5)
 - `def assets_of(payload: dict, appid: str) -> dict` (4)
 
-### `tests/backend/sources/test_steam_tags.py` — 206 строк
+### `tests/backend/sources/test_steam_tags.py` — 218 строк
 
 Теги Steam: отдельный запрос, три состояния ответа и сверка номера.
 
@@ -1491,7 +1544,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_card_writer.py` — 410 строк ⚠ подошёл к 300
+### `tests/backend/test_card_writer.py` — 414 строк ⚠ подошёл к 300
 
 Запись карточки источника в базу целиком — или ничего.
 
@@ -1619,7 +1672,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
-### `tests/backend/test_filters.py` — 296 строк
+### `tests/backend/test_filters.py` — 295 строк
 
 Отбор ленты фильтрами: включённые, исключённые и их сочетания.
 
@@ -1629,36 +1682,47 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def library(sessions)` (2)
 
-### `tests/backend/test_genre_reference.py` — 241 строк
+### `tests/backend/test_genre_reference.py` — 236 строк
 
 Справочник жанров из миграции против записанного эталона.
 
 Зависит от: `tests.alembic_runner`
 
-Тестов: 13
+Тестов: 11
 
-- `def named(connection, source: str, ext_id: str) -> set[str]` (10)
-- `def counted(connection, where: str) -> int` (4)
-- `def declared_in_migration() -> dict[str, dict[str, list[str]]]` (4)
-- `def differences(reference: dict, declared: dict) -> list[str]` (8)
+- `def named(connection, source: str, ext_id: str) -> set[str]` (14)
+- `def counted(connection, table: str, where: str='') -> int` (4)
+- `def declared_in_migration() -> dict[str, list[list]]` (8)
 
-### `tests/backend/test_genre_resolution.py` — 78 строк
+### `tests/backend/test_genre_resolution.py` — 100 строк
 
-Разрешение чужих меток жанров: то, что видно в самом списке наших номеров.
+Разрешение чужих меток карточки: то, что видно в самом списке наших номеров.
 
 Зависит от: `backend.model`, `backend.service.genres`, `backend.storage.repository.genres`, `tests.conftest`
 
-Тестов: 5
+Тестов: 6
 
 - `async def genres(engine, sessions)` (3)
 
-### `tests/backend/test_genres.py` — 185 строк
+### `tests/backend/test_genre_rules.py` — 220 строк
 
-Перевод чужих меток в наши жанры и запись их карточке.
+Правила справочника: набор чужих меток на входе, набор наших жанров на выходе.
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.genres`, `backend.sources.gog.parse`, `backend.sources.steam.parse`, `backend.storage.repository.genres`, `backend.storage.session`, `tests.alembic_runner`
 
-Тестов: 15
+Тестов: 19
+
+- `def stocked(tmp_path_factory)` (7)
+- `async def book(stocked)` (6)
+- `def names(genres) -> list[str]` (2)
+
+### `tests/backend/test_genres.py` — 155 строк
+
+Жанры карточки в базе: чтение справочника и запись набора.
+
+Зависит от: `backend.model`, `backend.service.genres`, `backend.storage.repository.genres`
+
+Тестов: 12
 
 
 ### `tests/backend/test_histogram.py` — 213 строк
@@ -1863,25 +1927,23 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search.py` — 382 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 377 строк ⚠ подошёл к 300
 
 Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
 
-Зависит от: `backend.model`, `backend.service.search`, `tests.conftest`, `tests.wiring`
+Зависит от: `backend.model`, `backend.service.search`, `tests.conftest`
 
 Тестов: 24
 
-- `async def service(sessions)` (2)
 
-### `tests/backend/test_search_genres.py` — 159 строк
+### `tests/backend/test_search_genres.py` — 158 строк
 
 Жанры кандидата: чужие метки разворачиваются нашим справочником.
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`, `tests.conftest`, `tests.wiring`
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `tests.conftest`
 
 Тестов: 9
 
-- `async def service(sessions)` (2)
 
 ### `tests/backend/test_search_local.py` — 157 строк
 
@@ -1968,7 +2030,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_views.py` — 375 строк ⚠ подошёл к 300
+### `tests/backend/test_views.py` — 374 строк ⚠ подошёл к 300
 
 Пачечное чтение страницы: девять запросов на любое число карточек.
 
@@ -2184,7 +2246,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
 
-### `tests/conftest.py` — 245 строк
+### `tests/conftest.py` — 255 строк
 
 Фикстуры тестов и поверхность общего.
 
@@ -2193,12 +2255,12 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
 
 - `def ours(caplog) -> list[str]` (8)
-- `async def film_genres(engine) -> None` (11)
+- `async def film_genres(engine) -> None` (13)
 - `async def seed(engine, *statements: str) -> None` (7)
 - `def migrated(tmp_path)` (16)
 - `async def engine(tmp_path)` (8)
 - `async def sections(sessions)` (3)
-- `async def reference(engine)` (20)
+- `async def reference(engine)` (23)
 - `async def sessions(engine)` (4)
 - `async def posters(tmp_path)` (6)
 - `async def card(sessions)` (11)

@@ -108,21 +108,35 @@ def test_a_game_from_the_last_century_keeps_its_year():
 
 
 def test_genres_come_from_the_genres_and_not_from_the_neighbours(fixture):
-    """Номера сверяются с записанным ответом, а не с их формой: у Steam рядом с
-    `genres` лежат `categories`, они устроены так же и тоже нумерованы. Подмена
-    ключа проходит проверку «цифры и пространство» молча, а в справочнике
-    `steam:2` — это `Strategy`, тогда как `categories[2]` — «Одиночная игра»:
-    каждая одиночная игра уехала бы в базу стратегией."""
-    block = block_of(fixture("steam/appdetails.json"))
-    card = parse_card(block)
+    """Жанр берётся из `genres`, а не из соседей: рядом лежат `categories`, они
+    устроены так же и тоже нумерованы. Подмена ключа проходит проверку «цифры и
+    пространство» молча, а в записанном ответе жанр один против девятнадцати
+    категорий — так что и длина, и значение тут говорят.
 
-    numbers = [ext_id for space, ext_id in card.genre_ext_ids
-               if space is GenreSource.STEAM]
+    Ждём `122`, а не `3`: жанр магазина едет номером тега-двойника, потому что
+    пространство меток в справочнике одно. «Ролевая игра» у Steam — жанр `3` и
+    тег `122`."""
+    card = parse_card(block_of(fixture("steam/appdetails.json")))
 
-    # Сверяется равенство, и его хватает: в записанном ответе жанр один, а
-    # категорий девятнадцать, так что подмена ключа роняет тест длиной. Отдельное
-    # «не равно категориям» покраснеть не может никогда и потому не пишется.
-    assert numbers == [str(one["id"]) for one in block["genres"]]
+    assert card.genre_ext_ids == ((GenreSource.STEAM, "122"),)
+
+
+def test_a_genre_and_its_twin_tag_become_one_mark():
+    """Жанр `1` «Экшены» и тег `19` «Экшен» — одна и та же метка справочника, и
+    приходить она обязана одинаково обоими путями. Иначе игра, у которой Steam
+    отдал жанр, а тегов не отдал, осталась бы без единого жанра."""
+    block = {"steam_appid": 1, "name": "и", "genres": [{"id": "1"}]}
+
+    assert parse_card(block).genre_ext_ids == ((GenreSource.STEAM, "19"),)
+
+
+def test_a_genre_without_a_twin_is_dropped():
+    """`23` «Инди» и `70` «Ранний доступ» жанра не несут, двойника у них нет, и
+    в справочник они не едут вовсе: пропущенный сквозь него номер столкнулся бы
+    с чужим тегом под тем же числом."""
+    block = {"steam_appid": 1, "name": "и", "genres": [{"id": "23"}, {"id": "70"}]}
+
+    assert parse_card(block).genre_ext_ids == ()
 
 
 async def test_missing_game_answers_under_two_hundred(replay, meta):

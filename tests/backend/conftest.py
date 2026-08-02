@@ -13,6 +13,7 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.library import LibraryRepository
 from tests.conftest import MOMENT, FakeSources, an_item
+from tests.wiring import search_service
 
 
 @pytest.fixture
@@ -24,6 +25,14 @@ async def item_id(sessions):
         made, ExternalId(IdSource.IMDB, "tt0816692")
     )
     return made
+
+@pytest.fixture
+async def service(sessions):
+    """Сервис поиска на подставных клиентах. Здесь, а не в двух модулях по
+    копии: проверки выдачи и проверки жанров кандидата разъехались по файлам,
+    когда первый упёрся в предел, — и обёртка уехала следом дважды."""
+    return lambda *clients: search_service(sessions, *clients)
+
 
 @pytest.fixture
 async def enrich(sessions):

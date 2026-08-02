@@ -1,74 +1,46 @@
-"""Перевод чужих меток в наши жанры и запись их карточке."""
+"""Жанры карточки в базе: чтение справочника и запись набора.
 
-import logging
+Как метки превращаются в жанры — `test_genre_rules.py` и
+`test_genre_resolution.py`; здесь только то, что делает сам репозиторий."""
 
 import pytest
 
 
 from backend.model import Dangling, GenreKind, GenreSource, Kind
+from backend.service.genres import matched
 from backend.storage.repository.genres import GenresRepository
-from tests.conftest import ours
 
 
-async def test_plain_identifier_resolves_to_one_genre(sessions, reference):
-    assert await GenresRepository(sessions).resolve(GenreSource.TMDB, ["18"]) == [3]
+async def test_a_rule_comes_back_with_the_genre_it_leads_to(sessions, reference):
+    """Наружу репозиторий отдаёт правила, а не строки: жанр в них уже собран,
+    и второго запроса за именем не нужно."""
+    rules = await GenresRepository(sessions).rules(GenreSource.TMDB)
+
+    assert [genre.name for genre in matched(rules, {"18"})] == ["Драма"]
 
 
-async def test_composite_identifier_unfolds_into_two(sessions, reference):
-    resolved = await GenresRepository(sessions).resolve(GenreSource.TMDB, ["10759"])
-    assert sorted(resolved) == [1, 2]
+async def test_one_mark_leads_to_two_genres_by_two_rules(sessions, reference):
+    """Сборный жанр TMDB — это два правила с одной меткой, а не правило с двумя
+    жанрами."""
+    rules = await GenresRepository(sessions).rules(GenreSource.TMDB)
+
+    assert sorted(genre.id for genre in matched(rules, {"10759"})) == [1, 2]
 
 
-async def test_overlapping_identifiers_do_not_duplicate(sessions, reference):
-    resolved = await GenresRepository(sessions).resolve(GenreSource.TMDB, ["10759", "28"])
-    assert sorted(resolved) == [1, 2]
+async def test_the_rules_of_one_source_do_not_include_another(sessions, reference):
+    """Отбор по источнику: `3` у Steam — это ролевая, а у TMDB такой метки нет
+    вовсе. Спроси репозиторий без отбора — кино получило бы игровой жанр."""
+    steam = await GenresRepository(sessions).rules(GenreSource.STEAM)
+    tmdb = await GenresRepository(sessions).rules(GenreSource.TMDB)
+
+    assert [genre.id for genre in matched(steam, {"3"})] == [4]
+    assert matched(tmdb, {"3"}) == []
 
 
-SILENT = [
-    ("незнакомый жанр", GenreSource.GOG, "совсем-новый-жанр"),
-    ("отвергнутый слаг", GenreSource.GOG, "fpp"),
-    ("незнакомый тег", GenreSource.GOG_TAG, "atmospheric"),
-    ("незнакомый номер", GenreSource.TMDB, "99999"),
-]
-
-
-@pytest.mark.parametrize(("case", "source", "ext_id"), SILENT,
-                         ids=[one[0] for one in SILENT])
-async def test_what_is_not_in_the_reference_is_dropped_without_a_word(
-    sessions, reference, caplog, case, source, ext_id
-):
-    """Чего нет в таблице соответствий — то молча отбрасывается, откуда бы оно
-    ни пришло. Лог не ведём: читать его никто не будет, а справочник пополняют
-    руками, когда владелец сам этого захочет.
-
-    Смотрим на свои записи, а не на весь лог: на уровне отладки в него сыпет
-    сам драйвер базы."""
-    with caplog.at_level(logging.DEBUG):
-        assert await GenresRepository(sessions).resolve(source, [ext_id]) == []
-    assert ours(caplog) == []
-
-
-async def test_the_known_part_survives_the_unknown(sessions, reference, caplog):
-    """Незнакомое рядом со знакомым не мешает знакомому доехать."""
-    with caplog.at_level(logging.DEBUG):
-        resolved = await GenresRepository(sessions).resolve(
-            GenreSource.TMDB, ["18", "99999"]
-        )
-    assert resolved == [3]
-    assert ours(caplog) == []
-
-
-async def test_nothing_asked_is_nothing_resolved(sessions, reference):
-    """Пустой список не повод падать. Про «не повод идти в базу» здесь не
-    утверждается: ранний выход не наблюдается — `in_([])` вернул бы ту же
-    пустоту, и проверить его можно было бы только счётчиком запросов."""
-    assert await GenresRepository(sessions).resolve(GenreSource.TMDB, []) == []
-
-
-async def test_sources_do_not_leak_into_each_other(sessions, reference):
-    # У Steam свой словарь: id 3 у него ролевая, а не драма.
-    assert await GenresRepository(sessions).resolve(GenreSource.STEAM, ["3"]) == [4]
-    assert await GenresRepository(sessions).resolve(GenreSource.TMDB, ["3"]) == []
+async def test_a_source_without_rules_gives_an_empty_book(sessions, reference):
+    """У пространства без единого правила справочник пуст, а не сломан:
+    old-games.ru появится в базе раньше, чем его клиент."""
+    assert await GenresRepository(sessions).rules(GenreSource.OLD_GAMES) == ()
 
 
 async def test_set_and_read_genres_of_a_card(sessions, reference, card):
@@ -169,9 +141,7 @@ async def test_a_failed_replacement_keeps_the_old_set(sessions, reference, card)
     внешний ключ уже после очистки."""
     item_id = await card()
     repository = GenresRepository(sessions)
-    await repository.set_for_item(item_id, await repository.resolve(
-        GenreSource.TMDB, ["18"]
-    ))
+    await repository.set_for_item(item_id, [3])
     before = [one.id for one in await repository.genres_of(item_id)]
     assert before, "фикстура пуста — проверять нечего"
 

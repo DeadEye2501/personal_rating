@@ -84,6 +84,11 @@ __all__ = [
 # Вопрос ленты, от которого отталкиваются проверки разделов: оценённое кино по
 # убыванию оценки. Что именно проверяет тест, он меняет через `replace`, и в
 # вызове видно только это.
+# Номера жанров из фикстуры `reference`. Карточке их ставят прямо, а не через
+# справочник: там, где предмет проверки — фильтр, лента или показ, справочник
+# только шум.
+ACTION, ADVENTURE, DRAMA = 1, 2, 3
+
 RATED = Feed(Section.RATED, Kind.MOVIE, Filters(), Order(Sort.SCORE))
 WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
 
@@ -99,15 +104,17 @@ def ours(caplog) -> list[str]:
 
 
 async def film_genres(engine) -> None:
-    """Два киножанра со соответствиями к ним. Два, а не один: с одним нельзя
+    """Два киножанра с правилами к ним. Два, а не один: с одним нельзя
     проверить, что чужой жанр не затирает выбранный руками — дополнять было бы
     нечем."""
     await seed(
         engine,
         "INSERT INTO genre (id, name, kind) VALUES "
         "(1, 'фантастика', 'film'), (2, 'приключения', 'film')",
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('tmdb', '878', 1), ('tmdb', '12', 2)",
+        "INSERT INTO genre_rule (id, source, genre_id, alone) VALUES "
+        "(1, 'tmdb', 1, 0), (2, 'tmdb', 2, 0)",
+        "INSERT INTO genre_rule_mark (rule_id, ext_id, forbidden) VALUES "
+        "(1, '878', 0), (2, '12', 0)",
     )
 
 
@@ -123,7 +130,7 @@ async def seed(engine, *statements: str) -> None:
 # Список из спеки, а не из `metadata`: он и есть ожидаемое. Взятый из кода, он
 # совпал бы с ним при любой пропаже таблицы.
 TABLES = {
-    "item", "genre", "genre_map", "item_genre",
+    "item", "genre", "genre_rule", "genre_rule_mark", "item_genre",
     "person", "person_credit", "company", "company_credit",
     "external_id", "external_rating",
     "rating", "tag", "item_tag", "wishlist",
@@ -181,22 +188,25 @@ async def sections(sessions):
 async def reference(engine):
     """Справочник жанров, засеянный руками.
 
-    Тесты не зависят от миграции: проверяется разрешение идентификаторов, а не
-    содержимое справочника — его сторожит `test_genre_reference.py`. Набор
-    маленький и нарочно включает сборный 10759 — один внешний идентификатор,
-    разворачивающийся в два наших жанра, — и по одной строке на каждое чужое
-    пространство: без строки `gog` «отвергнутый слаг» и «совсем новый жанр»
-    оказались бы одним и тем же случаем, потому что самого пространства в
-    справочнике не было бы вовсе."""
+    Тесты не зависят от миграции: проверяется разрешение меток, а не содержимое
+    справочника — его сторожит `test_genre_reference.py`. Набор маленький и
+    нарочно включает сборный 10759 — одну метку, ведущую в два наших жанра
+    двумя правилами, — и по строке на каждое чужое пространство: без правила
+    `gog` «отвергнутый слаг» и «совсем новый жанр» оказались бы одним и тем же
+    случаем, потому что самого пространства в справочнике не было бы вовсе."""
     await seed(
         engine,
         "INSERT INTO genre (id, name, kind) VALUES "
         "(1, 'Боевик', 'film'), (2, 'Приключения', 'film'), "
         "(3, 'Драма', 'film'), (4, 'ролевая', 'game')",
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('tmdb', '28', 1), ('tmdb', '12', 2), ('tmdb', '18', 3), "
-        "('tmdb', '10759', 1), ('tmdb', '10759', 2), "
-        "('steam', '3', 4), ('gog', 'rpg', 4), ('gog_tag', 'story-rich', 3)",
+        "INSERT INTO genre_rule (id, source, genre_id, alone) VALUES "
+        "(1, 'tmdb', 1, 0), (2, 'tmdb', 2, 0), (3, 'tmdb', 3, 0), "
+        "(4, 'tmdb', 1, 0), (5, 'tmdb', 2, 0), "
+        "(6, 'steam', 4, 0), (7, 'gog', 4, 0)",
+        "INSERT INTO genre_rule_mark (rule_id, ext_id, forbidden) VALUES "
+        "(1, '28', 0), (2, '12', 0), (3, '18', 0), "
+        "(4, '10759', 0), (5, '10759', 0), "
+        "(6, '3', 0), (7, 'rpg', 0)",
     )
 
 

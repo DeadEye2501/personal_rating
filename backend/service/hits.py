@@ -12,16 +12,15 @@ from datetime import datetime
 from backend.model import (
     CardView,
     Found,
-    Genre,
-    GenreSource,
     Outcome,
     Refusal,
     SearchHit,
     view_from_hit,
 )
+from backend.service.genres import book_for, genres_of
 from backend.sources.convert import from_search
 from backend.storage.repository.genres import GenresRepository
-from backend.unique import unique, unique_by
+from backend.unique import unique_by
 
 
 def once(refusals: list[Refusal]) -> list[Refusal]:
@@ -61,28 +60,14 @@ async def to_views(hits: list[SearchHit], genres: GenresRepository,
                    clock: Callable[[], datetime]) -> list[CardView]:
     """Справочник спрашивается по пространству, а не по кандидату: у страницы
     выдачи их два-три на все двадцать строк."""
-    index: dict[GenreSource, dict[str, tuple[Genre, ...]]] = {}
-    views = []
-    for hit in hits:
-        for space, _ in hit.genre_ext_ids:
-            if space not in index:
-                index[space] = await genres.index(space)
-        views.append(view_from_hit(
-            hit,
-            _genres_of(hit, index),
-            from_search(hit.source, hit.source_rating, clock()),
-        ))
-    return views
-
-
-def _genres_of(
-    hit: SearchHit,
-    index: dict[GenreSource, dict[str, tuple[Genre, ...]]],
-) -> tuple[Genre, ...]:
-    """Незнакомое молча отбрасывается: заводить жанр на лету нельзя — имена в
-    справочнике наши, а сборный жанр автоматически не разложить."""
-    return tuple(unique(
-        genre
-        for space, ext_id in hit.genre_ext_ids
-        for genre in index[space].get(ext_id, ())
+    book = await book_for(genres, (
+        space for hit in hits for space, _ in hit.genre_ext_ids
     ))
+    return [
+        view_from_hit(
+            hit,
+            genres_of(book, hit.genre_ext_ids),
+            from_search(hit.source, hit.source_rating, clock()),
+        )
+        for hit in hits
+    ]

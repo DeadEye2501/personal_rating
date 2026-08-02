@@ -1,57 +1,54 @@
-"""Жанры в базе: свои, и чужие метки, ведущие к ним."""
+"""Жанры в базе: свои, и правила из чужих меток, ведущие к ним."""
 
-from sqlalchemy import select
+from sqlalchemy import Row, select
 from sqlalchemy.dialects.sqlite import insert
 
-from backend.model import Genre, GenreKind, GenreSource
+from backend.model import Genre, GenreKind, GenreRule, GenreSource
 from backend.storage.repository.base import Repository
 from backend.storage.rows import grouped, to_genre
 from backend.storage.statements import clearing
 from backend.storage.tables import genre as genre_table
-from backend.storage.tables import genre_map as genre_map_table
+from backend.storage.tables import genre_rule as genre_rule_table
+from backend.storage.tables import genre_rule_mark as mark_table
 from backend.storage.tables import item_genre as item_genre_table
-from backend.unique import unique
+
+
+def _rule(marks: list[Row]) -> GenreRule:
+    """Строки одного правила — со всеми его метками — в само правило."""
+    head = marks[0]
+    return GenreRule(
+        genre=to_genre(head),
+        required=frozenset(row.ext_id for row in marks if not row.forbidden),
+        forbidden=frozenset(row.ext_id for row in marks if row.forbidden),
+        alone=bool(head.alone),
+    )
 
 
 class GenresRepository(Repository):
-    async def resolve(self, source: GenreSource, ext_ids: list[str]) -> list[int]:
-        """Внешние идентификаторы в свои.
+    async def rules(self, source: GenreSource) -> tuple[GenreRule, ...]:
+        """Правила одного источника целиком.
 
-        Сборный разворачивается в два. Незнакомый молча отбрасывается: имена в
-        справочнике наши, сборный жанр автоматически не разложить, а пополняют
-        справочник руками. Карточка приезжает без этого жанра, и всё."""
-        if not ext_ids:
-            return []
-
+        Целиком, а не по метке: правило смотрит на весь набор меток игры сразу,
+        и спрашивать его по одной метке нечем. Один запрос на источник — в
+        выдаче поиска их два-три на все двадцать строк, а по кандидату это был
+        бы запрос на кандидата."""
         rows = await self._rows(
-            select(genre_map_table.c.genre_id)
-            .where(
-                genre_map_table.c.source == source,
-                genre_map_table.c.ext_id.in_(ext_ids),
+            select(
+                genre_rule_table.c.id.label("rule_id"),
+                genre_rule_table.c.alone,
+                genre_table.c.id,
+                genre_table.c.name,
+                genre_table.c.kind,
+                mark_table.c.ext_id,
+                mark_table.c.forbidden,
             )
+            .join(genre_table, genre_table.c.id == genre_rule_table.c.genre_id)
+            .join(mark_table, mark_table.c.rule_id == genre_rule_table.c.id)
+            .where(genre_rule_table.c.source == source)
+            .order_by(genre_table.c.name, genre_rule_table.c.id)
         )
-
-        # Порядок сохраняется: сборный жанр разворачивается в два, и оба должны
-        # прийти в том порядке, в каком лежат в справочнике.
-        return unique(row.genre_id for row in rows)
-
-    async def index(self, source: GenreSource) -> dict[str, tuple[Genre, ...]]:
-        """Соответствия одного пространства целиком.
-
-        В выдаче поиска жанры приходят голыми идентификаторами, и разворачивать
-        их по кандидату значит запрос на кандидата. Один сборный идентификатор
-        разворачивается в несколько жанров — отсюда кортеж, а не жанр.
-
-        Пространство, а не источник карточки: у магазина их два, жанры и теги,
-        и нумеруются они порознь — `9` у Steam это и «Гонки», и «Стратегия»."""
-        rows = await self._rows(
-            select(genre_map_table.c.ext_id, genre_table)
-            .join(genre_table, genre_table.c.id == genre_map_table.c.genre_id)
-            .where(genre_map_table.c.source == source)
-            .order_by(genre_table.c.name)
-        )
-        found = grouped(rows, "ext_id", to_genre)
-        return {ext_id: tuple(genres) for ext_id, genres in found.items()}
+        by_rule = grouped(rows, "rule_id", lambda row: row)
+        return tuple(_rule(marks) for marks in by_rule.values())
 
     async def set_for_item(self, item_id: int, genre_ids: list[int]) -> None:
         """Набор жанров заменяется целиком: пришедшее из источника — это весь

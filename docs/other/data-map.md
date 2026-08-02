@@ -84,6 +84,11 @@
   - `id: int`
   - `name: str`
   - `kind: GenreKind`
+- `class GenreRule`
+  - `genre: Genre`
+  - `required: frozenset[str]`
+  - `forbidden: frozenset[str]` = `frozenset()`
+  - `alone: bool` = `False`
 
 ### `backend/model/item.py`
 
@@ -120,9 +125,8 @@
 - `class GenreSource(StrEnum)`
   - `TMDB` = `'tmdb'`
   - `STEAM` = `'steam'`
-  - `STEAM_TAG` = `'steam_tag'`
   - `GOG` = `'gog'`
-  - `GOG_TAG` = `'gog_tag'`
+  - `OLD_GAMES` = `'old_games'`
 - `class IdSource(StrEnum)`
   - `IMDB` = `'imdb'`
   - `KINOPOISK` = `'kinopoisk'`
@@ -307,6 +311,11 @@
   - `values: dict[RatingSource, float]` = `field(default_factory=dict)`
   - `refused: set[RatingSource]` = `field(default_factory=set)`
 
+### `backend/service/genres.py`
+
+- `Book` = `dict[GenreSource, tuple[GenreRule, ...]]`
+- `Marked` = `Iterable[tuple[GenreSource, str]]`
+
 ### `backend/service/images.py`
 
 - `TARGET_RATIO` = `2 / 3`
@@ -357,6 +366,10 @@
 - `CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `PRODUCT` = `'https://api.gog.com/products/{source_id}'`
 - `PRODUCT_TYPES` = `'in:game,pack'`
+
+### `backend/sources/gog/parse.py`
+
+- `SPELLING` = `словарь из 5`
 
 ### `backend/sources/http.py`
 
@@ -438,6 +451,7 @@
 - `TYPE_GAME` = `0`
 - `ANSWERED` = `1`
 - `YEAR` = `re.compile('(?:19|20)\\d{2}')`
+- `GENRE_TWIN` = `словарь из 8`
 
 ### `backend/sources/tmdb/client.py`
 
@@ -499,7 +513,8 @@
 
 - `item` = `Table('item', metadata, Column('id', Integer, pr…`
 - `genre` = `Table('genre', metadata, Column('id', Integer, p…`
-- `genre_map` = `Table('genre_map', metadata, Column('source', Te…`
+- `genre_rule` = `Table('genre_rule', metadata, Column('id', Integ…`
+- `genre_rule_mark` = `Table('genre_rule_mark', metadata, Column('rule_…`
 - `item_genre` = `Table('item_genre', metadata, item_fk(nullable=F…`
 - `person` = `Table('person', metadata, Column('id', Integer, …`
 - `person_credit` = `Table('person_credit', metadata, item_fk(nullabl…`
@@ -562,6 +577,35 @@
 - `config` = `context.config`
 - `target_metadata` = `metadata`
 
+### `migrations/reference/gog.py`
+
+- `GOG` = `набор из 101`
+
+### `migrations/reference/names.py`
+
+- `FILM` = `набор из 25`
+- `GAME` = `набор из 19`
+
+### `migrations/reference/old_games.py`
+
+- `OLD_GAMES` = `набор из 13`
+
+### `migrations/reference/rule.py`
+
+- `class Rule(NamedTuple)`
+  - `genre: str`
+  - `marks: str`
+  - `without: str` = `''`
+  - `alone: bool` = `False`
+
+### `migrations/reference/steam.py`
+
+- `STEAM` = `набор из 219`
+
+### `migrations/reference/tmdb.py`
+
+- `TMDB` = `набор из 30`
+
 ### `migrations/versions/0001_schema.py`
 
 - `revision: str` = `'0001'`
@@ -571,13 +615,7 @@
 
 - `revision: str` = `'0002'`
 - `down_revision: str | None` = `'0001'`
-- `FILM` = `набор из 25`
-- `TMDB` = `словарь из 27`
-- `GAME` = `набор из 22`
-- `STEAM` = `словарь из 8`
-- `STEAM_TAG` = `словарь из 168`
-- `GOG` = `словарь из 39`
-- `GOG_TAG` = `словарь из 68`
+- `BOOKS` = `набор из 4`
 
 ## scripts
 
@@ -656,19 +694,23 @@
 
 - `MIGRATION` = `'migrations.versions.0002_genres'`
 - `REFERENCE` = `Path(__file__).resolve().parents[1] / 'fixtures/…`
-- `BOOKS` = `набор из 5`
 - `FILM_GENRES` = `набор из 25`
-- `GAME_GENRES` = `набор из 22`
+- `GAME_GENRES` = `набор из 19`
 - `COMPOSITE` = `словарь из 3`
+- `RULES` = `363`
+- `MARKS` = `385`
 
 ### `tests/backend/test_genre_resolution.py`
 
 - `REFERENCE` = `"INSERT INTO genre (id, name, kind) VALUES (1, '…`
-- `MAP` = `"INSERT INTO genre_map (source, ext_id, genre_id…`
+- `RULES` = `"INSERT INTO genre_rule (id, source, genre_id, a…`
+- `MARKS` = `"INSERT INTO genre_rule_mark (rule_id, ext_id, f…`
 
-### `tests/backend/test_genres.py`
+### `tests/backend/test_genre_rules.py`
 
-- `SILENT` = `набор из 4`
+- `FALLOUT` = `набор из 3`
+- `STARDEW` = `набор из 10`
+- `STEAM_GENRES` = `словарь из 8`
 
 ### `tests/backend/test_images.py`
 
@@ -774,7 +816,10 @@
 
 ### `tests/conftest.py`
 
+- `ACTION` = `набор из 3`
+- `ADVENTURE` = `набор из 3`
+- `DRAMA` = `набор из 3`
 - `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
-- `TABLES` = `набор из 14`
+- `TABLES` = `набор из 15`
 - `MINIMAL` = `словарь из 5`

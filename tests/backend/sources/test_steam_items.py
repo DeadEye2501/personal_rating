@@ -4,10 +4,10 @@ import json
 
 import httpx
 
-from backend.model import Found, GenreSource, Kind
+from backend.model import Found, Kind
 from backend.sources.http import SourceHttp
 from backend.sources.steam.client import SteamClient
-from backend.sources.steam.parse import ASSETS, poster_url
+from backend.sources.steam.parse import ASSETS, parse_tags, poster_url
 
 FOUND = [
     {"appid": "292030", "name": "The Witcher 3: Wild Hunt"},
@@ -256,9 +256,10 @@ async def test_the_card_takes_cover_and_tags_from_one_answer(replay, fixture):
     assert result.value.item.poster_url.startswith(ASSETS)
     assert result.value.item.poster_url.endswith(assets["library_capsule_2x"]
                                                  + "?t=1768303991")
-    assert GenreSource.STEAM_TAG in {
-        space for space, _ in result.value.genre_ext_ids
-    }, "теги потерялись из общего с обложкой ответа"
+    tagged = parse_tags(fixture("steam/store_items_card.json"), appid)
+    assert tagged, "фикстура без тегов — проверять нечего"
+    assert set(tagged) <= set(result.value.genre_ext_ids), \
+        "теги потерялись из общего с обложкой ответа"
 
 
 async def test_the_card_asks_for_covers_and_tags_at_once(fixture):

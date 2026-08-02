@@ -11,15 +11,14 @@ from backend.sources.steam.client import SteamClient
 from backend.sources.steam.parse import parse_tags
 
 
-def test_tags_arrive_in_their_own_space(fixture):
-    """Жанр и тег у Steam нумеруются порознь: `9` — это жанр «Гонки» и тег
-    «Стратегия». Пространство обязано ехать вместе с номером, иначе стратегия
-    молча получит гонки."""
+def test_tags_arrive_in_the_steam_space(fixture):
+    """Пространство меток у Steam одно, и теги едут в нём же: жанр магазина
+    приводится к номеру тега-двойника ещё в разборе карточки."""
     tags = parse_tags(fixture("steam/store_items.json"), "292030")
 
     assert tags
     assert all(
-        space is GenreSource.STEAM_TAG and ext_id.isdigit() for space, ext_id in tags
+        space is GenreSource.STEAM and ext_id.isdigit() for space, ext_id in tags
     )
 
 def test_a_tag_is_its_number_and_not_its_weight(fixture):
@@ -39,8 +38,8 @@ def test_an_answer_without_items_is_a_breakage(fixture):
     """Ответ без `store_items` — это «мы спросили неправильно», а не «тегов
     нет». Так Steam отвечает на пустой `ids`.
 
-    Разница не косметическая: на тегах держатся 177 соответствий справочника из
-    326, и молчаливое «тегов нет» кладёт в базу обеднённую игру навсегда —
+    Разница не косметическая: из 219 правил Steam без тегов срабатывают девять,
+    и молчаливое «тегов нет» кладёт в базу обеднённую игру навсегда —
     перезапроса у игр не бывает вовсе.
 
     Пустой список проверяется рядом с отсутствующим ключом нарочно: это разные
@@ -63,9 +62,12 @@ def test_a_game_without_tags_is_an_answer_and_not_a_breakage():
 
     assert parse_tags(payload, "292030") == ()
 
-async def test_the_card_carries_both_spaces(replay, fixture):
+async def test_the_card_carries_its_genre_and_its_tags(replay, fixture):
     """Клиент доливает теги к жанрам: без них у игры остаётся один-два общих
-    жанра из двенадцати, какие есть у Steam на весь магазин."""
+    жанра из двенадцати, какие есть у Steam на весь магазин.
+
+    Сверяются обе половины поимённо: с проверкой «меток больше одной» потеря
+    жанра под двумя десятками тегов прошла бы молча."""
     appid = next(iter(fixture("steam/appdetails.json")))
     client = SteamClient(
         SourceHttp(
@@ -78,8 +80,9 @@ async def test_the_card_carries_both_spaces(replay, fixture):
     await client.aclose()
 
     assert isinstance(result, Found)
-    spaces = {space for space, _ in result.value.genre_ext_ids}
-    assert spaces == {GenreSource.STEAM, GenreSource.STEAM_TAG}
+    tagged = parse_tags(fixture("steam/store_items.json"), appid)
+    # `122` — тег-двойник жанра «Ролевая игра», единственного у этой игры.
+    assert result.value.genre_ext_ids == ((GenreSource.STEAM, "122"), *tagged)
 
 async def test_tags_that_did_not_arrive_do_not_break_the_card(
     replay, fixture, caplog
@@ -101,7 +104,10 @@ async def test_tags_that_did_not_arrive_do_not_break_the_card(
     await client.aclose()
 
     assert isinstance(result, Found)
-    assert {space for space, _ in result.value.genre_ext_ids} == {GenreSource.STEAM}
+    # Точный набор, а не пространство: пространство теперь одно на источник, и
+    # проверка «все метки из него» означала бы лишь «меток не ноль». Остаться
+    # обязан ровно жанр карточки — `122`, тег-двойник «Ролевой игры».
+    assert result.value.genre_ext_ids == ((GenreSource.STEAM, "122"),)
     assert "400" in caplog.text, "код отказа на тегах не записан"
 
 async def test_an_empty_tag_answer_leaves_a_trace(replay, fixture, caplog):
@@ -121,7 +127,10 @@ async def test_an_empty_tag_answer_leaves_a_trace(replay, fixture, caplog):
     await client.aclose()
 
     assert isinstance(result, Found)
-    assert {space for space, _ in result.value.genre_ext_ids} == {GenreSource.STEAM}
+    # Точный набор, а не пространство: пространство теперь одно на источник, и
+    # проверка «все метки из него» означала бы лишь «меток не ноль». Остаться
+    # обязан ровно жанр карточки — `122`, тег-двойник «Ролевой игры».
+    assert result.value.genre_ext_ids == ((GenreSource.STEAM, "122"),)
     assert "store_items" in caplog.text, "причина обеднённых жанров не записана"
 
 async def test_a_hidden_game_is_a_breakage_and_not_an_absence(fixture):
@@ -202,5 +211,8 @@ async def test_the_client_checks_the_tags_against_what_it_asked(fixture, caplog)
     await client.aclose()
 
     assert isinstance(result, Found)
-    assert {space for space, _ in result.value.genre_ext_ids} == {GenreSource.STEAM}
+    # Точный набор, а не пространство: пространство теперь одно на источник, и
+    # проверка «все метки из него» означала бы лишь «меток не ноль». Остаться
+    # обязан ровно жанр карточки — `122`, тег-двойник «Ролевой игры».
+    assert result.value.genre_ext_ids == ((GenreSource.STEAM, "122"),)
     assert "999999" in caplog.text, "чужой ответ на теги не записан"

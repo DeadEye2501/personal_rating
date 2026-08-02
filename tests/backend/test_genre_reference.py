@@ -1,4 +1,7 @@
-"""Справочник жанров из миграции против записанного эталона."""
+"""Справочник жанров из миграции против записанного эталона.
+
+Как правила срабатывают — `test_genre_rules.py`; здесь только то, что объявлено
+и что из объявленного доехало до базы."""
 
 import json
 from importlib import import_module
@@ -11,11 +14,15 @@ from tests.alembic_runner import alembic
 
 MIGRATION = "migrations.versions.0002_genres"
 
-# Эталон соответствий: 326 строк, снятых с согласованных наборов жанров. Лежит
-# данными, а не выводится из кода, — иначе сверять было бы не с чем.
-REFERENCE = Path(__file__).resolve().parents[1] / "fixtures/genre_map.json"
-
-BOOKS = ("TMDB", "STEAM", "STEAM_TAG", "GOG", "GOG_TAG")
+# Эталон правил: снимок, снятый с объявления один раз и с тех пор замороженный.
+# Он не проверяет сегодняшний перенос из спеки — это работа глаз и ревью; его
+# дело — уронить сборку, когда правило поправят мимоходом, а таких правил 363, и
+# счётом ни одна подмена метки не видна.
+#
+# **Пересобирать его вслепую нельзя.** Он единственный сторож этих 363 строк
+# поимённо, и пересборка «чтобы позеленело» обнуляет его молча: сперва читают,
+# что именно разошлось, и только потом снимают снимок заново.
+REFERENCE = Path(__file__).resolve().parents[1] / "fixtures/genre_rules.json"
 
 FILM_GENRES = {
     "Боевик", "Вестерн", "Военный", "Детектив", "Детский", "Документальный",
@@ -26,10 +33,10 @@ FILM_GENRES = {
 }
 
 GAME_GENRES = {
-    "Action", "Quest", "RPG", "JRPG", "Strategy", "Tabletop", "Tactical",
-    "Simulator", "Racing", "Sport", "Shooter", "Platformer", "Metroidvania",
-    "Puzzle", "Arcade", "Survival", "Horror", "Stealth", "Roguelike",
-    "Sandbox", "Fighting", "Multiplayer",
+    "Action", "Shooter", "Action-RPG", "RPG", "Strategy", "Tactical",
+    "Fighting", "Platformer", "Quest", "Puzzle", "Survival", "Tabletop",
+    "Sport", "Racing", "Simulator", "Horror", "Multiplayer", "Roguelike",
+    "Arcade",
 }
 
 COMPOSITE = {
@@ -38,17 +45,30 @@ COMPOSITE = {
     "10768": {"Военный", "Политика"},
 }
 
+RULES = 363
+MARKS = 385
+
 
 def named(connection, source: str, ext_id: str) -> set[str]:
-    """Наши жанры, в которые ведёт чужой идентификатор."""
+    """Наши жанры, к которым ведёт чужая метка. Запреты не в счёт: метка,
+    стоящая в правиле запретом, к его жанру не ведёт, а мешает."""
     rows = connection.execute(
         text(
-            "SELECT g.name FROM genre_map m JOIN genre g ON g.id = m.genre_id "
-            "WHERE m.source = :source AND m.ext_id = :ext_id"
+            "SELECT g.name FROM genre_rule r "
+            "JOIN genre g ON g.id = r.genre_id "
+            "JOIN genre_rule_mark m ON m.rule_id = r.id "
+            "WHERE r.source = :source AND m.ext_id = :ext_id "
+            "AND m.forbidden = 0"
         ),
         {"source": source, "ext_id": ext_id},
     ).scalars().all()
     return set(rows)
+
+
+def counted(connection, table: str, where: str = "") -> int:
+    return connection.execute(
+        text(f"SELECT count(*) FROM {table} {where}")
+    ).scalar()
 
 
 def test_film_set_has_twenty_five_genres(migrated):
@@ -59,164 +79,137 @@ def test_film_set_has_twenty_five_genres(migrated):
     assert len(rows) == 25
 
 
-def test_game_set_has_twenty_two_genres(migrated):
+def test_game_set_has_nineteen_genres(migrated):
+    """Набор пересмотрен пользователем 02.08.2026: прежние двадцать два
+    отменены, дробления на поджанры не будет."""
     rows = migrated.execute(
         text("SELECT name FROM genre WHERE kind = 'game'")
     ).scalars().all()
     assert set(rows) == GAME_GENRES
-    assert len(rows) == 22
-
-
-def test_tmdb_map_has_thirty_rows_over_twenty_seven_ids(migrated):
-    rows = migrated.execute(
-        text("SELECT ext_id FROM genre_map WHERE source = 'tmdb'")
-    ).scalars().all()
-    assert len(rows) == 30
-    assert len(set(rows)) == 27
+    assert len(rows) == 19
 
 
 def test_composite_genres_are_split_in_two(migrated):
+    """У TMDB сборный жанр — это два наших, и записан он двумя правилами с
+    одной меткой: правила с двумя жанрами не бывает."""
     for ext_id, expected in COMPOSITE.items():
         assert named(migrated, "tmdb", ext_id) == expected, ext_id
 
 
-def test_shared_identifiers_map_to_a_single_row(migrated):
+def test_shared_identifiers_map_to_a_single_rule(migrated):
     # Восемь id встречаются и в киношном, и в сериальном списке TMDB и означают
-    # одно и то же — строка у них одна. «Драма» это 18 в обоих.
+    # одно и то же — правило у них одно. «Драма» это 18 в обоих.
     assert named(migrated, "tmdb", "18") == {"Драма"}
 
 
-def test_game_map_covers_both_stores(migrated):
-    # Жанр и тег нумеруются порознь: у Steam 9 — это и жанр «Гонки», и тег
-    # «Стратегия». Слитый источник молча выдал бы игре чужой жанр.
+def test_every_source_has_the_rules_it_should(migrated):
+    """Числа правил по источникам. Колонка old-games.ru лежит в базе раньше,
+    чем появится его клиент: справочник — один артефакт, и собирать его дважды
+    дороже, чем подержать тринадцать строк без потребителя один слайс."""
     counts = dict(
         migrated.execute(
-            text("SELECT source, count(*) FROM genre_map GROUP BY source")
+            text("SELECT source, count(*) FROM genre_rule GROUP BY source")
         ).all()
     )
-    assert counts == {
-        "tmdb": 30, "steam": 8, "steam_tag": 177, "gog": 40, "gog_tag": 71
+    assert counts == {"tmdb": 30, "steam": 219, "gog": 101, "old_games": 13}
+
+
+def test_every_rule_requires_at_least_one_mark(migrated):
+    """Правило из одних запретов сработало бы на любой игре без них — то есть
+    почти на всех."""
+    empty = migrated.execute(
+        text(
+            "SELECT count(*) FROM genre_rule r WHERE NOT EXISTS ("
+            "  SELECT 1 FROM genre_rule_mark m "
+            "  WHERE m.rule_id = r.id AND m.forbidden = 0)"
+        )
+    ).scalar()
+    assert (empty, counted(migrated, "genre_rule")) == (0, RULES)
+
+
+def declared_in_migration() -> dict[str, list[list]]:
+    """Правила, как их объявила миграция, — в форме эталона."""
+    module = import_module(MIGRATION)
+    return {
+        source: [[rule.genre, rule.required(), rule.forbidden(), rule.alone]
+                 for rule in rules]
+        for source, rules, _kind in module.BOOKS
     }
 
 
-def test_the_same_number_means_different_things_in_the_two_spaces(migrated):
-    """Ловушка, ради которой источников четыре, а не два: у Steam 9 — жанр
-    «Гонки» и тег «Стратегия» одновременно."""
-    assert named(migrated, "steam", "9") == {"Racing"}
-    assert named(migrated, "steam_tag", "9") == {"Strategy"}
+def test_every_rule_matches_the_reference():
+    """Поимённо правила сторожит только эта сверка.
 
+    Тестами проверены числа, границы наборов и сами срабатывания — но подмена
+    метки у одного правила чисел не меняет, а правил 363.
 
-def test_only_composite_identifiers_lead_to_two_genres(migrated):
-    """Один идентификатор ведёт в два жанра только там, где сам значит два.
-
-    Три сборных жанра TMDB, девять составных тегов Steam вроде `Action RPG`,
-    слаг `jrpg` у GOG и три его составных тега. Всё остальное однозначно:
-    иначе тег «Стратегия» тихо выдал бы игре ещё и Racing."""
-    doubled = migrated.execute(
-        text(
-            "SELECT source, count(*) FROM ("
-            "  SELECT source, ext_id FROM genre_map "
-            "  GROUP BY source, ext_id HAVING count(*) > 1"
-            ") GROUP BY source"
-        )
-    ).all()
-    assert dict(doubled) == {"tmdb": 3, "steam_tag": 9, "gog": 1, "gog_tag": 3}
-
-
-def counted(connection, where: str) -> int:
-    return connection.execute(
-        text(f"SELECT count(*) FROM genre_map m {where}")
-    ).scalar()
-
-
-def declared_in_migration() -> dict[str, dict[str, list[str]]]:
-    """Пять словарей соответствий, как их объявила миграция."""
-    module = import_module(MIGRATION)
-    return {book: getattr(module, book) for book in BOOKS}
-
-
-def differences(reference: dict, declared: dict) -> list[str]:
-    found = []
-    for book in BOOKS:
-        for key in sorted(reference[book].keys() | declared[book].keys()):
-            mine, other = reference[book].get(key), declared[book].get(key)
-            if mine != other:
-                found.append(f"{book} {key}: эталон {mine}, миграция {other}")
-    return found
-
-
-def test_every_mapping_matches_the_reference():
-    """Поимённо соответствия сторожит только эта сверка.
-
-    Тестами проверены числа, ловушки и границы наборов — но подмена жанра у
-    одного идентификатора чисел не меняет, и таких строк 326.
-
-    Сверяются два объявления, до базы проверка не доходит. Что объявленное в неё
-    доехало, сторожит соседний
-    `test_the_declared_mappings_all_reached_the_database`."""
+    Сверяются два объявления, до базы проверка не доходит. Что объявленное в
+    неё доехало, сторожит соседний
+    `test_the_declared_rules_all_reached_the_database`."""
     reference = json.loads(REFERENCE.read_text(encoding="utf-8"))
 
-    assert differences(reference, declared_in_migration()) == []
+    assert declared_in_migration() == reference
 
 
-def test_the_declared_mappings_all_reached_the_database(migrated):
+def test_the_declared_rules_all_reached_the_database(migrated):
     """Объявленное в миграции против того, что легло в базу: сторожится перенос,
     а не сами таблицы.
 
-    `upgrade` кладёт строки в трёх вложенных циклах, и промахнуться там есть чем:
-    привязать пространство к чужому словарю или потерять метку у сборного
-    идентификатора — замерено, обе поломки этот тест роняет. Сравниваются тройки
-    «источник, чужая метка, имя нашего жанра»: с парой «источник и метка» первая
-    из двух прошла бы молча.
+    `upgrade` кладёт правило и его метки в трёх вложенных циклах, и
+    промахнуться там есть чем: привязать источник к чужому списку, потерять
+    запрет или слить метки двух правил в одно. Сравниваются четвёрки «источник,
+    жанр, требуемые, запрещённые»: с парой «источник и жанр» первая из трёх
+    поломок прошла бы молча.
 
-    Чего он не ловит и ловить не должен: опечатку в объявленном имени жанра —
-    `upgrade` разрешает имя через `ids[(kind, name)]` и роняет саму миграцию, — и
-    неверно выбранный жанр для чужой метки: обе стороны сравнения приходят из
-    одного объявления. Второе сторожит соседний
-    `test_every_mapping_matches_the_reference`; глазами остаётся только промах,
-    повторённый и в эталоне."""
-    module = import_module(MIGRATION)
-    declared = {
-        (source, ext_id, name)
-        for source, mapping in (
-            ("tmdb", module.TMDB), ("steam", module.STEAM),
-            ("steam_tag", module.STEAM_TAG), ("gog", module.GOG),
-            ("gog_tag", module.GOG_TAG),
-        )
-        for ext_id, names in mapping.items()
-        for name in names
-    }
-
-    stored = {
-        (row.source, row.ext_id, row.name)
+    Чего он не ловит и ловить не должен: неверно выбранный жанр для чужой
+    метки — обе стороны сравнения приходят из одного объявления. Это сторожит
+    соседний `test_every_rule_matches_the_reference`."""
+    stored = sorted(
+        (row.source, row.name, row.required or "", row.forbidden or "",
+         bool(row.alone))
         for row in migrated.execute(text(
-            "SELECT m.source, m.ext_id, g.name "
-            "FROM genre_map m JOIN genre g ON g.id = m.genre_id"
+            "SELECT r.source, g.name, r.alone, "
+            "  (SELECT group_concat(m.ext_id, '|') FROM ("
+            "     SELECT ext_id FROM genre_rule_mark "
+            "     WHERE rule_id = r.id AND forbidden = 0 ORDER BY ext_id) m"
+            "  ) AS required, "
+            "  (SELECT group_concat(m.ext_id, '|') FROM ("
+            "     SELECT ext_id FROM genre_rule_mark "
+            "     WHERE rule_id = r.id AND forbidden = 1 ORDER BY ext_id) m"
+            "  ) AS forbidden "
+            "FROM genre_rule r JOIN genre g ON g.id = r.genre_id"
         ))
-    }
+    )
+    declared = sorted(
+        (source, genre, "|".join(sorted(required)), "|".join(sorted(forbidden)),
+         alone)
+        for source, rules in declared_in_migration().items()
+        for genre, required, forbidden, alone in rules
+    )
 
     assert stored == declared
-    # Множеств меньше, чем строк: одна метка ведёт в два жанра у сборных
-    # идентификаторов, и кратность строк множество не показывает. Её сторожит
-    # соседний тест числом 326.
-    assert len(declared) == counted(migrated, "")
 
 
-def test_every_mapping_leads_to_an_existing_genre(migrated):
-    """Соответствие в никуда — тихая потеря жанра: карточка приедет без него, и
+def test_every_rule_leads_to_an_existing_genre(migrated):
+    """Правило в никуда — тихая потеря жанра: карточка приедет без него, и
     никто не заметит.
 
     Сравниваются два числа, а не проверяется отсутствие сирот: на пустой
     таблице сирот нет тоже."""
-    joined = counted(migrated, "JOIN genre g ON g.id = m.genre_id")
-    assert (joined, counted(migrated, "")) == (326, 326)
+    joined = counted(migrated, "genre_rule r",
+                     "JOIN genre g ON g.id = r.genre_id")
+    assert (joined, counted(migrated, "genre_rule")) == (RULES, RULES)
 
 
 def test_the_reference_can_be_rolled_back_and_laid_again(tmp_path):
     """Обратный ход этой миграции — не пустая формальность: она вставляет
     строки, и не убрав их за собой, следующий же прямой ход упирается в
     уникальность имени жанра. Полный откат до пустой базы этого не показывает —
-    там строки уходят вместе с таблицами."""
+    там строки уходят вместе с таблицами.
+
+    Метки считаются тоже: каскад тут двухступенчатый, и осиротевшая метка
+    прицепилась бы к чужому правилу — `genre_rule.id` это rowid, и SQLite
+    выдаёт его повторно."""
     db_path = tmp_path / "library.db"
     alembic(db_path, "upgrade", "head")
     alembic(db_path, "downgrade", "0001")
@@ -224,18 +217,20 @@ def test_the_reference_can_be_rolled_back_and_laid_again(tmp_path):
 
     engine = sqlalchemy.create_engine(f"sqlite:///{db_path}")
     with engine.connect() as connection:
-        genres = connection.execute(text("SELECT count(*) FROM genre")).scalar()
-        mapped = connection.execute(text("SELECT count(*) FROM genre_map")).scalar()
+        genres = counted(connection, "genre")
+        rules = counted(connection, "genre_rule")
+        marks = counted(connection, "genre_rule_mark")
     engine.dispose()
-    assert (genres, mapped) == (47, 326)
+    assert (genres, rules) == (44, RULES)
+    assert marks == MARKS
 
 
 def test_film_and_game_sets_never_mix(migrated):
-    """Кино и игры — два раздельных набора. Соответствие из магазина, ведущее
-    в киношный жанр, значит, что при вставке перепутан набор."""
+    """Кино и игры — два раздельных набора. Правило из магазина, ведущее в
+    киношный жанр, значит, что при вставке перепутан набор."""
     right = counted(
-        migrated,
-        "JOIN genre g ON g.id = m.genre_id "
-        "WHERE (m.source = 'tmdb') = (g.kind = 'film')",
+        migrated, "genre_rule r",
+        "JOIN genre g ON g.id = r.genre_id "
+        "WHERE (r.source = 'tmdb') = (g.kind = 'film')",
     )
-    assert right == 326
+    assert right == RULES
