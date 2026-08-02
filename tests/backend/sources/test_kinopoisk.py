@@ -212,124 +212,6 @@ async def test_primary_asks_for_the_fields_it_needs():
     assert seen["x-api-key"] == "k"
 
 
-async def test_fallback_empty_result_is_an_answer(replay):
-    result = await fallback(replay("kinopoisk/unofficial_not_found.json")).ratings(
-        "tt0000000", Kind.MOVIE
-    )
-
-    assert isinstance(result, Missing)
-
-
-async def test_fallback_rating_comes_with_the_search(replay):
-    """Одна оценка за один запрос: ratingKinopoisk лежит прямо здесь."""
-    result = await fallback(replay("kinopoisk/unofficial_found.json")).ratings(
-        "tt0816692", Kind.MOVIE
-    )
-
-    assert isinstance(result, Found)
-    assert [one.source for one in result.value.values] == [RatingSource.KINOPOISK]
-    assert result.value.values[0].value == 8.7
-    # Тот же идентификатор, что у основного зеркала: источник один.
-    assert [one.value for one in result.value.external_ids] == ["258687"]
-
-
-async def test_fallback_quota_has_its_own_code(replay, meta):
-    """402 — отдельный код, не путать с 429 по частоте."""
-    assert meta("kinopoisk/unofficial_quota.json")["status"] == 402
-
-    result = await fallback(replay("kinopoisk/unofficial_quota.json")).ratings(
-        "tt0816692", Kind.MOVIE
-    )
-
-    assert isinstance(result, Refusal)
-    assert result.reason is Reason.QUOTA
-
-
-async def test_fallback_html_from_nginx_does_not_crash_the_parser(replay, meta):
-    """429 приходит от nginx с телом text/html — JSON на нём падает."""
-    assert meta("kinopoisk/unofficial_rate.txt")["status"] == 429
-
-    result = await fallback(replay("kinopoisk/unofficial_rate.txt")).ratings(
-        "tt0816692", Kind.MOVIE
-    )
-
-    assert isinstance(result, Refusal)
-    assert result.reason is Reason.RATE
-
-
-async def test_fallback_rate_limit_trips_its_breaker_too():
-    """Пять запросов в секунду — предел этой ручки. Не взведя предохранитель,
-    мы продолжили бы стучаться и выбрали бы суточную квоту на отказы."""
-    transport, seen = counting(responding(429, text="<html>429</html>"))
-
-    client = fallback(transport)
-    first = await client.ratings("tt0816692", Kind.MOVIE)
-    await client.ratings("tt0111161", Kind.MOVIE)
-
-    assert first.reason is Reason.RATE
-    assert first.retry_after == timedelta(minutes=1)
-    assert len(seen) == 1
-
-
-async def test_the_quota_closes_the_mirror_for_six_hours():
-    """Срок — не украшение: у Кинопоиска квота самая жёсткая из всех, 500
-    запросов в сутки, и минутный откат сжёг бы её на повторных отказах."""
-    clock = FakeClock()
-    http = SourceHttp(
-        "kinopoisk", clock=clock, transport=responding(403, json={"statusCode": 403})
-    )
-    client = PoiskkinoClient(http, api_key="k")
-
-    await client.ratings("tt0816692", Kind.MOVIE)
-    clock.advance(timedelta(hours=5))
-    assert http.breaker.is_open(), "предохранитель отпустил раньше срока"
-
-    clock.advance(timedelta(hours=2))
-    assert not http.breaker.is_open(), "предохранитель не отпустил через шесть часов"
-    await client.aclose()
-
-
-async def test_fallback_bad_key_is_a_refusal(replay, meta):
-    assert meta("kinopoisk/unofficial_bad_key.json")["status"] == 401
-
-    result = await fallback(replay("kinopoisk/unofficial_bad_key.json")).ratings(
-        "tt0816692", Kind.MOVIE
-    )
-
-    assert isinstance(result, Refusal)
-    assert result.reason is Reason.KEY
-
-
-async def test_fallback_sends_the_key_in_the_header_and_keeps_the_tt_prefix():
-    seen = {}
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.update(request.headers)
-        seen["url"] = str(request.url)
-        return httpx.Response(200, json={"total": 0, "items": []})
-
-    await fallback(httpx.MockTransport(handler)).ratings("tt0816692", Kind.MOVIE)
-
-    assert seen["x-api-key"] == "k"
-    assert "imdbId=tt0816692" in seen["url"]
-    # search-by-keyword не используем: у него 404 означает два разных смысла.
-    assert "v2.2/films" in seen["url"]
-    assert "search-by-keyword" not in seen["url"]
-
-
-async def test_an_honest_zero_is_not_an_absence():
-    """Весь план стоит на различии «нет ответа» и «ответ пустой». Ноль — это
-    значение, а не молчание."""
-    transport = responding(
-        200, json={"total": 1, "items": [{"ratingKinopoisk": 0, "kinopoiskId": 1}]}
-    )
-
-    result = await fallback(transport).ratings("tt0816692", Kind.MOVIE)
-
-    assert isinstance(result, Found)
-    assert result.value.values[0].value == 0.0
-
-
 async def test_a_refusal_switches_to_the_fallback():
     asked = []
 
@@ -437,9 +319,9 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
     assert all(one.startswith("kinopoisk:") for one in said.values())
 
 
-
-
 @pytest.mark.parametrize("mirror", ["primary", "fallback"])
+
+
 async def test_a_well_formed_body_under_a_failure_code_is_not_an_answer(fixture, mirror):
     """Ответ разбирается только под кодом 200. Тело правильной формы под 5xx —
     обычное дело у периметра, который кеширует старую страницу, и разобрать его
@@ -458,3 +340,21 @@ async def test_a_well_formed_body_under_a_failure_code_is_not_an_answer(fixture,
 
     assert isinstance(outcome, Refusal)
     assert outcome.reason is Reason.BROKEN
+
+
+async def test_the_quota_closes_the_mirror_for_six_hours():
+    """Срок — не украшение: у Кинопоиска квота самая жёсткая из всех, 500
+    запросов в сутки, и минутный откат сжёг бы её на повторных отказах."""
+    clock = FakeClock()
+    http = SourceHttp(
+        "kinopoisk", clock=clock, transport=responding(403, json={"statusCode": 403})
+    )
+    client = PoiskkinoClient(http, api_key="k")
+
+    await client.ratings("tt0816692", Kind.MOVIE)
+    clock.advance(timedelta(hours=5))
+    assert http.breaker.is_open(), "предохранитель отпустил раньше срока"
+
+    clock.advance(timedelta(hours=2))
+    assert not http.breaker.is_open(), "предохранитель не отпустил через шесть часов"
+    await client.aclose()

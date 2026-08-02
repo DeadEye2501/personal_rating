@@ -43,6 +43,13 @@ def parse_unofficial(payload: dict) -> Ratings:
     if row is None:
         return Ratings()
 
+    return parse_unofficial_card(row)
+
+
+def parse_unofficial_card(row: dict) -> Ratings:
+    """Строка фильма: у списка она лежит в `items`, у карточки по номеру ответ
+    и есть эта строка. Поля в обеих одни и те же — замерено на «Гражданине-
+    мстителе», где в списке `ratingKinopoisk: null`, а в карточке `6.5`."""
     now = datetime.now()
     return Ratings(
         values=_rating(row.get("ratingKinopoisk"), now),

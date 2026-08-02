@@ -194,6 +194,12 @@ async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> No
         base, params={"imdbId": "tt0000000"}, headers={"X-API-KEY": key}))
     save("kinopoisk", "unofficial_bad_key", await client.get(
         base, params={"imdbId": INTERSTELLAR_IMDB}, headers={"X-API-KEY": wrong}))
+    # «Гражданин-мститель»: в списке оценки нет, в карточке по номеру она есть.
+    # У «Интерстеллара» в списке она стоит, и на нём этот случай не наблюдается.
+    save("kinopoisk", "unofficial_list_without_rating", await client.get(
+        base, params={"imdbId": "tt35309713"}, headers={"X-API-KEY": key}))
+    save("kinopoisk", "unofficial_card", await client.get(
+        f"{base}/6943602", headers={"X-API-KEY": key}))
 
 
 async def main() -> None:

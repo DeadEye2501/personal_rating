@@ -517,7 +517,7 @@
 - `def refuse_code(status: int) -> Refusal` (3)
 - `def answered(answer: Ratings) -> Outcome` (7)
 
-### `backend/sources/ratings/kinopoisk/parse.py` — 50 строк
+### `backend/sources/ratings/kinopoisk/parse.py` — 57 строк
 
 Перевод ответов обоих зеркал Кинопоиска в наши типы.
 
@@ -526,7 +526,8 @@
 - `def _rating(value, now: datetime) -> tuple[ExternalRating, ...]` (8)
 - `def _first_row(payload: dict, key: str) -> dict | None` (8)
 - `def parse_poiskkino(payload: dict) -> Ratings` (10)
-- `def parse_unofficial(payload: dict) -> Ratings` (10)
+- `def parse_unofficial(payload: dict) -> Ratings` (6)
+- `def parse_unofficial_card(row: dict) -> Ratings` (9)
 
 ### `backend/sources/ratings/kinopoisk/poiskkino.py` — 68 строк
 
@@ -540,15 +541,17 @@
   - `def _answer(self, response: httpx.Response) -> Outcome` (3)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/ratings/kinopoisk/unofficial.py` — 58 строк
+### `backend/sources/ratings/kinopoisk/unofficial.py` — 103 строк
 
 Запасное зеркало Кинопоиска.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.parse`
 
-- `class UnofficialClient` (32)
-  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (9)
-  - `def _verdict(self, response: httpx.Response) -> Outcome` (14)
+- `def _needs_the_card(ratings: Ratings) -> bool` (4)
+- `class UnofficialClient` (67)
+  - `async def ratings(self, imdb_id: str, kind: Kind) -> Outcome` (13)
+  - `async def _card(self, listed: Ratings) -> Outcome` (29)
+  - `def _verdict(self, response: httpx.Response, parse: Callable[[dict], Ratings]) -> Outcome` (15)
   - `async def aclose(self) -> None` (2)
 
 ### `backend/sources/ratings/mdblist/client.py` — 95 строк
@@ -1220,7 +1223,7 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
-### `scripts/record_fixtures.py` — 222 строк
+### `scripts/record_fixtures.py` — 228 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -1233,10 +1236,10 @@
 - `async def record_gog(client: httpx.AsyncClient) -> None` (18)
 - `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
 - `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
-- `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
+- `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (19)
 - `async def main() -> None` (20)
 
-## tests — 85 модулей
+## tests — 86 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1298,15 +1301,25 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 Тестов: 24
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 460 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 360 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.conftest`
 
-Тестов: 30
+Тестов: 22
 
 - `def primary(transport) -> PoiskkinoClient` (2)
+- `def fallback(transport) -> UnofficialClient` (2)
+
+### `tests/backend/sources/test_kinopoisk_unofficial.py` — 174 строк
+
+Запасное зеркало Кинопоиска: оценка, отказы и дозапрос карточки.
+
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.conftest`
+
+Тестов: 11
+
 - `def fallback(transport) -> UnofficialClient` (2)
 
 ### `tests/backend/sources/test_mdblist.py` — 255 строк

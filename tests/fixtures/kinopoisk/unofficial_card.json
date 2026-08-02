@@ -1,0 +1,64 @@
+{
+  "kinopoiskId": 6943602,
+  "kinopoiskHDId": null,
+  "imdbId": "tt35309713",
+  "nameRu": "Гражданин-мститель",
+  "nameEn": null,
+  "nameOriginal": "Citizen Vigilante",
+  "posterUrl": "https://kinopoiskapiunofficial.tech/images/posters/kp/6943602.jpg",
+  "posterUrlPreview": "https://kinopoiskapiunofficial.tech/images/posters/kp_small/6943602.jpg",
+  "coverUrl": null,
+  "logoUrl": null,
+  "reviewsCount": 6,
+  "ratingGoodReview": 75.0,
+  "ratingGoodReviewVoteCount": 4,
+  "ratingKinopoisk": 6.5,
+  "ratingKinopoiskVoteCount": 4009,
+  "ratingImdb": 5.2,
+  "ratingImdbVoteCount": 803,
+  "ratingFilmCritics": 2.0,
+  "ratingFilmCriticsVoteCount": 10,
+  "ratingAwait": null,
+  "ratingAwaitCount": 0,
+  "ratingRfCritics": null,
+  "ratingRfCriticsVoteCount": 1,
+  "webUrl": "https://www.kinopoisk.ru/film/6943602/",
+  "year": 2026,
+  "filmLength": 89,
+  "slogan": null,
+  "description": "Американец Сандерс самостоятельно ведёт охоту на преступников, скрывшихся от правосудия. Часть общественности одобряет его действия, но полиция под руководством главы регионального отделения Интерпола полна решимости арестовать вершителя самосуда.",
+  "shortDescription": null,
+  "editorAnnotation": null,
+  "isTicketsAvailable": false,
+  "productionStatus": "FILMING",
+  "type": "FILM",
+  "ratingMpaa": null,
+  "ratingAgeLimits": null,
+  "countries": [
+    {
+      "country": "Германия"
+    },
+    {
+      "country": "Хорватия"
+    }
+  ],
+  "genres": [
+    {
+      "genre": "триллер"
+    },
+    {
+      "genre": "криминал"
+    },
+    {
+      "genre": "боевик"
+    }
+  ],
+  "startYear": null,
+  "endYear": null,
+  "serial": false,
+  "shortFilm": false,
+  "completed": false,
+  "hasImax": false,
+  "has3D": false,
+  "lastSync": "2026-07-09T11:46:05.104382"
+}
