@@ -37,7 +37,6 @@ from tests.conftest import (
     picture,
     responding,
     seed,
-    unreachable,
 )
 
 
@@ -102,7 +101,7 @@ async def writer(sessions, engine, posters):
 
 
 async def test_a_whole_card_lands_in_the_database(writer, sessions):
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
     assert isinstance(item_id, int)
 
     stored = await LibraryRepository(sessions).get(item_id)
@@ -112,7 +111,7 @@ async def test_a_whole_card_lands_in_the_database(writer, sessions):
 
 
 async def test_genres_are_resolved_through_the_reference(writer, sessions):
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
 
     names = {g.name for g in await GenresRepository(sessions).genres_of(item_id)}
     assert names == {"фантастика", "приключения"}
@@ -121,7 +120,7 @@ async def test_genres_are_resolved_through_the_reference(writer, sessions):
 async def test_people_are_attached_with_their_roles(writer, sessions):
     """Роль привязана к человеку, а не лежит рядом набором: перепутанные
     местами режиссёр и актёр набор имён не различает."""
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
 
     found = await people(sessions).credits_of(item_id)
     assert {(c.name, c.role, c.position) for c in found} == {
@@ -135,8 +134,8 @@ async def test_people_are_attached_with_their_roles(writer, sessions):
 async def test_the_same_person_on_two_cards_is_one_row(writer, sessions):
     """Склейка по идентификатору источника: иначе «показать всё с этим
     человеком» разваливается на пять Кристоферов Ноланов."""
-    first = await writer.save(source_card())
-    second = await writer.save(another_movie("374720"))
+    first = await writer.save(source_card(), POSTER)
+    second = await writer.save(another_movie("374720"), POSTER)
 
     assert len(await people(sessions).find_by_name("Кристофер Нолан")) == 1
     for item_id in (first, second):
@@ -152,7 +151,7 @@ async def test_two_namesakes_from_the_source_do_not_merge(writer, sessions):
                source=Source.TMDB, source_id="1"),
         Credit("Василий Пупкин", PersonRole.ACTOR, position=1,
                source=Source.TMDB, source_id="2"),
-    )))
+    )), POSTER)
 
     assert len(await people(sessions).find_by_name("Василий Пупкин")) == 2
     assert len(await people(sessions).credits_of(item_id)) == 2
@@ -162,13 +161,13 @@ async def test_studios_without_identity_are_merged_by_name(writer, sessions):
     """У Steam и GOG студии приходят голыми строками — склеивать их больше не по
     чему, и это законно."""
     for source_id in ("1", "2"):
-        await writer.save(game_card(source_id))
+        await writer.save(game_card(source_id), POSTER)
 
     assert len(await companies(sessions).find_by_name("CD Projekt RED")) == 1
 
 
 async def test_companies_are_written_for_a_game(writer, sessions):
-    item_id = await writer.save(game_card())
+    item_id = await writer.save(game_card(), POSTER)
 
     found = await companies(sessions).credits_of(item_id)
     assert [(c.name, c.role) for c in found] == [
@@ -179,15 +178,15 @@ async def test_companies_are_written_for_a_game(writer, sessions):
 async def test_people_and_studios_do_not_land_in_one_another(writer, sessions):
     """Репозитория два, и таблицы у них разные: слитые, они показали бы студию
     в списке людей."""
-    movie = await writer.save(source_card())
-    game = await writer.save(game_card())
+    movie = await writer.save(source_card(), POSTER)
+    game = await writer.save(game_card(), POSTER)
 
     assert await companies(sessions).credits_of(movie) == []
     assert await people(sessions).credits_of(game) == []
 
 
 async def test_external_identifiers_and_ratings_are_written(writer, sessions):
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
 
     ids = await ExternalIdsRepository(sessions).ids_of(item_id)
     ratings = await ExternalRatingsRepository(sessions).ratings_of(item_id)
@@ -200,7 +199,7 @@ async def test_external_identifiers_and_ratings_are_written(writer, sessions):
 
 
 async def test_the_poster_is_stored(writer):
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
 
     assert await writer.posters._store.get(item_id) == POSTER
 
@@ -209,60 +208,32 @@ async def test_a_prefetched_poster_is_not_downloaded_again(writer):
     """Круги 2а и 2б можно пустить параллельно — оркестратор передаст байты."""
     ready = picture(600, 900)
 
-    item_id = await writer.save(source_card(), poster=ready)
+    item_id = await writer.save(source_card(), ready)
 
     assert await writer.posters._store.get(item_id) == ready
 
 
-async def test_a_card_without_a_poster_url_is_still_written(writer):
-    """Обложки нет в самом источнике — ждать нечего."""
+async def test_a_card_without_a_cover_is_still_written(writer):
+    """Обложки нет — ни в самом источнике, ни по угаданному адресу Steam. Такая
+    карточка пишется целиком, только без картинки: добывать её пробовал
+    загрузчик, и это его ответ, а не «мы не пробовали»."""
     item_id = await writer.save(source_card(
         item=an_item("1", "Без обложки"),
         external_ids=(),
-    ))
+    ), None)
 
     assert isinstance(item_id, int)
     assert not await writer.posters._store.has(item_id)
 
 
-async def test_nothing_is_written_when_the_poster_fails(sessions, engine, posters):
-    """Частичной карточки из внешнего источника в базе не бывает."""
-    writer = await build(sessions, engine, posters,
-                         responding(500, content=POSTER))
-
-    result = await writer.save(source_card())
-    await writer.posters.aclose()
-
-    assert isinstance(result, Refusal)
-    # Отказ обложки уходит наверх свой, а не собранный после сорванной записи:
-    # пиши мы карточку и падай уже на постере, наверх ушла бы ошибка базы, и
-    # причина «CDN молчит» потерялась бы.
-    assert result.source == "poster:tmdb"
-    assert await LibraryRepository(sessions).find_by_source(
-        Source.TMDB, "157336"
-    ) is None
-
-
-async def test_an_unreachable_cdn_keeps_its_reason(sessions, engine, posters):
-    """«Нет связи» и «ответил непонятно чем» решаются наверху по-разному, и
-    причина обязана дойти нетронутой."""
-    writer = await build(sessions, engine, posters, unreachable())
-
-    result = await writer.save(source_card())
-    await writer.posters.aclose()
-
-    assert isinstance(result, Refusal)
-    assert result.reason is Reason.NETWORK
-
-
 async def test_a_taken_identifier_leaves_nothing_behind(writer, sessions):
     """Занятый IMDb ID срывает запись на середине — убираем за собой. Проверка
     не только карточки: за ней остались бы и жанры, и люди, и постер."""
-    await writer.save(source_card())
+    await writer.save(source_card(), POSTER)
 
     result = await writer.save(another_movie(
         "999", external_ids=(ExternalId(IdSource.IMDB, "tt0816692"),),
-    ))
+    ), POSTER)
 
     assert isinstance(result, Refusal)
     # Отказ назван источником карточки и причиной «ответил непонятно чем»: по ним
@@ -276,12 +247,12 @@ async def test_the_rollback_takes_the_written_half_with_it(writer, sessions):
     """До занятого идентификатора успевают лечь жанры и люди. Уходят они
     каскадом, а каскад — свойство схемы: без внешнего ключа с `ON DELETE CASCADE`
     строки остались бы висеть на номере, который достанется другой карточке."""
-    first = await writer.save(source_card())
+    first = await writer.save(source_card(), POSTER)
     half_written = first + 1
 
     await writer.save(another_movie(
         "999", external_ids=(ExternalId(IdSource.IMDB, "tt0816692"),),
-    ))
+    ), POSTER)
 
     # Идентификаторы и оценки не проверяются: срыв наступает на первом же
     # `_ids.put`, до него их не записано, и пустота истинна по построению.
@@ -306,7 +277,7 @@ async def test_the_rollback_takes_the_poster_with_it(writer, monkeypatch):
 
     monkeypatch.setattr(writer.posters, "save", save_then_break)
 
-    result = await writer.save(source_card())
+    result = await writer.save(source_card(), POSTER)
 
     assert isinstance(result, Refusal)
     assert stored, "обложка до хранилища не дошла — тест проверяет не то"
@@ -329,7 +300,7 @@ async def test_the_writer_clears_the_place_under_the_cover_too(writer,
 
     monkeypatch.setattr(writer.posters, "delete", note)
 
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
 
     assert cleared == [item_id], "писатель завёл строку мимо общей уборки"
 
@@ -346,7 +317,7 @@ async def test_the_rollback_undoes_a_failed_clearing(writer, sessions,
 
     monkeypatch.setattr(writer.posters, "delete", refuse)
 
-    result = await writer.save(source_card())
+    result = await writer.save(source_card(), POSTER)
 
     assert isinstance(result, Refusal), "наружу из писателя летит отказ"
     assert await LibraryRepository(sessions).find_by_source(
@@ -371,7 +342,7 @@ async def test_cancelling_the_write_takes_the_card_with_it(writer, sessions,
     monkeypatch.setattr(writer._ids, "put", cancel)
 
     with pytest.raises(asyncio.CancelledError):
-        await writer.save(source_card())
+        await writer.save(source_card(), POSTER)
 
     assert await LibraryRepository(sessions).find_by_source(
         Source.TMDB, "157336") is None
@@ -380,9 +351,9 @@ async def test_cancelling_the_write_takes_the_card_with_it(writer, sessions,
 async def test_a_taken_card_identity_is_a_refusal_not_an_exception(writer):
     """Контракт save — int или Refusal, исключений наружу не летит. Отказ назван
     источником карточки: их шесть, и по имени наверху понимают, кто отказал."""
-    await writer.save(source_card())
+    await writer.save(source_card(), POSTER)
 
-    result = await writer.save(source_card(external_ids=()))
+    result = await writer.save(source_card(external_ids=()), POSTER)
 
     assert isinstance(result, Refusal)
     assert (result.source, result.reason) == ("tmdb", Reason.BROKEN)
@@ -393,7 +364,7 @@ async def test_an_unknown_genre_does_not_stop_the_card(writer, sessions):
     него, и всё — незнакомое молча отбрасывается."""
     item_id = await writer.save(source_card(genre_ext_ids=(
         (GenreSource.TMDB, "878"), (GenreSource.TMDB, "99999"),
-    )))
+    )), POSTER)
 
     names = {g.name for g in await GenresRepository(sessions).genres_of(item_id)}
     assert names == {"фантастика"}
@@ -413,7 +384,7 @@ async def test_two_spaces_of_one_card_are_asked_apart(writer, sessions, engine):
 
     item_id = await writer.save(game_card(genre_ext_ids=(
         (GenreSource.STEAM, "9"), (GenreSource.STEAM_TAG, "9"),
-    )))
+    )), POSTER)
 
     names = {g.name for g in await GenresRepository(sessions).genres_of(item_id)}
     assert names == {"Racing", "Strategy"}
@@ -425,7 +396,7 @@ async def test_the_poster_is_dated_by_the_moment_of_the_card(writer, tmp_path):
 
     Читается файл, а не хранилище: наружу `PosterStore` отдаёт байты, отметку он
     не показывает никому — сегодня её никто и не спрашивает."""
-    item_id = await writer.save(source_card())
+    item_id = await writer.save(source_card(), POSTER)
     await writer.posters.aclose()
 
     connection = sqlite3.connect(tmp_path / "posters.db")

@@ -331,6 +331,7 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `_SIGNATURES` = `набор из 3`
+- `_ABSENT` = `404`
 - `POSTER_SOURCES` = `набор из 3`
 
 ### `backend/service/search.py`

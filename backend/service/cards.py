@@ -19,14 +19,17 @@ class CardWriter(CardParts):
     за собой: общей транзакции на два файла базы не бывает."""
 
     async def save(self, card: SourceCard,
-                   poster: bytes | None = None) -> int | Refusal:
-        if poster is None:
-            poster = await self.posters.fetch(card.item.source,
-                                              card.item.poster_url)
-            if isinstance(poster, Refusal):
-                # Не скачалась — не пишем ничего, повторим при следующем показе.
-                return poster
+                   poster: bytes | None) -> int | Refusal:
+        """Обложка приходит доводом и не добывается здесь: качает её тот, кто
+        решает, писать ли карточку вовсе, — загрузчик. `None` тут значит ровно
+        одно, «обложки нет»: пустой адрес у источника или отвеченный CDN-ом
+        `404` на угаданный адрес Steam.
 
+        Со своим добыванием этих смыслов было два: «нет» и «не пробовали», — и
+        загрузчик, честно передав первое, получал второй поход в сеть по тому же
+        адресу. Судьбу карточки решал бы тогда второй ответ: сетевая икота между
+        запросами превращала бы «обложки нет» в отказ, и карточка не писалась
+        бы."""
         item_id = await self._started(card)
         if isinstance(item_id, Refusal):
             return item_id

@@ -240,14 +240,14 @@
   - `async def _attach_credits(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...]) -> None` (6)
   - `async def _write_external(self, item_id: int, card: SourceCard) -> None` (6)
 
-### `backend/service/cards.py` — 88 строк
+### `backend/service/cards.py` — 91 строк
 
 Карточка источника строками базы.
 
 Зависит от: `backend.model`, `backend.service.card_parts`, `backend.service.creation`, `backend.service.genres`, `backend.service.removal`, `backend.sources.errors`
 
-- `class CardWriter(CardParts)` (73)
-  - `async def save(self, card: SourceCard, poster: bytes | None=None) -> int | Refusal` (37)
+- `class CardWriter(CardParts)` (76)
+  - `async def save(self, card: SourceCard, poster: bytes | None) -> int | Refusal` (40)
   - `async def _started(self, card: SourceCard) -> int | Refusal` (16)
   - `async def _write_the_rest(self, item_id: int, card: SourceCard, poster: bytes | None) -> None` (13)
 
@@ -340,15 +340,16 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 105 строк
+### `backend/service/loading.py` — 123 строк
 
 Кандидат превращается в карточку.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.repository.library`
 
-- `class Loader` (81)
+- `class Loader` (99)
   - `def _catalog(self, source: Source, action: str)` (12)
-  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (32)
+  - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (37)
+  - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
 ### `backend/service/people.py` — 78 строк
@@ -362,16 +363,16 @@
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
   - `async def _outside(self, domain: str, identity: tuple[str, str | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (17)
 
-### `backend/service/posters.py` — 136 строк
+### `backend/service/posters.py` — 154 строк
 
 Путь обложки от источника до хранилища.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
 
-- `class PosterService` (109)
+- `class PosterService` (121)
   - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (7)
   - `async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal` (16)
-  - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | Refusal` (18)
+  - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | None | Refusal` (30)
   - `def _name(source: Source) -> str` (4)
   - `def _refuse(self, source: Source, detail: str) -> Refusal` (6)
   - `async def poster_for(self, item_id: int | None, source: Source, url: str, now: datetime) -> bytes | None | Refusal` (19)
@@ -1466,13 +1467,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_card_writer.py` — 439 строк ⚠ подошёл к 300
+### `tests/backend/test_card_writer.py` — 410 строк ⚠ подошёл к 300
 
 Запись карточки источника в базу целиком — или ничего.
 
 Зависит от: `backend.model`, `backend.service.cards`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `tests.conftest`
 
-Тестов: 24
+Тестов: 22
 
 - `def source_card(**overrides) -> SourceCard` (17)
 - `def game_card(source_id: str='292030', **overrides) -> SourceCard` (10)
@@ -1719,13 +1720,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 353 строк ⚠ подошёл к 300
+### `tests/backend/test_loading.py` — 398 строк ⚠ подошёл к 300
 
 Три круга загрузки: кандидат становится карточкой в базе.
 
 Зависит от: `backend.model`, `backend.service.cards`, `backend.service.loading`, `backend.service.posters`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 18
+Тестов: 20
 
 - `def candidate(source_id='157336', poster=SEARCH_COVER) -> CardView` (6)
 - `def source_card(source_id='157336', poster=DETAIL_COVER) -> SourceCard` (7)
@@ -1810,13 +1811,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
 - `def outside_questions(asked: list[tuple]) -> list[tuple]` (4)
 
-### `tests/backend/test_poster_service.py` — 226 строк
+### `tests/backend/test_poster_service.py` — 245 строк
 
 Путь обложки от источника до хранилища.
 
 Зависит от: `backend.model`, `backend.service.images`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `tests.conftest`
 
-Тестов: 17
+Тестов: 18
 
 - `async def service(posters)` (4)
 

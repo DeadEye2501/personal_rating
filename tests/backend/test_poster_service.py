@@ -36,13 +36,32 @@ async def test_no_url_means_nothing_to_wait_for(service):
     assert await service.fetch(Source.TMDB, "") is None
 
 
-async def test_a_failed_download_is_a_refusal(posters):
-    """В теле настоящая картинка, и отказ всё равно отказ: под кодом 404 CDN
-    отдаёт и заглушку-картинку, а сохранить её значило бы поселить в карточке
-    чужую обложку насовсем. С телом-текстом эта проверка сторожила бы подпись
-    формата, а не код ответа."""
+async def test_a_missing_picture_is_an_absence_and_not_a_refusal(posters):
+    """`404` — это «такой картинки нет», а не «не смогли посмотреть». У Steam
+    адрес обложки не приезжает в ответе, а собирается нами по образцу, и у части
+    приложений её не существует вовсе: замерено живьём 02.08.2026 — дополнение
+    GTA V и служебный клиент Steam отвечают `404`, настоящие игры `200`. Отказом
+    это запирало бы игру навсегда: карточка не пишется, а «повторим при
+    следующем показе» у постоянного `404` не наступает.
+
+    В теле нарочно настоящая картинка: под `404` CDN отдаёт и заглушку, а
+    сохранить её значило бы поселить в карточке чужую обложку насовсем. Здесь
+    наблюдается только то, что наружу она не выходит; что она не оседает в
+    хранилище — у загрузчика, где под тем же кодом транспорт отдаёт настоящие
+    байты, а хранилище остаётся пустым. С телом-текстом проверка сторожила бы
+    подпись формата, а не код."""
     service = poster_service(posters, responding(404, content=POSTER))
     result = await service.fetch(Source.TMDB, "https://example.com/missing.jpg")
+    await service.aclose()
+
+    assert result is None
+
+
+async def test_a_server_failure_is_still_a_refusal(posters):
+    """Пятисотые от «нет картинки» отличаются тем, что повторить их стоит:
+    карточка не пишется, и следующий показ спросит снова."""
+    service = poster_service(posters, responding(500, content=POSTER))
+    result = await service.fetch(Source.TMDB, "https://example.com/p.jpg")
     await service.aclose()
 
     assert isinstance(result, Refusal)

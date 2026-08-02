@@ -31,6 +31,7 @@ from tests.conftest import (
     capture,
     card_parts,
     hit,
+    unreachable,
 )
 
 
@@ -212,6 +213,50 @@ async def test_two_refusals_at_once_name_the_source_and_not_its_cdn(
 
     assert isinstance(result, Refusal)
     assert result.source == "tmdb"
+
+
+async def test_a_game_without_a_vertical_cover_is_still_written(sessions, loader,
+                                                                posters):
+    """У Steam адрес обложки не приезжает в ответе — он собирается нами по
+    образцу, и у части приложений такой картинки нет вовсе. Замерено живьём
+    02.08.2026: у «Ведьмака 3», Counter-Strike, REDkit и Ultima Underworld CDN
+    отвечает `200`, у дополнения GTA V и служебного клиента Steam — `404`.
+
+    Постоянный `404` отказом быть не может: карточка тогда не пишется вовсе, а
+    «повторим при следующем показе» не наступает никогда — добавить такую игру
+    было бы нельзя ни разу. Обложки просто нет, и карточка живёт без неё; так же
+    ведёт себя пустой адрес у TMDB и GOG."""
+    rig = loader(Found(source_card(poster=SEARCH_COVER)), poster_status=404)
+
+    item_id = await rig.load.ensure(candidate())
+
+    assert isinstance(item_id, int), f"карточка не завелась: {item_id}"
+    assert await posters.has(item_id) is False
+    # Запрос ровно один: писателю «обложки нет» и «обложку не добывали» —
+    # разные вещи, и на первом он в CDN не идёт. Сходи он туда второй раз,
+    # судьбу карточки решал бы второй ответ: сетевая икота между запросами
+    # вернула бы отказ, и карточка не записалась бы — то есть ровно то, ради
+    # снятия чего проверка и написана.
+    assert len(rig.requests) == 1
+
+
+async def test_an_unreachable_cdn_keeps_its_reason(sessions, engine, posters):
+    """«Нет связи» и «ответил непонятно чем» решаются наверху по-разному, и
+    причина обязана дойти нетронутой.
+
+    Проверяется у загрузчика: обложку добывает он, а писатель её только пишет —
+    со своим добыванием у писателя было два разных смысла у одного `None`."""
+    parts = card_parts(sessions, posters, unreachable())
+    load = Loader(library=LibraryRepository(sessions),
+                  writer=CardWriter(**parts),
+                  sources=FakeSources(FakeCatalog(Found(source_card()))),
+                  posters=parts["posters"])
+
+    result = await load.ensure(candidate())
+    await parts["posters"].aclose()
+
+    assert isinstance(result, Refusal)
+    assert result.reason is Reason.NETWORK
 
 
 async def test_a_broken_client_becomes_a_refusal(sessions, loader, caplog):

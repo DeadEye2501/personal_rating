@@ -81,7 +81,25 @@ class Loader:
             # показе. Отдельного случая тут нет, это общее правило.
             return poster
 
+        if poster is None:
+            poster = await self._second_try(card.value, view.poster_url)
+            if isinstance(poster, Refusal):
+                return poster
+
         return await self._writer.save(card.value, poster)
+
+    async def _second_try(self, card: SourceCard,
+                          asked: str) -> bytes | None | Refusal:
+        """Вторая попытка за обложкой — по адресу детального ответа.
+
+        Нужна потому, что круги идут разом: у кандидата выдачи адреса может не
+        быть вовсе, а в детальном ответе он есть. И только по другому адресу: у
+        Steam оба собираются по одному образцу из appid, и повтор дал бы второй
+        `404` на ту же картинку — а судьбу карточки решал бы уже он, превращая
+        «обложки нет» в отказ на любой сетевой икоте."""
+        if card.item.poster_url == asked:
+            return None
+        return await self._posters.fetch(card.item.source, card.item.poster_url)
 
     async def card_for_link(
         self, link: ExternalLink
