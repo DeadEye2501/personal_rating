@@ -1,11 +1,22 @@
 {
-  "skip": ["docs", "dist"],
+  "skip": [
+    "docs",
+    "dist"
+  ],
   "front": {
     "scope": "client",
     "styles": "styles",
     "allowed": {
-      "app": ["components", "state", "api", "styles"],
-      "components": ["state", "styles"],
+      "app": [
+        "components",
+        "state",
+        "api",
+        "styles"
+      ],
+      "components": [
+        "state",
+        "styles"
+      ],
       "state": [],
       "api": [],
       "styles": []
@@ -16,12 +27,14 @@
       "$state": "state",
       "$api": "api"
     },
-    "palette": ["styles/palette.css"]
+    "palette": [
+      "styles/palette.css"
+    ]
   },
   "maps": {
-    "modules": "docs/module-map.md",
-    "data": "docs/data-map.md",
-    "front": "docs/front-map.md",
-    "verdicts": "docs/not-duplicates.md"
+    "modules": "docs/other/module-map.md",
+    "data": "docs/other/data-map.md",
+    "front": "docs/other/front-map.md",
+    "verdicts": "docs/other/not-duplicates.md"
   }
 }
