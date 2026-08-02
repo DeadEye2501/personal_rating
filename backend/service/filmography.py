@@ -20,7 +20,8 @@ class Filmographies:
         self._sources = sources
 
     async def of_person(self, source_id: str,
-                        kind: Kind) -> tuple[list[SearchHit], list[Refusal]]:
+                        kind: Kind) -> tuple[list[list[SearchHit]],
+                                             list[Refusal]]:
         """У человека из TMDB идентификатор уже есть, и спрашивать его по имени
         значило бы притащить тёзок туда, где их быть не должно."""
         client = self._sources.people_for(kind)
@@ -29,7 +30,8 @@ class Filmographies:
         return await self._works(client, [source_id], kind)
 
     async def of_name(self, name: str,
-                      kind: Kind) -> tuple[list[SearchHit], list[Refusal]]:
+                      kind: Kind) -> tuple[list[list[SearchHit]],
+                                           list[Refusal]]:
         """Именем спрашивают дважды: когда его набрали в строке поиска и когда
         кликнули по человеку, у которого внешней идентичности нет."""
         client = self._sources.people_for(kind)
@@ -49,13 +51,21 @@ class Filmographies:
                                  [one.source_id for one in found.value], kind)
 
     async def _works(self, client, person_ids: list[str],
-                     kind: Kind) -> tuple[list[SearchHit], list[Refusal]]:
+                     kind: Kind) -> tuple[list[list[SearchHit]],
+                                          list[Refusal]]:
         """Фильмографии всех найденных разом: их бывает несколько, и ждать по
-        очереди значило бы сложить их сроки ожидания."""
+        очереди значило бы сложить их сроки ожидания.
+
+        Выдачи остаются по людям, а не сливаются в одну, и складывает их
+        вызывающий. Складывать по-разному приходится: у клика по имени порции
+        нет — там показываются все работы, и подряд они читаются лучше, — а у
+        строки поиска порция двадцать строк, и сложенные подряд работы первого
+        тёзки съедают её целиком. Слей их здесь — и одному из двух путей
+        досталось бы чужое правило."""
         outcomes = await answered_all(
             (client.credits_of(person_id, kind), client.name)
             for person_id in person_ids
         )
 
         answers, refusals = split(outcomes)
-        return [one for answer in answers for one in answer], once(refusals)
+        return answers, once(refusals)

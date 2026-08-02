@@ -5,21 +5,17 @@ from datetime import timedelta
 import pytest
 
 from backend.model import Kind, PersonRole
-from backend.service.search import SearchService
 from backend.storage.repository.credits import people
-from backend.storage.repository.genres import GenresRepository
-from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.tags import TagsRepository
-from backend.storage.repository.views import ViewsRepository
-from tests.conftest import MOMENT, FakeSources, rated
+from tests.conftest import MOMENT, rated
+from tests.wiring import search_service
 
 
 @pytest.fixture
 async def search(sessions):
     """Реестр подставной и пустой: `local()` в сеть не ходит вовсе, а поднимать
     ради него шесть настоящих клиентов со своими SSL-контекстами — впустую."""
-    return SearchService(LibraryRepository(sessions), ViewsRepository(sessions),
-                         FakeSources(), GenresRepository(sessions))
+    return search_service(sessions)
 
 
 async def test_a_substring_is_enough(sessions, search):

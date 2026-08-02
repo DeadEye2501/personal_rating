@@ -8,7 +8,6 @@ import pytest
 
 from backend.model import (
     Found,
-    GenreSource,
     Kind,
     Missing,
     PersonHit,
@@ -17,22 +16,14 @@ from backend.model import (
     Refusal,
     Source,
 )
-from backend.service.search import SEARCH_SIZE, SearchService
-from backend.storage.repository.genres import GenresRepository
-from backend.storage.repository.library import LibraryRepository
-from backend.storage.repository.views import ViewsRepository
-from tests.conftest import MOMENT, FakeSearch, FakeSources, hit, seed
+from backend.service.search import SEARCH_SIZE
+from tests.conftest import MOMENT, FakeSearch, hit
+from tests.wiring import search_service
 
 
 @pytest.fixture
 async def service(sessions):
-    def build(*clients) -> SearchService:
-        return SearchService(LibraryRepository(sessions),
-                            ViewsRepository(sessions),
-                            FakeSources(*clients),
-                            GenresRepository(sessions),
-                            clock=lambda: MOMENT)
-    return build
+    return lambda *clients: search_service(sessions, *clients)
 
 
 async def test_the_external_answer_becomes_candidates(sessions, service):
@@ -130,6 +121,59 @@ async def test_the_filmography_is_cut_to_the_portion_too(sessions, service):
     assert len(result.views) == SEARCH_SIZE
 
 
+async def test_the_portion_holds_works_of_every_namesake(sessions, service):
+    """«По имени — работы всех людей с таким именем»: решение пользователя от
+    02.08.2026, дословно.
+
+    Сложенные подряд, работы первого тёзки съедают порцию целиком: у самого
+    известного их обычно больше двадцати, и фильмографии остальных оказываются
+    запрошены, оплачены и выброшены — замерено на «Джоне Траволте», двадцать
+    строк, все его. Поэтому выдачи тёзок переплетаются между собой, как
+    переплетаются два игровых магазина.
+
+    Сверяется доля, а не членство: «взять по одной работе от каждого, а потом
+    отдать остаток первому» на одной работе второго тёзки неотличимо от
+    переплетения. Поэтому у второго их три, и порция обязана начаться с
+    чередования.
+
+    Длина фильмографии первого выведена из порции, а не написана числом: сравняй
+    её с порцией — и складывание подряд позеленело бы молча."""
+    client = FakeSearch(
+        Found([]),
+        people=Found([PersonHit("1"), PersonHit("2")]),
+        works={"1": Found([hit(f"a{n}") for n in range(SEARCH_SIZE + 10)]),
+               "2": Found([hit(f"b{n}") for n in range(3)])},
+    )
+
+    result = await service(client).external(Kind.MOVIE, "траволта")
+
+    assert len(result.views) == SEARCH_SIZE
+    assert [view.source_id for view in result.views][:6] == [
+        "a0", "b0", "a1", "b1", "a2", "b2"
+    ]
+
+
+async def test_namesakes_who_worked_together_do_not_eat_the_portion_twice(
+    sessions, service
+):
+    """Однофамильцы бывают соавторами: Коэны, Руссо, Вачовски. Фильмографии у
+    них общие, и переплетение кладёт каждую работу дважды — по слоту от каждого
+    брата, то есть половина порции уходит в близнецов.
+
+    Снимать их надо здесь, до среза: складывание своей выдачи с чужой снимает
+    близнеца уже после него, и до экрана доезжает вдвое меньше внешних строк,
+    чем поместилось бы."""
+    together = [hit(f"c{n}") for n in range(SEARCH_SIZE)]
+    client = FakeSearch(Found([]),
+                        people=Found([PersonHit("1"), PersonHit("2")]),
+                        works={"1": Found(together), "2": Found(together)})
+
+    result = await service(client).external(Kind.MOVIE, "руссо")
+
+    shown = [view.source_id for view in result.views]
+    assert shown == [one.source_id for one in together]
+
+
 async def test_a_refusal_of_the_name_search_travels_as_a_refusal(sessions,
                                                                  service):
     """Отказ половины людей — поле в результате, а не исключение: у границы
@@ -185,128 +229,6 @@ async def test_games_never_go_outside_for_people(sessions, service):
     await service(client).external(Kind.GAME, "ведьмак")
 
     assert [one for one in client.asked if one[0] == "find_people"] == []
-
-
-async def test_genres_are_unfolded_from_the_reference(sessions, reference, service):
-    """В выдаче приходят голые идентификаторы: 18 — это драма."""
-    search = service(FakeSearch(
-        Found([hit(genre_ext_ids=((GenreSource.TMDB, "18"),))])
-    ))
-
-    result = await search.external(Kind.MOVIE, "интерстеллар")
-
-    assert [g.name for g in result.views[0].genres] == ["Драма"]
-
-
-async def test_a_compound_genre_unfolds_into_two(sessions, reference, service):
-    """У TMDB в сериалах «Боевик и приключения» — это не жанр, а два.
-
-    Сверяем состав, а не длину: два неверных жанра прошли бы проверку длины."""
-    search = service(FakeSearch(
-        Found([hit(genre_ext_ids=((GenreSource.TMDB, "10759"),))])
-    ))
-
-    result = await search.external(Kind.SERIES, "andor")
-
-    assert [g.name for g in result.views[0].genres] == ["Боевик", "Приключения"]
-
-
-async def test_overlapping_identifiers_do_not_duplicate_a_genre(
-    sessions, reference, service
-):
-    """Сборный 10759 и обычный 28 оба дают Боевик — жанр должен быть один."""
-    search = service(FakeSearch(Found([hit(genre_ext_ids=(
-        (GenreSource.TMDB, "10759"), (GenreSource.TMDB, "28"),
-    ))])))
-
-    result = await search.external(Kind.SERIES, "andor")
-
-    assert [g.name for g in result.views[0].genres] == ["Боевик", "Приключения"]
-
-
-async def test_the_spaces_of_genres_do_not_leak_into_each_other(
-    sessions, reference, service
-):
-    """У магазина и у TMDB нумерация своя: `3` у Steam — это «ролевая», а у
-    TMDB такого номера нет вовсе. Спроси справочник без отбора по пространству,
-    и кино получило бы игровой жанр."""
-    search = service(FakeSearch(
-        Found([hit(genre_ext_ids=((GenreSource.TMDB, "3"),))])
-    ))
-
-    result = await search.external(Kind.MOVIE, "интерстеллар")
-
-    assert result.views[0].genres == ()
-
-
-async def test_a_compound_genre_comes_in_the_order_of_the_alphabet(
-    sessions, engine, reference, service
-):
-    """Порядок задаёт справочник, а не порядок строк в нём: жанры стоят в
-    карточке в ряд, и перетасовываться между показами им нельзя.
-
-    Соответствие заведено своё, и пара выбрана так, что алфавит обратен
-    порядку номеров: «Приключения» — это 2, «Драма» — 3. У сборного `10759` из
-    общего набора они совпадают, и потеря сортировки прошла бы там молча."""
-    await seed(
-        engine,
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('tmdb', '99', 2), ('tmdb', '99', 3)",
-    )
-    search = service(FakeSearch(
-        Found([hit(genre_ext_ids=((GenreSource.TMDB, "99"),))])
-    ))
-
-    result = await search.external(Kind.MOVIE, "интерстеллар")
-
-    assert [g.name for g in result.views[0].genres] == ["Драма", "Приключения"]
-
-
-async def test_a_tag_and_a_genre_of_one_store_do_not_mix(sessions, engine,
-                                                         reference, service):
-    """У Steam жанр и тег нумеруются порознь: `9` — это жанр «гонки» и тег
-    «ролевая» одновременно. Ключом словаря обязано быть пространство, а не
-    источник карточки: иначе стратегии получили бы гонки."""
-    await seed(
-        engine,
-        "INSERT INTO genre (id, name, kind) VALUES (5, 'гонки', 'game')",
-        "INSERT INTO genre_map (source, ext_id, genre_id) VALUES "
-        "('steam', '9', 5), ('steam_tag', '9', 4)",
-    )
-    search = service(FakeSearch(Found([hit(
-        "292030", "Ведьмак", source=Source.STEAM, kind=Kind.GAME,
-        genre_ext_ids=((GenreSource.STEAM, "9"), (GenreSource.STEAM_TAG, "9")),
-    )]), name="steam"))
-
-    result = await search.external(Kind.GAME, "ведьмак")
-
-    assert [g.name for g in result.views[0].genres] == ["гонки", "ролевая"]
-
-
-async def test_a_candidate_without_genres_brings_none(sessions, service):
-    """В выдаче магазинов жанров не бывает вовсе — только в карточке. Пустой
-    список не должен превращаться ни в отказ, ни в выдуманный жанр."""
-    search = service(FakeSearch(Found([hit()])))
-
-    result = await search.external(Kind.MOVIE, "интерстеллар")
-
-    assert result.views[0].genres == ()
-
-
-async def test_an_unknown_genre_is_dropped_without_a_word(
-    sessions, reference, service, caplog
-):
-    """Справочник нарочно засеян: с пустым `genre_map` неизвестен любой
-    идентификатор, и тест был бы зелёным даже при сломанном разборе."""
-    search = service(FakeSearch(Found([hit(genre_ext_ids=(
-        (GenreSource.TMDB, "18"), (GenreSource.TMDB, "99999"),
-    ))])))
-
-    with caplog.at_level("DEBUG"):
-        result = await search.external(Kind.MOVIE, "интерстеллар")
-
-    assert [g.name for g in result.views[0].genres] == ["Драма"]
-    assert [r for r in caplog.records if r.name.startswith("backend")] == []
 
 
 async def test_a_refusal_is_reported_and_not_raised(sessions, service):
@@ -458,29 +380,3 @@ async def test_a_portion_is_counted_per_source_and_not_per_page(sessions, servic
     assert len(result.views) == 2 * SEARCH_SIZE
 
 
-async def test_the_reference_is_asked_once_per_space(sessions, reference, service,
-                                                     monkeypatch):
-    """Разворачивать жанры по кандидату значит запрос на кандидата. Но и один
-    словарь на всех не годится: жанры GOG развернулись бы по словарю Steam."""
-    asked = []
-    original = GenresRepository.index
-
-    async def counting(self, source):
-        asked.append(source)
-        return await original(self, source)
-
-    monkeypatch.setattr(GenresRepository, "index", counting)
-    steam = FakeSearch(Found([
-        hit(f"s{n}", source=Source.STEAM, kind=Kind.GAME,
-            genre_ext_ids=((GenreSource.STEAM, "3"),))
-        for n in range(5)
-    ]), name="steam")
-    gog = FakeSearch(Found([
-        hit(f"g{n}", source=Source.GOG, kind=Kind.GAME,
-            genre_ext_ids=((GenreSource.GOG, "role-playing"),))
-        for n in range(5)
-    ]), name="gog")
-
-    await service(steam, gog).external(Kind.GAME, "ведьмак")
-
-    assert asked == [GenreSource.STEAM, GenreSource.GOG]

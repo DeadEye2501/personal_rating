@@ -17,6 +17,7 @@ from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
+from backend.unique import unique_by
 
 # Ровно страница выдачи TMDB: одна порция стоит одного запроса. Величина —
 # настройка, а не свойство схемы.
@@ -81,8 +82,19 @@ class SearchService:
         # Порция считается по выдаче, а не по странице: у каталога она стоит
         # одного запроса, у работ — одного на всех найденных тёзок разом, а их
         # бывают сотни, и показанная строка ложится в базу.
+        #
+        # Работы тёзок переплетаются между собой до того, как порция отрежет
+        # лишнее: сложенные подряд, работы первого съедают её целиком, а решение
+        # пользователя — «по имени ищутся работы всех людей с таким именем».
+        #
+        # Близнецы снимаются до среза и по той же паре, что и складывание своей
+        # выдачи с чужой: однофамильцы бывают соавторами — Коэны, Руссо,
+        # Вачовски, — и общая работа заняла бы по слоту на каждого. Складывание
+        # снимает её позже, и до экрана доехала бы половина порции.
+        together = unique_by(_weave(works),
+                             lambda one: (one.source, one.source_id))
         woven = _weave([answer[:SEARCH_SIZE] for answer in answers]
-                       + [works[:SEARCH_SIZE]])
+                       + [together[:SEARCH_SIZE]])
 
         return ExternalSearch(
             views=tuple(await to_views(woven, self._genres, self._clock)),

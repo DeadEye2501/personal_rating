@@ -69,6 +69,10 @@ class PeopleSearch:
             return [], []
 
         name, source_id = identity
-        if source_id:
-            return await self._works.of_person(source_id, kind)
-        return await self._works.of_name(name, kind)
+        works, refusals = (await self._works.of_person(source_id, kind)
+                           if source_id
+                           else await self._works.of_name(name, kind))
+        # Подряд, а не переплетением: у клика порции нет — показываются все
+        # работы всех тёзок, — и человек читает их по одному человеку за раз.
+        # Переплетает их строка поиска, где порция двадцать строк.
+        return [one for works_of_one in works for one in works_of_one], refusals

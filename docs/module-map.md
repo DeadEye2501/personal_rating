@@ -265,16 +265,16 @@
   - `async def _record(self, item_id: int, harvest: _Harvest, stale: list[RatingSource], now: datetime) -> None` (13)
   - `async def _keep(self, item_id: int, external: ExternalId) -> None` (5)
 
-### `backend/service/filmography.py` — 61 строк
+### `backend/service/filmography.py` — 71 строк
 
 Чужие работы человека: спросить о них источник.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.hits`, `backend.sources.registry`
 
-- `class Filmographies` (47)
-  - `async def of_person(self, source_id: str, kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (8)
-  - `async def of_name(self, name: str, kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (19)
-  - `async def _works(self, client, person_ids: list[str], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (11)
+- `class Filmographies` (57)
+  - `async def of_person(self, source_id: str, kind: Kind) -> tuple[list[list[SearchHit]], list[Refusal]]` (9)
+  - `async def of_name(self, name: str, kind: Kind) -> tuple[list[list[SearchHit]], list[Refusal]]` (20)
+  - `async def _works(self, client, person_ids: list[str], kind: Kind) -> tuple[list[list[SearchHit]], list[Refusal]]` (19)
 
 ### `backend/service/genres.py` — 28 строк
 
@@ -341,16 +341,16 @@
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (29)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/people.py` — 74 строк
+### `backend/service/people.py` — 78 строк
 
 Что найдётся по человеку или студии.
 
 Зависит от: `backend.model`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.views`
 
-- `class PeopleSearch` (48)
+- `class PeopleSearch` (52)
   - `async def by_entity(self, domain: str, entity_id: int, kind: Kind) -> ExternalSearch` (12)
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
-  - `async def _outside(self, domain: str, identity: tuple[str, str | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (13)
+  - `async def _outside(self, domain: str, identity: tuple[str, str | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (17)
 
 ### `backend/service/posters.py` — 136 строк
 
@@ -379,16 +379,16 @@
 
 - `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (17)
 
-### `backend/service/search.py` — 90 строк
+### `backend/service/search.py` — 102 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `backend.unique`
 
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (18)
-- `class SearchService` (45)
+- `class SearchService` (56)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
-  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (24)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (35)
 
 ### `backend/service/series.py` — 62 строк
 
@@ -1226,7 +1226,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 83 модулей
+## tests — 84 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1784,26 +1784,35 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_search.py` — 486 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 382 строк ⚠ подошёл к 300
 
 Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
 
-Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.search`, `tests.conftest`, `tests.wiring`
 
-Тестов: 31
+Тестов: 24
 
-- `async def service(sessions)` (8)
-  - `def build(*clients) -> SearchService` (6)
+- `async def service(sessions)` (2)
 
-### `tests/backend/test_search_local.py` — 161 строк
+### `tests/backend/test_search_genres.py` — 159 строк
+
+Жанры кандидата: чужие метки разворачиваются нашим справочником.
+
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `tests.conftest`, `tests.wiring`
+
+Тестов: 9
+
+- `async def service(sessions)` (2)
+
+### `tests/backend/test_search_local.py` — 157 строк
 
 Поиск по своей базе — единственный, который работает без сети.
 
-Зависит от: `backend.model`, `backend.service.search`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.tags`, `tests.conftest`, `tests.wiring`
 
 Тестов: 12
 
-- `async def search(sessions)` (5)
+- `async def search(sessions)` (4)
 
 ### `tests/backend/test_sections.py` — 229 строк
 
@@ -2145,14 +2154,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `def handler(request: httpx.Request) -> httpx.Response` (2)
 - `def capture(*, content: bytes | None=None, status: int=200)` (11)
 
-### `tests/wiring.py` — 30 строк
+### `tests/wiring.py` — 50 строк
 
 Части карточки и сервис обложек, собранные для теста на подставном транспорте.
 
-Зависит от: `backend.app`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`
+Зависит от: `backend.app`, `backend.service.posters`, `backend.service.search`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.builders`, `tests.fakes`
 
 - `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (8)
+- `def search_service(sessions, *clients) -> SearchService` (12)
 
 ## Абстракции с одной реализацией
 
