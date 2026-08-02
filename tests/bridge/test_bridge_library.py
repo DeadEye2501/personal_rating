@@ -1,6 +1,6 @@
 """Мост: карточка целиком — заведение, правка, отвязка, удаление."""
 
-from datetime import date
+from datetime import date, datetime
 
 from backend.model import Kind, Source
 from bridge.library import Library
@@ -10,15 +10,21 @@ from tests.builders import an_item
 def test_a_manual_card_is_built_by_the_bridge(spy, asked):
     """Страница присылает поля формы, а не `Item`: собрать датакласс обратно из
     JSON нечем, а `new_manual_item` уже умеет и источник, и свой идентификатор,
-    и момент создания."""
+    и момент создания.
+
+    Зовётся `create_manual_card`, а не `library.create`: закладку «Хочу
+    посмотреть» ставит он, и мимо него заведённая руками карточка не
+    показалась бы ни в одном разделе. Момент берётся здесь же, как у остальных
+    пометок: время ставит тот, кто нажал."""
     answers, log = asked
-    answers["library.create"] = 12
+    answers["create_manual_card"] = 12
 
     assert Library(spy).create({"kind": "movie", "title": "Одиссея",
                                 "year": 1997}) == {"ok": 12}
 
     name, args, _ = log[0]
-    assert name == "library.create"
+    assert name == "create_manual_card"
+    assert isinstance(args[1], datetime)
     item = args[0]
     assert item.source is Source.MANUAL
     assert item.source_id
@@ -36,7 +42,7 @@ def test_an_empty_field_does_not_reach_the_backend(spy, asked):
     умолчание — пустая строка, и незаполненное поле формы прописало бы туда
     `None`."""
     answers, log = asked
-    answers["library.create"] = 12
+    answers["create_manual_card"] = 12
 
     Library(spy).create({"kind": "movie", "title": "Одиссея",
                          "synopsis": None})
@@ -50,7 +56,7 @@ def test_a_broken_field_answers_instead_of_raising(spy, asked):
     исключение пересекло бы границу потоков и ушло в pywebview, где ловить его
     некому, — а мост обещает, что наружу летит только ответ."""
     answers, _ = asked
-    answers["library.create"] = 12
+    answers["create_manual_card"] = 12
 
     answer = Library(spy).create({"kind": "movie", "title": "Одиссея",
                                   "released_at": "не дата"})
@@ -61,7 +67,7 @@ def test_a_broken_field_answers_instead_of_raising(spy, asked):
 def test_a_release_date_arrives_as_a_date(spy, asked):
     """Через JSON дата едет строкой, а `Item.released_at` — это `date`."""
     answers, log = asked
-    answers["library.create"] = 12
+    answers["create_manual_card"] = 12
 
     Library(spy).create({"kind": "movie", "title": "Одиссея",
                          "released_at": "1997-05-18"})

@@ -1,7 +1,7 @@
 """Мост: карточка целиком — заведение, правка, отвязка, удаление."""
 
 from dataclasses import replace
-from datetime import date
+from datetime import date, datetime
 
 from backend.model import Denied, Kind, new_manual_item
 from bridge.answer import Domain
@@ -19,8 +19,14 @@ class Library(Domain):
 
         Разбор идёт внутри заявки: кривая дата и неизвестный тип содержимого —
         это `ValueError`, и снаружи оболочки он ушёл бы через границу потоков в
-        pywebview, где ловить его некому."""
-        return self._reply(lambda back: back.library.create(_manual(fields)))
+        pywebview, где ловить его некому.
+
+        Не `library.create`: заведённая руками карточка сразу ложится в список
+        дел, и знает об этом `create_manual_card`. Момент берётся тут же, как у
+        закладки по кнопке: время ставит тот, кто нажал."""
+        now = datetime.now()
+        return self._reply(
+            lambda back: back.create_manual_card(_manual(fields), now))
 
     def replace(self, item_id: int, fields: dict) -> dict:
         """Правка ложится **поверх** существующей строки, а не вместо неё:

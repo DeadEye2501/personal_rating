@@ -1,11 +1,13 @@
 """Бэкенд, собранный целиком."""
 
 from dataclasses import dataclass
+from datetime import datetime
 
 import httpx
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from backend.config import Config
+from backend.model import Item
 from backend.service.cards import CardWriter
 from backend.service.enrich import Enricher
 from backend.service.library import LibraryService
@@ -59,6 +61,23 @@ class Backend:
 
     _sources: Sources
     _engine: AsyncEngine
+
+    async def create_manual_card(self, item: Item, now: datetime) -> int:
+        """Заведённая руками карточка сразу ложится в список дел: решение
+        пользователя 02.08.2026.
+
+        Иначе она не показывается нигде — в «Оценённые» её не пускает
+        отсутствие оценки, — и найти сохранённое можно только поиском по своей
+        базе.
+
+        Метод здесь, а не у репозитория библиотеки: закладка живёт в соседней
+        таблице со своим репозиторием, и требовать его от вызывающего значило бы
+        менять правило заведения в каждом, кто заводит. Заводит его один — мост,
+        по кнопке «+»; кандидат выдачи и карточка от источника идут мимо, прямо
+        в `library.create`, и закладки не получают."""
+        item_id = await self.library.create(item)
+        await self.wishlist.add(item_id, now)
+        return item_id
 
     async def delete_card(self, item_id: int) -> None:
         """Карточка целиком, вместе с обложкой из второго файла базы.

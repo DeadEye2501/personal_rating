@@ -17,13 +17,14 @@
 
 ## backend — 78 модулей
 
-### `backend/app.py` — 154 строк
+### `backend/app.py` — 173 строк
 
 Бэкенд, собранный целиком.
 
-Зависит от: `backend.config`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
+Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
 
-- `class Backend` (40)
+- `class Backend` (57)
+  - `async def create_manual_card(self, item: Item, now: datetime) -> int` (16)
   - `async def delete_card(self, item_id: int) -> None` (7)
   - `async def aclose(self) -> None` (8)
 - `def card_parts(sessions, posters: PosterService) -> dict` (13)
@@ -1016,14 +1017,14 @@
   - `def put(self, op: int, value) -> None` (10)
   - `def taken(self, op: int)` (4)
 
-### `bridge/library.py` — 88 строк
+### `bridge/library.py` — 94 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Library(Domain)` (43)
-  - `def create(self, fields: dict) -> dict` (9)
+- `class Library(Domain)` (49)
+  - `def create(self, fields: dict) -> dict` (15)
   - `def replace(self, item_id: int, fields: dict) -> dict` (10)
   - `def same_title(self, kind: str, title: str) -> dict` (5)
   - `def unlink(self, item_id: int) -> dict` (2)
@@ -1712,13 +1713,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def boundary_dataclasses()` (15)
 - `def boundary_denials()` (6)
 
-### `tests/backend/test_offline.py` — 362 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 379 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
 Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 19
+Тестов: 20
 
 - `def mine(title: str, **fields)` (4)
 - `async def assemble(tmp_path)` (9)
@@ -1950,7 +1951,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 11
 
 
-### `tests/bridge/test_bridge_library.py` — 158 строк
+### `tests/bridge/test_bridge_library.py` — 164 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 

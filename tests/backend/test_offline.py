@@ -130,6 +130,23 @@ async def test_the_wishlist_works(offline):
     assert [view.title for view in page] == ["Потом"]
 
 
+async def test_a_hand_made_card_lands_in_the_wishlist(offline):
+    """Заведённая руками карточка не пропадает с глаз. В «Оценённые» её не
+    пускает отсутствие оценки, и без закладки её не показывает ни один раздел:
+    человек нажал «+», заполнил окно, сохранил — и не нашёл сохранённого.
+
+    Кандидат выдачи лежит здесь же и обязан остаться за бортом: пишется он тем
+    же `library.create`, и положи закладку туда — список дел заполнили бы
+    карточки, которых никто не заводил. Показанная строка заводится сама, по
+    одному показу."""
+    await offline.library.create(mine("Мелькнул в выдаче"))
+
+    await offline.create_manual_card(mine("Своё, руками"), now=MOMENT)
+    page = await offline.feed.page(WANTED)
+
+    assert [view.title for view in page] == ["Своё, руками"]
+
+
 async def test_tags_are_edited(offline):
     item_id = await offline.library.create(mine("Своё"))
     tag_id = await offline.tags.create(Kind.MOVIE, "пересмотреть")
