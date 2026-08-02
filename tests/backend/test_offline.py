@@ -1,5 +1,6 @@
 """Главное обещание приложения: без сети работает всё, кроме поиска чужого."""
 
+import httpx
 import pytest
 
 from backend.app import build_backend
@@ -19,6 +20,7 @@ from backend.model import (
     Source,
     SourceCard,
     new_manual_item,
+    view_from_hit,
 )
 from backend.service.posters import POSTER_SOURCES
 from backend.storage.posters import NotOpened
@@ -30,10 +32,12 @@ from backend.storage.session import create_engine, session_factory
 from backend.storage.tables import metadata
 from tests.conftest import (
     MOMENT,
+    hit,
     PICTURE,
     RATED,
     WANTED,
     an_item,
+    recorded,
     unreachable,
 )
 
@@ -44,15 +48,14 @@ def mine(title: str, **fields):
     return new_manual_item(Kind.MOVIE, title, synced_at=MOMENT, **fields)
 
 
-async def assemble(tmp_path):
+async def assemble(tmp_path, transport=None):
     engine = create_engine(tmp_path / "library.db")
     async with engine.begin() as connection:
         await connection.run_sync(metadata.create_all)
     await engine.dispose()
 
     config = load_config({"DATA_DIR": str(tmp_path)}, base_dir=tmp_path)
-    return await build_backend(config,
-                               transport=unreachable())
+    return await build_backend(config, transport=transport or unreachable())
 
 
 @pytest.fixture
@@ -334,6 +337,35 @@ async def test_the_assembly_wires_the_three_services_nobody_asked_about(offline)
     )
     assert isinstance(link, Refusal)
     assert link.reason is Reason.NETWORK
+
+
+async def test_the_assembly_gives_the_loader_its_poster_clients(tmp_path):
+    """Пятое поле того же рода: боевой загрузчик со своей службой обложек.
+
+    Проверок у него не было вовсе — единственная, трогавшая боевой `loader`,
+    ходит по ссылке, а этот путь обложек не касается. Пустой набор клиентов
+    **у самого загрузчика** не наблюдался ничем, а с ним завести найденную
+    поиском карточку было бы нельзя ни одну: обложка отвечала бы «нет клиента»,
+    и писатель не писал бы ничего. Пустые клиенты в сборке ловит сосед —
+    `test_every_poster_source_got_its_own_named_client`, — но он спрашивает
+    службу обложек напрямую, минуя загрузчик.
+
+    Сеть тут живая нарочно: с мёртвой отказала бы карточка, и до обложки дело не
+    дошло бы — проверять было бы нечего."""
+    def handler(request: httpx.Request) -> httpx.Response:
+        if "themoviedb.org" in request.url.host:
+            return httpx.Response(200, json=recorded("tmdb/movie_detail.json"))
+        return httpx.Response(200, content=PICTURE)
+
+    backend = await assemble(tmp_path, transport=httpx.MockTransport(handler))
+    try:
+        item_id = await backend.loader.ensure(
+            view_from_hit(hit(poster_url="https://image.tmdb.org/p.jpg")))
+
+        assert isinstance(item_id, int), f"карточка не завелась: {item_id}"
+        assert await backend.posters.has(item_id), "обложка не доехала"
+    finally:
+        await backend.aclose()
 
 
 async def test_the_assembly_wires_the_click_on_a_name(offline):

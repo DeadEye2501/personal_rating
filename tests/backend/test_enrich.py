@@ -2,90 +2,30 @@
 
 from datetime import timedelta
 
-import pytest
 from sqlalchemy import event
 
 from backend.model import (
-    ExternalId,
     ExternalRating,
-    Found,
-    IdSource,
     Kind,
     Missing,
     RatingSource,
-    Ratings,
     Reason,
     Refusal,
     Source,
 )
-from backend.service.enrich import Enricher
 from backend.storage.repository.external import (
     EMPTY_TTL,
     VALUE_TTL,
-    ExternalIdsRepository,
     ExternalRatingsRepository,
 )
 from backend.storage.repository.library import LibraryRepository
-from tests.conftest import MOMENT, FakeClient, FakeSources, an_item, ours
-
-
-class FakeRatings(FakeClient):
-    """Оценочный клиент: что он умеет привозить, объявлено списком, как у
-    настоящих."""
-
-    def __init__(self, provides, outcome, name: str = "mdblist") -> None:
-        super().__init__(outcome, name)
-        self.PROVIDES = provides
-
-    async def ratings(self, imdb_id: str, kind: Kind):
-        self.asked.append((imdb_id, kind))
-        return self.outcome
-
-
-class Breaking(FakeRatings):
-    """Клиент, падающий не тем, что клиенты ловят: так выглядит наша опечатка или
-    чужая библиотека. Провод и разбор клиент разбирает сам и отдаёт отказом."""
-
-    async def ratings(self, imdb_id: str, kind: Kind):
-        self.asked.append((imdb_id, kind))
-        raise KeyError("payload")
-
-
-@pytest.fixture
-async def item_id(sessions):
-    made = await LibraryRepository(sessions).create(
-        an_item("157336", "Интерстеллар")
-    )
-    await ExternalIdsRepository(sessions).put(
-        made, ExternalId(IdSource.IMDB, "tt0816692")
-    )
-    return made
-
-
-@pytest.fixture
-async def enrich(sessions):
-    """Обогатитель с остановленными часами: сроки годности — предмет проверки."""
-
-    def build(*clients) -> Enricher:
-        return Enricher(
-            sources=FakeSources(*clients),
-            ids=ExternalIdsRepository(sessions),
-            ratings=ExternalRatingsRepository(sessions),
-            clock=lambda: MOMENT,
-        )
-
-    return build
-
-
-def found(*pairs) -> Found:
-    return Found(Ratings(values=tuple(
-        ExternalRating(source, value, MOMENT) for source, value in pairs
-    )))
-
-
-async def stored_ratings(sessions, item_id) -> dict:
-    rows = await ExternalRatingsRepository(sessions).ratings_of(item_id)
-    return {row.source: row.value for row in rows}
+from tests.backend.enriching import (
+    Breaking,
+    FakeRatings,
+    found,
+    stored_ratings,
+)
+from tests.conftest import MOMENT, an_item, ours
 
 
 async def test_a_value_is_written(sessions, item_id, enrich):
@@ -343,55 +283,6 @@ async def test_games_ask_nobody(sessions, enrich):
     await enrich(client).enrich(item_id, Kind.GAME)
 
     assert client.asked == []
-
-
-async def test_without_an_imdb_id_nobody_is_asked(sessions, enrich):
-    """`imdb_id` есть только в детальном ответе — без него спрашивать нечем."""
-    item_id = await LibraryRepository(sessions).create(
-        an_item("1", "Без идентификатора")
-    )
-    client = FakeRatings((RatingSource.IMDB,), found((RatingSource.IMDB, 8.6)))
-
-    await enrich(client).enrich(item_id, Kind.MOVIE)
-
-    assert client.asked == []
-
-
-async def test_a_found_identifier_is_kept(sessions, item_id, enrich):
-    """Кинопоиск заодно сообщает свой id — дальше по нему ходить дешевле."""
-    answer = Found(Ratings(
-        values=(ExternalRating(RatingSource.KINOPOISK, 8.6, MOMENT),),
-        external_ids=(ExternalId(IdSource.KINOPOISK, "258687"),),
-    ))
-    service = enrich(FakeRatings((RatingSource.KINOPOISK,), answer))
-
-    await service.enrich(item_id, Kind.MOVIE)
-
-    stored = await ExternalIdsRepository(sessions).ids_of(item_id)
-    assert (IdSource.KINOPOISK, "258687") in [(e.source, e.value) for e in stored]
-
-
-async def test_an_identifier_taken_by_another_card_is_logged_not_raised(
-    sessions, item_id, enrich, caplog
-):
-    other_id = await LibraryRepository(sessions).create(
-        an_item("27205", "Начало")
-    )
-    await ExternalIdsRepository(sessions).put(
-        other_id, ExternalId(IdSource.KINOPOISK, "258687")
-    )
-    answer = Found(Ratings(
-        values=(ExternalRating(RatingSource.KINOPOISK, 8.6, MOMENT),),
-        external_ids=(ExternalId(IdSource.KINOPOISK, "258687"),),
-    ))
-    service = enrich(FakeRatings((RatingSource.KINOPOISK,), answer))
-
-    with caplog.at_level("WARNING"):
-        await service.enrich(item_id, Kind.MOVIE)
-
-    assert "258687" in caplog.text
-    # Оценка при этом записана: занятый чужой идентификатор её не отменяет.
-    assert await stored_ratings(sessions, item_id) == {RatingSource.KINOPOISK: 8.6}
 
 
 async def test_the_first_value_wins_when_two_sources_know_the_same_rating(

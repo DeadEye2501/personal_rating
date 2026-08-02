@@ -1239,7 +1239,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (19)
 - `async def main() -> None` (20)
 
-## tests — 86 модулей
+## tests — 89 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1249,13 +1249,35 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/sources/conftest.py` — 67 строк
+### `tests/backend/conftest.py` — 40 строк
+
+Фикстуры проверок бэкенда, общие у соседних модулей.
+
+Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+
+- `async def item_id(sessions)` (8)
+- `async def enrich(sessions)` (12)
+  - `def build(*clients) -> Enricher` (7)
+
+### `tests/backend/enriching.py` — 48 строк
+
+Общее у проверок третьего круга: подставные оценочные клиенты и карточка.
+
+Зависит от: `backend.model`, `backend.storage.repository.external`, `tests.conftest`
+
+- `class FakeRatings(FakeClient)` (11)
+  - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
+- `class Breaking(FakeRatings)` (7)
+  - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
+- `def found(*pairs) -> Found` (4)
+- `async def stored_ratings(sessions, item_id) -> dict` (3)
+
+### `tests/backend/sources/conftest.py` — 58 строк
 
 Записанные ответы источников: живьём тесты не ходят никуда.
 
-Зависит от: —
+Зависит от: `tests.builders`
 
-- `def _load(relative: str)` (4)
 - `def _meta(relative: str) -> dict` (3)
 - `def fixture()` (3)
 - `def meta()` (2)
@@ -1524,23 +1546,23 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/backend/test_enrich.py` — 474 строк ⚠ подошёл к 300
+### `tests/backend/test_enrich.py` — 365 строк ⚠ подошёл к 300
 
 Третий круг: оценки агрегаторов и сроки их годности.
 
-Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.backend.enriching`, `tests.conftest`
 
-Тестов: 26
+Тестов: 23
 
-- `class FakeRatings(FakeClient)` (11)
-  - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
-- `class Breaking(FakeRatings)` (7)
-  - `async def ratings(self, imdb_id: str, kind: Kind)` (3)
-- `async def item_id(sessions)` (8)
-- `async def enrich(sessions)` (12)
-  - `def build(*clients) -> Enricher` (7)
-- `def found(*pairs) -> Found` (4)
-- `async def stored_ratings(sessions, item_id) -> dict` (3)
+
+### `tests/backend/test_enrich_identifiers.py` — 105 строк
+
+Чем спрашивают агрегаторов и что запоминают из их ответа.
+
+Зависит от: `backend.model`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.backend.enriching`, `tests.conftest`
+
+Тестов: 4
+
 
 ### `tests/backend/test_external_ids.py` — 120 строк
 
@@ -1743,7 +1765,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 163 строк
+### `tests/backend/test_model.py` — 171 строк
 
 Типы границы слоёв: их поля, значения и неизменность.
 
@@ -1752,18 +1774,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 - `def boundary_dataclasses()` (15)
-- `def boundary_denials()` (6)
+- `def boundary_denials()` (14)
 
-### `tests/backend/test_offline.py` — 400 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 432 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
 Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 21
+Тестов: 22
 
 - `def mine(title: str, **fields)` (4)
-- `async def assemble(tmp_path)` (9)
+- `async def assemble(tmp_path, transport=None)` (8)
 - `async def offline(tmp_path)` (4)
 
 ### `tests/backend/test_outcome.py` — 43 строк
@@ -2071,7 +2093,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/bridge/test_page_contract.py` — 349 строк ⚠ подошёл к 300
+### `tests/bridge/test_page_contract.py` — 365 строк ⚠ подошёл к 300
 
 Имена, которые страница и мост обязаны называть одинаково.
 
@@ -2085,7 +2107,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def body_of(table: str, text: str) -> str` (14)
 - `def keys_of(table: str, text: str) -> set[str]` (2)
 - `def keys_and_values(table: str, text: str) -> dict[str, str]` (6)
-- `def paths_of_the_page() -> set[tuple[str, str]]` (7)
+- `def paths_of_the_page(domains: set[str]) -> set[tuple[str, str]]` (8)
 
 ### `tests/bridge/test_serve.py` — 226 строк
 
@@ -2125,24 +2147,25 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/builders.py` — 74 строк
+### `tests/builders.py` — 90 строк
 
-Строители данных для тестов: карточки, кандидаты, картинки.
+Строители данных для тестов: карточки, кандидаты, картинки, записанное.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`
 
+- `def recorded(relative: str)` (9)
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
 
-### `tests/conftest.py` — 243 строк
+### `tests/conftest.py` — 245 строк
 
 Фикстуры тестов и поверхность общего.
 
 Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
 
-Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `responding`, `unreachable`
+Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
 
 - `def ours(caplog) -> list[str]` (8)
 - `async def film_genres(engine) -> None` (11)

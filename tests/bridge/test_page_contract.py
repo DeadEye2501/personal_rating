@@ -32,6 +32,11 @@ from bridge.api import Api
 from bridge.feed import FILTER_FIELDS
 
 WEB = Path(__file__).resolve().parents[2] / "client"
+# Читается исходник, а не собранное: в `dist` лежат те же строки, и сверка по
+# ним подтверждала бы сама себя вчерашней сборкой. Замерено: пути там есть, и от
+# ложного согласия спасало только то, что минификатор пишет их обратными
+# кавычками.
+SKIPPED = {"node_modules", "dist"}
 
 # Тело `chosen` — единственное место страницы, где имена фильтра пишутся.
 CHOSEN = re.compile(r"export function chosen\(filters\) \{(.+?)\n\}", re.DOTALL)
@@ -220,7 +225,7 @@ def test_every_reader_of_the_genre_table_reads_the_sworn_one():
     решению проекта не проверяется вовсе."""
     readers, declared = set(), set()
     for path in WEB.rglob("*"):
-        if path.suffix not in {".js", ".svelte"} or "node_modules" in path.parts:
+        if path.suffix not in {".js", ".svelte"} or SKIPPED & set(path.parts):
             continue
         body = path.read_text(encoding="utf-8")
         if "GENRE_KINDS[" in body:
@@ -270,18 +275,24 @@ def test_the_page_calls_a_hand_made_card_what_the_base_calls_it():
     assert named.group(1) == Source.MANUAL
 
 
-# `call('домен.метод')` и `numbered('домен.метод')` — единственный способ, каким
-# страница называет мост. Путь пишется строкой, и опечатка в нём не роняет ни
-# сборку, ни один тест фронта: промис отклоняется в бегущем приложении.
-CALLED = re.compile(r"(?:call|numbered)\('(\w+)\.(\w+)'")
+# Путь до моста страница называет строкой, и опечатка в нём не роняет ни сборку,
+# ни один тест фронта: промис отклоняется уже в бегущем приложении.
+#
+# Ищется **любой** строковый литерал вида «слово.слово», а не только стоящий
+# прямо в `call(...)`: страница зовёт мост и тернарником, и через производную, и
+# через свою обёртку — привязка к имени вызова оставляла четыре живых пути вне
+# сверки, и среди них весь круг обогащения видимой карточки. Лишнее отсекается
+# доменом: пара считается путём, только если её первое слово — домен моста.
+CALLED = re.compile(r"'(\w+)\.(\w+)'")
 
 
-def paths_of_the_page() -> set[tuple[str, str]]:
+def paths_of_the_page(domains: set[str]) -> set[tuple[str, str]]:
     found = set()
     for path in WEB.rglob("*"):
-        if path.suffix not in {".js", ".svelte"} or "node_modules" in path.parts:
+        if path.suffix not in {".js", ".svelte"} or SKIPPED & set(path.parts):
             continue
-        found |= set(CALLED.findall(path.read_text(encoding="utf-8")))
+        found |= {pair for pair in CALLED.findall(path.read_text(encoding="utf-8"))
+                  if pair[0] in domains}
     return found
 
 
@@ -290,14 +301,19 @@ def test_every_path_the_page_calls_exists_on_the_bridge():
     этот — «страница → мост». Без него `marks.tag_usage`, написанное как
     `marks.tag_uses`, оставляет оба набора зелёными, а удаление тега перестаёт
     спрашивать про носителей — молча."""
+    sides = {domain: side for domain, side in vars(Api(None)).items()
+             if isinstance(side, Domain)}
     surface = {(domain, method)
-               for domain, side in vars(Api(None)).items()
-               if isinstance(side, Domain)
+               for domain, side in sides.items()
                for method in dir(side) if not method.startswith("_")}
-    called = paths_of_the_page()
+    called = paths_of_the_page(set(sides))
 
     assert called, "страница больше не зовёт мост ни одним путём"
     assert called <= surface, f"страница зовёт то, чего у моста нет: {called - surface}"
+    # Число, а не только вложенность: сверка ничего не стоит, если находить
+    # пути перестал сам поиск. Оно и ловило четыре пути, потерянных прежним
+    # выражением — те, что страница зовёт не прямо.
+    assert len(called) >= 38, f"путей найдено меньше, чем есть: {len(called)}"
 
 
 def test_the_page_reads_exactly_what_the_summary_of_a_deletion_holds():

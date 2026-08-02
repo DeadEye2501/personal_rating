@@ -1,18 +1,9 @@
 """Записанные ответы источников: живьём тесты не ходят никуда."""
 
-import json
-from pathlib import Path
-
 import httpx
 import pytest
 
-FIXTURES = Path(__file__).resolve().parents[2] / "fixtures"
-
-
-def _load(relative: str):
-    path = FIXTURES / relative
-    text = path.read_text(encoding="utf-8")
-    return json.loads(text) if path.suffix == ".json" else text
+from tests.builders import recorded as _load
 
 
 def _meta(relative: str) -> dict:

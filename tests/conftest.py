@@ -37,6 +37,7 @@ from tests.builders import (
     hit,
     picture,
     rated,
+    recorded,
 )
 from tests.fakes import (
     FakeCatalog,
@@ -75,6 +76,7 @@ __all__ = [
     "picture",
     "poster_service",
     "rated",
+    "recorded",
     "responding",
     "unreachable",
 ]

@@ -1,13 +1,29 @@
-"""Строители данных для тестов: карточки, кандидаты, картинки."""
+"""Строители данных для тестов: карточки, кандидаты, картинки, записанное."""
 
 import io
+import json
 from datetime import datetime
+from pathlib import Path
 
 from PIL import Image
 
 from backend.model import Item, Kind, SearchHit, Source
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+
+
+def recorded(relative: str):
+    """Тело записанного ответа источника. JSON разбирается, всё прочее идёт
+    текстом.
+
+    Здесь, а не у клиентов источников: записанные ответы нужны и проверкам
+    собранного бэкенда — там, где по мёртвой сети наблюдать нечего."""
+    path = FIXTURES / relative
+    text = path.read_text(encoding="utf-8")
+    return json.loads(text) if path.suffix == ".json" else text
+
 
 # Момент и момент позже. Заведённые в каждом модуле заново, они расходились
 # значениями, ничего этим не проверяя. Важен только порядок: где нужен

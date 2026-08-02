@@ -603,10 +603,6 @@
 
 - `ROOT` = `Path(__file__).resolve().parents[1]`
 
-### `tests/backend/sources/conftest.py`
-
-- `FIXTURES` = `Path(__file__).resolve().parents[2] / 'fixtures'`
-
 ### `tests/backend/sources/test_gog.py`
 
 - `WANTED` = `'1456460669'`
@@ -746,8 +742,9 @@
 ### `tests/bridge/test_page_contract.py`
 
 - `WEB` = `Path(__file__).resolve().parents[2] / 'client'`
+- `SKIPPED` = `набор из 2`
 - `CHOSEN` = `re.compile('export function chosen\\(filters\\) …`
-- `CALLED` = `re.compile("(?:call|numbered)\\('(\\w+)\\.(\\w+)…`
+- `CALLED` = `re.compile("'(\\w+)\\.(\\w+)'")`
 
 ### `tests/bridge/test_serve.py`
 
@@ -757,6 +754,7 @@
 
 ### `tests/builders.py`
 
+- `FIXTURES` = `Path(__file__).resolve().parent / 'fixtures'`
 - `MOMENT` = `datetime(2026, 7, 29, 12, 0)`
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
