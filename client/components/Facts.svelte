@@ -27,11 +27,21 @@
     .map((row) => {
       const credits = view[row.domain] ?? []
       return opened.includes(row.role)
-        ? { ...row, credits: castOf(credits, row.role, Infinity), hidden: 0 }
+        ? { ...row, credits: castOf(credits, row.role, Infinity),
+            hidden: 0, full: true }
         : { ...row, credits: castOf(credits, row.role),
-            hidden: hiddenOf(credits, row.role) }
+            hidden: hiddenOf(credits, row.role), full: false }
     })
     .filter((row) => row.credits.length))
+
+  /** Одна кнопка на оба хода, на своём месте: у сериала состав бывает в две
+   *  сотни имён, и без обратного хода карточка занимала три экрана до конца
+   *  сеанса — свёрнутой её возвращало только перечитывание. */
+  const flip = (role) => {
+    opened = opened.includes(role)
+      ? opened.filter((one) => one !== role)
+      : [...opened, role]
+  }
 </script>
 
 <dl class="film__facts">
@@ -49,12 +59,9 @@
                 onclick={() => onperson(row.domain, credit.entity_id)}
         >{credit.name}</button>
       {/each}
-      <!-- Разворачивается насовсем: обратной кнопки нет, и список остаётся
-           полным, пока карточку не перечитают. -->
-      {#if row.hidden}
-        <button type="button" class="more"
-                onclick={() => { opened = [...opened, row.role] }}
-        >… ещё {row.hidden}</button>
+      {#if row.hidden || row.full}
+        <button type="button" class="more" onclick={() => flip(row.role)}
+        >{row.full ? 'свернуть' : `… ещё ${row.hidden}`}</button>
       {/if}
     </dd>
   {/each}

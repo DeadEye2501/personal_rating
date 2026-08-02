@@ -111,7 +111,7 @@
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
 - принимает: label, text, ok, danger, onyes, onclose
 
-### components/Facts.svelte (61)
+### components/Facts.svelte (68)
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл. Длинный состав свёрнут до пятерых, пока не развернут.
 - принимает: view, onperson
 
@@ -183,8 +183,8 @@
 - Ряд из десяти звёзд: кликабельный или неподвижный с дробной.
 - принимает: score, onpick, onhover
 
-### components/Synopsis.svelte (28)
-- Описание карточки, обрезанное до трёх строк, с раскрытием.
+### components/Synopsis.svelte (128)
+- Описание карточки, обрезанное до трёх строк, с раскрытием и сворачиванием.
 - принимает: text
 
 ### components/TagBox.svelte (18)
@@ -199,7 +199,7 @@
 - Круглая кнопка ряда в шапке.
 - принимает: icon, dir, label, active, pressed, disabled, onclick, children
 
-## state — 19 файлов
+## state — 20 файлов
 
 ### state/card.js (107)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
@@ -277,6 +277,10 @@
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: MANUAL, inOrder, nameOf, pagesOf, shownValue, stepOfSource
 
+### state/trim.js (27)
+- Обрезка текста по границе слова.
+- отдаёт: wordEnd
+
 ## styles — 29 файлов
 
 ### styles/acts.css (45)
@@ -346,7 +350,7 @@
 .newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (151)
+### styles/film.css (156)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
 .film.is-collapsed .film__poster,
