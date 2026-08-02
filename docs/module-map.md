@@ -612,7 +612,7 @@
   - `async def _tags(self, source_id: str) -> tuple[tuple[GenreSource, str], ...]` (27)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 85 строк
+### `backend/sources/steam/parse.py` — 120 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -622,8 +622,8 @@
 - `def parse_search(payload: list[dict]) -> list[SearchHit]` (11)
 - `def _year(value: str | None) -> int | None` (7)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
-- `def parse_card(data: dict) -> SourceCard` (21)
-- `def parse_tags(payload: dict) -> tuple[tuple[GenreSource, str], ...]` (5)
+- `def parse_card(data: dict) -> SourceCard` (25)
+- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (36)
 
 ### `backend/sources/tmdb/client.py` — 158 строк
 
@@ -1226,7 +1226,7 @@
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def main() -> None` (20)
 
-## tests — 82 модулей
+## tests — 83 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1344,15 +1344,24 @@ OMDB: единственный источник, у которого отказ 
 - `async def registry()` (9)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 374 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam.py` — 263 строк
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`, `tests.conftest`
 
-Тестов: 27
+Тестов: 20
 
 - `def block_of(payload: dict) -> dict` (2)
+
+### `tests/backend/sources/test_steam_tags.py` — 206 строк
+
+Теги Steam: отдельный запрос, три состояния ответа и сверка номера.
+
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
+
+Тестов: 11
+
 
 ### `tests/backend/sources/test_tmdb_card.py` — 429 строк ⚠ подошёл к 300
 

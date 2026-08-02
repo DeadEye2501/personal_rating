@@ -111,7 +111,7 @@ class SteamClient:
                     response.status_code,
                 )
                 return ()
-            return parse_tags(response.json())
+            return parse_tags(response.json(), source_id)
         except BROKEN_BY_PARSING as error:
             logger.warning("steam: теги %s не разобрались — %s", source_id, error)
             return ()

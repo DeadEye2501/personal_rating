@@ -1,7 +1,5 @@
 """Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом."""
 
-import json
-
 import httpx
 
 from backend.model import (
@@ -17,12 +15,7 @@ from backend.model import (
 )
 from backend.sources.http import SourceHttp
 from backend.sources.steam.client import SteamClient
-from backend.sources.steam.parse import (
-    parse_card,
-    parse_search,
-    parse_tags,
-    poster_url,
-)
+from backend.sources.steam.parse import parse_card, parse_search, poster_url
 from tests.conftest import counting, responding
 
 
@@ -130,110 +123,6 @@ def test_genres_come_from_the_genres_and_not_from_the_neighbours(fixture):
     # категорий девятнадцать, так что подмена ключа роняет тест длиной. Отдельное
     # «не равно категориям» покраснеть не может никогда и потому не пишется.
     assert numbers == [str(one["id"]) for one in block["genres"]]
-
-
-def test_tags_arrive_in_their_own_space(fixture):
-    """Жанр и тег у Steam нумеруются порознь: `9` — это жанр «Гонки» и тег
-    «Стратегия». Пространство обязано ехать вместе с номером, иначе стратегия
-    молча получит гонки."""
-    tags = parse_tags(fixture("steam/store_items.json"))
-
-    assert tags
-    assert all(
-        space is GenreSource.STEAM_TAG and ext_id.isdigit() for space, ext_id in tags
-    )
-
-
-def test_a_tag_is_its_number_and_not_its_weight(fixture):
-    """Номера тегов сверяются с записанным ответом: рядом с `tagid` в том же
-    объекте лежит `weight`, тоже целое, и подмена одного другим проверку «цифры
-    и пространство» проходит молча. В базу тогда уедут веса под видом номеров —
-    и совпадут с чужими жанрами."""
-    payload = fixture("steam/store_items.json")
-    recorded = payload["response"]["store_items"][0]["tags"]
-
-    numbers = [ext_id for _, ext_id in parse_tags(payload)]
-
-    assert numbers == [str(one["tagid"]) for one in recorded]
-    assert numbers != [str(one["weight"]) for one in recorded]
-
-
-def test_an_answer_without_items_gives_no_tags(fixture):
-    """На пустой ответ разбор обязан отдать пусто, а не упасть по индексу."""
-    assert parse_tags(fixture("steam/store_items_empty.json")) == ()
-
-
-async def test_the_card_carries_both_spaces(replay, fixture):
-    """Клиент доливает теги к жанрам: без них у игры остаётся один-два общих
-    жанра из двенадцати, какие есть у Steam на весь магазин."""
-    appid = next(iter(fixture("steam/appdetails.json")))
-    client = SteamClient(
-        SourceHttp(
-            "steam",
-            transport=replay("steam/appdetails.json", "steam/store_items.json"),
-        )
-    )
-
-    result = await client.card(appid, Kind.GAME)
-    await client.aclose()
-
-    assert isinstance(result, Found)
-    spaces = {space for space, _ in result.value.genre_ext_ids}
-    assert spaces == {GenreSource.STEAM, GenreSource.STEAM_TAG}
-
-
-async def test_tags_that_did_not_arrive_do_not_break_the_card(
-    replay, fixture, caplog
-):
-    """Отказ на тегах меняет карточку, а не роняет её: жанры уже собраны.
-
-    Молчать при этом нельзя: карточка с одним жанром вместо двадцати выглядит
-    исправной, и без записи в лог причину не найти никогда."""
-    appid = next(iter(fixture("steam/appdetails.json")))
-    client = SteamClient(
-        SourceHttp(
-            "steam",
-            transport=replay("steam/appdetails.json", "steam/store_items_broken.txt"),
-        )
-    )
-
-    with caplog.at_level("WARNING"):
-        result = await client.card(appid, Kind.GAME)
-    await client.aclose()
-
-    assert isinstance(result, Found)
-    assert {space for space, _ in result.value.genre_ext_ids} == {GenreSource.STEAM}
-    assert "400" in caplog.text, "код отказа на тегах не записан"
-
-
-async def test_a_hidden_game_gives_no_tags(fixture):
-    """Скрытая из витрины приезжает без блока тегов вовсе — разбор обязан
-    отдать пусто, а не споткнуться об отсутствующий ключ."""
-    assert parse_tags(fixture("steam/store_items_missing.json")) == ()
-
-
-async def test_the_tag_request_asks_the_way_that_answers(fixture):
-    """`country_code: RU` отдаёт пустой ответ с `visible: false` — проверено
-    живьём. Подменить его на RU значит молча лишить тегов все игры разом, и
-    заметить это можно будет только по обеднённой карточке."""
-    asked = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        asked.append(request.url)
-        if "appdetails" in str(request.url):
-            return httpx.Response(200, json=fixture("steam/appdetails.json"))
-        return httpx.Response(200, json=fixture("steam/store_items.json"))
-
-    client = SteamClient(SourceHttp("steam", transport=httpx.MockTransport(handler)))
-    await client.card("292030", Kind.GAME)
-    await client.aclose()
-
-    card_url, tags_url = asked
-    assert "l=russian" in str(card_url), "карточка запрошена не по-русски"
-    wanted = json.loads(tags_url.params["input_json"])
-    assert wanted["context"]["country_code"] == "US"
-    assert wanted["data_request"]["include_tag_count"] > 0
-    assert wanted["ids"] == [{"appid": 292030}]
 
 
 async def test_missing_game_answers_under_two_hundred(replay, meta):
