@@ -18,6 +18,7 @@ from backend.model import (
     Section,
     Sort,
 )
+from backend.config import TEN
 from backend.storage.posters import PosterStore
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.sections import SectionsRepository
@@ -180,8 +181,9 @@ async def engine(tmp_path):
 
 @pytest.fixture
 async def sections(sessions):
-    """Запросы разделов: их спрашивают и лента, и гистограмма."""
-    return SectionsRepository(sessions)
+    """Запросы разделов: их спрашивают и лента, и гистограмма. Шкала обычная —
+    пятибалльную называет прямо тот тест, который её и проверяет."""
+    return SectionsRepository(sessions, TEN)
 
 
 @pytest.fixture

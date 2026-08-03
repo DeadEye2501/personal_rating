@@ -15,34 +15,34 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (45)
 
-## backend — 87 модулей
+## backend — 88 модулей
 
-### `backend/app.py` — 192 строк
+### `backend/app.py` — 201 строк
 
 Бэкенд, собранный целиком.
 
-Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
+Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.rescale`, `backend.storage.session`
 
-- `class Backend` (72)
+- `class Backend` (76)
   - `async def create_manual_card(self, item: Item, now: datetime) -> int` (16)
   - `async def delete_card(self, item_id: int) -> None` (9)
   - `async def restore_removed(self, kind: Kind, source: Source, source_id: str) -> None` (9)
   - `async def aclose(self) -> None` (8)
 - `def card_parts(sessions, posters: PosterService) -> dict` (13)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (61)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (65)
 
-### `backend/config.py` — 49 строк
+### `backend/config.py` — 59 строк
 
 Настройки приложения, прочитанные из окружения.
 
 Зависит от: —
 
-- `class Config` (20)
+- `class Config` (21)
   - `def library_db(self) -> Path` (2)
   - `def posters_db(self) -> Path` (2)
   - `def log_file(self) -> Path` (2)
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
-- `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
+- `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (15)
 
 ### `backend/language.py` — 72 строк
 
@@ -857,14 +857,14 @@
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (23)
 
-### `backend/storage/repository/credits.py` — 272 строк
+### `backend/storage/repository/credits.py` — 290 строк
 
 Один репозиторий на людей и на студий — различает их только описатель.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
 
 - `def _outer(row) -> str | None` (14)
-- `class CreditRepository(Repository)` (217)
+- `class CreditRepository(Repository)` (235)
   - `def _link(self) -> Column` (2)
   - `def _folded_name(self) -> ColumnElement[str]` (2)
   - `def _same_name(self, name: str) -> ColumnElement[bool]` (2)
@@ -875,7 +875,8 @@
   - `async def find_by_source(self, source: Source, source_id: str) -> int | None` (7)
   - `async def find_by_name(self, name: str) -> list[int]` (8)
   - `async def find_anonymous_by_name(self, name: str) -> int | None` (12)
-  - `async def ensure(self, credit: Credit) -> int` (10)
+  - `async def ensure(self, credit: Credit) -> int` (7)
+  - `async def _identified(self, credit: Credit) -> int` (20)
   - `async def attach(self, item_id: int, entity_id: int, role: PersonRole | CompanyRole, position: int | None=None) -> None` (13)
   - `async def detach_all(self, item_id: int) -> None` (2)
   - `async def credits_of(self, item_id: int) -> list[Credit]` (17)
@@ -965,7 +966,7 @@
   - `async def forget(self, kind: Kind, source: Source, source_id: str) -> None` (14)
   - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (20)
 
-### `backend/storage/repository/sections.py` — 177 строк
+### `backend/storage/repository/sections.py` — 187 строк
 
 Вопросы к отфильтрованному набору раздела.
 
@@ -975,9 +976,9 @@
 - `def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (16)
 - `def _included(query: Select, filters: Filters) -> Select` (18)
 - `def _excluded(query: Select, filters: Filters) -> Select` (23)
-- `class SectionsRepository(Repository)` (72)
+- `class SectionsRepository(Repository)` (81)
   - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (12)
-  - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (34)
+  - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (35)
   - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
 ### `backend/storage/repository/tags.py` — 110 строк
@@ -1029,6 +1030,16 @@
   - `async def remove(self, item_id: int) -> None` (2)
   - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
+
+### `backend/storage/rescale.py` — 79 строк
+
+Приведение хранимых оценок к настроенной шкале.
+
+Зависит от: `backend.config`, `backend.model`, `backend.storage.tables`
+
+- `def rescaled(value: float | None, scale: int) -> int | None` (11)
+- `async def apply_scale(sessions: async_sessionmaker[AsyncSession], scale: int) -> None` (30)
+- `def _moved(row, scale: int) -> dict` (10)
 
 ### `backend/storage/rows.py` — 121 строк
 
@@ -1205,19 +1216,21 @@
   - `def wish(self, item_id: int) -> dict` (3)
   - `def unwish(self, item_id: int) -> dict` (2)
 
-### `bridge/refs.py` — 74 строк
+### `bridge/refs.py` — 86 строк
 
-Мост: справочники — жанры, люди, студии.
+Мост: справочники — жанры, люди, студии и шкала оценок.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Refs(Domain)` (43)
+- `class Refs(Domain)` (51)
   - `def genres(self, genre_kind: str) -> dict` (5)
   - `def suggest(self, domain: str, name: str, offset: int=0) -> dict` (8)
   - `def set_genres(self, item_id: int, genre_ids: list) -> dict` (7)
   - `def detach_all(self, domain: str, item_id: int) -> dict` (5)
   - `def attach(self, domain: str, item_id: int, entity_id: int, role: str, position: int) -> dict` (7)
+  - `def scale(self) -> dict` (7)
   - `def create_person(self, domain: str, name: str) -> dict` (5)
+- `async def _scale(back) -> int` (2)
 - `def _role(domain: str, role: str)` (4)
 - `def _of(backend, domain: str)` (7)
 
@@ -1406,6 +1419,7 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
+
 ### `scripts/record_fixtures.py` — 281 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
@@ -1424,7 +1438,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 101 модулей
+## tests — 102 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1693,13 +1707,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def build(sessions, engine, posters, transport=None) -> CardWriter` (9)
 - `async def writer(sessions, engine, posters)` (4)
 
-### `tests/backend/test_config.py` — 68 строк
+### `tests/backend/test_config.py` — 87 строк
 
 Чтение настроек из окружения и путей к файлам данных.
 
 Зависит от: `backend.config`
 
-Тестов: 9
+Тестов: 11
 
 
 ### `tests/backend/test_cover_reads.py` — 93 строк
@@ -1721,13 +1735,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 6
 
 
-### `tests/backend/test_credits.py` — 350 строк ⚠ подошёл к 300
+### `tests/backend/test_credits.py` — 377 строк ⚠ подошёл к 300
 
 Люди и студии: одна реализация на две сущности, и различает их идентичность.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
-Тестов: 27
+Тестов: 28
 
 
 ### `tests/backend/test_dangling.py` — 55 строк
@@ -1860,13 +1874,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 12
 
 
-### `tests/backend/test_histogram.py` — 213 строк
+### `tests/backend/test_histogram.py` — 226 строк
 
 Гистограмма своих оценок по отфильтрованному набору.
 
-Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 18
+Тестов: 19
 
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 
@@ -2120,6 +2134,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 - `async def rows(engine) -> list[tuple]` (7)
 
+### `tests/backend/test_rescale.py` — 172 строк
+
+Приведение хранимых оценок к настроенной шкале.
+
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.storage`, `backend.storage.repository.ratings`, `backend.storage.rescale`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+
+Тестов: 10
+
+- `async def game_with_aspects(sessions, visual, narrative, gameplay) -> int` (8)
+- `async def stored_mark(sessions) -> int` (3)
+- `async def built_on(tmp_path, scale: str)` (6)
+
 ### `tests/backend/test_restore.py` — 149 строк
 
 Список убранного: шесть слов в строке поиска показывают его вместо выдачи.
@@ -2195,7 +2221,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Base(DeclarativeBase)` (2)
 - `class Note(Base)` (5)
 
-### `tests/backend/test_startup.py` — 147 строк
+### `tests/backend/test_startup.py` — 161 строк
 
 Запуск готовит рабочую папку сам: папка, файл настроек и схема базы.
 
@@ -2204,6 +2230,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 8
 
 - `def a_template(folder: Path) -> Path` (4)
+- `def _read_by_settings() -> set[str]` (6)
 - `def _genres_in(path: Path) -> int` (8)
 - `def _variables_of(text: str) -> set[str]` (3)
 
@@ -2274,7 +2301,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/conftest.py` — 184 строк
+### `tests/bridge/conftest.py` — 203 строк
 
 Двойники бэкенда и потоки на них.
 
@@ -2305,6 +2332,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `def run(self, factory, op=None)` (3)
 - `def _running(running)` (7)
 - `def thread(backend)` (3)
+- `class Scaled` (11)
+  - `async def aclose(self) -> None` (2)
+- `def scaled()` (3)
 
 ### `tests/bridge/test_answer.py` — 108 строк
 
@@ -2353,13 +2383,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/bridge/test_bridge_refs.py` — 128 строк
+### `tests/bridge/test_bridge_refs.py` — 134 строк
 
 Мост: справочники — жанры, люди, студии.
 
 Зависит от: `backend.model`, `bridge.refs`
 
-Тестов: 10
+Тестов: 11
 
 
 ### `tests/bridge/test_bridge_search.py` — 377 строк ⚠ подошёл к 300
@@ -2372,17 +2402,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
 
-### `tests/bridge/test_bridge_surface.py` — 187 строк
+### `tests/bridge/test_bridge_surface.py` — 216 строк
 
 Каждый вызов, который мост делает бэкенду, обязан ему подходить.
 
 Зависит от: `backend.app`, `bridge.api`, `bridge.refs`
 
-Тестов: 7
+Тестов: 9
 
 - `def chain(node)` (16)
 - `def _chooses(node) -> bool` (5)
 - `def calls() -> dict[str, dict[str, tuple]]` (15)
+- `def fields_read() -> set[str]` (16)
 - `def flat() -> list[tuple]` (4)
 - `def surface(api) -> set[str]` (13)
 - `def _behind(where, step)` (6)
@@ -2405,13 +2436,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/bridge/test_page_contract.py` — 377 строк ⚠ подошёл к 300
+### `tests/bridge/test_page_contract.py` — 400 строк ⚠ подошёл к 300
 
 Имена, которые страница и мост обязаны называть одинаково.
 
-Зависит от: `backend.model`, `bridge.answer`, `bridge.api`, `bridge.feed`
+Зависит от: `backend.config`, `backend.model`, `bridge.answer`, `bridge.api`, `bridge.feed`
 
-Тестов: 21
+Тестов: 23
 
 - `def source(path: str) -> str` (2)
 - `def named_in_chosen() -> set[str]` (4)
@@ -2473,11 +2504,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def row(source: Source, source_id: str, title: str, **fields) -> SearchHit` (8)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (3)
 
-### `tests/conftest.py` — 255 строк
+### `tests/conftest.py` — 257 строк
 
 Фикстуры тестов и поверхность общего.
 
-Зависит от: `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
+Зависит от: `backend.config`, `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
 
 Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
 
@@ -2486,7 +2517,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def seed(engine, *statements: str) -> None` (7)
 - `def migrated(tmp_path)` (16)
 - `async def engine(tmp_path)` (8)
-- `async def sections(sessions)` (3)
+- `async def sections(sessions)` (4)
 - `async def reference(engine)` (23)
 - `async def sessions(engine)` (4)
 - `async def posters(tmp_path)` (6)

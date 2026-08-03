@@ -27,6 +27,7 @@ from backend.model import (
     Sort,
     Source,
 )
+from backend.config import FIVE, TEN
 from bridge.answer import Domain, kebab
 from bridge.api import Api
 from bridge.feed import FILTER_FIELDS
@@ -375,3 +376,25 @@ def test_the_page_has_a_word_form_for_every_kind():
 
     assert forms, "в client/state/kinds.js больше нет таблицы NOUNS"
     assert set(re.findall(r"^  (\w+):", forms.group(1), re.MULTILINE)) == set(Kind)
+
+
+def test_the_page_draws_every_scale_the_settings_can_ask_for():
+    """Шкал две, и обе объявлены на странице своей нотацией.
+
+    Разъехавшись, они молчат: `SCALE_X2=0` дал бы питону пятёрку, а странице
+    неизвестную шкалу — то есть ряд звёзд без ярлыков и без цветов, потому что
+    поиск в пропавшей таблице отдаёт `undefined`, а не отказ."""
+    notation = re.search(r"const NOTATION = \{(.+?)\n\}\n",
+                         source("state/scores.js"), re.DOTALL)
+
+    assert notation, "в client/state/scores.js больше нет таблицы NOTATION"
+    known = {int(one) for one in re.findall(r"^  (\d+): \{",
+                                            notation.group(1), re.MULTILINE)}
+    assert known == {TEN, FIVE}
+
+
+def test_the_page_asks_the_bridge_for_the_scale():
+    """Не спросив, страница нарисует десять звёзд на пятибалльной базе, и
+    молча: умолчание нотации совпадает с прежней шкалой, а число столбцов
+    приезжает от базы — расхождение видно только глазами."""
+    assert ("refs", "scale") in paths_of_the_page({"refs"})

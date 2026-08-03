@@ -185,7 +185,7 @@
 - принимает: message
 
 ### components/Stars.svelte (73)
-- Ряд из десяти звёзд: кликабельный или неподвижный с дробной.
+- Ряд звёзд по числу ступеней: кликабельный или неподвижный с дробной.
 - принимает: score, onpick, onhover
 
 ### components/Synopsis.svelte (128)
@@ -262,9 +262,9 @@
 - Куда встаёт строка, которую тащат указателем.
 - отдаёт: dragged
 
-### state/scores.js (74)
+### state/scores.js (107)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
-- отдаёт: ASPECTS, LABELS, SCALE, average, colorOf, meanOf, partOf, stepOf, toneOf, verdictOf
+- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, toneOf, verdictOf
 
 ### state/scroll.js (23)
 - Арифметика своей полосы прокрутки.

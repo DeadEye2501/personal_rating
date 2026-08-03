@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
-import { ASPECTS, LABELS, SCALE, average, colorOf, meanOf, partOf, stepOf,
-  toneOf, verdictOf } from '$state/scores.js'
+import { ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale,
+  sourceColorOf, stepOf, toneOf, verdictOf } from '$state/scores.js'
 
 describe('нотация оценок', () => {
   it('десять ступеней, и ни одна не повторяется', () => {
@@ -45,7 +45,7 @@ describe('нотация оценок', () => {
     expect(verdictOf(10)).toBe('Шедевр')
     expect(verdictOf(7)).toBe('Интересно')
     expect(verdictOf(1)).toBe('Отвратительно')
-    expect(Object.keys(LABELS)).toHaveLength(10)
+    expect(scale()).toHaveLength(10)
   })
 
   it('дробная оценка берёт ярлык по целой части', () => {
@@ -127,16 +127,60 @@ describe('нотация оценок', () => {
 })
 
 describe('ступени шкалы', () => {
+  afterEach(() => setScale(10))
+
   it('начинаются с первой, а не с нулевой', () => {
     // Нулевая ступень — это `var(--score-0)`, которого в палитре нет вовсе:
     // первая звезда покрасилась бы ничем, а ярлыка у неё не нашлось бы.
-    expect(SCALE.map(colorOf)).not.toContain('var(--score-0)')
-    expect(SCALE.every((step) => LABELS[step])).toBe(true)
+    expect(scale().map(colorOf)).not.toContain('var(--score-0)')
+    expect(scale().every((step) => labelOf(step))).toBe(true)
   })
 
-  it('покрывают всю нотацию и ничего сверх неё', () => {
+  it('у каждой ступени обеих шкал есть и ярлык, и цвет', () => {
     // Разойдясь с ярлыками, шкала дала бы звезду без подписи или подпись без
-    // звезды: перебирают их порознь ряд звёзд и список фильтра.
-    expect(SCALE.map(String)).toEqual(Object.keys(LABELS).sort((a, b) => a - b))
+    // звезды: перебирают их порознь ряд звёзд и список фильтра. Ряд цветов
+    // короче ступеней даёт `var(--score-undefined)` — то есть цифру без цвета,
+    // и молча.
+    for (const steps of [10, 5]) {
+      setScale(steps)
+
+      expect(scale().every((step) => labelOf(step))).toBe(true)
+      expect(scale().map(colorOf)).not.toContain('var(--score-undefined)')
+      expect(labelOf(steps + 1)).toBe('')
+    }
+  })
+})
+
+describe('две шкалы', () => {
+  afterEach(() => setScale(10))
+
+  it('на пяти ступенях свои ярлыки и свои цвета', () => {
+    // Своих цветов у пятёрки нет: она берёт пять из тех же десяти, и таблица
+    // взята из спеки, а не выведена делением.
+    setScale(5)
+
+    expect(scale()).toEqual([1, 2, 3, 4, 5])
+    expect(labelOf(3)).toBe('средне')
+    expect(colorOf(4)).toBe('var(--score-8)')
+    expect(colorOf(5)).toBe('var(--score-10)')
+  })
+
+  it('на десяти ступенях всё как было', () => {
+    setScale(10)
+
+    expect(scale()).toHaveLength(10)
+    expect(labelOf(10)).toBe('Шедевр')
+    expect(colorOf(4)).toBe('var(--score-4)')
+  })
+
+  it('оценки агрегаторов от своей шкалы не зависят вовсе', () => {
+    // Иначе IMDb 8.6 при пятибалльной своей шкале красился бы девятой ступенью
+    // из пяти — то есть ничем, а цифра пропала бы. Решение пользователя: у
+    // агрегаторов не меняется ничто.
+    setScale(5)
+
+    expect(stepOf(8.6, 10)).toBe(9)
+    expect(sourceColorOf(9)).toBe('var(--score-9)')
+    expect(sourceColorOf(stepOf(46, 100))).toBe('var(--score-5)')
   })
 })

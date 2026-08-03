@@ -182,3 +182,22 @@ def _running(running):
 def thread(backend):
     """Поток на двойнике поведения: счётчики, событие, сон."""
     yield from _running(BackendThread(lambda: ready(backend)))
+
+
+class Scaled:
+    """Бэкенд, у которого шкала — данные, а не метод.
+
+    Свой двойник, потому что записывающий отвечает только на вызовы: обращение
+    к полю он превращает в очередное звено цепочки, и число оттуда не приезжает
+    вовсе."""
+
+    scale = 5
+
+    async def aclose(self) -> None:
+        """Поток закрывает бэкенд при остановке — молча, как настоящий."""
+
+
+@pytest.fixture
+def scaled():
+    """Поток на бэкенде с пятибалльной шкалой."""
+    yield from _running(BackendThread(lambda: ready(Scaled())))

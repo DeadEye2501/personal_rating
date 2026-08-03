@@ -6,6 +6,11 @@ from pathlib import Path
 
 DEFAULT_DATA_DIR = "data"
 
+# Ступеней в своей оценке. Наружу из настроек идёт число, а не признак: весь
+# остальной код говорит «пять» и «десять», а слово «удвоено» дальше не живёт.
+TEN = 10
+FIVE = 5
+
 
 @dataclass(frozen=True, slots=True)
 class Config:
@@ -16,6 +21,7 @@ class Config:
     poiskkino_key: str
     kinopoisk_unofficial_key: str
     log_level: str
+    scale: int
 
     @property
     def library_db(self) -> Path:
@@ -46,4 +52,8 @@ def load_config(env: Mapping[str, str], base_dir: Path) -> Config:
         poiskkino_key=value(env, "POISKKINO_API_KEY"),
         kinopoisk_unofficial_key=value(env, "KINOPOISK_UNOFFICIAL_API_KEY"),
         log_level=value(env, "LOG_LEVEL") or "INFO",
+        # Ступеней всегда десять, кроме единственного явного «нет»: опечатка в
+        # переменной обязана оставить шкалу привычной, а не переписать всю
+        # библиотеку — пересчёт необратим.
+        scale=FIVE if value(env, "SCALE_X2") == "0" else TEN,
     )

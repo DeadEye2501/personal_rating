@@ -1,7 +1,7 @@
-<!-- Ряд из десяти звёзд: кликабельный или неподвижный с дробной. -->
+<!-- Ряд звёзд по числу ступеней: кликабельный или неподвижный с дробной. -->
 <script>
   import Icon from '$components/Icon.svelte'
-  import { SCALE, colorOf, partOf } from '$state/scores.js'
+  import { colorOf, partOf, scale } from '$state/scores.js'
 
   // Кликабельный ряд — своя оценка; неподвижный с дробной звездой —
   // усреднённая у свёрнутой игры. Двух компонентов тут не нужно: отличие в
@@ -51,7 +51,7 @@
      кнопками есть щель, и на ней подсветка мигала бы. -->
 <div class="stars" bind:this={row}
      onmouseleave={onpick ? () => mark(null) : null}>
-  {#each SCALE as step (step)}
+  {#each scale() as step (step)}
     {#if onpick}
       <button type="button" class:is-on={step <= whole} style:--score={colour}
               aria-label={`Оценка ${step}`}

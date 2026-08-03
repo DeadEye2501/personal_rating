@@ -1,4 +1,4 @@
-"""Мост: справочники — жанры, люди, студии.
+"""Мост: справочники — жанры, люди, студии и шкала оценок.
 
 Люди и студии — один класс с двумя экземплярами: все методы у них общие, и
 писать их дважды нельзя. Имя домена приезжает доводом и выбирает репозиторий."""
@@ -52,11 +52,23 @@ class Refs(Domain):
             lambda back: _of(back, domain).attach(
                 item_id, entity_id, _role(domain, role), position))
 
+    def scale(self) -> dict:
+        """Ступеней в своей оценке. Спрашивается один раз при загрузке
+        страницы: без него ряд звёзд рисовать нечем, а настройка живёт в `.env`.
+
+        Обёрнуто в корутину, как и `world.expected`: поток кладёт фабрику в
+        `create_task`, а тот от числа поднимает `TypeError`."""
+        return self._reply(lambda back: _scale(back))
+
     def create_person(self, domain: str, name: str) -> dict:
         """Enter при неподсвеченном списке заводит нового — и человека, и
         студию. Выбранного из подсказки заводить не нужно: `entity_id` уже
         известен."""
         return self._reply(lambda back: _of(back, domain).create_manual(name))
+
+
+async def _scale(back) -> int:
+    return back.scale
 
 
 def _role(domain: str, role: str):

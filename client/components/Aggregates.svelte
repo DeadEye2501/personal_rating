@@ -1,6 +1,6 @@
 <!-- Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой. -->
 <script>
-  import { colorOf } from '$state/scores.js'
+  import { sourceColorOf } from '$state/scores.js'
   import {
     inOrder, nameOf, pagesOf, shownValue, stepOfSource,
   } from '$state/sources.js'
@@ -58,7 +58,7 @@
         <span class="aggr aggr--flat">{nameOf(one.source)}</span>
       {/if}
       {#if one.value !== null}
-        <b style:--score={colorOf(stepOfSource(one.value, one.source))}
+        <b style:--score={sourceColorOf(stepOfSource(one.value, one.source))}
         >{shownValue(one.value, one.source)}</b>
       {:else if one.waiting}
         <i class="aggr-wait" aria-hidden="true"></i>

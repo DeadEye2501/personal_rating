@@ -12,13 +12,13 @@
   import { dragging } from '$state/dragging.js'
   import { dragged } from '$state/reorder.js'
   import { GENRE_KINDS } from '$state/genres.js'
-  import { SCALE } from '$state/scores.js'
+  import { scale } from '$state/scores.js'
   import { created } from './tags.js'
   import { dropped, ordered, wearers } from './tagset.js'
   import { complaining } from './trouble.js'
 
   // Список открывается на высоких оценках: их ищут чаще.
-  const HIGH_FIRST = SCALE.toReversed()
+  const HIGH_FIRST = scale().toReversed()
 
   let { field, kind, title, filters, onfilters, onforget, onclose, ontrouble }
     = $props()

@@ -74,6 +74,35 @@ def calls() -> dict[str, dict[str, tuple]]:
     return found
 
 
+def fields_read() -> set[str]:
+    """Что мост читает у бэкенда полем, а не зовёт.
+
+    Собирается отдельно от вызовов: у поля нет скобок, и `calls()` его не видит
+    вовсе — переименуй `Backend.scale`, и весь набор останется зелёным, а окно
+    ответит «непредвиденный сбой» на первый же вопрос страницы."""
+    found = set()
+    for path in SOURCES:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        called = {node.func for node in ast.walk(tree)
+                  if isinstance(node, ast.Call)}
+        found.update(
+            node.attr for node in ast.walk(tree)
+            if isinstance(node, ast.Attribute) and node not in called
+            and isinstance(node.value, ast.Name) and node.value.id == "back")
+    return found
+
+
+@pytest.mark.parametrize("name", sorted(fields_read()))
+def test_every_field_the_bridge_reads_exists_on_the_backend(name):
+    assert hasattr(Backend, name), f"у бэкенда нет поля {name}"
+
+
+def test_the_guard_sees_the_fields_the_bridge_reads():
+    """Порога «собралось хотя бы что-то» мало и здесь: собери разбор ноль имён —
+    и проверка выше стала бы пустым перебором, зелёным при любом расхождении."""
+    assert "scale" in fields_read()
+
+
 def flat() -> list[tuple]:
     return sorted((path, count, named)
                   for calls_of in calls().values()

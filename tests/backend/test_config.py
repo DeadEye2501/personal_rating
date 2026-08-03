@@ -2,7 +2,9 @@
 
 from pathlib import Path
 
-from backend.config import load_config
+import pytest
+
+from backend.config import FIVE, TEN, load_config
 
 
 def test_data_dir_defaults_to_folder_next_to_program(tmp_path):
@@ -66,3 +68,20 @@ def test_log_level_is_read_from_env():
 
 def test_log_level_defaults_to_info():
     assert load_config({}, base_dir=Path(".")).log_level == "INFO"
+
+
+@pytest.mark.parametrize(("given", "steps"), [
+    ("0", FIVE), ("1", TEN), ("", TEN), ("да", TEN), (" 0 ", FIVE),
+])
+def test_the_scale_is_ten_unless_the_variable_says_otherwise(tmp_path, given,
+                                                             steps):
+    """Ступеней всегда десять, кроме единственного явного «нет»: опечатка в
+    переменной обязана оставить шкалу привычной, а не переписать всю
+    библиотеку — пересчёт необратим."""
+    assert load_config({"SCALE_X2": given}, base_dir=tmp_path).scale == steps
+
+
+def test_a_missing_variable_leaves_the_usual_scale(tmp_path):
+    """Переменной нет вовсе — это `.env` от прежней версии, и шкала в нём
+    десятибалльная."""
+    assert load_config({}, base_dir=tmp_path).scale == TEN

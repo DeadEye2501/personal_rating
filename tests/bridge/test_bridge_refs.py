@@ -126,3 +126,9 @@ def test_an_unknown_set_of_genres_is_a_failure_too(spy, asked):
 
     assert Refs(spy).genres("книги")["fail"] == "broken"
     assert log == []
+
+
+def test_the_page_is_told_the_scale(scaled):
+    """Ряд звёзд, список фильтра по оценке и ярлык словом рисуются по этому
+    числу, а взять его странице больше неоткуда: настройка живёт в `.env`."""
+    assert Refs(scaled).scale() == {"ok": 5}

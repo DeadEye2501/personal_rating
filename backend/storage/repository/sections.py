@@ -2,6 +2,7 @@
 
 
 from sqlalchemy import Column, Integer, Select, Table, cast, func, select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from backend.model import (
     Bucket,
@@ -109,7 +110,15 @@ class SectionsRepository(Repository):
     показывала бы не то, что видно в ленте.
 
     Карточки отдаются номерами: состав собирает `ViewsRepository`, а спрошенный
-    тем же запросом дал бы строку на каждый жанр и тег."""
+    тем же запросом дал бы строку на каждый жанр и тег.
+
+    Число ступеней обязательно и приходит из настроек: у гистограммы столько
+    столбцов, сколько их в шкале."""
+
+    def __init__(self, sessions: async_sessionmaker[AsyncSession],
+                 scale: int) -> None:
+        super().__init__(sessions)
+        self._scale = scale
 
     async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]:
         key = _KEYS[feed.order.key]
@@ -125,7 +134,7 @@ class SectionsRepository(Repository):
         return [row.id for row in await self._rows(query)]
 
     async def histogram(self, kind: Kind, filters: Filters) -> Histogram:
-        """Десять столбцов всегда, включая пустые: пустой столбец — это
+        """Столбец на каждую ступень шкалы, включая пустые: пустой столбец — это
         сведение, а не отсутствие данных. Плюс подвал: сколько всего и средняя.
 
         Раздел здесь всегда «Оценённые»: гистограмма строится по выставленным
@@ -147,14 +156,15 @@ class SectionsRepository(Repository):
             Section.RATED, kind, filters,
         )
 
-        counts = dict.fromkeys(range(1, 11), 0)
+        steps = range(1, self._scale + 1)
+        counts = dict.fromkeys(steps, 0)
         for row in await self._rows(counted):
             counts[row.bucket] = row.total
         average = (await self._row(mean)).mean
 
         return Histogram(
             buckets=tuple(Bucket(score=score, count=counts[score])
-                          for score in range(1, 11)),
+                          for score in steps),
             total=sum(counts.values()),
             average=average,
         )

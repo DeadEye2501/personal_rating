@@ -5,6 +5,8 @@
 `docs/specs/2026-08-03-delivery.md`.
 """
 
+import ast
+import inspect
 import logging
 from dataclasses import fields
 from pathlib import Path
@@ -83,6 +85,18 @@ def test_the_template_names_every_variable_the_settings_read():
                if isinstance(getattr(settings, one.name), str)
                and not getattr(settings, one.name).startswith("<")]
     assert unnamed == []
+    # Метка доезжает только до строковых полей, а `scale` — число, и переменную
+    # под ним этот приём не видит вовсе. Нестроковые сверяются по имени: что
+    # читает `load_config`, то и обязано стоять в шаблоне.
+    assert _read_by_settings() <= named
+
+
+def _read_by_settings() -> set[str]:
+    """Имена переменных, которые `load_config` спрашивает у окружения."""
+    body = ast.parse(inspect.getsource(load_config))
+    return {node.args[1].value for node in ast.walk(body)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+            and node.func.id == "value"}
 
 
 def test_the_schema_comes_from_the_migrations(tmp_path, monkeypatch):

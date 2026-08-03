@@ -34,6 +34,7 @@
   - `enricher: Enricher`
   - `linker: Linker`
   - `posters: PosterService`
+  - `scale: int`
   - `_removed: RemovedRepository`
   - `_sources: Sources`
   - `_engine: AsyncEngine`
@@ -41,6 +42,8 @@
 ### `backend/config.py`
 
 - `DEFAULT_DATA_DIR` = `'data'`
+- `TEN` = `10`
+- `FIVE` = `5`
 - `class Config`
   - `data_dir: Path`
   - `tmdb_key: str`
@@ -49,6 +52,7 @@
   - `poiskkino_key: str`
   - `kinopoisk_unofficial_key: str`
   - `log_level: str`
+  - `scale: int`
 
 ### `backend/language.py`
 
@@ -558,6 +562,11 @@
 - `_COLUMN` = `cast(rating.c.score, Integer)`
 - `_KEYS` = `словарь из 5`
 
+### `backend/storage/rescale.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `ASPECTS` = `набор из 3`
+
 ### `backend/storage/tables/base.py`
 
 - `metadata` = `MetaData(naming_convention={'pk': 'pk_%(table_na…`
@@ -681,6 +690,7 @@
 - `STEAM_APP` = `'https://store.steampowered.com/api/appdetails'`
 - `GOG_CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `EXAMPLES_PER_GENRE` = `2`
+
 
 ### `scripts/record_fixtures.py`
 
@@ -863,6 +873,11 @@
 ### `tests/backend/test_view_types.py`
 
 - `DRAMA` = `Genre(id=1, name='Драма', kind=GenreKind.FILM)`
+
+### `tests/bridge/conftest.py`
+
+- `class Scaled`
+  - `scale` = `5`
 
 ### `tests/bridge/test_bridge_covers.py`
 

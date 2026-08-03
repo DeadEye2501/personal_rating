@@ -4,6 +4,7 @@ import pytest
 
 from backend.model import Filters, Kind, Source
 from backend.storage.repository.genres import GenresRepository
+from backend.storage.repository.sections import SectionsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
 from tests.conftest import DRAMA, MOMENT, rated
@@ -23,6 +24,18 @@ async def test_there_are_always_ten_columns(sessions, sections):
     assert [b.score for b in histogram.buckets] == list(range(1, 11))
     assert all(b.count == 0 for b in histogram.buckets)
     assert (histogram.total, histogram.average) == (0, None)
+
+
+async def test_there_is_a_column_per_step_of_the_scale(sessions):
+    """Столбцов столько, сколько ступеней в шкале: десять столбцов на
+    пятибалльной базе означали бы пять пустых справа навсегда."""
+    await rated(sessions, "157336", 3.0)
+
+    histogram = await SectionsRepository(sessions, 5).histogram(
+        Kind.MOVIE, Filters())
+
+    assert [b.score for b in histogram.buckets] == [1, 2, 3, 4, 5]
+    assert next(b.count for b in histogram.buckets if b.score == 3) == 1
 
 
 async def test_a_score_lands_in_its_column(sessions, sections):

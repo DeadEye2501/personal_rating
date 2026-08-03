@@ -36,6 +36,7 @@ from backend.storage.repository.sections import SectionsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.storage.repository.wishlist import WishlistRepository
+from backend.storage.rescale import apply_scale
 from backend.storage.session import create_engine, session_factory
 
 
@@ -60,6 +61,10 @@ class Backend:
     enricher: Enricher
     linker: Linker
     posters: PosterService
+
+    # Ступеней в своей оценке. Число, а не репозиторий: страница рисует по нему
+    # ряд звёзд, и спрашивает его один раз при загрузке.
+    scale: int
 
     # Наружу не отдаётся: клиенту знать об удалённом нечего — он видит
     # следствие, отсеянную выдачу. Зовут его двое, и оба здесь.
@@ -143,6 +148,9 @@ async def build_backend(
     первым — до того, как за файл возьмётся хранилище постеров."""
     engine = create_engine(config.library_db)
     sessions = session_factory(engine)
+    # До первого запроса: шкала могла смениться, и лента, гистограмма и звёзды
+    # обязаны увидеть уже переведённые оценки.
+    await apply_scale(sessions, config.scale)
 
     store = PosterStore(config.posters_db)
     await store.open()
@@ -179,13 +187,14 @@ async def build_backend(
         finder=PeopleSearch(views=views, people=parts["people"],
                             companies=parts["companies"], sources=sources,
                             parts=SearchParts(genres=genres, removed=removed)),
-        feed=LibraryService(SectionsRepository(sessions), views),
+        feed=LibraryService(SectionsRepository(sessions, config.scale), views),
         loader=Loader(library=library, writer=CardWriter(**parts),
                       sources=sources, posters=posters),
         series=SeriesRefresh(library=library, sources=sources),
         enricher=Enricher(sources=sources, ids=ids, ratings=external_ratings),
         linker=Linker(**parts),
         posters=posters,
+        scale=config.scale,
         _removed=removed,
         _sources=sources,
         _engine=engine,
