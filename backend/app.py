@@ -20,7 +20,7 @@ from backend.service.removal import discard_card
 from backend.service.search import SearchParts, SearchService
 from backend.service.series import SeriesRefresh
 from backend.sources.build import build_sources
-from backend.sources.http import SourceHttp
+from backend.sources.http import SourceHttp, poster_name
 from backend.sources.registry import Sources
 from backend.storage.posters import PosterStore
 from backend.storage.repository.credits import CreditRepository, companies, people
@@ -140,7 +140,7 @@ async def build_backend(
     sources = build_sources(config, transport=transport)
     # Своя ветка на источник: у каждого свой предохранитель и свой заголовок.
     posters = PosterService(
-        {source: SourceHttp(f"{source}-poster", transport=transport)
+        {source: SourceHttp(poster_name(source), transport=transport)
          for source in POSTER_SOURCES},
         store,
     )

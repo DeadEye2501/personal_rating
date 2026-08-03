@@ -299,7 +299,7 @@
 - `def genres_of(book: Book, marked: Marked) -> tuple[Genre, ...]` (14)
 - `async def resolved_genres(genres: GenresRepository, marked: Marked) -> list[int]` (5)
 
-### `backend/service/hits.py` — 111 строк
+### `backend/service/hits.py` — 113 строк
 
 Приведение того, что ответили источники, к тому виду, в котором это
 
@@ -358,15 +358,15 @@
   - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/merging.py` — 183 строк
+### `backend/service/merging.py` — 193 строк
 
 Одна игра — одна строка выдачи.
 
-Зависит от: `backend.model`, `backend.service.titles`
+Зависит от: `backend.model`, `backend.service.titles`, `backend.unique`
 
 - `def _a_set(hit: SearchHit) -> bool` (2)
 - `def _asked_for(hit: SearchHit, asked: list[str]) -> bool` (11)
-- `def _keys(hit: SearchHit, *, alone: bool) -> set[str]` (13)
+- `def _keys(hit: SearchHit, *, alone: bool) -> list[str]` (20)
 - `def _dressed(hit: SearchHit) -> bool` (5)
 - `def _rank(hit: SearchHit) -> tuple` (6)
 - `class _Groups` (42)
@@ -407,9 +407,9 @@
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
-### `backend/service/removal.py` — 52 строк
+### `backend/service/removal.py` — 55 строк
 
-Удаление карточки из обоих файлов базы.
+Удаление карточки из обоих файлов базы, двумя путями.
 
 Зависит от: `backend.service.posters`, `backend.storage.repository.library`, `backend.storage.repository.removed`
 
@@ -438,7 +438,7 @@
 - `class SeriesRefresh` (38)
   - `async def refresh(self, item_id: int) -> None` (28)
 
-### `backend/service/titles.py` — 73 строк
+### `backend/service/titles.py` — 98 строк
 
 Приведение чужого названия к сравнимому виду.
 
@@ -455,14 +455,14 @@
 
 - `def refuse_until(http: SourceHttp, reason: Reason, delay: timedelta, source: str | None=None) -> Refusal` (23)
 
-### `backend/sources/build.py` — 47 строк
+### `backend/sources/build.py` — 54 строк
 
 Семь клиентов источников, поднятых из настроек.
 
-Зависит от: `backend.config`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
+Зависит от: `backend.config`, `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-- `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (29)
-  - `def http(name: str) -> SourceHttp` (7)
+- `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (35)
+  - `def http(name: str) -> SourceHttp` (13)
 
 ### `backend/sources/convert.py` — 104 строк
 
@@ -491,11 +491,11 @@
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 - `def parsed_or(log: Logger, source: str, note: str, produce: Callable[[], T], fallback: T) -> T` (12)
 
-### `backend/sources/gog/client.py` — 174 строк
+### `backend/sources/gog/client.py` — 175 строк
 
 Разговор с GOG по сети.
 
-Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`, `backend.unique`
 
 - `class GogClient` (140)
   - `def name(self) -> str` (4)
@@ -520,12 +520,13 @@
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
-### `backend/sources/http.py` — 131 строк
+### `backend/sources/http.py` — 150 строк
 
 Общая дверь в сеть для всех источников.
 
 Зависит от: `backend.model`
 
+- `def poster_name(source: Source) -> str` (3)
 - `def _limit(name: str) -> int | None` (4)
 - `class Breaker` (28)
   - `def is_open(self) -> bool` (7)
@@ -698,7 +699,7 @@
   - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str]` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 215 строк
+### `backend/sources/steam/parse.py` — 216 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -714,7 +715,7 @@
 - `def _genres(data: dict) -> tuple[tuple[GenreSource, str], ...]` (6)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def parse_card(data: dict) -> SourceCard` (25)
-- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (33)
+- `def parse_tags(payload: dict, appid: str) -> tuple[tuple[GenreSource, str], ...]` (34)
 
 ### `backend/sources/tmdb/client.py` — 158 строк
 
@@ -1434,7 +1435,7 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 464 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 471 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
@@ -1454,13 +1455,13 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def client(handler) -> GogClient` (2)
 
-### `tests/backend/sources/test_http.py` — 393 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_http.py` — 445 строк ⚠ подошёл к 300
 
 Общая дверь в сеть: заголовок, таймауты и предохранитель.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.undocumented`, `tests.conftest`
 
-Тестов: 24
+Тестов: 26
 
 
 ### `tests/backend/sources/test_kinopoisk.py` — 360 строк ⚠ подошёл к 300
@@ -1494,7 +1495,7 @@ MDBList: квота, битый ключ и чужой периметр — тр
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
-### `tests/backend/sources/test_oldgames.py` — 377 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_oldgames.py` — 364 строк ⚠ подошёл к 300
 
 Разбор страниц old-games.ru: выдача и карточка.
 
@@ -1529,7 +1530,7 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 288 строк
+### `tests/backend/sources/test_registry.py` — 290 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
@@ -1791,13 +1792,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def genres(engine, sessions)` (3)
 
-### `tests/backend/test_genre_rules.py` — 220 строк
+### `tests/backend/test_genre_rules.py` — 247 строк
 
 Правила справочника: набор чужих меток на входе, набор наших жанров на выходе.
 
 Зависит от: `backend.model`, `backend.service.genres`, `backend.sources.gog.parse`, `backend.sources.steam.parse`, `backend.storage.repository.genres`, `backend.storage.session`, `tests.alembic_runner`
 
-Тестов: 19
+Тестов: 21
 
 - `def stocked(tmp_path_factory)` (7)
 - `async def book(stocked)` (6)
@@ -1928,13 +1929,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 
-### `tests/backend/test_merging.py` — 188 строк
+### `tests/backend/test_merging.py` — 297 строк
 
 Одна игра — одна строка выдачи.
 
 Зависит от: `backend.model`, `backend.service.merging`
 
-Тестов: 15
+Тестов: 21
 
 - `def row(source: Source, source_id: str, title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (6)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)
@@ -1963,13 +1964,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def boundary_dataclasses()` (15)
 - `def boundary_denials()` (14)
 
-### `tests/backend/test_offline.py` — 432 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 456 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
 Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 22
+Тестов: 23
 
 - `def mine(title: str, **fields)` (4)
 - `async def assemble(tmp_path, transport=None)` (8)
@@ -1984,26 +1985,26 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 3
 
 
-### `tests/backend/test_people_search.py` — 396 строк ⚠ подошёл к 300
+### `tests/backend/test_people_search.py` — 416 строк ⚠ подошёл к 300
 
 Клик по человеку и студии: внутренняя половина и внешняя.
 
 Зависит от: `backend.model`, `backend.service.people`, `backend.service.search`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 21
+Тестов: 22
 
 - `def parts(sessions)` (9)
 - `def finder_on(parts, client) -> PeopleSearch` (5)
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
 - `def outside_questions(asked: list[tuple]) -> list[tuple]` (4)
 
-### `tests/backend/test_poster_service.py` — 245 строк
+### `tests/backend/test_poster_service.py` — 261 строк
 
 Путь обложки от источника до хранилища.
 
 Зависит от: `backend.model`, `backend.service.images`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `tests.conftest`
 
-Тестов: 18
+Тестов: 19
 
 - `async def service(posters)` (4)
 
@@ -2025,25 +2026,25 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_removed.py` — 186 строк
+### `tests/backend/test_removed.py` — 211 строк
 
 Удалённое не возвращается: карточка уходит, а память о ней остаётся.
 
 Зависит от: `backend.model`, `backend.service.hits`, `backend.service.removal`, `backend.service.search`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `tests.conftest`, `tests.wiring`
 
-Тестов: 11
+Тестов: 12
 
 - `async def removed(sessions)` (2)
 - `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 - `async def rows(engine) -> list[tuple]` (7)
 
-### `tests/backend/test_search.py` — 418 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 446 строк ⚠ подошёл к 300
 
 Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
 
 Зависит от: `backend.model`, `backend.service.search`, `tests.conftest`
 
-Тестов: 26
+Тестов: 27
 
 
 ### `tests/backend/test_search_genres.py` — 161 строк
@@ -2131,13 +2132,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 28
 
 
-### `tests/backend/test_titles.py` — 73 строк
+### `tests/backend/test_titles.py` — 114 строк
 
 Приведение чужого названия к сравнимому виду.
 
 Зависит от: `backend.service.titles`
 
-Тестов: 7
+Тестов: 9
 
 
 ### `tests/backend/test_view_types.py` — 110 строк
@@ -2299,13 +2300,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/bridge/test_page_contract.py` — 365 строк ⚠ подошёл к 300
+### `tests/bridge/test_page_contract.py` — 377 строк ⚠ подошёл к 300
 
 Имена, которые страница и мост обязаны называть одинаково.
 
 Зависит от: `backend.model`, `bridge.answer`, `bridge.api`, `bridge.feed`
 
-Тестов: 20
+Тестов: 21
 
 - `def source(path: str) -> str` (2)
 - `def named_in_chosen() -> set[str]` (4)
@@ -2353,7 +2354,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/builders.py` — 90 строк
+### `tests/builders.py` — 101 строк
 
 Строители данных для тестов: карточки, кандидаты, картинки, записанное.
 
@@ -2363,7 +2364,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def an_item(source_id: str, title: str, **fields) -> Item` (15)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
-- `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (8)
+- `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (16)
 
 ### `tests/conftest.py` — 255 строк
 

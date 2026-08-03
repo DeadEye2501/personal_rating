@@ -124,7 +124,7 @@ async def test_every_catalog_client_takes_the_same_arguments(registry):
             ], type(client)
 
 
-@pytest.mark.parametrize("name", ["tmdb", "steam", "gog"])
+@pytest.mark.parametrize("name", ["tmdb", "steam", "gog", "old_games"])
 async def test_each_catalog_client_sits_on_the_connection_of_its_own_name(registry, name):
     """Привязка «имя соединения — клиент» проверяется следствием, а не чтением
     `client.name`: имя в отказе клиенты подставляют литералом, поэтому
@@ -132,9 +132,10 @@ async def test_each_catalog_client_sits_on_the_connection_of_its_own_name(regist
     там, и в сравнении набора имён.
 
     Взводим предохранитель на соединении с этим именем и спрашиваем каждого из
-    трёх: замолчать обязан ровно один, и это должен быть тот, чьё имя мы взвели.
-    Обменяй соединения — замолчит не тот, и тест покраснеет."""
-    clients = {"tmdb": registry.tmdb, "steam": registry.steam, "gog": registry.gog}
+    четырёх: замолчать обязан ровно один, и это должен быть тот, чьё имя мы
+    взвели. Обменяй соединения — замолчит не тот, и тест покраснеет."""
+    clients = {"tmdb": registry.tmdb, "steam": registry.steam,
+               "gog": registry.gog, "old_games": registry.old_games}
     for connection in registry.connections:
         if connection.name == name:
             connection.breaker.trip(timedelta(hours=1))
@@ -229,6 +230,7 @@ async def test_a_card_goes_back_to_the_client_it_came_from(registry):
     assert registry.client_for(Source.TMDB) is registry.tmdb
     assert registry.client_for(Source.STEAM) is registry.steam
     assert registry.client_for(Source.GOG) is registry.gog
+    assert registry.client_for(Source.OLD_GAMES) is registry.old_games
 
 
 async def test_a_manual_card_has_no_client(registry):
@@ -252,7 +254,7 @@ async def test_closing_closes_every_connection():
         raise AssertionError(f"соединение {one.name} осталось открытым")
 
 
-CATALOG_OWNERS = ("tmdb", "steam", "gog")
+CATALOG_OWNERS = ("tmdb", "steam", "gog", "old_games")
 
 
 @pytest.mark.parametrize("owner", [*CATALOG_OWNERS, "mdblist", "omdb"])

@@ -7,13 +7,18 @@ from datetime import datetime, timedelta
 
 import httpx
 
-from backend.model import Reason, Refusal
+from backend.model import Reason, Refusal, Source
 
 logger = logging.getLogger(__name__)
 
 # Обязателен: без него запрос до MDBList не доходит — Cloudflare отвечает 403
 # с телом «error code: 1010», не JSON.
-USER_AGENT = "PersonalRating/0.1 (personal library app)"
+#
+# Контакт в скобках — не вежливость: часть сайтов отказывает без него прямо.
+# Замерено 03.08.2026 — Wikimedia отвечает `403` и текстом «Please respect our
+# robot policy… Contact bot-traffic@wikimedia.org». Адрес личный и уезжает в
+# каждый запрос к каждому источнику; поставлен решением пользователя.
+USER_AGENT = "PersonalRating/0.1 (dead.eye.2501@gmail.com)"
 
 DEFAULT_TIMEOUT = 20.0
 
@@ -34,13 +39,27 @@ NETWORK_BACKOFF = timedelta(seconds=15)
 # Предел стоит здесь, а не в клиенте, потому что соединений к этому сайту два:
 # карточки идут своим, обложки — своим, `<имя>-poster`. Ограничитель в клиенте
 # постерный путь не накрывал вовсе.
-AT_ONCE = {"old_games": 4}
+# Ключ — значение перечисления, а не литерал: постерное имя собирается в
+# сборке как `f"{source}-poster"`, и с литералом переименование источника
+# молча уносило бы очередь у обложек, оставляя её у карточек.
+AT_ONCE = {Source.OLD_GAMES: 4}
+
+
+# Хвост имени постерного соединения. Одной строкой на оба места — и на сборку
+# имени, и на его разбор: разойдись они, предел молча перестал бы накрывать
+# обложки, а сторож остался бы зелёным.
+POSTER_SUFFIX = "-poster"
+
+
+def poster_name(source: Source) -> str:
+    """Имя соединения, которым ходят за обложками этого источника."""
+    return f"{source}{POSTER_SUFFIX}"
 
 
 def _limit(name: str) -> int | None:
-    """Предел для этого соединения. Имя постерного — `<источник>-poster`, и
-    политика у обоих одна: сервер-то один."""
-    return AT_ONCE.get(name.split("-")[0])
+    """Предел для этого соединения. У карточек и обложек он общий: сервер-то
+    один."""
+    return AT_ONCE.get(name.removesuffix(POSTER_SUFFIX))
 
 
 class Breaker:

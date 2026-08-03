@@ -14,6 +14,7 @@ from backend.sources.gog.parse import (
 )
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import asked, refuse_undocumented
+from backend.unique import unique
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +156,7 @@ class GogClient:
         ручки."""
         # Слаг без подчёркиваний обе формы даёт одинаковыми, и второй запрос был
         # бы тем же самым: спрашиваем один раз.
-        for query in dict.fromkeys((slug, slug.replace("_", " "))):
+        for query in unique((slug, slug.replace("_", " "))):
             payload = await self._payload(query)
             if isinstance(payload, Refusal):
                 return payload

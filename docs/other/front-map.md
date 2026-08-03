@@ -277,9 +277,9 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (110)
+### state/sources.js (124)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
-- отдаёт: MANUAL, inOrder, nameOf, pagesOf, shownValue, stepOfSource
+- отдаёт: MANUAL, cardSourceName, inOrder, nameOf, pagesOf, shownValue, stepOfSource
 
 ### state/trim.js (27)
 - Обрезка текста по границе слова.

@@ -4,7 +4,7 @@
   import Icon from '$components/Icon.svelte'
   import TagBox from '$components/TagBox.svelte'
   import { call, lastOp, numbered } from '$api/bridge.js'
-  import { nameOf } from '$state/sources.js'
+  import { cardSourceName } from '$state/sources.js'
   import { complaining } from './trouble.js'
 
   // Единственный род отказа, который тут не поломка, а ответ: за этой ссылкой в
@@ -76,7 +76,7 @@
 
 <div class="cardform__row">
   {#if source}
-    <span class="cardform__linked">{nameOf(source)}</span>
+    <span class="cardform__linked">{cardSourceName(source)}</span>
     <button type="button" class="icon-btn icon-btn--del cardform__unlink"
             aria-label="Отвязать от источника"
             onclick={() => unlink().catch((error) =>

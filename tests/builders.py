@@ -80,11 +80,22 @@ def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
 POSTER = picture(600, 900, fmt="JPEG")
 
 
+STORES = (Source.STEAM, Source.GOG, Source.OLD_GAMES)
+
+
 def hit(source_id: str = "157336", title: str = "Интерстеллар",
         **fields) -> SearchHit:
     """Короткий кандидат выдачи: опознание аргументами, остальное по вкусу теста.
 
     Умолчания уезжают в `base`, а не в подпись: иначе вызов `hit(kind=Kind.GAME)`
-    даёт «got multiple values for keyword argument»."""
-    base = dict(kind=Kind.MOVIE, source=Source.TMDB)
+    даёт «got multiple values for keyword argument».
+
+    Тип выводится из источника, а не стоит кино всегда. Магазины ничего, кроме
+    игр, не отдают, и строка `Kind.MOVIE` с `source=Source.STEAM` — состояние,
+    которого в производстве не бывает. Стоило оно дорого: `merged` выходит из
+    склейки по **первой** не-игре, и шесть проверок игрового пути исполнялись
+    мимо неё вовсе, а по именам и докстрингам выглядели исполняющимися."""
+    source = fields.get("source", Source.TMDB)
+    base = dict(kind=Kind.GAME if source in STORES else Kind.MOVIE,
+                source=Source.TMDB)
     return SearchHit(source_id=source_id, title=title, **(base | fields))

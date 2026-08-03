@@ -74,14 +74,14 @@ class OldGamesClient:
         page = await self._page(CATALOG, {"gamename": query})
         if isinstance(page, Refusal):
             return page
-        return parsed(logger, "old-games", "выдача не разобралась",
+        return parsed(logger, "old_games", "выдача не разобралась",
                       lambda: Found(parse_search(page)))
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         page = await self._page(CARD.format(source_id=source_id))
         if isinstance(page, Refusal):
             return page
-        return parsed(logger, "old-games", f"карточка {source_id} не разобралась",
+        return parsed(logger, "old_games", f"карточка {source_id} не разобралась",
                       lambda: Found(parse_card(page, source_id)))
 
     async def aclose(self) -> None:

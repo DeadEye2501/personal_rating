@@ -3,6 +3,7 @@
 import httpx
 
 from backend.config import Config
+from backend.model import Source
 from backend.sources.gog.client import GogClient
 from backend.sources.http import SourceHttp
 from backend.sources.oldgames.client import OldGamesClient
@@ -27,7 +28,13 @@ def build_sources(
         # Свой предохранитель на источник: исчерпанная квота одного не должна
         # выключать остальных. Оба зеркала Кинопоиска при этом заводятся под
         # одним именем — наружу источник один.
-        one = SourceHttp(name, transport=transport)
+        #
+        # Каталожные зовутся значением `Source`, а не литералом: из того же
+        # значения сборка собирает имя постерного соединения (`<источник>-poster`),
+        # а по нему ищется предел одновременных запросов. С литералом
+        # переименование источника уносило бы очередь у обложек и оставляло у
+        # карточек, и не покраснело бы ничто.
+        one = SourceHttp(str(name), transport=transport)
         raised.append(one)
         return one
 
@@ -36,10 +43,10 @@ def build_sources(
         UnofficialClient(http("kinopoisk"), config.kinopoisk_unofficial_key),
     )
     return Sources(
-        tmdb=TmdbClient(http("tmdb"), config.tmdb_key),
-        steam=SteamClient(http("steam")),
-        gog=GogClient(http("gog")),
-        oldgames=OldGamesClient(http("old_games")),
+        tmdb=TmdbClient(http(Source.TMDB), config.tmdb_key),
+        steam=SteamClient(http(Source.STEAM)),
+        gog=GogClient(http(Source.GOG)),
+        old_games=OldGamesClient(http(Source.OLD_GAMES)),
         mdblist=MdbListClient(http("mdblist"), config.mdblist_key),
         omdb=OmdbClient(http("omdb"), config.omdb_key),
         kinopoisk=kinopoisk,

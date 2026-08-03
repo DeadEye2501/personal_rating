@@ -197,6 +197,30 @@ async def test_a_card_is_deleted_with_everything_of_mine(offline):
     assert await offline.posters.has(item_id) is False
 
 
+async def test_the_delete_button_remembers_what_was_taken_away(offline):
+    """Главное следствие задачи 4 достигается ровно здесь: страница зовёт через
+    мост `Backend.delete_card`, других вызовов `discard_card` в боевом коде нет.
+
+    Соседние проверки удаления берут ручную карточку, а у неё `remember`
+    выходит первой же строкой — разницы между `discard_card` и `remove_card`
+    там нет **по построению**, и подмена одного другим оставалась зелёной.
+    Поэтому карточка здесь чужая, из магазина.
+
+    Память спрашивается у самого репозитория, а не через выдачу поиска:
+    внешняя выдача требует сети, а этот файл проверяет обещание «без сети
+    работает всё, кроме поиска чужого». Поле приватное намеренно — через
+    границу слоёв его не отдают, — и лезем в него только отсюда, из проверки
+    самой сборки."""
+    mark = (Kind.GAME, Source.STEAM, "570")
+    gone = await offline.library.create(
+        an_item("570", "Dota 2", kind=Kind.GAME, source=Source.STEAM)
+    )
+
+    await offline.delete_card(gone)
+
+    assert await offline._removed.known([mark]) == {mark}
+
+
 async def test_a_single_card_can_be_redrawn(offline):
     """После загрузки кандидата и после простановки оценки ленте нужно
     перерисовать одну карточку. Спросить её больше негде: `page` умеет только

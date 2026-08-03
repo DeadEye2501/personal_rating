@@ -427,8 +427,8 @@ async def test_the_catalog_is_asked_only_for_games_and_packs(fixture, gog_catalo
     выбран второй, не наблюдалась бы ничем."""
     # Эмуляция сверяется с тем, что живой каталог ответил на самом деле, иначе
     # она проверяла бы наше представление о параметре, а не сам параметр.
-    recorded = {one["title"]
-                for one in fixture("gog/catalog_filtered.json")["products"]}
+    rows = fixture("gog/catalog_filtered.json")["products"]
+    recorded = {one["title"] for one in rows}
     client = GogClient(
         SourceHttp("gog", transport=httpx.MockTransport(gog_catalog)))
 
@@ -438,6 +438,13 @@ async def test_the_catalog_is_asked_only_for_games_and_packs(fixture, gog_catalo
     assert isinstance(result, Found)
     titles = {hit.title for hit in result.value}
     assert titles == recorded
+    # Слаг доезжает до кандидата из **сборки клиента**, а не только из разбора:
+    # сам разбор сторожится отдельно, а `search` можно вернуть к прежнему
+    # `to_hit(card)` — и тогда осиротеет `parse_hits`, а с ним исчезнет
+    # единственный ключ, которым «The Witcher 3» сходится с «Ведьмаком 3».
+    assert {hit.aliases for hit in result.value} == {
+        (one["slug"].replace("_", " "),) for one in rows
+    }
     # Комплекты остаются: `Toolkit` у GOG — это `pack`.
     assert "Baldur's Gate 3 Toolkit" in titles
     assert not [one for one in titles if "Soundtrack" in one]

@@ -259,7 +259,7 @@ async def test_a_broken_client_becomes_a_refusal_with_its_name(
 async def test_a_broken_client_does_not_hide_the_other(sessions, service):
     """Второй магазин отвечает своё, и его находки доезжают."""
     broken = FakeSearch(RuntimeError("сорвался"), name="steam")
-    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
+    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", kind=Kind.GAME, source=Source.GOG)]),
                       name="gog")
 
     result = await service(broken, gog).external(Kind.GAME, "ведьмак")
@@ -287,11 +287,16 @@ async def test_a_missing_answer_is_not_a_refusal_either(sessions, service):
 
 async def test_two_stores_are_asked_at_once(sessions, service):
     """У игр кандидатов спрашивают у двух магазинов сразу — и с тем же запросом
-    и типом, что пришли снаружи."""
-    steam = FakeSearch(Found([hit("292030", "Ведьмак", source=Source.STEAM)]),
-                        name="steam")
-    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
-                      name="gog")
+    и типом, что пришли снаружи.
+
+    Названия у строк разные нарочно: одноимённые склеились бы в одну — и верно
+    склеились бы, — а тут считается, что спросили обоих."""
+    steam = FakeSearch(
+        Found([hit("292030", "Ведьмак 3", kind=Kind.GAME, source=Source.STEAM)]),
+        name="steam")
+    gog = FakeSearch(
+        Found([hit("1207664663", "Ведьмак 2", kind=Kind.GAME, source=Source.GOG)]),
+        name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
 
@@ -304,9 +309,9 @@ async def test_two_stores_come_woven_and_not_in_blocks(sessions, service):
     """Спека требует «показывают вперемешку». Подряд это значит, что вторая
     половина страницы — всегда GOG, а он на бессмыслицу отдаёт два десятка
     несвязанных игр: настоящие находки уехали бы за экран."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME, source=Source.STEAM)
                                for n in range(3)]), name="steam")
-    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", source=Source.GOG)
+    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", kind=Kind.GAME, source=Source.GOG)
                              for n in range(3)]), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
@@ -316,11 +321,34 @@ async def test_two_stores_come_woven_and_not_in_blocks(sessions, service):
     ]
 
 
+async def test_three_answers_are_woven_by_turns(sessions, service):
+    """У игр источников три — Steam, GOG и old-games, — а собиралась выдача из
+    трёх ни разу: во всех прежних проверках `_weave` получал одну или две.
+
+    Порядок «по одному кандидату по кругу» на трёх выдачах разной длины и есть
+    предмет: с двумя он неотличим от простого чередования, а третий источник
+    приписан этим же планом."""
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME,
+                                  source=Source.STEAM) for n in range(3)]),
+                       name="steam")
+    gog = FakeSearch(Found([hit("g0", "GOG 0", kind=Kind.GAME,
+                                source=Source.GOG)]), name="gog")
+    old = FakeSearch(Found([hit(f"o{n}", f"Old {n}", kind=Kind.GAME,
+                                source=Source.OLD_GAMES) for n in range(2)]),
+                     name="old_games")
+
+    result = await service(steam, gog, old).external(Kind.GAME, "игра")
+
+    assert [one.title for one in result.views] == [
+        "Steam 0", "GOG 0", "Old 0", "Steam 1", "Old 1", "Steam 2",
+    ]
+
+
 async def test_a_shorter_answer_does_not_leave_a_hole(sessions, service):
     """Магазины отдают разное число находок — переплетение это переживает."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME, source=Source.STEAM)
                                for n in range(3)]), name="steam")
-    gog = FakeSearch(Found([hit("g0", "GOG 0", source=Source.GOG)]), name="gog")
+    gog = FakeSearch(Found([hit("g0", "GOG 0", kind=Kind.GAME, source=Source.GOG)]), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
 
@@ -340,7 +368,7 @@ async def test_one_source_keeps_the_order_it_gave(sessions, service):
 async def test_one_store_refusing_does_not_hide_the_other(sessions, service):
     steam = FakeSearch(Refusal(source="steam", reason=Reason.NETWORK),
                         name="steam")
-    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", source=Source.GOG)]),
+    gog = FakeSearch(Found([hit("1207664663", "Ведьмак", kind=Kind.GAME, source=Source.GOG)]),
                       name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
@@ -406,9 +434,9 @@ async def test_the_portion_is_cut_before_the_merging(sessions, service):
 async def test_a_portion_is_counted_per_source_and_not_per_page(sessions, service):
     """У игр магазина два, и по 20 у каждого — это два запроса, как и сказано в
     спеке. Срез на общей выдаче отдал бы 20 на двоих."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME, source=Source.STEAM)
                                for n in range(50)]), name="steam")
-    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", source=Source.GOG)
+    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", kind=Kind.GAME, source=Source.GOG)
                              for n in range(50)]), name="gog")
 
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")

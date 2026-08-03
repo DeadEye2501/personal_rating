@@ -9,7 +9,7 @@ import pytest
 from backend.model import GenreSource
 from backend.service.genres import matched
 from backend.sources.gog.parse import SPELLING, parse_catalog
-from backend.sources.steam.parse import parse_card
+from backend.sources.steam.parse import GENRE_TWIN, parse_card
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.session import create_engine, session_factory
 from tests.alembic_runner import alembic
@@ -187,6 +187,16 @@ STEAM_GENRES = {
 }
 
 
+def test_the_table_of_steam_genres_did_not_grow():
+    """Проверка выше идёт по рукописной таблице теста, поэтому **добавленную** в
+    боевую строку она не увидит вовсе. Комментарий у `GENRE_TWIN` прямо
+    утверждает, что жанр несут ровно эти восемь из двенадцати, и не сторожит
+    этого ничто: припиши туда «Инди» — и каждая инди-игра получит Action.
+
+    Сверяются ключи, а не значения: значения ловит проверка ниже, привязкой."""
+    assert set(GENRE_TWIN) == set(STEAM_GENRES)
+
+
 @pytest.mark.parametrize(("genre_id", "expected"), sorted(STEAM_GENRES.items()))
 async def test_a_steam_genre_leads_to_the_genre_it_names(book, genre_id, expected):
     """Жанр магазина проходит весь путь: разбор ответа переводит его в номер
@@ -200,6 +210,23 @@ async def test_a_steam_genre_leads_to_the_genre_it_names(book, genre_id, expecte
     marks = {ext_id for _space, ext_id in card.genre_ext_ids}
 
     assert names(matched(await book(GenreSource.STEAM), marks)) == [expected]
+
+
+# Написания GOG поимённо. Проверка ниже идёт по самой `SPELLING`, поэтому
+# **удаление** строки для неё незаметно: параметров станет на один меньше, и
+# только. А удаление стоит жанра — сотри `role-playing`, и игра, у которой GOG
+# отдал ролевую жанром, а не тегом, перестаёт получать `Action-RPG`.
+FROZEN_SPELLING = {
+    "point-and-click": "pointandclick",
+    "team-sport": "teamsport",
+    "virtual-life": "virtuallife",
+    "roguelike": "rougelike",
+    "role-playing": "rpg",
+}
+
+
+def test_the_table_of_gog_spellings_did_not_shrink():
+    assert SPELLING == FROZEN_SPELLING
 
 
 @pytest.mark.parametrize(("written", "canonical"), sorted(SPELLING.items()))

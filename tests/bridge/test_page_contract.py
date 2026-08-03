@@ -109,6 +109,18 @@ def test_every_rating_source_has_a_scale_and_a_name():
     assert keys_of("NAMES", page) == set(RatingSource)
 
 
+def test_every_card_source_has_a_name_on_the_page():
+    """Подпись источника карточки живёт в своём пространстве — `Source`, а не
+    `RatingSource`: совпадают они только тремя значениями из семи, и седьмой
+    источник страница подписывала бы сырым ключом `old_games`.
+
+    Ручной в таблице нет намеренно: окно карточки её подпись не показывает
+    вовсе — там крестик вместо имени."""
+    keys = keys_of("CARDS", source("state/sources.js"))
+
+    assert keys == set(Source) - {Source.MANUAL}
+
+
 def test_every_rating_source_has_a_place_in_the_row():
     """Порядок в ряду оценок назван списком, и в нём обязаны стоять все семь.
     Пропущенный уходит в конец — это задумано для восьмого, которого ещё нет, —

@@ -1,8 +1,10 @@
 """Одна игра — одна строка выдачи.
 
 Автоматическая половина дедупликации: то, что склеивается без единой ошибки,
-склеивается само и человека не беспокоит. Замер принятого правила — 382 верных
-склейки при нуле ложных, 83% из 461 верной пары на 224 запросах, 03.08.2026.
+склеивается само и человека не беспокоит. Замер боевой реализации на
+независимой разметке — 383 верных склейки при нуле ложных, 83% из 461 верной
+пары на 224 запросах, 03.08.2026. Английское название GOG в ключи не берётся
+по решению пользователя, и стоит это ровно одну пару — «Ведьмака 2».
 
 Что не склеилось, остаётся на глазах человека: он убирает лишнее руками, и это
 помнит `RemovedRepository`.
@@ -10,6 +12,7 @@
 
 from backend.model import Kind, SearchHit, Source
 from backend.service.titles import flattened, without_edition
+from backend.unique import unique
 
 # Слова сборника. Сборник — не издание: это несколько игр под одной строкой, и
 # показывать его в выдаче незачем. Решение пользователя 03.08.2026.
@@ -38,19 +41,26 @@ def _asked_for(hit: SearchHit, asked: list[str]) -> bool:
     return bool(asked) and set(asked) <= set(flattened(hit.title).split())
 
 
-def _keys(hit: SearchHit, *, alone: bool) -> set[str]:
+def _keys(hit: SearchHit, *, alone: bool) -> list[str]:
     """Чем строка узнаётся. Внутри одного источника ключ только один —
     показываемое название.
 
     Замерено 03.08.2026: со вторым названием склеек внутри магазина становится
     126 вместо 51, и склеиваются ими разные игры одной серии — `Worms` с
     `Worms 2`, `Space Quest I` со `Space Quest II`. Между источниками этого не
-    случается, поэтому там добавочные ключи разрешены."""
-    keys = {without_edition(hit.title)}
+    случается, поэтому там добавочные ключи разрешены.
+
+    Список, а не множество, и порядок в нём — правило: **своё показываемое
+    название сильнее псевдонима.** Строка примыкает к группе первым подошедшим
+    ключом, а `_joinable` вторую склейку уже запретит, так что очередь решает
+    исход. Множество отдавало эту очередь хешам, а хеш строки солится на запуск
+    процесса: замерено 03.08.2026 — девять солей из шестнадцати показывали
+    дубль `Worms`, семь верную пару, при зелёном наборе на любой."""
+    keys = [without_edition(hit.title)]
     if not alone:
-        keys.add(without_edition(hit.original_title))
-        keys.update(without_edition(one) for one in hit.aliases)
-    return {one for one in keys if one}
+        keys.append(without_edition(hit.original_title))
+        keys.extend(without_edition(one) for one in hit.aliases)
+    return unique(one for one in keys if one)
 
 
 def _dressed(hit: SearchHit) -> bool:

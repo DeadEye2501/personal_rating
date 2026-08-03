@@ -365,7 +365,7 @@
 
 ### `backend/service/titles.py`
 
-- `ROMAN` = `словарь из 13`
+- `ROMAN` = `словарь из 20`
 - `EDITION_WORDS` = `frozenset({'edition', 'editions', 'ed', 'goty', …`
 - `SYMBOLS` = `str.maketrans({'™': ' ', '®': ' ', '©': ' ', '℠'…`
 - `ARTICLES` = `frozenset({'the', 'a', 'an'})`
@@ -392,10 +392,11 @@
 ### `backend/sources/http.py`
 
 - `logger` = `logging.getLogger(__name__)`
-- `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
+- `USER_AGENT` = `'PersonalRating/0.1 (dead.eye.2501@gmail.com)'`
 - `DEFAULT_TIMEOUT` = `20.0`
 - `NETWORK_BACKOFF` = `timedelta(seconds=15)`
 - `AT_ONCE` = `словарь из 1`
+- `POSTER_SUFFIX` = `'-poster'`
 
 ### `backend/sources/oldgames/client.py`
 
@@ -466,7 +467,7 @@
   - `tmdb: TmdbClient`
   - `steam: SteamClient`
   - `gog: GogClient`
-  - `oldgames: OldGamesClient`
+  - `old_games: OldGamesClient`
   - `mdblist: MdbListClient`
   - `omdb: OmdbClient`
   - `kinopoisk: KinopoiskClient`
@@ -701,7 +702,7 @@
 ### `tests/backend/sources/test_registry.py`
 
 - `SILENT` = `responding(json={})`
-- `CATALOG_OWNERS` = `набор из 3`
+- `CATALOG_OWNERS` = `набор из 4`
 
 ### `tests/backend/sources/test_steam_items.py`
 
@@ -748,6 +749,7 @@
 - `FALLOUT` = `набор из 3`
 - `STARDEW` = `набор из 10`
 - `STEAM_GENRES` = `словарь из 8`
+- `FROZEN_SPELLING` = `словарь из 5`
 
 ### `tests/backend/test_images.py`
 
@@ -779,6 +781,10 @@
   - `client: FakeCatalog`
   - `posters: PosterService`
   - `requests: list`
+
+### `tests/backend/test_merging.py`
+
+- `FROZEN_SETS` = `набор из 7`
 
 ### `tests/backend/test_migrations.py`
 
@@ -817,8 +823,9 @@
 
 ### `tests/backend/test_titles.py`
 
-- `SAME` = `набор из 7`
+- `SAME` = `набор из 14`
 - `EDITIONS` = `набор из 3`
+- `FROZEN_EDITIONS` = `набор из 49`
 
 ### `tests/backend/test_view_types.py`
 
@@ -859,6 +866,7 @@
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `POSTER` = `picture(600, 900, fmt='JPEG')`
+- `STORES` = `набор из 3`
 
 ### `tests/conftest.py`
 

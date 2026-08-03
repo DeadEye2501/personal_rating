@@ -170,6 +170,31 @@ async def test_a_removed_row_of_one_source_leaves_the_other_alone(
     assert [one.source for one in result.views] == [Source.GOG]
 
 
+async def test_the_removal_reaches_every_answer_and_not_only_the_first(
+    sessions, reference, removed
+):
+    """У игр выдач две-три, а отсев берёт их списком. Урежься он до первой —
+    убранная строка второго магазина возвращалась бы навсегда, при зелёном
+    наборе: во всех прежних проверках убранное лежало в выдаче Steam, а она
+    первая.
+
+    Игры взяты разные нарочно. С одинаковыми названиями дефект прячет склейка:
+    строка, которую отсев пропустил, слипается со своей парой и исчезает как
+    проигравшая — то есть на экране всё верно по случайной причине."""
+    await removed.remember(a_game("1207658691", "Arcanum", source=Source.GOG))
+    steam = FakeSearch(Found([
+        hit("38410", "Fallout 2", source=Source.STEAM, kind=Kind.GAME),
+    ]), name="steam")
+    gog = FakeSearch(Found([
+        hit("1207658691", "Arcanum", source=Source.GOG, kind=Kind.GAME),
+    ]), name="gog")
+
+    result = await search_service(sessions, steam, gog).external(Kind.GAME,
+                                                                "игра")
+
+    assert [one.title for one in result.views] == ["Fallout 2"]
+
+
 async def test_a_removed_row_does_not_eat_a_slot(sessions, reference, removed):
     """Отсев стоит **до** среза порции. Иначе убранная строка занимала бы слот
     из двадцати, до экрана доезжало бы девятнадцать, а добрать двадцатую

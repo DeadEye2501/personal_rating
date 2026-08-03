@@ -3,6 +3,8 @@
 import logging
 from datetime import timedelta
 
+import asyncio
+
 import httpx
 import pytest
 
@@ -22,6 +24,19 @@ async def test_user_agent_is_always_sent():
 
     # httpx приводит имена заголовков к нижнему регистру.
     assert seen[0].headers["user-agent"] == USER_AGENT
+
+
+def test_the_user_agent_names_the_app_and_a_way_to_reach_it():
+    """Честный `User-Agent` — не косметика: Wikimedia отвечает `403` с прямым
+    требованием контакта, и замерено это 03.08.2026 на живом API.
+
+    Проверки выше сверяют заголовок с самой константой и потому упасть не
+    могут: подставь туда `Mozilla/5.0 …`, и все три останутся зелёными.
+    Здесь названы сами свойства — имя приложения, контакт и то, что мы не
+    притворяемся браузером."""
+    assert USER_AGENT.startswith("PersonalRating/")
+    assert "@" in USER_AGENT, "контакта нет — часть сайтов ответит отказом"
+    assert "Mozilla" not in USER_AGENT, "браузером не притворяемся"
 
 
 async def test_request_goes_by_get_to_the_address_it_was_given():
@@ -391,3 +406,40 @@ async def test_error_codes_are_not_swallowed_here():
 
     assert isinstance(result, httpx.Response)
     assert result.status_code == 401
+
+
+@pytest.mark.parametrize(("name", "at_once"),
+                         [("old_games", 4), ("old_games-poster", 4),
+                          ("steam", 12)])
+async def test_the_queue_covers_both_connections_of_the_site(name, at_once):
+    """Вежливость к сайту без внутреннего счётчика: замерено, что волной по
+    двадцать выходит двенадцать `503`, а очередью по четыре — ни одного, и за
+    то же время.
+
+    Соединений к этому сайту два: карточки идут своим, обложки — своим,
+    `old_games-poster` (`app.py`). Постерное здесь наравне с карточным, потому
+    что ради него ограничитель и лежит в `SourceHttp`, а не в клиенте, — и
+    именно оно уходило волной: прокрутка ленты просит обложки пачкой.
+
+    Steam третьим, чтобы предел не оказался общим: `AT_ONCE` объявлен словарём
+    ровно ради этого — тормозить витрины незачем, — и без неограниченного
+    соседа «ограничены все» прошло бы молча.
+
+    Числа литералами, а не из `AT_ONCE`: сверка с объявлением зеленела бы при
+    любом значении от единицы до числа запросов, включая снятый ограничитель."""
+    live = peak = 0
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal live, peak
+        live += 1
+        peak = max(peak, live)
+        await asyncio.sleep(0.01)
+        live -= 1
+        return httpx.Response(200, text="")
+
+    http = SourceHttp(name, transport=httpx.MockTransport(handler))
+    await asyncio.gather(*(http.get("https://www.old-games.ru/catalog/")
+                           for _ in range(12)))
+    await http.aclose()
+
+    assert peak == at_once, f"{name}: в полёте было {peak}, а не {at_once}"

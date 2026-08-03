@@ -5,7 +5,7 @@
 
 import pytest
 
-from backend.service.titles import flattened, without_edition
+from backend.service.titles import EDITION_WORDS, flattened, without_edition
 
 SAME = [
     ("римские и арабские", "Fallout II", "Fallout 2"),
@@ -15,6 +15,13 @@ SAME = [
     ("артикль", "The Witcher", "Witcher"),
     ("регистр и знаки препинания", "FALLOUT: New Vegas!", "fallout new vegas"),
     ("длинное тире", "Fallout — New Vegas", "Fallout - New Vegas"),
+    ("апостроф", "Emperor's Testament", "emperors testament"),
+    ("машинописный апостроф", "Emperor´s Testament", "emperors testament"),
+    ("модификатор", "Emperorʼs Testament", "emperors testament"),
+    ("штрих", "Emperor′s Testament", "emperors testament"),
+    ("надстрочная двойка", "Postal²", "Postal 2"),
+    ("надстрочная семёрка", "Resident Evil⁷", "Resident Evil 7"),
+    ("римская за тринадцатью", "Final Fantasy XV", "Final Fantasy 15"),
 ]
 
 
@@ -71,3 +78,37 @@ def test_different_games_keep_different_keys():
     та, на которой второе название old-games однажды и склеило разное."""
     assert without_edition("Worms") != without_edition("Worms 2")
     assert without_edition("Space Quest I") != without_edition("Space Quest II")
+
+
+# Замороженный список издательских слов. Наблюдается их всего восемь, а счётом
+# подмена не видна вовсе, и опасность здесь односторонняя: пропавшее слово
+# перестаёт склеивать издания — терпимо, — а **лишнее режет настоящее
+# название**. Впиши сюда `hunt`, и «The Witcher 3: Wild Hunt» превратится в
+# «witcher 3 wild» и склеится со всем, что так приводится.
+#
+# Обновлять его вслепую, «чтобы позеленело», нельзя: он и есть единственный
+# сторож сорока девяти слов.
+FROZEN_EDITIONS = {
+    "2in1", "anniversary", "anthology", "bundle", "classic", "classics",
+    "collected", "collection", "collector", "collectors", "complete", "cut",
+    "definitive", "deluxe", "digital", "director", "directors", "ed",
+    "edition", "editions", "edt", "edycja", "enhanced", "extended", "final",
+    "full", "game", "gold", "goty", "hd", "legendary", "master", "of", "pack",
+    "platinum", "plus", "premium", "redux", "remaster", "remastered",
+    "republic", "revised", "special", "standard", "the", "trilogy",
+    "ultimate", "vr", "year",
+}
+
+
+def test_the_edition_words_did_not_drift():
+    assert EDITION_WORDS == FROZEN_EDITIONS
+
+
+@pytest.mark.parametrize("word", sorted(FROZEN_EDITIONS - {"the"}))
+def test_each_edition_word_is_stripped_from_the_tail(word):
+    """Снимок сторожит состав, а это — что каждое слово в нём работает: строка
+    из списка могла бы лежать там мёртвой, и заметить это счётом нельзя.
+
+    Артикль исключён: его снимает само приведение, до всякого хвоста, и
+    «Fallout 2 the» неотличимо от «Fallout 2» уже на `flattened`."""
+    assert without_edition(f"Fallout 2 {word}") == without_edition("Fallout 2")

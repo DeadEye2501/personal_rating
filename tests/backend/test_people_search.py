@@ -113,6 +113,26 @@ async def test_every_namesake_brings_all_their_work(parts):
     assert [view.source_id for view in found.views] == ["1", "3", "2"]
 
 
+async def test_a_removed_row_does_not_come_back_through_a_click(parts):
+    """Убранное человеком не возвращается **никаким** жестом.
+
+    Внешнюю выдачу производят двое — строка поиска и клик по человеку, — и
+    инвариант выписан дословно в докстринге `without_removed`: разойдись они,
+    удалённое возвращалось бы одним жестом и не возвращалось другим. Сторожила
+    его до сих пор только половина строки поиска; снятие отсева здесь оставляло
+    весь набор зелёным."""
+    client = FakeSearch(works=Found([hit("1"), hit("2")]))
+    entity_id = await a_person(parts, source_id="525")
+    await parts["parts"].removed.remember(
+        an_item("2", "Убранная", kind=Kind.MOVIE, source=Source.TMDB)
+    )
+
+    found = await finder_on(parts, client).by_entity("people", entity_id,
+                                                     Kind.MOVIE)
+
+    assert [view.source_id for view in found.views] == ["1"]
+
+
 async def test_the_works_carry_genres_and_the_free_rating(parts, reference):
     """Кандидат клика проходит ту же сборку, что и кандидат строки поиска, —
     со справочником жанров и с бесплатной оценкой источника.

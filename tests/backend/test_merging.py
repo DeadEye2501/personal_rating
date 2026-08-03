@@ -1,13 +1,15 @@
 """Одна игра — одна строка выдачи.
 
 Автоматическая половина дедупликации: то, что машина склеивает без единой
-ошибки, она склеивает сама и человека не беспокоит. Замер принятого правила —
-382 верных склейки при нуле ложных, 83% из 461 верной пары на 224 запросах.
+ошибки, она склеивает сама и человека не беспокоит. Замер боевой реализации —
+383 верных склейки при нуле ложных, 83% из 461 верной пары на 224 запросах.
 
 Что не склеилось — на глазах человека: он убирает лишнее руками, и это задача 4."""
 
+import pytest
+
 from backend.model import Kind, SearchHit, Source
-from backend.service.merging import merged
+from backend.service.merging import SETS, merged
 
 
 def row(source: Source, source_id: str, title: str, *,
@@ -45,14 +47,37 @@ def test_a_slug_glues_two_stores_whose_names_differ():
     ]
 
 
-def test_the_english_name_of_gog_glues_too():
-    """Второй ключ GOG — английское название: локализованное у него своё, а
-    английское совпадает с тем, что показывает Steam."""
+def test_a_second_written_name_glues_a_localized_row():
+    """Второе написание — самостоятельный ключ: показываемое название
+    локализовано, а второе совпадает с тем, что показывает Steam.
+
+    Кормит этот ключ old-games.ru — у него второе название лежит на странице.
+    **GOG его не заполняет**: английское название знает только отдельный
+    запрос, и брать его пользователь решил 03.08.2026 не стоящим того. Прежде
+    тест назывался «английское название GOG», и по нему выходило, что ключ у
+    GOG работает."""
     steam = [row(Source.STEAM, "1", "Baldur's Gate 3")]
-    gog = [row(Source.GOG, "2", "Врата Балдура 3",
+    old = [row(Source.OLD_GAMES, "2", "Врата Балдура 3",
                original_title="Baldur's Gate 3")]
 
-    assert titles(merged([steam, gog], "baldurs gate")) == ["Baldur's Gate 3"]
+    assert titles(merged([steam, old], "baldurs gate")) == ["Baldur's Gate 3"]
+
+
+def test_an_apostrophe_does_not_break_the_slug_key():
+    """Слаг GOG апостроф съедает — `perimeter_emperors_testament`, — и
+    приведение обязано съедать его так же. Раздели он слово пробелом, ключи
+    разошлись бы у каждой игры с апострофом в названии.
+
+    Замерено 03.08.2026 на независимой разметке: съеденный апостроф даёт 383
+    верных склейки при нуле ложных против 380, и три прибавившиеся — «Периметр»
+    и две «Heroes of Might and Magic III»."""
+    steam = [row(Source.STEAM, "289240", "Perimeter: Emperor's Testament")]
+    gog = [row(Source.GOG, "1454498998", "Периметр: Завет Императора",
+               aliases=("perimeter emperors testament",))]
+
+    assert titles(merged([steam, gog], "perimeter")) == [
+        "Perimeter: Emperor's Testament"
+    ]
 
 
 def test_the_winner_is_the_store_with_the_highest_priority():
@@ -122,12 +147,17 @@ def test_the_asked_compilation_is_matched_by_words_and_not_by_letters():
 
 def test_a_compilation_stays_hidden_when_the_query_did_not_name_one():
     """Обе половины правила нужны разом. По «fallout» слова запроса в названии
-    «Fallout Classic Collection» есть, а сборника человек не просил — и строка
-    остаётся скрытой. Ровно эти строки спека и назвала ценой решения."""
-    steam = [row(Source.STEAM, "1", "Fallout"),
-             row(Source.STEAM, "2", "Fallout Classic Collection")]
+    «Fallout Collection» есть, а сборника человек не просил — и строка остаётся
+    скрытой. Ровно эти строки спека и назвала ценой решения.
 
-    assert titles(merged([steam], "fallout")) == ["Fallout"]
+    Соседкой взята «Fallout 2», а не «Fallout»: с одноимённой сборник исчезал
+    бы и при снятой проверке «сборник назвали», потому что склейка убрала бы
+    его как одетую строку. Ключи тут разные — `fallout` против `fallout 2`, —
+    поэтому спрятать сборник может только сам отсев."""
+    steam = [row(Source.STEAM, "1", "Fallout 2"),
+             row(Source.STEAM, "2", "Fallout Collection")]
+
+    assert titles(merged([steam], "fallout")) == ["Fallout 2"]
 
 
 def test_a_second_name_does_not_glue_inside_one_source():
@@ -157,6 +187,44 @@ def test_a_third_row_does_not_drag_a_sibling_in_through_a_shared_key():
     assert titles(merged([steam, old], "worms")) == ["Worms", "Worms 2"]
 
 
+def test_a_row_joins_by_its_own_name_before_its_alias():
+    """У строки бывает два ключа, и очередь между ними решает исход.
+
+    `Worms 2` из old-games знает своё название и второе — `Worms`. Примкни она
+    сперва по второму, и её место займёт `Worms` из Steam, а `Worms 2` из
+    Steam останется одна: `_joinable` вторую склейку уже запретит, и в выдаче
+    появится третья строка — дубль `Worms`.
+
+    Своё показываемое название сильнее псевдонима, и порядок ключей задан, а не
+    взят из множества: обход `set` идёт по хешам, а хеш строки солится на
+    запуск процесса. Замерено 03.08.2026 — до этой правки девять солей из
+    шестнадцати давали дубль, семь верную пару, и все тесты были зелёными при
+    любой."""
+    steam = [row(Source.STEAM, "70600", "Worms"),
+             row(Source.STEAM, "70610", "Worms 2")]
+    old = [row(Source.OLD_GAMES, "1", "Worms 2", original_title="Worms"),
+           row(Source.OLD_GAMES, "2", "Worms", original_title="Worms")]
+
+    assert titles(merged([steam, old], "worms")) == ["Worms", "Worms 2"]
+
+
+def test_two_ready_groups_merge_into_one():
+    """Группы бывают глубже двух строк, и цепочка возникает сама: у Steam
+    «Fallout 3» и его издание, у GOG — тоже пара, и стоит паре сойтись с парой,
+    как в объединении появляется звено второго уровня.
+
+    Все прежние проверки строили группы не глубже одной склейки, поэтому поиск
+    корня, идущий по цепочке до конца, не наблюдался ничем: с одним шагом
+    вместо цикла тот же вход отвечал бы `KeyError` — то есть исключением через
+    границу потоков на обычном поиске."""
+    steam = [row(Source.STEAM, "1", "Fallout 3"),
+             row(Source.STEAM, "2", "Fallout 3 - Game of the Year Edition")]
+    gog = [row(Source.GOG, "3", "Fallout 3"),
+           row(Source.GOG, "4", "Fallout 3 Complete Edition")]
+
+    assert titles(merged([steam, gog], "fallout 3")) == ["Fallout 3"]
+
+
 def test_a_second_name_glues_between_sources():
     """Та же метка между источниками работает: у old-games русское название, а
     английское знает Steam."""
@@ -184,5 +252,46 @@ def test_the_order_inside_a_source_survives():
     assert titles(merged([steam], "игра")) == [f"Игра {n}" for n in range(5)]
 
 
+def test_two_films_of_the_same_name_are_not_glued():
+    """Склейка работает только на играх. «Дюна» 1984 года и «Дюна» 2021-го —
+    разные фильмы с одним названием, и по общему правилу они слились бы в одну
+    строку.
+
+    Прямым тестом, а не следствием чужого: до сих пор охранник падал только в
+    `test_search.py`, где две строки приходят с `Kind.MOVIE` по недосмотру
+    помощника, — то есть свойство модуля сторожила несогласованность чужой
+    фикстуры."""
+    tmdb = [SearchHit(kind=Kind.MOVIE, source=Source.TMDB, source_id="1",
+                      title="Дюна", year=1984),
+            SearchHit(kind=Kind.MOVIE, source=Source.TMDB, source_id="2",
+                      title="Дюна", year=2021)]
+
+    assert titles(merged([tmdb], "дюна")) == ["Дюна", "Дюна"]
+
+
 def test_nothing_found_stays_nothing():
     assert merged([[], []], "что угодно") == [[], []]
+
+
+# Слова сборника поимённо. Наблюдалось три из семи, а цена ошибки односторонняя
+# и тяжелее, чем у изданий: лишнее слово **скрывает настоящие игры навсегда** —
+# спека уже назвала пятнадцать таких строк ценой решения. Два слова русские, и
+# источник с русскими названиями появился тем же планом, что и они.
+FROZEN_SETS = ("bundle", "collection", "trilogy", "anthology", "антология",
+               "коллекция", "compilation")
+
+
+def test_the_words_of_a_compilation_did_not_drift():
+    assert SETS == FROZEN_SETS
+
+
+@pytest.mark.parametrize("word", FROZEN_SETS)
+def test_each_word_of_a_compilation_hides_its_row(word):
+    """Снимок сторожит состав, а это — что каждое слово в нём работает.
+
+    Запрос нарочно не содержит слова сборника: иначе сработало бы исключение
+    «остался тот, который спросили», и строка осталась бы законно."""
+    steam = [row(Source.STEAM, "1", "Fallout 2"),
+             row(Source.STEAM, "2", f"Fallout {word}")]
+
+    assert titles(merged([steam], "fallout")) == ["Fallout 2"]

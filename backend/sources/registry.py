@@ -27,7 +27,7 @@ class Sources:
     tmdb: TmdbClient
     steam: SteamClient
     gog: GogClient
-    oldgames: OldGamesClient
+    old_games: OldGamesClient
     mdblist: MdbListClient
     omdb: OmdbClient
     kinopoisk: KinopoiskClient
@@ -43,7 +43,7 @@ class Sources:
         что склеивается без единой ошибки. Что не склеилось, остаётся на глазах
         человека: он убирает лишнее сам."""
         if kind is Kind.GAME:
-            return [self.steam, self.gog, self.oldgames]
+            return [self.steam, self.gog, self.old_games]
         return [self.tmdb]
 
     def people_for(self, kind: Kind) -> TmdbClient | None:
@@ -60,7 +60,7 @@ class Sources:
             Source.TMDB: self.tmdb,
             Source.STEAM: self.steam,
             Source.GOG: self.gog,
-            Source.OLD_GAMES: self.oldgames,
+            Source.OLD_GAMES: self.old_games,
         }.get(source)
 
     def rating_sources(self, kind: Kind) -> list:

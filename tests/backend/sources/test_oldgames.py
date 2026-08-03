@@ -5,13 +5,11 @@
 записью в лог, а не тихо отдавать пустую карточку. Молчаливая потеря здесь
 худший исход: перезапроса у игр не бывает вовсе."""
 
-import asyncio
-
 import httpx
 import pytest
 
 from backend.model import Found, GenreSource, Kind, Refusal, Source
-from backend.sources.http import AT_ONCE, USER_AGENT, SourceHttp
+from backend.sources.http import USER_AGENT, SourceHttp
 from backend.sources.oldgames.client import ATTEMPTS, CARD, OldGamesClient
 from backend.sources.oldgames.parse import parse_card, parse_search
 from tests.conftest import counting, responding
@@ -50,6 +48,22 @@ def test_a_search_row_carries_what_the_page_shows(fixture):
     dune = next(one for one in hits if one.source_id == "25")
     assert (dune.title, dune.year) == ("Dune", 1992)
     assert (dune.kind, dune.source) == (Kind.GAME, Source.OLD_GAMES)
+
+
+def test_a_title_comes_from_the_attribute_and_not_from_the_broken_text(fixture):
+    """Название берётся из атрибута ссылки, а не из её текста, и разница видна
+    прямо на записанной странице: у игры 11045 название разбито тегом —
+    `<b>Dune</b>: Keep The Secret`, — и склейка кусков через пробел даёт лишний
+    пробел перед двоеточием.
+
+    Отдельным тестом, а не строкой в соседнем: тот смотрит на «Dune», у которой
+    `<b>` обнимает название целиком, и обе ветки дают там одно и то же —
+    свойство наблюдалось ровно там, где оно неразличимо. Цена не косметическая:
+    показываемое название уезжает в базу навсегда, перезапроса у игр не бывает."""
+    hits = parse_search(fixture("oldgames/search_dune.txt"))
+
+    secret = next(one for one in hits if one.source_id == "11045")
+    assert secret.title == "Dune: Keep The Secret"
 
 
 def test_a_second_title_stays_with_its_own_row(fixture):
@@ -228,7 +242,7 @@ async def test_a_broken_page_becomes_a_refusal_with_a_trace(caplog):
         found = await searched(transport)
 
     assert isinstance(found, Refusal)
-    assert "old-games" in caplog.text
+    assert "old_games" in caplog.text
 
 
 def busy(page: str, times: int):
@@ -291,33 +305,6 @@ async def test_the_repeat_is_not_endless():
     assert len(asked) == ATTEMPTS
 
 
-async def test_no_more_than_four_requests_are_in_flight(fixture):
-    """Вежливость к сайту без внутреннего счётчика: замерено, что волной по
-    двадцать выходит двенадцать `503`, а очередью по четыре — ни одного, и за
-    то же время.
-
-    Наблюдается по числу запросов в полёте, а не по константе: сверка с
-    объявлением прошла бы и при снятом ограничителе."""
-    page = fixture("oldgames/search_dune.txt")
-    live = peak = 0
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        nonlocal live, peak
-        live += 1
-        peak = max(peak, live)
-        await asyncio.sleep(0.01)
-        live -= 1
-        return httpx.Response(200, text=page)
-
-    client = OldGamesClient(SourceHttp("old_games",
-                                       transport=httpx.MockTransport(handler)))
-    await asyncio.gather(*(client.search("dune", Kind.GAME) for _ in range(12)))
-    await client.aclose()
-
-    limit = AT_ONCE["old_games"]
-    assert peak == limit, f"в полёте было {peak}, а не {limit}"
-
-
 async def test_the_search_asks_the_catalog_with_the_query(fixture):
     """Адрес и довод запроса — то, чего не сторожит ни один разбор: подмени
     путь, и все проверки разбора останутся зелёными, а живой поиск замолчит.
@@ -374,4 +361,4 @@ async def test_a_broken_card_becomes_a_refusal_with_a_trace(caplog):
     await client.aclose()
 
     assert isinstance(found, Refusal)
-    assert "old-games" in caplog.text
+    assert "old_games" in caplog.text
