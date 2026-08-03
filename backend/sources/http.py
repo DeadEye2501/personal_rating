@@ -1,5 +1,6 @@
 """Общая дверь в сеть для всех источников."""
 
+import asyncio
 import logging
 from collections.abc import Callable, Mapping
 from datetime import datetime, timedelta
@@ -20,6 +21,26 @@ DEFAULT_TIMEOUT = 20.0
 # сразу, а сеть с пакетами в никуда досиживает весь таймаут — и так на каждой
 # карточке прокрутки. Пятнадцать секунд, а не минуты: сеть возвращается сама.
 NETWORK_BACKOFF = timedelta(seconds=15)
+
+# Сколько запросов к источнику держать в полёте. Названы только те, кому предел
+# нужен: Steam и GOG держат двадцать разом без единого отказа, и тормозить их
+# незачем.
+#
+# У old-games.ru замерено обратное: волной по двадцать выходит восемь успешных и
+# двенадцать `503`, очередью по четыре — двадцать из двадцати и ни одного, причём
+# за то же время. Узкое место в самом сервере, около двух карточек в секунду, так
+# что вежливость здесь бесплатна.
+#
+# Предел стоит здесь, а не в клиенте, потому что соединений к этому сайту два:
+# карточки идут своим, обложки — своим, `<имя>-poster`. Ограничитель в клиенте
+# постерный путь не накрывал вовсе.
+AT_ONCE = {"old_games": 4}
+
+
+def _limit(name: str) -> int | None:
+    """Предел для этого соединения. Имя постерного — `<источник>-poster`, и
+    политика у обоих одна: сервер-то один."""
+    return AT_ONCE.get(name.split("-")[0])
 
 
 class Breaker:
@@ -68,6 +89,8 @@ class SourceHttp:
         # отката считается до полуночи, и без общих часов его не проверить.
         self.clock = clock
         self.breaker = Breaker(clock)
+        limit = _limit(name)
+        self._turn = asyncio.Semaphore(limit) if limit else None
         self._client = httpx.AsyncClient(
             transport=transport,
             timeout=timeout,
@@ -84,6 +107,17 @@ class SourceHttp:
         if self.breaker.is_open():
             return Refusal(source=self.name, reason=self.breaker.reason,
                            detail="предохранитель взведён")
+        if self._turn is None:
+            return await self._fetched(url, params, headers)
+        async with self._turn:
+            return await self._fetched(url, params, headers)
+
+    async def _fetched(
+        self,
+        url: str,
+        params: Mapping[str, object] | None,
+        headers: Mapping[str, str] | None,
+    ) -> httpx.Response | Refusal:
         try:
             return await self._client.get(url, params=params, headers=headers)
         except httpx.HTTPError as error:

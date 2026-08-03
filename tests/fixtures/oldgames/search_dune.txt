@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ru" prefix="og: http://ogp.me/ns#">
+<head>
+    <title>Каталог игр на Old-Games.RU, название dune</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=1336">
+<meta name="robots" content="all"/>
+<meta name="keywords" content="Каталог игр, скачать, игры, старые игры, old, games, download, играть, abandonware, форум, forum, бесплатно, free"/>
+<meta name="description" content="Каталог игр - игры, скриншоты, видеоролики, обзоры, описания, ссылки на скачивание."/>
+<meta name="Publisher-URL" content="https://www.old-games.ru"/>
+<!-- <meta property="fb:admins" content="100001450308155" /> -->
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+<link rel="apple-touch-icon" type="image/png" href="/img/small_og_logo.png">
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новости"
+      href="https://feeds.feedburner.com/Old-games-ru-news"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые игры"
+      href="https://feeds.feedburner.com/Old-games-ru"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые файлы"
+      href="https://feeds.feedburner.com/Old-games-ru-files"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые обзоры игр"
+      href="https://feeds.feedburner.com/Old-games-ru-articles"/>
+<link rel="stylesheet" type="text/css" href="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/og-styles.css,js/jqueryui/jquery-ui.min.css,js/jqueryui/jquery-ui.structure.min.css,js/jqueryui/jquery-ui.theme.min.css,js/select2/select2.css,js/uploadifive/uploadifive.css,js/fancybox2/jquery.fancybox.css,js/fancybox2/helpers/jquery.fancybox-thumbs.css" /><link rel="stylesheet" type="text/css" href="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/font-awesome/css/fa-svg-with-js.css,js/notification/notification.css" /><script type="text/javascript" src="/js/prebid-ads.js"></script>
+<script defer type="text/javascript" src="/js/font-awesome/js/fa-solid.min.js"></script>
+<script defer type="text/javascript" src="/js/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/jquery/jquery.min.js,js/jqueryui/jquery-ui.min.js,js/jqueryui/jquery.ui.datepicker-ru.min.js,js/notification/jquery.notification.min.js,js/jquery.simplemodal.1.4.4.min.js,js/raty-2.5.2/jquery.raty.min.js,js/select2/select2.min.js,js/select2/select2_locale_ru.js"></script><script type="text/javascript" src="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/uploadifive/jquery.uploadifive.min.js,js/fancybox2/jquery.fancybox.pack.js,js/fancybox2/helpers/jquery.fancybox-thumbs.js,js/js.cookie.min.js,js/og-scripts.js,js/og-game-actions.js"></script>
+</head>
+<body>
+<!-- Header begin -->
+<header id="pageHeader">
+    <div class="header">
+                    <a class="lfloat" href="/" title="Скачать старые игры с Old-Games.RU">
+                <img src="//static.old-games.ru/img/logos/Abuse_kill.gif" width="253" height="68" alt="Бесплатные старые игры"/>
+            </a>
+                <!--noindex-->
+                <!--/noindex-->
+    </div>
+    <!--noindex-->
+<div style="display:none;">
+    <!--LiveInternet counter-->
+    <script type="text/javascript"><!--
+        new Image().src = "//counter.yadro.ru/hit?r" + escape(document.referrer) + ((typeof(screen) == "undefined") ? "" : ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ? screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) + ";h" + escape(document.title.substring(0, 80)) + ";" + Math.random();
+        //-->
+    </script>
+    <!--/LiveInternet-->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-260122-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</div>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter2036 = new Ya.Metrika({
+                    id:2036,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/2036" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+<!--/noindex-->
+    <div class="headerpanel">
+        <div class="userlogin"><a href="#" id="loginform">Вход / Регистрация</a></div>
+        <div class="lang">
+            <!--noindex-->
+                            <a href="/?language=eng" title="English version"><img
+                            src="//static.old-games.ru/img/eng.png"
+                            width="22" height="16" alt="ENG"/></a>
+                            <!--/noindex-->
+        </div>
+        <nav class="menupanel">
+            <ul id="nav">
+                <li class="noborderli"><a href="/catalog/" title="Каталог старых игр">Каталог игр</a></li>
+                <li>
+                    <div id="searchblock">
+                        <div id="quicksearchform">
+                            <form method="get" action="/catalog/">
+                                <input type="text" placeholder="Введите название игры..." id="quicksearchgame"
+                                       name="gamename" value="">
+                            </form>
+                        </div>
+                        <a class="advitems" title="Расширенный поиск" href="/search/">
+                            <i class="fas fa-sliders-h">
+                            </i>
+                        </a>
+                        <a class="advitems" title="Свойства игр" href="/properties/">
+                            <i class="fas fa-tags">
+                            </i>
+                        </a>
+                    </div>
+                </li>
+                <li><a href="/" title="Новости сайта">Новости</a></li>
+                <li><a href="/forum/" title="Форум о старых играх">Форум</a></li>
+                <li><a href="/wiki/" title="Энциклопедия о старых играх и железе">Wiki</a></li>
+                <li><a href="/articles/" title="Различные статьи и обзоры">Статьи</a></li>
+                <li><a href="/utils/" title="Различные файлы для старых игр">Файлы</a></li>
+                <li><a href="#" title="Информация" class="information">Информация <img
+                                src="//static.old-games.ru/img/arrow-down.png" width="15"
+                                height="13" class="arrow-down" alt=""/></a>
+                    <ul>
+                        <li><a href="/about/" title="О нашем сайте">О проекте</a></li>
+                        <li><a href="/faq/" title="FAQ по старым играм">FAQ</a></li>
+                        <li><a href="/donate/" title="Помощь сайту">Поддержите нас!</a></li>
+                        <li><a href="/about/history/" title="История проекта">История проекта</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="dialog-form" style="display:none;" title="Авторизация">
+            <div class="loginbox">
+            <form action="/forum/login/login" method="post">
+                <label for="navbar_username">Логин:</label>
+                <input type="text" id="navbar_username" name="login">
+                <label for="navbar_login">Пароль:</label>
+                <input type="password" id="navbar_login" name="password">
+                <label for="cb_cookieuser_navbar">
+                    <input name="remember" type="checkbox" id="cb_cookieuser_navbar" value="1"
+                           checked="checked"/>Запомнить                </label>
+
+                <div class="centeralign">
+                    <input type="submit" value="Войти"/>
+                </div>
+                <br/>
+                <input type="hidden" name="cookie_check" value="1"/>
+                <input type="hidden" name="_xfToken" value=""/>
+
+                <div class="centeralign">
+                    <a href="/forum/login/"
+                       title="Регистрация на форуме старых игр">Регистрация</a> - <a
+                            href="/forum/lost-password/">Напомнить пароль</a>
+                </div>
+            </form>
+        </div>
+        </div>
+<!-- Header end -->
+<!-- Main begin -->
+<div class="main">
+    <main id="main">
+        <!-- Content center begin -->
+            <div class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <img src="//static.old-games.ru/img/path_bullet.gif" width="16" height="19" alt=""/>
+        <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" title="старые игры скачать" href="/"><span itemprop="name">Old-Games.RU</span></a>
+            <meta itemprop="position" content="1"/>
+        </span>
+                            <img src="//static.old-games.ru/img/slash.png" width="19" height="19"
+                         alt="/"/>
+                    <span class="active-link">Каталог игр</span>
+                        </div>
+        <h1 class="title">Каталог игр, название "dune"</h1>
+            <div class="main-content">
+            <!-- Catalog begin -->
+
+                            <br/>
+                <br/>
+                <table width="100%" cellspacing="1" cellpadding="5" border="0" class="listtable">
+
+                                        <tr class="catalog_header">
+                                                        <th>
+                                    <a class="whitelinkclicked" title="Сортировка по названию"
+                                                           href="?gamename=dune&sort=name">Название</a>
+                                </th>
+                                                                <th>Жанр</th>
+                                                                <th>
+                                    <a class="whitelinkclicked" title="Сортировка по году"
+                                                           href="?gamename=dune&sort=year">Год</a>
+                                </th>
+                                                                <th>
+                                    <a class="whitelinkclicked" title="Сортировка по платформе"
+                                                           href="?gamename=dune&sort=platform">Платформа</a>
+                                </th>
+                                                                <th>Издатель</th>
+                                                                <th>
+                                    <a class="whitelinkclicked" title="Сортировка по оценке"
+                                                           href="?gamename=dune&sort=rating">Оценка</a>
+                                </th>
+                                                    </tr>
+
+                                        <tr class="bgstripe1" id="game_1345">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 10.07.2006"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="D.O.G: Fight for Your Life"
+                                           href="/game/1345.html">D.O.G: Fight for Your Life</a><div class="alt-titles-list"><b>Dune</b> Runner<br />
+DOG</div>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 3"
+                                               href="/game/video/1345.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Скриншоты: 18"
+                                               href="/game/screenshots/1345.html">
+                                                <i class="fas fa-camera fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                                                                <td width="18px">
+                                            <a target="_blank"
+                                               title="Обложки: 6"
+                                               href="/game/covers/1345.html">
+                                                <i class="fas fa-image fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Racing" href="/catalog/?genre=12">Racing</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 1997 года"
+                               href="/catalog/?year= 1997&amp;year2=1997">1997</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на Windows/DOS"
+                               href="/catalog/?platform=4">Windows/DOS</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя THQ" href="/catalog/?publisherCompany=4264">THQ</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star6.png" alt="Оценка рецензента - 6 из 10" title="Оценка рецензента - 6 из 10" height="16" width="80" /></td>
+                                            <tr class="bgstripe2" id="game_25">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 23.09.2002"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="Dune"
+                                           href="/game/25.html"><b>Dune</b></a>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 3"
+                                               href="/game/video/25.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Скриншоты: 36"
+                                               href="/game/screenshots/25.html">
+                                                <i class="fas fa-camera fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                                                                <td width="18px">
+                                            <a target="_blank"
+                                               title="Обложки: 15"
+                                               href="/game/covers/25.html">
+                                                <i class="fas fa-image fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Adventure" href="/catalog/?genre=7">Adventure</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 1992 года"
+                               href="/catalog/?year= 1992&amp;year2=1992">1992</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на DOS"
+                               href="/catalog/?platform=1">DOS</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя Virgin Games" href="/catalog/?publisherCompany=18">Virgin Games</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star8.png" alt="Оценка рецензента - 8 из 10" title="Оценка рецензента - 8 из 10" height="16" width="80" /></td>
+                                            <tr class="bgstripe1" id="game_861">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 15.02.2005"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="Dune 2000: Long Live the Fighters!"
+                                           href="/game/861.html"><b>Dune</b> 2000: Long Live the Fighters!</a>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 4"
+                                               href="/game/video/861.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Скриншоты: 16"
+                                               href="/game/screenshots/861.html">
+                                                <i class="fas fa-camera fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                                                                <td width="18px">
+                                            <a target="_blank"
+                                               title="Обложки: 10"
+                                               href="/game/covers/861.html">
+                                                <i class="fas fa-image fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Strategy" href="/catalog/?genre=6">Strategy</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 1998 года"
+                               href="/catalog/?year= 1998&amp;year2=1998">1998</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на Windows"
+                               href="/catalog/?platform=2">Windows</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя Westwood Studios" href="/catalog/?publisherCompany=102">Westwood Studios</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star8.png" alt="Оценка рецензента - 8 из 10" title="Оценка рецензента - 8 из 10" height="16" width="80" /></td>
+                                            <tr class="bgstripe2" id="game_1482">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 11.11.2006"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="Dune II: The Building of a Dynasty"
+                                           href="/game/1482.html"><b>Dune</b> II: The Building of a Dynasty</a><div class="alt-titles-list"><b>Dune</b> II: Battle for Arrakis</div>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 2"
+                                               href="/game/video/1482.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Скриншоты: 50"
+                                               href="/game/screenshots/1482.html">
+                                                <i class="fas fa-camera fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                                                                <td width="18px">
+                                            <a target="_blank"
+                                               title="Обложки: 27"
+                                               href="/game/covers/1482.html">
+                                                <i class="fas fa-image fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Strategy" href="/catalog/?genre=6">Strategy</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 1992 года"
+                               href="/catalog/?year= 1992&amp;year2=1992">1992</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на DOS"
+                               href="/catalog/?platform=1">DOS</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя Virgin Games" href="/catalog/?publisherCompany=18">Virgin Games</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star10.png" alt="Оценка рецензента - 10 из 10" title="Оценка рецензента - 10 из 10" height="16" width="80" /></td>
+                                            <tr class="bgstripe1" id="game_11045">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 10.03.2021"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="Dune: Keep The Secret"
+                                           href="/game/11045.html"><b>Dune</b>: Keep The Secret</a>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 1"
+                                               href="/game/video/11045.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                                                        </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Quest" href="/catalog/?genre=9">Quest</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 2000 года"
+                               href="/catalog/?year= 2000&amp;year2=2000">2000</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на Windows"
+                               href="/catalog/?platform=2">Windows</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя Orbit Records" href="/catalog/?publisherCompany=6792">Orbit Records</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star7.png" alt="Оценка рецензента - 7 из 10" title="Оценка рецензента - 7 из 10" height="16" width="80" /></td>
+                                            <tr class="bgstripe2" id="game_2131">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 20.10.2008"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="Emperor: Battle for Dune"
+                                           href="/game/2131.html">Emperor: Battle for <b>Dune</b></a><div class="alt-titles-list"><b>Dune</b> 3</div>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 1"
+                                               href="/game/video/2131.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Скриншоты: 74"
+                                               href="/game/screenshots/2131.html">
+                                                <i class="fas fa-camera fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                                                                <td width="18px">
+                                            <a target="_blank"
+                                               title="Обложки: 11"
+                                               href="/game/covers/2131.html">
+                                                <i class="fas fa-image fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Strategy" href="/catalog/?genre=6">Strategy</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 2001 года"
+                               href="/catalog/?year= 2001&amp;year2=2001">2001</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на Windows"
+                               href="/catalog/?platform=2">Windows</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя Electronic Arts" href="/catalog/?publisherCompany=30">Electronic Arts</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star10.png" alt="Оценка рецензента - 10 из 10" title="Оценка рецензента - 10 из 10" height="16" width="80" /></td>
+                                            <tr class="bgstripe1" id="game_11350">
+                        <td>
+                            <table width="100%">
+                                <tr>
+                                    <td width="16px">
+                                        <i class="fas fa-calendar-alt fa-lg gray-icon" title="Дата добавления: 13.05.2021"></i>
+                                    </td>
+                                    <td align="left">
+                                        <a title="Frank Herbert's Dune"
+                                           href="/game/11350.html">Frank Herbert's <b>Dune</b></a><div class="alt-titles-list">Дюна</div>                                    </td>
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Видеоролики: 2"
+                                               href="/game/video/11350.html">
+                                                <i class="fas fa-video fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                    
+                                                                            <td width="18px">
+                                            <a target="_blank"
+                                               title="Скриншоты: 22"
+                                               href="/game/screenshots/11350.html">
+                                                <i class="fas fa-camera fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                                                                <td width="18px">
+                                            <a target="_blank"
+                                               title="Обложки: 7"
+                                               href="/game/covers/11350.html">
+                                                <i class="fas fa-image fa-lg gray-icon"></i>
+                                            </a>
+                                        </td>
+                                                                    </tr>
+                            </table>
+                        </td>
+                        <td>
+                                                        <a title="Все игры жанра Adventure" href="/catalog/?genre=7">Adventure</a>                        </td>
+                        <td align="center">
+                            <a title="Все игры 2001 года"
+                               href="/catalog/?year= 2001&amp;year2=2001">2001</a>
+                        </td>
+                        <td>
+                            <a title="Все игры на Windows"
+                               href="/catalog/?platform=2">Windows</a>
+                        </td>
+                        <td>
+                                                        <a title="Все игры издателя Cryo Interactive Entertainment" href="/catalog/?publisherCompany=7">Cryo Interactive Entertainment</a>                        </td>
+                        <td align="center" class="red"><img src="//static.old-games.ru/img/rating/star7.png" alt="Оценка рецензента - 7 из 10" title="Оценка рецензента - 7 из 10" height="16" width="80" /></td>
+                                            </tr>
+                </table>
+                            <!-- Catalog end -->
+        </div>
+        <!-- Content center end -->
+    </main>
+    <!-- Content left begin -->
+    <aside id="lside">
+            <div class="bluetitle">Это интересно</div>
+        <!-- Blue line start -->
+        <div class="tiptext">Кроме движка SCUMM программисты команды <b><a href="https://www.old-games.ru/game/154.html" class="internalLink">Full Throttle</a></b> - <i>Стефен Шау</i> и <i>Марк Кроули</i> - использовали движок <b><a href="https://www.old-games.ru/game/1773.html" class="internalLink">Rebel Assault</a></b> <i>Винса Ли</i> для некоторых экшен-сцен. Это было довольно сложно, так как обе программы имели свои вызовы прерываний и свои способы работы с данными. SCUMM даже пришлось переработать в мультизадачный движок, чтобы он мог работать совместно с &quot;собратом&quot;.<br /></div>
+            <div class="bluetitle">Каталог игр</div>
+    <!-- By genre begin -->
+    <nav class="left">
+    <div class="head">по жанру</div>
+    <ul class="leftlist" id="genres_table">
+        <li><a  href="/catalog/?genre=8">Action (1333)</a></li><li><a  href="/catalog/?genre=7">Adventure (540)</a></li><li><a  href="/catalog/?genre=1">Arcade (3529)</a></li><li><a  href="/catalog/?genre=17">Edutainment (1821)</a></li><li><a  href="/catalog/?genre=10">Fighting (187)</a></li><li><a  href="/catalog/?genre=14">Interactive Fiction (241)</a></li><li><a  href="/catalog/?genre=11">Other (178)</a></li><li><a  href="/catalog/?genre=15">Puzzle (1498)</a></li><li><a  href="/catalog/?genre=9">Quest (994)</a></li><li><a  href="/catalog/?genre=12">Racing (815)</a></li><li><a  href="/catalog/?genre=4">RPG (681)</a></li><li><a  href="/catalog/?genre=5">Simulation (718)</a></li><li><a  href="/catalog/?genre=13">Sports (579)</a></li><li><a  href="/catalog/?genre=6">Strategy (1524)</a></li><li><a  href="/catalog/?genre=16">Tabletop (759)</a></li>    </ul>
+</nav>
+    <!-- By genre end -->
+        <div class="left">
+        <div class="head">по платформе</div>
+        <ul class="leftlist" id="platforms_table">
+            <li><a href="/catalog/?platform=6">Amiga (191)</a></li><li><a href="/catalog/?platform=7">Amiga CD32 (11)</a></li><li><a href="/catalog/?platform=14">Amstrad CPC (58)</a></li><li><a href="/catalog/?platform=18">Apple II (63)</a></li><li><a href="/catalog/?platform=17">Atari ST (37)</a></li><li><a href="/catalog/?platform=9">Commodore 64 (60)</a></li><li><a href="/catalog/?platform=1">DOS (7045)</a></li><li><a href="/catalog/?platform=13">DVDi (30)</a></li><li><a href="/catalog/?platform=12">Macintosh (51)</a></li><li><a href="/catalog/?platform=19">MSX (65)</a></li><li><a href="/catalog/?platform=15">PC-88 (35)</a></li><li><a href="/catalog/?platform=16">PC-98 (103)</a></li><li><a href="/catalog/?platform=2">Windows (6022)</a></li><li><a href="/catalog/?platform=5">Windows 3.x (512)</a></li><li><a href="/catalog/?platform=3">Windows 3.x/DOS (62)</a></li><li><a href="/catalog/?platform=4">Windows/DOS (226)</a></li><li><a href="/catalog/?platform=10">Windows/Windows 3.x (527)</a></li><li><a href="/catalog/?platform=8">ZX Spectrum (90)</a></li>        </ul>
+    </div>
+        <!-- By year begin -->
+    <div class="left">
+    <div class="head">по году выпуска</div>
+    <table>
+        <tr><td><a href="/catalog/?year=2008&amp;year2=2008">2008</a></td><td><a href="/catalog/?year=2007&amp;year2=2007">2007</a></td><td><a href="/catalog/?year=2006&amp;year2=2006">2006</a></td></tr><tr><td><a href="/catalog/?year=2005&amp;year2=2005">2005</a></td><td><a href="/catalog/?year=2004&amp;year2=2004">2004</a></td><td><a href="/catalog/?year=2003&amp;year2=2003">2003</a></td></tr><tr><td><a href="/catalog/?year=2002&amp;year2=2002">2002</a></td><td><a href="/catalog/?year=2001&amp;year2=2001">2001</a></td><td><a href="/catalog/?year=2000&amp;year2=2000">2000</a></td></tr><tr><td><a href="/catalog/?year=1999&amp;year2=1999">1999</a></td><td><a href="/catalog/?year=1998&amp;year2=1998">1998</a></td><td><a href="/catalog/?year=1997&amp;year2=1997">1997</a></td></tr><tr><td><a href="/catalog/?year=1996&amp;year2=1996">1996</a></td><td><a href="/catalog/?year=1995&amp;year2=1995">1995</a></td><td><a href="/catalog/?year=1994&amp;year2=1994">1994</a></td></tr><tr><td><a href="/catalog/?year=1993&amp;year2=1993">1993</a></td><td><a href="/catalog/?year=1992&amp;year2=1992">1992</a></td><td><a href="/catalog/?year=1991&amp;year2=1991">1991</a></td></tr><tr><td><a href="/catalog/?year=1990&amp;year2=1990">1990</a></td><td><a href="/catalog/?year=1989&amp;year2=1989">1989</a></td><td><a href="/catalog/?year=1988&amp;year2=1988">1988</a></td></tr><tr><td><a href="/catalog/?year=1987&amp;year2=1987">1987</a></td><td><a href="/catalog/?year=1986&amp;year2=1986">1986</a></td><td><a href="/catalog/?year=1970&amp;year2=1985">ранее</a></td></tr>    </table>
+</div>    <!-- By year end -->
+
+    <!-- By letter begin -->
+    <div class="left">
+    <div class="head">по букве</div>
+    <table class="lefttable">
+        <tr><td><a href="/catalog/?letter=0">0</a></td><td><a href="/catalog/?letter=A">A</a></td><td><a href="/catalog/?letter=B">B</a></td><td><a href="/catalog/?letter=C">C</a></td><td><a href="/catalog/?letter=D">D</a></td><td><a href="/catalog/?letter=E">E</a></td><td><a href="/catalog/?letter=F">F</a></td></tr><tr><td><a href="/catalog/?letter=G">G</a></td><td><a href="/catalog/?letter=H">H</a></td><td><a href="/catalog/?letter=I">I</a></td><td><a href="/catalog/?letter=J">J</a></td><td><a href="/catalog/?letter=K">K</a></td><td><a href="/catalog/?letter=L">L</a></td><td><a href="/catalog/?letter=M">M</a></td></tr><tr><td><a href="/catalog/?letter=N">N</a></td><td><a href="/catalog/?letter=O">O</a></td><td><a href="/catalog/?letter=P">P</a></td><td><a href="/catalog/?letter=Q">Q</a></td><td><a href="/catalog/?letter=R">R</a></td><td><a href="/catalog/?letter=S">S</a></td><td><a href="/catalog/?letter=T">T</a></td></tr><tr><td><a href="/catalog/?letter=U">U</a></td><td><a href="/catalog/?letter=V">V</a></td><td><a href="/catalog/?letter=W">W</a></td><td><a href="/catalog/?letter=X">X</a></td><td><a href="/catalog/?letter=Y">Y</a></td><td><a href="/catalog/?letter=Z">Z</a></td><td><a href="/catalog/?properties[]=russian">Я</a></td></tr>    </table>
+</div></aside>
+    <!-- Content left end -->
+    <!-- Content right begin -->
+    <aside id="rside">
+    <div class="bluetitle">
+    Поддержите нас!</div>
+<div class="right">
+    <div class="donate-block-img">
+        <img alt="Поддержите нас!" src="/img/donate/macintosh_heart.gif">
+    </div>
+    <div>
+        Привет, олдгеймер! Если тебе нравится наш проект и тебе не безразлична его судьба, ты можешь поддержать нас на Boosty или любым другим способом    </div>
+    <div class="donate-block-img">
+     <a class="donate-boosty-url" rel="nofollow" href="https://boosty.to/old-games"><img src="/img/donate/boosty.svg" width="120px" height="50px"></a>
+    </div>
+    <div class="donate-more-button showmore">
+        <a href="/donate/">Другие способы...</a>
+    </div>
+</div>
+        <div class="bluetitle">
+            Случайная игра        </div>
+        <div class="right random-game">
+        <div id="random_screen_game">
+        
+    <a class="middlesmall" href="/game/15391.html"
+       title="Cuentos de Siempre"><b>Cuentos de Siempre</b></a>
+    <div class="random-screen-info small"><a
+                title="Все игры на Windows"
+                href="/catalog/?platform=2 ">Windows</a>, <a title="Все игры 1996 года" href="/catalog/?year=1996&amp;year2=1996">1996</a>        <br/>
+        <a title="Все игры жанра Edutainment" href="/catalog/?genre=17">Edutainment</a>    </div>
+    <div class="random-screen-image">
+        <a href="/game/15391.html" title="Cuentos de Siempre">
+            <img style="vertical-align: middle;" border="0" src="/games/pc/cuentos_de_siempre/screenshots/180/15391_6a61252212ba6.png" width="180"
+                 title="Cuentos de Siempre"
+                 alt="Cuentos de Siempre"/>
+        </a>
+    </div>
+    <div style="margin-top: 5px;">
+                    <img src="//static.old-games.ru/img/rating/star1.png"
+                 alt="Оценка рецензента - 1 из 10"
+                 title="Оценка рецензента - 1 из 10"
+                 width="80" height="16"/>
+                </div>
+
+    </div>
+<div class="random-next-screen">
+<img id="random-game" title="Другая случайная игра" width="24" height="24" style="cursor:pointer;"
+                                            src="//static.old-games.ru/img/next-screen.png"
+                                            alt="Другая случайная игра"/>
+</div>
+<div class="clear"></div>
+</div>    <!-- New games begin -->
+
+<div class="bluetitle">
+    Новинки</div>
+<div class="right">
+
+    <div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15475.html" title="Muls">
+                  <b>Muls</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15474.html" title="MineSweeper">
+                  <b>MineSweeper</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15473.html" title="Hyper Backgammon">
+                  <b>Hyper Backgammon</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15472.html" title="Putt-Putt and Fatty Bear's Activity Pack">
+                  <b>Putt-Putt and Fatty Bear's Activity Pack</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15471.html" title="Fatty Bear's Fun Pack">
+                  <b>Fatty Bear's Fun Pack</b>
+                  </a>
+                  <br />02.08.2026</div>        <div class="showmore">
+            <a href="/catalog/?sort=date">Далее...</a>
+        </div>
+        
+</div><!-- New articles begin -->
+<div class="bluetitle">
+    Последние статьи</div>
+<div class="right">
+    <div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120699.html">Назад в прошлое. Часть 6.2. Роковая красота, или Интервью с Лией Монтелонго.</a><br />
+         17.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120644.html">Не то золото, что блестит, или Интервью с коллекционерами из разных стран. Часть 9. Испания.</a><br />
+         12.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120607.html">Не то золото, что блестит, или Интервью с коллекционерами из разных стран. Часть 8. Австралия.</a><br />
+         09.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Обзор]</b>&nbsp;<a href="/articles/120599.html">APS3000 (星际移民) – современный ремейк старой RTS Colonial Project (殖民計劃, 1996 г.)</a><br />
+         09.07.2026 &mdash; <a href="/users/?userid=39623">WERTA</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Статья]</b>&nbsp;<a href="/articles/120302.html">Столпы войны. По каким принципам построены бои в трилогии Halo.</a><br />
+         23.06.2026 &mdash; <a href="/users/?userid=228632">KOG</a>
+         </div>        <div class="showmore">
+            <a href="/articles/">Далее...</a>
+        </div>
+
+        
+</div><!-- New game files begin -->
+
+<div class="bluetitle">
+    Последние файлы</div>
+
+<div class="right">
+
+    <div class="small" style="margin-bottom:8px;" id="newfiles_game_1">
+                  <a href="/game/1280.html">
+                  <b>Martian Memorandum</b></a>
+
+                  [+] <a title="Русификатор к игре от Бюро переводов Old-Games.Ru. В комплекте прилагается также руководство пользователя на русском языке." href="/game/download/1280.html">Полезные файлы</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_2">
+                  <a href="/game/411.html">
+                  <b>Su-27 Flanker</b></a>
+
+                  [+] <a title="Официальный патч для игры от версии 1.0 до версии 1.1." href="/game/download/411.html">Обновление</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_3">
+                  <a href="/game/1058.html">
+                  <b>SSN-21 Seawolf</b></a>
+
+                  [+] <a title="Обновлённый драйвер Sound Blaster 16 для игры." href="/game/download/1058.html">Полезные файлы</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_4">
+                  <a href="/game/5683.html">
+                  <b>Links 386 Pro</b></a>
+
+                  [+] <a title="Дискетная версия игры (то есть в оригинале распространявшаяся на floppy-носителе[-ях] {дискете}). Всегда является полной (сохранены все игровые компоненты) и не требует инсталляции." href="/game/download/5683.html">Floppy-версия</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_5">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Набор дополнительных полей для игры.
+Некоторые поля подходят только для русской версии игры, некоторые - для русской и украинской. 
+Кроме того, в архиве присутствуют два дополнительных поля - &quot;Zoo&quot; и &quot;british&quot; - для английской версии игры." href="/game/download/15431.html">Полезные файлы</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_6">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Официальный редактор полей игры (SNK Monopoly Game Designer, для Монополии 1.4 и выше) в виде инсталлятора. Версия - 1.0." href="/game/download/15431.html">Полезные файлы</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_7">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Различные версии игры, распространявшиеся через сеть (BBS, Интернет, Фидо).
+
+Русская инсталляционная версия игры 2.0.2." href="/game/download/15431.html">Электронная версия</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_8">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Различные версии игры, распространявшиеся через сеть (BBS, Интернет, Фидо).
+
+Английская инсталляционная версия игры 2.0.2." href="/game/download/15431.html">Электронная версия</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_9">
+                  <a href="/game/836.html">
+                  <b>Twilight: 2000</b></a>
+
+                  [+] <a title="Официальный патч для VGA-версии игры." href="/game/download/836.html">Обновление</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_10">
+                  <a href="/game/836.html">
+                  <b>Twilight: 2000</b></a>
+
+                  [+] <a title="Официальный патч для EGA-версии игры." href="/game/download/836.html">Обновление</a></div>        <div class="showmore">
+            <a id="is_show_newfiles_games" href="javascript: void(0)">Далее...</a>
+        </div>
+        
+</div><!-- Popular begin -->
+
+<div class="bluetitle">
+    Популярные</div>
+
+<div class="right">
+
+    <div  style="margin-bottom:8px;"  id="pop_game_1" class="small"><a href="/game/754.html" title="Half-Life"><b>Half-Life</b></a><br />Популярность: 1292087</div><div  style="margin-bottom:8px;"  id="pop_game_2" class="small"><a href="/game/1350.html" title="Command &amp; Conquer: Red Alert 2"><b>Command &amp; Conquer: Red Alert 2</b></a><br />Популярность: 1122538</div><div  style="margin-bottom:8px;"  id="pop_game_3" class="small"><a href="/game/808.html" title="Diablo II"><b>Diablo II</b></a><br />Популярность: 1065758</div><div  style="margin-bottom:8px;"  id="pop_game_4" class="small"><a href="/game/2126.html" title="Diablo II: Lord of Destruction"><b>Diablo II: Lord of Destruction</b></a><br />Популярность: 815814</div><div  style="margin-bottom:8px;"  id="pop_game_5" class="small"><a href="/game/232.html" title="Diablo"><b>Diablo</b></a><br />Популярность: 729280</div><div  style="display:none; margin:4px;"  id="pop_game_6" class="small"><a href="/game/23.html" title="DOOM II: Hell on Earth"><b>DOOM II: Hell on Earth</b></a><br />Популярность: 722024</div><div  style="display:none; margin:4px;"  id="pop_game_7" class="small"><a href="/game/73.html" title="WarCraft II: Tides of Darkness"><b>WarCraft II: Tides of Darkness</b></a><br />Популярность: 715610</div><div  style="display:none; margin:4px;"  id="pop_game_8" class="small"><a href="/game/612.html" title="Age of Empires II: The Age of Kings"><b>Age of Empires II: The Age of Kings</b></a><br />Популярность: 711244</div><div  style="display:none; margin:4px;"  id="pop_game_9" class="small"><a href="/game/1747.html" title="Heroes of Might and Magic III Complete (Collector's Edition)"><b>Heroes of Might and Magic III Complete (Collector's Edition)</b></a><br />Популярность: 696018</div><div  style="display:none; margin:4px;"  id="pop_game_10" class="small"><a href="/game/11.html" title="Blood"><b>Blood</b></a><br />Популярность: 654912</div>        <div class="showmore">
+            <a href="/catalog/?sort=popularity">Далее...</a>
+        </div>
+        
+</div>
+<!-- Popular end --></aside>
+    <!-- Content right end -->
+</div>
+<!-- Main end -->
+
+<!-- Footer begin -->
+<footer id="pageFooter">
+    <div class="ui-notification-container"></div>
+    <div class="footwarn lfloat darkgraytext">
+        <div class="lfloat sidebar">
+            <div class="socialbutton" style="background: #45668e"><a rel="nofollow"
+                                                                     href="https://vk.com/old_games">VK</a>
+            </div>
+            <div class="socialbutton" style="background: #45668e"><a rel="nofollow" href="https://vk.com/podcastogru">Podcast
+                    VK</a></div>
+            <div class="socialbutton" style="background: #ff0000"><a rel="nofollow"
+                                                                     href="https://www.youtube.com/channel/UCjL57vLdE5Ae1frLxevzHaw">Podcast
+                    YT</a></div>
+            <div class="socialbutton" style="background: #929292"><a rel="nofollow"
+                                                                     href="mailto:support@old-games.ru">Поддержка</a>
+            </div>
+        </div>
+        <div class="smallcolumn">
+            <h3>Разделы</h3>
+            <ul>
+                <li><a href="/">Новости</a></li>
+                <li><a href="/catalog/">Каталог игр</a></li>
+                <li><a href="/search/">Расширенный поиск</a></li>
+                <li><a href="/forum/">Форум</a></li>
+                <li><a href="/articles/">Статьи</a></li>
+                <li><a href="/wiki/">Wiki</a></li>
+                <li><a href="/utils/">Файлы</a></li>
+            </ul>
+        </div>
+        <div class="smallcolumn">
+            <h3>Информация</h3>
+            <ul>
+                <li><a href="/about/">О проекте</a></li>
+                <li><a href="/about/history/">История проекта</a></li>
+                <li><a href="/faq/">FAQ</a></li>
+                <li><a href="/donate/">Поддержите нас!</a></li>
+            </ul>
+        </div>
+        <div class="smallcolumn">
+            <h3><i class="fas fa-rss-square"></i> RSS</h3>
+            <ul>
+                <li><a rel="nofollow" href="https://feeds.feedburner.com/Old-games-ru-news">Новости сайта</a>
+                </li>
+                <li><a rel="nofollow" href="https://feeds.feedburner.com/Old-games-ru">Новые игры</a>
+                </li>
+                <li><a rel="nofollow"
+                       href="https://feeds.feedburner.com/Old-games-ru-files">Новые файлы</a>
+                </li>
+                <li><a rel="nofollow"
+                       href="https://feeds.feedburner.com/Old-games-ru-articles">Новые статьи</a></li>
+            </ul>
+        </div>
+        <div class="bigcolumn">
+            <div>&copy; Old-Games.RU, 2000&mdash;2026</div>
+            <br/>
+            <div class="middlesmall">Ответственность за содержание рекламных объявлений несет рекламодатель.<br/>
+                При использовании материалов сайта Old-Games.RU, ссылка на сайт обязательна.<br/>
+                Old-Games.RU не несет ответственности за содержание веб-сайтов, на которые даются гиперссылки.<br/>
+                Все права на опубликованные на сайте Old-Games.RU материалы принадлежат их законным владельцам.<br/>
+                <br/>
+            </div>
+            <h3><a rel="nofollow" href="/?language=eng">Switch to English</a></h3>
+                    </div>
+    </div>
+</footer>
+</body>
+</html>

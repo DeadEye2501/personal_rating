@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # сторожил отсутствующее.
 BANNED_IN_BACKEND = {"bridge", "webview", "pythonnet", "clr"}
 
-BANNED_IN_BRIDGE = {"sqlalchemy", "aiosqlite", "httpx", "alembic", "PIL"}
+BANNED_IN_BRIDGE = {"sqlalchemy", "aiosqlite", "httpx", "alembic", "PIL", "bs4"}
 
 # Из бэкенда мосту открыты только типы границы и настройки. Всё прочее —
 # репозитории, сервисы, клиенты источников — тянет за собой и сессию

@@ -15,7 +15,7 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (22)
 
-## backend — 79 модулей
+## backend — 81 модулей
 
 ### `backend/app.py` — 174 строк
 
@@ -111,14 +111,14 @@
 - `def new_source_id() -> str` (5)
 - `def new_manual_item(kind: Kind, title: str, **fields) -> Item` (13)
 
-### `backend/model/kinds.py` — 68 строк
+### `backend/model/kinds.py` — 69 строк
 
 Закрытые наборы значений, которыми описывается карточка.
 
 Зависит от: —
 
 - `class Kind(StrEnum)` (4)
-- `class Source(StrEnum)` (7)
+- `class Source(StrEnum)` (8)
 - `class GenreSource(StrEnum)` (8)
 - `class IdSource(StrEnum)` (7)
 - `class RatingSource(StrEnum)` (11)
@@ -423,16 +423,16 @@
 
 - `def refuse_until(http: SourceHttp, reason: Reason, delay: timedelta, source: str | None=None) -> Refusal` (23)
 
-### `backend/sources/build.py` — 45 строк
+### `backend/sources/build.py` — 47 строк
 
-Шесть клиентов источников, поднятых из настроек.
+Семь клиентов источников, поднятых из настроек.
 
-Зависит от: `backend.config`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
+Зависит от: `backend.config`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-- `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (28)
+- `def build_sources(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Sources` (29)
   - `def http(name: str) -> SourceHttp` (7)
 
-### `backend/sources/convert.py` — 88 строк
+### `backend/sources/convert.py` — 104 строк
 
 Куски чужого ответа, которые все источники переводят одинаково.
 
@@ -441,6 +441,7 @@
 - `def identifier(source: IdSource, value) -> tuple[ExternalId, ...]` (12)
 - `def genres(space: GenreSource, rows: list[dict], key: str='id') -> tuple[tuple[GenreSource, str], ...]` (10)
 - `def year(value: str | None) -> int | None` (5)
+- `def year_in_text(value: str | None) -> int | None` (13)
 - `def companies(payload: dict) -> tuple[Credit, ...]` (11)
 - `def from_search(source: Source, value: float | None, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
@@ -486,19 +487,50 @@
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
-### `backend/sources/http.py` — 97 строк
+### `backend/sources/http.py` — 131 строк
 
 Общая дверь в сеть для всех источников.
 
 Зависит от: `backend.model`
 
+- `def _limit(name: str) -> int | None` (4)
 - `class Breaker` (28)
   - `def is_open(self) -> bool` (7)
   - `def trip(self, delay: timedelta, reason: Reason=Reason.QUOTA) -> None` (7)
   - `def reason(self) -> Reason` (2)
-- `class SourceHttp` (43)
-  - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (17)
+- `class SourceHttp` (56)
+  - `async def get(self, url: str, params: Mapping[str, object] | None=None, headers: Mapping[str, str] | None=None) -> httpx.Response | Refusal` (13)
+  - `async def _fetched(self, url: str, params: Mapping[str, object] | None, headers: Mapping[str, str] | None) -> httpx.Response | Refusal` (14)
   - `async def aclose(self) -> None` (2)
+
+### `backend/sources/oldgames/client.py` — 88 строк
+
+Разговор с old-games.ru по сети.
+
+Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.oldgames.parse`, `backend.sources.undocumented`
+
+- `class OldGamesClient` (58)
+  - `def name(self) -> str` (2)
+  - `async def _page(self, url: str, params: dict | None=None) -> str | Refusal` (19)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (11)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (6)
+  - `async def aclose(self) -> None` (2)
+
+### `backend/sources/oldgames/parse.py` — 166 строк
+
+Перевод страниц old-games.ru в наши типы.
+
+Зависит от: `backend.model`, `backend.sources.convert`
+
+- `def _soup(page: str) -> BeautifulSoup` (2)
+- `def _text(node: Tag | None) -> str` (4)
+- `def _hit(row: Tag) -> SearchHit` (28)
+- `def parse_search(page: str) -> list[SearchHit]` (11)
+- `def _labelled(scope: Tag, label: str) -> str` (7)
+- `def _companies(scope: Tag) -> tuple[Credit, ...]` (7)
+- `def _synopsis(soup: BeautifulSoup) -> str` (3)
+- `def _cover(soup: BeautifulSoup) -> str` (4)
+- `def parse_card(page: str, source_id: str) -> SourceCard` (31)
 
 ### `backend/sources/ratings/kinopoisk/client.py` — 45 строк
 
@@ -605,16 +637,16 @@
 - `def _number(raw: str | None) -> float | None` (10)
 - `def parse_ratings(payload: dict) -> Ratings` (21)
 
-### `backend/sources/registry.py` — 66 строк
+### `backend/sources/registry.py` — 71 строк
 
 Кто отвечает за какой тип содержимого.
 
-Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
+Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-- `class Sources` (48)
-  - `def catalog_for(self, kind: Kind) -> list` (6)
+- `class Sources` (52)
+  - `def catalog_for(self, kind: Kind) -> list` (8)
   - `def people_for(self, kind: Kind) -> TmdbClient | None` (6)
-  - `def client_for(self, source: Source)` (8)
+  - `def client_for(self, source: Source)` (9)
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `async def aclose(self) -> None` (3)
 
@@ -633,7 +665,7 @@
   - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str]` (17)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 227 строк
+### `backend/sources/steam/parse.py` — 215 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -646,7 +678,6 @@
 - `def _answered(payload: dict) -> dict[str, dict]` (10)
 - `def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]` (17)
 - `def cover_of(payload: dict, appid: str) -> str` (8)
-- `def _year(value: str | None) -> int | None` (7)
 - `def _genres(data: dict) -> tuple[tuple[GenreSource, str], ...]` (6)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def parse_card(data: dict) -> SourceCard` (25)
@@ -1284,7 +1315,7 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
-### `scripts/record_fixtures.py` — 264 строк
+### `scripts/record_fixtures.py` — 283 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -1299,9 +1330,10 @@
 - `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
 - `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (19)
-- `async def main() -> None` (21)
+- `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
+- `async def main() -> None` (22)
 
-## tests — 91 модулей
+## tests — 92 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1419,6 +1451,18 @@ MDBList: квота, битый ключ и чужой периметр — тр
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
+### `tests/backend/sources/test_oldgames.py` — 377 строк ⚠ подошёл к 300
+
+Разбор страниц old-games.ru: выдача и карточка.
+
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.oldgames.parse`, `tests.conftest`
+
+Тестов: 27
+
+- `async def searched(transport: httpx.MockTransport, query: str='dune')` (7)
+- `def busy(page: str, times: int)` (14)
+  - `def handler(request: httpx.Request) -> httpx.Response` (5)
+
 ### `tests/backend/sources/test_omdb.py` — 290 строк
 
 OMDB: единственный источник, у которого отказ приходит под кодом 401, а
@@ -1442,11 +1486,11 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 283 строк
+### `tests/backend/sources/test_registry.py` — 288 строк
 
 Реестр держится на том, что контракт у всех клиентов один.
 
-Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `tests.conftest`
+Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `tests.conftest`
 
 Тестов: 17
 

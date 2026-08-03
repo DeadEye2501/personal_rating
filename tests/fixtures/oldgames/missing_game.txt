@@ -1,0 +1,71 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Error! Ошибочка вышла...</title>
+
+<style>
+
+body {background:#0000aa;color:#ffffff;font-family:courier;font-size:12pt;text-align:center;margin:80px;}
+
+blink {color:yellow;}
+
+.neg {background:#fff;color:#0000aa;padding:2px 8px;font-weight:bold;}
+
+p {margin:30px 100px;text-align:left;}
+
+a,a:hover {color:inherit;font:inherit;}
+
+.menu {text-align:center;margin-top:50px;}
+
+</style>
+
+</head>
+
+<body>
+
+<span class="neg">ERROR 404</span>
+
+<p>
+
+Произошла критическая ошибка по адресу 0x4f6c642d47616d65732e5255.<br />
+
+Пользователь (предположительно Вы) обратился к странице, которой нет на сервере WWW.OLD-GAMES.RU. Вы можете перезагрузить свой компьютер и посмотреть будет ли доступна данная страница после этого.
+
+</p>
+
+<p>
+
+* Одновременно нажать CTRL+ALT+DEL и перезагрузить свой компьютер. При этом, администрация
+
+ ресурса не несёт ответственности за потерю всего того, что вы не сохранили.<br />
+
+* Сунуть два пальца в розетку. Мы не знаем, к каким результатам это может привести.<br />
+
+* Создать страницу самому и прислать её к нам.<br />
+
+* При попытке уйти с данной страницы ваш компьютер будет перезагружаться до победного, т.е.
+
+до появления искомой страницы на сервере.<br />
+
+* Если ничего не помогает и вы уверены, что такая страница должна быть, вы можете написать
+
+ об этом на форуме.<br />
+
+</p>
+
+Нажмите любую ссылку для продолжения <blink>_</blink>
+
+<div class="menu">
+
+<a href="https://www.old-games.ru">Перезагрузить</a> |
+
+<a href="https://www.old-games.ru">компьютер</a> |
+
+<a href="#">сейчас</a>
+
+</div>
+
+<!-- O-G.RU, 2008 -->
+
+</body></html>

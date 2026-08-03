@@ -237,6 +237,24 @@ async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> No
         f"{base}/6943602", headers={"X-API-KEY": key}))
 
 
+async def record_oldgames(client: httpx.AsyncClient) -> None:
+    """Единственный источник без API: пишутся страницы, а не ответы ручек.
+
+    «Dune» взята потому, что у неё есть всё сразу — обложка, описание, оценка;
+    «Dedale» — потому что обложки у неё нет, и вместо адреса приезжает заглушка
+    `nocover-rus.gif`. Несуществующий номер даёт страницу ошибки: единственный
+    ответ сайта, который не таблица и не карточка."""
+    print("old-games.ru")
+    base = "https://www.old-games.ru"
+    save("oldgames", "search_dune", await client.get(
+        f"{base}/catalog/", params={"gamename": "dune"}))
+    save("oldgames", "search_nothing", await client.get(
+        f"{base}/catalog/", params={"gamename": "щукапцхжэ"}))
+    save("oldgames", "card_dune", await client.get(f"{base}/game/25.html"))
+    save("oldgames", "card_without_cover", await client.get(f"{base}/game/4000.html"))
+    save("oldgames", "missing_game", await client.get(f"{base}/game/99999999.html"))
+
+
 async def main() -> None:
     load_dotenv(ROOT / ".env")
     config = load_config(os.environ, ROOT)
@@ -245,6 +263,7 @@ async def main() -> None:
         await record_steam(client)
         await record_steam_items(client)
         await record_gog(client)
+        await record_oldgames(client)
 
         pairs = (
             ("TMDB", config.tmdb_key, record_tmdb),

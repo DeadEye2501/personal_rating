@@ -12,6 +12,7 @@ httpx = "*"
 python-dotenv = "*"
 pillow = "*"
 pywebview = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 pytest = "*"

@@ -28,7 +28,7 @@ _ABSENT = 404
 # Набор объявлен здесь, а не у сборки: клиентов под него заводят двое — боевая
 # сборка и тесты, — и разойдись они, четвёртый источник молча остался бы без
 # обложек в одной из двух.
-POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG)
+POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG, Source.OLD_GAMES)
 
 
 class PosterService:

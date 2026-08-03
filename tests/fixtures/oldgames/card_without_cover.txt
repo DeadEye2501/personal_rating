@@ -1,0 +1,869 @@
+
+<!DOCTYPE html>
+<html lang="ru" prefix="og: http://ogp.me/ns#">
+<head>
+    <title>Dedale (1986 - DOS). Ссылки, описание, обзоры, скриншоты, видеоролики на Old-Games.RU</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=1336">
+<meta name="robots" content="all"/>
+<meta name="keywords" content="Dedale, скачать, игры, старые игры, old, games, download, играть, abandonware, форум, forum, бесплатно, free"/>
+<meta name="description" content="Dedale. Обзоры, описания, ссылки на скачивание, скриншоты, видеоролики."/>
+<meta name="Publisher-URL" content="https://www.old-games.ru"/>
+<!-- <meta property="fb:admins" content="100001450308155" /> -->
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+<link rel="apple-touch-icon" type="image/png" href="/img/small_og_logo.png">
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новости"
+      href="https://feeds.feedburner.com/Old-games-ru-news"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые игры"
+      href="https://feeds.feedburner.com/Old-games-ru"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые файлы"
+      href="https://feeds.feedburner.com/Old-games-ru-files"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые обзоры игр"
+      href="https://feeds.feedburner.com/Old-games-ru-articles"/>
+<link rel="stylesheet" type="text/css" href="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/og-styles.css,js/jqueryui/jquery-ui.min.css,js/jqueryui/jquery-ui.structure.min.css,js/jqueryui/jquery-ui.theme.min.css,js/select2/select2.css,js/uploadifive/uploadifive.css,js/fancybox2/jquery.fancybox.css,js/fancybox2/helpers/jquery.fancybox-thumbs.css" /><link rel="stylesheet" type="text/css" href="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/font-awesome/css/fa-svg-with-js.css,js/notification/notification.css" /><script type="text/javascript" src="/js/prebid-ads.js"></script>
+<script defer type="text/javascript" src="/js/font-awesome/js/fa-solid.min.js"></script>
+<script defer type="text/javascript" src="/js/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/jquery/jquery.min.js,js/jqueryui/jquery-ui.min.js,js/jqueryui/jquery.ui.datepicker-ru.min.js,js/notification/jquery.notification.min.js,js/jquery.simplemodal.1.4.4.min.js,js/raty-2.5.2/jquery.raty.min.js,js/select2/select2.min.js,js/select2/select2_locale_ru.js"></script><script type="text/javascript" src="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/uploadifive/jquery.uploadifive.min.js,js/fancybox2/jquery.fancybox.pack.js,js/fancybox2/helpers/jquery.fancybox-thumbs.js,js/js.cookie.min.js,js/og-scripts.js,js/og-game-actions.js"></script>
+
+    <link rel="canonical" href="https://www.old-games.ru/game/4000.html"/>
+    <meta property="og:image" content="https://www.old-games.ru/img/nocover-rus.gif" />
+    <meta property="og:site_name" content="Old-Games.RU" />
+    <meta property="og:title" content="Dedale на Old-Games.RU" />
+    <meta name="title"
+          content="Dedale на Old-Games.RU"/>
+    <link rel="image_src" href="/img/nocover-rus.gif"/>
+    <script type="text/javascript" async>
+        $(document).ready(function () {
+            $("a.gamescreens").fancybox({
+                helpers: {
+                    overlay: {
+                        css: {
+                            'background': 'rgba(170, 170, 170, 0.5)'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<!-- Header begin -->
+<header id="pageHeader">
+    <div class="header">
+                    <a class="lfloat" href="/" title="Скачать старые игры с Old-Games.RU">
+                <img src="//static.old-games.ru/img/logos/time_commando.gif" width="253" height="68" alt="Бесплатные старые игры"/>
+            </a>
+                <!--noindex-->
+                <!--/noindex-->
+    </div>
+    <!--noindex-->
+<div style="display:none;">
+    <!--LiveInternet counter-->
+    <script type="text/javascript"><!--
+        new Image().src = "//counter.yadro.ru/hit?r" + escape(document.referrer) + ((typeof(screen) == "undefined") ? "" : ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ? screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) + ";h" + escape(document.title.substring(0, 80)) + ";" + Math.random();
+        //-->
+    </script>
+    <!--/LiveInternet-->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-260122-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</div>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter2036 = new Ya.Metrika({
+                    id:2036,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/2036" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+<!--/noindex-->
+    <div class="headerpanel">
+        <div class="userlogin"><a href="#" id="loginform">Вход / Регистрация</a></div>
+        <div class="lang">
+            <!--noindex-->
+                            <a href="/?language=eng" title="English version"><img
+                            src="//static.old-games.ru/img/eng.png"
+                            width="22" height="16" alt="ENG"/></a>
+                            <!--/noindex-->
+        </div>
+        <nav class="menupanel">
+            <ul id="nav">
+                <li class="noborderli"><a href="/catalog/" title="Каталог старых игр">Каталог игр</a></li>
+                <li>
+                    <div id="searchblock">
+                        <div id="quicksearchform">
+                            <form method="get" action="/catalog/">
+                                <input type="text" placeholder="Введите название игры..." id="quicksearchgame"
+                                       name="gamename" value="">
+                            </form>
+                        </div>
+                        <a class="advitems" title="Расширенный поиск" href="/search/">
+                            <i class="fas fa-sliders-h">
+                            </i>
+                        </a>
+                        <a class="advitems" title="Свойства игр" href="/properties/">
+                            <i class="fas fa-tags">
+                            </i>
+                        </a>
+                    </div>
+                </li>
+                <li><a href="/" title="Новости сайта">Новости</a></li>
+                <li><a href="/forum/" title="Форум о старых играх">Форум</a></li>
+                <li><a href="/wiki/" title="Энциклопедия о старых играх и железе">Wiki</a></li>
+                <li><a href="/articles/" title="Различные статьи и обзоры">Статьи</a></li>
+                <li><a href="/utils/" title="Различные файлы для старых игр">Файлы</a></li>
+                <li><a href="#" title="Информация" class="information">Информация <img
+                                src="//static.old-games.ru/img/arrow-down.png" width="15"
+                                height="13" class="arrow-down" alt=""/></a>
+                    <ul>
+                        <li><a href="/about/" title="О нашем сайте">О проекте</a></li>
+                        <li><a href="/faq/" title="FAQ по старым играм">FAQ</a></li>
+                        <li><a href="/donate/" title="Помощь сайту">Поддержите нас!</a></li>
+                        <li><a href="/about/history/" title="История проекта">История проекта</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="dialog-form" style="display:none;" title="Авторизация">
+            <div class="loginbox">
+            <form action="/forum/login/login" method="post">
+                <label for="navbar_username">Логин:</label>
+                <input type="text" id="navbar_username" name="login">
+                <label for="navbar_login">Пароль:</label>
+                <input type="password" id="navbar_login" name="password">
+                <label for="cb_cookieuser_navbar">
+                    <input name="remember" type="checkbox" id="cb_cookieuser_navbar" value="1"
+                           checked="checked"/>Запомнить                </label>
+
+                <div class="centeralign">
+                    <input type="submit" value="Войти"/>
+                </div>
+                <br/>
+                <input type="hidden" name="cookie_check" value="1"/>
+                <input type="hidden" name="_xfToken" value=""/>
+
+                <div class="centeralign">
+                    <a href="/forum/login/"
+                       title="Регистрация на форуме старых игр">Регистрация</a> - <a
+                            href="/forum/lost-password/">Напомнить пароль</a>
+                </div>
+            </form>
+        </div>
+        </div>
+<!-- Header end -->
+<!-- Main begin -->
+<div class="main">
+    <main id="main">
+        <!-- Content center begin -->
+            <div class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <img src="//static.old-games.ru/img/path_bullet.gif" width="16" height="19" alt=""/>
+        <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" title="старые игры скачать" href="/"><span itemprop="name">Old-Games.RU</span></a>
+            <meta itemprop="position" content="1"/>
+        </span>
+                            <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                        <img src="//static.old-games.ru/img/slash.png" width="19" height="19"
+                             alt="/"/>
+                        <a itemprop="item" href="/catalog/" title="Каталог игр">
+                            <span itemprop="name">Каталог игр</span>
+                        </a><meta itemprop="position" content="2"/>
+                    </span>
+                                        <img src="//static.old-games.ru/img/slash.png" width="19" height="19"
+                         alt="/"/>
+                    <span class="active-link">Dedale</span>
+                        </div>
+    
+        <!-- Information -->
+            <div class="main-content" itemscope itemtype="http://schema.org/SoftwareApplication">
+        <link itemprop="applicationCategory" href="https://schema.org/GameApplication"/>
+        <div><h1 class="game_title" itemprop="name">Dedale</h1>
+                    </div>
+        <!-- Game begin -->
+
+        
+                <table class="gameinfo">
+            <tr>
+                <td class="game-cover" rowspan="2">
+                    <div class="game_info_cover" style="position: relative">
+                        <img src="/img/nocover-rus.gif" width="120"
+                             alt="Dedale"
+                             title="Dedale"/>
+                    </div>
+                </td>
+                <td style="vertical-align: top;">
+                    <table id="releaseinfo">
+                        <tr>
+                            <td class="head middlesmall">Жанр:</td>
+                            <td align="left" class="middlesmall button">
+                                                                <a class="orangelink" href="/catalog/?genre=15"><span itemprop="applicationSubCategory">Puzzle</span></a>                            </td>
+                        </tr>
+                                                    <tr>
+                                <td class="head middlesmall">Разработчик:</td>
+                                <td align="left" class="middlesmall button">
+                                                                        <a class="orangelink" href="/catalog/?developerCompany=483">-</a>                                </td>
+                            </tr>
+                                                        <tr>
+                                <td class="head middlesmall">Издатель:</td>
+                                <td align="left" class="middlesmall button">
+                                                                        <a class="orangelink" href="/catalog/?publisherCompany=483">-</a>                                </td>
+                            </tr>
+                                                    <tr>
+                            <td class="head middlesmall">Год выхода:</td>
+                            <td align="left" class="middlesmall button">
+                                <a class="orangelink"
+                                   href="/catalog/?year=1986&amp;year2=1986">1986</a>
+                                <meta itemprop="description"
+                                      content="Dedale, Год выхода: 1986"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="head middlesmall">Платформа:</td>
+                            <td align="left" class="middlesmall button">
+                                <a class="orangelink"
+                                   href="/catalog/?platform=1"><span
+                                            itemprop="operatingSystem">DOS</span></a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: bottom;">
+                    <div class="rating-box">
+                        <b>Оценка рецензента:</b><br/>
+                                                    <img src="//static.old-games.ru/img/rating/bigstar7.png"
+                                 alt="Оценка рецензента - 7 из 10"
+                                 title="Оценка рецензента - 7 из 10"
+                                 height="22" width="115"/>
+                                                </div>
+                    <div class="rating-box">
+                        <b>Оценка пользователей:</b><br/>
+                        <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+	                    <meta itemprop="bestRating" content="10"/>
+                        <meta itemprop="ratingCount" content="6"/>
+	                    <meta itemprop="ratingValue" content="6"/>
+                        <img src="//static.old-games.ru/img/rating/bigstar6.png"
+                             height="22"
+                             width="115"
+                             alt="Оценка пользователей - 6.33 из 10"
+                             title="Оценка пользователей - 6.33 из 10. Всего голосов: 6"/>
+	                    </span>
+                    </div>
+                </td>
+            </tr>
+
+        </table>
+
+        <div class="bookmark-icon-block">
+            <ul class="bookmark-icon-list">
+                                    <li>
+                        <div class="bookmark-icon-count">0</div>
+                        <div id="markicon1" title="Добавить в любимые игры"
+                             class="user-not-registered bookmark-icon"
+                             data-bookmarktype="1"
+                             style="background-image: url('//static.old-games.ru/img/bookmark-icon-favorites.png');"></div>
+                    </li>
+                                        <li>
+                        <div class="bookmark-icon-count">6</div>
+                        <div id="markicon2" title="Добавить в пройденные игры"
+                             class="user-not-registered bookmark-icon"
+                             data-bookmarktype="2"
+                             style="background-image: url('//static.old-games.ru/img/bookmark-icon-completed.png');"></div>
+                    </li>
+                                        <li>
+                        <div class="bookmark-icon-count">3</div>
+                        <div id="markicon3" title="Добавить в закладки"
+                             class="user-not-registered bookmark-icon"
+                             data-bookmarktype="3"
+                             style="background-image: url('//static.old-games.ru/img/bookmark-icon-bookmarks.png');"></div>
+                    </li>
+                                </ul>
+        </div>
+    </div>
+
+    <div class="game_tabs">
+
+        <form id="bookmarkform" method="POST">
+            <input type="hidden" name="gameid" value="4000"/>
+            <input type="hidden" name="securitytoken" value="d310a999352556fa0b7e34b54654203d"/>
+        </form>
+        <div class="lfloat game-actions" style="position: relative">
+            Действия<img src="//static.old-games.ru/img/dropdown-action.png"
+                                        width="9" height="14" alt=""/>
+        </div>
+        <div class="game-actions-droplist">
+            <ul>
+                                    <li>
+                        <a id="mark1"
+                           class="user-not-registered bookmark-link" href="#">
+                            <img src="//static.old-games.ru/img/bookmark-small-favorites.png"
+                                 alt="" width="13" height="13"/>
+                            <span>Добавить в любимые игры</span>
+                            <input type="hidden" name="bookmarktype" value="1"/>
+                        </a>
+                    </li>
+                                        <li>
+                        <a id="mark2"
+                           class="user-not-registered bookmark-link" href="#">
+                            <img src="//static.old-games.ru/img/bookmark-small-completed.png"
+                                 alt="" width="13" height="13"/>
+                            <span>Добавить в пройденные игры</span>
+                            <input type="hidden" name="bookmarktype" value="2"/>
+                        </a>
+                    </li>
+                                        <li>
+                        <a id="mark3"
+                           class="user-not-registered bookmark-link" href="#">
+                            <img src="//static.old-games.ru/img/bookmark-small-bookmarks.png"
+                                 alt="" width="13" height="13"/>
+                            <span>Добавить в закладки</span>
+                            <input type="hidden" name="bookmarktype" value="3"/>
+                        </a>
+                    </li>
+                    
+                <li style="padding: 0;">
+                    <hr class="darkgrayline"/>
+                </li>
+                <li><a href="#" class="user-not-registered" data-id="4000"><img
+                                src="//static.old-games.ru/img/small-plus.png" alt=""
+                                width="13"
+                                height="13"/>Добавить скриншоты</a></li>
+                <li><a href="#" class="user-not-registered" data-id="4000"><img
+                                src="//static.old-games.ru/img/small-plus.png" alt=""
+                                width="13"
+                                height="13"/>Добавить видеоролик</a></li>
+                                    <li><a href="#" class="user-not-registered" data-id="4000"><img
+                                    src="//static.old-games.ru/img/small-plus.png" alt=""
+                                    width="13"
+                                    height="13"/>Добавить обложки</a></li>
+                                <li><a href="#" class="user-not-registered" data-content-id="4000"
+                       data-content-type="game"><img
+                                src="//static.old-games.ru/img/small-plus.png" alt=""
+                                width="13"
+                                height="13"/>Дополнить информацию</a></li>
+            </ul>
+
+        </div>
+
+        <ul class="tabs rfloat">
+            <li class="current"><a href="/game/4000.html">Описание</a></li><li><a href="/game/download/4000.html">Файлы</a></li><li><a href="/game/screenshots/4000.html">Скриншоты (12)</a></li><li><a href="/game/video/4000.html">Видео (1)</a></li><li><a href="/game/covers/4000.html">Обложки (0)</a></li><li><a href="/game/play/4000.html">Играть в браузере</a></li>        </ul>
+        <div class="clear"></div>
+    </div>
+    
+        <!-- Description -->
+        <div class="main-content">
+            <div class="game_main_container">
+                <section class="game_main_row">
+                    <aside class="game_main_left game_small_screens">
+                                                                                    <a class="gamescreens"
+                                   title="Скриншот: Dedale"
+                                   data-fancybox-group="screen"
+                                   href="/games/pc/dedale/screenshots/4000_508bafad346e1.jpg" target="_blank">
+                                    <img width="120" src="/games/pc/dedale/thumbs/thumb_4000_508bafad346e1.jpg"
+                                         title="Скриншот: Dedale"
+                                         alt="[Скриншот: Dedale]"/>
+                                </a>
+                                <br/>
+                                                                <a class="gamescreens"
+                                   title="Скриншот: Dedale"
+                                   data-fancybox-group="screen"
+                                   href="/games/pc/dedale/screenshots/4000_508baf912d9a1.jpg" target="_blank">
+                                    <img width="120" src="/games/pc/dedale/thumbs/thumb_4000_508baf912d9a1.jpg"
+                                         title="Скриншот: Dedale"
+                                         alt="[Скриншот: Dedale]"/>
+                                </a>
+                                <br/>
+                                                                <a class="gamescreens"
+                                   title="Скриншот: Dedale"
+                                   data-fancybox-group="screen"
+                                   href="/games/pc/dedale/screenshots/4000_508baf96befb9.jpg" target="_blank">
+                                    <img width="120" src="/games/pc/dedale/thumbs/thumb_4000_508baf96befb9.jpg"
+                                         title="Скриншот: Dedale"
+                                         alt="[Скриншот: Dedale]"/>
+                                </a>
+                                <br/>
+                                                                                </aside>
+                    <article>
+                        <div id="reviewtext">
+                            Данную игру, наверное, стоило бы назвать не «Дедал», а «Тесей», потому как посвящена она не полётам на древнем орнитоптере, а путешествию по лабиринтам. В принципе, в этом цель игры и состоит: вам нужно проходить лабиринты за ограниченное время; если вам это удалось – то вы переходите на следующий уровень и получаете тем больше очков, чем за более короткое время прошли лабиринт. После прохождения всей игры (если получится её пройти) вам покажут ваш общий счёт.<br />
+<br />
+Лабиринтов всего девять, и каждый из них куда сложнее предыдущего, как по своей архитектуре, так и по остающемуся времени. Если вы вдруг побежите прямо на стену и столкнётесь с ней, то потеряете пять секунд времени, что для данной игры очень плачевно.<br />
+<br />
+Графика достаточно условна, но для такой игры красивая картинка никому и не нужна, потому что на увлечённость игровым процессом никак не влияет. Особенно сложной назвать игру нельзя, хотя некоторые лабиринты с первого раза пройти наверняка не получится; в принципе, можно смело рекомендовать эту игру детям, хотя и взрослым в качестве «активного» отдыха она наверняка будет хоть немного интересна.                            <div class="game_review_author">Автор обзора:                                 <b><a href="/users/?userid=53911">kreol</a></b></div>
+                        </div>
+                        <div class="game_gradient_container"><span class="game_review_gradient"></span>
+                        </div>
+                        <div class="game_review_button" id="openreview">
+                            <a href="#">Развернуть описание</a>
+                        </div>
+
+                        <div class="middlesmall">
+                            <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
+                            <script src="//yastatic.net/share2/share.js"></script>
+                            <div class="ya-share2"
+                                 data-services="vkontakte,facebook,odnoklassniki,twitter,telegram"></div>
+                                                                                            <ul class="game-groups">
+                                    <li>Страна или регион происхождения:<br /><a class='tip-list' href='/catalog/?properties[]=france' title='Игра разрабатывалась во Франции.'>Франция</a><br /></li><li>Технические детали:<br /><a class='tip-list' href='/catalog/?properties[]=wise' title='Why Is Size Everything? Игры, вне архива занимающие менее 100 кб.'>W.I.S.E.</a><br /></li><li>Язык:<br /><a class='tip-list' href='/catalog/?properties[]=english' title='На английском языке.'>English</a><br /></li>                                </ul>
+                                                        </div>
+                    </article>
+                </section>
+                                            </div>
+
+            
+        </div>
+
+        <div id="newcomment" class="game_newcomment_container">
+                            <div class="game_comments_unregistred">
+                    Незарегистрированные пользователи не могут оставлять комментарии и оценивать игры. Зарегистрироваться можно на <a href="/forum/login/login">этой странице</a>.                </div>
+                        </div>
+        <!-- Game end -->
+        <div class="main-content">
+            <!-- Misc begin -->
+                            <div id="comments" class="game_comments_container">
+        <section class="comments">
+            <aside class="game_description_col">
+                            </aside>
+            <aside class="game_comments_title">Комментарии к игре</aside>
+        </section>
+        
+            <section class="comments bgstripe1">
+                <aside class="game_comments_row middlesmall">
+                    
+                    <b><a href="/users/?userid=143265">AndyFox</a></b>
+
+                    <div class="red">
+                        24.04.2025 22:04</div>
+                                            <img src="//static.old-games.ru/img/rating/star10.png"
+                             alt="Оценка пользователя - 10 из 10"
+                             title="Оценка пользователя - 10 из 10"
+                             width="80" height="16"/>
+                                        </aside>
+                <section class="game_comments_text middlesmall">
+                    Лабиринты с каждым уровнем увеличиваются в размерах.                </section>
+            </section>
+            
+            <section class="comments bgstripe2">
+                <aside class="game_comments_row middlesmall">
+                    
+                    <b><a href="/users/?userid=241219">Вендиго</a></b>
+
+                    <div class="red">
+                        25.03.2020 22:03</div>
+                                            <img src="//static.old-games.ru/img/rating/star8.png"
+                             alt="Оценка пользователя - 8 из 10"
+                             title="Оценка пользователя - 8 из 10"
+                             width="80" height="16"/>
+                                        </aside>
+                <section class="game_comments_text middlesmall">
+                    Лабиринты слишком простые, а так, великолепная игра.                </section>
+            </section>
+            
+            <section class="comments bgstripe1">
+                <aside class="game_comments_row middlesmall">
+                    
+                    <b><a href="/users/?userid=16960">Smiling Spectre</a></b>
+
+                    <div class="red">
+                        08.03.2019 11:03</div>
+                                    </aside>
+                <section class="game_comments_text middlesmall">
+                    <a href="https://www.old-games.ru/forum/members/53911/" class="username" data-user="53911, @kreol">@kreol</a> к тому, что более известный полёт на орнитоптере является следствием менее известного, но куда более значимого события: постройки Лабиринта. Видимо, по мысли автора игры, Минос заставил его проходить Дедала. <img src="/forum/styles/default/old-games/smilies/smile.gif" class="mceSmilie" alt=":)" title="Smile    :)" />                </section>
+            </section>
+            
+            <section class="comments bgstripe2">
+                <aside class="game_comments_row middlesmall">
+                    
+                    <b><a href="/users/?userid=53911">kreol</a></b>
+
+                    <div class="red">
+                        07.03.2019 21:03</div>
+                                            <img src="//static.old-games.ru/img/rating/star7.png"
+                             alt="Оценка пользователя - 7 из 10"
+                             title="Оценка пользователя - 7 из 10"
+                             width="80" height="16"/>
+                                        </aside>
+                <section class="game_comments_text middlesmall">
+                    <a href="https://www.old-games.ru/forum/members/16960/" class="username" data-user="16960, @Smiling Spectre">@Smiling Spectre</a>, не очень понял, что ты хотел этим сказать.                </section>
+            </section>
+            
+            <section class="comments bgstripe1">
+                <aside class="game_comments_row middlesmall">
+                    
+                    <b><a href="/users/?userid=16960">Smiling Spectre</a></b>
+
+                    <div class="red">
+                        07.03.2019 20:03</div>
+                                    </aside>
+                <section class="game_comments_text middlesmall">
+                    Дедал сбежал с Крита именно потому, что гуманный Минос не стал его убивать. После завершения Критского лабиринта, который Дедал спроектировал.                </section>
+            </section>
+                </div>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        $(document).ready(function () {
+            var prevpage = "id0";
+            var nextpage = "id2";
+            var extrprevPage = prevpage.substr(2, 2);
+            var extrnextPage = nextpage.substr(2, 2);
+
+            if (extrprevPage < 1) $(".commentarrow-prev-horizontal").addClass("commentarrow-prev-disabled-horizontal");
+            else if ($(".commentarrow-prev-horizontal").hasClass("commentarrow-prev-disabled-horizontal")) $(".commentarrow-prev-horizontal").removeClass("commentarrow-prev-disabled-horizontal");
+
+            if (extrnextPage > 1) $(".commentarrow-next-horizontal").addClass("commentarrow-prev-disabled-horizontal");
+            else if ($(".commentarrow-next-horizontal").hasClass("commentarrow-prev-disabled-horizontal")) $(".commentarrow-next-horizontal").removeClass("commentarrow-prev-disabled-horizontal");
+
+            $(".commentarrow-prev-horizontal").attr("id", prevpage);
+            $(".commentarrow-next-horizontal").attr("id", nextpage);
+            $(".commentarrow-prev-horizontal").click(function () {
+                if ($(this).hasClass("commentarrow-prev-disabled-horizontal")) {
+                } else {
+                    var extrPage = this.id.substr(2, 2);
+                    var pageNum = extrPage;
+                    $("#comments").html("<br /><img src='//static.old-games.ru/img/loading-thickbox.gif' />");
+                    $.post("game_comments.php", {
+                        "gameid": "4000",
+                        "gamethreadid": "52369",
+                        "page": pageNum
+                    }, function (data) {
+                        $("#comments").html(data);
+                    });
+                }
+            });
+
+            $(".commentarrow-next-horizontal").click(function () {
+                if ($(this).hasClass("commentarrow-prev-disabled-horizontal")) {
+                } else {
+                    var extrPage = this.id.substr(2, 2);
+                    var pageNum = extrPage;
+                    $("#comments").html("<br /><img src='//static.old-games.ru/img/loading-thickbox.gif' />");
+                    $.post("game_comments.php", {
+                        "gameid": "4000",
+                        "gamethreadid": "52369",
+                        "page": pageNum
+                    }, function (data) {
+                        $("#comments").html(data);
+                    });
+                }
+            });
+
+        })
+        /* ]]> */
+    </script>
+                <!-- Comments end -->
+
+            <!-- Misc end -->
+
+            <!-- Content center end -->
+        </div>
+        <!-- Content center end -->
+    </main>
+    <!-- Content left begin -->
+    <aside id="lside">
+            <div class="bluetitle">Это интересно</div>
+        <!-- Blue line start -->
+        <div class="tiptext">По словам нескольких сотрудников Black Isle Studio, создание <b>Fallout 3</b> было начато еще в 1999 году. Уже тогда BIS планировали использовать трёхмерный движок, серьёзно переработать систему S.P.E.C.I.A.L. и добавить режим боя в реальном времени к привычному пошаговому. Но проект был заморожен из-за мобилизации всех сил студии к завершению <b><a href="https://www.old-games.ru/game/10710.html" class="internalLink">Icewind Dale</a></b>.<br /></div>
+            <div class="bluetitle">Каталог игр</div>
+    <!-- By genre begin -->
+    <nav class="left">
+    <div class="head">по жанру</div>
+    <ul class="leftlist" id="genres_table">
+        <li><a  href="/catalog/?genre=8">Action (1333)</a></li><li><a  href="/catalog/?genre=7">Adventure (540)</a></li><li><a  href="/catalog/?genre=1">Arcade (3529)</a></li><li><a  href="/catalog/?genre=17">Edutainment (1821)</a></li><li><a  href="/catalog/?genre=10">Fighting (187)</a></li><li><a  href="/catalog/?genre=14">Interactive Fiction (241)</a></li><li><a  href="/catalog/?genre=11">Other (178)</a></li><li><a  href="/catalog/?genre=15">Puzzle (1498)</a></li><li><a  href="/catalog/?genre=9">Quest (994)</a></li><li><a  href="/catalog/?genre=12">Racing (815)</a></li><li><a  href="/catalog/?genre=4">RPG (681)</a></li><li><a  href="/catalog/?genre=5">Simulation (718)</a></li><li><a  href="/catalog/?genre=13">Sports (579)</a></li><li><a  href="/catalog/?genre=6">Strategy (1524)</a></li><li><a  href="/catalog/?genre=16">Tabletop (759)</a></li>    </ul>
+</nav>
+    <!-- By genre end -->
+        <div class="left">
+        <div class="head">по платформе</div>
+        <ul class="leftlist" id="platforms_table">
+            <li><a href="/catalog/?platform=6">Amiga (191)</a></li><li><a href="/catalog/?platform=7">Amiga CD32 (11)</a></li><li><a href="/catalog/?platform=14">Amstrad CPC (58)</a></li><li><a href="/catalog/?platform=18">Apple II (63)</a></li><li><a href="/catalog/?platform=17">Atari ST (37)</a></li><li><a href="/catalog/?platform=9">Commodore 64 (60)</a></li><li><a href="/catalog/?platform=1">DOS (7045)</a></li><li><a href="/catalog/?platform=13">DVDi (30)</a></li><li><a href="/catalog/?platform=12">Macintosh (51)</a></li><li><a href="/catalog/?platform=19">MSX (65)</a></li><li><a href="/catalog/?platform=15">PC-88 (35)</a></li><li><a href="/catalog/?platform=16">PC-98 (103)</a></li><li><a href="/catalog/?platform=2">Windows (6022)</a></li><li><a href="/catalog/?platform=5">Windows 3.x (512)</a></li><li><a href="/catalog/?platform=3">Windows 3.x/DOS (62)</a></li><li><a href="/catalog/?platform=4">Windows/DOS (226)</a></li><li><a href="/catalog/?platform=10">Windows/Windows 3.x (527)</a></li><li><a href="/catalog/?platform=8">ZX Spectrum (90)</a></li>        </ul>
+    </div>
+        <!-- By year begin -->
+    <div class="left">
+    <div class="head">по году выпуска</div>
+    <table>
+        <tr><td><a href="/catalog/?year=2008&amp;year2=2008">2008</a></td><td><a href="/catalog/?year=2007&amp;year2=2007">2007</a></td><td><a href="/catalog/?year=2006&amp;year2=2006">2006</a></td></tr><tr><td><a href="/catalog/?year=2005&amp;year2=2005">2005</a></td><td><a href="/catalog/?year=2004&amp;year2=2004">2004</a></td><td><a href="/catalog/?year=2003&amp;year2=2003">2003</a></td></tr><tr><td><a href="/catalog/?year=2002&amp;year2=2002">2002</a></td><td><a href="/catalog/?year=2001&amp;year2=2001">2001</a></td><td><a href="/catalog/?year=2000&amp;year2=2000">2000</a></td></tr><tr><td><a href="/catalog/?year=1999&amp;year2=1999">1999</a></td><td><a href="/catalog/?year=1998&amp;year2=1998">1998</a></td><td><a href="/catalog/?year=1997&amp;year2=1997">1997</a></td></tr><tr><td><a href="/catalog/?year=1996&amp;year2=1996">1996</a></td><td><a href="/catalog/?year=1995&amp;year2=1995">1995</a></td><td><a href="/catalog/?year=1994&amp;year2=1994">1994</a></td></tr><tr><td><a href="/catalog/?year=1993&amp;year2=1993">1993</a></td><td><a href="/catalog/?year=1992&amp;year2=1992">1992</a></td><td><a href="/catalog/?year=1991&amp;year2=1991">1991</a></td></tr><tr><td><a href="/catalog/?year=1990&amp;year2=1990">1990</a></td><td><a href="/catalog/?year=1989&amp;year2=1989">1989</a></td><td><a href="/catalog/?year=1988&amp;year2=1988">1988</a></td></tr><tr><td><a href="/catalog/?year=1987&amp;year2=1987">1987</a></td><td><a href="/catalog/?year=1986&amp;year2=1986">1986</a></td><td><a href="/catalog/?year=1970&amp;year2=1985">ранее</a></td></tr>    </table>
+</div>    <!-- By year end -->
+
+    <!-- By letter begin -->
+    <div class="left">
+    <div class="head">по букве</div>
+    <table class="lefttable">
+        <tr><td><a href="/catalog/?letter=0">0</a></td><td><a href="/catalog/?letter=A">A</a></td><td><a href="/catalog/?letter=B">B</a></td><td><a href="/catalog/?letter=C">C</a></td><td><a href="/catalog/?letter=D">D</a></td><td><a href="/catalog/?letter=E">E</a></td><td><a href="/catalog/?letter=F">F</a></td></tr><tr><td><a href="/catalog/?letter=G">G</a></td><td><a href="/catalog/?letter=H">H</a></td><td><a href="/catalog/?letter=I">I</a></td><td><a href="/catalog/?letter=J">J</a></td><td><a href="/catalog/?letter=K">K</a></td><td><a href="/catalog/?letter=L">L</a></td><td><a href="/catalog/?letter=M">M</a></td></tr><tr><td><a href="/catalog/?letter=N">N</a></td><td><a href="/catalog/?letter=O">O</a></td><td><a href="/catalog/?letter=P">P</a></td><td><a href="/catalog/?letter=Q">Q</a></td><td><a href="/catalog/?letter=R">R</a></td><td><a href="/catalog/?letter=S">S</a></td><td><a href="/catalog/?letter=T">T</a></td></tr><tr><td><a href="/catalog/?letter=U">U</a></td><td><a href="/catalog/?letter=V">V</a></td><td><a href="/catalog/?letter=W">W</a></td><td><a href="/catalog/?letter=X">X</a></td><td><a href="/catalog/?letter=Y">Y</a></td><td><a href="/catalog/?letter=Z">Z</a></td><td><a href="/catalog/?properties[]=russian">Я</a></td></tr>    </table>
+</div></aside>
+    <!-- Content left end -->
+    <!-- Content right begin -->
+    <aside id="rside">
+    <div class="bluetitle">
+    Поддержите нас!</div>
+<div class="right">
+    <div class="donate-block-img">
+        <img alt="Поддержите нас!" src="/img/donate/macintosh_heart.gif">
+    </div>
+    <div>
+        Привет, олдгеймер! Если тебе нравится наш проект и тебе не безразлична его судьба, ты можешь поддержать нас на Boosty или любым другим способом    </div>
+    <div class="donate-block-img">
+     <a class="donate-boosty-url" rel="nofollow" href="https://boosty.to/old-games"><img src="/img/donate/boosty.svg" width="120px" height="50px"></a>
+    </div>
+    <div class="donate-more-button showmore">
+        <a href="/donate/">Другие способы...</a>
+    </div>
+</div>
+        <div class="bluetitle">
+            Случайная игра        </div>
+        <div class="right random-game">
+        <div id="random_screen_game">
+        
+    <a class="middlesmall" href="/game/14908.html"
+       title="Survival Crisis Z"><b>Survival Crisis Z</b></a>
+    <div class="random-screen-info small"><a
+                title="Все игры на Windows"
+                href="/catalog/?platform=2 ">Windows</a>, <a title="Все игры 2004 года" href="/catalog/?year=2004&amp;year2=2004">2004</a>        <br/>
+        <a title="Все игры жанра RPG" href="/catalog/?genre=4">RPG</a>    </div>
+    <div class="random-screen-image">
+        <a href="/game/14908.html" title="Survival Crisis Z">
+            <img style="vertical-align: middle;" border="0" src="/games/pc/survival_crisis_z/screenshots/180/14908_6a2b25d55c7ba.jpg" width="180"
+                 title="Survival Crisis Z"
+                 alt="Survival Crisis Z"/>
+        </a>
+    </div>
+    <div style="margin-top: 5px;">
+                    <img src="//static.old-games.ru/img/rating/star10.png"
+                 alt="Оценка рецензента - 10 из 10"
+                 title="Оценка рецензента - 10 из 10"
+                 width="80" height="16"/>
+                </div>
+
+    </div>
+<div class="random-next-screen">
+<img id="random-game" title="Другая случайная игра" width="24" height="24" style="cursor:pointer;"
+                                            src="//static.old-games.ru/img/next-screen.png"
+                                            alt="Другая случайная игра"/>
+</div>
+<div class="clear"></div>
+</div>    <!-- New games begin -->
+
+<div class="bluetitle">
+    Новинки</div>
+<div class="right">
+
+    <div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15475.html" title="Muls">
+                  <b>Muls</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15474.html" title="MineSweeper">
+                  <b>MineSweeper</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15473.html" title="Hyper Backgammon">
+                  <b>Hyper Backgammon</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15472.html" title="Putt-Putt and Fatty Bear's Activity Pack">
+                  <b>Putt-Putt and Fatty Bear's Activity Pack</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15471.html" title="Fatty Bear's Fun Pack">
+                  <b>Fatty Bear's Fun Pack</b>
+                  </a>
+                  <br />02.08.2026</div>        <div class="showmore">
+            <a href="/catalog/?sort=date">Далее...</a>
+        </div>
+        
+</div><!-- New articles begin -->
+<div class="bluetitle">
+    Последние статьи</div>
+<div class="right">
+    <div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120699.html">Назад в прошлое. Часть 6.2. Роковая красота, или Интервью с Лией Монтелонго.</a><br />
+         17.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120644.html">Не то золото, что блестит, или Интервью с коллекционерами из разных стран. Часть 9. Испания.</a><br />
+         12.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120607.html">Не то золото, что блестит, или Интервью с коллекционерами из разных стран. Часть 8. Австралия.</a><br />
+         09.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Обзор]</b>&nbsp;<a href="/articles/120599.html">APS3000 (星际移民) – современный ремейк старой RTS Colonial Project (殖民計劃, 1996 г.)</a><br />
+         09.07.2026 &mdash; <a href="/users/?userid=39623">WERTA</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Статья]</b>&nbsp;<a href="/articles/120302.html">Столпы войны. По каким принципам построены бои в трилогии Halo.</a><br />
+         23.06.2026 &mdash; <a href="/users/?userid=228632">KOG</a>
+         </div>        <div class="showmore">
+            <a href="/articles/">Далее...</a>
+        </div>
+
+        
+</div><!-- New game files begin -->
+
+<div class="bluetitle">
+    Последние файлы</div>
+
+<div class="right">
+
+    <div class="small" style="margin-bottom:8px;" id="newfiles_game_1">
+                  <a href="/game/1280.html">
+                  <b>Martian Memorandum</b></a>
+
+                  [+] <a title="Русификатор к игре от Бюро переводов Old-Games.Ru. В комплекте прилагается также руководство пользователя на русском языке." href="/game/download/1280.html">Полезные файлы</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_2">
+                  <a href="/game/411.html">
+                  <b>Su-27 Flanker</b></a>
+
+                  [+] <a title="Официальный патч для игры от версии 1.0 до версии 1.1." href="/game/download/411.html">Обновление</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_3">
+                  <a href="/game/1058.html">
+                  <b>SSN-21 Seawolf</b></a>
+
+                  [+] <a title="Обновлённый драйвер Sound Blaster 16 для игры." href="/game/download/1058.html">Полезные файлы</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_4">
+                  <a href="/game/5683.html">
+                  <b>Links 386 Pro</b></a>
+
+                  [+] <a title="Дискетная версия игры (то есть в оригинале распространявшаяся на floppy-носителе[-ях] {дискете}). Всегда является полной (сохранены все игровые компоненты) и не требует инсталляции." href="/game/download/5683.html">Floppy-версия</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_5">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Набор дополнительных полей для игры.
+Некоторые поля подходят только для русской версии игры, некоторые - для русской и украинской. 
+Кроме того, в архиве присутствуют два дополнительных поля - &quot;Zoo&quot; и &quot;british&quot; - для английской версии игры." href="/game/download/15431.html">Полезные файлы</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_6">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Официальный редактор полей игры (SNK Monopoly Game Designer, для Монополии 1.4 и выше) в виде инсталлятора. Версия - 1.0." href="/game/download/15431.html">Полезные файлы</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_7">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Различные версии игры, распространявшиеся через сеть (BBS, Интернет, Фидо).
+
+Русская инсталляционная версия игры 2.0.2." href="/game/download/15431.html">Электронная версия</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_8">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Различные версии игры, распространявшиеся через сеть (BBS, Интернет, Фидо).
+
+Английская инсталляционная версия игры 2.0.2." href="/game/download/15431.html">Электронная версия</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_9">
+                  <a href="/game/836.html">
+                  <b>Twilight: 2000</b></a>
+
+                  [+] <a title="Официальный патч для VGA-версии игры." href="/game/download/836.html">Обновление</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_10">
+                  <a href="/game/836.html">
+                  <b>Twilight: 2000</b></a>
+
+                  [+] <a title="Официальный патч для EGA-версии игры." href="/game/download/836.html">Обновление</a></div>        <div class="showmore">
+            <a id="is_show_newfiles_games" href="javascript: void(0)">Далее...</a>
+        </div>
+        
+</div><!-- Popular begin -->
+
+<div class="bluetitle">
+    Популярные</div>
+
+<div class="right">
+
+    <div  style="margin-bottom:8px;"  id="pop_game_1" class="small"><a href="/game/754.html" title="Half-Life"><b>Half-Life</b></a><br />Популярность: 1292087</div><div  style="margin-bottom:8px;"  id="pop_game_2" class="small"><a href="/game/1350.html" title="Command &amp; Conquer: Red Alert 2"><b>Command &amp; Conquer: Red Alert 2</b></a><br />Популярность: 1122538</div><div  style="margin-bottom:8px;"  id="pop_game_3" class="small"><a href="/game/808.html" title="Diablo II"><b>Diablo II</b></a><br />Популярность: 1065758</div><div  style="margin-bottom:8px;"  id="pop_game_4" class="small"><a href="/game/2126.html" title="Diablo II: Lord of Destruction"><b>Diablo II: Lord of Destruction</b></a><br />Популярность: 815814</div><div  style="margin-bottom:8px;"  id="pop_game_5" class="small"><a href="/game/232.html" title="Diablo"><b>Diablo</b></a><br />Популярность: 729280</div><div  style="display:none; margin:4px;"  id="pop_game_6" class="small"><a href="/game/23.html" title="DOOM II: Hell on Earth"><b>DOOM II: Hell on Earth</b></a><br />Популярность: 722024</div><div  style="display:none; margin:4px;"  id="pop_game_7" class="small"><a href="/game/73.html" title="WarCraft II: Tides of Darkness"><b>WarCraft II: Tides of Darkness</b></a><br />Популярность: 715610</div><div  style="display:none; margin:4px;"  id="pop_game_8" class="small"><a href="/game/612.html" title="Age of Empires II: The Age of Kings"><b>Age of Empires II: The Age of Kings</b></a><br />Популярность: 711244</div><div  style="display:none; margin:4px;"  id="pop_game_9" class="small"><a href="/game/1747.html" title="Heroes of Might and Magic III Complete (Collector's Edition)"><b>Heroes of Might and Magic III Complete (Collector's Edition)</b></a><br />Популярность: 696018</div><div  style="display:none; margin:4px;"  id="pop_game_10" class="small"><a href="/game/11.html" title="Blood"><b>Blood</b></a><br />Популярность: 654912</div>        <div class="showmore">
+            <a href="/catalog/?sort=popularity">Далее...</a>
+        </div>
+        
+</div>
+<!-- Popular end --></aside>
+    <!-- Content right end -->
+</div>
+<!-- Main end -->
+
+<!-- Footer begin -->
+<footer id="pageFooter">
+    <div class="ui-notification-container"></div>
+    <div class="footwarn lfloat darkgraytext">
+        <div class="lfloat sidebar">
+            <div class="socialbutton" style="background: #45668e"><a rel="nofollow"
+                                                                     href="https://vk.com/old_games">VK</a>
+            </div>
+            <div class="socialbutton" style="background: #45668e"><a rel="nofollow" href="https://vk.com/podcastogru">Podcast
+                    VK</a></div>
+            <div class="socialbutton" style="background: #ff0000"><a rel="nofollow"
+                                                                     href="https://www.youtube.com/channel/UCjL57vLdE5Ae1frLxevzHaw">Podcast
+                    YT</a></div>
+            <div class="socialbutton" style="background: #929292"><a rel="nofollow"
+                                                                     href="mailto:support@old-games.ru">Поддержка</a>
+            </div>
+        </div>
+        <div class="smallcolumn">
+            <h3>Разделы</h3>
+            <ul>
+                <li><a href="/">Новости</a></li>
+                <li><a href="/catalog/">Каталог игр</a></li>
+                <li><a href="/search/">Расширенный поиск</a></li>
+                <li><a href="/forum/">Форум</a></li>
+                <li><a href="/articles/">Статьи</a></li>
+                <li><a href="/wiki/">Wiki</a></li>
+                <li><a href="/utils/">Файлы</a></li>
+            </ul>
+        </div>
+        <div class="smallcolumn">
+            <h3>Информация</h3>
+            <ul>
+                <li><a href="/about/">О проекте</a></li>
+                <li><a href="/about/history/">История проекта</a></li>
+                <li><a href="/faq/">FAQ</a></li>
+                <li><a href="/donate/">Поддержите нас!</a></li>
+            </ul>
+        </div>
+        <div class="smallcolumn">
+            <h3><i class="fas fa-rss-square"></i> RSS</h3>
+            <ul>
+                <li><a rel="nofollow" href="https://feeds.feedburner.com/Old-games-ru-news">Новости сайта</a>
+                </li>
+                <li><a rel="nofollow" href="https://feeds.feedburner.com/Old-games-ru">Новые игры</a>
+                </li>
+                <li><a rel="nofollow"
+                       href="https://feeds.feedburner.com/Old-games-ru-files">Новые файлы</a>
+                </li>
+                <li><a rel="nofollow"
+                       href="https://feeds.feedburner.com/Old-games-ru-articles">Новые статьи</a></li>
+            </ul>
+        </div>
+        <div class="bigcolumn">
+            <div>&copy; Old-Games.RU, 2000&mdash;2026</div>
+            <br/>
+            <div class="middlesmall">Ответственность за содержание рекламных объявлений несет рекламодатель.<br/>
+                При использовании материалов сайта Old-Games.RU, ссылка на сайт обязательна.<br/>
+                Old-Games.RU не несет ответственности за содержание веб-сайтов, на которые даются гиперссылки.<br/>
+                Все права на опубликованные на сайте Old-Games.RU материалы принадлежат их законным владельцам.<br/>
+                <br/>
+            </div>
+            <h3><a rel="nofollow" href="/?language=eng">Switch to English</a></h3>
+                    </div>
+    </div>
+</footer>
+</body>
+</html>

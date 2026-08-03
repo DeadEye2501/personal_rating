@@ -1,6 +1,5 @@
 """Перевод ответов Steam в наши типы."""
 
-import re
 from dataclasses import replace
 from datetime import datetime
 
@@ -14,7 +13,7 @@ from backend.model import (
     Source,
     SourceCard,
 )
-from backend.sources.convert import companies, genres, rating
+from backend.sources.convert import companies, genres, rating, year_in_text
 
 ASSETS = "https://shared.akamai.steamstatic.com/store_item_assets/"
 
@@ -25,8 +24,6 @@ TYPE_GAME = 0
 
 # Ответ про товар, а не отговорка. Число, а не флаг: `15` истинно.
 ANSWERED = 1
-
-YEAR = re.compile(r"(?:19|20)\d{2}")
 
 # Жанр магазина и его тег нумеруются порознь и сталкиваются числами: жанр `9` —
 # это «Гонки», а тег `9` — «Стратегия». В справочнике пространство одно, и жанр
@@ -141,15 +138,6 @@ def cover_of(payload: dict, appid: str) -> str:
     return _poster(row, appid) if row else ""
 
 
-def _year(value: str | None) -> int | None:
-    """Дата приходит как её написал человек и на языке запроса: «18 мая.
-    2015 г.», «26 Nov, 2015», «Coming soon». Год ищется в строке, а не
-    отрезается с конца: по-русски там стоит «г.», и хвост из четырёх знаков
-    даёт «5 г.»."""
-    found = YEAR.search(value or "")
-    return int(found.group()) if found else None
-
-
 def _genres(data: dict) -> tuple[tuple[GenreSource, str], ...]:
     """Жанры карточки — номерами тегов-двойников: пространство меток у Steam
     одно на весь справочник."""
@@ -184,7 +172,7 @@ def parse_card(data: dict) -> SourceCard:
             synced_at=now,
             synopsis=data.get("short_description") or "",
             poster_url=poster_url(appid),
-            year=_year((data.get("release_date") or {}).get("date")),
+            year=year_in_text((data.get("release_date") or {}).get("date")),
         ),
         genre_ext_ids=_genres(data),
         companies=companies(data),

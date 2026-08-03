@@ -1,5 +1,6 @@
 """Куски чужого ответа, которые все источники переводят одинаково."""
 
+import re
 from datetime import datetime
 
 from backend.model import (
@@ -45,6 +46,21 @@ def year(value: str | None) -> int | None:
     `2023.08.03` у GOG. У необъявленного к выходу дата приходит пустой."""
     head = (value or "")[:4]
     return int(head) if head.isdigit() else None
+
+
+def year_in_text(value: str | None) -> int | None:
+    """Год, найденный где угодно в строке, которую писал человек.
+
+    Второй способ, а не замена первому: у TMDB и GOG дата машинная и начинается
+    с года, а у Steam приезжает как «18 мая. 2015 г.» или «Coming soon», у
+    old-games.ru — ячейкой таблицы. Отрезанный с конца хвост из четырёх знаков
+    дал бы там «5 г.».
+
+    Вынесено на втором появлении: у Steam и old-games совпали и выражение, и
+    тело. Машинная проверка дублей этого не видит — тело в две инструкции, а
+    сравнивается от пяти."""
+    found = re.search(r"(?:19|20)\d{2}", value or "")
+    return int(found.group()) if found else None
 
 
 def companies(payload: dict) -> tuple[Credit, ...]:

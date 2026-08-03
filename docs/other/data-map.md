@@ -122,6 +122,7 @@
   - `TMDB` = `'tmdb'`
   - `STEAM` = `'steam'`
   - `GOG` = `'gog'`
+  - `OLD_GAMES` = `'old_games'`
 - `class GenreSource(StrEnum)`
   - `TMDB` = `'tmdb'`
   - `STEAM` = `'steam'`
@@ -341,7 +342,7 @@
 - `logger` = `logging.getLogger(__name__)`
 - `_SIGNATURES` = `набор из 3`
 - `_ABSENT` = `404`
-- `POSTER_SOURCES` = `набор из 3`
+- `POSTER_SOURCES` = `набор из 4`
 
 ### `backend/service/search.py`
 
@@ -377,6 +378,24 @@
 - `USER_AGENT` = `'PersonalRating/0.1 (personal library app)'`
 - `DEFAULT_TIMEOUT` = `20.0`
 - `NETWORK_BACKOFF` = `timedelta(seconds=15)`
+- `AT_ONCE` = `словарь из 1`
+
+### `backend/sources/oldgames/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BASE` = `'https://www.old-games.ru'`
+- `CATALOG` = `f'{BASE}/catalog/'`
+- `CARD` = `BASE + '/game/{source_id}.html'`
+- `BUSY` = `503`
+- `ATTEMPTS` = `3`
+
+### `backend/sources/oldgames/parse.py`
+
+- `GAME_HREF` = `re.compile('^/game/(\\d+)\\.html$')`
+- `NOCOVER` = `'nocover-rus.gif'`
+- `GAME_SCOPE` = `'[itemtype*="SoftwareApplication"]'`
+- `BY` = `'Автор обзора:'`
+- `UNKNOWN` = `'-'`
 
 ### `backend/sources/ratings/kinopoisk/client.py`
 
@@ -430,6 +449,7 @@
   - `tmdb: TmdbClient`
   - `steam: SteamClient`
   - `gog: GogClient`
+  - `oldgames: OldGamesClient`
   - `mdblist: MdbListClient`
   - `omdb: OmdbClient`
   - `kinopoisk: KinopoiskClient`
@@ -450,7 +470,6 @@
 - `ASSETS` = `'https://shared.akamai.steamstatic.com/store_ite…`
 - `TYPE_GAME` = `0`
 - `ANSWERED` = `1`
-- `YEAR` = `re.compile('(?:19|20)\\d{2}')`
 - `GENRE_TWIN` = `словарь из 8`
 
 ### `backend/sources/tmdb/client.py`
@@ -720,7 +739,7 @@
 
 - `ROOT` = `Path(__file__).resolve().parents[2]`
 - `BANNED_IN_BACKEND` = `набор из 4`
-- `BANNED_IN_BRIDGE` = `набор из 5`
+- `BANNED_IN_BRIDGE` = `набор из 6`
 - `ALLOWED_FROM_BACKEND` = `набор из 2`
 
 ### `tests/backend/test_linking.py`

@@ -10,6 +10,7 @@ import pytest
 from backend.config import load_config
 from backend.model import Found, Kind, Refusal, Source
 from backend.sources.gog.client import GogClient
+from backend.sources.oldgames.client import OldGamesClient
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.omdb.client import OmdbClient
@@ -58,13 +59,16 @@ async def test_films_and_series_come_from_tmdb(registry):
         assert [type(one) for one in registry.catalog_for(kind)] == [TmdbClient], kind
 
 
-async def test_games_come_from_two_equal_stores(registry):
-    """Заметная часть ретро в Steam не продаётся — магазина два."""
+async def test_games_come_from_three_equal_sources(registry):
+    """Покрытие даёт сумма трёх, а не каждый по отдельности: Steam и GOG —
+    витрины и знают только то, что продаётся сегодня, old-games.ru закрывает
+    ретро, которого в витринах нет вовсе."""
     # Список, а не множество: порядок задаёт, чью выдачу человек увидит первой
-    # при равном числе кандидатов, а множество обмен магазинов местами скрывает.
+    # при равном числе кандидатов, а множество обмен источников местами скрывает.
     assert [type(one) for one in registry.catalog_for(Kind.GAME)] == [
         SteamClient,
         GogClient,
+        OldGamesClient,
     ]
 
 
@@ -161,11 +165,12 @@ async def test_every_source_has_its_own_breaker(registry):
     # Оба зеркала Кинопоиска заведены под одним именем: наружу источник один, и
     # в `Refusal.source` человек должен увидеть «kinopoisk», а не имя зеркала.
     assert sorted(one.name for one in registry.connections) == [
-        "gog", "kinopoisk", "kinopoisk", "mdblist", "omdb", "steam", "tmdb",
+        "gog", "kinopoisk", "kinopoisk", "mdblist", "old_games", "omdb",
+        "steam", "tmdb",
     ]
     assert len(breakers) == len({id(one) for one in breakers})
-    # Шесть источников, но соединений семь: у Кинопоиска два зеркала.
-    assert len(breakers) == 7
+    # Семь источников, но соединений восемь: у Кинопоиска два зеркала.
+    assert len(breakers) == 8
 
 
 async def test_a_tripped_breaker_leaves_the_others_alone(registry):

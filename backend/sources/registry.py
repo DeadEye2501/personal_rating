@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from backend.model import Kind, Source
 from backend.sources.gog.client import GogClient
 from backend.sources.http import SourceHttp
+from backend.sources.oldgames.client import OldGamesClient
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.omdb.client import OmdbClient
@@ -26,16 +27,19 @@ class Sources:
     tmdb: TmdbClient
     steam: SteamClient
     gog: GogClient
+    oldgames: OldGamesClient
     mdblist: MdbListClient
     omdb: OmdbClient
     kinopoisk: KinopoiskClient
     connections: tuple[SourceHttp, ...]
 
     def catalog_for(self, kind: Kind) -> list:
-        """У игр два равноправных магазина: заметная часть ретро в Steam не
-        продаётся. Склейки в выдаче нет — решает человек."""
+        """У игр три равноправных источника, и покрытие даёт их сумма, а не
+        каждый по отдельности: Steam и GOG — витрины и знают только то, что
+        продаётся сегодня, old-games.ru закрывает ретро. «Дюны» нет ни в одной
+        из витрин вовсе. Склейки в выдаче нет — решает человек."""
         if kind is Kind.GAME:
-            return [self.steam, self.gog]
+            return [self.steam, self.gog, self.oldgames]
         return [self.tmdb]
 
     def people_for(self, kind: Kind) -> TmdbClient | None:
@@ -52,6 +56,7 @@ class Sources:
             Source.TMDB: self.tmdb,
             Source.STEAM: self.steam,
             Source.GOG: self.gog,
+            Source.OLD_GAMES: self.oldgames,
         }.get(source)
 
     def rating_sources(self, kind: Kind) -> list:
