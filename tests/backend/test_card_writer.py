@@ -239,7 +239,7 @@ async def test_a_taken_identifier_leaves_nothing_behind(writer, sessions):
     # Отказ назван источником карточки и причиной «ответил непонятно чем»: по ним
     # наверху решают, показывать человеку строку или ждать.
     assert (result.source, result.reason) == ("tmdb", Reason.BROKEN)
-    dropped = await LibraryRepository(sessions).find_by_source(Source.TMDB, "999")
+    dropped = await LibraryRepository(sessions).find_by_source(Kind.MOVIE, Source.TMDB, "999")
     assert dropped is None
 
 
@@ -321,7 +321,7 @@ async def test_the_rollback_undoes_a_failed_clearing(writer, sessions,
 
     assert isinstance(result, Refusal), "наружу из писателя летит отказ"
     assert await LibraryRepository(sessions).find_by_source(
-        Source.TMDB, "157336"
+        Kind.MOVIE, Source.TMDB, "157336"
     ) is None, "строка осталась без обложки, состава и жанров"
 
 
@@ -345,7 +345,7 @@ async def test_cancelling_the_write_takes_the_card_with_it(writer, sessions,
         await writer.save(source_card(), POSTER)
 
     assert await LibraryRepository(sessions).find_by_source(
-        Source.TMDB, "157336") is None
+        Kind.MOVIE, Source.TMDB, "157336") is None
 
 
 async def test_a_taken_card_identity_is_a_refusal_not_an_exception(writer):

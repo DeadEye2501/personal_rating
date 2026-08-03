@@ -173,7 +173,7 @@ async def test_a_refusal_of_the_source_writes_nothing(sessions, loader):
 
     assert result is refusal
     assert await LibraryRepository(sessions).find_by_source(
-        Source.TMDB, "157336"
+        Kind.MOVIE, Source.TMDB, "157336"
     ) is None
 
 
@@ -275,7 +275,7 @@ async def test_a_broken_client_becomes_a_refusal(sessions, loader, caplog):
     assert result.reason is Reason.BROKEN
     assert "разбор не удался" in result.detail
     assert await LibraryRepository(sessions).find_by_source(
-        Source.TMDB, "157336"
+        Kind.MOVIE, Source.TMDB, "157336"
     ) is None
 
 
@@ -294,7 +294,7 @@ async def test_a_poster_that_did_not_arrive_stops_the_writing(sessions, loader,
 
     assert isinstance(result, Refusal)
     assert await LibraryRepository(sessions).find_by_source(
-        Source.TMDB, "157336"
+        Kind.MOVIE, Source.TMDB, "157336"
     ) is None
     assert [r for r in caplog.records
             if r.name.startswith("backend") and r.levelname == "ERROR"] == []

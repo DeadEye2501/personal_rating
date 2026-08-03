@@ -49,7 +49,7 @@ def upgrade() -> None:
     sa.Column('episodes_count', sa.Integer(), nullable=True),
     sa.Column('synced_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_item')),
-    sa.UniqueConstraint('source', 'source_id', name='uq_item_source')
+    sa.UniqueConstraint('kind', 'source', 'source_id', name='uq_item_source')
     )
     op.create_index('ix_item_kind', 'item', ['kind'], unique=False)
     op.create_index('ix_item_kind_year', 'item', ['kind', 'year'], unique=False)

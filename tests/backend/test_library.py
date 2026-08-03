@@ -147,22 +147,46 @@ async def test_get_picks_the_asked_card_and_not_just_any(sessions):
     assert await repository.get(max(identifiers) + 1) is None
 
 
+async def test_a_film_and_a_series_share_a_number_and_both_fit(sessions):
+    """У TMDB фильмы и сериалы нумеруются порознь, и числа сталкиваются.
+    Проверено на живом API 03.08.2026: `550` — это и «Бойцовский клуб», и сериал
+    «Till Death Us Do Part», `278` — «Побег из Шоушенка» и «Nightline».
+
+    Опознаёт карточку тройка, а не пара: с парой второй такой номер получал бы
+    «уже в библиотеке» про то, чего в библиотеке нет, и завести его было бы
+    нельзя вовсе. Тем же ключом живёт таблица удалённого — там тройка стояла с
+    самого начала, а здесь пара пережила её на день."""
+    repository = LibraryRepository(sessions)
+
+    film = await repository.create(
+        make_item(kind=Kind.MOVIE, source_id="550", title="Бойцовский клуб"))
+    series = await repository.create(
+        make_item(kind=Kind.SERIES, source_id="550",
+                  title="Till Death Us Do Part"))
+
+    assert film != series
+    assert (await repository.find_by_source(
+        Kind.SERIES, Source.TMDB, "550")).title == "Till Death Us Do Part"
+    assert (await repository.find_by_source(
+        Kind.MOVIE, Source.TMDB, "550")).title == "Бойцовский клуб"
+
+
 async def test_find_by_source_takes_the_source_into_account(sessions):
     """Номер сам по себе карточку не опознаёт: `500810` есть и в Steam, и в
     GOG, и это разные игры."""
     repository = LibraryRepository(sessions)
     await in_both_stores(repository)
 
-    found = await repository.find_by_source(Source.GOG, "500810")
+    found = await repository.find_by_source(Kind.GAME, Source.GOG, "500810")
     assert found.title == "Arcanum в GOG"
 
 
 async def test_find_by_source(sessions):
     repository = LibraryRepository(sessions)
     await repository.create(make_item())
-    found = await repository.find_by_source(Source.TMDB, "157336")
+    found = await repository.find_by_source(Kind.MOVIE, Source.TMDB, "157336")
     assert found.title == "Интерстеллар"
-    assert await repository.find_by_source(Source.TMDB, "1") is None
+    assert await repository.find_by_source(Kind.MOVIE, Source.TMDB, "1") is None
 
 
 async def test_lists_give_out_cards_and_not_rows(sessions):

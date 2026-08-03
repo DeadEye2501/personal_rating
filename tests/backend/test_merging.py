@@ -28,8 +28,8 @@ def test_two_editions_of_one_game_in_one_store_become_one():
     """Издания одной игры — одна игра, решение пользователя 02.08.2026.
     Побеждает строка без слов издания: показывать «Fallout 3» вернее, чем
     «Fallout 3 - Game of the Year Edition»."""
-    steam = [row(Source.STEAM, "22370", "Fallout 3"),
-             row(Source.STEAM, "22300", "Fallout 3 - Game of the Year Edition")]
+    steam = [row(Source.STEAM, "22300", "Fallout 3"),
+             row(Source.STEAM, "22370", "Fallout 3 - Game of the Year Edition")]
 
     assert titles(merged([steam], "fallout 3")) == ["Fallout 3"]
 

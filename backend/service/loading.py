@@ -56,7 +56,7 @@ class Loader:
         if view.item_id is not None:
             return view.item_id
 
-        existing = await self._library.find_by_source(view.source, view.source_id)
+        existing = await self._library.find_by_source(view.kind, view.source, view.source_id)
         if existing is not None:
             return existing.id
 

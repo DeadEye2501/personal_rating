@@ -33,7 +33,11 @@ item = Table(
     Column("seasons_count", Integer),
     Column("episodes_count", Integer),
     Column("synced_at", DateTime, nullable=False),
-    UniqueConstraint("source", "source_id", name="uq_item_source"),
+    # Тройка, а не пара: у TMDB фильмы и сериалы нумеруются порознь и
+    # сталкиваются числами — `550` это и «Бойцовский клуб», и сериал
+    # «Till Death Us Do Part», проверено на живом API. С парой второй такой
+    # номер получал бы «уже в библиотеке» про то, чего в библиотеке нет.
+    UniqueConstraint("kind", "source", "source_id", name="uq_item_source"),
     Index("ix_item_kind", "kind"),
     Index("ix_item_kind_year", "kind", "year"),
 )

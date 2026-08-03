@@ -175,7 +175,7 @@ async def test_unlink_returns_the_card_to_manual_and_keeps_the_data(sessions):
     # руками карточкой на ключе уникальности.
     assert stored.source_id not in ("157336", str(item_id))
     # Освободившийся внешний идентификатор снова свободен.
-    assert await repository.find_by_source(Source.TMDB, "157336") is None
+    assert await repository.find_by_source(Kind.MOVIE, Source.TMDB, "157336") is None
 
 
 async def test_unlink_gives_a_fresh_identity_to_each_card(sessions):

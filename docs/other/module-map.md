@@ -872,7 +872,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 214 строк
+### `backend/storage/repository/library.py` — 218 строк
 
 Карточки библиотеки.
 
@@ -880,11 +880,11 @@
 
 - `def _named(entity: Entity, needle: str)` (13)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (167)
+- `class LibraryRepository(Repository)` (171)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
-  - `async def find_by_source(self, source: Source, source_id: str) -> Item | None` (7)
+  - `async def find_by_source(self, kind: Kind, source: Source, source_id: str) -> Item | None` (11)
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (18)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
   - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (37)
@@ -1039,7 +1039,7 @@
 - `def item_fk(**kwargs: Any) -> Column` (6)
 - `def genre_fk(**kwargs: Any) -> Column` (5)
 
-### `backend/storage/tables/catalog.py` — 141 строк
+### `backend/storage/tables/catalog.py` — 145 строк
 
 Таблицы каталога: то, что наполняется из источников.
 
@@ -1849,13 +1849,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def offenders(package: str, banned: set[str]) -> list[str]` (7)
 - `def reaching_backend(package: str, allowed: set[str]) -> list[str]` (14)
 
-### `tests/backend/test_library.py` — 378 строк ⚠ подошёл к 300
+### `tests/backend/test_library.py` — 402 строк ⚠ подошёл к 300
 
 Репозиторий библиотеки: карточка, окна и поиск по названию.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 25
+Тестов: 26
 
 - `def make_item(**overrides) -> Item` (4)
 - `async def in_both_stores(repository) -> tuple[int, int]` (15)

@@ -58,9 +58,13 @@ class LibraryRepository(Repository):
     async def get(self, item_id: int) -> Item | None:
         return await self._one(select(item_table).where(item_table.c.id == item_id))
 
-    async def find_by_source(self, source: Source, source_id: str) -> Item | None:
+    async def find_by_source(self, kind: Kind, source: Source,
+                             source_id: str) -> Item | None:
+        """Тройкой, а не парой: тем же ключом карточка опознаётся уникальной.
+        Номер `550` у TMDB носят и фильм, и сериал."""
         return await self._one(
             select(item_table).where(
+                item_table.c.kind == kind,
                 item_table.c.source == source,
                 item_table.c.source_id == source_id,
             )
