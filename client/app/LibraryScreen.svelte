@@ -9,7 +9,7 @@
   import { owned } from '$api/owned.svelte.js'
   import { retagged } from '$state/marking.js'
   import { requestOf } from '$state/section.js'
-  import { flipped } from '$state/session.js'
+  import { flipped, swept } from '$state/session.js'
   import { aspected, scored, wished } from './marks.js'
   import { refreshed, without } from './reread.js'
   import { complaining } from './trouble.js'
@@ -94,6 +94,19 @@
   // Свёрнутость принадлежит элементу ленты: тумблер шапки — состояние всего
   // приложения, шеврон карточки — свойство её самой.
   const collapse = (view) => patch(view, flipped(view, session.collapsed))
+
+  // Отдельной величиной, а не чтением `session` в эффекте: прочитанный там, он
+  // метил бы эффект грязным на любую пересборку сеанса — и клик по жанру
+  // распрямлял бы карточки, свёрнутые шевроном.
+  const all = $derived(session.collapsed)
+
+  // Нажали тумблер — он забирает власть у тронутых шевроном строк. Слушается
+  // ровно он: `views` здесь и читаются, и пишутся, а такой круг эффект уже
+  // ловил.
+  $effect(() => {
+    const pressed = all
+    untrack(() => { views = swept(views, pressed) })
+  })
 
   /** Замена идёт по номеру строки, а не по ссылке: список мог смениться, пока
    *  запись доезжала до базы. */

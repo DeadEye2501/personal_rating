@@ -10,7 +10,7 @@
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
   import { retagged } from '$state/marking.js'
-  import { flipped } from '$state/session.js'
+  import { flipped, swept } from '$state/session.js'
   import { rowTurns } from './inturn.js'
   import { keyOf, merged, refreshed, same, without } from './reread.js'
   import { aspected, scored, wished } from './marks.js'
@@ -257,6 +257,16 @@
 
   // Ждать заведения свёрнутости незачем: это показ, а не запись.
   const collapse = (view) => patch(view, flipped(view, session.collapsed))
+
+  // Нажали тумблер — он забирает власть у тронутых шевроном строк. Величина
+  // отдельная по той же причине, что и `kind`: прочитанная в эффекте, она
+  // метила бы его грязным на любую пересборку сеанса.
+  const all = $derived(session.collapsed)
+
+  $effect(() => {
+    const pressed = all
+    untrack(() => { views = swept(views, pressed) })
+  })
 
   /** Правка кандидата открывает окно на заведённой карточке, а не на пустой
    *  форме: иначе «Сохранить» завело бы вторую, ручную карточку того же

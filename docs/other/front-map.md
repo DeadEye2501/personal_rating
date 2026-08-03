@@ -33,7 +33,7 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (143)
+### app/LibraryScreen.svelte (156)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
 - берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
@@ -43,7 +43,7 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (295)
+### app/SearchScreen.svelte (305)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -65,7 +65,7 @@
 - Свои отметки на карточке: оценка и закладка.
 - отдаёт: aspected, scored, wished
 
-### app/reread.js (51)
+### app/reread.js (47)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
 - отдаёт: keyOf, merged, refreshed, same, without
 
@@ -274,9 +274,9 @@
 - Запрос раздела: то, что уезжает мостом в `feed.page`.
 - отдаёт: requestOf
 
-### state/session.js (72)
+### state/session.js (79)
 - Выбранное в приложении вместе с переходами между выборами.
-- отдаёт: collapsedOf, flipped, newSession, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
+- отдаёт: collapsedOf, flipped, newSession, swept, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
 
 ### state/sorting.js (76)
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.

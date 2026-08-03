@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { EMPTY, chosen, cycled, isEmpty } from '$state/filters.js'
-import { collapsedOf, flipped, newSession, withClearedFilter, withCollapsed,
-  withFilters,
+import { collapsedOf, flipped, newSession, swept, withClearedFilter,
+  withCollapsed, withFilters,
   withForgotten, withKind, withMark, withNextSort, withSection,
   withToggledSection }
   from '$state/session.js'
@@ -263,6 +263,34 @@ describe('свёрнутость карточки', () => {
   it('нетронутая карточка слушается тумблера', () => {
     expect(collapsedOf({ collapsed: null }, true)).toBe(true)
     expect(collapsedOf({}, false)).toBe(false)
+  })
+})
+
+describe('нажатие тумблера шапки', () => {
+  it('забирает власть у строки, тронутой шевроном', () => {
+    // Без этого «своё сильнее общего» становится «своё сильнее общего
+    // навсегда»: первый же щелчок по шеврону уводил карточку из-под тумблера
+    // до самого перечитывания ленты.
+    const touched = { item_id: 1, ...flipped({ item_id: 1 }, false) }
+    const [after] = swept([touched], false)
+
+    expect(collapsedOf(after, false)).toBe(false)
+  })
+
+  it('и шеврон снова волен с ним спорить', () => {
+    // Порядок такой: тумблер задаёт всем, шеврон спорит у одной строки,
+    // следующее нажатие тумблера снова забирает власть.
+    const [after] = swept([{ item_id: 1, collapsed: true }], false)
+
+    expect(flipped(after, false)).toEqual({ collapsed: true })
+  })
+
+  it('ничего, кроме свёрнутости, в строке не трогает', () => {
+    // Строка ленты — это вся карточка целиком: снятый спред унёс бы и оценку,
+    // и метки, и постер, а увидеть это можно только глазами на живом окне.
+    const rows = swept([{ item_id: 7, title: 'Дюна', collapsed: true }], false)
+
+    expect(rows).toEqual([{ item_id: 7, title: 'Дюна', collapsed: false }])
   })
 })
 
