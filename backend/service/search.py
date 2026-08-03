@@ -15,6 +15,7 @@ from backend.service.asking import answered_all
 from backend.service.filmography import Filmographies
 from backend.service.hits import once, split, to_views, without_removed
 from backend.service.merging import merged
+from backend.service.relevance import relevant
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
@@ -112,15 +113,34 @@ class SearchService:
         # снимает её позже, и до экрана доехала бы половина порции.
         together = unique_by(_weave(works),
                              lambda one: (one.source, one.source_id))
-        kept = await without_removed(self._removed, [*answers, together])
-        # Порция режется до склейки, а склейка стоит последней из отсевов.
-        # Сливать имеет смысл то, что уже прошло чистку, иначе дополнение
-        # склеилось бы с игрой; а склеивать — только видимое: победитель с
-        # сороковой строки убил бы проигравшего со второй, и на экран не попал
-        # бы ни один из двух.
-        woven = _weave(merged([one[:SEARCH_SIZE] for one in kept], query))
+        woven = await self._narrowed(answers, together, query)
 
         return ExternalSearch(
             views=tuple(await to_views(woven, self._genres, self._clock)),
             refusals=tuple(once(refusals + refused)),
         )
+
+    async def _narrowed(self, answers: list[list[SearchHit]],
+                        together: list[SearchHit],
+                        query: str) -> list[SearchHit]:
+        """Четыре отсева подряд и переплетение. Порядок между ними — решение, а
+        не последовательность вызовов.
+
+        **Не относящееся к запросу** уходит первым и **только из выдач
+        каталогов**. У работ тёзок запрос — это имя человека, а строки его
+        фильмы: общего слова у «Джона Траволты» с «Криминальным чтивом» нет ни
+        одного, и общий отсев отменил бы поиск по имени целиком.
+
+        **Убранное человеком** — вторым: мусор в базу не ходит, и чем меньше
+        строк доживёт до запроса `known`, тем он дешевле.
+
+        Оба стоят **до среза порции**: иначе двадцать негодных строк заняли бы
+        двадцать слотов, а добрать двадцать первую неоткуда.
+
+        **Склейка** — последней, и уже после среза. Сливать имеет смысл то, что
+        прошло чистку, иначе дополнение склеилось бы с игрой; а склеивать —
+        только видимое: победитель с сороковой строки убил бы проигравшего со
+        второй, и на экран не попал бы ни один из двух."""
+        kept = await without_removed(
+            self._removed, [*relevant(answers, query), together])
+        return _weave(merged([one[:SEARCH_SIZE] for one in kept], query))

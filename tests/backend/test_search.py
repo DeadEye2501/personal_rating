@@ -94,7 +94,7 @@ async def test_titles_and_people_come_woven(sessions, service):
         works=Found([hit(f"p{n}", f"Работа {n}") for n in range(2)]),
     )
 
-    result = await service(client).external(Kind.MOVIE, "траволта")
+    result = await service(client).external(Kind.MOVIE, "название")
 
     assert [v.source_id for v in result.views] == ["t0", "p0", "t1", "p1"]
 
@@ -177,7 +177,7 @@ async def test_a_refusal_of_the_name_search_travels_as_a_refusal(sessions,
     client = FakeSearch(Found([hit()]),
                         people=Refusal(source="tmdb", reason=Reason.NETWORK))
 
-    result = await service(client).external(Kind.MOVIE, "траволта")
+    result = await service(client).external(Kind.MOVIE, "интерстеллар")
 
     assert [v.title for v in result.views] == ["Интерстеллар"]
     assert [r.reason for r in result.refusals] == [Reason.NETWORK]
@@ -211,7 +211,7 @@ async def test_two_stores_down_by_the_same_reason_stay_two(sessions, service):
                        name="steam")
     gog = FakeSearch(Refusal(source="gog", reason=Reason.NETWORK), name="gog")
 
-    result = await service(steam, gog).external(Kind.GAME, "ведьмак")
+    result = await service(steam, gog).external(Kind.GAME, "игра")
 
     assert sorted(r.source for r in result.refusals) == ["gog", "steam"]
 
@@ -221,7 +221,7 @@ async def test_games_never_go_outside_for_people(sessions, service):
     слушаться: у игр такого клиента нет вовсе."""
     client = FakeSearch(Found([]), people=Found([PersonHit("1")]), name="steam")
 
-    await service(client).external(Kind.GAME, "ведьмак")
+    await service(client).external(Kind.GAME, "игра")
 
     assert [one for one in client.asked if one[0] == "find_people"] == []
 
@@ -246,7 +246,7 @@ async def test_a_broken_client_becomes_a_refusal_with_its_name(
     search = service(FakeSearch(RuntimeError("разбор не удался"), name="steam"))
 
     with caplog.at_level("ERROR"):
-        result = await search.external(Kind.GAME, "ведьмак")
+        result = await search.external(Kind.GAME, "игра")
 
     assert result.views == ()
     assert (result.refusals[0].source, result.refusals[0].reason) == (
@@ -309,12 +309,12 @@ async def test_two_stores_come_woven_and_not_in_blocks(sessions, service):
     """Спека требует «показывают вперемешку». Подряд это значит, что вторая
     половина страницы — всегда GOG, а он на бессмыслицу отдаёт два десятка
     несвязанных игр: настоящие находки уехали бы за экран."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME, source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Игра S{n}", kind=Kind.GAME, source=Source.STEAM)
                                for n in range(3)]), name="steam")
-    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", kind=Kind.GAME, source=Source.GOG)
+    gog = FakeSearch(Found([hit(f"g{n}", f"Игра G{n}", kind=Kind.GAME, source=Source.GOG)
                              for n in range(3)]), name="gog")
 
-    result = await service(steam, gog).external(Kind.GAME, "ведьмак")
+    result = await service(steam, gog).external(Kind.GAME, "игра")
 
     assert [v.source_id for v in result.views] == [
         "s0", "g0", "s1", "g1", "s2", "g2"
@@ -328,29 +328,29 @@ async def test_three_answers_are_woven_by_turns(sessions, service):
     Порядок «по одному кандидату по кругу» на трёх выдачах разной длины и есть
     предмет: с двумя он неотличим от простого чередования, а третий источник
     приписан этим же планом."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME,
+    steam = FakeSearch(Found([hit(f"s{n}", f"Игра S{n}", kind=Kind.GAME,
                                   source=Source.STEAM) for n in range(3)]),
                        name="steam")
-    gog = FakeSearch(Found([hit("g0", "GOG 0", kind=Kind.GAME,
+    gog = FakeSearch(Found([hit("g0", "Игра G0", kind=Kind.GAME,
                                 source=Source.GOG)]), name="gog")
-    old = FakeSearch(Found([hit(f"o{n}", f"Old {n}", kind=Kind.GAME,
+    old = FakeSearch(Found([hit(f"o{n}", f"Игра O{n}", kind=Kind.GAME,
                                 source=Source.OLD_GAMES) for n in range(2)]),
                      name="old_games")
 
     result = await service(steam, gog, old).external(Kind.GAME, "игра")
 
     assert [one.title for one in result.views] == [
-        "Steam 0", "GOG 0", "Old 0", "Steam 1", "Old 1", "Steam 2",
+        "Игра S0", "Игра G0", "Игра O0", "Игра S1", "Игра O1", "Игра S2",
     ]
 
 
 async def test_a_shorter_answer_does_not_leave_a_hole(sessions, service):
     """Магазины отдают разное число находок — переплетение это переживает."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME, source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Игра S{n}", kind=Kind.GAME, source=Source.STEAM)
                                for n in range(3)]), name="steam")
-    gog = FakeSearch(Found([hit("g0", "GOG 0", kind=Kind.GAME, source=Source.GOG)]), name="gog")
+    gog = FakeSearch(Found([hit("g0", "Игра G0", kind=Kind.GAME, source=Source.GOG)]), name="gog")
 
-    result = await service(steam, gog).external(Kind.GAME, "ведьмак")
+    result = await service(steam, gog).external(Kind.GAME, "игра")
 
     assert [v.source_id for v in result.views] == ["s0", "g0", "s1", "s2"]
 
@@ -384,7 +384,7 @@ async def test_both_stores_refusing_report_both(sessions, service):
                         name="steam")
     gog = FakeSearch(Refusal(source="gog", reason=Reason.RATE), name="gog")
 
-    result = await service(steam, gog).external(Kind.GAME, "ведьмак")
+    result = await service(steam, gog).external(Kind.GAME, "игра")
 
     assert result.views == ()
     assert sorted(r.source for r in result.refusals) == ["gog", "steam"]
@@ -417,7 +417,7 @@ async def test_the_portion_is_cut_before_the_merging(sessions, service):
     краем порции у одного из них: срезав порцию первой, склейка её не увидит и
     ничего не тронет."""
     steam = FakeSearch(Found(
-        [hit(f"s{n}", f"Steam {n}", source=Source.STEAM, kind=Kind.GAME)
+        [hit(f"s{n}", f"Игра S{n}", source=Source.STEAM, kind=Kind.GAME)
          for n in range(SEARCH_SIZE)]
         + [hit("s-late", "Общая игра", source=Source.STEAM, kind=Kind.GAME)]
     ), name="steam")
@@ -434,12 +434,12 @@ async def test_the_portion_is_cut_before_the_merging(sessions, service):
 async def test_a_portion_is_counted_per_source_and_not_per_page(sessions, service):
     """У игр магазина два, и по 20 у каждого — это два запроса, как и сказано в
     спеке. Срез на общей выдаче отдал бы 20 на двоих."""
-    steam = FakeSearch(Found([hit(f"s{n}", f"Steam {n}", kind=Kind.GAME, source=Source.STEAM)
+    steam = FakeSearch(Found([hit(f"s{n}", f"Игра S{n}", kind=Kind.GAME, source=Source.STEAM)
                                for n in range(50)]), name="steam")
-    gog = FakeSearch(Found([hit(f"g{n}", f"GOG {n}", kind=Kind.GAME, source=Source.GOG)
+    gog = FakeSearch(Found([hit(f"g{n}", f"Игра G{n}", kind=Kind.GAME, source=Source.GOG)
                              for n in range(50)]), name="gog")
 
-    result = await service(steam, gog).external(Kind.GAME, "ведьмак")
+    result = await service(steam, gog).external(Kind.GAME, "игра")
 
     assert len(result.views) == 2 * SEARCH_SIZE
 

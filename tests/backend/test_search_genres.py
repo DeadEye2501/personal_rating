@@ -30,7 +30,7 @@ async def test_a_compound_genre_unfolds_into_two(sessions, reference, service):
         Found([hit(genre_ext_ids=((GenreSource.TMDB, "10759"),))])
     ))
 
-    result = await search.external(Kind.SERIES, "andor")
+    result = await search.external(Kind.SERIES, "интерстеллар")
 
     assert [g.name for g in result.views[0].genres] == ["Боевик", "Приключения"]
 
@@ -42,7 +42,7 @@ async def test_overlapping_identifiers_do_not_duplicate_a_genre(
         (GenreSource.TMDB, "10759"), (GenreSource.TMDB, "28"),
     ))])))
 
-    result = await search.external(Kind.SERIES, "andor")
+    result = await search.external(Kind.SERIES, "интерстеллар")
 
     assert [g.name for g in result.views[0].genres] == ["Боевик", "Приключения"]
 
@@ -156,6 +156,6 @@ async def test_the_reference_is_asked_once_per_space(sessions, reference, servic
         for n in range(5)
     ]), name="gog")
 
-    await service(steam, gog).external(Kind.GAME, "ведьмак")
+    await service(steam, gog).external(Kind.GAME, "игра")
 
     assert asked == [GenreSource.STEAM, GenreSource.GOG]

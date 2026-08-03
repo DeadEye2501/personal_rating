@@ -15,7 +15,7 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (22)
 
-## backend — 84 модулей
+## backend — 85 модулей
 
 ### `backend/app.py` — 182 строк
 
@@ -407,6 +407,18 @@
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
+### `backend/service/relevance.py` — 71 строк
+
+Строка выдачи обязана знать, о чём её спросили.
+
+Зависит от: `backend.model`, `backend.service.titles`
+
+Отдаёт наружу: `relevant`
+
+- `def _asked(query: str) -> set[str]` (7)
+- `def _knows(hit: SearchHit, asked: set[str]) -> bool` (11)
+- `def relevant(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (30)
+
 ### `backend/service/removal.py` — 55 строк
 
 Удаление карточки из обоих файлов базы, двумя путями.
@@ -416,17 +428,18 @@
 - `async def discard_card(library: LibraryRepository, posters: PosterService, removed: RemovedRepository, item_id: int) -> None` (19)
 - `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (24)
 
-### `backend/service/search.py` — 126 строк
+### `backend/service/search.py` — 146 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.service.merging`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.service.merging`, `backend.service.relevance`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `backend.unique`
 
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (18)
 - `class SearchParts` (12)
-- `class SearchService` (62)
+- `class SearchService` (81)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
-  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (40)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (34)
+  - `async def _narrowed(self, answers: list[list[SearchHit]], together: list[SearchHit], query: str) -> list[SearchHit]` (24)
 
 ### `backend/service/series.py` — 62 строк
 
@@ -1377,7 +1390,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 95 модулей
+## tests — 96 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -2026,7 +2039,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_removed.py` — 211 строк
+### `tests/backend/test_relevance.py` — 162 строк
+
+Строка выдачи обязана знать, о чём её спросили.
+
+Зависит от: `backend.model`, `backend.service.relevance`, `backend.service.search`, `tests.conftest`, `tests.wiring`
+
+Тестов: 9
+
+- `def row(title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (5)
+- `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)
+
+### `tests/backend/test_removed.py` — 212 строк
 
 Удалённое не возвращается: карточка уходит, а память о ней остаётся.
 

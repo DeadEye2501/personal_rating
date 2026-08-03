@@ -181,16 +181,17 @@ async def test_the_removal_reaches_every_answer_and_not_only_the_first(
     Игры взяты разные нарочно. С одинаковыми названиями дефект прячет склейка:
     строка, которую отсев пропустил, слипается со своей парой и исчезает как
     проигравшая — то есть на экране всё верно по случайной причине."""
-    await removed.remember(a_game("1207658691", "Arcanum", source=Source.GOG))
+    await removed.remember(
+        a_game("1207658691", "Fallout Tactics", source=Source.GOG))
     steam = FakeSearch(Found([
         hit("38410", "Fallout 2", source=Source.STEAM, kind=Kind.GAME),
     ]), name="steam")
     gog = FakeSearch(Found([
-        hit("1207658691", "Arcanum", source=Source.GOG, kind=Kind.GAME),
+        hit("1207658691", "Fallout Tactics", source=Source.GOG, kind=Kind.GAME),
     ]), name="gog")
 
     result = await search_service(sessions, steam, gog).external(Kind.GAME,
-                                                                "игра")
+                                                                "fallout")
 
     assert [one.title for one in result.views] == ["Fallout 2"]
 
