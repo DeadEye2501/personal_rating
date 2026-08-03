@@ -20,6 +20,8 @@ dist/
 *.spec
 node_modules/
 *.exe
+*.png
+*.ico
 
 # Логи
 *.log
