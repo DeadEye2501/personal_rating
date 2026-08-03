@@ -1,0 +1,66 @@
+{
+ "id": 1207664663,
+ "title": "The Witcher 3: Wild Hunt",
+ "purchase_link": "https://www.gog.com/en/checkout/manual/the_witcher_3_wild_hunt",
+ "slug": "the_witcher_3_wild_hunt",
+ "content_system_compatibility": {
+  "windows": true,
+  "osx": false,
+  "linux": false
+ },
+ "languages": {
+  "ar": "العربية",
+  "br": "Português do Brasil",
+  "cn": "中文",
+  "cz": "český",
+  "de": "Deutsch",
+  "en": "English",
+  "es": "español",
+  "es_mx": "Español (AL)",
+  "fr": "français",
+  "hu": "magyar",
+  "it": "italiano",
+  "jp": "日本語",
+  "ko": "한국어",
+  "pl": "polski",
+  "ru": "русский",
+  "tr": "Türkçe",
+  "zh": "中文(繁體)"
+ },
+ "links": {
+  "purchase_link": "https://www.gog.com/en/checkout/manual/the_witcher_3_wild_hunt",
+  "product_card": "https://www.gog.com/game/the_witcher_3_wild_hunt",
+  "support": "https://www.gog.com/support/the_witcher_3_wild_hunt",
+  "forum": "https://www.gog.com/forum/the_witcher_3_wild_hunt"
+ },
+ "in_development": {
+  "active": false,
+  "until": null
+ },
+ "is_secret": false,
+ "is_installable": false,
+ "game_type": "pack",
+ "is_pre_order": false,
+ "release_date": "2015-05-19T01:00:00+0200",
+ "images": {
+  "background": "//images-1.gog-statics.com/a31cc28555c4e773d8962b993f9d1dd62aa6895f2077a5d755eb8a01ed0bba91.jpg",
+  "logo": "//images-4.gog-statics.com/45a0d9d39f01bd10a9d967194d81e0660da0cd93038501be48b32ac4667a8591_glx_logo.jpg",
+  "logo2x": "//images-3.gog-statics.com/45a0d9d39f01bd10a9d967194d81e0660da0cd93038501be48b32ac4667a8591_glx_logo_2x.jpg",
+  "sidebarIcon": "//images-3.gog-statics.com/b42b5d2814d11c06f01558e313b23218029c4a845f1e9f1b9c80e0fc4eb22974_sbicon.png",
+  "sidebarIcon2x": "//images-2.gog-statics.com/b42b5d2814d11c06f01558e313b23218029c4a845f1e9f1b9c80e0fc4eb22974_sbicon_2x.png",
+  "menuNotificationAv": "//images-1.gog-statics.com/b42b5d2814d11c06f01558e313b23218029c4a845f1e9f1b9c80e0fc4eb22974_menu_notification_av.png",
+  "menuNotificationAv2": "//images-1.gog-statics.com/b42b5d2814d11c06f01558e313b23218029c4a845f1e9f1b9c80e0fc4eb22974_menu_notification_av2.png",
+  "icon": "//images-2.gog-statics.com/b42b5d2814d11c06f01558e313b23218029c4a845f1e9f1b9c80e0fc4eb22974.png"
+ },
+ "dlcs": {
+  "products": [
+   {
+    "id": 2021941787,
+    "link": "https://api.gog.com/products/2021941787",
+    "expanded_link": "https://api.gog.com/products/2021941787"
+   }
+  ],
+  "all_products_url": "https://api.gog.com/products?ids=2021941787",
+  "expanded_all_products_url": "https://api.gog.com/products?ids=2021941787"
+ }
+}

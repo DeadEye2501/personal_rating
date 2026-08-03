@@ -1,0 +1,778 @@
+
+<!DOCTYPE html>
+<html lang="ru" prefix="og: http://ogp.me/ns#">
+<head>
+    <title>Bad Boys II (2004 - Windows). Ссылки, описание, обзоры, скриншоты, видеоролики на Old-Games.RU</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=1336">
+<meta name="robots" content="all"/>
+<meta name="keywords" content="Bad Boys II, скачать, игры, старые игры, old, games, download, играть, abandonware, форум, forum, бесплатно, free"/>
+<meta name="description" content="Bad Boys II. Обзоры, описания, ссылки на скачивание, скриншоты, видеоролики."/>
+<meta name="Publisher-URL" content="https://www.old-games.ru"/>
+<!-- <meta property="fb:admins" content="100001450308155" /> -->
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+<link rel="apple-touch-icon" type="image/png" href="/img/small_og_logo.png">
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новости"
+      href="https://feeds.feedburner.com/Old-games-ru-news"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые игры"
+      href="https://feeds.feedburner.com/Old-games-ru"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые файлы"
+      href="https://feeds.feedburner.com/Old-games-ru-files"/>
+<link rel="alternate" type="application/rss+xml" title="Old-Games.RU. Новые обзоры игр"
+      href="https://feeds.feedburner.com/Old-games-ru-articles"/>
+<link rel="stylesheet" type="text/css" href="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/og-styles.css,js/jqueryui/jquery-ui.min.css,js/jqueryui/jquery-ui.structure.min.css,js/jqueryui/jquery-ui.theme.min.css,js/select2/select2.css,js/uploadifive/uploadifive.css,js/fancybox2/jquery.fancybox.css,js/fancybox2/helpers/jquery.fancybox-thumbs.css" /><link rel="stylesheet" type="text/css" href="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/font-awesome/css/fa-svg-with-js.css,js/notification/notification.css" /><script type="text/javascript" src="/js/prebid-ads.js"></script>
+<script defer type="text/javascript" src="/js/font-awesome/js/fa-solid.min.js"></script>
+<script defer type="text/javascript" src="/js/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/jquery/jquery.min.js,js/jqueryui/jquery-ui.min.js,js/jqueryui/jquery.ui.datepicker-ru.min.js,js/notification/jquery.notification.min.js,js/jquery.simplemodal.1.4.4.min.js,js/raty-2.5.2/jquery.raty.min.js,js/select2/select2.min.js,js/select2/select2_locale_ru.js"></script><script type="text/javascript" src="/scripts/minify.php?a54e9456e508244129fdc3602d45f3fc&amp;files=js/uploadifive/jquery.uploadifive.min.js,js/fancybox2/jquery.fancybox.pack.js,js/fancybox2/helpers/jquery.fancybox-thumbs.js,js/js.cookie.min.js,js/og-scripts.js,js/og-game-actions.js"></script>
+
+    <link rel="canonical" href="https://www.old-games.ru/game/11297.html"/>
+    <meta property="og:image" content="https://www.old-games.ru/games/pc/bad_boys_2/bad_boys_2_cover.jpg" />
+    <meta property="og:site_name" content="Old-Games.RU" />
+    <meta property="og:title" content="Bad Boys II на Old-Games.RU" />
+    <meta name="title"
+          content="Bad Boys II на Old-Games.RU"/>
+    <link rel="image_src" href="/games/pc/bad_boys_2/bad_boys_2_cover.jpg"/>
+    <script type="text/javascript" async>
+        $(document).ready(function () {
+            $("a.gamescreens").fancybox({
+                helpers: {
+                    overlay: {
+                        css: {
+                            'background': 'rgba(170, 170, 170, 0.5)'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<!-- Header begin -->
+<header id="pageHeader">
+    <div class="header">
+                    <a class="lfloat" href="/" title="Скачать старые игры с Old-Games.RU">
+                <img src="//static.old-games.ru/img/logos/Blood1_Live.gif" width="253" height="68" alt="Бесплатные старые игры"/>
+            </a>
+                <!--noindex-->
+                <!--/noindex-->
+    </div>
+    <!--noindex-->
+<div style="display:none;">
+    <!--LiveInternet counter-->
+    <script type="text/javascript"><!--
+        new Image().src = "//counter.yadro.ru/hit?r" + escape(document.referrer) + ((typeof(screen) == "undefined") ? "" : ";s" + screen.width + "*" + screen.height + "*" + (screen.colorDepth ? screen.colorDepth : screen.pixelDepth)) + ";u" + escape(document.URL) + ";h" + escape(document.title.substring(0, 80)) + ";" + Math.random();
+        //-->
+    </script>
+    <!--/LiveInternet-->
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-260122-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</div>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" >
+    (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+            try {
+                w.yaCounter2036 = new Ya.Metrika({
+                    id:2036,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true
+                });
+            } catch(e) { }
+        });
+
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+            d.addEventListener("DOMContentLoaded", f, false);
+        } else { f(); }
+    })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/2036" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
+<!--/noindex-->
+    <div class="headerpanel">
+        <div class="userlogin"><a href="#" id="loginform">Вход / Регистрация</a></div>
+        <div class="lang">
+            <!--noindex-->
+                            <a href="/?language=eng" title="English version"><img
+                            src="//static.old-games.ru/img/eng.png"
+                            width="22" height="16" alt="ENG"/></a>
+                            <!--/noindex-->
+        </div>
+        <nav class="menupanel">
+            <ul id="nav">
+                <li class="noborderli"><a href="/catalog/" title="Каталог старых игр">Каталог игр</a></li>
+                <li>
+                    <div id="searchblock">
+                        <div id="quicksearchform">
+                            <form method="get" action="/catalog/">
+                                <input type="text" placeholder="Введите название игры..." id="quicksearchgame"
+                                       name="gamename" value="">
+                            </form>
+                        </div>
+                        <a class="advitems" title="Расширенный поиск" href="/search/">
+                            <i class="fas fa-sliders-h">
+                            </i>
+                        </a>
+                        <a class="advitems" title="Свойства игр" href="/properties/">
+                            <i class="fas fa-tags">
+                            </i>
+                        </a>
+                    </div>
+                </li>
+                <li><a href="/" title="Новости сайта">Новости</a></li>
+                <li><a href="/forum/" title="Форум о старых играх">Форум</a></li>
+                <li><a href="/wiki/" title="Энциклопедия о старых играх и железе">Wiki</a></li>
+                <li><a href="/articles/" title="Различные статьи и обзоры">Статьи</a></li>
+                <li><a href="/utils/" title="Различные файлы для старых игр">Файлы</a></li>
+                <li><a href="#" title="Информация" class="information">Информация <img
+                                src="//static.old-games.ru/img/arrow-down.png" width="15"
+                                height="13" class="arrow-down" alt=""/></a>
+                    <ul>
+                        <li><a href="/about/" title="О нашем сайте">О проекте</a></li>
+                        <li><a href="/faq/" title="FAQ по старым играм">FAQ</a></li>
+                        <li><a href="/donate/" title="Помощь сайту">Поддержите нас!</a></li>
+                        <li><a href="/about/history/" title="История проекта">История проекта</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="dialog-form" style="display:none;" title="Авторизация">
+            <div class="loginbox">
+            <form action="/forum/login/login" method="post">
+                <label for="navbar_username">Логин:</label>
+                <input type="text" id="navbar_username" name="login">
+                <label for="navbar_login">Пароль:</label>
+                <input type="password" id="navbar_login" name="password">
+                <label for="cb_cookieuser_navbar">
+                    <input name="remember" type="checkbox" id="cb_cookieuser_navbar" value="1"
+                           checked="checked"/>Запомнить                </label>
+
+                <div class="centeralign">
+                    <input type="submit" value="Войти"/>
+                </div>
+                <br/>
+                <input type="hidden" name="cookie_check" value="1"/>
+                <input type="hidden" name="_xfToken" value=""/>
+
+                <div class="centeralign">
+                    <a href="/forum/login/"
+                       title="Регистрация на форуме старых игр">Регистрация</a> - <a
+                            href="/forum/lost-password/">Напомнить пароль</a>
+                </div>
+            </form>
+        </div>
+        </div>
+<!-- Header end -->
+<!-- Main begin -->
+<div class="main">
+    <main id="main">
+        <!-- Content center begin -->
+            <div class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <img src="//static.old-games.ru/img/path_bullet.gif" width="16" height="19" alt=""/>
+        <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" title="старые игры скачать" href="/"><span itemprop="name">Old-Games.RU</span></a>
+            <meta itemprop="position" content="1"/>
+        </span>
+                            <span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                        <img src="//static.old-games.ru/img/slash.png" width="19" height="19"
+                             alt="/"/>
+                        <a itemprop="item" href="/catalog/" title="Каталог игр">
+                            <span itemprop="name">Каталог игр</span>
+                        </a><meta itemprop="position" content="2"/>
+                    </span>
+                                        <img src="//static.old-games.ru/img/slash.png" width="19" height="19"
+                         alt="/"/>
+                    <span class="active-link">Bad Boys II</span>
+                        </div>
+    
+        <!-- Information -->
+            <div class="main-content" itemscope itemtype="http://schema.org/SoftwareApplication">
+        <link itemprop="applicationCategory" href="https://schema.org/GameApplication"/>
+        <div><h1 class="game_title" itemprop="name">Bad Boys II</h1>
+            <span class="game_alt_names">Bad Boys: Miami Takedown</span><br /><span class="game_alt_names">Плохие парни II</span><br />        </div>
+        <!-- Game begin -->
+
+        
+                <table class="gameinfo">
+            <tr>
+                <td class="game-cover" rowspan="2">
+                    <div class="game_info_cover" style="position: relative">
+                        <img src="/games/pc/bad_boys_2/bad_boys_2_cover.jpg" width="120"
+                             alt="Bad Boys II"
+                             title="Bad Boys II"/>
+                    </div>
+                </td>
+                <td style="vertical-align: top;">
+                    <table id="releaseinfo">
+                        <tr>
+                            <td class="head middlesmall">Жанр:</td>
+                            <td align="left" class="middlesmall button">
+                                                                <a class="orangelink" href="/catalog/?genre=8"><span itemprop="applicationSubCategory">Action</span></a>                            </td>
+                        </tr>
+                                                    <tr>
+                                <td class="head middlesmall">Разработчик:</td>
+                                <td align="left" class="middlesmall button">
+                                                                        <a class="orangelink" href="/catalog/?developerCompany=533">Blitz Games</a>                                </td>
+                            </tr>
+                                                        <tr>
+                                <td class="head middlesmall">Издатель:</td>
+                                <td align="left" class="middlesmall button">
+                                                                        <a class="orangelink" href="/catalog/?publisherCompany=2556">Empire Interactive</a>                                </td>
+                            </tr>
+                                                    <tr>
+                            <td class="head middlesmall">Год выхода:</td>
+                            <td align="left" class="middlesmall button">
+                                <a class="orangelink"
+                                   href="/catalog/?year=2004&amp;year2=2004">2004</a>
+                                <meta itemprop="description"
+                                      content="Bad Boys II, Год выхода: 2004"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="head middlesmall">Платформа:</td>
+                            <td align="left" class="middlesmall button">
+                                <a class="orangelink"
+                                   href="/catalog/?platform=2"><span
+                                            itemprop="operatingSystem">Windows</span></a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align: bottom;">
+                    <div class="rating-box">
+                        <b>Оценка рецензента:</b><br/>
+                                                    <img src="//static.old-games.ru/img/rating/bigstar7.png"
+                                 alt="Оценка рецензента - 7 из 10"
+                                 title="Оценка рецензента - 7 из 10"
+                                 height="22" width="115"/>
+                                                </div>
+                    <div class="rating-box">
+                        <b>Оценка пользователей:</b><br/>
+                        <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+	                    <meta itemprop="bestRating" content="10"/>
+                        <meta itemprop="ratingCount" content="2"/>
+	                    <meta itemprop="ratingValue" content="8"/>
+                        <img src="//static.old-games.ru/img/rating/bigstar8.png"
+                             height="22"
+                             width="115"
+                             alt="Оценка пользователей - 7.50 из 10"
+                             title="Оценка пользователей - 7.50 из 10. Всего голосов: 2"/>
+	                    </span>
+                    </div>
+                </td>
+            </tr>
+
+        </table>
+
+        <div class="bookmark-icon-block">
+            <ul class="bookmark-icon-list">
+                                    <li>
+                        <div class="bookmark-icon-count">5</div>
+                        <div id="markicon1" title="Добавить в любимые игры"
+                             class="user-not-registered bookmark-icon"
+                             data-bookmarktype="1"
+                             style="background-image: url('//static.old-games.ru/img/bookmark-icon-favorites.png');"></div>
+                    </li>
+                                        <li>
+                        <div class="bookmark-icon-count">5</div>
+                        <div id="markicon2" title="Добавить в пройденные игры"
+                             class="user-not-registered bookmark-icon"
+                             data-bookmarktype="2"
+                             style="background-image: url('//static.old-games.ru/img/bookmark-icon-completed.png');"></div>
+                    </li>
+                                        <li>
+                        <div class="bookmark-icon-count">24</div>
+                        <div id="markicon3" title="Добавить в закладки"
+                             class="user-not-registered bookmark-icon"
+                             data-bookmarktype="3"
+                             style="background-image: url('//static.old-games.ru/img/bookmark-icon-bookmarks.png');"></div>
+                    </li>
+                                </ul>
+        </div>
+    </div>
+
+    <div class="game_tabs">
+
+        <form id="bookmarkform" method="POST">
+            <input type="hidden" name="gameid" value="11297"/>
+            <input type="hidden" name="securitytoken" value="880f33af2cba8a84020cd2f6e34ebd5b"/>
+        </form>
+        <div class="lfloat game-actions" style="position: relative">
+            Действия<img src="//static.old-games.ru/img/dropdown-action.png"
+                                        width="9" height="14" alt=""/>
+        </div>
+        <div class="game-actions-droplist">
+            <ul>
+                                    <li>
+                        <a id="mark1"
+                           class="user-not-registered bookmark-link" href="#">
+                            <img src="//static.old-games.ru/img/bookmark-small-favorites.png"
+                                 alt="" width="13" height="13"/>
+                            <span>Добавить в любимые игры</span>
+                            <input type="hidden" name="bookmarktype" value="1"/>
+                        </a>
+                    </li>
+                                        <li>
+                        <a id="mark2"
+                           class="user-not-registered bookmark-link" href="#">
+                            <img src="//static.old-games.ru/img/bookmark-small-completed.png"
+                                 alt="" width="13" height="13"/>
+                            <span>Добавить в пройденные игры</span>
+                            <input type="hidden" name="bookmarktype" value="2"/>
+                        </a>
+                    </li>
+                                        <li>
+                        <a id="mark3"
+                           class="user-not-registered bookmark-link" href="#">
+                            <img src="//static.old-games.ru/img/bookmark-small-bookmarks.png"
+                                 alt="" width="13" height="13"/>
+                            <span>Добавить в закладки</span>
+                            <input type="hidden" name="bookmarktype" value="3"/>
+                        </a>
+                    </li>
+                    
+                <li style="padding: 0;">
+                    <hr class="darkgrayline"/>
+                </li>
+                <li><a href="#" class="user-not-registered" data-id="11297"><img
+                                src="//static.old-games.ru/img/small-plus.png" alt=""
+                                width="13"
+                                height="13"/>Добавить скриншоты</a></li>
+                <li><a href="#" class="user-not-registered" data-id="11297"><img
+                                src="//static.old-games.ru/img/small-plus.png" alt=""
+                                width="13"
+                                height="13"/>Добавить видеоролик</a></li>
+                                    <li><a href="#" class="user-not-registered" data-id="11297"><img
+                                    src="//static.old-games.ru/img/small-plus.png" alt=""
+                                    width="13"
+                                    height="13"/>Добавить обложки</a></li>
+                                <li><a href="#" class="user-not-registered" data-content-id="11297"
+                       data-content-type="game"><img
+                                src="//static.old-games.ru/img/small-plus.png" alt=""
+                                width="13"
+                                height="13"/>Дополнить информацию</a></li>
+            </ul>
+
+        </div>
+
+        <ul class="tabs rfloat">
+            <li class="current"><a href="/game/11297.html">Описание</a></li><li><a href="/game/download/11297.html">Файлы</a></li><li><a href="/game/screenshots/11297.html">Скриншоты (48)</a></li><li><a href="/game/video/11297.html">Видео (2)</a></li><li><a href="/game/covers/11297.html">Обложки (17)</a></li>        </ul>
+        <div class="clear"></div>
+    </div>
+    
+        <!-- Description -->
+        <div class="main-content">
+            <div class="game_main_container">
+                <section class="game_main_row">
+                    <aside class="game_main_left game_small_screens">
+                                                                                    <a class="gamescreens"
+                                   title="Скриншот: Bad Boys II"
+                                   data-fancybox-group="screen"
+                                   href="/games/pc/bad_boys_2/screenshots/11297_608efee1870e5.jpg" target="_blank">
+                                    <img width="120" src="/games/pc/bad_boys_2/thumbs/thumb_11297_608efee1870e5.jpg"
+                                         title="Скриншот: Bad Boys II"
+                                         alt="[Скриншот: Bad Boys II]"/>
+                                </a>
+                                <br/>
+                                                                <a class="gamescreens"
+                                   title="Скриншот: Bad Boys II"
+                                   data-fancybox-group="screen"
+                                   href="/games/pc/bad_boys_2/screenshots/11297_608eff897d273.jpg" target="_blank">
+                                    <img width="120" src="/games/pc/bad_boys_2/thumbs/thumb_11297_608eff897d273.jpg"
+                                         title="Скриншот: Bad Boys II"
+                                         alt="[Скриншот: Bad Boys II]"/>
+                                </a>
+                                <br/>
+                                                                <a class="gamescreens"
+                                   title="Скриншот: Bad Boys II"
+                                   data-fancybox-group="screen"
+                                   href="/games/pc/bad_boys_2/screenshots/11297_608eff284eff4.jpg" target="_blank">
+                                    <img width="120" src="/games/pc/bad_boys_2/thumbs/thumb_11297_608eff284eff4.jpg"
+                                         title="Скриншот: Bad Boys II"
+                                         alt="[Скриншот: Bad Boys II]"/>
+                                </a>
+                                <br/>
+                                                                                </aside>
+                    <article>
+                        <div id="reviewtext">
+                            <div style="text-align: right"><i>Bad boys, bad boys watcha gonna do,<br />
+Watcha gonna do when they come for you</i><br />
+<br />
+<i>When you were eight and you had bad traits,<br />
+You go to school and learn the golden rule,<br />
+So why are you acting like a bloody fool,<br />
+If you get hot then you must get cool.</i><br />
+<br />
+<i>Bad boys, bad boys watcha gonna do,<br />
+Watcha gonna do when they come for you</i><br />
+ <br />
+Inner Circle&#8203;</div><br />
+Игры по кинолицензиям – огромный пласт индустрии, огромный и часто безрадостный. Короткие сроки, малые вложения, низкие требования к навыкам разработчиков и общая легкомысленность отношения к данному сопутствующему товару не могут не сказаться на конечном результате. Сколько примеров бесцельной растраты ресурсов знает история! Но – как исключение из правила – случается и обратное. Впрочем, редкая птица долетит до середины Дне… ой, то есть до уровня <b>The Chronicles of Riddick: Escape from Butcher Bay</b>. И наш сегодняшний экспонат <b>Bad Boys II</b> (известная также как <b>Bad Boys: Miami Takedown</b>), к слову – одногодка с Риддиком, как раз из тех, кого, с одной стороны, сильно не похвалишь, а с другой – особо и не выругаешь.<br />
+<br />
+За основу идеи взят свежий на тот момент фильм Майкла Бэя «Плохие парни 2» – культовый в определённых кругах комедийный боевик, идеальный тупоголовый блокбастер для просмотра в кинозалах. На роль ремесленников была избрана английская студия Blitz Games, чей послужной список не впечатлял и на тот момент, не впечатляет он и сейчас, хотя компания существует по сей день.<br />
+<br />
+Добро пожаловать в будни двух крутых чернокожих полицейских из Майами – Майка Лори и Маркуса Бернетта. Ребята работают в местном подразделении по борьбе с распространением наркотиков TNT (Tactical Narcotics Team) и ведут свои расследования по принципу «shoot first, ask questions later», при этом устраивая перепалки, в которых комментируют происходящее и переругиваются друг с другом. Связь сюжета игры с фильмом неочевидна, – и для тех, кто пропустил основное зрелище, история ведётся с чистого листа. Но знакомые с первоисточником заметят некоторые упоминания, намекающие на то, что <b>Bad Boys II</b> продолжает повествование. Грубо говоря, в фильме братва разделалась с одним из главных распространителей наркотиков в Майами, а в игре та же самая участь постигла поставщика – колумбийского наркобарона Тулио Мендозу. Или всё было не так?<br />
+<br />
+На самом деле буквоеды, знакомые и с фильмом и с игрой, легко рассыплют этот карточный домик из домыслов. Впрочем, они и сами легко убедятся в вероятности следующего умозаключения: британцы работали в запертом тёмном сыром подвале за еду и были выпущены на свободу только после сдачи тиража, и потому ленту они даже не видели. Иначе как объяснить то, что модели Маркуса Бернетта, чью роль исполнил в кино Мартин Лоуренс, нарисовали лицо Уилла Смита, который, в свою очередь, сыграл Майка Лори. Последнему же дали физиономию, не похожую ни на одного из актёров, засветившихся в ленте. К тому же Майк должен быть богатеньким пижоном и ловеласом, что в самой игре заметно лишь в паре коротеньких диалогов, а внешне не проявляется вообще никак, поскольку герой бегает в обычных джинсах и белой футболке, которые, может быть, и от Версаче, но абсолютно не отличаются от тех, что висят в любом секонд-хенде.<br />
+<br />
+Сюжет <b>Bad Boys II</b> – даже в сравнении с киноверсией – совсем уж не блещет логикой: иногда кажется, что парни просто штурмуют все дома в округе подряд, а не ведут расследование. Но спасают ситуацию грамотно срежиссированные и качественно поставленные видеоролики, а также живые и бойкие диалоги. Банально интересно, какую же ещё дурь отчебучат наши бравые полисмены.<br />
+<br />
+Внешность игры не чета уже упомянутому Риддику – разница примерно в одно поколение консолей. Но то, что было в руках разработчиков, использовано достаточно грамотно и умело. Великих красот не ждите, но детализация окружения разумно достаточная – с учётом, конечно же, платформ, для которых игра разрабатывалась (к слову, разработчиками заявлена поддержка Windows 98 во всех её ипостасях). Потому улицы и пляжи за пределами уровня слишком пустынны, текстуры пейзажей в окнах предельно картонны, а бассейн на одной из крыш, например, огорожен невидимыми стенами. Бюджетность, что с них взять. С другой стороны, для кроссплатформы здесь потрясающая интерактивность уровней: крушить, ломать и разбивать можно огромное количество объектов. А в одном месте авторы просто феноменально заморочились: в погребе одного из последних этапов стоят бочки, которые заполнены вином, и если проделать в одной из них отверстие, то наружу потечёт красная жидкость и будет выплёскиваться до уровня этого отверстия, после чего струя иссякнет; повторный расстрел в более высокую точку не активирует анимации, ведь там ничего и не должно быть, – тогда как, если сделать это ниже предполагаемого уровня, на пол снова польётся поток живительной влаги.<br />
+<br />
+Игровой процесс нашей стрелялки от третьего лица, по всей видимости, немножко срисован с <b>Mafia: The City of Lost Heaven</b>, если судить по медленному перекату и нависшему ровно над головой протагониста, словно нимб, перекрестию прицела. Впрочем, относительно этой формулы есть некоторое новшество – система укрытий. Увы, реализована она откровенно неудобно. Не ждите динамики <b>kill.switch</b>, – здесь всё ровно наоборот. Герой жёстко прилипает к препятствию; высовывается с видом от первого лица быстро, но прячется обратно очень медленно, часто получая болезненные дозы свинца; переход от одного укрытия к другому возможен, но реализован в редких случаях; из-за пассивности врагов всё это превращается даже не в виртуальный тир, а в странную и скучную разновидность Whac-a-mole; а главное – всё это не нужно, ведь играть допустимо в совершенно ином стиле.<br />
+<br />
+Во-первых, можно прятаться за теми же препятствиями, но не пользуясь новаторской находкой авторов, что делает персонажа гораздо мобильнее, в то же время добавляя точности атакам. Во-вторых, никто не запрещает просто ломиться вперёд с пушкой наголо – при достаточной реакции (да ещё и подкреплённой некоторым знанием) приходовать противников можно ощутимо быстрее. Последний стиль прохождения, как ни странно, даже при наплевательском отношении к собственной шкуре эффективнее осторожного, – хотя в последнем акте враги станут бить больнее, так что нужно быть расторопнее и осмотрительнее.<br />
+<br />
+Общая сложность игры всё равно невысока, хотя начинать почти каждый уровень приходится без брони (а регенерации здоровья здесь нет) и с одним лишь табельным оружием, которое имеет бесконечный боезапас и занимает одну из двух ячеек, откуда не может быть удалено ни при каких обстоятельствах. Но полицейский «кольт», скажу по секрету, – фактически предел мечтаний наших «плохих парней», потому как с ним вполне реально пройти все этапы, кроме, может быть, схваток с боссами, реализованных чаще как своеобразные головоломки. Да и самые отвязные и мастеровитые игроки, вполне возможно, осилят и это испытание.<br />
+<br />
+Остальной арсенал, из которого можно выбрать лишь одну единицу, не слишком велик, но охватывает собой почти все архетипы шутеров: мощный, но медленный револьвер, пара дробовиков, столько же пистолетов-пулемётов, несколько штурмовых и одна снайперская винтовки. Если есть выбор, то из всего этого имеет смысл брать лишь автоматическое оружие; правда, большая часть его бьёт в белый свет как в копеечку, – таковы реалии типично консольной баллистики. Впрочем, и дистанции перестрелок здесь также характерны для приставочных игр, то есть никак не больше пятидесяти метров, а если всё же больше, значит, это снайперская миссия. Есть ещё гранаты, которые обладают весьма малым радиусом поражения, низкой дальностью броска и общим неудобством использования, а потому чаще пылятся в кармане и вынимаются лишь по особой нужде.<br />
+<br />
+Последние аргументы предстоит испытывать на самых обыкновенных людях, бандитах разнообразной наружности: предположительно гаитянской шпане, плохих русских (ну как же без них!) и столь же нехороших колумбийцах. Разница между индивидами определяется только их вооружением, – потому за всю игру нам фактически противостоит лишь один тип супостатов. Искусственный Идиот не отличается ни умом, ни сообразительностью, хотя если присмотреться, то в его действиях заметны некие зачатки осмысленности, к несчастью быстро нивелирующиеся склонностью к зависанию и общей глючностью. Как уже упоминалось, враги склонны к пассивному времяпрепровождению за каким-либо препятствием, откуда они периодически высовывают нос, чтобы накормить героев свинцом. При этом они в лучших традициях TPS’ов с укрытиями не могут спрятаться так, чтобы не были видны их конечности, буквально напрашиваясь на то, чтобы им их отстрелили. Также часто ребята любят стоять столбом на открытом пространстве, целясь куда-нибудь – совсем не обязательно в последнюю виденную ими позицию героя. Иногда им вообще всё до лампочки, даже то, что их расстреливают, – но чаще они пытаются отвечать; правда, спустя короткий промежуток времени теряют цель, если та не показывается на глаза, чем облегчают свою участь. А уж когда они вбегают в помещение и со всех ног несутся к понравившемуся укрытию, то вообще представляют собой идеальную мишень. Хорошо хоть авторы не пожалели усилий на анимацию движений супостатов, а пантомимы последних секунд жизни выглядят даже красиво и всегда увязаны с местом смертельного ранения.<br />
+<br />
+Учтите, главных героев в игре двое, – соответственно, в ряде случаев за управляемым персонажем будет таскаться его напарник. За ним полагается присматривать, – но, во-первых, он довольно живуч и способен подавить любое сопротивление самостоятельно, а во-вторых, нередко помощи от него просто не дождаться: товарищ прячется в укромном уголке, предпочитая не ввязываться в перестрелку. Но вдвоём бродить предстоит нечасто, – напарник преимущественно будет балаболить по рации. Выбора же героев игра не предоставляет, предпочитая регулярно их тасовать в начале уровней, что несущественно, ибо разницу между ними не усмотреть и через микроскоп.<br />
+<br />
+Что касается архитектуры этапов, то в <b>Bad Boys II</b> царит реализм – уровни максимально приближены к тому, что могло бы быть в жизни. Соответственно, не ждите безумных полётов фантазии или вывихов мозга – скорее даже наоборот. Если бы не работа дизайнеров над общим антуражем, позволившая частично скрыть примитивность архитектуры, то можно было бы даже приуныть. Но этапы ещё и весьма непродолжительны, отчего просто не дают успеть заскучать, – игрок проносится через них на повышенной передаче. А чтобы исключить любые попытки блуждания, а заодно снизить нагрузку на оперативную память вычислительного устройства, на них реализована привычная нам уже сейчас, но в 2004 году нечасто встречающаяся особенность. Дело в том, что уровень грузится не целиком, а небольшими кусочками по мере необходимости и продвижения игрока – и пройденные части из памяти убираются, а двери в них запираются, не давая вернуться в начало. Так что если игрок забыл что-то взять или осмотреть, то – извините, начинайте заново. Потому – только вперёд. Впрочем, встреча с титрами не заставит себя долго ждать, ведь все пять актов повествования равномерно укомплектованы в тринадцать уровней.<br />
+<br />
+Да, всего лишь тринадцать коротких этапов. Ну не считать же обучающий уровень в тире за отдельный, тем более что он опционален. Хотя разработчики предлагают в нём подзадержаться, выдавая немаленький список оружейных испытаний. Но кому это надо? Вообще-то мы сюда не за этим пришли. Впрочем, краткость сюжетной кампании авторы пытаются компенсировать системой рейтингов, выдаваемых за стиль прохождения игры. Хотите быть Perfect Cop’ом? Действуйте внимательно, собирайте улики, старайтесь арестовать, а не убить преступников, для чего здесь реализована функция выбивания оружия из рук; правда, стрелять нужно точно в огнестрел – ранить в верхние конечности почему-то бесполезно. Или желаете быть настоящим Bad Boy’ем? Ну тогда крушите всё направо и налево, не просто убивайте, а казните негодяев (то есть нужно сначала обезоружить, а потом хладнокровно отправить к праотцам, – ужас!) и всё в том же духе. Зачем такие сложности? Ну вы же помните, что игра консольная, а на консолях любят такие заморочки, а также любят за их исполнение выдавать всяческие справочные внутриигровые материалы. А что вы на меня так скептически смотрите? Это не я такой порядок придумал!<br />
+<br />
+Но никто, конечно же, не заставляет игрока тратить время на подобную ерунду, – хотя эти условия могут добавить в достаточно слащавое и приторное действо немного перца. С другой стороны, и просто пробежать кампанию, не ввязываясь ни в какие испытания,  незазорно. <b>Bad Boys II</b> вполне играбельна и даже интересна, особенно если не предъявлять к ней неадекватно завышенные требования. Это мини-блокбастер, который не хватает звёзд с небес, ему отчаянно не достаёт лоска, масштаба, бюджета, – но авторы выжали максимум из того, что было у них в руках. Так что если вы хотите наказать зарвавшихся наркоторговцев – дерзайте.<br />
+<br />
+<div style="text-align: right"><i>Bad boys, bad boys watcha gonna do,<br />
+Watcha gonna do when they come for you</i>&#8203;</div>                            <div class="game_review_author">Автор обзора:                                 <b><a href="/users/?userid=191794">A National Acrobat</a></b></div>
+                        </div>
+                        <div class="game_gradient_container"><span class="game_review_gradient"></span>
+                        </div>
+                        <div class="game_review_button" id="openreview">
+                            <a href="#">Развернуть описание</a>
+                        </div>
+
+                        <div class="middlesmall">
+                            <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
+                            <script src="//yastatic.net/share2/share.js"></script>
+                            <div class="ya-share2"
+                                 data-services="vkontakte,facebook,odnoklassniki,twitter,telegram"></div>
+                                                                                            <ul class="game-groups">
+                                    <li>Аудитория:<br /><a class='tip-list' href='/catalog/?properties[]=violence' title='Игры с повышенным содержанием сцен жестокости и насилия.'>Жестокость</a><br /><a class='tip-list' href='/catalog/?properties[]=obscene-language' title='В игре используется нецензурная лексика.'>Нецензурная лексика</a><br /></li><li>Перспектива:<br /><a class='tip-list' href='/catalog/?properties[]=third-person' title='Вид &quot;от третьего лица&quot;. Камера расположена за игровым персонажем.'>Вид от третьего лица</a><br /><a class='tip-list' href='/catalog/?properties[]=first-person' title='Вид от первого лица (так называемый &quot;вид из глаз&quot;). Камера расположена как бы в глазах игрового персонажа.'>Вид от первого лица</a><br /></li><li>Происхождение:<br /><a class='tip-list' href='/catalog/?properties[]=consoles' title='Игры, портированные с консолей.'>Консоли</a><br /><a class='tip-list' href='/catalog/?properties[]=film' title='Игры, основанные на кинофильмах.'>Фильмы</a><br /></li><li>Страна или регион происхождения:<br /><a class='tip-list' href='/catalog/?properties[]=UK' title='Игра разрабатывалась в Великобритании.'>Великобритания</a><br /></li><li>Язык:<br /><a class='tip-list' href='/catalog/?properties[]=russian' title='На русском языке.'>Русский</a><br /><a class='tip-list' href='/catalog/?properties[]=english' title='На английском языке.'>English</a><br /></li>                                </ul>
+                                                        </div>
+                    </article>
+                </section>
+                                            </div>
+
+            
+        </div>
+
+        <div id="newcomment" class="game_newcomment_container">
+                            <div class="game_comments_unregistred">
+                    Незарегистрированные пользователи не могут оставлять комментарии и оценивать игры. Зарегистрироваться можно на <a href="/forum/login/login">этой странице</a>.                </div>
+                        </div>
+        <!-- Game end -->
+        <div class="main-content">
+            <!-- Misc begin -->
+                                    <!-- Comments end -->
+
+            <!-- Misc end -->
+
+            <!-- Content center end -->
+        </div>
+        <!-- Content center end -->
+    </main>
+    <!-- Content left begin -->
+    <aside id="lside">
+            <div class="bluetitle">Это интересно</div>
+        <!-- Blue line start -->
+        <div class="tiptext">Наиболее точным изложением событий войны в Средиземье, описанной в эпопее Толкиена &quot;Властелин Колец&quot;, обладает игра <b><a href="https://www.old-games.ru/game/1663.html" class="internalLink">War in Middle-Earth</a></b>. Игру можно пройти строго &quot;по книге&quot;.</div>
+            <div class="bluetitle">Каталог игр</div>
+    <!-- By genre begin -->
+    <nav class="left">
+    <div class="head">по жанру</div>
+    <ul class="leftlist" id="genres_table">
+        <li><a  href="/catalog/?genre=8">Action (1333)</a></li><li><a  href="/catalog/?genre=7">Adventure (540)</a></li><li><a  href="/catalog/?genre=1">Arcade (3529)</a></li><li><a  href="/catalog/?genre=17">Edutainment (1821)</a></li><li><a  href="/catalog/?genre=10">Fighting (187)</a></li><li><a  href="/catalog/?genre=14">Interactive Fiction (241)</a></li><li><a  href="/catalog/?genre=11">Other (178)</a></li><li><a  href="/catalog/?genre=15">Puzzle (1498)</a></li><li><a  href="/catalog/?genre=9">Quest (994)</a></li><li><a  href="/catalog/?genre=12">Racing (815)</a></li><li><a  href="/catalog/?genre=4">RPG (681)</a></li><li><a  href="/catalog/?genre=5">Simulation (718)</a></li><li><a  href="/catalog/?genre=13">Sports (579)</a></li><li><a  href="/catalog/?genre=6">Strategy (1524)</a></li><li><a  href="/catalog/?genre=16">Tabletop (759)</a></li>    </ul>
+</nav>
+    <!-- By genre end -->
+        <div class="left">
+        <div class="head">по платформе</div>
+        <ul class="leftlist" id="platforms_table">
+            <li><a href="/catalog/?platform=6">Amiga (191)</a></li><li><a href="/catalog/?platform=7">Amiga CD32 (11)</a></li><li><a href="/catalog/?platform=14">Amstrad CPC (58)</a></li><li><a href="/catalog/?platform=18">Apple II (63)</a></li><li><a href="/catalog/?platform=17">Atari ST (37)</a></li><li><a href="/catalog/?platform=9">Commodore 64 (60)</a></li><li><a href="/catalog/?platform=1">DOS (7045)</a></li><li><a href="/catalog/?platform=13">DVDi (30)</a></li><li><a href="/catalog/?platform=12">Macintosh (51)</a></li><li><a href="/catalog/?platform=19">MSX (65)</a></li><li><a href="/catalog/?platform=15">PC-88 (35)</a></li><li><a href="/catalog/?platform=16">PC-98 (103)</a></li><li><a href="/catalog/?platform=2">Windows (6022)</a></li><li><a href="/catalog/?platform=5">Windows 3.x (512)</a></li><li><a href="/catalog/?platform=3">Windows 3.x/DOS (62)</a></li><li><a href="/catalog/?platform=4">Windows/DOS (226)</a></li><li><a href="/catalog/?platform=10">Windows/Windows 3.x (527)</a></li><li><a href="/catalog/?platform=8">ZX Spectrum (90)</a></li>        </ul>
+    </div>
+        <!-- By year begin -->
+    <div class="left">
+    <div class="head">по году выпуска</div>
+    <table>
+        <tr><td><a href="/catalog/?year=2008&amp;year2=2008">2008</a></td><td><a href="/catalog/?year=2007&amp;year2=2007">2007</a></td><td><a href="/catalog/?year=2006&amp;year2=2006">2006</a></td></tr><tr><td><a href="/catalog/?year=2005&amp;year2=2005">2005</a></td><td><a href="/catalog/?year=2004&amp;year2=2004">2004</a></td><td><a href="/catalog/?year=2003&amp;year2=2003">2003</a></td></tr><tr><td><a href="/catalog/?year=2002&amp;year2=2002">2002</a></td><td><a href="/catalog/?year=2001&amp;year2=2001">2001</a></td><td><a href="/catalog/?year=2000&amp;year2=2000">2000</a></td></tr><tr><td><a href="/catalog/?year=1999&amp;year2=1999">1999</a></td><td><a href="/catalog/?year=1998&amp;year2=1998">1998</a></td><td><a href="/catalog/?year=1997&amp;year2=1997">1997</a></td></tr><tr><td><a href="/catalog/?year=1996&amp;year2=1996">1996</a></td><td><a href="/catalog/?year=1995&amp;year2=1995">1995</a></td><td><a href="/catalog/?year=1994&amp;year2=1994">1994</a></td></tr><tr><td><a href="/catalog/?year=1993&amp;year2=1993">1993</a></td><td><a href="/catalog/?year=1992&amp;year2=1992">1992</a></td><td><a href="/catalog/?year=1991&amp;year2=1991">1991</a></td></tr><tr><td><a href="/catalog/?year=1990&amp;year2=1990">1990</a></td><td><a href="/catalog/?year=1989&amp;year2=1989">1989</a></td><td><a href="/catalog/?year=1988&amp;year2=1988">1988</a></td></tr><tr><td><a href="/catalog/?year=1987&amp;year2=1987">1987</a></td><td><a href="/catalog/?year=1986&amp;year2=1986">1986</a></td><td><a href="/catalog/?year=1970&amp;year2=1985">ранее</a></td></tr>    </table>
+</div>    <!-- By year end -->
+
+    <!-- By letter begin -->
+    <div class="left">
+    <div class="head">по букве</div>
+    <table class="lefttable">
+        <tr><td><a href="/catalog/?letter=0">0</a></td><td><a href="/catalog/?letter=A">A</a></td><td><a href="/catalog/?letter=B">B</a></td><td><a href="/catalog/?letter=C">C</a></td><td><a href="/catalog/?letter=D">D</a></td><td><a href="/catalog/?letter=E">E</a></td><td><a href="/catalog/?letter=F">F</a></td></tr><tr><td><a href="/catalog/?letter=G">G</a></td><td><a href="/catalog/?letter=H">H</a></td><td><a href="/catalog/?letter=I">I</a></td><td><a href="/catalog/?letter=J">J</a></td><td><a href="/catalog/?letter=K">K</a></td><td><a href="/catalog/?letter=L">L</a></td><td><a href="/catalog/?letter=M">M</a></td></tr><tr><td><a href="/catalog/?letter=N">N</a></td><td><a href="/catalog/?letter=O">O</a></td><td><a href="/catalog/?letter=P">P</a></td><td><a href="/catalog/?letter=Q">Q</a></td><td><a href="/catalog/?letter=R">R</a></td><td><a href="/catalog/?letter=S">S</a></td><td><a href="/catalog/?letter=T">T</a></td></tr><tr><td><a href="/catalog/?letter=U">U</a></td><td><a href="/catalog/?letter=V">V</a></td><td><a href="/catalog/?letter=W">W</a></td><td><a href="/catalog/?letter=X">X</a></td><td><a href="/catalog/?letter=Y">Y</a></td><td><a href="/catalog/?letter=Z">Z</a></td><td><a href="/catalog/?properties[]=russian">Я</a></td></tr>    </table>
+</div></aside>
+    <!-- Content left end -->
+    <!-- Content right begin -->
+    <aside id="rside">
+    <div class="bluetitle">
+    Поддержите нас!</div>
+<div class="right">
+    <div class="donate-block-img">
+        <img alt="Поддержите нас!" src="/img/donate/macintosh_heart.gif">
+    </div>
+    <div>
+        Привет, олдгеймер! Если тебе нравится наш проект и тебе не безразлична его судьба, ты можешь поддержать нас на Boosty или любым другим способом    </div>
+    <div class="donate-block-img">
+     <a class="donate-boosty-url" rel="nofollow" href="https://boosty.to/old-games"><img src="/img/donate/boosty.svg" width="120px" height="50px"></a>
+    </div>
+    <div class="donate-more-button showmore">
+        <a href="/donate/">Другие способы...</a>
+    </div>
+</div>
+        <div class="bluetitle">
+            Случайная игра        </div>
+        <div class="right random-game">
+        <div id="random_screen_game">
+        
+    <a class="middlesmall" href="/game/9148.html"
+       title="Artus contre le démon du musée"><b>Artus contre le démon du musée</b></a>
+    <div class="random-screen-info small"><a
+                title="Все игры на Windows"
+                href="/catalog/?platform=2 ">Windows</a>, <a title="Все игры 2002 года" href="/catalog/?year=2002&amp;year2=2002">2002</a>        <br/>
+        <a title="Все игры жанра Edutainment" href="/catalog/?genre=17">Edutainment</a>    </div>
+    <div class="random-screen-image">
+        <a href="/game/9148.html" title="Artus contre le démon du musée">
+            <img style="vertical-align: middle;" border="0" src="/games/pc/artus_contre_le_demon_du_musee/screenshots/180/9148_5e1734316e563.png" width="180"
+                 title="Artus contre le démon du musée"
+                 alt="Artus contre le démon du musée"/>
+        </a>
+    </div>
+    <div style="margin-top: 5px;">
+                    <img src="//static.old-games.ru/img/rating/star6.png"
+                 alt="Оценка рецензента - 6 из 10"
+                 title="Оценка рецензента - 6 из 10"
+                 width="80" height="16"/>
+                </div>
+
+    </div>
+<div class="random-next-screen">
+<img id="random-game" title="Другая случайная игра" width="24" height="24" style="cursor:pointer;"
+                                            src="//static.old-games.ru/img/next-screen.png"
+                                            alt="Другая случайная игра"/>
+</div>
+<div class="clear"></div>
+</div>    <!-- New games begin -->
+
+<div class="bluetitle">
+    Новинки</div>
+<div class="right">
+
+    <div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15475.html" title="Muls">
+                  <b>Muls</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15474.html" title="MineSweeper">
+                  <b>MineSweeper</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15473.html" title="Hyper Backgammon">
+                  <b>Hyper Backgammon</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15472.html" title="Putt-Putt and Fatty Bear's Activity Pack">
+                  <b>Putt-Putt and Fatty Bear's Activity Pack</b>
+                  </a>
+                  <br />02.08.2026</div><div style="margin-bottom:8px;" class="small">
+                  <a href="/game/15471.html" title="Fatty Bear's Fun Pack">
+                  <b>Fatty Bear's Fun Pack</b>
+                  </a>
+                  <br />02.08.2026</div>        <div class="showmore">
+            <a href="/catalog/?sort=date">Далее...</a>
+        </div>
+        
+</div><!-- New articles begin -->
+<div class="bluetitle">
+    Последние статьи</div>
+<div class="right">
+    <div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120699.html">Назад в прошлое. Часть 6.2. Роковая красота, или Интервью с Лией Монтелонго.</a><br />
+         17.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120644.html">Не то золото, что блестит, или Интервью с коллекционерами из разных стран. Часть 9. Испания.</a><br />
+         12.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Интервью]</b>&nbsp;<a href="/articles/120607.html">Не то золото, что блестит, или Интервью с коллекционерами из разных стран. Часть 8. Австралия.</a><br />
+         09.07.2026 &mdash; <a href="/users/?userid=202403">UnknDoomer</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Обзор]</b>&nbsp;<a href="/articles/120599.html">APS3000 (星际移民) – современный ремейк старой RTS Colonial Project (殖民計劃, 1996 г.)</a><br />
+         09.07.2026 &mdash; <a href="/users/?userid=39623">WERTA</a>
+         </div><div style="margin-bottom:8px;" class="small"><b>[Статья]</b>&nbsp;<a href="/articles/120302.html">Столпы войны. По каким принципам построены бои в трилогии Halo.</a><br />
+         23.06.2026 &mdash; <a href="/users/?userid=228632">KOG</a>
+         </div>        <div class="showmore">
+            <a href="/articles/">Далее...</a>
+        </div>
+
+        
+</div><!-- New game files begin -->
+
+<div class="bluetitle">
+    Последние файлы</div>
+
+<div class="right">
+
+    <div class="small" style="margin-bottom:8px;" id="newfiles_game_1">
+                  <a href="/game/1280.html">
+                  <b>Martian Memorandum</b></a>
+
+                  [+] <a title="Русификатор к игре от Бюро переводов Old-Games.Ru. В комплекте прилагается также руководство пользователя на русском языке." href="/game/download/1280.html">Полезные файлы</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_2">
+                  <a href="/game/411.html">
+                  <b>Su-27 Flanker</b></a>
+
+                  [+] <a title="Официальный патч для игры от версии 1.0 до версии 1.1." href="/game/download/411.html">Обновление</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_3">
+                  <a href="/game/1058.html">
+                  <b>SSN-21 Seawolf</b></a>
+
+                  [+] <a title="Обновлённый драйвер Sound Blaster 16 для игры." href="/game/download/1058.html">Полезные файлы</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_4">
+                  <a href="/game/5683.html">
+                  <b>Links 386 Pro</b></a>
+
+                  [+] <a title="Дискетная версия игры (то есть в оригинале распространявшаяся на floppy-носителе[-ях] {дискете}). Всегда является полной (сохранены все игровые компоненты) и не требует инсталляции." href="/game/download/5683.html">Floppy-версия</a></div><div class="small" style="margin-bottom:8px;" id="newfiles_game_5">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Набор дополнительных полей для игры.
+Некоторые поля подходят только для русской версии игры, некоторые - для русской и украинской. 
+Кроме того, в архиве присутствуют два дополнительных поля - &quot;Zoo&quot; и &quot;british&quot; - для английской версии игры." href="/game/download/15431.html">Полезные файлы</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_6">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Официальный редактор полей игры (SNK Monopoly Game Designer, для Монополии 1.4 и выше) в виде инсталлятора. Версия - 1.0." href="/game/download/15431.html">Полезные файлы</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_7">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Различные версии игры, распространявшиеся через сеть (BBS, Интернет, Фидо).
+
+Русская инсталляционная версия игры 2.0.2." href="/game/download/15431.html">Электронная версия</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_8">
+                  <a href="/game/15431.html">
+                  <b>SNK Monopoly</b></a>
+
+                  [+] <a title="Различные версии игры, распространявшиеся через сеть (BBS, Интернет, Фидо).
+
+Английская инсталляционная версия игры 2.0.2." href="/game/download/15431.html">Электронная версия</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_9">
+                  <a href="/game/836.html">
+                  <b>Twilight: 2000</b></a>
+
+                  [+] <a title="Официальный патч для VGA-версии игры." href="/game/download/836.html">Обновление</a></div><div class="small hidedgamefiles" style="display:none; margin-bottom:8px;" id="newfiles_game_10">
+                  <a href="/game/836.html">
+                  <b>Twilight: 2000</b></a>
+
+                  [+] <a title="Официальный патч для EGA-версии игры." href="/game/download/836.html">Обновление</a></div>        <div class="showmore">
+            <a id="is_show_newfiles_games" href="javascript: void(0)">Далее...</a>
+        </div>
+        
+</div><!-- Popular begin -->
+
+<div class="bluetitle">
+    Популярные</div>
+
+<div class="right">
+
+    <div  style="margin-bottom:8px;"  id="pop_game_1" class="small"><a href="/game/754.html" title="Half-Life"><b>Half-Life</b></a><br />Популярность: 1292238</div><div  style="margin-bottom:8px;"  id="pop_game_2" class="small"><a href="/game/1350.html" title="Command &amp; Conquer: Red Alert 2"><b>Command &amp; Conquer: Red Alert 2</b></a><br />Популярность: 1122615</div><div  style="margin-bottom:8px;"  id="pop_game_3" class="small"><a href="/game/808.html" title="Diablo II"><b>Diablo II</b></a><br />Популярность: 1065787</div><div  style="margin-bottom:8px;"  id="pop_game_4" class="small"><a href="/game/2126.html" title="Diablo II: Lord of Destruction"><b>Diablo II: Lord of Destruction</b></a><br />Популярность: 815833</div><div  style="margin-bottom:8px;"  id="pop_game_5" class="small"><a href="/game/232.html" title="Diablo"><b>Diablo</b></a><br />Популярность: 729356</div><div  style="display:none; margin:4px;"  id="pop_game_6" class="small"><a href="/game/23.html" title="DOOM II: Hell on Earth"><b>DOOM II: Hell on Earth</b></a><br />Популярность: 722059</div><div  style="display:none; margin:4px;"  id="pop_game_7" class="small"><a href="/game/73.html" title="WarCraft II: Tides of Darkness"><b>WarCraft II: Tides of Darkness</b></a><br />Популярность: 715671</div><div  style="display:none; margin:4px;"  id="pop_game_8" class="small"><a href="/game/612.html" title="Age of Empires II: The Age of Kings"><b>Age of Empires II: The Age of Kings</b></a><br />Популярность: 711286</div><div  style="display:none; margin:4px;"  id="pop_game_9" class="small"><a href="/game/1747.html" title="Heroes of Might and Magic III Complete (Collector's Edition)"><b>Heroes of Might and Magic III Complete (Collector's Edition)</b></a><br />Популярность: 696102</div><div  style="display:none; margin:4px;"  id="pop_game_10" class="small"><a href="/game/11.html" title="Blood"><b>Blood</b></a><br />Популярность: 654946</div>        <div class="showmore">
+            <a href="/catalog/?sort=popularity">Далее...</a>
+        </div>
+        
+</div>
+<!-- Popular end --></aside>
+    <!-- Content right end -->
+</div>
+<!-- Main end -->
+
+<!-- Footer begin -->
+<footer id="pageFooter">
+    <div class="ui-notification-container"></div>
+    <div class="footwarn lfloat darkgraytext">
+        <div class="lfloat sidebar">
+            <div class="socialbutton" style="background: #45668e"><a rel="nofollow"
+                                                                     href="https://vk.com/old_games">VK</a>
+            </div>
+            <div class="socialbutton" style="background: #45668e"><a rel="nofollow" href="https://vk.com/podcastogru">Podcast
+                    VK</a></div>
+            <div class="socialbutton" style="background: #ff0000"><a rel="nofollow"
+                                                                     href="https://www.youtube.com/channel/UCjL57vLdE5Ae1frLxevzHaw">Podcast
+                    YT</a></div>
+            <div class="socialbutton" style="background: #929292"><a rel="nofollow"
+                                                                     href="mailto:support@old-games.ru">Поддержка</a>
+            </div>
+        </div>
+        <div class="smallcolumn">
+            <h3>Разделы</h3>
+            <ul>
+                <li><a href="/">Новости</a></li>
+                <li><a href="/catalog/">Каталог игр</a></li>
+                <li><a href="/search/">Расширенный поиск</a></li>
+                <li><a href="/forum/">Форум</a></li>
+                <li><a href="/articles/">Статьи</a></li>
+                <li><a href="/wiki/">Wiki</a></li>
+                <li><a href="/utils/">Файлы</a></li>
+            </ul>
+        </div>
+        <div class="smallcolumn">
+            <h3>Информация</h3>
+            <ul>
+                <li><a href="/about/">О проекте</a></li>
+                <li><a href="/about/history/">История проекта</a></li>
+                <li><a href="/faq/">FAQ</a></li>
+                <li><a href="/donate/">Поддержите нас!</a></li>
+            </ul>
+        </div>
+        <div class="smallcolumn">
+            <h3><i class="fas fa-rss-square"></i> RSS</h3>
+            <ul>
+                <li><a rel="nofollow" href="https://feeds.feedburner.com/Old-games-ru-news">Новости сайта</a>
+                </li>
+                <li><a rel="nofollow" href="https://feeds.feedburner.com/Old-games-ru">Новые игры</a>
+                </li>
+                <li><a rel="nofollow"
+                       href="https://feeds.feedburner.com/Old-games-ru-files">Новые файлы</a>
+                </li>
+                <li><a rel="nofollow"
+                       href="https://feeds.feedburner.com/Old-games-ru-articles">Новые статьи</a></li>
+            </ul>
+        </div>
+        <div class="bigcolumn">
+            <div>&copy; Old-Games.RU, 2000&mdash;2026</div>
+            <br/>
+            <div class="middlesmall">Ответственность за содержание рекламных объявлений несет рекламодатель.<br/>
+                При использовании материалов сайта Old-Games.RU, ссылка на сайт обязательна.<br/>
+                Old-Games.RU не несет ответственности за содержание веб-сайтов, на которые даются гиперссылки.<br/>
+                Все права на опубликованные на сайте Old-Games.RU материалы принадлежат их законным владельцам.<br/>
+                <br/>
+            </div>
+            <h3><a rel="nofollow" href="/?language=eng">Switch to English</a></h3>
+                    </div>
+    </div>
+</footer>
+</body>
+</html>

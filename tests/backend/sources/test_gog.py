@@ -245,6 +245,30 @@ async def test_card_picks_the_asked_identifier(replay):
     assert result.value.item.source_id == WANTED
 
 
+async def test_the_card_keeps_the_english_name_it_already_asked_for(replay):
+    """Английское название карточке достаётся даром: товарная ручка зовётся всё
+    равно — ею номер переводится в название для запроса к каталогу, — и локали у
+    неё нет, она отвечает по-английски всегда. До сих пор этот ответ
+    выбрасывался.
+
+    Свидетель записан живьём и нарочно расходящийся: у «Ведьмака 3» ручка даёт
+    `The Witcher 3: Wild Hunt`, а каталог с `locale: ru-RU` — «Ведьмак 3: Дикая
+    Охота». На `Baldur's Gate 3`, что лежит в соседней фикстуре, оба имени
+    совпадают, и проверка не отличила бы одно от другого.
+
+    Раскладка полей — решение пользователя 03.08.2026: `original_title` у игры
+    всегда английское, `title` — язык оригинала либо русская локализация."""
+    client = GogClient(SourceHttp("gog", transport=replay(
+        "gog/product_witcher.json", "gog/catalog_witcher.json")))
+
+    result = await client.card("1207664663", Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value.item.title == "Ведьмак 3: Дикая Охота"
+    assert result.value.item.original_title == "The Witcher 3: Wild Hunt"
+
+
 async def test_the_catalog_is_asked_by_title_and_never_by_number(fixture):
     """Сторожим оба запроса разом: сначала товарная ручка номером, потом каталог
     названием. Подстановка номера в каталог возвращает прежнюю поломку, при

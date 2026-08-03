@@ -15,7 +15,7 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (22)
 
-## backend — 85 модулей
+## backend — 86 модулей
 
 ### `backend/app.py` — 182 строк
 
@@ -42,6 +42,17 @@
   - `def log_file(self) -> Path` (2)
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
+
+### `backend/language.py` — 44 строк
+
+На каком языке написано название.
+
+Зависит от: —
+
+Отдаёт наружу: `in_latin`, `in_russian`
+
+- `def in_russian(name: str) -> bool` (6)
+- `def in_latin(name: str) -> bool` (11)
 
 ### `backend/model/__init__.py` — 110 строк
 
@@ -504,19 +515,19 @@
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 - `def parsed_or(log: Logger, source: str, note: str, produce: Callable[[], T], fallback: T) -> T` (12)
 
-### `backend/sources/gog/client.py` — 175 строк
+### `backend/sources/gog/client.py` — 182 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`, `backend.unique`
 
-- `class GogClient` (140)
+- `class GogClient` (146)
   - `def name(self) -> str` (4)
   - `async def _payload(self, query: str, product_types: str | None=None) -> dict | Refusal` (18)
   - `async def _catalog(self, query: str, product_types: str | None=None) -> list | Refusal` (7)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (8)
   - `async def _title(self, source_id: str) -> str | Outcome` (20)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (21)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (27)
   - `async def resolve_slug(self, slug: str) -> Outcome` (33)
   - `async def aclose(self) -> None` (2)
 
@@ -563,11 +574,11 @@
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (6)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/oldgames/parse.py` — 166 строк
+### `backend/sources/oldgames/parse.py` — 196 строк
 
 Перевод страниц old-games.ru в наши типы.
 
-Зависит от: `backend.model`, `backend.sources.convert`
+Зависит от: `backend.language`, `backend.model`, `backend.sources.convert`
 
 - `def _soup(page: str) -> BeautifulSoup` (2)
 - `def _text(node: Tag | None) -> str` (4)
@@ -577,7 +588,8 @@
 - `def _companies(scope: Tag) -> tuple[Credit, ...]` (7)
 - `def _synopsis(soup: BeautifulSoup) -> str` (3)
 - `def _cover(soup: BeautifulSoup) -> str` (4)
-- `def parse_card(page: str, source_id: str) -> SourceCard` (31)
+- `def _by_language(names: list[str]) -> tuple[str, str]` (20)
+- `def parse_card(page: str, source_id: str) -> SourceCard` (34)
 
 ### `backend/sources/ratings/kinopoisk/client.py` — 45 строк
 
@@ -1390,7 +1402,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 96 модулей
+## tests — 97 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1448,13 +1460,13 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 471 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 495 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 31
+Тестов: 32
 
 - `def answering(body) -> SourceHttp` (3)
 
@@ -1508,13 +1520,13 @@ MDBList: квота, битый ключ и чужой периметр — тр
 
 - `async def ask(transport, kind=Kind.MOVIE)` (5)
 
-### `tests/backend/sources/test_oldgames.py` — 364 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_oldgames.py` — 461 строк ⚠ подошёл к 300
 
 Разбор страниц old-games.ru: выдача и карточка.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.oldgames.parse`, `tests.conftest`
 
-Тестов: 27
+Тестов: 34
 
 - `async def searched(transport: httpx.MockTransport, query: str='dune')` (7)
 - `def busy(page: str, times: int)` (14)
@@ -1847,6 +1859,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes` (7)
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
+
+### `tests/backend/test_language.py` — 58 строк
+
+На каком языке написано название.
+
+Зависит от: `backend.language`
+
+Тестов: 5
+
 
 ### `tests/backend/test_layers.py` — 124 строк
 

@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup, Tag
 
 from backend.sources.convert import year_in_text
 
+from backend.language import in_latin, in_russian
 from backend.model import (
     CompanyRole,
     Credit,
@@ -45,6 +46,10 @@ GAME_SCOPE = '[itemtype*="SoftwareApplication"]'
 # Чем сайт подписывает автора обзора. Хвост отрезается: это не часть синопсиса, а
 # подпись под ним, и в карточке она выглядела бы концом описания игры.
 BY = "Автор обзора:"
+
+# Второе имя игры на странице карточки. В выдаче оно лежит иначе — там
+# `div.alt-titles-list`, — и общего селектора у двух страниц нет.
+ALT_NAMES = "span.game_alt_names"
 
 # «Разработчик неизвестен» оформлен у сайта настоящей компанией с именем `-`.
 # Взятая как есть, она стала бы одной кликабельной студией на все такие игры.
@@ -133,6 +138,28 @@ def _cover(soup: BeautifulSoup) -> str:
     return "" if NOCOVER in address else address
 
 
+def _by_language(names: list[str]) -> tuple[str, str]:
+    """Имена страницы, разложенные по своим полям: `title` — язык оригинала либо
+    русская локализация, `original_title` — всегда английское. Решение
+    пользователя 03.08.2026.
+
+    Первым идёт показываемое имя, остальные — вторые, и раскладывает их язык, а
+    не порядок. Смотреть надо на **все**: вторых имён на странице бывает до
+    семи, каждое своим элементом, и у `Bad Boys II` русское стоит вторым — взяв
+    первое, карточка потеряла бы его навсегда.
+
+    Порядок решает спор внутри одной письменности: у `Arthur's Knights II` два
+    латинских имени, английское и французское, и берётся показываемое — оно
+    первое.
+
+    Пустое английское поле честнее неанглийского: у «Ядерного титбита» и у
+    «Штырлица» английского имени нет вовсе, а у `Ankh 2` второе имя японское —
+    поле обещает английское, и японскому там не место."""
+    russian = next((one for one in names if in_russian(one)), "")
+    latin = next((one for one in names if in_latin(one)), "")
+    return russian or names[0], latin
+
+
 def parse_card(page: str, source_id: str) -> SourceCard:
     """Карточка игры.
 
@@ -147,6 +174,8 @@ def parse_card(page: str, source_id: str) -> SourceCard:
     title = _text(scope.select_one('[itemprop="name"]'))
     if not title:
         raise ValueError(f"у карточки {source_id} нет названия")
+    title, original_title = _by_language(
+        [title, *(_text(one) for one in scope.select(ALT_NAMES))])
 
     genre = _text(scope.select_one('[itemprop="applicationSubCategory"]'))
     return SourceCard(
@@ -157,6 +186,7 @@ def parse_card(page: str, source_id: str) -> SourceCard:
             source_id=source_id,
             title=title,
             synced_at=datetime.now(),
+            original_title=original_title,
             year=year_in_text(_labelled(scope, "Год выхода")),
             synopsis=_synopsis(soup),
             poster_url=_cover(soup),

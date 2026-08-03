@@ -135,6 +135,103 @@ def test_the_card_takes_its_name_from_the_game_and_not_from_the_site(fixture):
     assert (card.item.source, card.item.source_id) == (Source.OLD_GAMES, "25")
 
 
+def test_the_card_lays_the_two_names_out_by_language(fixture):
+    """У карточки два имени, и раскладывает их язык, а не порядок на странице:
+    `title` — язык оригинала либо русская локализация, `original_title` — всегда
+    английское. Решение пользователя 03.08.2026.
+
+    Свидетеля два, и они нарочно смотрят в разные стороны. У `Frank Herbert's
+    Dune` главное имя английское, второе русское — поля **меняются местами**. У
+    «Ил-2 Штурмовик» наоборот, и там перестановки быть не должно. С одним
+    свидетелем «раскладываем по языку» неотличимо от «всегда меняем местами»."""
+    swapped = parse_card(fixture("oldgames/card_frank_herberts_dune.txt"), "11350")
+    assert swapped.item.title == "Дюна"
+    assert swapped.item.original_title == "Frank Herbert's Dune"
+
+    kept = parse_card(fixture("oldgames/card_il2.txt"), "14735")
+    assert kept.item.title == "Ил-2 Штурмовик"
+    assert kept.item.original_title == "IL-2 Sturmovik"
+
+
+def test_every_second_name_is_looked_at_and_not_just_the_first(fixture):
+    """Вторых имён на странице бывает несколько, каждое своим элементом, и брать
+    первое попавшееся нельзя.
+
+    Замерено: из 199 строк каталога второе имя есть у 81, и **у 28 из них их два
+    и более** — треть. Свидетель: у `Bad Boys II` их два, `Bad Boys: Miami
+    Takedown` и «Плохие парни II», и русское стоит вторым. Взяв первое, карточка
+    теряет русское название навсегда — перезапроса у игр не бывает."""
+    card = parse_card(fixture("oldgames/card_many_names.txt"), "11297")
+
+    assert card.item.title == "Плохие парни II"
+    assert card.item.original_title == "Bad Boys II"
+
+
+def test_a_name_in_another_writing_is_not_the_english_one(fixture):
+    """«Не русское» и «английское» — разные вещи, и поле обещает второе.
+
+    У `Ankh: Pyramid No Nazo` второе имя японское,
+    `アンク ピラミッドの謎`. Проверка «строка не русская» пропускает его в поле
+    английского названия, и замерено, что таких строк у old-games 4 из 53.
+    Магазины такого не отдают вовсе — там всё латиницей, — а третий источник не
+    магазин."""
+    card = parse_card(fixture("oldgames/card_japanese.txt"), "13380")
+
+    assert card.item.title == "Ankh: Pyramid No Nazo"
+    assert card.item.original_title == "Ankh: Pyramid No Nazo"
+
+
+def test_an_english_name_stays_english_even_with_an_alias(fixture):
+    """Если показываемое имя не русское, оно **и есть** английское, а второе имя
+    при нём — псевдоним, и в поле английского названия ему не место.
+
+    Свидетель замерен: у `D.O.G: Fight for Your Life` на странице **два** вторых
+    имени, `DOG` и `Dune Runner`, и оба английские. Без этой проверки
+    перестановка, потерявшая условие «второе имя русское», молча подменяла бы
+    название псевдонимом — навсегда, перезапроса у игр не бывает."""
+    card = parse_card(fixture("oldgames/card_two_english_names.txt"), "1345")
+
+    assert card.item.title == "D.O.G: Fight for Your Life"
+    assert card.item.original_title == "D.O.G: Fight for Your Life"
+
+
+def test_a_russian_alias_does_not_reach_the_english_field(fixture):
+    """Обратная сторона: у «Штырлица» второе имя тоже русское, и английского у
+    игры нет. Поле остаётся пустым — оно обещает английское название, а не
+    «второе, какое нашлось».
+
+    Без этого свидетеля условие «второе имя не русское» не наблюдается вовсе:
+    сними его, и в английское поле уехало бы «Штырлиц : Операция „Бюст“»."""
+    card = parse_card(fixture("oldgames/card_two_russian_names.txt"), "8704")
+
+    assert card.item.title == "Штырлиц"
+    assert card.item.original_title == ""
+
+
+def test_a_lone_english_name_fills_both_fields(fixture):
+    """`original_title` у игры — **всегда** английское, и одинокое английское имя
+    не исключение: у «Dune» второго нет, и оно же встаёт в оба поля. Решение
+    пользователя 03.08.2026, замеченное им на этой самой игре."""
+    card = parse_card(fixture("oldgames/card_dune.txt"), "25")
+
+    assert card.item.title == "Dune"
+    assert card.item.original_title == "Dune"
+
+
+def test_a_lone_russian_name_leaves_the_english_field_empty(fixture):
+    """Обратная сторона того же правила, и без неё «копируем одинокое имя»
+    неотличимо от «копируем любое одинокое».
+
+    Английского названия у «Ядерного титбита» нет вовсе: old-games находит его по
+    «ядерный титбит» и **ничего** по «titbit», то есть имени нет не в этом
+    ответе, а нигде. Пустое поле тут ответ, а не потеря: положи мы туда русское
+    имя, поле стало бы врать о себе — оно обещает английское."""
+    card = parse_card(fixture("oldgames/card_russian_only.txt"), "13363")
+
+    assert card.item.title == "Ядерный титбит"
+    assert card.item.original_title == ""
+
+
 def test_the_card_carries_year_genre_and_synopsis(fixture):
     """Год берётся по подписи «Год выхода», жанр — из микроразметки, описание —
     из тела страницы: в микроразметке `description` лежит огрызок «Dune, Год

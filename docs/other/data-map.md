@@ -49,6 +49,11 @@
   - `kinopoisk_unofficial_key: str`
   - `log_level: str`
 
+### `backend/language.py`
+
+- `RUSSIAN_LETTERS` = `frozenset('абвгдеёжзийклмнопрстуфхцчшщъыьэюя')`
+- `LATIN_LETTERS` = `frozenset('abcdefghijklmnopqrstuvwxyz')`
+
 ### `backend/model/card.py`
 
 - `class SourceCard`
@@ -413,6 +418,7 @@
 - `NOCOVER` = `'nocover-rus.gif'`
 - `GAME_SCOPE` = `'[itemtype*="SoftwareApplication"]'`
 - `BY` = `'Автор обзора:'`
+- `ALT_NAMES` = `'span.game_alt_names'`
 - `UNKNOWN` = `'-'`
 
 ### `backend/sources/ratings/kinopoisk/client.py`
@@ -754,6 +760,11 @@
 ### `tests/backend/test_images.py`
 
 - `DEGENERATE` = `набор из 3`
+
+### `tests/backend/test_language.py`
+
+- `RUSSIAN` = `набор из 5`
+- `NOT_RUSSIAN` = `набор из 6`
 
 ### `tests/backend/test_layers.py`
 

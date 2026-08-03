@@ -1,6 +1,7 @@
 """Разговор с GOG по сети."""
 
 import logging
+from dataclasses import replace
 
 import httpx
 
@@ -130,7 +131,13 @@ class GogClient:
             return cards
         for card in cards:
             if card.item.source_id == source_id:
-                return Found(card)
+                # Английское название достаётся даром: ручку мы уже спросили, а
+                # локали у неё нет — она отвечает по-английски всегда. Каталог
+                # при этом спрашивается с `ru-RU`, и в `title` лежит
+                # локализованное. Раскладка полей — решение пользователя
+                # 03.08.2026: `original_title` у игры всегда английское.
+                return Found(replace(
+                    card, item=replace(card.item, original_title=title)))
         return Refusal(
             source="gog",
             reason=Reason.BROKEN,

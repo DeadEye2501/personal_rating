@@ -1,0 +1,2255 @@
+{
+ "pages": 1,
+ "currentlyShownProductCount": 4,
+ "productCount": 4,
+ "products": [
+  {
+   "id": "1640424747",
+   "slug": "the_witcher_3_wild_hunt_game_of_the_year_edition",
+   "features": [
+    {
+     "name": "Достижения",
+     "slug": "achievements"
+    },
+    {
+     "name": "Облачные сохранения",
+     "slug": "cloud_saves"
+    },
+    {
+     "name": "Поддержка контроллера",
+     "slug": "controller_support"
+    },
+    {
+     "name": "Одиночная игра",
+     "slug": "single"
+    }
+   ],
+   "screenshots": [
+    "https://images.gog-statics.com/75fbf3c988f1c815f57ac04859b0f6e5fb4a2c649804e57052796dc10b4e959e_{formatter}.jpg",
+    "https://images.gog-statics.com/e6b978f13174499c55f2b8dcc4ab9d08eae7886ab4c72c4b8d0193a97d6babbd_{formatter}.jpg",
+    "https://images.gog-statics.com/6a849f720c9d70a9932fc32ac957ae98c8d49a1dbc7fd14ef343139faf6e9072_{formatter}.jpg",
+    "https://images.gog-statics.com/82de2b7b39d89650cd875dd723326b3249890f7e2f3d46f81a64c26778953731_{formatter}.jpg",
+    "https://images.gog-statics.com/c61b9494ed2312bf6227fe75e145a7ec4f43b19c64b3d0e8320e715ca3383e7f_{formatter}.jpg",
+    "https://images.gog-statics.com/edf320c47c0ab40022875da1f35805d44a66407ba52104e35079d92dd619f265_{formatter}.jpg",
+    "https://images.gog-statics.com/057efab166b0bce212729a3149de647ed5f55614645ff00a3d7d88afcdf7e6a3_{formatter}.jpg",
+    "https://images.gog-statics.com/afc7cfc877ce2687d2fa08a401aa536aa30c853c6ce125e8f38f15d26ae46f31_{formatter}.jpg",
+    "https://images.gog-statics.com/b8caef6662a0ccf6f60f45a2e68c9bd83ad76f0a8354135d623390e209af06a7_{formatter}.jpg",
+    "https://images.gog-statics.com/052a8e9562a00fd8a0d635c3156194c412ed0d63791b13cea66e9a251ad8cb03_{formatter}.jpg",
+    "https://images.gog-statics.com/c676205e5e145576ec823fe771f5dc8e324c111f205f2570937cd3c641c9695d_{formatter}.jpg",
+    "https://images.gog-statics.com/c645ad1c248dbcd72f47155232e25b5e5bf9a0de52728220a8d3e9b749d970fc_{formatter}.jpg",
+    "https://images.gog-statics.com/112cdede657fe35f625e44184bbaca49de5e10a18e2cfcfd189838bfc42bf388_{formatter}.jpg",
+    "https://images.gog-statics.com/29775073d3b97f926235212b7b2953ad8acb8d22173b2897a04477950fffe659_{formatter}.jpg",
+    "https://images.gog-statics.com/75f26a48a98bd0e0bdda9be3526bebb5e004f55b3d39591b16484c87085ad840_{formatter}.jpg",
+    "https://images.gog-statics.com/4c98631afa0e653108037c9fad8e004ba3fda43bef5df8a0691d04a2cba5fdae_{formatter}.jpg",
+    "https://images.gog-statics.com/6ede7e56d8cf857318b4c2deafe79a12550fc0618e7978149ac86f4aedfec03e_{formatter}.jpg",
+    "https://images.gog-statics.com/bcb6b400bb1f09148d2de4537465c92caaba88ab6afe803395a19f13b0f1fc1c_{formatter}.jpg",
+    "https://images.gog-statics.com/2e3efaada47215a042b7787e58f5a215f23af708dbd67b2fb9ad1111e3127197_{formatter}.jpg",
+    "https://images.gog-statics.com/e446c4533f6b360c9f9981b44947ac43f50483c04743152ed08b550425d05b6e_{formatter}.jpg"
+   ],
+   "userPreferredLanguage": {
+    "code": "ru",
+    "inAudio": true,
+    "inText": true
+   },
+   "releaseDate": "2016.08.30",
+   "storeReleaseDate": "2016.08.29",
+   "productType": "pack",
+   "title": "Ведьмак 3: Дикая Охота - Издание Игра Года",
+   "coverHorizontal": "https://images.gog-statics.com/71d71c40052877a42c096b8230c71856a560d42132208cfa8e719243b5c6626b.png",
+   "coverVertical": "https://images.gog-statics.com/6278561a6c70684ab3cd86065ba337c4ae9dd5e3f63b5bd9997d2eba602d17cd.jpg",
+   "logo": "https://images.gog-statics.com/90dc4e2c86b036c2b2c392adea197ad7dc6b750ce01af0416ed8b37f3d0101c9.png",
+   "galaxyBackgroundImage": "https://images.gog-statics.com/7809c7dbb669c753234bf81df927521d2084f54e14f97ad1a3fecfbac10f2df4.jpg",
+   "developers": [
+    "CD PROJEKT RED"
+   ],
+   "publishers": [
+    "CD PROJEKT RED"
+   ],
+   "operatingSystems": [
+    "windows"
+   ],
+   "price": {
+    "final": "$49.99",
+    "base": "$49.99",
+    "discount": null,
+    "finalMoney": {
+     "amount": "49.99",
+     "currency": "USD",
+     "discount": "0.00"
+    },
+    "baseMoney": {
+     "amount": "49.99",
+     "currency": "USD"
+    }
+   },
+   "productState": "default",
+   "genres": [
+    {
+     "name": "Ролевая игра",
+     "slug": "rpg"
+    },
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    },
+    {
+     "name": "Насыщенный сюжет",
+     "slug": "story-rich"
+    },
+    {
+     "name": "Атмосферные",
+     "slug": "atmospheric"
+    },
+    {
+     "name": "Ролевая игра",
+     "slug": "role-playing"
+    },
+    {
+     "name": "Исследовательские",
+     "slug": "exploration"
+    },
+    {
+     "name": "Классика",
+     "slug": "classic"
+    },
+    {
+     "name": "Отличный саундтрек",
+     "slug": "great-soundtrack"
+    },
+    {
+     "name": "Решения с последствиями",
+     "slug": "choices-matter"
+    },
+    {
+     "name": "Открытый мир",
+     "slug": "open-world"
+    },
+    {
+     "name": "От третьего лица",
+     "slug": "third-person"
+    },
+    {
+     "name": "Для взрослых",
+     "slug": "mature"
+    },
+    {
+     "name": "Сексуальный контент",
+     "slug": "sexual-content"
+    },
+    {
+     "name": "Нагота",
+     "slug": "nudity"
+    },
+    {
+     "name": "Насилие",
+     "slug": "violent"
+    },
+    {
+     "name": "Несколько концовок",
+     "slug": "multiple-endings"
+    },
+    {
+     "name": "Мясо",
+     "slug": "gore"
+    },
+    {
+     "name": "Магия",
+     "slug": "magic"
+    },
+    {
+     "name": "Средневековье",
+     "slug": "medieval"
+    },
+    {
+     "name": "Вампир",
+     "slug": "vampire"
+    },
+    {
+     "name": "Оборотни",
+     "slug": "werewolves"
+    }
+   ],
+   "reviewsRating": 48,
+   "reviewsCount": 14114,
+   "editions": [
+    {
+     "id": 1207664663,
+     "name": "Standard Edition",
+     "isRootEdition": true
+    },
+    {
+     "id": 1640424747,
+     "name": "Complete Edition",
+     "isRootEdition": false
+    }
+   ],
+   "ratings": [
+    {
+     "name": "pegiRating",
+     "ageRating": "18"
+    },
+    {
+     "name": "esrbRating",
+     "ageRating": "17"
+    },
+    {
+     "name": "uskRating",
+     "ageRating": "18"
+    }
+   ],
+   "storeLink": "https://www.gog.com/ru/game/the_witcher_3_wild_hunt_game_of_the_year_edition"
+  },
+  {
+   "id": "1427195509",
+   "slug": "the_witcher_3_wild_hunt_expansion_pass",
+   "features": [
+    {
+     "name": "Достижения",
+     "slug": "achievements"
+    },
+    {
+     "name": "Облачные сохранения",
+     "slug": "cloud_saves"
+    },
+    {
+     "name": "Поддержка контроллера",
+     "slug": "controller_support"
+    },
+    {
+     "name": "Одиночная игра",
+     "slug": "single"
+    }
+   ],
+   "screenshots": [
+    "https://images.gog-statics.com/e7b76e347aa1a9ede3d0abd021a2b69f57d0e9b4cdd9140aa455a91262129f41_{formatter}.jpg",
+    "https://images.gog-statics.com/01280bdb3654d5b8ea24fb38a6d88bfa4981364d4e320f8ebafb6a33488b5523_{formatter}.jpg",
+    "https://images.gog-statics.com/c72b203ae67a4488d9a18bd373f28745d53cde3757545fc10537b2001a3429a7_{formatter}.jpg",
+    "https://images.gog-statics.com/1b5ad0a635c48c2f57e0b6f27ad8e5ab73b2ed8437f2e317dfd5c7d3ab1d4ca8_{formatter}.jpg",
+    "https://images.gog-statics.com/5dad8bff682cb47546e97ffe91513b92ca0bd2d47df66ab3e1aacd16693e3022_{formatter}.jpg",
+    "https://images.gog-statics.com/14fe10bc96b6de77c7180ec61480b85b3625e5b1929abce8726f62eb996338fd_{formatter}.jpg",
+    "https://images.gog-statics.com/b51b03d17553c05c20b6900531f5325d318948bd8a55e3ce036de87c774c0f39_{formatter}.jpg",
+    "https://images.gog-statics.com/30122fffc3511452e1591efd85dd54349a3688b2862273a44e5372ca095c76f8_{formatter}.jpg",
+    "https://images.gog-statics.com/c35a65b3d9a9fa389f43bbf61e212e535aa29f301936ec3a602d671e72b030c7_{formatter}.jpg",
+    "https://images.gog-statics.com/2d1a4983cd08457ea364e5a89b4612da5a223edcd74cf8e55643112dc0a35e87_{formatter}.jpg",
+    "https://images.gog-statics.com/1c5b835b50465161bf091f2c05c10d5b80c7e9f92b20bbf0263f0b637550804f_{formatter}.jpg",
+    "https://images.gog-statics.com/7f11241ffe165de1c1d9324c59fe57c30291a6a98cbe41c5aa80e9367f5ab25f_{formatter}.jpg",
+    "https://images.gog-statics.com/7b18287011a23ead14e27123af1fea67d70a5a5ad3718fa787918bab5c4da44a_{formatter}.jpg",
+    "https://images.gog-statics.com/871deee645e42a7cc21830230b8b50c054dad55290a4e82f867bc923b16e317a_{formatter}.jpg",
+    "https://images.gog-statics.com/d6a853d4e5b0fb3f4fcc0c23a9dd619082660365dd318130eaff70d65db9a80b_{formatter}.jpg",
+    "https://images.gog-statics.com/b32067ae51ee07be41ec47a14387abeeadb5cb2a782fdddfb90c21fc915908b9_{formatter}.jpg",
+    "https://images.gog-statics.com/1566e75311a0136a1bc74411eadd8ec7c79f0b42f52ce7e6bc52298384a5c9a2_{formatter}.jpg",
+    "https://images.gog-statics.com/01a5f2c39d4d6755ee7c202b26a81f388f5b9e0da3f58bc3cc0d5bf030607bde_{formatter}.jpg",
+    "https://images.gog-statics.com/ef8d26ee32b7e7f7b9508a6e81859a4451558b8c88dd3bd8e16707c807442456_{formatter}.jpg",
+    "https://images.gog-statics.com/c55a4125b8afee802c1873a0223ea5ae1306f0d82580fa66d5dae4c46cdc8457_{formatter}.jpg",
+    "https://images.gog-statics.com/da7d6addcd2b573273fded1bce660dff09a470687a558042c859ed0db76443a3_{formatter}.jpg",
+    "https://images.gog-statics.com/b526faf911bcd63c12cc35d8fbac51596b36913995ebdb2cbf8281b7da66f4ec_{formatter}.jpg",
+    "https://images.gog-statics.com/1a7e71586c7932903c3980cfb4d0b297183b11b1a18a1f9e1e0c443b86f51116_{formatter}.jpg",
+    "https://images.gog-statics.com/a2872cfbdb364b4ce9e5660fb4b7d2eb1a209043816e20ddc7c72ece1ed9131b_{formatter}.jpg",
+    "https://images.gog-statics.com/d334f165c4c9e27cc0252bebd1194599721e59657c04994efd593ee2f84d48ef_{formatter}.jpg",
+    "https://images.gog-statics.com/f422d9a5125a9c2c6c4c25b54cc040cae6546fb09ec21e27a87f0fc931f76ea9_{formatter}.jpg",
+    "https://images.gog-statics.com/da637c47ad69f605703e092e7a12f63bea1569b3922f27738bee21d962c0a0b4_{formatter}.jpg",
+    "https://images.gog-statics.com/d9e9602ab79364c042d73ad48497ef4e3bd3b2793f65cebecb16cd1e0a205f03_{formatter}.jpg",
+    "https://images.gog-statics.com/6f8f0729b8b6c6f55a65cb5977cb3f3f345449c158758d968e2f8ef31828556e_{formatter}.jpg",
+    "https://images.gog-statics.com/5c7819fc362681ddc99c590536c54054a57aa1ff4038176e311bae4491b2aede_{formatter}.jpg",
+    "https://images.gog-statics.com/85891bad466cc3f94f9c6cd31323494cecf10e5b48fa8f0a470a452e0cef33a0_{formatter}.jpg",
+    "https://images.gog-statics.com/183dd643c1683194f80bfbcc8d5cea55fcf1ba24a7a8ffc138a22556dfb1b7d4_{formatter}.jpg",
+    "https://images.gog-statics.com/b170da0a9017c6505085e317b5f6c341fc78e916e7d38b6c894ee411696bb4f9_{formatter}.jpg"
+   ],
+   "userPreferredLanguage": {
+    "code": "ru",
+    "inAudio": true,
+    "inText": true
+   },
+   "releaseDate": "2015.05.19",
+   "storeReleaseDate": "2016.05.31",
+   "productType": "pack",
+   "title": "Комплект дополнений для игры «Ведьмак 3: Дикая Охота»",
+   "coverHorizontal": "https://images.gog-statics.com/110067209949b038a775d031c40226af85b2ea9b6b08a682ce46e473b6f09bf2.png",
+   "coverVertical": "https://images.gog-statics.com/14db6e9cc06d12080cedc8e0e4188f9e93bbce00e298a41919fee1a30403bbb7.jpg",
+   "logo": "https://images.gog-statics.com/a0e3fcc9795987148a8568290e3eb48b5dffbe466d1cafdc489814f69b341409.png",
+   "galaxyBackgroundImage": "https://images.gog-statics.com/0970363330fbaaf6de42a35c2dea44fa5b97b6907feb899620a011b0e770f0c2.jpg",
+   "developers": [
+    "CD PROJEKT RED"
+   ],
+   "publishers": [
+    "CD PROJEKT RED"
+   ],
+   "operatingSystems": [
+    "windows"
+   ],
+   "price": {
+    "final": "$24.99",
+    "base": "$24.99",
+    "discount": null,
+    "finalMoney": {
+     "amount": "24.99",
+     "currency": "USD",
+     "discount": "0.00"
+    },
+    "baseMoney": {
+     "amount": "24.99",
+     "currency": "USD"
+    }
+   },
+   "productState": "default",
+   "genres": [
+    {
+     "name": "Ролевая игра",
+     "slug": "rpg"
+    },
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    },
+    {
+     "name": "Насыщенный сюжет",
+     "slug": "story-rich"
+    },
+    {
+     "name": "Атмосферные",
+     "slug": "atmospheric"
+    },
+    {
+     "name": "Ролевая игра",
+     "slug": "role-playing"
+    },
+    {
+     "name": "Исследовательские",
+     "slug": "exploration"
+    },
+    {
+     "name": "Классика",
+     "slug": "classic"
+    },
+    {
+     "name": "Отличный саундтрек",
+     "slug": "great-soundtrack"
+    },
+    {
+     "name": "Решения с последствиями",
+     "slug": "choices-matter"
+    },
+    {
+     "name": "Открытый мир",
+     "slug": "open-world"
+    },
+    {
+     "name": "От третьего лица",
+     "slug": "third-person"
+    },
+    {
+     "name": "Для взрослых",
+     "slug": "mature"
+    },
+    {
+     "name": "Сексуальный контент",
+     "slug": "sexual-content"
+    },
+    {
+     "name": "Нагота",
+     "slug": "nudity"
+    },
+    {
+     "name": "Насилие",
+     "slug": "violent"
+    },
+    {
+     "name": "Несколько концовок",
+     "slug": "multiple-endings"
+    },
+    {
+     "name": "Мясо",
+     "slug": "gore"
+    },
+    {
+     "name": "Магия",
+     "slug": "magic"
+    },
+    {
+     "name": "Средневековье",
+     "slug": "medieval"
+    },
+    {
+     "name": "Вампир",
+     "slug": "vampire"
+    },
+    {
+     "name": "Оборотни",
+     "slug": "werewolves"
+    }
+   ],
+   "reviewsRating": 49,
+   "reviewsCount": 2829,
+   "editions": [],
+   "ratings": [
+    {
+     "name": "pegiRating",
+     "ageRating": "18"
+    },
+    {
+     "name": "esrbRating",
+     "ageRating": "17"
+    },
+    {
+     "name": "uskRating",
+     "ageRating": "18"
+    }
+   ],
+   "storeLink": "https://www.gog.com/ru/game/the_witcher_3_wild_hunt_expansion_pass"
+  },
+  {
+   "id": "1427206931",
+   "slug": "the_witcher_3_wild_hunt_free_dlc_program",
+   "features": [
+    {
+     "name": "Достижения",
+     "slug": "achievements"
+    },
+    {
+     "name": "Поддержка контроллера",
+     "slug": "controller_support"
+    },
+    {
+     "name": "Одиночная игра",
+     "slug": "single"
+    }
+   ],
+   "screenshots": [
+    "https://images.gog-statics.com/0cd5257383e43ffce01483482292f42a135a12004344a39a30489fd4a8fec3a7_{formatter}.jpg",
+    "https://images.gog-statics.com/9d5a41647e377b58cf317991845ab279b7b68349a48a7300b43fd8d7d74cfde7_{formatter}.jpg",
+    "https://images.gog-statics.com/6188a987af2877ee09b8da0a31228f6f5cc78ccbd1cdbe2e78f725e93045efb7_{formatter}.jpg",
+    "https://images.gog-statics.com/1e3a474b3ace713444a2988b84a7cdeb0cc6be0acf9f2fae6be435c80b82356f_{formatter}.jpg",
+    "https://images.gog-statics.com/64d8cb60c99a46063885e19a032493bdb3a9f8ae06bb39f7128c03a35e0d488a_{formatter}.jpg",
+    "https://images.gog-statics.com/ccfe45949ba077b707d47ca62fdd9575fa5f40212021895d2f29f273435cfc4d_{formatter}.jpg",
+    "https://images.gog-statics.com/824e0560d78086aafe3a94c1c33de8abc01e3caecfc5edd8f49a565a63333753_{formatter}.jpg",
+    "https://images.gog-statics.com/9f70be2886a8e5c35b68a61b38d3ed95e93d55d90ab03686066f490a9155a183_{formatter}.jpg",
+    "https://images.gog-statics.com/2b626bed66c5ab2dcc30555eb0a76fd5b12e29b4edfef2d2840955d469a3b939_{formatter}.jpg",
+    "https://images.gog-statics.com/e4c2542d87387d0f035dea4b6ccfdc256f65733c2ebb3988d014287059d9800e_{formatter}.jpg",
+    "https://images.gog-statics.com/f4fc6b7c694ff3dccc016d679bd357bd3140ca55c99b1d77f2ca59f4a499ce50_{formatter}.jpg",
+    "https://images.gog-statics.com/3dfe171018f057b63e5fadd4f70e4be07ae2d55f989418cbc748a7fe216b83c4_{formatter}.jpg"
+   ],
+   "userPreferredLanguage": {
+    "code": "ru",
+    "inAudio": true,
+    "inText": true
+   },
+   "releaseDate": "2015.05.19",
+   "storeReleaseDate": "2015.05.18",
+   "productType": "pack",
+   "title": "Бесплатные DLC к игре «Ведьмак 3: Дикая Охота»",
+   "coverHorizontal": "https://images.gog-statics.com/6638cec393d8936ffca6567d62db919ee0f82e218c5c96494f51e2544d531968.png",
+   "coverVertical": "https://images.gog-statics.com/b830480bbc17a1376df20e2833bd50f22e3772a3cc56494be31903fbdf1b8025.jpg",
+   "logo": "https://images.gog-statics.com/8e40853e7e34d328f1b822df2f6cc61e7ff99774735651246b3c9c1f13279365.png",
+   "galaxyBackgroundImage": "https://images.gog-statics.com/2f48b5cf6d86fdd856a6aac19929f45d5a5c5ada11aedbb7cd32cd95ab80de3f.jpg",
+   "developers": [
+    "CD PROJEKT RED"
+   ],
+   "publishers": [
+    "CD PROJEKT RED"
+   ],
+   "operatingSystems": [
+    "windows"
+   ],
+   "price": {
+    "final": "$0.00",
+    "base": "$0.00",
+    "discount": null,
+    "finalMoney": {
+     "amount": "0.00",
+     "currency": "USD",
+     "discount": "0.00"
+    },
+    "baseMoney": {
+     "amount": "0.00",
+     "currency": "USD"
+    }
+   },
+   "productState": "default",
+   "genres": [
+    {
+     "name": "Ролевая игра",
+     "slug": "rpg"
+    },
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    },
+    {
+     "name": "Насыщенный сюжет",
+     "slug": "story-rich"
+    },
+    {
+     "name": "Атмосферные",
+     "slug": "atmospheric"
+    },
+    {
+     "name": "Ролевая игра",
+     "slug": "role-playing"
+    },
+    {
+     "name": "Исследовательские",
+     "slug": "exploration"
+    },
+    {
+     "name": "Отличный саундтрек",
+     "slug": "great-soundtrack"
+    },
+    {
+     "name": "Решения с последствиями",
+     "slug": "choices-matter"
+    },
+    {
+     "name": "Открытый мир",
+     "slug": "open-world"
+    },
+    {
+     "name": "От третьего лица",
+     "slug": "third-person"
+    },
+    {
+     "name": "Для взрослых",
+     "slug": "mature"
+    },
+    {
+     "name": "Сексуальный контент",
+     "slug": "sexual-content"
+    },
+    {
+     "name": "Нагота",
+     "slug": "nudity"
+    },
+    {
+     "name": "Насилие",
+     "slug": "violent"
+    },
+    {
+     "name": "Несколько концовок",
+     "slug": "multiple-endings"
+    },
+    {
+     "name": "Мясо",
+     "slug": "gore"
+    },
+    {
+     "name": "Магия",
+     "slug": "magic"
+    },
+    {
+     "name": "Средневековье",
+     "slug": "medieval"
+    },
+    {
+     "name": "Вампир",
+     "slug": "vampire"
+    },
+    {
+     "name": "Оборотни",
+     "slug": "werewolves"
+    }
+   ],
+   "reviewsRating": 49,
+   "reviewsCount": 3530,
+   "editions": [],
+   "ratings": [
+    {
+     "name": "pegiRating",
+     "ageRating": "18"
+    },
+    {
+     "name": "esrbRating",
+     "ageRating": "17"
+    },
+    {
+     "name": "uskRating",
+     "ageRating": "18"
+    }
+   ],
+   "storeLink": "https://www.gog.com/ru/game/the_witcher_3_wild_hunt_free_dlc_program"
+  },
+  {
+   "id": "1207664663",
+   "slug": "the_witcher_3_wild_hunt",
+   "features": [
+    {
+     "name": "Достижения",
+     "slug": "achievements"
+    },
+    {
+     "name": "Облачные сохранения",
+     "slug": "cloud_saves"
+    },
+    {
+     "name": "Поддержка контроллера",
+     "slug": "controller_support"
+    },
+    {
+     "name": "Одиночная игра",
+     "slug": "single"
+    }
+   ],
+   "screenshots": [
+    "https://images.gog-statics.com/3176c5947e367f70bca70cd7433ecf9c9516f8bd1cb58d12e4e0485a0e605267_{formatter}.jpg",
+    "https://images.gog-statics.com/5e6de2e64a80c60fd1dbfc43fa0a0ea314fa8107b485c67144f3c220a46b10f6_{formatter}.jpg",
+    "https://images.gog-statics.com/220be99fcee7f49da7c31878ead9ec9571c59033e2e85f7cce3d386373557a1d_{formatter}.jpg",
+    "https://images.gog-statics.com/3db98ec25ee1d791c8d746369cace5176b0a20093356a9828a03d85010296951_{formatter}.jpg",
+    "https://images.gog-statics.com/df1896cbb1caf27168513782c31d2b6acf920d185c0a1fae4f4553dd72e94a07_{formatter}.jpg",
+    "https://images.gog-statics.com/494a1e57325a32cf44360fbff8f65203c58b372ba1d8504665b5ba0df6f63910_{formatter}.jpg",
+    "https://images.gog-statics.com/92579767592d04a31ae394bcbfeeeda0096e409029eed90560b661b80dcdcdc2_{formatter}.jpg",
+    "https://images.gog-statics.com/f31f609c9b3366bf7646fe790fc375b87d2a683c35243c0beba9cc41cd0b4bb2_{formatter}.jpg",
+    "https://images.gog-statics.com/ab3a940de6909e3a158ada6e97ab52209ba553eb51cef4c88e316191573df1f6_{formatter}.jpg",
+    "https://images.gog-statics.com/14bfa01968cc7db9a57727e82dd60264a322497d51b7fa2120af59002e6d2caa_{formatter}.jpg",
+    "https://images.gog-statics.com/6894cf642c7670c465f6368ea188f61b61fa5af6d09426f4aee2f691b620f860_{formatter}.jpg",
+    "https://images.gog-statics.com/38ea83966bee844e10a034ea73d149d55e8c8fe418e18fd6e41c8c755d8bbec0_{formatter}.jpg",
+    "https://images.gog-statics.com/2f165f28005b9a1cd2f6150e1c6e726c5725b657daa61adef794cd5f716094a7_{formatter}.jpg",
+    "https://images.gog-statics.com/84d9659a78527b7d61363930bb7842f703adc3b83264542a107a1dbbffde2743_{formatter}.jpg",
+    "https://images.gog-statics.com/fd7c9b743b1f572b8fd632a128af3f4e3da01bcf722a89ebe06d53dc575715cb_{formatter}.jpg",
+    "https://images.gog-statics.com/57eaef3e89ba0c7609fad8cb37653fec2524902294a66750d5888014522679c8_{formatter}.jpg",
+    "https://images.gog-statics.com/c3e7d7c452ce0bdb54eb59967c7d835568cf0ccc840f763ec5aaf69965f84bb2_{formatter}.jpg",
+    "https://images.gog-statics.com/15f1a3d0729cbe6045d7d92d07794dcf47c65136b22e351b2eec161a4151741d_{formatter}.jpg",
+    "https://images.gog-statics.com/93eea13d9d8edd8b29d7492315e05fe251de4bfebf28c186887ff28b40809464_{formatter}.jpg",
+    "https://images.gog-statics.com/95ccd4d8592a3d08d060e2fc00f1f91d8faccafade3783697bc94dba4b8e59c4_{formatter}.jpg",
+    "https://images.gog-statics.com/4d3195b8134788650c3da6fff0db9371b096133259eeadca35c5170679007aee_{formatter}.jpg",
+    "https://images.gog-statics.com/1493644d97cd3c4b949907c836123d720ae3524eaa7e3e72c67831ed06e618a9_{formatter}.jpg",
+    "https://images.gog-statics.com/940ba668b74d6f25e3eb403cb0fda10018c16efe078a4bb496e3c742363b9d71_{formatter}.jpg",
+    "https://images.gog-statics.com/4e4fa3151d55f09c181a8bb94001d8b51a04b43f654e030a548f549167519058_{formatter}.jpg",
+    "https://images.gog-statics.com/753abbf5750ae0f70779a5c07a9656f86a8ed69b472b1ee91ea09d1f3e905e1c_{formatter}.jpg",
+    "https://images.gog-statics.com/c00716935a4a6ba124afbd48ee55cd20ea2162b352cf9513ccd32df9eeb421de_{formatter}.jpg",
+    "https://images.gog-statics.com/0590c43c5c436bfc4c116f44a3d9f14bed3dd93505afb439c25a5075c20aefaa_{formatter}.jpg",
+    "https://images.gog-statics.com/e0544bdfa4200602a5d55852c1672571dbb375f6309e0e3cd48de1c410438c57_{formatter}.jpg",
+    "https://images.gog-statics.com/9ec051b15d646bb0089290ebb39ebbda92ec21426627f36b653944215d031c85_{formatter}.jpg",
+    "https://images.gog-statics.com/753b480968523d6b42ccc89a7f4f252e7439a15e350577741a978e833a46ea25_{formatter}.jpg",
+    "https://images.gog-statics.com/7fe257fd08ccfc8dd702ad0ac2980e3eb5d796f985cf844c9d96ef1a45a74c05_{formatter}.jpg",
+    "https://images.gog-statics.com/3f665d320a3cdbb421ca628f84ef6eaac6eb0425cc8f994713fc887f6402e004_{formatter}.jpg"
+   ],
+   "userPreferredLanguage": {
+    "code": "ru",
+    "inAudio": true,
+    "inText": true
+   },
+   "releaseDate": "2015.05.19",
+   "storeReleaseDate": "2015.05.19",
+   "productType": "pack",
+   "title": "Ведьмак 3: Дикая Охота",
+   "coverHorizontal": "https://images.gog-statics.com/45a0d9d39f01bd10a9d967194d81e0660da0cd93038501be48b32ac4667a8591.png",
+   "coverVertical": "https://images.gog-statics.com/43972f6e5406e50b6ac3e82b16500c601e8c45f9a3577d026d99acd7c291607c.jpg",
+   "logo": "https://images.gog-statics.com/676c424592d576d253c18437972337e8fa4776eecfe6c5868aadf36010f9b11e.png",
+   "galaxyBackgroundImage": "https://images.gog-statics.com/8b55161db272b2689fc816afcae69c58f533587d7eb483d03509baac29b1f682.jpg",
+   "developers": [
+    "CD PROJEKT RED"
+   ],
+   "publishers": [
+    "CD PROJEKT RED"
+   ],
+   "operatingSystems": [
+    "windows"
+   ],
+   "price": {
+    "final": "$39.99",
+    "base": "$39.99",
+    "discount": null,
+    "finalMoney": {
+     "amount": "39.99",
+     "currency": "USD",
+     "discount": "0.00"
+    },
+    "baseMoney": {
+     "amount": "39.99",
+     "currency": "USD"
+    }
+   },
+   "productState": "default",
+   "genres": [
+    {
+     "name": "Ролевая игра",
+     "slug": "rpg"
+    },
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Приключение",
+     "slug": "adventure"
+    },
+    {
+     "name": "Фэнтези",
+     "slug": "fantasy"
+    },
+    {
+     "name": "Насыщенный сюжет",
+     "slug": "story-rich"
+    },
+    {
+     "name": "Атмосферные",
+     "slug": "atmospheric"
+    },
+    {
+     "name": "Ролевая игра",
+     "slug": "role-playing"
+    },
+    {
+     "name": "Исследовательские",
+     "slug": "exploration"
+    },
+    {
+     "name": "Классика",
+     "slug": "classic"
+    },
+    {
+     "name": "Отличный саундтрек",
+     "slug": "great-soundtrack"
+    },
+    {
+     "name": "Решения с последствиями",
+     "slug": "choices-matter"
+    },
+    {
+     "name": "Открытый мир",
+     "slug": "open-world"
+    },
+    {
+     "name": "От третьего лица",
+     "slug": "third-person"
+    },
+    {
+     "name": "Для взрослых",
+     "slug": "mature"
+    },
+    {
+     "name": "Сексуальный контент",
+     "slug": "sexual-content"
+    },
+    {
+     "name": "Нагота",
+     "slug": "nudity"
+    },
+    {
+     "name": "Насилие",
+     "slug": "violent"
+    },
+    {
+     "name": "Несколько концовок",
+     "slug": "multiple-endings"
+    },
+    {
+     "name": "Мясо",
+     "slug": "gore"
+    },
+    {
+     "name": "Магия",
+     "slug": "magic"
+    },
+    {
+     "name": "Средневековье",
+     "slug": "medieval"
+    },
+    {
+     "name": "Вампир",
+     "slug": "vampire"
+    },
+    {
+     "name": "Оборотни",
+     "slug": "werewolves"
+    }
+   ],
+   "reviewsRating": 48,
+   "reviewsCount": 12980,
+   "editions": [
+    {
+     "id": 1207664663,
+     "name": "Standard Edition",
+     "isRootEdition": true
+    },
+    {
+     "id": 1640424747,
+     "name": "Complete Edition",
+     "isRootEdition": false
+    }
+   ],
+   "ratings": [
+    {
+     "name": "pegiRating",
+     "ageRating": "18"
+    },
+    {
+     "name": "esrbRating",
+     "ageRating": "17"
+    },
+    {
+     "name": "uskRating",
+     "ageRating": "18"
+    }
+   ],
+   "storeLink": "https://www.gog.com/ru/game/the_witcher_3_wild_hunt"
+  }
+ ],
+ "dreamlistGames": [],
+ "filters": {
+  "releaseDateRange": {
+   "min": 2015,
+   "max": 2016
+  },
+  "priceRange": {
+   "min": 0,
+   "max": 49.99,
+   "currency": "USD",
+   "decimalPlaces": 2
+  },
+  "genres": [
+   {
+    "name": "Гонки",
+    "slug": "racing"
+   },
+   {
+    "name": "Приключение",
+    "slug": "adventure"
+   },
+   {
+    "name": "Ролевая игра",
+    "slug": "rpg"
+   },
+   {
+    "name": "Симулятор",
+    "slug": "simulation"
+   },
+   {
+    "name": "Спорт",
+    "slug": "sports"
+   },
+   {
+    "name": "Стратегия",
+    "slug": "strategy"
+   },
+   {
+    "name": "Шутер",
+    "slug": "shooter"
+   },
+   {
+    "name": "Экшн",
+    "slug": "action"
+   }
+  ],
+  "languages": [
+   {
+    "slug": "ar",
+    "name": "العربية"
+   },
+   {
+    "slug": "br",
+    "name": "Português do Brasil"
+   },
+   {
+    "slug": "cn",
+    "name": "中文(简体)"
+   },
+   {
+    "slug": "cz",
+    "name": "český"
+   },
+   {
+    "slug": "da",
+    "name": "Dansk"
+   },
+   {
+    "slug": "de",
+    "name": "Deutsch"
+   },
+   {
+    "slug": "en",
+    "name": "English"
+   },
+   {
+    "slug": "es",
+    "name": "español"
+   },
+   {
+    "slug": "es_mx",
+    "name": "Español (AL)"
+   },
+   {
+    "slug": "fi",
+    "name": "Suomi"
+   },
+   {
+    "slug": "fr",
+    "name": "français"
+   },
+   {
+    "slug": "gk",
+    "name": "Ελληνικά"
+   },
+   {
+    "slug": "hu",
+    "name": "magyar"
+   },
+   {
+    "slug": "hr",
+    "name": "hrvatski"
+   },
+   {
+    "slug": "id",
+    "name": "bahasa Indonesia"
+   },
+   {
+    "slug": "it",
+    "name": "italiano"
+   },
+   {
+    "slug": "jp",
+    "name": "日本語"
+   },
+   {
+    "slug": "ko",
+    "name": "한국어"
+   },
+   {
+    "slug": "nl",
+    "name": "nederlands"
+   },
+   {
+    "slug": "no",
+    "name": "norsk"
+   },
+   {
+    "slug": "pl",
+    "name": "polski"
+   },
+   {
+    "slug": "pt",
+    "name": "português"
+   },
+   {
+    "slug": "ro",
+    "name": "română"
+   },
+   {
+    "slug": "ru",
+    "name": "русский"
+   },
+   {
+    "slug": "sv",
+    "name": "svenska"
+   },
+   {
+    "slug": "th",
+    "name": "ไทย"
+   },
+   {
+    "slug": "tr",
+    "name": "Türkçe"
+   },
+   {
+    "slug": "uk",
+    "name": "Українська"
+   },
+   {
+    "slug": "vi",
+    "name": "Tiếng Việt"
+   },
+   {
+    "slug": "zh",
+    "name": "中文(繁體)"
+   }
+  ],
+  "systems": [
+   {
+    "slug": "windows",
+    "name": "Windows"
+   },
+   {
+    "slug": "osx",
+    "name": "macOS"
+   },
+   {
+    "slug": "linux",
+    "name": "Linux"
+   }
+  ],
+  "tags": [
+   {
+    "name": "Приключение",
+    "slug": "adventure"
+   },
+   {
+    "name": "Экшн",
+    "slug": "action"
+   },
+   {
+    "name": "Инди",
+    "slug": "indie"
+   },
+   {
+    "name": "Насыщенный сюжет",
+    "slug": "story-rich"
+   },
+   {
+    "name": "Атмосферные",
+    "slug": "atmospheric"
+   },
+   {
+    "name": "Фэнтези",
+    "slug": "fantasy"
+   },
+   {
+    "name": "Стратегия",
+    "slug": "strategy"
+   },
+   {
+    "name": "2D",
+    "slug": "two-dimensional"
+   },
+   {
+    "name": "Ролевая игра",
+    "slug": "role-playing"
+   },
+   {
+    "name": "Классика",
+    "slug": "classic"
+   }
+  ],
+  "discounted": false,
+  "features": [
+   {
+    "slug": "single",
+    "name": "Одиночная игра"
+   },
+   {
+    "slug": "multi",
+    "name": "сетевая игра"
+   },
+   {
+    "slug": "coop",
+    "name": "Кооперативный режим"
+   },
+   {
+    "slug": "achievements",
+    "name": "Достижения"
+   },
+   {
+    "slug": "leaderboards",
+    "name": "Таблицы лидеров"
+   },
+   {
+    "slug": "controller_support",
+    "name": "Поддержка контроллера"
+   },
+   {
+    "slug": "cloud_saves",
+    "name": "Облачные сохранения"
+   },
+   {
+    "slug": "overlay",
+    "name": "Оверлей"
+   },
+   {
+    "slug": "galaxy_multiplayer",
+    "name": "сетевая игра"
+   }
+  ],
+  "releaseStatuses": [
+   {
+    "slug": "new-arrival",
+    "name": "New Arrivals"
+   },
+   {
+    "slug": "upcoming",
+    "name": "Upcoming"
+   },
+   {
+    "slug": "early-access",
+    "name": "Early Access"
+   }
+  ],
+  "types": [
+   "game",
+   "dlc",
+   "extras",
+   "pack"
+  ],
+  "fullGenresList": [
+   {
+    "name": "Гонки",
+    "slug": "racing",
+    "level": 1
+   },
+   {
+    "name": "Приключение",
+    "slug": "adventure",
+    "level": 1
+   },
+   {
+    "name": "Ролевая игра",
+    "slug": "rpg",
+    "level": 1
+   },
+   {
+    "name": "Симулятор",
+    "slug": "simulation",
+    "level": 1
+   },
+   {
+    "name": "Спорт",
+    "slug": "sports",
+    "level": 1
+   },
+   {
+    "name": "Стратегия",
+    "slug": "strategy",
+    "level": 1
+   },
+   {
+    "name": "Шутер",
+    "slug": "shooter",
+    "level": 1
+   },
+   {
+    "name": "Экшн",
+    "slug": "action",
+    "level": 1
+   },
+   {
+    "name": "Metroidvania",
+    "slug": "metroidvania",
+    "level": 2
+   },
+   {
+    "name": "Survival",
+    "slug": "survival",
+    "level": 2
+   },
+   {
+    "name": "Аркада",
+    "slug": "arcade",
+    "level": 2
+   },
+   {
+    "name": "В реальном времени",
+    "slug": "realtime",
+    "level": 2
+   },
+   {
+    "name": "Визуальные новеллы",
+    "slug": "visual-novel",
+    "level": 2
+   },
+   {
+    "name": "Головоломка",
+    "slug": "puzzle",
+    "level": 2
+   },
+   {
+    "name": "Карточная игра",
+    "slug": "card-game",
+    "level": 2
+   },
+   {
+    "name": "Квест",
+    "slug": "pointandclick",
+    "level": 2
+   },
+   {
+    "name": "Командный спорт",
+    "slug": "teamsport",
+    "level": 2
+   },
+   {
+    "name": "Обучающая",
+    "slug": "educational",
+    "level": 2
+   },
+   {
+    "name": "От первого лица",
+    "slug": "fpp",
+    "level": 2
+   },
+   {
+    "name": "От третьего лица",
+    "slug": "tpp",
+    "level": 2
+   },
+   {
+    "name": "Пошаговая",
+    "slug": "turnbased",
+    "level": 2
+   },
+   {
+    "name": "Приключение",
+    "slug": "adventure",
+    "level": 2
+   },
+   {
+    "name": "Ролевая игра",
+    "slug": "rpg",
+    "level": 2
+   },
+   {
+    "name": "Симулятор",
+    "slug": "simulation",
+    "level": 2
+   },
+   {
+    "name": "Сражения",
+    "slug": "combat",
+    "level": 2
+   },
+   {
+    "name": "Стратегия",
+    "slug": "strategy",
+    "level": 2
+   },
+   {
+    "name": "Строительство",
+    "slug": "building",
+    "level": 2
+   },
+   {
+    "name": "Экономика",
+    "slug": "economic",
+    "level": 2
+   },
+   {
+    "name": "Экшн",
+    "slug": "action",
+    "level": 2
+   },
+   {
+    "name": "Exploration",
+    "slug": "exploration",
+    "level": 3
+   },
+   {
+    "name": "FPP",
+    "slug": "fpp",
+    "level": 3
+   },
+   {
+    "name": "JRPG",
+    "slug": "jrpg",
+    "level": 3
+   },
+   {
+    "name": "Metroidvania",
+    "slug": "metroidvania",
+    "level": 3
+   },
+   {
+    "name": "Open World",
+    "slug": "open-world",
+    "level": 3
+   },
+   {
+    "name": "Roguelike",
+    "slug": "rougelike",
+    "level": 3
+   },
+   {
+    "name": "Sandbox",
+    "slug": "sandbox",
+    "level": 3
+   },
+   {
+    "name": "Shoot 'em Up",
+    "slug": "shoot-em-up",
+    "level": 3
+   },
+   {
+    "name": "Виртуальная жизнь",
+    "slug": "virtuallife",
+    "level": 3
+   },
+   {
+    "name": "Внедорожники",
+    "slug": "offroad",
+    "level": 3
+   },
+   {
+    "name": "Выживание",
+    "slug": "survival",
+    "level": 3
+   },
+   {
+    "name": "Головоломка",
+    "slug": "puzzle",
+    "level": 3
+   },
+   {
+    "name": "Детектив",
+    "slug": "detective",
+    "level": 3
+   },
+   {
+    "name": "Драма",
+    "slug": "narrative",
+    "level": 3
+   },
+   {
+    "name": "Историческая",
+    "slug": "historical",
+    "level": 3
+   },
+   {
+    "name": "Комедия",
+    "slug": "comedy",
+    "level": 3
+   },
+   {
+    "name": "Менеджмент",
+    "slug": "managerial",
+    "level": 3
+   },
+   {
+    "name": "Мистика",
+    "slug": "mystery",
+    "level": 3
+   },
+   {
+    "name": "Пинбол",
+    "slug": "pinball",
+    "level": 3
+   },
+   {
+    "name": "Платформер",
+    "slug": "platformer",
+    "level": 3
+   },
+   {
+    "name": "Поиск предметов",
+    "slug": "hidden-object",
+    "level": 3
+   },
+   {
+    "name": "Про море",
+    "slug": "naval",
+    "level": 3
+   },
+   {
+    "name": "Программирование",
+    "slug": "programming",
+    "level": 3
+   },
+   {
+    "name": "Ралли",
+    "slug": "rally",
+    "level": 3
+   },
+   {
+    "name": "Современность",
+    "slug": "modern",
+    "level": 3
+   },
+   {
+    "name": "Стелс",
+    "slug": "stealth",
+    "level": 3
+   },
+   {
+    "name": "Тактическая",
+    "slug": "tactical",
+    "level": 3
+   },
+   {
+    "name": "Турне",
+    "slug": "touring",
+    "level": 3
+   },
+   {
+    "name": "Файтинг",
+    "slug": "fighting",
+    "level": 3
+   },
+   {
+    "name": "Фантастика",
+    "slug": "scifi",
+    "level": 3
+   },
+   {
+    "name": "Футбол",
+    "slug": "soccer",
+    "level": 3
+   },
+   {
+    "name": "Фэнтези",
+    "slug": "fantasy",
+    "level": 3
+   },
+   {
+    "name": "Хоррор",
+    "slug": "horror",
+    "level": 3
+   },
+   {
+    "name": "Шахматы",
+    "slug": "chess",
+    "level": 3
+   },
+   {
+    "name": "Шпионаж",
+    "slug": "espionage",
+    "level": 3
+   }
+  ],
+  "fullTagsList": [
+   {
+    "name": "Приключение",
+    "slug": "adventure"
+   },
+   {
+    "name": "Экшн",
+    "slug": "action"
+   },
+   {
+    "name": "Инди",
+    "slug": "indie"
+   },
+   {
+    "name": "Насыщенный сюжет",
+    "slug": "story-rich"
+   },
+   {
+    "name": "Атмосферные",
+    "slug": "atmospheric"
+   },
+   {
+    "name": "Фэнтези",
+    "slug": "fantasy"
+   },
+   {
+    "name": "Стратегия",
+    "slug": "strategy"
+   },
+   {
+    "name": "2D",
+    "slug": "two-dimensional"
+   },
+   {
+    "name": "Ролевая игра",
+    "slug": "role-playing"
+   },
+   {
+    "name": "Классика",
+    "slug": "classic"
+   },
+   {
+    "name": "Исследовательские",
+    "slug": "exploration"
+   },
+   {
+    "name": "Научная фантастика",
+    "slug": "sci-fi"
+   },
+   {
+    "name": "Головоломка",
+    "slug": "puzzle"
+   },
+   {
+    "name": "Симулятор",
+    "slug": "simulation"
+   },
+   {
+    "name": "Пошаговая стратегия",
+    "slug": "turn-based"
+   },
+   {
+    "name": "Казуальная",
+    "slug": "casual"
+   },
+   {
+    "name": "Протагонистка",
+    "slug": "female-protagonist"
+   },
+   {
+    "name": "Пиксельная графика",
+    "slug": "pixel-graphics"
+   },
+   {
+    "name": "Наука",
+    "slug": "science"
+   },
+   {
+    "name": "Мрачная",
+    "slug": "dark"
+   },
+   {
+    "name": "От первого лица",
+    "slug": "first-person"
+   },
+   {
+    "name": "Отличный саундтрек",
+    "slug": "great-soundtrack"
+   },
+   {
+    "name": "Решения с последствиями",
+    "slug": "choices-matter"
+   },
+   {
+    "name": "Хоррор",
+    "slug": "horror"
+   },
+   {
+    "name": "Смешная",
+    "slug": "funny"
+   },
+   {
+    "name": "Тактика",
+    "slug": "tactical"
+   },
+   {
+    "name": "Управление",
+    "slug": "management"
+   },
+   {
+    "name": "Визуальная новелла",
+    "slug": "visual-novel"
+   },
+   {
+    "name": "Тайна",
+    "slug": "mystery"
+   },
+   {
+    "name": "От третьего лица",
+    "slug": "third-person"
+   },
+   {
+    "name": "Открытый мир",
+    "slug": "open-world"
+   },
+   {
+    "name": "Многопользовательская игра",
+    "slug": "multiplayer"
+   },
+   {
+    "name": "Для взрослых",
+    "slug": "mature"
+   },
+   {
+    "name": "OST",
+    "slug": "ost"
+   },
+   {
+    "name": "Сексуальный контент",
+    "slug": "sexual-content"
+   },
+   {
+    "name": "Песочница",
+    "slug": "sandbox"
+   },
+   {
+    "name": "Нагота",
+    "slug": "nudity"
+   },
+   {
+    "name": "Платформер",
+    "slug": "platformer"
+   },
+   {
+    "name": "Point&Click",
+    "slug": "point-and-click"
+   },
+   {
+    "name": "История",
+    "slug": "historical"
+   },
+   {
+    "name": "Управление ресурсами",
+    "slug": "resource-management"
+   },
+   {
+    "name": "Выживание",
+    "slug": "survival"
+   },
+   {
+    "name": "Сложная",
+    "slug": "difficult"
+   },
+   {
+    "name": "Насилие",
+    "slug": "violent"
+   },
+   {
+    "name": "Несколько концовок",
+    "slug": "multiple-endings"
+   },
+   {
+    "name": "В реальном времени",
+    "slug": "real-time"
+   },
+   {
+    "name": "NSFW",
+    "slug": "nsfw"
+   },
+   {
+    "name": "Семейная",
+    "slug": "family-friendly"
+   },
+   {
+    "name": "Мясо",
+    "slug": "gore"
+   },
+   {
+    "name": "Японская ролевая игра",
+    "slug": "jrpg"
+   },
+   {
+    "name": "Ретро",
+    "slug": "retro"
+   },
+   {
+    "name": "Рогалик",
+    "slug": "roguelike"
+   },
+   {
+    "name": "Изометрия",
+    "slug": "isometric"
+   },
+   {
+    "name": "Магия",
+    "slug": "magic"
+   },
+   {
+    "name": "Расслабляющая",
+    "slug": "relaxing"
+   },
+   {
+    "name": "Вид сверху вних",
+    "slug": "top-down"
+   },
+   {
+    "name": "Космос",
+    "slug": "space"
+   },
+   {
+    "name": "Строительство",
+    "slug": "building"
+   },
+   {
+    "name": "Логическая",
+    "slug": "logic"
+   },
+   {
+    "name": "Шутер от первого лица",
+    "slug": "fps"
+   },
+   {
+    "name": "Мультипликация",
+    "slug": "cartoony"
+   },
+   {
+    "name": "Война",
+    "slug": "war"
+   },
+   {
+    "name": "Средневековье",
+    "slug": "medieval"
+   },
+   {
+    "name": "Драма",
+    "slug": "narrative"
+   },
+   {
+    "name": "Упрощенный рогалик",
+    "slug": "roguelite"
+   },
+   {
+    "name": "Слэшер",
+    "slug": "hack-and-slash"
+   },
+   {
+    "name": "Эмоциональная",
+    "slug": "emotional"
+   },
+   {
+    "name": "Крафтинг",
+    "slug": "crafting"
+   },
+   {
+    "name": "Шутер",
+    "slug": "shooter"
+   },
+   {
+    "name": "Строительство базы",
+    "slug": "base-building"
+   },
+   {
+    "name": "Реалистичная",
+    "slug": "realistic"
+   },
+   {
+    "name": "Менеджмент",
+    "slug": "managerial"
+   },
+   {
+    "name": "Градостроение",
+    "slug": "city-builder"
+   },
+   {
+    "name": "Процедурная генерация",
+    "slug": "procedural-generation"
+   },
+   {
+    "name": "Расследование",
+    "slug": "investigation"
+   },
+   {
+    "name": "Постапокалипсис",
+    "slug": "post-apocalyptic"
+   },
+   {
+    "name": "Стратегия в реальном времени",
+    "slug": "rts"
+   },
+   {
+    "name": "Локальный кооператив",
+    "slug": "local-co-op"
+   },
+   {
+    "name": "Выбери себе приключение",
+    "slug": "choose-your-own-adventure"
+   },
+   {
+    "name": "Романтическая",
+    "slug": "romance"
+   },
+   {
+    "name": "Психологический хоррор",
+    "slug": "psychological-horror"
+   },
+   {
+    "name": "Стелс",
+    "slug": "stealth"
+   },
+   {
+    "name": "Военная",
+    "slug": "military"
+   },
+   {
+    "name": "Хоррор на выживание",
+    "slug": "survival-horror"
+   },
+   {
+    "name": "Подземелья",
+    "slug": "dungeon-crawler"
+   },
+   {
+    "name": "Artbook",
+    "slug": "artbook"
+   },
+   {
+    "name": "Тактическая ролевая игра",
+    "slug": "tactical-rpg"
+   },
+   {
+    "name": "Аркада",
+    "slug": "arcade"
+   },
+   {
+    "name": "Глобальная стратегия",
+    "slug": "grand-strategy"
+   },
+   {
+    "name": "Сюрреалистичная",
+    "slug": "surreal"
+   },
+   {
+    "name": "ЛГБТК+",
+    "slug": "lgbtq-plus"
+   },
+   {
+    "name": "Сражения",
+    "slug": "combat"
+   },
+   {
+    "name": "Киберпанк",
+    "slug": "cyberpunk"
+   },
+   {
+    "name": "Локальный мультиплеер",
+    "slug": "local-multiplayer"
+   },
+   {
+    "name": "Симулятор свиданий",
+    "slug": "dating-sim"
+   },
+   {
+    "name": "Компьютерная ролевая игра",
+    "slug": "crpg"
+   },
+   {
+    "name": "Современность",
+    "slug": "modern"
+   },
+   {
+    "name": "Головоломка-платформер",
+    "slug": "puzzle-platformer"
+   },
+   {
+    "name": "Файтинг",
+    "slug": "fighting"
+   },
+   {
+    "name": "Комедия",
+    "slug": "comedy"
+   },
+   {
+    "name": "Метроидвания",
+    "slug": "metroidvania"
+   },
+   {
+    "name": "Хентай",
+    "slug": "hentai"
+   },
+   {
+    "name": "Симультор ходьбы",
+    "slug": "walking-simulator"
+   },
+   {
+    "name": "Физика",
+    "slug": "physics"
+   },
+   {
+    "name": "Сверхъестественное",
+    "slug": "supernatural"
+   },
+   {
+    "name": "Карточная игра",
+    "slug": "card-game"
+   },
+   {
+    "name": "Детектив",
+    "slug": "detective"
+   },
+   {
+    "name": "Психология",
+    "slug": "psychological"
+   },
+   {
+    "name": "Черная комедия",
+    "slug": "dark-comedy"
+   },
+   {
+    "name": "Лавкрафт",
+    "slug": "lovecraftian"
+   },
+   {
+    "name": "Природа",
+    "slug": "nature"
+   },
+   {
+    "name": "Политическая",
+    "slug": "politics"
+   },
+   {
+    "name": "Триллер",
+    "slug": "thriller"
+   },
+   {
+    "name": "Cozy",
+    "slug": "cozy"
+   },
+   {
+    "name": "Shoot'EmUp",
+    "slug": "shoot-em-up"
+   },
+   {
+    "name": "Скролл-шутер",
+    "slug": "bullet-hell"
+   },
+   {
+    "name": "Дистопия",
+    "slug": "dystopian"
+   },
+   {
+    "name": "4X",
+    "slug": "four-x"
+   },
+   {
+    "name": "Роботы",
+    "slug": "robots"
+   },
+   {
+    "name": "Good Old Game",
+    "slug": "good-old-game"
+   },
+   {
+    "name": "Похожа на Dark Souls",
+    "slug": "souls-like"
+   },
+   {
+    "name": "Demoware",
+    "slug": "demo"
+   },
+   {
+    "name": "Перманентная смерть",
+    "slug": "perma-death"
+   },
+   {
+    "name": "Текстовая",
+    "slug": "text-based"
+   },
+   {
+    "name": "Криминал",
+    "slug": "crime"
+   },
+   {
+    "name": "Быстрая игра",
+    "slug": "short"
+   },
+   {
+    "name": "Нуар",
+    "slug": "noir"
+   },
+   {
+    "name": "Мифология",
+    "slug": "mythology"
+   },
+   {
+    "name": "Поиск предметов",
+    "slug": "hidden-object"
+   },
+   {
+    "name": "Beat 'em up",
+    "slug": "beat-em-up"
+   },
+   {
+    "name": "Карточная",
+    "slug": "deckbuilding"
+   },
+   {
+    "name": "Котики",
+    "slug": "cats"
+   },
+   {
+    "name": "Вторая мировая войны",
+    "slug": "world-war-ii"
+   },
+   {
+    "name": "Римейк",
+    "slug": "remake"
+   },
+   {
+    "name": "Симулятор жизни",
+    "slug": "lifesim"
+   },
+   {
+    "name": "Настольная с полем",
+    "slug": "board-game"
+   },
+   {
+    "name": "Образование",
+    "slug": "education"
+   },
+   {
+    "name": "Зомби",
+    "slug": "zombies"
+   },
+   {
+    "name": "Полеты",
+    "slug": "flight"
+   },
+   {
+    "name": "Стимпанк",
+    "slug": "steampunk"
+   },
+   {
+    "name": "Башенная защита",
+    "slug": "tower-defense"
+   },
+   {
+    "name": "Философская",
+    "slug": "philosophical"
+   },
+   {
+    "name": "Торговля",
+    "slug": "trading"
+   },
+   {
+    "name": "Настольная игра",
+    "slug": "tabletop"
+   },
+   {
+    "name": "Экономика",
+    "slug": "economic"
+   },
+   {
+    "name": "Твин-стик шутер",
+    "slug": "twin-stick-shooter"
+   },
+   {
+    "name": "Гонки",
+    "slug": "racing"
+   },
+   {
+    "name": "Только на GOG",
+    "slug": "only-on-gog"
+   },
+   {
+    "name": "Редактор уровней",
+    "slug": "leveleditor"
+   },
+   {
+    "name": "Вампир",
+    "slug": "vampire"
+   },
+   {
+    "name": "FMV-игра",
+    "slug": "fmv"
+   },
+   {
+    "name": "Спорт",
+    "slug": "sports"
+   },
+   {
+    "name": "Рыбалка",
+    "slug": "fishing"
+   },
+   {
+    "name": "Пираты",
+    "slug": "pirates"
+   },
+   {
+    "name": "Контроль времени",
+    "slug": "time-manipulation"
+   },
+   {
+    "name": "Поезда",
+    "slug": "trains"
+   },
+   {
+    "name": "Фермерство",
+    "slug": "farming"
+   },
+   {
+    "name": "Транспорт",
+    "slug": "transportation"
+   },
+   {
+    "name": "Танки",
+    "slug": "tanks"
+   },
+   {
+    "name": "Мореплавание",
+    "slug": "naval"
+   },
+   {
+    "name": "Пародия",
+    "slug": "parody"
+   },
+   {
+    "name": "Вестерн",
+    "slug": "western"
+   },
+   {
+    "name": "Без насилия",
+    "slug": "non-violent"
+   },
+   {
+    "name": "Боевые искусства",
+    "slug": "martial-arts"
+   },
+   {
+    "name": "Собаки",
+    "slug": "dog"
+   },
+   {
+    "name": "Ритм",
+    "slug": "rhythm"
+   },
+   {
+    "name": "Разделение экрана",
+    "slug": "split-screen"
+   },
+   {
+    "name": "Автобатлер",
+    "slug": "auto-battler"
+   },
+   {
+    "name": "Кулинария",
+    "slug": "cooking"
+   },
+   {
+    "name": "Подводный мир",
+    "slug": "underwater"
+   },
+   {
+    "name": "Супергерои",
+    "slug": "superhero"
+   },
+   {
+    "name": "VR",
+    "slug": "vr"
+   },
+   {
+    "name": "Free Game",
+    "slug": "freegame"
+   },
+   {
+    "name": "Подземный мир",
+    "slug": "underground"
+   },
+   {
+    "name": "Лутер-шутер",
+    "slug": "looter-shooter"
+   },
+   {
+    "name": "Ниндзя",
+    "slug": "ninja"
+   },
+   {
+    "name": "Виртуальная жизнь",
+    "slug": "virtual-life"
+   },
+   {
+    "name": "Динозавры",
+    "slug": "dinosaurs"
+   },
+   {
+    "name": "Викинги",
+    "slug": "vikings"
+   },
+   {
+    "name": "Ралли",
+    "slug": "rally"
+   },
+   {
+    "name": "Побег из комнаты",
+    "slug": "escape-room"
+   },
+   {
+    "name": "Партийная игра",
+    "slug": "party-game"
+   },
+   {
+    "name": "Программирование",
+    "slug": "programming"
+   },
+   {
+    "name": "Первая мировая война",
+    "slug": "world-war-i"
+   },
+   {
+    "name": "Печатание",
+    "slug": "typing"
+   },
+   {
+    "name": "educational",
+    "slug": "educational"
+   },
+   {
+    "name": "Гладить собак",
+    "slug": "petting-dogs"
+   },
+   {
+    "name": "Футбол",
+    "slug": "football"
+   },
+   {
+    "name": "Для совершеннолетних",
+    "slug": "coming-of-age"
+   },
+   {
+    "name": "Оборотни",
+    "slug": "werewolves"
+   },
+   {
+    "name": "Mod",
+    "slug": "mod"
+   },
+   {
+    "name": "Внедорожники",
+    "slug": "offroad"
+   },
+   {
+    "name": "Американский футбол",
+    "slug": "soccer"
+   },
+   {
+    "name": "Кино",
+    "slug": "movie"
+   },
+   {
+    "name": "Шпионаж",
+    "slug": "espionage"
+   },
+   {
+    "name": "Пинболл",
+    "slug": "pinball"
+   },
+   {
+    "name": "Три в ряд",
+    "slug": "match-three"
+   },
+   {
+    "name": "Crossplay",
+    "slug": "crossplay"
+   },
+   {
+    "name": "Командный спорт",
+    "slug": "team-sport"
+   },
+   {
+    "name": "Шахматы",
+    "slug": "chess"
+   },
+   {
+    "name": "Снайпер",
+    "slug": "sniper"
+   },
+   {
+    "name": "Турне",
+    "slug": "touring"
+   },
+   {
+    "name": "Online-only",
+    "slug": "online-only"
+   }
+  ]
+ },
+ "searchAlgo": "default"
+}
