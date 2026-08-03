@@ -43,7 +43,7 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (260)
+### app/SearchScreen.svelte (295)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -85,7 +85,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale
 
-## components — 28 файлов
+## components — 29 файлов
 
 ### components/Acts.svelte (21)
 - Ряд действий карточки: правка, удаление, закладка.
@@ -126,6 +126,11 @@
 ### components/Film.svelte (105)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
+
+### components/Gone.svelte (23)
+- Строка списка убранного: слева название, справа кнопка возврата. Свёрнутая карточка без возможности развернуть — разворачивать в ней нечего: кроме названия, источника и типа в таблице убранного ничего не лежит. Решение пользователя 03.08.2026.
+- принимает: view, onrestore
+- берёт: ./Icon.svelte
 
 ### components/Icon.svelte (6)
 - Глиф Material Symbols.
@@ -354,9 +359,9 @@
 .newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (156)
+### styles/film.css (162)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
-- селекторы (19): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
+- селекторы (20): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
 .film.is-collapsed .film__poster,
 .film.is-collapsed .film__chips,
 .film.is-collapsed .film__facts,
@@ -364,7 +369,7 @@
 .film.is-collapsed .film__aggr,
 .film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film__poster, .film__poster .material-symbols-outlined, .film__poster img,
 .cardform__poster img, .film__body, .film__top,
-.film__bottom, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover
+.film__bottom, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover, .film.is-gone .film__toggle .material-symbols-outlined
 - объявляет: --gutter, --icon-inset, --row-gap
 - берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --row-gap, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 

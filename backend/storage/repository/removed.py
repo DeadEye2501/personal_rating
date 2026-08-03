@@ -1,9 +1,9 @@
 """Что человек убрал из выдачи насовсем."""
 
-from sqlalchemy import select, tuple_
+from sqlalchemy import delete, select, tuple_
 from sqlalchemy.dialects.sqlite import insert
 
-from backend.model import Item, Kind, Source
+from backend.model import CardView, Item, Kind, Source
 from backend.storage.repository.base import Repository
 from backend.storage.tables import removed as removed_table
 
@@ -26,6 +26,41 @@ class RemovedRepository(Repository):
             .values(kind=item.kind, source=item.source,
                     source_id=item.source_id, title=item.title)
             .on_conflict_do_nothing()
+        )
+
+    async def listing(self, kind: Kind) -> list[CardView]:
+        """Что человек убирал в этой вкладке. Вкладка — первичный фильтр везде,
+        и здесь тоже.
+
+        `CardView`, а не свой тип: строка рисуется свёрнутой карточкой, и
+        показывать в ней, кроме названия, нечего — остальные поля пустуют ровно
+        так же, как у кандидата выдачи. Заводить ради четырёх колонок второй тип
+        границы значит вести его и через мост, и через сторожа поверхности.
+
+        Порядок по названию: своего времени у строки нет, таблица его не хранит,
+        а без порядка список прыгал бы между перерисовками."""
+        rows = await self._rows(
+            select(removed_table)
+            .where(removed_table.c.kind == kind)
+            .order_by(removed_table.c.title)
+        )
+        return [CardView(kind=Kind(row.kind), source=Source(row.source),
+                         source_id=row.source_id, title=row.title)
+                for row in rows]
+
+    async def forget(self, kind: Kind, source: Source, source_id: str) -> None:
+        """Снять пометку. Возвращается не карточка, а только память о ней: игра
+        снова находится поиском, завести её можно заново — уже как новую, без
+        прежней оценки.
+
+        Пометки может не оказаться вовсе, и это исход, а не отказ: человек нажал
+        дважды, страница дважды позвала мост."""
+        await self._run(
+            delete(removed_table).where(
+                removed_table.c.kind == kind,
+                removed_table.c.source == source,
+                removed_table.c.source_id == source_id,
+            )
         )
 
     async def known(

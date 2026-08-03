@@ -243,6 +243,7 @@
 - `class ExternalSearch`
   - `views: tuple[CardView, ...]`
   - `refusals: tuple[Refusal, ...]`
+  - `removed: bool` = `False`
 
 ### `backend/model/search.py`
 
@@ -360,6 +361,7 @@
 ### `backend/service/search.py`
 
 - `SEARCH_SIZE` = `20`
+- `COMMANDS` = `frozenset({'удалено', 'удаленное', 'удаленный', …`
 - `class SearchParts`
   - `genres: GenresRepository`
   - `removed: RemovedRepository`
@@ -815,6 +817,10 @@
 ### `tests/backend/test_removed.py`
 
 - `FALLOUT` = `набор из 3`
+
+### `tests/backend/test_restore.py`
+
+- `WORDS` = `набор из 6`
 
 ### `tests/backend/test_series_refresh.py`
 

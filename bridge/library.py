@@ -3,7 +3,7 @@
 from dataclasses import replace
 from datetime import date, datetime
 
-from backend.model import Denied, Kind, new_manual_item
+from backend.model import Denied, Kind, Source, new_manual_item
 from bridge.answer import Domain
 
 
@@ -56,6 +56,15 @@ class Library(Domain):
         Обложка уходит первой — `id` SQLite выдаёт повторно, и оставшаяся
         сирота досталась бы следующей карточке."""
         return self._reply(lambda back: back.delete_card(item_id))
+
+    def restore(self, kind: str, source: str, source_id: str) -> dict:
+        """Снять пометку об удалении: игра снова находится поиском.
+
+        Номера операции нет — это запись, а записи не отменяются, как оценки и
+        теги. Доводы разбираются **внутри** заявки: снаружи оболочки неизвестный
+        тип содержимого ушёл бы исключением через границу потоков."""
+        return self._reply(lambda back: back.restore_removed(
+            Kind(kind), Source(source), source_id))
 
 
 async def _over(back, item_id: int, fields: dict) -> None:

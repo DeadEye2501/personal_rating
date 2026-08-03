@@ -85,8 +85,12 @@ class Search(Domain):
             # ячейку под свою выдачу. Затереть её собой значит отнять у новой
             # операции её собственную половину — ту, где оценки, теги и закладка.
             self._kept.put(op, merged)
-        return ExternalSearch(views=tuple(merged),
-                              refusals=found.refusals)
+        # Признак переносится поимённо, а не наследуется: ответ тут собирается
+        # заново, и всякое новое поле `ExternalSearch` теряется в такой сборке
+        # молча — у него есть умолчание. Страница ветвится по этому признаку, и
+        # без него список убранного нарисовался бы обычными карточками ленты.
+        return ExternalSearch(views=tuple(merged), refusals=found.refusals,
+                              removed=found.removed)
 
     async def _person(self, back, op, domain, entity_id, kind):
         answer = await back.finder.by_entity(domain, entity_id, kind)

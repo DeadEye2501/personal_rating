@@ -341,3 +341,37 @@ def test_a_source_that_lost_the_card_says_so(spy, asked):
 
     assert search.ensure(1, "tmdb", "157336") == {
         "ok": {"outcome": "missing"}}
+
+
+def test_the_removed_mark_survives_the_bridge(spy, asked):
+    """Признак «это список убранного» обязан доехать до страницы: она ветвится
+    по нему, а не по строке поиска.
+
+    Мост пересобирает ответ своими руками — складывает своё с чужим, — и новое
+    поле в такой пересборке теряется молча, потому что у него есть умолчание.
+    Страница получила бы список убранного, нарисованный обычными карточками
+    ленты: со звёздами, корзиной и разворотом."""
+    answers, _ = asked
+    answers["search.local"] = []
+    answers["search.external"] = ExternalSearch(
+        views=(a_view("38410", title="Fallout 2"),), refusals=(), removed=True)
+
+    search = Search(spy)
+    search.local(1, "game", "удалённые")
+    answer = search.external(1)
+
+    assert answer["ok"]["removed"] is True
+
+
+def test_an_ordinary_answer_is_not_marked_removed(spy, asked):
+    """Вторая половина: без неё «признак доезжает» неотличимо от «признак
+    всегда истина», и обычная выдача рисовалась бы кнопками возврата."""
+    answers, _ = asked
+    answers["search.local"] = []
+    answers["search.external"] = ExternalSearch(views=(a_view("1"),),
+                                                refusals=())
+
+    search = Search(spy)
+    search.local(1, "game", "fallout")
+
+    assert search.external(1)["ok"]["removed"] is False

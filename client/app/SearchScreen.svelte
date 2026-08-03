@@ -5,7 +5,8 @@
   import { untrack } from 'svelte'
 
   import Feed from '$components/Feed.svelte'
-  import { cancel, drop, lastOp, numbered } from '$api/bridge.js'
+  import Gone from '$components/Gone.svelte'
+  import { call, cancel, drop, lastOp, numbered } from '$api/bridge.js'
   import { owned } from '$api/owned.svelte.js'
   import { passes } from '$state/filters.js'
   import { retagged } from '$state/marking.js'
@@ -21,6 +22,10 @@
         ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag } = $props()
 
   let views = $state([])
+  // Список убранного вместо выдачи. Признак приходит из ответа, а не
+  // выводится из строки поиска: «`deleted` означает показать убранное» —
+  // логика, и решает её бэкенд.
+  let gone = $state(false)
   const ops = owned()
 
   // Тип содержимого отдельной величиной, а не чтением `session` в эффекте:
@@ -68,6 +73,7 @@
     drop('search')
     cancel(ops)
     views = []
+    gone = false
   }
 
   /** Выдача по клику на имя приезжает собранной: своя половина и чужая сложены
@@ -81,11 +87,18 @@
    *  разные каналы оставили бы обе выдачи в гонке. */
   async function about({ domain, entity_id }, forKind) {
     views = []
+    gone = false
     arrived(await numbered('search.by_person', domain, entity_id, forKind,
                           { channel: 'search', ops }))
   }
 
   async function look(text, forKind) {
+    // Признак гасится до запроса, а не по приезде ответа: своя половина
+    // приходит за миллисекунды, а чужая идёт в сеть до двадцати секунд, и всё
+    // это время найденное рисовалось бы строками списка убранного — с кнопкой
+    // возврата, которая прячет настоящую карточку из выдачи.
+    gone = false
+
     // Своё показывается сразу: локальная база отвечает за миллисекунды.
     views = await numbered('search.local', forKind, text,
                            { channel: 'search', ops })
@@ -107,8 +120,20 @@
   /** Отказ источника — поле в ответе, а не исключение. Пустая выдача при этом
    *  молчит: пустая лента и есть ответ. */
   function arrived(answer) {
+    gone = answer.removed
     views = merged(views, answer.views)
     if (answer.refusals.length) ontrouble('Внешняя база недоступна')
+  }
+
+  /** Снять пометку об удалении. Карточка не возвращается — её нет; игра
+   *  просто снова находится поиском.
+   *
+   *  Строка убирается со списка сразу, не дожидаясь перезапроса: спрашивать
+   *  бэкенд заново незачем, а видеть её на месте после нажатия человек не
+   *  должен. */
+  async function restore(view) {
+    await call('library.restore', view.kind, view.source, view.source_id)
+    views = views.filter((each) => !same(each, view))
   }
 
   /** Кандидат становится карточкой: детальный ответ источника и обложка, запись
@@ -243,6 +268,15 @@
 
 </script>
 
+{#if gone}
+  <!-- Список убранного. Отметок, оценок и разворота у строки нет: возвращается
+       не карточка, а память о ней. -->
+  <div class="feed">
+    {#each views as view (keyOf(view))}
+      <Gone {view} onrestore={(one) => restore(one).catch(lost)} />
+    {/each}
+  </div>
+{:else}
 <!-- Порции в поиске не догружаются, и `onmore` отвечает «больше нет» намеренно:
      у TMDB страница выдачи это ровно двадцать кандидатов и один запрос, у игр
      два магазина по двадцать. Второй страницы в спеке нет.
@@ -258,3 +292,4 @@
       oncollapse={collapse} onedit={(view) => edit(view).catch(lost)}
       {ondelete} onwish={(view) => applying(view, wished).catch(lost)}
       {ontag} />
+{/if}

@@ -7,7 +7,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from backend.config import Config
-from backend.model import Item
+from backend.model import Item, Kind, Source
 from backend.service.cards import CardWriter
 from backend.service.creation import fresh_item
 from backend.service.enrich import Enricher
@@ -93,6 +93,16 @@ class Backend:
         `service/removal.py`: там же записано, почему помнит именно этот путь, а
         не общий `remove_card`, которым откатывается сорвавшаяся запись."""
         await discard_card(self.library, self.posters, self._removed, item_id)
+
+    async def restore_removed(self, kind: Kind, source: Source,
+                              source_id: str) -> None:
+        """Снять пометку об удалении. Карточка при этом не возвращается — её
+        нет, — игра просто снова находится поиском.
+
+        Метод здесь по той же причине, что и `delete_card`: память об убранном
+        клиенту не открыта, она приватная. Иначе поток интерфейса дотянулся бы
+        до репозитория напрямую."""
+        await self._removed.forget(kind, source, source_id)
 
     async def aclose(self) -> None:
         """Закрыть могут и владелец, и фикстура теста — второй раз это тихо.

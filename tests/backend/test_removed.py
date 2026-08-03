@@ -210,3 +210,67 @@ async def test_a_removed_row_does_not_eat_a_slot(sessions, reference, removed):
 
     assert len(result.views) == SEARCH_SIZE
     assert "0" not in [one.source_id for one in result.views]
+
+
+async def test_the_list_of_removed_is_narrowed_by_the_tab(removed):
+    """Вкладка — первичный фильтр везде, и здесь тоже: во вкладке фильмов
+    показывается только убранное кино.
+
+    Свидетель с обоими типами нарочно: со списком из одних игр «сузили
+    вкладкой» неотличимо от «отдали всё, что есть»."""
+    await removed.remember(a_game("38410", "Fallout 2"))
+    await removed.remember(
+        an_item("550", "Бойцовский клуб", kind=Kind.MOVIE, source=Source.TMDB))
+
+    games = await removed.listing(Kind.GAME)
+
+    assert [(one.source_id, one.title) for one in games] == [
+        ("38410", "Fallout 2")]
+
+
+async def test_the_list_of_removed_knows_the_source_of_each_row(removed):
+    """Источник нужен самой кнопке `restore`: снимают пометку по той же тройке,
+    какой её ставили. Без него строку не с чем сопоставить."""
+    await removed.remember(
+        a_game("1207658691", "Fallout Tactics", source=Source.GOG))
+
+    one, = await removed.listing(Kind.GAME)
+
+    assert (one.kind, one.source, one.source_id) == (
+        Kind.GAME, Source.GOG, "1207658691")
+
+
+async def test_forgetting_lets_the_game_be_found_again(removed):
+    """`restore` снимает только память об удалении. Карточка не возвращается —
+    её нет вовсе, вместе с оценкой, тегами и обложкой; игра просто снова
+    находится поиском.
+
+    Наблюдается через `known`, а не через `listing`: пустой список сказал бы
+    лишь, что строка исчезла из перечня, а важно, что отсев её больше не
+    отбрасывает."""
+    await removed.remember(a_game())
+    assert await removed.known([FALLOUT]) == {("game", "steam", "38410")}
+
+    await removed.forget(Kind.GAME, Source.STEAM, "38410")
+
+    assert await removed.known([FALLOUT]) == set()
+
+
+async def test_forgetting_touches_nobody_else(removed):
+    """Снятие идёт по тройке целиком. Свидетель — сосед с тем же номером у
+    другого источника: у Steam и GOG номера свои, и они сталкиваются."""
+    await removed.remember(a_game("38410", "Fallout 2"))
+    await removed.remember(a_game("38410", "Другая игра", source=Source.GOG))
+
+    await removed.forget(Kind.GAME, Source.STEAM, "38410")
+
+    assert [one.source for one in await removed.listing(Kind.GAME)] == [
+        Source.GOG]
+
+
+async def test_forgetting_what_was_not_removed_is_quiet(removed):
+    """Человек нажимает `restore` дважды, страница успела дважды позвать мост —
+    отказом это быть не должно: убирать нечего, и это исход, а не беда."""
+    await removed.forget(Kind.GAME, Source.STEAM, "нет такого")
+
+    assert await removed.listing(Kind.GAME) == []

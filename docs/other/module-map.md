@@ -17,15 +17,16 @@
 
 ## backend — 86 модулей
 
-### `backend/app.py` — 182 строк
+### `backend/app.py` — 192 строк
 
 Бэкенд, собранный целиком.
 
 Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
 
-- `class Backend` (62)
+- `class Backend` (72)
   - `async def create_manual_card(self, item: Item, now: datetime) -> int` (16)
   - `async def delete_card(self, item_id: int) -> None` (9)
+  - `async def restore_removed(self, kind: Kind, source: Source, source_id: str) -> None` (9)
   - `async def aclose(self) -> None` (8)
 - `def card_parts(sessions, posters: PosterService) -> dict` (13)
 - `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (61)
@@ -190,13 +191,13 @@
 
 - `class Ratings` (8)
 
-### `backend/model/results.py` — 45 строк
+### `backend/model/results.py` — 50 строк
 
 Что ответила чужая база и как её выдача складывается со своей.
 
 Зависит от: `backend.model.kinds`, `backend.model.outcome`, `backend.model.view`
 
-- `class ExternalSearch` (6)
+- `class ExternalSearch` (11)
 - `def merge_results(local: list[CardView], external: list[CardView]) -> list[CardView]` (23)
 
 ### `backend/model/search.py` — 49 строк
@@ -447,17 +448,18 @@
 - `async def discard_card(library: LibraryRepository, posters: PosterService, removed: RemovedRepository, item_id: int) -> None` (19)
 - `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (24)
 
-### `backend/service/search.py` — 146 строк
+### `backend/service/search.py` — 182 строк
 
 Что найдётся по запросу.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.service.merging`, `backend.service.relevance`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `backend.unique`
 
+- `def _asks_for_removed(query: str) -> bool` (13)
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (18)
 - `class SearchParts` (12)
-- `class SearchService` (81)
-  - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
-  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (34)
+- `class SearchService` (92)
+  - `async def local(self, kind: Kind, query: str) -> list[CardView]` (8)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (40)
   - `async def _narrowed(self, answers: list[list[SearchHit]], together: list[SearchHit], query: str) -> list[SearchHit]` (24)
 
 ### `backend/service/series.py` — 62 строк
@@ -942,14 +944,16 @@
   - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
-### `backend/storage/repository/removed.py` — 50 строк
+### `backend/storage/repository/removed.py` — 85 строк
 
 Что человек убрал из выдачи насовсем.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
 
-- `class RemovedRepository(Repository)` (40)
+- `class RemovedRepository(Repository)` (75)
   - `async def remember(self, item: Item) -> None` (14)
+  - `async def listing(self, kind: Kind) -> list[CardView]` (19)
+  - `async def forget(self, kind: Kind, source: Source, source_id: str) -> None` (14)
   - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (20)
 
 ### `backend/storage/repository/sections.py` — 177 строк
@@ -1152,19 +1156,20 @@
   - `def put(self, op: int, value) -> None` (10)
   - `def taken(self, op: int)` (4)
 
-### `bridge/library.py` — 94 строк
+### `bridge/library.py` — 103 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Library(Domain)` (49)
+- `class Library(Domain)` (58)
   - `def create(self, fields: dict) -> dict` (15)
   - `def replace(self, item_id: int, fields: dict) -> dict` (10)
   - `def same_title(self, kind: str, title: str) -> dict` (5)
   - `def unlink(self, item_id: int) -> dict` (2)
   - `def deletion_summary(self, item_id: int) -> dict` (2)
   - `def delete(self, item_id: int) -> dict` (5)
+  - `def restore(self, kind: str, source: str, source_id: str) -> dict` (8)
 - `async def _over(back, item_id: int, fields: dict) -> None` (9)
 - `def _known(fields: dict) -> dict` (16)
 - `def _manual(fields: dict)` (5)
@@ -1207,19 +1212,19 @@
 - `def _role(domain: str, role: str)` (4)
 - `def _of(backend, domain: str)` (7)
 
-### `bridge/search.py` — 106 строк
+### `bridge/search.py` — 110 строк
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.answer`, `bridge.kept`, `bridge.wire`
 
-- `class Search(Domain)` (85)
+- `class Search(Domain)` (89)
   - `def local(self, op: int, kind: str, query: str) -> dict` (12)
   - `def external(self, op: int) -> dict` (18)
   - `def by_person(self, op: int, domain: str, entity_id: int, kind: str) -> dict` (11)
   - `def ensure(self, op: int, source: str, source_id: str) -> dict` (8)
   - `async def _own(self, back, op, kind, query)` (6)
-  - `async def _outer(self, back, op, kind, query)` (11)
+  - `async def _outer(self, back, op, kind, query)` (15)
   - `async def _person(self, back, op, domain, entity_id, kind)` (4)
   - `async def _added(self, back, candidate)` (2)
 - `def _found(views, source: str, source_id: str)` (7)
@@ -1410,7 +1415,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 99 модулей
+## tests — 100 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -2094,17 +2099,28 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def row(title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (5)
 
-### `tests/backend/test_removed.py` — 212 строк
+### `tests/backend/test_removed.py` — 276 строк
 
 Удалённое не возвращается: карточка уходит, а память о ней остаётся.
 
 Зависит от: `backend.model`, `backend.service.hits`, `backend.service.removal`, `backend.service.search`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `tests.conftest`, `tests.wiring`
 
-Тестов: 12
+Тестов: 17
 
 - `async def removed(sessions)` (2)
 - `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 - `async def rows(engine) -> list[tuple]` (7)
+
+### `tests/backend/test_restore.py` — 149 строк
+
+Список убранного: шесть слов в строке поиска показывают его вместо выдачи.
+
+Зависит от: `backend.model`, `backend.storage.repository.removed`, `tests.conftest`, `tests.wiring`
+
+Тестов: 8
+
+- `async def removed(sessions)` (2)
+- `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 
 ### `tests/backend/test_search.py` — 446 строк ⚠ подошёл к 300
 
@@ -2298,13 +2314,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 11
 
 
-### `tests/bridge/test_bridge_library.py` — 164 строк
+### `tests/bridge/test_bridge_library.py` — 193 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
 Зависит от: `backend.model`, `bridge.library`, `tests.builders`
 
-Тестов: 11
+Тестов: 13
 
 
 ### `tests/bridge/test_bridge_marks.py` — 200 строк
@@ -2325,13 +2341,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/test_bridge_search.py` — 343 строк ⚠ подошёл к 300
+### `tests/bridge/test_bridge_search.py` — 377 строк ⚠ подошёл к 300
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `bridge.search`
 
-Тестов: 19
+Тестов: 21
 
 - `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
 

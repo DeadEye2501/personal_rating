@@ -162,3 +162,32 @@ def test_the_summary_travels_as_a_flat_dictionary(spy, asked):
     assert Library(spy).deletion_summary(12) == {"ok": {"tags": 2,
                                                         "has_rating": True}}
     assert log[0] == ("library.deletion_summary", (12,), {})
+
+
+def test_restoring_goes_through_the_backend_method(spy, asked):
+    """Снятие пометки — запись, поэтому номера операции у неё нет: отменять
+    записи в проекте нельзя нигде.
+
+    Через метод бэкенда, а не через репозиторий: память об убранном ему не
+    открыта — она приватная, как и источники, и клиент до неё не дотягивается."""
+    answers, log = asked
+    answers["restore_removed"] = None
+
+    assert Library(spy).restore("game", "steam", "38410") == {"ok": None}
+
+    name, args, _ = log[0]
+    assert name == "restore_removed"
+    # `is`, а не `==`: строка `"game"` равна значению перечисления, и сравнение
+    # по значению пропустило бы неразобранный довод.
+    assert args[0] is Kind.GAME
+    assert args[1] is Source.STEAM
+    assert args[2] == "38410"
+
+
+def test_an_unknown_kind_comes_back_as_a_refusal(spy, asked):
+    """Разбор довода стоит **внутри** заявки. Снаружи оболочки он ушёл бы
+    исключением через границу потоков, где ловить его некому."""
+    answers, _ = asked
+    answers["restore_removed"] = None
+
+    assert "ok" not in Library(spy).restore("книга", "steam", "1")
