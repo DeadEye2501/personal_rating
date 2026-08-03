@@ -92,6 +92,123 @@ async def loader(sessions, posters):
     return build
 
 
+async def test_the_stored_card_takes_both_names(sessions, loader):
+    """Пара имён, собранная склейкой, доезжает до базы — иначе она собиралась бы
+    впустую.
+
+    Свидетель — путь Steam, ради которого слайс и написан: карточка приходит из
+    `appdetails` с `l=russian`, то есть по-русски, а английское имя лежит в
+    строке выдачи, куда карточке не дотянуться. Сложить их можно только здесь.
+
+    Карточка сильнее для того языка, который принесла: русское берётся её, а не
+    из пары. Английскому взяться у Steam неоткуда, и его даёт пара."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "292030", "Ведьмак 3: Дикая Охота", kind=Kind.GAME,
+        source=Source.STEAM, poster_url=DETAIL_COVER))))
+    came = view_from_hit(hit("292030", "The Witcher 3: Wild Hunt",
+                             kind=Kind.GAME, source=Source.STEAM,
+                             original_title="Ведьмак 3: Дикая Охота",
+                             poster_url=DETAIL_COVER))
+
+    item_id = await rig.load.ensure(came)
+
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.title == "Ведьмак 3: Дикая Охота"
+    assert stored.original_title == "The Witcher 3: Wild Hunt"
+
+
+async def test_the_card_wins_over_the_pair_for_its_own_language(sessions, loader):
+    """Пара — фоллбек, и карточка сильнее: решение пользователя 03.08.2026.
+
+    В выдаче GOG показал издание — «Ведьмак 3: Дикая Охота - Издание Игра
+    Года», — а карточка приезжает с обычным названием. В базу идёт то, что
+    принесла карточка.
+
+    Без этого свидетеля «карточка сильнее» неотличимо от «пара сильнее»: в
+    соседней проверке русское имя у них совпадает."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "1207664663", "Ведьмак 3: Дикая Охота", kind=Kind.GAME,
+        source=Source.GOG, poster_url=DETAIL_COVER))))
+    came = view_from_hit(hit("1207664663",
+                             "Ведьмак 3: Дикая Охота - Издание Игра Года",
+                             kind=Kind.GAME, source=Source.GOG,
+                             original_title="The Witcher 3: Wild Hunt",
+                             poster_url=DETAIL_COVER))
+
+    item_id = await rig.load.ensure(came)
+
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.title == "Ведьмак 3: Дикая Охота"
+    assert stored.original_title == "The Witcher 3: Wild Hunt"
+
+
+async def test_the_card_beats_the_group_on_the_year(sessions, loader):
+    """При записи побеждает год карточки, а не ранний год группы.
+
+    Правило «ранний верен» держится, пока группа — это издания одной игры. Но
+    склейка сводит и ремейк с оригиналом: у них одно название буква в букву.
+    Замерено на живом Steam — строка «System Shock» это ремейк 2023 года, а из
+    группы ей доставался 1994-й от оригинала old-games, и он же уезжал в базу.
+    Тем же болели `Prince of Persia` 2008→1990, `Thief` 2014→1998,
+    `Silent Hill 2` 2024→2002.
+
+    Карточка тут знает правду: она спрошена по номеру у самого источника."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "482400", "System Shock", kind=Kind.GAME, source=Source.STEAM,
+        year=2023, poster_url=DETAIL_COVER))))
+    came = view_from_hit(hit("482400", "System Shock", kind=Kind.GAME,
+                             source=Source.STEAM, year=1994,
+                             poster_url=DETAIL_COVER))
+
+    item_id = await rig.load.ensure(came)
+
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.year == 2023
+
+
+async def test_the_group_year_fills_a_card_without_one(sessions, loader):
+    """Обратная сторона: своего года у карточки может не быть, и тогда берётся
+    год пары — иначе строки Steam оставались бы без года вовсе, а это и была
+    исходная беда.
+
+    Без этой половины «карточка сильнее» неотличимо от «пару не берём вовсе»."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "38410", "Fallout 2", kind=Kind.GAME, source=Source.STEAM,
+        poster_url=DETAIL_COVER))))
+    came = view_from_hit(hit("38410", "Fallout 2", kind=Kind.GAME,
+                             source=Source.STEAM, year=1998,
+                             poster_url=DETAIL_COVER))
+
+    item_id = await rig.load.ensure(came)
+
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.year == 1998
+
+
+async def test_a_film_keeps_the_original_title_tmdb_gave(sessions, loader):
+    """Сборка имени — правило про **игры**, и к кино её применять нельзя.
+
+    У TMDB `original_title` значит другое: там настоящий язык оригинала, а не
+    английское название. Раскладка по письменности такого не знает и кладёт в
+    поле первое латинское имя — а латинского у «Унесённых призраками» нет ни
+    одного, и поле обнулилось бы. Проверено на боевой раскладке: `千と千尋の神隠し`,
+    `올드보이` и «Брат» дают пустоту все три.
+
+    Пишется это навсегда — карточка заводится один раз."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "129", "Унесённые призраками", kind=Kind.MOVIE,
+        original_title="千と千尋の神隠し", poster_url=DETAIL_COVER))))
+    came = view_from_hit(hit("129", "Унесённые призраками", kind=Kind.MOVIE,
+                             original_title="千と千尋の神隠し",
+                             poster_url=DETAIL_COVER))
+
+    item_id = await rig.load.ensure(came)
+
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.title == "Унесённые призраками"
+    assert stored.original_title == "千と千尋の神隠し"
+
+
 async def test_a_candidate_becomes_a_card(sessions, loader):
     rig = loader(Found(source_card()))
 

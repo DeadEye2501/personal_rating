@@ -43,16 +43,17 @@
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (11)
 
-### `backend/language.py` — 44 строк
+### `backend/language.py` — 72 строк
 
 На каком языке написано название.
 
 Зависит от: —
 
-Отдаёт наружу: `in_latin`, `in_russian`
+Отдаёт наружу: `by_language`, `in_latin`, `in_russian`
 
 - `def in_russian(name: str) -> bool` (6)
-- `def in_latin(name: str) -> bool` (11)
+- `def in_latin(name: str) -> bool` (17)
+- `def by_language(names: list[str]) -> tuple[str, str]` (20)
 
 ### `backend/model/__init__.py` — 110 строк
 
@@ -357,23 +358,24 @@
   - `async def _fill(self, repository: CreditRepository, item_id: int, credits: tuple[Credit, ...], overwrite: bool) -> None` (12)
   - `async def _fill_poster(self, item_id: int, item: Item, overwrite: bool) -> None` (11)
 
-### `backend/service/loading.py` — 123 строк
+### `backend/service/loading.py` — 159 строк
 
 Кандидат превращается в карточку.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.repository.library`
+Зависит от: `backend.language`, `backend.model`, `backend.service.asking`, `backend.service.cards`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.repository.library`
 
+- `def _from_both(card: SourceCard, view: CardView) -> SourceCard` (31)
 - `class Loader` (99)
   - `def _catalog(self, source: Source, action: str)` (12)
   - `async def ensure(self, view: CardView) -> int | Missing | Refusal` (37)
   - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/merging.py` — 193 строк
+### `backend/service/merging.py` — 260 строк
 
 Одна игра — одна строка выдачи.
 
-Зависит от: `backend.model`, `backend.service.titles`, `backend.unique`
+Зависит от: `backend.language`, `backend.model`, `backend.service.titles`, `backend.unique`
 
 - `def _a_set(hit: SearchHit) -> bool` (2)
 - `def _asked_for(hit: SearchHit, asked: list[str]) -> bool` (11)
@@ -385,8 +387,12 @@
   - `def _shown(self, head: int) -> dict[Source, set[str]]` (7)
   - `def _joinable(self, one: int, other: int) -> bool` (7)
   - `def join(self, one: int, other: int) -> None` (6)
+- `def _other_name(winner: SearchHit, group: list[SearchHit]) -> str` (29)
+- `def _earliest_year(group: list[SearchHit]) -> int | None` (13)
+- `def _completed(winner: SearchHit, group: list[SearchHit]) -> SearchHit` (4)
 - `def _grouped(flat: list[SearchHit]) -> list[int]` (28)
-- `def merged(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (39)
+- `def _without_sets(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (12)
+- `def merged(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (36)
 
 ### `backend/service/people.py` — 84 строк
 
@@ -418,7 +424,7 @@
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
-### `backend/service/relevance.py` — 71 строк
+### `backend/service/relevance.py` — 85 строк
 
 Строка выдачи обязана знать, о чём её спросили.
 
@@ -426,9 +432,9 @@
 
 Отдаёт наружу: `relevant`
 
-- `def _asked(query: str) -> set[str]` (7)
-- `def _knows(hit: SearchHit, asked: set[str]) -> bool` (11)
-- `def relevant(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (30)
+- `def _asked(query: str) -> set[str]` (8)
+- `def _knows(hit: SearchHit, asked: set[str]) -> bool` (23)
+- `def relevant(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (29)
 
 ### `backend/service/removal.py` — 55 строк
 
@@ -574,7 +580,7 @@
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (6)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/oldgames/parse.py` — 196 строк
+### `backend/sources/oldgames/parse.py` — 174 строк
 
 Перевод страниц old-games.ru в наши типы.
 
@@ -588,7 +594,6 @@
 - `def _companies(scope: Tag) -> tuple[Credit, ...]` (7)
 - `def _synopsis(soup: BeautifulSoup) -> str` (3)
 - `def _cover(soup: BeautifulSoup) -> str` (4)
-- `def _by_language(names: list[str]) -> tuple[str, str]` (20)
 - `def parse_card(page: str, source_id: str) -> SourceCard` (34)
 
 ### `backend/sources/ratings/kinopoisk/client.py` — 45 строк
@@ -709,22 +714,22 @@
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `async def aclose(self) -> None` (3)
 
-### `backend/sources/steam/client.py` — 174 строк
+### `backend/sources/steam/client.py` — 184 строк
 
 Разговор со Steam по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.http`, `backend.sources.steam.parse`, `backend.sources.undocumented`
 
-- `class SteamClient` (128)
+- `class SteamClient` (135)
   - `def name(self) -> str` (4)
   - `async def search(self, query: str, kind: Kind) -> Outcome` (13)
   - `async def _narrowed(self, hits: list[SearchHit]) -> list[SearchHit]` (14)
-  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (36)
+  - `async def card(self, source_id: str, kind: Kind) -> Outcome` (40)
   - `async def _items(self, appids: list[str], wanted: dict) -> dict | None` (28)
-  - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str]` (17)
+  - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str, int | None]` (20)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 216 строк
+### `backend/sources/steam/parse.py` — 232 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -732,6 +737,7 @@
 
 - `def poster_url(appid: str) -> str` (7)
 - `def parse_search(payload: list[dict]) -> list[SearchHit]` (11)
+- `def released_in(payload: dict, source_id: str) -> int | None` (14)
 - `def _store_items(payload: dict) -> list[dict]` (10)
 - `def _poster(row: dict, appid: str) -> str` (16)
 - `def _answered(payload: dict) -> dict[str, dict]` (10)
@@ -1567,23 +1573,23 @@ OMDB: единственный источник, у которого отказ 
 - `async def registry()` (9)
 - `def keyed()` (12)
 
-### `tests/backend/sources/test_steam.py` — 279 строк
+### `tests/backend/sources/test_steam.py` — 303 строк ⚠ подошёл к 300
 
 Steam: отсутствие игры приходит под кодом 200, а теги — вторым запросом.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`, `tests.conftest`
 
-Тестов: 22
+Тестов: 23
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_steam_items.py` — 309 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam_items.py` — 375 строк ⚠ подошёл к 300
 
 Ответ `GetItems`: род товара в выдаче и настоящий адрес обложки.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
 
-Тестов: 15
+Тестов: 18
 
 - `def two_answers(first: list | dict, items, opens: str='SearchApps')` (13)
   - `def handler(request: httpx.Request) -> httpx.Response` (5)
@@ -1860,13 +1866,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
-### `tests/backend/test_language.py` — 58 строк
+### `tests/backend/test_language.py` — 83 строк
 
 На каком языке написано название.
 
 Зависит от: `backend.language`
 
-Тестов: 5
+Тестов: 7
 
 
 ### `tests/backend/test_layers.py` — 124 строк
@@ -1930,13 +1936,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 14
 
 
-### `tests/backend/test_loading.py` — 398 строк ⚠ подошёл к 300
+### `tests/backend/test_loading.py` — 515 строк ⚠ за пределом 500
 
 Три круга загрузки: кандидат становится карточкой в базе.
 
 Зависит от: `backend.model`, `backend.service.cards`, `backend.service.loading`, `backend.service.posters`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 20
+Тестов: 25
 
 - `def candidate(source_id='157336', poster=SEARCH_COVER) -> CardView` (6)
 - `def source_card(source_id='157336', poster=DETAIL_COVER) -> SourceCard` (7)
@@ -1963,15 +1969,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 
-### `tests/backend/test_merging.py` — 297 строк
+### `tests/backend/test_merging.py` — 438 строк ⚠ подошёл к 300
 
 Одна игра — одна строка выдачи.
 
 Зависит от: `backend.model`, `backend.service.merging`
 
-Тестов: 21
+Тестов: 29
 
-- `def row(source: Source, source_id: str, title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (6)
+- `def row(source: Source, source_id: str, title: str, **rest) -> SearchHit` (6)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)
 
 ### `tests/backend/test_migrations.py` — 126 строк
@@ -2060,13 +2066,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_relevance.py` — 162 строк
+### `tests/backend/test_relevance.py` — 221 строк
 
 Строка выдачи обязана знать, о чём её спросили.
 
 Зависит от: `backend.model`, `backend.service.relevance`, `backend.service.search`, `tests.conftest`, `tests.wiring`
 
-Тестов: 9
+Тестов: 12
 
 - `def row(title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (5)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)

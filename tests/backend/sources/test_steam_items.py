@@ -307,3 +307,69 @@ async def test_an_empty_search_asks_nobody_about_kinds():
     assert isinstance(result, Found)
     assert result.value == []
     assert len(asked) == 1, "за родом товара сходили, не найдя ни одной строки"
+
+
+async def test_the_card_takes_the_year_the_game_came_out(replay):
+    """Год выхода игры, а не год её появления в Steam.
+
+    `appdetails` отдаёт магазинную дату, и у старых игр она врёт на десятилетия.
+    Замерено на живом API 03.08.2026: `Fallout` — 2015 против 1997, `Fallout 2`
+    — 2009 против 1998, `Arcanum` — 2016 против 2001, `DOOM + DOOM II` — 2007
+    против 1995.
+
+    Верная дата лежит в том же ответе `GetItems`, который карточка уже
+    спрашивает ради тегов и обложки. Пишется год навсегда: перезапроса у игр не
+    бывает.
+
+    Свидетель нарочно старый: у игры, вышедшей сразу в Steam, обе даты совпадают
+    и подмена одной другой прошла бы незамеченной. У «Ведьмака 3»
+    `original_release_date` вовсе пуст — на этом и держится вторая половина
+    проверки ниже."""
+    client = SteamClient(SourceHttp("steam", transport=replay(
+        "steam/appdetails_old_game.json", "steam/store_items_release.json")))
+
+    result = await client.card("38400", Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value.item.year == 1997
+
+
+async def test_a_game_born_on_steam_keeps_the_store_year(replay):
+    """У игры, вышедшей сразу в Steam, `original_release_date` пуст, и брать
+    оттуда нечего — остаётся магазинная дата, и она же верная.
+
+    Без этой половины «берём год выхода» неотличимо от «обнуляем год всем, у
+    кого второй даты нет»."""
+    client = SteamClient(SourceHttp("steam", transport=replay(
+        "steam/appdetails.json", "steam/store_items_card.json")))
+
+    result = await client.card("292030", Kind.GAME)
+    await client.aclose()
+
+    assert isinstance(result, Found)
+    assert result.value.item.year == 2015
+
+
+async def test_the_card_asks_for_the_release_date(fixture):
+    """Дата выхода приезжает только если её попросили: `include_release` в
+    запросе `GetItems`.
+
+    Сторожится сам запрос, потому что записанные ответы отдаются по порядку и
+    параметров не смотрят — без этой проверки снятый флаг оставлял весь набор
+    зелёным, а в базу каждой заводимой игры уезжал магазинный год. Навсегда:
+    перезапроса у игр не бывает."""
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request.url.params.get("input_json"))
+        name = ("steam/appdetails_old_game.json" if len(seen) == 1
+                else "steam/store_items_release.json")
+        return httpx.Response(200, json=fixture(name))
+
+    client = SteamClient(SourceHttp("steam", transport=httpx.MockTransport(handler)))
+    await client.card("38400", Kind.GAME)
+    await client.aclose()
+
+    asked = json.loads(seen[1])
+    assert asked["data_request"]["include_release"] is True

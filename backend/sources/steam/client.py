@@ -21,6 +21,7 @@ from backend.sources.errors import BROKEN_BY_PARSING, broken, parsed, parsed_or
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import asked
 from backend.sources.steam.parse import (
+    released_in,
     cover_of,
     parse_card,
     parse_search,
@@ -41,7 +42,9 @@ ITEMS = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 ITEMS_CONTEXT = {"language": "russian", "country_code": "US", "steam_realm": 1}
 # Выдаче нужен род товара и адрес обложки; карточке — то же и теги.
 SIFT_WANTED = {"include_assets": True}
-CARD_WANTED = SIFT_WANTED | {"include_tag_count": 20}
+# Год выхода спрашивается только карточкой: в выдаче года у Steam нет вовсе.
+CARD_WANTED = SIFT_WANTED | {"include_tag_count": 20,
+                             "include_release": True}
 
 
 class SteamClient:
@@ -89,8 +92,11 @@ class SteamClient:
     async def card(self, source_id: str, kind: Kind) -> Outcome:
         # Отсутствия Steam кодом не выражает: битый или отсутствующий appids
         # даёт 400 и тело `null`, поэтому «такого нет» читается ниже, из тела.
+        # Регион обязателен: без него `appdetails` отвечает `success: false` про
+        # живую игру — замерено на `Fallout: New Vegas` 03.08.2026, с `cc=us`
+        # приезжает полная карточка. Ту же ловушку обходит `ITEMS_CONTEXT`.
         answer = await asked(self._http, DETAILS,
-                             {"appids": source_id, "l": "russian"})
+                             {"appids": source_id, "l": "russian", "cc": "us"})
         if not isinstance(answer, httpx.Response):
             return answer
 
@@ -118,8 +124,9 @@ class SteamClient:
 
         # Уточнения добираются вне общего `try`: карточка уже собрана и годится,
         # и уронить её из-за них было бы обменом целого на украшение.
-        tags, cover = await self._beyond_details(source_id)
+        tags, cover, year = await self._beyond_details(source_id)
         item = replace(card.item, poster_url=cover) if cover else card.item
+        item = replace(item, year=year) if year else item
         return Found(replace(card, item=item,
                              genre_ext_ids=card.genre_ext_ids + tags))
 
@@ -154,21 +161,24 @@ class SteamClient:
 
     async def _beyond_details(
         self, source_id: str
-    ) -> tuple[tuple[tuple[GenreSource, str], ...], str]:
-        """Теги и настоящий адрес обложки: ни того, ни другого в `appdetails`
-        нет, а живут они в одном ответе — значит и запрос один.
+    ) -> tuple[tuple[tuple[GenreSource, str], ...], str, int | None]:
+        """Теги, настоящий адрес обложки и год выхода: `appdetails` первых двух
+        не знает вовсе, а третий отдаёт магазинный — у `Fallout` 2015 вместо
+        1997. Живут они в одном ответе, значит и запрос один.
 
         Отказ карточку не роняет. Без тегов она беднее: своих жанров у Steam
         двенадцать на весь магазин. Без адреса — остаётся угаданный, и он верен
         в 62% случаев."""
         payload = await self._items([source_id], CARD_WANTED)
         if payload is None:
-            return (), ""
+            return (), "", None
         tags = parsed_or(logger, "steam", f"теги {source_id} не разобрались",
                          lambda: parse_tags(payload, source_id), ())
         cover = parsed_or(logger, "steam", f"обложка {source_id} не разобралась",
                           lambda: cover_of(payload, source_id), "")
-        return tags, cover
+        year = parsed_or(logger, "steam", f"год {source_id} не разобрался",
+                         lambda: released_in(payload, source_id), None)
+        return tags, cover, year
 
     async def aclose(self) -> None:
         await self._http.aclose()

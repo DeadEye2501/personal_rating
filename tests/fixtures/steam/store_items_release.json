@@ -1,0 +1,168 @@
+{
+ "response": {
+  "store_items": [
+   {
+    "item_type": 0,
+    "id": 38400,
+    "success": 1,
+    "visible": true,
+    "name": "Fallout: A Post Nuclear Role Playing Game",
+    "store_url_path": "app/38400/Fallout_A_Post_Nuclear_Role_Playing_Game",
+    "appid": 38400,
+    "type": 0,
+    "tagids": [
+     122,
+     3835,
+     1693,
+     1695,
+     5851,
+     1677,
+     4325,
+     4182,
+     3942,
+     4166,
+     6971,
+     4474,
+     6691,
+     4004,
+     21,
+     3834,
+     3871,
+     4026,
+     1708,
+     3810
+    ],
+    "categories": {
+     "supported_player_categoryids": [
+      2
+     ],
+     "feature_categoryids": [
+      23,
+      62
+     ]
+    },
+    "tags": [
+     {
+      "tagid": 122,
+      "weight": 1358
+     },
+     {
+      "tagid": 3835,
+      "weight": 1082
+     },
+     {
+      "tagid": 1693,
+      "weight": 850
+     },
+     {
+      "tagid": 1695,
+      "weight": 700
+     },
+     {
+      "tagid": 5851,
+      "weight": 623
+     },
+     {
+      "tagid": 1677,
+      "weight": 548
+     },
+     {
+      "tagid": 4325,
+      "weight": 537
+     },
+     {
+      "tagid": 4182,
+      "weight": 513
+     },
+     {
+      "tagid": 3942,
+      "weight": 491
+     },
+     {
+      "tagid": 4166,
+      "weight": 375
+     },
+     {
+      "tagid": 6971,
+      "weight": 364
+     },
+     {
+      "tagid": 4474,
+      "weight": 361
+     },
+     {
+      "tagid": 6691,
+      "weight": 359
+     },
+     {
+      "tagid": 4004,
+      "weight": 345
+     },
+     {
+      "tagid": 21,
+      "weight": 292
+     },
+     {
+      "tagid": 3834,
+      "weight": 283
+     },
+     {
+      "tagid": 3871,
+      "weight": 269
+     },
+     {
+      "tagid": 4026,
+      "weight": 253
+     },
+     {
+      "tagid": 1708,
+      "weight": 234
+     },
+     {
+      "tagid": 3810,
+      "weight": 154
+     }
+    ],
+    "assets": {
+     "asset_url_format": "steam/apps/38400/${FILENAME}?t=1572025441",
+     "main_capsule": "capsule_616x353.jpg",
+     "small_capsule": "capsule_231x87.jpg",
+     "header": "header.jpg",
+     "header_2x": "header.jpg",
+     "library_capsule": "library_600x900.jpg",
+     "library_capsule_2x": "library_600x900_2x.jpg",
+     "library_hero": "library_hero.jpg",
+     "library_hero_2x": "library_hero_2x.jpg",
+     "community_icon": "df0001a1aa011e6c7a8f38a65908070eba3d2f61",
+     "page_background_path": "app/38400?t=1572025441"
+    },
+    "release": {
+     "steam_release_date": 1446400800,
+     "original_release_date": 875602800
+    },
+    "best_purchase_option": {
+     "packageid": 45613,
+     "purchase_option_name": "Fallout",
+     "final_price_in_cents": "249",
+     "original_price_in_cents": "999",
+     "formatted_final_price": "$2.49",
+     "formatted_original_price": "$9.99",
+     "discount_pct": 75,
+     "active_discounts": [
+      {
+       "discount_amount": "750",
+       "discount_description": "#discount_desc_preset_weekend",
+       "discount_end_date": 1786640400
+      }
+     ],
+     "user_can_purchase_as_gift": true,
+     "hide_discount_pct_for_compliance": false,
+     "included_game_count": 1,
+     "must_purchase_as_set": false,
+     "package_group": "default",
+     "price_cannot_be_displayed_as_discount": false
+    }
+   }
+  ]
+ }
+}

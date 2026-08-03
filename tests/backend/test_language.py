@@ -7,7 +7,7 @@
 
 import pytest
 
-from backend.language import in_russian
+from backend.language import in_latin, in_russian
 
 RUSSIAN = [
     "Ведьмак 3: Дикая Охота",
@@ -56,3 +56,28 @@ def test_the_letter_yo_counts():
     диапазона, и проверка по одному диапазону объявила бы «Ёжик» английским."""
     assert in_russian("Ёжик") is True
     assert in_russian("ёж") is True
+
+
+LATIN = ["The Witcher 3: Wild Hunt", "Trüberbrook", "FINAL FANTASY VII", "Dune"]
+
+NOT_LATIN = [
+    "Ил-2 Штурмовик",
+    "千と千尋の神隠し",
+    "올드보이",
+    # Смешанное латиницей **не** считается, и это главный случай: латинских букв
+    # тут больше половины, а название всё равно русское. Прими его за
+    # английское — и оно вытеснит настоящее английское из своего поля.
+    "S.T.A.L.K.E.R.: Тень Чернобыля",
+    "King's Bounty: Легенда о рыцаре",
+    "",
+]
+
+
+@pytest.mark.parametrize("name", LATIN)
+def test_a_name_written_in_latin_is_latin(name):
+    assert in_latin(name) is True
+
+
+@pytest.mark.parametrize("name", NOT_LATIN)
+def test_a_name_with_russian_letters_is_not_latin(name):
+    assert in_latin(name) is False

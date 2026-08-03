@@ -1,7 +1,7 @@
 """Перевод ответов Steam в наши типы."""
 
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 
 from backend.model import (
     ExternalRating,
@@ -65,6 +65,22 @@ def parse_search(payload: list[dict]) -> list[SearchHit]:
         )
         for row in payload
     ]
+
+
+def released_in(payload: dict, source_id: str) -> int | None:
+    """Год, когда игра вышла, а не когда попала в Steam.
+
+    `appdetails` отдаёт магазинную дату, и у старых игр она врёт на
+    десятилетия: замерено 03.08.2026 — `Fallout` 2015 против 1997, `Arcanum`
+    2016 против 2001, `DOOM + DOOM II` 2007 против 1995.
+
+    Пусто у игр, вышедших сразу в Steam: у «Ведьмака 3» второй даты нет вовсе, и
+    магазинная там верна. Пусто — значит «брать неоткуда», а не «года нет»."""
+    row = _answered(payload).get(source_id)
+    stamp = ((row or {}).get("release") or {}).get("original_release_date")
+    if not stamp:
+        return None
+    return datetime.fromtimestamp(stamp, timezone.utc).year
 
 
 def _store_items(payload: dict) -> list[dict]:

@@ -2,11 +2,14 @@
 
 import asyncio
 import logging
+from dataclasses import replace
 
+from backend.language import by_language
 from backend.model import (
     CardView,
     ExternalLink,
     Found,
+    Kind,
     Missing,
     Reason,
     Refusal,
@@ -20,6 +23,39 @@ from backend.sources.registry import Sources
 from backend.storage.repository.library import LibraryRepository
 
 logger = logging.getLogger(__name__)
+
+
+def _from_both(card: SourceCard, view: CardView) -> SourceCard:
+    """Карточка, дополненная тем, что знала выдача: имена и год.
+
+    Пара — фоллбек, карточка сильнее: её имена идут первыми, и раскладка берёт
+    первое подходящее по письменности. Решение пользователя 03.08.2026.
+
+    Складывать их можно только здесь. У Steam карточка приходит по-русски
+    (`appdetails` с `l=russian`), а английское имя лежит в строке выдачи, куда
+    детальному ответу не дотянуться; у пары наоборот. Ни та, ни другая сторона
+    поодиночке обоих имён не знает.
+
+    **Кино и сериалов не касается**, и это не перестраховка. Правило «оригинал
+    всегда английский» — про игры: у TMDB `original_title` значит другое, там
+    настоящий язык оригинала. Раскладка по письменности такого не знает и
+    обнулила бы поле: замерено на боевом коде — `千と千尋の神隠し`, `기생충` и
+    «Брат» дают пустоту все три. Пишется навсегда: карточка заводится один
+    раз."""
+    if card.item.kind is not Kind.GAME:
+        return card
+    title, original_title = by_language([
+        card.item.title, card.item.original_title,
+        view.title, view.original_title,
+    ])
+    # Год карточки сильнее года пары, и это не то же правило, что в склейке.
+    # Там ранний верен, пока группа — издания одной игры; но склейка сводит и
+    # ремейк с оригиналом, у которых название одно буква в букву. Замерено:
+    # строка «System Shock» — ремейк 2023 года, а из группы ей доставался 1994-й.
+    # Карточка знает правду: она спрошена по номеру у самого источника.
+    return replace(card, item=replace(card.item, title=title,
+                                      original_title=original_title,
+                                      year=card.item.year or view.year))
 
 
 class Loader:
@@ -86,7 +122,7 @@ class Loader:
             if isinstance(poster, Refusal):
                 return poster
 
-        return await self._writer.save(card.value, poster)
+        return await self._writer.save(_from_both(card.value, view), poster)
 
     async def _second_try(self, card: SourceCard,
                           asked: str) -> bytes | None | Refusal:

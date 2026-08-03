@@ -487,7 +487,7 @@
 - `ITEMS` = `'https://api.steampowered.com/IStoreBrowseServic…`
 - `ITEMS_CONTEXT` = `словарь из 3`
 - `SIFT_WANTED` = `словарь из 1`
-- `CARD_WANTED` = `SIFT_WANTED | {'include_tag_count': 20}`
+- `CARD_WANTED` = `SIFT_WANTED | {'include_tag_count': 20, 'include…`
 
 ### `backend/sources/steam/parse.py`
 
@@ -765,6 +765,8 @@
 
 - `RUSSIAN` = `набор из 5`
 - `NOT_RUSSIAN` = `набор из 6`
+- `LATIN` = `набор из 4`
+- `NOT_LATIN` = `набор из 6`
 
 ### `tests/backend/test_layers.py`
 

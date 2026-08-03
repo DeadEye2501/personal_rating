@@ -10,6 +10,9 @@
 помнит `RemovedRepository`.
 """
 
+from dataclasses import replace
+
+from backend.language import in_latin, in_russian
 from backend.model import Kind, SearchHit, Source
 from backend.service.titles import flattened, without_edition
 from backend.unique import unique
@@ -122,6 +125,59 @@ class _Groups:
         self._members[first].extend(self._members.pop(second))
 
 
+def _other_name(winner: SearchHit, group: list[SearchHit]) -> str:
+    """Имя на другой письменности, взятое из группы.
+
+    Одно из двух полей, которыми проигравшая строка делится с победителем —
+    второе год, — и исключение это принято решением пользователя 03.08.2026. Собирается именно
+    здесь, до того как проигравшие исчезнут: группа склейки — единственное
+    место, где два имени **доказанно** про одну игру, их свело правило, а не
+    догадка.
+
+    Показываемое имя не трогается: список выдачи от этого не меняется, а второе
+    поле у кандидатов из магазинов и так пустое — Steam и GOG в выдаче отдают по
+    одному имени.
+
+    Своё второе имя стоит первым в списке и потому сильнее чужого: у old-games
+    оно со страницы той же игры. Оно же и ответ, когда другой письменности в
+    группе не нашлось: `Dune II: The Building of a Dynasty` знает про себя
+    `Dune II: Battle for Arrakis`, письменность у них одна, и затирать его
+    пустотой не за что.
+
+    Чужие имена перебираются тем же ключом, каким выбран победитель, а не в
+    порядке выдач: внутри одного источника порядок задаёт сам источник, и без
+    сортировки второе имя доставалось бы от строки-издания — «Готика II . Gold»
+    вместо «Готика II», если old-games вернёт издание первым."""
+    wanted = in_latin if in_russian(winner.title) else in_russian
+    names = [winner.original_title,
+             *(name for one in sorted(group, key=_rank) if one is not winner
+               for name in (one.title, one.original_title))]
+    return next((one for one in names if one and wanted(one)),
+                winner.original_title)
+
+
+def _earliest_year(group: list[SearchHit]) -> int | None:
+    """Самый ранний год группы: игра не могла выйти раньше самой себя, значит из
+    разошедшихся дат верна ранняя. Решение пользователя 03.08.2026.
+
+    Правило бьёт и по самому победителю: Steam помечает игру годом появления в
+    магазине, и он всегда позже настоящего — `Arcanum` 2016 против 2001. В
+    выдаче Steam года не отдаёт вовсе, и без этого правила «Fallout 2»
+    показывался бы без года, хотя два соседа по группе знали 1998-й.
+
+    Чем правило рискует: мусорной ранней датой. Риск принят пользователем —
+    правится руками через окно карточки."""
+    years = [one.year for one in group if one.year]
+    return min(years) if years else None
+
+
+def _completed(winner: SearchHit, group: list[SearchHit]) -> SearchHit:
+    """Победитель, добравший из группы то, чего у него нет."""
+    return replace(winner, original_title=_other_name(winner, group),
+                   year=_earliest_year(group))
+
+
+
 def _grouped(flat: list[SearchHit]) -> list[int]:
     """Номер группы для каждой строки, сквозной по всем выдачам.
 
@@ -152,12 +208,28 @@ def _grouped(flat: list[SearchHit]) -> list[int]:
     return [groups.head(number) for number in range(len(flat))]
 
 
+def _without_sets(answers: list[list[SearchHit]],
+                  query: str) -> list[list[SearchHit]]:
+    """Выдачи без сборников — кроме того, который спросили прямо.
+
+    Слово сборника обязано стоять в самом запросе: без этой половины «fallout»
+    оставлял бы «Fallout Classic Collection» — слова запроса в её названии
+    есть, а сборника человек не просил."""
+    asked = flattened(query).split()
+    named = any(word in asked for word in SETS)
+    return [[one for one in answer
+             if not _a_set(one) or (named and _asked_for(one, asked))]
+            for answer in answers]
+
+
 def merged(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]:
     """Выдачи, из которых убрано лишнее: сборники и проигравшие строки.
 
     Порядок внутри каждой выдачи сохраняется — его задал источник, а
-    переплетают выдачи после. Победитель уходит целиком: поля не смешиваются,
-    проигравшая строка исчезает вся.
+    переплетают выдачи после. Победитель уходит целиком, и проигравшая строка
+    исчезает вся — **кроме имени на другой письменности и года выхода**: их
+    победитель забирает себе. Оба исключения приняты решением пользователя
+    03.08.2026 и других нет. Подробности у `_completed`.
 
     Строка поиска нужна ради одного исключения: остаётся **тот** сборник,
     который спросили. Набравший «Mortal Kombat Trilogy» обязан её найти — но
@@ -172,22 +244,17 @@ def merged(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]:
     if not all(one.kind is Kind.GAME for answer in answers for one in answer):
         return answers
 
-    asked = flattened(query).split()
-    # Слово сборника обязано стоять в самом запросе: без этой половины «fallout»
-    # оставлял бы «Fallout Classic Collection» — слова запроса в её названии
-    # есть, а сборника человек не просил.
-    named = any(word in asked for word in SETS)
-    kept = [[one for one in answer
-             if not _a_set(one) or (named and _asked_for(one, asked))]
-            for answer in answers]
+    kept = _without_sets(answers, query)
 
     flat = [one for answer in kept for one in answer]
     heads = _grouped(flat)
-    winners: dict[int, SearchHit] = {}
+    groups: dict[int, list[SearchHit]] = {}
     for number, hit in enumerate(flat):
-        group = heads[number]
-        if group not in winners or _rank(hit) < _rank(winners[group]):
-            winners[group] = hit
+        groups.setdefault(heads[number], []).append(hit)
 
-    survivors = {id(one) for one in winners.values()}
-    return [[one for one in answer if id(one) in survivors] for answer in kept]
+    winners = {}
+    for rows in groups.values():
+        winner = min(rows, key=_rank)
+        winners[id(winner)] = _completed(winner, rows)
+    return [[winners[id(one)] for one in answer if id(one) in winners]
+            for answer in kept]

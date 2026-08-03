@@ -229,6 +229,30 @@ async def test_found_game_comes_back_as_a_card(replay):
     assert result.value.item.source is Source.STEAM
 
 
+async def test_the_card_is_asked_with_a_region(fixture):
+    """Ответ `appdetails` зависит от страны вызывающего, и без неё магазин
+    отвечает «такого нет» про живую игру.
+
+    Замерено на живом Steam 03.08.2026: `Fallout: New Vegas` (22380) без `cc`
+    даёт `success: false`, с `cc=us` — полную карточку. Человек видит игру в
+    списке и не может её завести.
+
+    Ту же ловушку соседний запрос того же клиента обходит с самого начала —
+    `ITEMS_CONTEXT` несёт `country_code: US`, и рядом записано, чем это было
+    замерено. Здесь она осталась незакрытой."""
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.setdefault("url", str(request.url))
+        return httpx.Response(200, json=fixture("steam/appdetails.json"))
+
+    client = SteamClient(SourceHttp("steam", transport=httpx.MockTransport(handler)))
+    await client.card("292030", Kind.GAME)
+    await client.aclose()
+
+    assert "cc=us" in seen["url"].lower()
+
+
 async def test_search_uses_the_community_endpoint(fixture):
     seen = {}
 

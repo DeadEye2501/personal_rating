@@ -35,13 +35,67 @@ def test_a_row_that_knows_no_word_of_the_query_is_not_shown():
     assert titles(relevant(answers, "witcher 3")) == ["The Witcher 3: Wild Hunt"]
 
 
-def test_a_number_is_not_a_word():
-    """По «3» совпадает и «Ведьмак 3», и «Baldur's Gate 3», и «Broken Sword 3» —
-    то есть что угодно. Свидетель снят с живого GOG 03.08.2026: по «fallout 2»
-    он приносит `FlatOut 2`."""
-    answers = [[row("Fallout 2"), row("FlatOut 2")]]
+def test_the_words_may_come_from_different_fields_of_the_row():
+    """Слова строки складываются в одну кучу: одно слово запроса может найтись в
+    названии, другое — в слаге.
 
-    assert titles(relevant(answers, "fallout 2")) == ["Fallout 2"]
+    Это главное свойство правила «все слова», и без него запрос «ведьмак 3» не
+    нашёл бы гоговскую строку: показываемое название у неё русское, тройка в
+    нём есть, а слово `witcher` — только в слаге. Попольная проверка «в каком-то
+    одном поле все слова» выбросила бы её."""
+    split = row("Ведьмак 3: Дикая Охота",
+                aliases=("the witcher 3 wild hunt",))
+
+    assert titles(relevant([[split]], "witcher 3")) == ["Ведьмак 3: Дикая Охота"]
+    assert titles(relevant([[split]], "ведьмак hunt")) == [
+        "Ведьмак 3: Дикая Охота"
+    ]
+
+
+def test_every_word_of_the_query_has_to_be_there():
+    """Строка обязана знать **все** слова запроса, а не хоть одно.
+
+    С «хоть одним» по «x com» пролезало 14 строк из 68, а `s.t.a.l.k.e.r`
+    приведение режет на семь однобуквенных слов — и любая строка с буквой `s`
+    в названии проходила. Замерено на живых источниках 03.08.2026."""
+    rows = [row("X-COM: UFO Defense"), row("Combat Mission"), row("X Rebirth")]
+
+    assert titles(relevant([rows], "x com")) == ["X-COM: UFO Defense"]
+
+
+def test_a_possessive_name_is_found_by_its_bare_word():
+    """Апостроф при приведении исчезает, и `Baldur's` становится одним словом
+    `baldurs` — на букву длиннее того, что набирает человек. Без этого правила
+    запрос «baldur» не находил **ничего**: замерено на живых источниках, 19
+    строк на входе и ноль на экране.
+
+    Правило узкое нарочно — только форма на `s`. Совпадение началом слова
+    замерено и отвергнуто: по «x com» оно пропускает 62 строки из 68 вместо 14,
+    а `s.t.a.l.k.e.r` приведение режет на однобуквенные слова, и началом слова
+    проходит что угодно."""
+    answers = [[row("Baldur's Gate 3"), row("Assassin's Creed"),
+                row("Combat Mission")]]
+
+    assert titles(relevant(answers, "baldur")) == ["Baldur's Gate 3"]
+    assert titles(relevant(answers, "assassin")) == ["Assassin's Creed"]
+    assert titles(relevant(answers, "com")) == []
+
+
+def test_a_number_narrows_the_text_it_stands_with():
+    """Цифра — слово наравне с текстом, и она **сужает**. Решение пользователя
+    03.08.2026: «Герои» находят все части, «Герои 3» — только третью.
+
+    Без неё `Heroes of Might and Magic: Olden Era` выходит первой строкой на
+    запрос про третьих «Героев»: все текстовые слова у неё есть, а это другая
+    игра, замерено на живом Steam."""
+    rows = [row("Heroes of Might and Magic III"),
+            row("Heroes of Might and Magic: Olden Era"),
+            row("Heroes of Might and Magic IV")]
+
+    assert titles(relevant([rows], "heroes of might and magic 3")) == [
+        "Heroes of Might and Magic III"
+    ]
+    assert len(relevant([rows], "heroes of might and magic")[0]) == 3
 
 
 def test_a_second_name_and_an_alias_count_as_the_row_knowing_the_word():
@@ -82,13 +136,18 @@ def test_films_and_series_are_not_filtered():
     assert titles(relevant(films, "spirited away")) == ["Унесённые призраками"]
 
 
-def test_a_query_without_meaningful_words_filters_nothing():
-    """Пустой набор слов выбросил бы всю выдачу. Человек вправе набрать одни
-    цифры — «2024» или «3», — и это не повод показать ему пустоту."""
+def test_an_empty_query_filters_nothing():
+    """Пустой набор слов выбросил бы всю выдачу целиком: `all()` на пустом
+    истинно, и без этой ветки правило работало бы наоборот.
+
+    Одни цифры пустотой не считаются — цифра слово, и «2024» сужает, как всякое
+    другое."""
     answers = [[row("Fallout 2"), row("FlatOut 2")]]
 
-    assert titles(relevant(answers, "2024")) == ["Fallout 2", "FlatOut 2"]
     assert titles(relevant(answers, "  ")) == ["Fallout 2", "FlatOut 2"]
+    assert titles(relevant(answers, "")) == ["Fallout 2", "FlatOut 2"]
+    assert titles(relevant(answers, "2")) == ["Fallout 2", "FlatOut 2"]
+    assert titles(relevant(answers, "2024")) == []
 
 
 def test_the_order_and_the_shape_of_the_answers_survive():
