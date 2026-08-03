@@ -116,6 +116,9 @@ COMPOSITE = [
     ("company_credit", ("item_id", "company_id", "role")),
     # Метка в ключе правила одна: и требуемой, и запрещённой она не бывает.
     ("genre_rule_mark", ("rule_id", "ext_id")),
+    # Тип содержимого в ключе: у TMDB фильмы и сериалы нумеруются порознь и
+    # сталкиваются числами — `tmdb/1399` это и фильм, и «Игра престолов».
+    ("removed", ("kind", "source", "source_id")),
     ("item_genre", ("item_id", "genre_id")),
     ("item_tag", ("item_id", "tag_id")),
     ("external_id", ("item_id", "source")),

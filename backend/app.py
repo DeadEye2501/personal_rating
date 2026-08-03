@@ -16,8 +16,8 @@ from backend.service.linking import Linker
 from backend.service.loading import Loader
 from backend.service.people import PeopleSearch
 from backend.service.posters import POSTER_SOURCES, PosterService
-from backend.service.removal import remove_card
-from backend.service.search import SearchService
+from backend.service.removal import discard_card
+from backend.service.search import SearchParts, SearchService
 from backend.service.series import SeriesRefresh
 from backend.sources.build import build_sources
 from backend.sources.http import SourceHttp
@@ -31,6 +31,7 @@ from backend.storage.repository.external import (
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
+from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.sections import SectionsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.views import ViewsRepository
@@ -60,6 +61,9 @@ class Backend:
     linker: Linker
     posters: PosterService
 
+    # Наружу не отдаётся: клиенту знать об удалённом нечего — он видит
+    # следствие, отсеянную выдачу. Зовут его двое, и оба здесь.
+    _removed: RemovedRepository
     _sources: Sources
     _engine: AsyncEngine
 
@@ -85,8 +89,10 @@ class Backend:
 
         Метод здесь, а не у репозитория: удаление — это две базы в строго
         определённом порядке, и репозиторий одной из них не должен требовать от
-        клиента вторую. Порядок задан в `service/removal.py`."""
-        await remove_card(self.library, self.posters, item_id)
+        клиента вторую. Порядок и память об убранном заданы в
+        `service/removal.py`: там же записано, почему помнит именно этот путь, а
+        не общий `remove_card`, которым откатывается сорвавшаяся запись."""
+        await discard_card(self.library, self.posters, self._removed, item_id)
 
     async def aclose(self) -> None:
         """Закрыть могут и владелец, и фикстура теста — второй раз это тихо.
@@ -145,6 +151,7 @@ async def build_backend(
     # предметы разные: у `parts` это оценки агрегаторов, у `Backend.ratings` — свои.
     library = parts["library"]
     genres = parts["genres"]
+    removed = RemovedRepository(sessions)
     ids = parts["ids"]
     external_ratings = parts["ratings"]
     views = ViewsRepository(sessions)
@@ -158,10 +165,10 @@ async def build_backend(
         people=parts["people"],
         companies=parts["companies"],
         search=SearchService(library=library, views=views, sources=sources,
-                             genres=genres),
+                             parts=SearchParts(genres=genres, removed=removed)),
         finder=PeopleSearch(views=views, people=parts["people"],
                             companies=parts["companies"], sources=sources,
-                            genres=genres),
+                            parts=SearchParts(genres=genres, removed=removed)),
         feed=LibraryService(SectionsRepository(sessions), views),
         loader=Loader(library=library, writer=CardWriter(**parts),
                       sources=sources, posters=posters),
@@ -169,6 +176,7 @@ async def build_backend(
         enricher=Enricher(sources=sources, ids=ids, ratings=external_ratings),
         linker=Linker(**parts),
         posters=posters,
+        _removed=removed,
         _sources=sources,
         _engine=engine,
     )

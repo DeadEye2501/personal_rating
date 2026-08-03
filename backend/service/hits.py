@@ -12,14 +12,17 @@ from datetime import datetime
 from backend.model import (
     CardView,
     Found,
+    Kind,
     Outcome,
     Refusal,
     SearchHit,
+    Source,
     view_from_hit,
 )
 from backend.service.genres import book_for, genres_of
 from backend.sources.convert import from_search
 from backend.storage.repository.genres import GenresRepository
+from backend.storage.repository.removed import RemovedRepository
 from backend.unique import unique_by
 
 
@@ -54,6 +57,41 @@ def split(
         elif isinstance(outcome, Found):
             answers.append(list(outcome.value))
     return answers, refusals
+
+
+def mark_of(hit: SearchHit) -> tuple[Kind, Source, str]:
+    """Чем строка чужой выдачи опознаётся до всякой загрузки.
+
+    Тип содержимого входит в тройку не для порядка: у TMDB фильмы и сериалы
+    нумеруются порознь и сталкиваются числами — `tmdb/1399` это и фильм, и
+    «Игра престолов»."""
+    return (hit.kind, hit.source, hit.source_id)
+
+
+async def without_removed(
+    removed: RemovedRepository, answers: list[list[SearchHit]]
+) -> list[list[SearchHit]]:
+    """Выдачи без того, что человек уже убирал.
+
+    Здесь, а не у каждой из двух сборок: внешнюю выдачу производят двое — строка
+    поиска и клик по человеку, — и разойдись они, удалённое возвращалось бы одним
+    жестом и не возвращалось другим. Ровно тот довод, ради которого этот модуль
+    и заведён.
+
+    Зовётся **до среза порции и до сборки карточек**: иначе убранная строка
+    занимала бы слот из двадцати — а добрать двадцатую неоткуда, — и на неё
+    уходил бы запрос за жанрами.
+
+    Спрашивается один раз на все выдачи разом: запрос на каждую стоил бы
+    столько же, сколько сам отсев экономит.
+
+    Совпадение точное, по тройке. Ложных срабатываний тут не бывает по
+    построению: названия не сравниваются вовсе, и одна игра в двух магазинах —
+    две разные строки, из которых убрана может быть только названная."""
+    gone = await removed.known(
+        [mark_of(one) for answer in answers for one in answer])
+    return [[one for one in answer if mark_of(one) not in gone]
+            for answer in answers]
 
 
 async def to_views(hits: list[SearchHit], genres: GenresRepository,

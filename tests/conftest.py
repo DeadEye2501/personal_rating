@@ -81,14 +81,14 @@ __all__ = [
     "unreachable",
 ]
 
-# Вопрос ленты, от которого отталкиваются проверки разделов: оценённое кино по
-# убыванию оценки. Что именно проверяет тест, он меняет через `replace`, и в
-# вызове видно только это.
 # Номера жанров из фикстуры `reference`. Карточке их ставят прямо, а не через
 # справочник: там, где предмет проверки — фильтр, лента или показ, справочник
 # только шум.
 ACTION, ADVENTURE, DRAMA = 1, 2, 3
 
+# Вопрос ленты, от которого отталкиваются проверки разделов: оценённое кино по
+# убыванию оценки. Что именно проверяет тест, он меняет через `replace`, и в
+# вызове видно только это.
 RATED = Feed(Section.RATED, Kind.MOVIE, Filters(), Order(Sort.SCORE))
 WANTED = Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Order(Sort.ADDED_AT))
 
@@ -133,7 +133,7 @@ TABLES = {
     "item", "genre", "genre_rule", "genre_rule_mark", "item_genre",
     "person", "person_credit", "company", "company_credit",
     "external_id", "external_rating",
-    "rating", "tag", "item_tag", "wishlist",
+    "rating", "tag", "item_tag", "wishlist", "removed",
 }
 
 # Минимально допустимая строка каждой таблицы: только обязательные колонки.

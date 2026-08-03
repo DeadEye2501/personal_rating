@@ -1,11 +1,11 @@
-"""Схема целиком: пятнадцать таблиц каталога и моих данных.
+"""Схема целиком: шестнадцать таблиц каталога и моих данных.
 
 Revision ID: 0001
 Revises:
 Create Date: 2026-07-29
 
 Тело `upgrade` длиннее предела в сорок строк намеренно: это машинный вывод
-автогенерации, сверенный с объявлениями прогоном. Разнести пятнадцать таблиц
+автогенерации, сверенный с объявлениями прогоном. Разнести шестнадцать таблиц
 по функциям значило бы переписать сгенерированное руками — и получить файл,
 который уже не сверить с новым выводом автогенерации.
 """
@@ -136,6 +136,13 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('item_id', 'person_id', 'role', name=op.f('pk_person_credit'))
     )
     op.create_index('ix_person_credit_person_id', 'person_credit', ['person_id'], unique=False)
+    op.create_table('removed',
+    sa.Column('kind', sa.Text(), nullable=False),
+    sa.Column('source', sa.Text(), nullable=False),
+    sa.Column('source_id', sa.Text(), nullable=False),
+    sa.Column('title', sa.Text(), nullable=False),
+    sa.PrimaryKeyConstraint('kind', 'source', 'source_id', name=op.f('pk_removed'))
+    )
     op.create_table('rating',
     sa.Column('item_id', sa.Integer(), nullable=False),
     sa.Column('score', sa.Float(), nullable=True),
@@ -171,6 +178,7 @@ def downgrade() -> None:
     op.drop_table('item_tag')
     op.drop_index('ix_item_genre_genre_id', table_name='item_genre')
     op.drop_table('item_genre')
+    op.drop_table('removed')
     op.drop_table('genre_rule_mark')
     op.drop_index('ix_genre_rule_source', table_name='genre_rule')
     op.drop_table('genre_rule')

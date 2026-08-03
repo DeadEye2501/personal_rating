@@ -14,7 +14,7 @@ from backend.storage.tables.catalog import (
     person,
     person_credit,
 )
-from backend.storage.tables.mine import item_tag, rating, tag, wishlist
+from backend.storage.tables.mine import item_tag, rating, removed, tag, wishlist
 
 __all__ = [
     "company",
@@ -31,6 +31,7 @@ __all__ = [
     "person",
     "person_credit",
     "rating",
+    "removed",
     "tag",
     "wishlist",
 ]

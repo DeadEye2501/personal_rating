@@ -2,6 +2,7 @@
 
 import asyncio
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
 
 from backend.model import (
@@ -12,10 +13,11 @@ from backend.model import (
 )
 from backend.service.asking import answered_all
 from backend.service.filmography import Filmographies
-from backend.service.hits import once, split, to_views
+from backend.service.hits import once, split, to_views, without_removed
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.unique import unique_by
 
@@ -44,18 +46,34 @@ def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]:
     return woven
 
 
+@dataclass(frozen=True, slots=True)
+class SearchParts:
+    """Хранилища, которые нужны внешней выдаче.
+
+    Заведено потому, что доводов у сборщика стало шесть: справочник разворачивает
+    метки кандидата, память об убранном отсеивает то, что человек уже удалил.
+
+    С `CardParts` записи карточки роднит только повод — предел на число доводов.
+    Тот держит общее поведение двух наследников, этот не держит ничего: просто
+    два поля, которые нужны обеим сборкам внешней выдачи."""
+
+    genres: GenresRepository
+    removed: RemovedRepository
+
+
 class SearchService:
     """Поиск идёт сразу по двум местам, и метод у каждого свой: своё отдаётся
     первым и работает без сети, внешнее доливается по готовности."""
 
     def __init__(self, library: LibraryRepository, views: ViewsRepository,
-                 sources: Sources, genres: GenresRepository,
+                 sources: Sources, parts: SearchParts,
                  clock: Callable[[], datetime] = datetime.now) -> None:
         self._library = library
         self._views = views
         self._sources = sources
         self._works = Filmographies(sources)
-        self._genres = genres
+        self._genres = parts.genres
+        self._removed = parts.removed
         # Часы внедряются, как во всех записях проекта: отметка бесплатной оценки
         # кандидата в базу не попадает, но брать время изнутри — путь к тому, что
         # однажды попадёт и проверить это будет нечем.
@@ -93,8 +111,8 @@ class SearchService:
         # снимает её позже, и до экрана доехала бы половина порции.
         together = unique_by(_weave(works),
                              lambda one: (one.source, one.source_id))
-        woven = _weave([answer[:SEARCH_SIZE] for answer in answers]
-                       + [together[:SEARCH_SIZE]])
+        kept = await without_removed(self._removed, [*answers, together])
+        woven = _weave([one[:SEARCH_SIZE] for one in kept])
 
         return ExternalSearch(
             views=tuple(await to_views(woven, self._genres, self._clock)),

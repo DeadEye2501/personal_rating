@@ -7,11 +7,12 @@ import httpx
 
 from backend.app import card_parts as backend_card_parts
 from backend.service.posters import POSTER_SOURCES, PosterService
-from backend.service.search import SearchService
+from backend.service.search import SearchParts, SearchService
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.views import ViewsRepository
 from tests.builders import MOMENT
 from tests.fakes import FakeSources
@@ -46,5 +47,6 @@ def search_service(sessions, *clients) -> SearchService:
     return SearchService(LibraryRepository(sessions),
                          ViewsRepository(sessions),
                          FakeSources(*clients),
-                         GenresRepository(sessions),
+                         SearchParts(genres=GenresRepository(sessions),
+                                     removed=RemovedRepository(sessions)),
                          clock=lambda: MOMENT)

@@ -17,10 +17,10 @@ from backend.model import (
     merge_results,
 )
 from backend.service.filmography import Filmographies
-from backend.service.hits import to_views
+from backend.service.hits import to_views, without_removed
+from backend.service.search import SearchParts
 from backend.sources.registry import Sources
 from backend.storage.repository.credits import CreditRepository
-from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.views import ViewsRepository
 
 
@@ -30,12 +30,13 @@ class PeopleSearch:
 
     def __init__(self, views: ViewsRepository, people: CreditRepository,
                  companies: CreditRepository, sources: Sources,
-                 genres: GenresRepository,
+                 parts: SearchParts,
                  clock: Callable[[], datetime] = datetime.now) -> None:
         self._views = views
         self._entities = {"people": people, "companies": companies}
         self._works = Filmographies(sources)
-        self._genres = genres
+        self._genres = parts.genres
+        self._removed = parts.removed
         self._clock = clock
 
     async def by_entity(self, domain: str, entity_id: int,
@@ -47,6 +48,11 @@ class PeopleSearch:
 
         own = await self._own(repository, entity_id, kind)
         hits, refusals = await self._outside(domain, identity, kind)
+        # Убранное не возвращается и этим жестом тоже: «больше не приходит
+        # никогда» сказано про игру, а не про строку поиска. Отсев тот же, что
+        # у строки, и стоит он до сборки карточек — на удалённого кандидата не
+        # уходит ни одного запроса за жанрами.
+        hits, = await without_removed(self._removed, [hits])
         outside = await to_views(hits, self._genres, self._clock)
         return ExternalSearch(views=tuple(merge_results(own, outside)),
                               refusals=tuple(refusals))

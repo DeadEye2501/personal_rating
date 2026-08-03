@@ -15,20 +15,20 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (22)
 
-## backend — 81 модулей
+## backend — 82 модулей
 
-### `backend/app.py` — 174 строк
+### `backend/app.py` — 182 строк
 
 Бэкенд, собранный целиком.
 
-Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
+Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.session`
 
-- `class Backend` (57)
+- `class Backend` (62)
   - `async def create_manual_card(self, item: Item, now: datetime) -> int` (16)
-  - `async def delete_card(self, item_id: int) -> None` (7)
+  - `async def delete_card(self, item_id: int) -> None` (9)
   - `async def aclose(self) -> None` (8)
 - `def card_parts(sessions, posters: PosterService) -> dict` (13)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (59)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (61)
 
 ### `backend/config.py` — 49 строк
 
@@ -299,14 +299,16 @@
 - `def genres_of(book: Book, marked: Marked) -> tuple[Genre, ...]` (14)
 - `async def resolved_genres(genres: GenresRepository, marked: Marked) -> list[int]` (5)
 
-### `backend/service/hits.py` — 73 строк
+### `backend/service/hits.py` — 111 строк
 
 Приведение того, что ответили источники, к тому виду, в котором это
 
-Зависит от: `backend.model`, `backend.service.genres`, `backend.sources.convert`, `backend.storage.repository.genres`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.genres`, `backend.sources.convert`, `backend.storage.repository.genres`, `backend.storage.repository.removed`, `backend.unique`
 
 - `def once(refusals: list[Refusal]) -> list[Refusal]` (10)
 - `def split(outcomes: Iterable[Outcome]) -> tuple[list[list[SearchHit]], list[Refusal]]` (19)
+- `def mark_of(hit: SearchHit) -> tuple[Kind, Source, str]` (7)
+- `async def without_removed(removed: RemovedRepository, answers: list[list[SearchHit]]) -> list[list[SearchHit]]` (24)
 - `async def to_views(hits: list[SearchHit], genres: GenresRepository, clock: Callable[[], datetime]) -> list[CardView]` (15)
 
 ### `backend/service/images.py` — 49 строк
@@ -356,14 +358,14 @@
   - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/people.py` — 78 строк
+### `backend/service/people.py` — 84 строк
 
 Что найдётся по человеку или студии.
 
-Зависит от: `backend.model`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.views`
+Зависит от: `backend.model`, `backend.service.filmography`, `backend.service.hits`, `backend.service.search`, `backend.sources.registry`, `backend.storage.repository.credits`, `backend.storage.repository.views`
 
-- `class PeopleSearch` (52)
-  - `async def by_entity(self, domain: str, entity_id: int, kind: Kind) -> ExternalSearch` (12)
+- `class PeopleSearch` (58)
+  - `async def by_entity(self, domain: str, entity_id: int, kind: Kind) -> ExternalSearch` (17)
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
   - `async def _outside(self, domain: str, identity: tuple[str, str | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (17)
 
@@ -386,22 +388,24 @@
   - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
   - `async def aclose(self) -> None` (4)
 
-### `backend/service/removal.py` — 23 строк
+### `backend/service/removal.py` — 52 строк
 
 Удаление карточки из обоих файлов базы.
 
-Зависит от: `backend.service.posters`, `backend.storage.repository.library`
+Зависит от: `backend.service.posters`, `backend.storage.repository.library`, `backend.storage.repository.removed`
 
-- `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (17)
+- `async def discard_card(library: LibraryRepository, posters: PosterService, removed: RemovedRepository, item_id: int) -> None` (19)
+- `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (24)
 
-### `backend/service/search.py` — 102 строк
+### `backend/service/search.py` — 120 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `backend.unique`
 
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (18)
-- `class SearchService` (56)
+- `class SearchParts` (12)
+- `class SearchService` (57)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
   - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (35)
 
@@ -875,6 +879,16 @@
   - `async def get(self, item_id: int) -> Rating | None` (5)
   - `async def clear(self, item_id: int) -> None` (3)
 
+### `backend/storage/repository/removed.py` — 50 строк
+
+Что человек убрал из выдачи насовсем.
+
+Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.tables`
+
+- `class RemovedRepository(Repository)` (40)
+  - `async def remember(self, item: Item) -> None` (14)
+  - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (20)
+
 ### `backend/storage/repository/sections.py` — 177 строк
 
 Вопросы к отфильтрованному набору раздела.
@@ -977,13 +991,13 @@
 - `def clearing(table: Table, item_id: int) -> Delete` (6)
 - `def upserting(table: Table, values: dict, key: list[Column]) -> Insert` (14)
 
-### `backend/storage/tables/__init__.py` — 36 строк
+### `backend/storage/tables/__init__.py` — 37 строк
 
 Поверхность схемы: отсюда таблицы берут репозитории.
 
 Зависит от: `backend.storage.tables.base`, `backend.storage.tables.catalog`, `backend.storage.tables.mine`
 
-Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_rule`, `genre_rule_mark`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `tag`, `wishlist`
+Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_rule`, `genre_rule_mark`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `removed`, `tag`, `wishlist`
 
 
 ### `backend/storage/tables/base.py` — 32 строк
@@ -1002,9 +1016,9 @@
 Зависит от: `backend.storage.tables.base`
 
 
-### `backend/storage/tables/mine.py` — 56 строк
+### `backend/storage/tables/mine.py` — 80 строк
 
-Таблицы моих данных: то, что не зависит от источника.
+Таблицы моих данных: то, что заводит и правит человек.
 
 Зависит от: `backend.storage.tables.base`
 
@@ -1282,14 +1296,14 @@
 Зависит от: `migrations.reference.rule`
 
 
-### `migrations/versions/0001_schema.py` — 187 строк
+### `migrations/versions/0001_schema.py` — 195 строк
 
-Схема целиком: пятнадцать таблиц каталога и моих данных.
+Схема целиком: шестнадцать таблиц каталога и моих данных.
 
 Зависит от: —
 
-- `def upgrade() -> None` (140)
-- `def downgrade() -> None` (26)
+- `def upgrade() -> None` (147)
+- `def downgrade() -> None` (27)
 
 ### `migrations/versions/0002_genres.py` — 76 строк
 
@@ -1333,7 +1347,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 92 модулей
+## tests — 93 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1930,15 +1944,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 3
 
 
-### `tests/backend/test_people_search.py` — 394 строк ⚠ подошёл к 300
+### `tests/backend/test_people_search.py` — 396 строк ⚠ подошёл к 300
 
 Клик по человеку и студии: внутренняя половина и внешняя.
 
-Зависит от: `backend.model`, `backend.service.people`, `backend.service.search`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.people`, `backend.service.search`, `backend.storage.repository.credits`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `tests.conftest`
 
 Тестов: 21
 
-- `def parts(sessions)` (8)
+- `def parts(sessions)` (9)
 - `def finder_on(parts, client) -> PeopleSearch` (5)
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
 - `def outside_questions(asked: list[tuple]) -> list[tuple]` (4)
@@ -1970,6 +1984,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 16
 
+
+### `tests/backend/test_removed.py` — 186 строк
+
+Удалённое не возвращается: карточка уходит, а память о ней остаётся.
+
+Зависит от: `backend.model`, `backend.service.hits`, `backend.service.removal`, `backend.service.search`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `tests.conftest`, `tests.wiring`
+
+Тестов: 11
+
+- `async def removed(sessions)` (2)
+- `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
+- `async def rows(engine) -> list[tuple]` (7)
 
 ### `tests/backend/test_search.py` — 377 строк ⚠ подошёл к 300
 
@@ -2045,7 +2071,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def person_with(sessions, name: str, item_ids: list[int]) -> int` (6)
 
-### `tests/backend/test_tables.py` — 205 строк
+### `tests/backend/test_tables.py` — 208 строк
 
 Объявленная схема: таблицы, индексы, ключи и ограничения.
 
@@ -2340,15 +2366,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `def handler(request: httpx.Request) -> httpx.Response` (2)
 - `def capture(*, content: bytes | None=None, status: int=200)` (11)
 
-### `tests/wiring.py` — 50 строк
+### `tests/wiring.py` — 52 строк
 
 Части карточки и сервис обложек, собранные для теста на подставном транспорте.
 
-Зависит от: `backend.app`, `backend.service.posters`, `backend.service.search`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.builders`, `tests.fakes`
+Зависит от: `backend.app`, `backend.service.posters`, `backend.service.search`, `backend.sources.http`, `backend.storage.posters`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `tests.builders`, `tests.fakes`
 
 - `def poster_service(store: PosterStore, transport: httpx.MockTransport) -> PosterService` (7)
 - `def card_parts(sessions, store: PosterStore, transport: httpx.MockTransport) -> dict` (8)
-- `def search_service(sessions, *clients) -> SearchService` (12)
+- `def search_service(sessions, *clients) -> SearchService` (13)
 
 ## Абстракции с одной реализацией
 

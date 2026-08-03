@@ -33,6 +33,7 @@
   - `enricher: Enricher`
   - `linker: Linker`
   - `posters: PosterService`
+  - `_removed: RemovedRepository`
   - `_sources: Sources`
   - `_engine: AsyncEngine`
 
@@ -347,6 +348,9 @@
 ### `backend/service/search.py`
 
 - `SEARCH_SIZE` = `20`
+- `class SearchParts`
+  - `genres: GenresRepository`
+  - `removed: RemovedRepository`
 
 ### `backend/service/series.py`
 
@@ -544,6 +548,7 @@
 
 ### `backend/storage/tables/mine.py`
 
+- `removed` = `Table('removed', metadata, Column('kind', Text, …`
 - `rating` = `Table('rating', metadata, item_fk(primary_key=Tr…`
 - `tag` = `Table('tag', metadata, Column('id', Integer, pri…`
 - `item_tag` = `Table('item_tag', metadata, item_fk(nullable=Fal…`
@@ -774,6 +779,10 @@
 
 - `OTHER` = `'другая обложка'.encode()`
 
+### `tests/backend/test_removed.py`
+
+- `FALLOUT` = `набор из 3`
+
 ### `tests/backend/test_series_refresh.py`
 
 - `LONG_AGO` = `MOMENT - timedelta(days=40)`
@@ -790,7 +799,7 @@
 - `TYPES` = `набор из 9`
 - `REQUIRED` = `набор из 12`
 - `UNIQUE` = `набор из 4`
-- `COMPOSITE` = `набор из 7`
+- `COMPOSITE` = `набор из 8`
 - `PARENTS` = `набор из 5`
 
 ### `tests/backend/test_view_types.py`
@@ -840,5 +849,5 @@
 - `DRAMA` = `набор из 3`
 - `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
-- `TABLES` = `набор из 15`
+- `TABLES` = `набор из 16`
 - `MINIMAL` = `словарь из 5`

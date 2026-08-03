@@ -14,10 +14,11 @@ from backend.model import (
     Source,
 )
 from backend.service.people import PeopleSearch
-from backend.service.search import SearchService
+from backend.service.search import SearchParts, SearchService
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.views import ViewsRepository
 from tests.conftest import FakeSearch, FakeSources, an_item, hit, rated
 
@@ -29,7 +30,8 @@ def parts(sessions):
         "views": ViewsRepository(sessions),
         "people": people(sessions),
         "companies": companies(sessions),
-        "genres": GenresRepository(sessions),
+        "parts": SearchParts(genres=GenresRepository(sessions),
+                             removed=RemovedRepository(sessions)),
     }
 
 
@@ -374,7 +376,7 @@ async def test_an_unknown_entity_has_nothing_to_show(parts):
     assert client.asked == []
 
 
-async def test_a_clicked_name_and_a_typed_one_ask_the_same(parts):
+async def test_a_clicked_name_and_a_typed_one_ask_the_same(parts, sessions):
     """Клик по человеку без внешней идентичности и его же имя, набранное в
     строке, — один путь наружу, а не два разошедшихся.
 
@@ -388,7 +390,7 @@ async def test_a_clicked_name_and_a_typed_one_ask_the_same(parts):
 
     await finder_on(parts, clicked).by_entity("people", entity_id, Kind.MOVIE)
     await SearchService(parts["library"], parts["views"], FakeSources(typed),
-                        parts["genres"]).external(Kind.MOVIE, "Кристофер Нолан")
+                        parts["parts"]).external(Kind.MOVIE, "Кристофер Нолан")
 
     assert outside_questions(clicked.asked) == outside_questions(typed.asked)
     assert outside_questions(typed.asked) != []

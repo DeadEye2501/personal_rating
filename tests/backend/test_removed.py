@@ -1,0 +1,186 @@
+"""Удалённое не возвращается: карточка уходит, а память о ней остаётся.
+
+Ручная половина дедупликации. Что не склеила машина, показывается двумя
+строками; человек убирает лишнюю, и она больше не приходит никогда — ни в
+выдаче, ни кругом загрузки, ни одним лишним запросом.
+
+Совпадение точное, по тройке «тип содержимого, источник, идентификатор»:
+ложных срабатываний тут не бывает по построению, названия не сравниваются
+вовсе."""
+
+import pytest
+import sqlalchemy
+
+from backend.model import Found, Kind, Source
+from backend.service.hits import mark_of
+from backend.service.removal import discard_card, remove_card
+from backend.service.search import SEARCH_SIZE
+from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.removed import RemovedRepository
+from tests.conftest import FakeSearch, an_item, hit, poster_service, unreachable
+from tests.wiring import search_service
+
+FALLOUT = (Kind.GAME, Source.STEAM, "38410")
+
+
+@pytest.fixture
+async def removed(sessions):
+    return RemovedRepository(sessions)
+
+
+def a_game(source_id: str = "38410", title: str = "Fallout 2",
+           source: Source = Source.STEAM):
+    return an_item(source_id, title, kind=Kind.GAME, source=source)
+
+
+async def rows(engine) -> list[tuple]:
+    """Строки таблицы как есть: колонки читаются сырыми, чтобы наблюдать сам
+    ключ, а не то, что о нём думает репозиторий."""
+    async with engine.begin() as connection:
+        found = await connection.execute(sqlalchemy.text(
+            "SELECT kind, source, source_id, title FROM removed"))
+        return [tuple(row) for row in found]
+
+
+async def test_a_removed_row_is_remembered(removed, engine):
+    """Запоминается тройка и название. Название — для человека: обратного хода
+    в приложении нет, чинить придётся руками из SQLite, а по паре «steam /
+    38410» не понять, что это было."""
+    await removed.remember(a_game())
+
+    assert await removed.known([FALLOUT]) == {FALLOUT}
+    assert await rows(engine) == [("game", "steam", "38410", "Fallout 2")]
+
+
+async def test_the_same_id_in_another_source_is_another_row(removed):
+    """Ключ составной. Удалили строку Steam — гоговская остаётся: это разные
+    записи о разных строках выдачи, и совпадение чисел ничего не значит."""
+    await removed.remember(a_game())
+
+    assert await removed.known([(Kind.GAME, Source.GOG, "38410")]) == set()
+
+
+async def test_the_same_id_of_another_kind_is_another_row(removed, engine):
+    """У TMDB фильмы и сериалы нумеруются порознь и сталкиваются числами:
+    `tmdb/1399` — это и фильм, и «Игра престолов». Без типа содержимого в ключе
+    удалённый фильм молча унёс бы сериал, а спека обещает, что ложных
+    срабатываний не бывает по построению."""
+    await removed.remember(an_item("1399", "Фильм", kind=Kind.MOVIE))
+
+    assert await removed.known([(Kind.MOVIE, Source.TMDB, "1399")]) == {
+        (Kind.MOVIE, Source.TMDB, "1399")
+    }
+    assert await removed.known([(Kind.SERIES, Source.TMDB, "1399")]) == set()
+
+    # И обе строки уживаются: ключ их различает, а не отбрасывает вторую.
+    await removed.remember(an_item("1399", "Сериал", kind=Kind.SERIES))
+    assert len(await rows(engine)) == 2
+
+
+async def test_removing_the_same_row_twice_is_quiet(removed, engine):
+    """Убрать одну и ту же игру дважды человек вправе: завёл заново, посмотрел
+    и убрал опять. Второй раз не должен ронять запись."""
+    await removed.remember(a_game())
+    await removed.remember(a_game(title="Fallout 2 переизданный"))
+
+    assert len(await rows(engine)) == 1
+
+
+async def test_nothing_asked_is_nothing_known(removed):
+    """Пустой список не повод падать. Про «не повод идти в базу» тут не
+    утверждается: пропущенный запрос не наблюдается — пустая таблица дала бы ту
+    же пустоту."""
+    assert await removed.known([]) == set()
+
+
+async def test_a_manual_card_is_not_remembered(removed, engine):
+    """У ручной карточки выдуманный `source_id`, и в выдаче она не появляется
+    никогда — помнить о ней нечего. Записанная, она заняла бы строку, которая
+    не отсеет ничего и никогда."""
+    await removed.remember(an_item("сочинённый", "Своя игра",
+                                   source=Source.MANUAL))
+
+    assert await rows(engine) == []
+
+
+async def test_discarding_a_card_removes_it_and_remembers_it(sessions, posters,
+                                                             card):
+    """Кнопка «удалить» обязана и убрать карточку, и закрыть ей дорогу обратно.
+    Оба следствия проверяются разом: с одним первым политика слайса не
+    наблюдалась бы вовсе."""
+    item_id = await card(Kind.GAME, "38410")
+    library = LibraryRepository(sessions)
+    # Тройка берётся у самой карточки, а не пишется литералом: фикстура заводит
+    # её со своим источником, и разъехавшийся литерал сделал бы проверку
+    # зелёной при любой поломке.
+    mark = mark_of(await library.get(item_id))
+
+    await discard_card(library, poster_service(posters, unreachable()),
+                       RemovedRepository(sessions), item_id)
+
+    assert await library.get(item_id) is None
+    assert await RemovedRepository(sessions).known([mark]) == {mark}
+
+
+async def test_a_rollback_does_not_close_the_road_back(sessions, posters, card):
+    """Тот же порядок удаления зовёт откат сорвавшейся записи, и там пометки
+    быть не должно: карточка не сохранилась, а не была убрана человеком.
+    Помеченная, она перестала бы находиться навсегда."""
+    item_id = await card(Kind.GAME, "38410")
+    library = LibraryRepository(sessions)
+    mark = mark_of(await library.get(item_id))
+
+    await remove_card(library, poster_service(posters, unreachable()), item_id)
+
+    assert await library.get(item_id) is None
+    assert await RemovedRepository(sessions).known([mark]) == set()
+
+
+async def test_a_removed_candidate_never_reaches_the_search(sessions, reference,
+                                                            removed):
+    """Отсев стоит до показа: удалённая строка не мелькает и не исчезает — её
+    нет с самого начала."""
+    await removed.remember(a_game())
+    found = FakeSearch(Found([
+        hit("38410", "Fallout 2", source=Source.STEAM, kind=Kind.GAME),
+        hit("38411", "Fallout Tactics", source=Source.STEAM, kind=Kind.GAME),
+    ]), name="steam")
+
+    result = await search_service(sessions, found).external(Kind.GAME, "fallout")
+
+    assert [one.title for one in result.views] == ["Fallout Tactics"]
+
+
+async def test_a_removed_row_of_one_source_leaves_the_other_alone(
+    sessions, reference, removed
+):
+    """Удалили из Steam — гоговская строка на месте. Ровно ради этого ключ и
+    составной: одна игра в двух магазинах — две разные строки выдачи."""
+    await removed.remember(a_game())
+    steam = FakeSearch(Found([
+        hit("38410", "Fallout 2", source=Source.STEAM, kind=Kind.GAME),
+    ]), name="steam")
+    gog = FakeSearch(Found([
+        hit("38410", "Fallout 2", source=Source.GOG, kind=Kind.GAME),
+    ]), name="gog")
+
+    result = await search_service(sessions, steam, gog).external(Kind.GAME,
+                                                                "fallout")
+
+    assert [one.source for one in result.views] == [Source.GOG]
+
+
+async def test_a_removed_row_does_not_eat_a_slot(sessions, reference, removed):
+    """Отсев стоит **до** среза порции. Иначе убранная строка занимала бы слот
+    из двадцати, до экрана доезжало бы девятнадцать, а добрать двадцатую
+    неоткуда: догрузки у поиска нет вовсе."""
+    await removed.remember(a_game("0"))
+    many = FakeSearch(Found([
+        hit(str(n), f"Игра {n}", source=Source.STEAM, kind=Kind.GAME)
+        for n in range(SEARCH_SIZE + 5)
+    ]), name="steam")
+
+    result = await search_service(sessions, many).external(Kind.GAME, "игра")
+
+    assert len(result.views) == SEARCH_SIZE
+    assert "0" not in [one.source_id for one in result.views]
