@@ -6,16 +6,16 @@
 
 ## . — 1 модулей
 
-### `main.py` — 63 строк
+### `main.py` — 75 строк
 
 Собирает зависимости, настраивает лог и поднимает окно.
 
-Зависит от: `backend.app`, `backend.config`, `bridge.thread`, `bridge.window`
+Зависит от: `backend.app`, `backend.config`, `backend.startup`, `bridge.thread`, `bridge.window`
 
 - `def setup_logging(config) -> None` (12)
-- `def main() -> None` (22)
+- `def main() -> None` (33)
 
-## backend — 86 модулей
+## backend — 87 модулей
 
 ### `backend/app.py` — 192 строк
 
@@ -805,6 +805,15 @@
 - `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (6)
 - `async def asked(http: SourceHttp, url: str, params: dict | None=None) -> httpx.Response | Refusal` (17)
 
+### `backend/startup.py` — 72 строк
+
+Всё, чего не хватает приложению до первого запроса: рабочая папка с файлом
+
+Зависит от: —
+
+- `def ensure_env(data_dir: Path, template: Path) -> None` (18)
+- `def upgrade_schema(base_dir: Path | None=None) -> None` (22)
+
 ### `backend/storage/entity.py` — 34 строк
 
 Чем человек отличается от студии в схеме.
@@ -1307,7 +1316,7 @@
 
 ## migrations — 9 модулей
 
-### `migrations/env.py` — 56 строк
+### `migrations/env.py` — 62 строк
 
 Точка входа Alembic: адрес базы и соединение под миграции.
 
@@ -1415,7 +1424,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 100 модулей
+## tests — 101 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -2185,6 +2194,18 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def bare_engine(tmp_path)` (4)
 - `class Base(DeclarativeBase)` (2)
 - `class Note(Base)` (5)
+
+### `tests/backend/test_startup.py` — 147 строк
+
+Запуск готовит рабочую папку сам: папка, файл настроек и схема базы.
+
+Зависит от: `backend.config`, `backend.startup`
+
+Тестов: 8
+
+- `def a_template(folder: Path) -> Path` (4)
+- `def _genres_in(path: Path) -> int` (8)
+- `def _variables_of(text: str) -> set[str]` (3)
 
 ### `tests/backend/test_suggestions.py` — 229 строк
 

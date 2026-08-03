@@ -12,7 +12,13 @@ from backend.storage.session import prepare_connection
 from backend.storage.tables import metadata
 
 config = context.config
-if config.config_file_name is not None:
+# Настройки лога читаются только когда миграции гонит человек из командной
+# строки. Внутри приложения их читать нельзя: `fileConfig` переконфигурирует
+# корневой логгер и глушит все существующие — `disable_existing_loggers` у него
+# истина по умолчанию, — то есть стёр бы лог, настроенный строкой выше, и
+# приложение продолжило бы работать молча.
+if (config.config_file_name is not None
+        and config.attributes.get("configure_logger", True)):
     fileConfig(config.config_file_name)
 
 target_metadata = metadata

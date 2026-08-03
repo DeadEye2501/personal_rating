@@ -518,6 +518,12 @@
 
 - `UNDOCUMENTED_BACKOFF` = `timedelta(minutes=5)`
 
+### `backend/startup.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `TEMPLATE_NAME` = `'.env.example'`
+- `ALEMBIC_INI` = `'alembic.ini'`
+
 ### `backend/storage/entity.py`
 
 - `class Entity`
@@ -832,6 +838,11 @@
   - `__tablename__` = `'note'`
   - `id: Mapped[int]` = `mapped_column(primary_key=True)`
   - `title: Mapped[str]`
+
+### `tests/backend/test_startup.py`
+
+- `ROOT` = `Path(__file__).resolve().parents[2]`
+- `SHORT` = `'TMDB_API_KEY=\nLOG_LEVEL=INFO\n'`
 
 ### `tests/backend/test_tables.py`
 

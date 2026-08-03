@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from backend.app import build_backend
 from backend.config import load_config
+from backend.startup import TEMPLATE_NAME, ensure_env, upgrade_schema
 from bridge.thread import BackendThread
 from bridge.window import open_window
 
@@ -36,7 +37,17 @@ def setup_logging(config) -> None:
 
 
 def main() -> None:
+    # Порядок здесь и есть содержание: папка заводится до файла настроек, файл
+    # читается до схемы — путь к базе alembic берёт из тех же настроек, — и всё
+    # это до окна, потому что первый же его запрос идёт в базу.
+    #
+    # Корневой `.env` читается первым и побеждает: он у разработчика, а рабочий
+    # лежит в папке данных. `load_dotenv` уже прочитанного не перебивает.
     load_dotenv()
+    folder = load_config(os.environ, BASE_DIR).data_dir
+    ensure_env(folder, BASE_DIR / TEMPLATE_NAME)
+    load_dotenv(folder / ".env")
+
     config = load_config(os.environ, BASE_DIR)
     setup_logging(config)
 
@@ -46,6 +57,15 @@ def main() -> None:
     # ним приехали бы и SQLAlchemy, и httpx в поток интерфейса.
     thread = BackendThread(lambda: build_backend(config))
     try:
+        # Первое, что нужно знать при разборе: куда уехали файлы. `DATA_DIR`
+        # разводит настройки и данные по разным папкам, и без этой строки
+        # перенесённая папка выглядела бы обычным первым запуском.
+        logger.info("настройки %s, данные %s", folder / ".env", config.data_dir)
+
+        # Схема поднимается внутри `try`, а не до него: битая база, база от
+        # будущей версии и недоступная папка — обычные исходы, и без записи они
+        # дают ровно то, что комментарий ниже объявляет недопустимым.
+        upgrade_schema(BASE_DIR)
         thread.start()
         open_window(thread, debug=bool(os.environ.get("PR_DEBUG")))
     except Exception:
