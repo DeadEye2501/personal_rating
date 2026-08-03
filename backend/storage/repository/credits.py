@@ -124,13 +124,31 @@ class CreditRepository(Repository):
     async def ensure(self, credit: Credit) -> int:
         """Найти существующего или завести нового."""
         if credit.source is not None and credit.source_id is not None:
-            found = await self.find_by_source(credit.source, credit.source_id)
-            if found is not None:
-                return found
-            return await self.create(credit.name, credit.source, credit.source_id)
+            return await self._identified(credit)
 
         found = await self.find_anonymous_by_name(credit.name)
         return found if found is not None else await self.create(credit.name)
+
+    async def _identified(self, credit: Credit) -> int:
+        """Строка того, кого источник знает по номеру.
+
+        Занятая идентичность — не отказ, а проигранная гонка: карточки грузятся
+        разом и делят актёров, и между поиском и вставкой вставляет сосед.
+        Опоздавший берёт чужую строку, иначе писатель откатит всю карточку.
+
+        Пустой ответ второго поиска пробрасывается: занятость без строки — не
+        гонка, а поломка."""
+        found = await self.find_by_source(credit.source, credit.source_id)
+        if found is not None:
+            return found
+        try:
+            return await self.create(credit.name, credit.source,
+                                     credit.source_id)
+        except IdentityTaken:
+            theirs = await self.find_by_source(credit.source, credit.source_id)
+            if theirs is None:
+                raise
+            return theirs
 
     async def attach(
         self,

@@ -119,6 +119,33 @@ async def test_one_identity_cannot_belong_to_two_people(sessions):
         await repository.create("Другой Нолан", Source.TMDB, "525")
 
 
+async def test_ensure_yields_to_the_one_who_inserted_first(sessions):
+    """Карточки грузятся разом и делят актёра: между поиском и вставкой
+    вставляет сосед, и опоздавший обязан взять чужую строку. Сорвись он —
+    писатель откатит карточку целиком, без жанров, состава и оценок.
+
+    Соседняя вставка вклеивается в `create`, а не пускается вперегонки: гонка от
+    `gather` наступает не на каждом прогоне, и сторож из неё негодный."""
+    repository = people(sessions)
+    neighbour = people(sessions)
+    credit = Credit("Энди Сёркис", PersonRole.ACTOR,
+                    source=Source.TMDB, source_id="1333")
+    theirs = None
+
+    original = repository.create
+
+    async def create_after_the_neighbour(name, source=None, source_id=None):
+        nonlocal theirs
+        repository.create = original
+        theirs = await neighbour.create(name, source, source_id)
+        return await original(name, source, source_id)
+
+    repository.create = create_after_the_neighbour
+
+    assert await repository.ensure(credit) == theirs
+    assert len(await repository.find_by_name("Энди Сёркис")) == 1
+
+
 async def test_find_by_name_returns_every_namesake(sessions):
     """Совпадение имени само по себе ничего не решает: тёзки существуют,
     и выбирает между ними человек."""
