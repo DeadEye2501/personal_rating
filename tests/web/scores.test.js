@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale,
-  sourceColorOf, stepOf, toneOf, verdictOf } from '$state/scores.js'
+  sourceColorOf, stepOf, toneOf, toneOfMean, verdictOf, verdictOfMean } from '$state/scores.js'
 
 describe('нотация оценок', () => {
   it('десять ступеней, и ни одна не повторяется', () => {
@@ -148,6 +148,54 @@ describe('ступени шкалы', () => {
       expect(scale().map(colorOf)).not.toContain('var(--score-undefined)')
       expect(labelOf(steps + 1)).toBe('')
     }
+  })
+})
+
+describe('ярлык средней оценки игры', () => {
+  afterEach(() => setScale(10))
+
+  it('берёт ближайшую ступень, а половину отдаёт нижней', () => {
+    // Своё правило, а не общее: `verdictOf` округляет вниз, и по нему 4.9
+    // оставалось бы «хорошо». Границы названы пользователем 04.08.2026.
+    setScale(5)
+
+    expect(verdictOfMean(1.5)).toBe('плохо')
+    expect(verdictOfMean(1.51)).toBe('посредственно')
+    expect(verdictOfMean(2.5)).toBe('посредственно')
+    expect(verdictOfMean(2.51)).toBe('средне')
+    expect(verdictOfMean(4.5)).toBe('хорошо')
+    expect(verdictOfMean(4.51)).toBe('отлично')
+  })
+
+  it('цвет средней берётся той же ступенью, что и слово', () => {
+    // Свёрнутая карточка показывает одни звёзды: слова там нет, и цвет — всё,
+    // что говорит об оценке. Считанный по целой части, он красил бы 4.67
+    // четвёркой, тогда как игра эта — «отлично».
+    setScale(5)
+
+    expect(toneOfMean(4.67)).toBe(colorOf(5))
+    expect(toneOfMean(4.5)).toBe(colorOf(4))
+  })
+
+  it('цвет средней так же считается и на десяти ступенях', () => {
+    // Правило одно на обе шкалы: усреднённую строку показывают обе.
+    setScale(10)
+
+    expect(toneOfMean(7.6)).toBe(colorOf(8))
+    expect(toneOfMean(7.5)).toBe(colorOf(7))
+  })
+
+  it('у неоценённой игры цвет всё равно есть', () => {
+    // Неопределённая переменная не красит ничем, и звёзды пропали бы вовсе.
+    expect(toneOfMean(null)).toBe(colorOf(1))
+  })
+
+  it('у неоценённой игры ярлыка нет', () => {
+    // Место под слово остаётся, а сказать о нём нечего: ни одна сторона не
+    // выставлена.
+    setScale(5)
+
+    expect(verdictOfMean(null)).toBe('')
   })
 })
 

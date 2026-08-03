@@ -77,8 +77,29 @@
   color: var(--score);
 }
 
+/* Три стороны игры одной строкой — раскладка короткой шкалы. Промежуток между
+   сторонами шире, чем внутри стороны: иначе подпись соседа читается частью
+   предыдущих звёзд. */
+.film__scores--sides { gap: 8px 26px }
+
+.film__side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Подпись стороны у ряда своей ширины не держит: колонок тут нет, а 86 пикселей
+   развели бы слова и звёзды дырами. */
+.film__scores--sides .film__aspect { width: auto }
+
+/* Слово продолжает тот же ряд и тем же промежутком, каким разделены стороны:
+   свой отступ у него снимается, иначе к промежутку прибавились бы ещё восемь
+   пикселей и слово отстало бы от строки. */
+.film__scores--sides .film__verdict { margin-left: 0 }
+
 /* У игры три шкалы сворачиваются в одну усреднённую. Селектор двойной: иначе
    общее правило .film__scores перебьёт скрытие. */
 .film__scores.film__scores--avg { display: none }
 .film.is-collapsed .film__scores--avg { display: flex }
-.film.is-collapsed .film__scores--aspect { display: none }
+.film.is-collapsed .film__scores--aspect,
+.film.is-collapsed .film__scores--sides { display: none }

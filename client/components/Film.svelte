@@ -8,7 +8,9 @@
   import Poster from '$components/Poster.svelte'
   import Stars from '$components/Stars.svelte'
   import Synopsis from '$components/Synopsis.svelte'
-  import { ASPECTS, meanOf, toneOf, verdictOf } from '$state/scores.js'
+  import { ASPECTS, average, meanOf, scale, toneOf, toneOfMean, verdictOf,
+    verdictOfMean }
+    from '$state/scores.js'
 
   let { view, collapsed = false, expected = [], on, oncollapse, onmark,
         onperson, onopen, ontag, onscore, onaspect, onedit, ondelete,
@@ -26,6 +28,17 @@
   // иначе непонятно, что получится от нажатия.
   let over = $state({})
   const showing = (key, real) => over[key] ?? real
+
+  // Три стороны игры встают в один ряд только на короткой шкале: на длинной их
+  // тридцать звёзд с подписями, и ряд всё равно сложился бы в три строки —
+  // тогда пусть он и остаётся тремя, как был. Решение пользователя 04.08.2026.
+  const inRow = $derived(scale().length <= 5)
+
+  // Средняя из показываемых сторон, а не из выставленных: пока курсор над
+  // рядом, слово говорит о будущей оценке — правило то же, что у слова у
+  // каждой стороны, которое оно заменило.
+  const shownMean = $derived(average(
+    ASPECTS.map((one) => showing(one.key, rating?.[one.key]) ?? null)))
 </script>
 
 <article class="film" class:is-collapsed={collapsed}>
@@ -65,29 +78,57 @@
            отсчитывает своё место от её правого края, и вынесенный выше уезжает
            за карточку. У игры это последняя из трёх строк. -->
       {#if view.kind === 'game'}
-        {#each ASPECTS as aspect, index (aspect.key)}
-          <div class="film__scores film__scores--aspect">
-            <span class="film__aspect">{aspect.label}</span>
-            <Stars score={rating?.[aspect.key] ?? null}
-                   onpick={(value) => onaspect(view, aspect.key, value)}
-                   onhover={(step) => { over = { ...over, [aspect.key]: step } }} />
-            <!-- Ярлык стоит у каждой стороны своим, а не один на все три: так в
-                 макете, и иначе «Отлично» у визуала было бы неотличимо от
-                 «Отлично» у геймплея. -->
-            <span class="film__verdict"
-                  style:--score={toneOf(showing(aspect.key, rating?.[aspect.key]))}
-            >{verdictOf(showing(aspect.key, rating?.[aspect.key]))}</span>
-            {#if index === ASPECTS.length - 1}
-              <Acts wished={view.in_wishlist}
-                    onedit={() => onedit(view)}
-                    ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
-            {/if}
+        {#if inRow}
+          <!-- Три стороны подряд, одной строкой у нижнего края: слово тут одно
+               на все три и берётся по средней — три слова в строку не встают. -->
+          <div class="film__scores film__scores--sides">
+            {#each ASPECTS as aspect (aspect.key)}
+              <span class="film__side">
+                <span class="film__aspect">{aspect.label}</span>
+                <Stars score={rating?.[aspect.key] ?? null}
+                       onpick={(value) => onaspect(view, aspect.key, value)}
+                       onhover={(step) => { over = { ...over, [aspect.key]: step } }} />
+              </span>
+            {/each}
+            <!-- Цвет тем же счётом, что и само слово: по целой части «отлично»
+                 красилось бы четвёркой. -->
+            <span class="film__verdict" style:--score={toneOfMean(shownMean)}
+            >{verdictOfMean(shownMean)}</span>
+            <Acts wished={view.in_wishlist}
+                  onedit={() => onedit(view)}
+                  ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
           </div>
-        {/each}
+        {:else}
+          {#each ASPECTS as aspect, index (aspect.key)}
+            <div class="film__scores film__scores--aspect">
+              <span class="film__aspect">{aspect.label}</span>
+              <Stars score={rating?.[aspect.key] ?? null}
+                     onpick={(value) => onaspect(view, aspect.key, value)}
+                     onhover={(step) => { over = { ...over, [aspect.key]: step } }} />
+              <!-- Ярлык стоит у каждой стороны своим, а не один на все три: так
+                   в макете, и иначе «Отлично» у визуала было бы неотличимо от
+                   «Отлично» у геймплея. -->
+              <span class="film__verdict"
+                    style:--score={toneOf(showing(aspect.key, rating?.[aspect.key]))}
+              >{verdictOf(showing(aspect.key, rating?.[aspect.key]))}</span>
+              {#if index === ASPECTS.length - 1}
+                <Acts wished={view.in_wishlist}
+                      onedit={() => onedit(view)}
+                      ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+              {/if}
+            </div>
+          {/each}
+        {/if}
+
+        <!-- Свёрнутая карточка показывает одну усреднённую строку вместо
+             сторон, и это общее у обеих раскладок: длинной шкале она заменяет
+             три строки, короткой — ряд.
+             Слова здесь нет: `.film__verdict` скрыт у свёрнутой, а сама строка
+             только у свёрнутой и показывается — увидеть его было нельзя
+             никогда. Поэтому цвет звёзд и считается по ближайшей ступени: он
+             тут единственное, что говорит об оценке. -->
         <div class="film__scores film__scores--avg">
-          <Stars score={mean} />
-          <span class="film__verdict" style:--score={toneOf(mean)}
-          >{verdictOf(mean)}</span>
+          <Stars score={mean} tone={toneOfMean(mean)} />
         </div>
       {:else}
         <div class="film__scores">

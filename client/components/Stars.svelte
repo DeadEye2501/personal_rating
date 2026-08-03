@@ -9,7 +9,9 @@
   //
   // Наведённое уходит наружу: слово-ярлык стоит рядом со звёздами, а не внутри
   // них, и показать будущую оценку иначе нечем.
-  let { score = null, onpick = null, onhover = null } = $props()
+  // `tone` — цвет со стороны: усреднённая оценка красится по ближайшей ступени,
+  // а не по целой части, и своим счётом ряд этого не знает.
+  let { score = null, onpick = null, onhover = null, tone = null } = $props()
 
   // Наведённая звезда. Пока курсор над рядом, ряд показывает, что получится, а
   // не то, что стоит.
@@ -21,7 +23,7 @@
   // Дробная звезда бывает только у неподвижного ряда: у кликабельного оценка
   // целая, а наведённая — тем более.
   const part = $derived(score ? partOf(score) : 0)
-  const colour = $derived(colorOf(Math.max(1, whole)))
+  const colour = $derived(tone ?? colorOf(Math.max(1, whole)))
 
   function mark(step) {
     over = step
