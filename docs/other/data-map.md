@@ -349,7 +349,7 @@
 
 - `SETS` = `набор из 7`
 - `PRIORITY` = `набор из 3`
-- `YEAR_GAP` = `4`
+- `YEAR_GAP` = `3`
 
 ### `backend/service/posters.py`
 

@@ -372,7 +372,7 @@
   - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/merging.py` — 297 строк
+### `backend/service/merging.py` — 302 строк ⚠ подошёл к 300
 
 Одна игра — одна строка выдачи.
 
@@ -1976,7 +1976,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 
-### `tests/backend/test_merging.py` — 261 строк
+### `tests/backend/test_merging.py` — 260 строк
 
 Что склеивается в одну строку выдачи, а что остаётся порознь.
 
