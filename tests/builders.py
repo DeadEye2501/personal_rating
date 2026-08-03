@@ -99,3 +99,18 @@ def hit(source_id: str = "157336", title: str = "Интерстеллар",
     base = dict(kind=Kind.GAME if source in STORES else Kind.MOVIE,
                 source=Source.TMDB)
     return SearchHit(source_id=source_id, title=title, **(base | fields))
+
+
+def row(source: Source, source_id: str, title: str, **fields) -> SearchHit:
+    """Тот же кандидат, но источником вперёд и без умолчаний.
+
+    Отдельным именем, а не вызовом `hit` по месту: у проверок склейки источник
+    — главное в свидетеле, и читаются они глазами именно по нему. Умолчаний нет
+    нарочно: склейка смотрит на все три поля разом, и подставленное молча
+    сделало бы свидетеля не тем, чем он выглядит."""
+    return hit(source_id, title, source=source, **fields)
+
+
+def titles(answers: list[list[SearchHit]]) -> list[str]:
+    """Названия всех строк всех выдач подряд — то, что видно на экране."""
+    return [one.title for answer in answers for one in answer]

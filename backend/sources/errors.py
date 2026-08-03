@@ -10,7 +10,11 @@ from backend.model import Missing, Reason, Refusal
 # Чем падает разбор чужого ответа. Не только `ValueError`: на словаре вместо
 # списка приезжает `TypeError`, на отсутствующем ключе — `KeyError`, на `None`
 # вместо тела — `AttributeError`.
-BROKEN_BY_PARSING = (ValueError, TypeError, KeyError, AttributeError)
+# `OSError` тут не про сеть: `datetime.fromtimestamp` отвечает им на штамп вне
+# календаря — замерено, `fromtimestamp(10**12)` даёт `[Errno 22]`. Это ровно
+# такой же неразобравшийся ответ, как строка вместо числа, и обходиться с ним
+# надо так же. Сетевые беды сюда не попадают: их ловит транспорт до разбора.
+BROKEN_BY_PARSING = (ValueError, TypeError, KeyError, AttributeError, OSError)
 
 
 def broken(source: str, error: Exception) -> Refusal:

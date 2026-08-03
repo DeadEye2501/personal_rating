@@ -79,6 +79,77 @@ async def test_the_kind_request_asks_about_every_found_appid(fixture):
     assert wanted["data_request"]["include_assets"] is True
 
 
+async def test_the_search_row_carries_the_year_the_game_came_out(fixture):
+    """Год выдачи — тот, когда игра вышла, а не когда попала в магазин.
+
+    Нужен он склейке: годы, разошедшиеся больше чем на люфт, означают разные
+    игры, и магазинная дата сделала бы разными игру и её же саму.
+
+    Свидетель нарочно старый: у `Arcanum` даты разные — 2001 против 2016, — и
+    подмена одной другой видна. У ровесника Steam они совпадают, и такой
+    свидетель ничего бы не сторожил."""
+    payload = fixture("steam/store_items_many.json")
+    transport, _ = two_answers(FOUND, lambda _: httpx.Response(200, json=payload))
+
+    result = await searched(transport)
+
+    years = {one.source_id: one.year for one in result.value}
+    assert years["500810"] == 2001
+
+
+async def test_a_search_row_born_on_steam_takes_the_store_year(fixture):
+    """У игры, вышедшей сразу в Steam, `original_release_date` пуст, и брать
+    оттуда нечего — остаётся магазинная дата, и она же верная.
+
+    Без этой половины «берём год выхода» неотличимо от «оставляем без года
+    всех, у кого второй даты нет», а без года строка не возражает против
+    склейки вовсе."""
+    payload = fixture("steam/store_items_many.json")
+    transport, _ = two_answers(FOUND, lambda _: httpx.Response(200, json=payload))
+
+    result = await searched(transport)
+
+    years = {one.source_id: one.year for one in result.value}
+    assert years["292030"] == 2015
+
+
+async def test_the_search_asks_for_the_release_date(fixture):
+    """Дата приезжает только если её попросили, и просит её тот же запрос, что
+    уже уходит ради рода товара и обложек.
+
+    Сторожится сам запрос: записанный ответ отдаётся независимо от параметров,
+    и снятый флаг оставил бы весь набор зелёным — ровно так же, как однажды на
+    пути карточки."""
+    payload = fixture("steam/store_items_many.json")
+    transport, asked = two_answers(FOUND, lambda _: httpx.Response(200, json=payload))
+
+    await searched(transport)
+
+    wanted = json.loads(asked[1].params["input_json"])
+    assert wanted["data_request"]["include_release"] is True
+
+
+async def test_an_impossible_date_does_not_cancel_the_whole_list(fixture, caplog):
+    """Штамп времени вне календаря даёт не `ValueError`, а `OSError`, и это
+    замерено: `datetime.fromtimestamp(10**12)` падает `[Errno 22]`.
+
+    До того как год приехал в выдачу, щель была величиной в одну карточку без
+    года. Теперь разбор даты стоит внутри отсева, то есть на пути **всей** выдачи
+    Steam, и незнакомое исключение унесло бы её целиком — а из клиента наружу не
+    должно выйти ни одного."""
+    payload = fixture("steam/store_items_many.json")
+    for one in payload["response"]["store_items"]:
+        one["release"] = {"original_release_date": 10 ** 12}
+
+    transport, _ = two_answers(FOUND, lambda _: httpx.Response(200, json=payload))
+    with caplog.at_level("WARNING"):
+        result = await searched(transport)
+
+    assert isinstance(result, Found)
+    assert len(result.value) == len(FOUND)
+    assert "steam" in caplog.text, "неразобранная дата не записана"
+
+
 async def test_a_refused_kind_request_does_not_cancel_the_results():
     """Потерять настоящую игру хуже, чем показать лишнее дополнение."""
     transport, _ = two_answers(FOUND, lambda _: httpx.Response(429, text="slow down"))
@@ -336,11 +407,17 @@ async def test_the_card_takes_the_year_the_game_came_out(replay):
 
 
 async def test_a_game_born_on_steam_keeps_the_store_year(replay):
-    """У игры, вышедшей сразу в Steam, `original_release_date` пуст, и брать
-    оттуда нечего — остаётся магазинная дата, и она же верная.
+    """У игры, вышедшей сразу в Steam, `original_release_date` приходит нулём —
+    не отсутствует, а именно `0`, замерено, — и берётся магазинная дата.
 
     Без этой половины «берём год выхода» неотличимо от «обнуляем год всем, у
-    кого второй даты нет»."""
+    кого второй даты нет».
+
+    **Чего эта проверка не различает:** пришёл ли 2015-й от `appdetails` или от
+    магазинной даты `GetItems`. У одной и той же игры это всегда один год, и
+    свидетеля, где они разошлись бы, не существует. Замерено, что переход на
+    запас поведение карточки не изменил; сам запас наблюдается на пути выдачи,
+    где года у строки не было вовсе."""
     client = SteamClient(SourceHttp("steam", transport=replay(
         "steam/appdetails.json", "steam/store_items_card.json")))
 

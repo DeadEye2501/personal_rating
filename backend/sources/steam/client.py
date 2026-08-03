@@ -40,11 +40,12 @@ ITEMS = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 # `country_code: RU` отдаёт `success: 15`, `visible: false` и ответ без рода
 # товара — на живую игру, а не на несуществующую. Проверено 03.08.2026. Нужен US.
 ITEMS_CONTEXT = {"language": "russian", "country_code": "US", "steam_realm": 1}
-# Выдаче нужен род товара и адрес обложки; карточке — то же и теги.
-SIFT_WANTED = {"include_assets": True}
-# Год выхода спрашивается только карточкой: в выдаче года у Steam нет вовсе.
-CARD_WANTED = SIFT_WANTED | {"include_tag_count": 20,
-                             "include_release": True}
+# Выдаче нужен род товара, адрес обложки и год выхода; карточке — то же и теги.
+# Год выдаче нужен для склейки: годы, разошедшиеся больше чем на люфт, означают
+# разные игры. Стоит он ноль — замерено 03.08.2026: +560 байт на 13 КБ и то же
+# время, потому что запрос выдача делает всё равно.
+SIFT_WANTED = {"include_assets": True, "include_release": True}
+CARD_WANTED = SIFT_WANTED | {"include_tag_count": 20}
 
 
 class SteamClient:

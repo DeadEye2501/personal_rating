@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 
 from backend.config import load_config
 from backend.sources.http import USER_AGENT
+from backend.sources.steam.client import CARD_WANTED, SIFT_WANTED
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "tests" / "fixtures"
@@ -144,22 +145,19 @@ async def record_steam_items(client: httpx.AsyncClient) -> None:
     # Единственный ответ за весь прогон, который не JSON: страница ошибки.
     save("steam", "store_items_broken", await client.get(
         tags, params={"input_json": "{не json"}))
-    # Тот же запрос на весь список найденных appid: им выдача поиска узнаёт род
-    # товара и настоящий адрес вертикальной обложки. Тегов он не просит — они
-    # нужны карточке, а не выдаче.
+    # Дальше — то, что спрашивает боевой клиент, и просимое берётся у него же.
+    # Списанное руками разошлось молча: `include_release` появился в коде, а
+    # здесь нет, и первый же перезапуск стёр бы годы из `store_items_many`,
+    # уронив три проверки с видом «Steam перестал отдавать дату».
+    #
+    # Выдача и карточка записываются порознь, потому что на пару Steam мог бы
+    # ответить иначе, чем на каждое порознь.
     save("steam", "store_items_many", await client.get(
         tags, params={"input_json": ask(
             [WITCHER_APPID, REDKIT_APPID, ARCANUM_APPID, PLAYTEST_APPID],
-            {"include_assets": True},
-        )}))
-    # А это то, что просит карточка: теги и картинки одним ответом. Записано
-    # отдельно, потому что на пару Steam мог бы ответить иначе, чем на каждое
-    # порознь, и проверять карточку на половинчатых ответах значило бы не
-    # проверять её вовсе.
+            SIFT_WANTED)}))
     save("steam", "store_items_card", await client.get(
-        tags, params={"input_json": ask(
-            [WITCHER_APPID], {"include_assets": True, "include_tag_count": 20},
-        )}))
+        tags, params={"input_json": ask([WITCHER_APPID], CARD_WANTED)}))
 
 
 async def record_gog(client: httpx.AsyncClient) -> None:

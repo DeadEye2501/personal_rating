@@ -26,6 +26,16 @@ SETS = ("bundle", "collection", "trilogy", "anthology", "антология",
 # замер: «победитель — по приоритету steam > gog > old-games».
 PRIORITY = (Source.STEAM, Source.GOG, Source.OLD_GAMES)
 
+# Насколько источникам позволено разойтись в годе одной и той же игры. Решение
+# пользователя 03.08.2026 по перебору люфтов 0–8 на 359 группах: «условно
+# фаллаут 1997 и фаллаут 1999 — будет как одна игра, но не фаллаут 1991».
+#
+# Четыре, а не пять: пятый точнее на две группы, но у `Fallout` однофамильцы
+# разошлись ровно на шесть, и запас в один год слишком тонок. Цена ошибок
+# несимметрична — лишняя строка убирается кнопкой навсегда, а спрятанная игра
+# следа не оставляет, — поэтому запас держится в сторону разделения.
+YEAR_GAP = 4
+
 
 def _a_set(hit: SearchHit) -> bool:
     return any(word in hit.title.lower() for word in SETS)
@@ -90,11 +100,11 @@ class _Groups:
     строки old-games с общим вторым названием дают одну группу, и «Worms 2»
     исчезает."""
 
-    def __init__(self, primary: list[str], sources: list[Source]) -> None:
-        self._of = list(range(len(primary)))
-        self._primary = primary
-        self._sources = sources
-        self._members = {number: [number] for number in range(len(primary))}
+    def __init__(self, rows: list[SearchHit]) -> None:
+        self._of = list(range(len(rows)))
+        self._rows = rows
+        self._primary = [without_edition(one.title) for one in rows]
+        self._members = {number: [number] for number in range(len(rows))}
 
     def head(self, one: int) -> int:
         while self._of[one] != one:
@@ -105,14 +115,38 @@ class _Groups:
         """Показываемые названия группы, разложенные по источникам."""
         found: dict[Source, set[str]] = {}
         for number in self._members[head]:
-            found.setdefault(self._sources[number], set()).add(
+            found.setdefault(self._rows[number].source, set()).add(
                 self._primary[number])
         return found
 
+    def _years(self, head: int) -> list[int]:
+        return [self._rows[number].year for number in self._members[head]
+                if self._rows[number].year]
+
+    def _too_far(self, one: int, other: int) -> bool:
+        """Разошлись ли годы двух групп больше чем на люфт.
+
+        Сравниваются **все** пары, а не сводимая: объединение транзитивно, и
+        строка без года законно склеивается с обеими сторонами по отдельности —
+        через неё `Fallout` 1991 заехал бы к `Fallout` 1997.
+
+        Строка без года не возражает никогда: у анонса года нет вовсе, у
+        old-games он бывает пуст, и считать пустоту расхождением значило бы
+        разваливать законные группы."""
+        return any(abs(mine - theirs) > YEAR_GAP
+                   for mine in self._years(one) for theirs in self._years(other))
+
     def _joinable(self, one: int, other: int) -> bool:
-        """Нельзя, если у какого-то источника в обеих группах лежат строки с
-        разными показываемыми названиями: внутри источника ключ только один, и
-        такая склейка означала бы, что `Worms` и `Worms 2` — одна игра."""
+        """Нельзя по двум причинам.
+
+        Первая: у какого-то источника в обеих группах лежат строки с разными
+        показываемыми названиями — внутри источника ключ только один, и такая
+        склейка означала бы, что `Worms` и `Worms 2` — одна игра.
+
+        Вторая: годы разошлись больше чем на люфт, то есть это разные игры под
+        одним названием."""
+        if self._too_far(one, other):
+            return False
         mine, theirs = self._shown(one), self._shown(other)
         return all(mine[source] == theirs[source]
                    for source in mine.keys() & theirs.keys())
@@ -160,10 +194,14 @@ def _earliest_year(group: list[SearchHit]) -> int | None:
     """Самый ранний год группы: игра не могла выйти раньше самой себя, значит из
     разошедшихся дат верна ранняя. Решение пользователя 03.08.2026.
 
-    Правило бьёт и по самому победителю: Steam помечает игру годом появления в
-    магазине, и он всегда позже настоящего — `Arcanum` 2016 против 2001. В
-    выдаче Steam года не отдаёт вовсе, и без этого правила «Fallout 2»
-    показывался бы без года, хотя два соседа по группе знали 1998-й.
+    Правило бьёт и по самому победителю: магазин помечает игру годом появления
+    у себя, и он всегда позже настоящего — `Wolfenstein 3D` 1994 у Steam против
+    1992 у GOG и old-games.
+
+    Год Steam в выдаче теперь есть, и правило от этого не отменилось: настоящую
+    дату магазин знает у 120 строк из 322, у остальных отдаёт свою, и ранняя
+    по-прежнему вернее. Разойтись больше чем на `YEAR_GAP` они при этом не
+    могут — такие в одну группу не попадают вовсе.
 
     Чем правило рискует: мусорной ранней датой. Риск принят пользователем —
     правится руками через окно карточки."""
@@ -185,8 +223,7 @@ def _grouped(flat: list[SearchHit]) -> list[int]:
     между источниками по любому. Второй проход сверяет строку со **всеми**
     занявшими её ключ, а не с первой попавшейся: с одной первой законная
     склейка терялась бы в зависимости от порядка ответов сети."""
-    groups = _Groups([without_edition(one.title) for one in flat],
-                     [one.source for one in flat])
+    groups = _Groups(flat)
 
     inside: dict[tuple[Source, str], list[int]] = {}
     for number, hit in enumerate(flat):

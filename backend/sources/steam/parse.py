@@ -74,10 +74,18 @@ def released_in(payload: dict, source_id: str) -> int | None:
     десятилетия: замерено 03.08.2026 — `Fallout` 2015 против 1997, `Arcanum`
     2016 против 2001, `DOOM + DOOM II` 2007 против 1995.
 
-    Пусто у игр, вышедших сразу в Steam: у «Ведьмака 3» второй даты нет вовсе, и
-    магазинная там верна. Пусто — значит «брать неоткуда», а не «года нет»."""
-    row = _answered(payload).get(source_id)
-    stamp = ((row or {}).get("release") or {}).get("original_release_date")
+    У игры, вышедшей сразу в Steam, настоящей даты нет вовсе, и магазинная там
+    верна — поэтому вторая идёт запасом, а не отказом.
+
+    **Магазинная дата берётся, хотя она врёт, и это решение пользователя
+    03.08.2026.** Замерено: настоящую знает 120 строк из 322, и знает там, где
+    так решил издатель. Отличить по её отсутствию переиздание от ремейка нельзя
+    — `Populous` 2024 (а игра 1989 года) и `DOOM` 2016 (и это верно) выглядят
+    одинаково. Отказ от магазинной вернул бы `DOOM` 1993 и `Resident Evil 2`
+    1999 под их новых тёзок, а лишняя строка в выдаче убирается кнопкой."""
+    release = (_answered(payload).get(source_id) or {}).get("release") or {}
+    stamp = (release.get("original_release_date")
+             or release.get("steam_release_date"))
     if not stamp:
         return None
     return datetime.fromtimestamp(stamp, timezone.utc).year
@@ -140,7 +148,8 @@ def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]:
         if row is None:
             kept.append(hit)
         elif row.get("type", TYPE_GAME) == TYPE_GAME:
-            kept.append(replace(hit, poster_url=_poster(row, hit.source_id)))
+            kept.append(replace(hit, poster_url=_poster(row, hit.source_id),
+                                year=released_in(payload, hit.source_id)))
     return kept
 
 

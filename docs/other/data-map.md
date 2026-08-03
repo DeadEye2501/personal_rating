@@ -348,6 +348,7 @@
 
 - `SETS` = `набор из 7`
 - `PRIORITY` = `набор из 3`
+- `YEAR_GAP` = `4`
 
 ### `backend/service/posters.py`
 
@@ -381,7 +382,7 @@
 
 ### `backend/sources/errors.py`
 
-- `BROKEN_BY_PARSING` = `набор из 4`
+- `BROKEN_BY_PARSING` = `набор из 5`
 
 ### `backend/sources/gog/client.py`
 
@@ -486,8 +487,8 @@
 - `DETAILS` = `'https://store.steampowered.com/api/appdetails'`
 - `ITEMS` = `'https://api.steampowered.com/IStoreBrowseServic…`
 - `ITEMS_CONTEXT` = `словарь из 3`
-- `SIFT_WANTED` = `словарь из 1`
-- `CARD_WANTED` = `SIFT_WANTED | {'include_tag_count': 20, 'include…`
+- `SIFT_WANTED` = `словарь из 2`
+- `CARD_WANTED` = `SIFT_WANTED | {'include_tag_count': 20}`
 
 ### `backend/sources/steam/parse.py`
 
@@ -795,7 +796,7 @@
   - `posters: PosterService`
   - `requests: list`
 
-### `tests/backend/test_merging.py`
+### `tests/backend/test_merging_sets.py`
 
 - `FROZEN_SETS` = `набор из 7`
 

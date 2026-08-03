@@ -371,7 +371,7 @@
   - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
-### `backend/service/merging.py` — 260 строк
+### `backend/service/merging.py` — 297 строк
 
 Одна игра — одна строка выдачи.
 
@@ -382,15 +382,17 @@
 - `def _keys(hit: SearchHit, *, alone: bool) -> list[str]` (20)
 - `def _dressed(hit: SearchHit) -> bool` (5)
 - `def _rank(hit: SearchHit) -> tuple` (6)
-- `class _Groups` (42)
+- `class _Groups` (66)
   - `def head(self, one: int) -> int` (4)
   - `def _shown(self, head: int) -> dict[Source, set[str]]` (7)
-  - `def _joinable(self, one: int, other: int) -> bool` (7)
+  - `def _years(self, head: int) -> list[int]` (3)
+  - `def _too_far(self, one: int, other: int) -> bool` (12)
+  - `def _joinable(self, one: int, other: int) -> bool` (14)
   - `def join(self, one: int, other: int) -> None` (6)
 - `def _other_name(winner: SearchHit, group: list[SearchHit]) -> str` (29)
-- `def _earliest_year(group: list[SearchHit]) -> int | None` (13)
+- `def _earliest_year(group: list[SearchHit]) -> int | None` (17)
 - `def _completed(winner: SearchHit, group: list[SearchHit]) -> SearchHit` (4)
-- `def _grouped(flat: list[SearchHit]) -> list[int]` (28)
+- `def _grouped(flat: list[SearchHit]) -> list[int]` (27)
 - `def _without_sets(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (12)
 - `def merged(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (36)
 
@@ -508,7 +510,7 @@
 - `def from_search(source: Source, value: float | None, now: datetime) -> tuple[ExternalRating, ...]` (5)
 - `def rating(source: RatingSource, value: float | int | None, now: datetime) -> tuple[ExternalRating, ...]` (10)
 
-### `backend/sources/errors.py` — 91 строк
+### `backend/sources/errors.py` — 95 строк
 
 Как источник отвечает, когда верить ответу нельзя.
 
@@ -714,7 +716,7 @@
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `async def aclose(self) -> None` (3)
 
-### `backend/sources/steam/client.py` — 184 строк
+### `backend/sources/steam/client.py` — 185 строк
 
 Разговор со Steam по сети.
 
@@ -729,7 +731,7 @@
   - `async def _beyond_details(self, source_id: str) -> tuple[tuple[tuple[GenreSource, str], ...], str, int | None]` (20)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/steam/parse.py` — 232 строк
+### `backend/sources/steam/parse.py` — 241 строк
 
 Перевод ответов Steam в наши типы.
 
@@ -737,11 +739,11 @@
 
 - `def poster_url(appid: str) -> str` (7)
 - `def parse_search(payload: list[dict]) -> list[SearchHit]` (11)
-- `def released_in(payload: dict, source_id: str) -> int | None` (14)
+- `def released_in(payload: dict, source_id: str) -> int | None` (22)
 - `def _store_items(payload: dict) -> list[dict]` (10)
 - `def _poster(row: dict, appid: str) -> str` (16)
 - `def _answered(payload: dict) -> dict[str, dict]` (10)
-- `def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]` (17)
+- `def sifted(hits: list[SearchHit], payload: dict) -> list[SearchHit]` (18)
 - `def cover_of(payload: dict, appid: str) -> str` (8)
 - `def _genres(data: dict) -> tuple[tuple[GenreSource, str], ...]` (6)
 - `def _metascore(data: dict, now: datetime) -> tuple[ExternalRating, ...]` (5)
@@ -1390,16 +1392,16 @@
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
 
-### `scripts/record_fixtures.py` — 283 строк
+### `scripts/record_fixtures.py` — 281 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
-Зависит от: `backend.config`, `backend.sources.http`
+Зависит от: `backend.config`, `backend.sources.http`, `backend.sources.steam.client`
 
 - `def save(source: str, case: str, response: httpx.Response) -> None` (23)
 - `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (34)
 - `async def record_steam(client: httpx.AsyncClient) -> None` (14)
-- `async def record_steam_items(client: httpx.AsyncClient) -> None` (41)
+- `async def record_steam_items(client: httpx.AsyncClient) -> None` (38)
   - `def ask(appids: list[int], wanted: dict) -> str` (7)
 - `async def record_gog(client: httpx.AsyncClient) -> None` (24)
 - `async def record_mdblist(client: httpx.AsyncClient, key: str) -> None` (11)
@@ -1408,7 +1410,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 97 модулей
+## tests — 99 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1583,13 +1585,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def block_of(payload: dict) -> dict` (2)
 
-### `tests/backend/sources/test_steam_items.py` — 375 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_steam_items.py` — 452 строк ⚠ подошёл к 300
 
 Ответ `GetItems`: род товара в выдаче и настоящий адрес обложки.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.steam.client`, `backend.sources.steam.parse`
 
-Тестов: 18
+Тестов: 22
 
 - `def two_answers(first: list | dict, items, opens: str='SearchApps')` (13)
   - `def handler(request: httpx.Request) -> httpx.Response` (5)
@@ -1969,16 +1971,32 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 
-### `tests/backend/test_merging.py` — 438 строк ⚠ подошёл к 300
+### `tests/backend/test_merging.py` — 261 строк
 
-Одна игра — одна строка выдачи.
+Что склеивается в одну строку выдачи, а что остаётся порознь.
 
-Зависит от: `backend.model`, `backend.service.merging`
+Зависит от: `backend.model`, `backend.service.merging`, `tests.builders`
 
-Тестов: 29
+Тестов: 17
 
-- `def row(source: Source, source_id: str, title: str, **rest) -> SearchHit` (6)
-- `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)
+
+### `tests/backend/test_merging_sets.py` — 92 строк
+
+Сборники в выдачу не попадают — кроме того, который спросили прямо.
+
+Зависит от: `backend.model`, `backend.service.merging`, `tests.builders`
+
+Тестов: 6
+
+
+### `tests/backend/test_merging_winner.py` — 179 строк
+
+Кто побеждает в группе склейки и что забирает у проигравших.
+
+Зависит от: `backend.model`, `backend.service.merging`, `tests.builders`
+
+Тестов: 10
+
 
 ### `tests/backend/test_migrations.py` — 126 строк
 
@@ -2066,16 +2084,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_relevance.py` — 221 строк
+### `tests/backend/test_relevance.py` — 218 строк
 
 Строка выдачи обязана знать, о чём её спросили.
 
-Зависит от: `backend.model`, `backend.service.relevance`, `backend.service.search`, `tests.conftest`, `tests.wiring`
+Зависит от: `backend.model`, `backend.service.relevance`, `backend.service.search`, `tests.builders`, `tests.conftest`, `tests.wiring`
 
 Тестов: 12
 
 - `def row(title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (5)
-- `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)
 
 ### `tests/backend/test_removed.py` — 212 строк
 
@@ -2405,7 +2422,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/builders.py` — 101 строк
+### `tests/builders.py` — 116 строк
 
 Строители данных для тестов: карточки, кандидаты, картинки, записанное.
 
@@ -2416,6 +2433,8 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (16)
+- `def row(source: Source, source_id: str, title: str, **fields) -> SearchHit` (8)
+- `def titles(answers: list[list[SearchHit]]) -> list[str]` (3)
 
 ### `tests/conftest.py` — 255 строк
 

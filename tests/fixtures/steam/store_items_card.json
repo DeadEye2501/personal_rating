@@ -164,6 +164,10 @@
           "page_background_path": "app/292030?t=1768303991",
           "raw_page_background": "94a3c7f9db82538b752312f6e17f912f0899ca30/page_bg_raw.jpg"
         },
+        "release": {
+          "steam_release_date": 1431937260,
+          "original_release_date": 0
+        },
         "best_purchase_option": {
           "packageid": 68476,
           "purchase_option_name": "The Witcher 3: Wild Hunt",

@@ -12,6 +12,7 @@ import pytest
 from backend.model import Found, Kind, PersonHit, SearchHit, Source
 from backend.service.relevance import relevant
 from backend.service.search import SEARCH_SIZE
+from tests.builders import titles
 from tests.conftest import FakeSearch, hit
 from tests.wiring import search_service
 
@@ -21,10 +22,6 @@ def row(title: str, *, original_title: str = "",
     return SearchHit(kind=Kind.GAME, source=Source.GOG, source_id="1",
                      title=title, original_title=original_title,
                      aliases=aliases)
-
-
-def titles(answers: list[list[SearchHit]]) -> list[str]:
-    return [one.title for answer in answers for one in answer]
 
 
 def test_a_row_that_knows_no_word_of_the_query_is_not_shown():

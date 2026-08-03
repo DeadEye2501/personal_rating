@@ -1,27 +1,20 @@
-"""Одна игра — одна строка выдачи.
+"""Что склеивается в одну строку выдачи, а что остаётся порознь.
 
 Автоматическая половина дедупликации: то, что машина склеивает без единой
 ошибки, она склеивает сама и человека не беспокоит. Замер боевой реализации —
 383 верных склейки при нуле ложных, 83% из 461 верной пары на 224 запросах.
 
-Что не склеилось — на глазах человека: он убирает лишнее руками, и это задача 4."""
+Что не склеилось — на глазах человека: он убирает лишнее руками, и это помнит
+`RemovedRepository`.
+
+Кто побеждает в группе и что забирает — `test_merging_winner.py`, сборники —
+`test_merging_sets.py`."""
 
 import pytest
 
 from backend.model import Kind, SearchHit, Source
-from backend.service.merging import SETS, merged
-
-
-def row(source: Source, source_id: str, title: str, **rest) -> SearchHit:
-    """Игровая строка выдачи. Остальные поля идут сквозь: их у `SearchHit`
-    девять, и перечислять здесь те, что понадобились, значит дописывать
-    помощника на каждую новую проверку."""
-    return SearchHit(kind=Kind.GAME, source=source, source_id=source_id,
-                     title=title, **rest)
-
-
-def titles(answers: list[list[SearchHit]]) -> list[str]:
-    return [one.title for answer in answers for one in answer]
+from backend.service.merging import merged
+from tests.builders import row, titles
 
 
 def test_two_editions_of_one_game_in_one_store_become_one():
@@ -80,225 +73,78 @@ def test_an_apostrophe_does_not_break_the_slug_key():
     ]
 
 
-def test_the_winner_picks_up_the_name_of_the_other_language():
-    """Пара имён собирается здесь — до того, как проигравшие строки исчезнут.
-    Группа склейки единственное место, где два имени **доказанно** про одну
-    игру: их свело правило, а не догадка.
+def test_two_games_of_the_same_name_are_told_apart_by_the_year():
+    """Однофамильцы: у old-games две карточки `Fallout` — 1997 года от Black
+    Isle и 1991 года авторства Brad Taylor, и её страница прямо говорит «совсем
+    не тот Fallout». Склеенные, они прятали настоящую игру и отдавали ей чужой
+    год.
 
-    Показываемое имя победителя не трогается: список выдачи от этого не меняется,
-    а второе поле у кандидатов из магазинов и так пустое. Решение пользователя
-    03.08.2026.
+    Разошлись на шесть лет, и люфт в четыре их разводит. Решение пользователя
+    03.08.2026."""
+    steam = [row(Source.STEAM, "38400", "Fallout", year=1997)]
+    old = [row(Source.OLD_GAMES, "30", "Fallout", year=1997),
+           row(Source.OLD_GAMES, "5251", "Fallout", year=1991)]
 
-    Свидетель замеренный: Steam отдаёт `The Witcher 3: Wild Hunt`, GOG под своей
-    локалью «Ведьмак 3: Дикая Охота», склеивает их слаг."""
-    steam = [row(Source.STEAM, "292030", "The Witcher 3: Wild Hunt")]
-    gog = [row(Source.GOG, "1207664663", "Ведьмак 3: Дикая Охота",
-               aliases=("the witcher 3 wild hunt",))]
+    kept = [one for answer in merged([steam, old], "fallout") for one in answer]
 
-    kept = merged([steam, gog], "witcher 3")
-
-    winner, = [one for answer in kept for one in answer]
-    assert winner.title == "The Witcher 3: Wild Hunt"
-    assert winner.original_title == "Ведьмак 3: Дикая Охота"
+    assert [(one.source_id, one.year) for one in kept] == [
+        ("38400", 1997), ("5251", 1991)]
 
 
-def test_a_winner_without_a_neighbour_keeps_its_own_second_name():
-    """Пара собирается не всегда, и это исход, а не отказ: игра только в Steam —
-    русского имени нет ниоткуда.
+@pytest.mark.parametrize("later, kept", [(2001, ["1"]), (2002, ["1", "2"])])
+def test_the_gap_is_four_years_and_the_fourth_still_counts(later, kept):
+    """«Условно фаллаут 1997 и фаллаут 1999 — будет как одна игра, но не
+    фаллаут 1991», словами пользователя. Люфт после перебора выбран им же —
+    четыре.
 
-    Второй свидетель — old-games со своим вторым именем: чужого в группе нет, а
-    своё обязано остаться. Без него «берём из группы» неотличимо от «затираем
-    тем, что нашлось»."""
-    alone = [row(Source.STEAM, "1", "Dishonored")]
-    assert [one.original_title for answer in merged([alone], "dishonored")
-            for one in answer] == [""]
+    Границу сторожат обе половины сразу, и поодиночке они бессильны: свидетель
+    на четыре разрешает и люфт побольше, свидетель на пять разрешает и поменьше.
+    Вместе они запирают ровно четвёрку и заодно `>` против `>=`.
 
-    own = [row(Source.OLD_GAMES, "2", "Ил-2 Штурмовик",
-               original_title="IL-2 Sturmovik")]
-    assert [one.original_title for answer in merged([own], "ил-2")
-            for one in answer] == ["IL-2 Sturmovik"]
+    Расходятся источники сплошь: у `Return to Castle Wolfenstein` 2001 против
+    2002, у `Quake III Arena` 1999 против 2001 — регион, платформа,
+    переиздание. Люфт для того и нужен."""
+    steam = [row(Source.STEAM, "1", "Fallout", year=1997)]
+    gog = [row(Source.GOG, "2", "Fallout", year=later)]
 
+    shown = [one for answer in merged([steam, gog], "fallout") for one in answer]
 
-def test_the_own_second_name_survives_when_it_is_of_the_same_script():
-    """Своё второе имя не обязано быть на другой письменности, и затирать его
-    пустотой не за что.
-
-    Свидетели замерены живьём на запросе `dune`: `Dune II: The Building of a
-    Dynasty` со вторым именем `Dune II: Battle for Arrakis`, `Emperor: Battle
-    for Dune` с `Dune 3`. Обе строки одинокие — терять в группе нечего, — а поле
-    после склейки становилось пустым."""
-    own = [row(Source.OLD_GAMES, "1482", "Dune II: The Building of a Dynasty",
-               original_title="Dune II: Battle for Arrakis")]
-
-    winner, = [one for answer in merged([own], "dune") for one in answer]
-
-    assert winner.original_title == "Dune II: Battle for Arrakis"
+    assert [one.source_id for one in shown] == kept
 
 
-def test_the_second_name_is_taken_from_a_row_without_edition_words():
-    """Второе имя выбирается тем же ключом, что и победитель: строка без слов
-    издания вернее.
+def test_a_row_without_a_year_never_objects():
+    """Год известен не всем: у анонса его нет вовсе, у old-games бывает пусто.
+    Пустота — не расхождение, и запрещать ею склейку значит развалить законные
+    группы на ровном месте."""
+    steam = [row(Source.STEAM, "1", "Fallout")]
+    old = [row(Source.OLD_GAMES, "2", "Fallout", year=1997)]
 
-    Состав группы замерен живьём на запросе `gothic 2`: у old-games там обе
-    строки — `Gothic II` с «Готика II» и `Gothic II: Gold Edition` с «Готика II .
-    Gold», — и склеивает их снятие хвоста издания. Порядок внутри источника
-    задаёт сам источник, поэтому свидетель ставит издание первым: этой
-    перестановкой и решается, чьё имя достанется победителю."""
-    steam = [row(Source.STEAM, "39510", "Gothic II: Gold Classic")]
-    old = [row(Source.OLD_GAMES, "1", "Gothic II: Gold Edition",
-               original_title="Готика II . Gold"),
-           row(Source.OLD_GAMES, "2", "Gothic II", original_title="Готика II")]
+    kept = [one for answer in merged([steam, old], "fallout") for one in answer]
 
-    winner, = [one for answer in merged([steam, old], "gothic 2")
-               for one in answer]
-
-    assert winner.original_title == "Готика II"
+    assert [one.source_id for one in kept] == ["1"]
 
 
-def test_a_russian_name_with_latin_letters_is_not_the_english_one():
-    """`S.T.A.L.K.E.R.: Тень Чернобыля` написан наполовину латиницей, и принять
-    его за английское значит вытеснить настоящее английское из его поля.
+def test_the_year_gap_holds_through_a_third_row():
+    """Запрет смотрит все пары двух групп, а не только те две строки, которые
+    сводят прямо сейчас.
 
-    Свидетель нарочно с соседом: настоящее английское имя лежит в группе рядом,
-    и без этой проверки оно проигрывало бы имени победителя."""
-    steam = [row(Source.STEAM, "1", "S.T.A.L.K.E.R.: Тень Чернобыля")]
-    old = [row(Source.OLD_GAMES, "2", "S.T.A.L.K.E.R.: Тень Чернобыля",
-               original_title="S.T.A.L.K.E.R.: Shadow of Chernobyl")]
+    Свидетель: между `Fallout` 1997 и `Fallout` 1991 встаёт строка без года.
+    Она законно склеивается с обеими по отдельности, и запрет, сравнивающий
+    только сводимую пару, пропустил бы 1991-й в группу через неё.
 
-    winner, = [one for answer in merged([steam, old], "stalker")
-               for one in answer]
+    **Строка без года стоит первой нарочно.** Группы сводят за головы, а головой
+    становится строка с наименьшим номером — то есть она. Своего года у неё нет,
+    и запрет «по одной строке группы» промолчал бы: 1991-й въехал бы внутрь при
+    зелёном наборе. Порядок выдач тут и есть то, что делает проверку способной
+    упасть."""
+    gog = [row(Source.GOG, "2", "Fallout")]
+    steam = [row(Source.STEAM, "1", "Fallout", year=1997)]
+    old = [row(Source.OLD_GAMES, "3", "Fallout", year=1991)]
 
-    assert winner.title == "S.T.A.L.K.E.R.: Тень Чернобыля"
-    assert winner.original_title == "S.T.A.L.K.E.R.: Shadow of Chernobyl"
+    kept = [one for answer in merged([gog, steam, old], "fallout")
+            for one in answer]
 
-
-def test_the_winner_takes_the_earliest_year_of_the_group():
-    """Игра не могла выйти раньше самой себя — значит из разошедшихся дат верна
-    ранняя. Решение пользователя 03.08.2026.
-
-    Свидетель замеренный и не тавтологичный: у GOG «Heroes of Might and Magic 3:
-    Complete» помечен 1999-м, у old-games «…Collector's Edition» — 2000-м.
-    Разошлись они на год потому, что у второго издание позднее, и прав оказался
-    ранний.
-
-    **Steam года в выдаче не отдаёт вовсе** — замерено, `None` у всех строк, — а
-    побеждает он по приоритету. Без этого правила человек видел бы «Fallout 2»
-    вообще без года, хотя два соседа по группе знали 1998-й."""
-    steam = [row(Source.STEAM, "1", "Heroes of Might and Magic 3")]
-    gog = [row(Source.GOG, "2", "Heroes of Might and Magic 3", year=1999)]
-    old = [row(Source.OLD_GAMES, "3", "Heroes of Might and Magic 3", year=2000)]
-
-    winner, = [one for answer in merged([steam, gog, old], "heroes")
-               for one in answer]
-
-    assert winner.source is Source.STEAM
-    assert winner.year == 1999
-
-
-def test_a_later_year_of_the_winner_yields_to_an_earlier_one():
-    """Правило действует и против самого победителя: у Steam карточка магазина
-    помечена годом появления в магазине, и он всегда позже настоящего.
-
-    Без этой половины «берём ранний» неотличимо от «берём свой, а чужой только
-    когда своего нет»."""
-    steam = [row(Source.STEAM, "1", "Arcanum", year=2016)]
-    gog = [row(Source.GOG, "2", "Arcanum", year=2001)]
-
-    winner, = [one for answer in merged([steam, gog], "arcanum")
-               for one in answer]
-
-    assert winner.year == 2001
-
-
-def test_a_group_without_years_leaves_the_year_alone():
-    """Года может не быть ни у кого, и это исход, а не отказ: подставлять туда
-    нечего."""
-    steam = [row(Source.STEAM, "1", "Dune")]
-    gog = [row(Source.GOG, "2", "Dune")]
-
-    winner, = [one for answer in merged([steam, gog], "dune") for one in answer]
-
-    assert winner.year is None
-
-
-def test_the_winner_is_the_store_with_the_highest_priority():
-    """Приоритет `steam > gog > old-games`, и поля не смешиваются: проигравшая
-    строка уходит целиком, а не отдаёт победителю свои."""
-    steam = [row(Source.STEAM, "1", "Dune")]
-    gog = [row(Source.GOG, "2", "Dune")]
-    old = [row(Source.OLD_GAMES, "3", "Dune")]
-
-    kept = merged([old, gog, steam], "dune")
-
-    assert titles(kept) == ["Dune"]
-    survivor, = [one for answer in kept for one in answer]
-    assert survivor.source is Source.STEAM
-
-
-def test_the_ladder_of_priority_has_a_second_step_too():
-    """Лестница проверяется и ниже первой ступени: с одним Steam перестановка
-    GOG и old-games местами прошла бы молча, а порядок задан всеми тремя."""
-    gog = [row(Source.GOG, "2", "Dune")]
-    old = [row(Source.OLD_GAMES, "3", "Dune")]
-
-    survivor, = [one for answer in merged([old, gog], "dune") for one in answer]
-
-    assert survivor.source is Source.GOG
-
-
-def test_a_compilation_does_not_show_up_at_all():
-    """Сборник — не издание: это несколько игр под одной строкой. Решение
-    пользователя 03.08.2026 — убирать вовсе.
-
-    Сборник взят такой, что ни с чем в выдаче не склеивается: с «Mafia Trilogy»
-    рядом с «Mafia» проверка была бы зелёной и при снятом отсеве — слово
-    `trilogy` есть и среди издательских, и строка ушла бы как издание.
-    Заплачено за это решение пятнадцатью настоящими строками, и сторожить его
-    надо тем, что без него не сходится."""
-    steam = [row(Source.STEAM, "1", "Mafia"),
-             row(Source.STEAM, "2", "Deus Ex Bundle")]
-
-    assert titles(merged([steam], "mafia")) == ["Mafia"]
-
-
-def test_the_asked_compilation_stays_and_the_others_do_not():
-    """Исключение из того же решения, уточнённое пользователем 03.08.2026:
-    остаётся **тот** сборник, который спросили, а не все сборники подряд.
-
-    Обе стороны в одном тесте нарочно: с одной строкой в выдаче исключение
-    неотличимо от «отсев выключился целиком», а посторонние сборники в выдаче
-    того же запроса — обычное дело."""
-    steam = [row(Source.STEAM, "1", "Mortal Kombat Trilogy"),
-             row(Source.STEAM, "2", "SUPERHOT ONE OF US BUNDLE")]
-
-    assert titles(merged([steam], "mortal kombat trilogy")) == [
-        "Mortal Kombat Trilogy"
-    ]
-
-
-def test_the_asked_compilation_is_matched_by_words_and_not_by_letters():
-    """Сравниваются приведённые слова, а не строка целиком: человек набирает
-    как придётся — со строчной буквы, без знаков, «and» вместо «&»."""
-    steam = [row(Source.STEAM, "1", "Command & Conquer: The Ultimate Collection")]
-
-    assert titles(merged([steam], "command and conquer ultimate collection")) == [
-        "Command & Conquer: The Ultimate Collection"
-    ]
-
-
-def test_a_compilation_stays_hidden_when_the_query_did_not_name_one():
-    """Обе половины правила нужны разом. По «fallout» слова запроса в названии
-    «Fallout Collection» есть, а сборника человек не просил — и строка остаётся
-    скрытой. Ровно эти строки спека и назвала ценой решения.
-
-    Соседкой взята «Fallout 2», а не «Fallout»: с одноимённой сборник исчезал
-    бы и при снятой проверке «сборник назвали», потому что склейка убрала бы
-    его как одетую строку. Ключи тут разные — `fallout` против `fallout 2`, —
-    поэтому спрятать сборник может только сам отсев."""
-    steam = [row(Source.STEAM, "1", "Fallout 2"),
-             row(Source.STEAM, "2", "Fallout Collection")]
-
-    assert titles(merged([steam], "fallout")) == ["Fallout 2"]
+    assert [one.source_id for one in kept] == ["1", "3"]
 
 
 def test_a_second_name_does_not_glue_inside_one_source():
@@ -413,26 +259,3 @@ def test_two_films_of_the_same_name_are_not_glued():
 def test_nothing_found_stays_nothing():
     assert merged([[], []], "что угодно") == [[], []]
 
-
-# Слова сборника поимённо. Наблюдалось три из семи, а цена ошибки односторонняя
-# и тяжелее, чем у изданий: лишнее слово **скрывает настоящие игры навсегда** —
-# спека уже назвала пятнадцать таких строк ценой решения. Два слова русские, и
-# источник с русскими названиями появился тем же планом, что и они.
-FROZEN_SETS = ("bundle", "collection", "trilogy", "anthology", "антология",
-               "коллекция", "compilation")
-
-
-def test_the_words_of_a_compilation_did_not_drift():
-    assert SETS == FROZEN_SETS
-
-
-@pytest.mark.parametrize("word", FROZEN_SETS)
-def test_each_word_of_a_compilation_hides_its_row(word):
-    """Снимок сторожит состав, а это — что каждое слово в нём работает.
-
-    Запрос нарочно не содержит слова сборника: иначе сработало бы исключение
-    «остался тот, который спросили», и строка осталась бы законно."""
-    steam = [row(Source.STEAM, "1", "Fallout 2"),
-             row(Source.STEAM, "2", f"Fallout {word}")]
-
-    assert titles(merged([steam], "fallout")) == ["Fallout 2"]
