@@ -56,7 +56,10 @@ def parse_catalog(payload: dict) -> list[SourceCard]:
                 kind=Kind.GAME,
                 source=Source.GOG,
                 source_id=str(row["id"]),
-                # Локализованы у GOG только жанры: название английское.
+                # Название приходит на языке запроса, а спрашиваем мы
+                # `locale: ru-RU`: у части игр оно локализовано — «Ведьмак 3:
+                # Дикая Охота». Английское знает только запрос с `en-US`, и
+                # второго запроса ради него не делается.
                 title=row.get("title") or "",
                 synced_at=now,
                 year=year(row.get("releaseDate")),
@@ -72,8 +75,13 @@ def parse_catalog(payload: dict) -> list[SourceCard]:
     ]
 
 
-def to_hit(card: SourceCard) -> SearchHit:
-    """Наружу поиск отдаёт кандидатов, как TMDB и Steam."""
+def to_hit(card: SourceCard, slug: str = "") -> SearchHit:
+    """Наружу поиск отдаёт кандидатов, как TMDB и Steam.
+
+    Слаг едет ключом склейки: показываемое название у GOG локализовано —
+    «Ведьмак 3: Дикая Охота» против «The Witcher 3: Wild Hunt» у Steam, — и
+    совпасть они не могут никогда, а слаг совпадает. Подчёркивания меняются на
+    пробелы: приведение названий режет по словам."""
     return SearchHit(
         kind=card.item.kind,
         source=card.item.source,
@@ -83,7 +91,20 @@ def to_hit(card: SourceCard) -> SearchHit:
         poster_url=card.item.poster_url,
         genre_ext_ids=card.genre_ext_ids,
         source_rating=card.ratings[0].value if card.ratings else None,
+        aliases=(slug.replace("_", " "),) if slug else (),
     )
+
+
+def parse_hits(payload: dict) -> list[SearchHit]:
+    """Кандидаты выдачи: те же карточки, но со слагом.
+
+    Слаг лежит в строке каталога, а до `SourceCard` не доезжает: карточке он не
+    нужен, а склейке нужен. Отдельной сборки полей это не заводит — берётся уже
+    разобранная карточка."""
+    slugs = {str(row["id"]): row.get("slug") or ""
+             for row in payload.get("products", [])}
+    return [to_hit(card, slugs.get(card.item.source_id, ""))
+            for card in parse_catalog(payload)]
 
 
 def find_slug(payload: dict, slug: str) -> str | None:

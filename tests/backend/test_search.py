@@ -362,6 +362,47 @@ async def test_both_stores_refusing_report_both(sessions, service):
     assert sorted(r.source for r in result.refusals) == ["gog", "steam"]
 
 
+async def test_one_game_from_two_stores_becomes_one_row(sessions, service):
+    """Склейка стоит в сборке выдачи, а не только в своём модуле. Без вызова
+    здесь человек по-прежнему видел бы две строки одной игры, а все проверки
+    самой склейки оставались бы зелёными.
+
+    Строки нарочно игровые: у кино источник один, склеивать там нечего, и на
+    умолчании помощника — а оно `Kind.MOVIE` — эта проверка не наблюдала бы
+    ничего."""
+    steam = FakeSearch(Found([hit("1", "Fallout 2", source=Source.STEAM,
+                                  kind=Kind.GAME)]), name="steam")
+    gog = FakeSearch(Found([hit("2", "Fallout 2", source=Source.GOG,
+                                kind=Kind.GAME)]), name="gog")
+
+    result = await service(steam, gog).external(Kind.GAME, "fallout 2")
+
+    assert [one.source for one in result.views] == [Source.STEAM]
+
+
+async def test_the_portion_is_cut_before_the_merging(sessions, service):
+    """Порядок этих двух шагов виден человеку. Склейка по полным выдачам даёт
+    победителя с сороковой строки, который убивает проигравшего со второй, — и
+    на экран не попадает ни один из двух.
+
+    Здесь у Steam и GOG совпадает единственная пара названий, и стоит она за
+    краем порции у одного из них: срезав порцию первой, склейка её не увидит и
+    ничего не тронет."""
+    steam = FakeSearch(Found(
+        [hit(f"s{n}", f"Steam {n}", source=Source.STEAM, kind=Kind.GAME)
+         for n in range(SEARCH_SIZE)]
+        + [hit("s-late", "Общая игра", source=Source.STEAM, kind=Kind.GAME)]
+    ), name="steam")
+    gog = FakeSearch(Found(
+        [hit("g0", "Общая игра", source=Source.GOG, kind=Kind.GAME)]
+    ), name="gog")
+
+    result = await service(steam, gog).external(Kind.GAME, "игра")
+
+    assert "Общая игра" in [one.title for one in result.views]
+    assert len(result.views) == SEARCH_SIZE + 1
+
+
 async def test_a_portion_is_counted_per_source_and_not_per_page(sessions, service):
     """У игр магазина два, и по 20 у каждого — это два запроса, как и сказано в
     спеке. Срез на общей выдаче отдал бы 20 на двоих."""

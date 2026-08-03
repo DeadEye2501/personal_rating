@@ -24,6 +24,15 @@ class SearchHit:
     # пространства не несёт, и правила пришлось бы искать наугад.
     genre_ext_ids: tuple[tuple[GenreSource, str], ...] = field(default_factory=tuple)
     source_rating: float | None = None
+    # Другие написания этой же строки, по которым её узнаёт склейка выдачи.
+    # Сегодня это слаг GOG: у него показываемое название локализовано — «Ведьмак
+    # 3: Дикая Охота» против «The Witcher 3: Wild Hunt» у Steam, — и совпасть
+    # они не могут никогда, а слаг совпадает.
+    #
+    # Отдельным полем, а не в `original_title`: то едет на экран, а слаг человеку
+    # показывать нечего. У old-games там лежит второе название игры, и склейка
+    # берёт оба поля.
+    aliases: tuple[str, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True, slots=True)

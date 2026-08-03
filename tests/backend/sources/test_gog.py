@@ -16,7 +16,7 @@ from backend.model import (
     Source,
 )
 from backend.sources.gog.client import GogClient
-from backend.sources.gog.parse import parse_catalog, to_hit
+from backend.sources.gog.parse import parse_catalog, parse_hits, to_hit
 from backend.sources.http import SourceHttp
 from tests.conftest import counting, responding, unreachable
 
@@ -59,6 +59,25 @@ def test_the_cover_is_the_vertical_one(fixture):
 def test_the_year_is_read_from_a_dotted_date(fixture):
     """Дата приходит как `2023.08.03` — не ISO, но год стоит первым."""
     assert parse_catalog(fixture("gog/catalog.json"))[0].item.year == 2023
+
+
+def test_a_candidate_carries_the_slug_for_the_merging(fixture):
+    """Слаг лежит в строке каталога и до карточки не доезжает — он нужен
+    склейке выдачи: показываемое название у GOG локализовано, и с «The Witcher
+    3: Wild Hunt» из Steam оно не совпадёт ни в одной букве, а слаг совпадает.
+
+    Сверяется привязка к своей строке, а не наличие: со словарём, собранным по
+    чужому ключу, каждая игра получила бы чужой слаг, и склейка стала бы врать.
+    Подчёркивания меняются на пробелы — приведение названий режет по словам."""
+    payload = fixture("gog/catalog.json")
+    slugs = {str(row["id"]): row["slug"] for row in payload["products"]}
+    assert len(slugs) > 1, "фикстура с одной строкой привязки не сторожит"
+
+    hits = parse_hits(payload)
+
+    assert {one.source_id: one.aliases for one in hits} == {
+        source_id: (slug.replace("_", " "),) for source_id, slug in slugs.items()
+    }
 
 
 def test_genres_come_as_slugs(fixture):

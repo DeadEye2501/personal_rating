@@ -9,8 +9,8 @@ from backend.sources.errors import absent, parsed
 from backend.sources.gog.parse import (
     find_slug,
     parse_catalog,
+    parse_hits,
     title_of,
-    to_hit,
 )
 from backend.sources.http import SourceHttp
 from backend.sources.undocumented import asked, refuse_undocumented
@@ -85,10 +85,13 @@ class GogClient:
                       lambda: parse_catalog(payload))
 
     async def search(self, query: str, kind: Kind) -> Outcome:
-        cards = await self._catalog(query, PRODUCT_TYPES)
-        if isinstance(cards, Refusal):
-            return cards
-        return Found([to_hit(card) for card in cards])
+        """Кандидаты собираются из тела ответа, а не из разобранных карточек:
+        слаг лежит в строке каталога и нужен склейке выдачи ключом."""
+        payload = await self._payload(query, PRODUCT_TYPES)
+        if isinstance(payload, Refusal):
+            return payload
+        return parsed(logger, "gog", "выдача каталога не разобралась",
+                      lambda: Found(parse_hits(payload)))
 
     async def _title(self, source_id: str) -> str | Outcome:
         """Название по номеру. Отдельный запрос — цена за то, что контракт у трёх

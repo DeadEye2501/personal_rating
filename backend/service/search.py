@@ -14,6 +14,7 @@ from backend.model import (
 from backend.service.asking import answered_all
 from backend.service.filmography import Filmographies
 from backend.service.hits import once, split, to_views, without_removed
+from backend.service.merging import merged
 from backend.sources.registry import Sources
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
@@ -112,7 +113,12 @@ class SearchService:
         together = unique_by(_weave(works),
                              lambda one: (one.source, one.source_id))
         kept = await without_removed(self._removed, [*answers, together])
-        woven = _weave([one[:SEARCH_SIZE] for one in kept])
+        # Порция режется до склейки, а склейка стоит последней из отсевов.
+        # Сливать имеет смысл то, что уже прошло чистку, иначе дополнение
+        # склеилось бы с игрой; а склеивать — только видимое: победитель с
+        # сороковой строки убил бы проигравшего со второй, и на экран не попал
+        # бы ни один из двух.
+        woven = _weave(merged([one[:SEARCH_SIZE] for one in kept], query))
 
         return ExternalSearch(
             views=tuple(await to_views(woven, self._genres, self._clock)),

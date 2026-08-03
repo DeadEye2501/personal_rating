@@ -142,13 +142,16 @@ async def test_the_reference_is_asked_once_per_space(sessions, reference, servic
         return await original(self, source)
 
     monkeypatch.setattr(GenresRepository, "rules", counting)
+    # Названия у всех разные: одинаковые склеились бы в одну строку — по
+    # решению задачи 5 это одна игра, — и до второго пространства выдача бы не
+    # дошла. Предмет проверки тут другой, и путать его со склейкой незачем.
     steam = FakeSearch(Found([
-        hit(f"s{n}", source=Source.STEAM, kind=Kind.GAME,
+        hit(f"s{n}", f"Игра Steam {n}", source=Source.STEAM, kind=Kind.GAME,
             genre_ext_ids=((GenreSource.STEAM, "3"),))
         for n in range(5)
     ]), name="steam")
     gog = FakeSearch(Found([
-        hit(f"g{n}", source=Source.GOG, kind=Kind.GAME,
+        hit(f"g{n}", f"Игра GOG {n}", source=Source.GOG, kind=Kind.GAME,
             genre_ext_ids=((GenreSource.GOG, "rpg"),))
         for n in range(5)
     ]), name="gog")

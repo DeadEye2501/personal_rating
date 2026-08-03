@@ -252,6 +252,7 @@
   - `poster_url: str` = `''`
   - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
   - `source_rating: float | None` = `None`
+  - `aliases: tuple[str, ...]` = `field(default_factory=tuple)`
 - `class PersonHit`
   - `source_id: str`
 
@@ -338,6 +339,11 @@
 
 - `logger` = `logging.getLogger(__name__)`
 
+### `backend/service/merging.py`
+
+- `SETS` = `набор из 7`
+- `PRIORITY` = `набор из 3`
+
 ### `backend/service/posters.py`
 
 - `logger` = `logging.getLogger(__name__)`
@@ -356,6 +362,13 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `REFRESH_TTL` = `timedelta(days=30)`
+
+### `backend/service/titles.py`
+
+- `ROMAN` = `словарь из 13`
+- `EDITION_WORDS` = `frozenset({'edition', 'editions', 'ed', 'goty', …`
+- `SYMBOLS` = `str.maketrans({'™': ' ', '®': ' ', '©': ' ', '℠'…`
+- `ARTICLES` = `frozenset({'the', 'a', 'an'})`
 
 ### `backend/sources/convert.py`
 
@@ -801,6 +814,11 @@
 - `UNIQUE` = `набор из 4`
 - `COMPOSITE` = `набор из 8`
 - `PARENTS` = `набор из 5`
+
+### `tests/backend/test_titles.py`
+
+- `SAME` = `набор из 7`
+- `EDITIONS` = `набор из 3`
 
 ### `tests/backend/test_view_types.py`
 

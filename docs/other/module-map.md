@@ -15,7 +15,7 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (22)
 
-## backend — 82 модулей
+## backend — 84 модулей
 
 ### `backend/app.py` — 182 строк
 
@@ -187,13 +187,13 @@
 - `class ExternalSearch` (6)
 - `def merge_results(local: list[CardView], external: list[CardView]) -> list[CardView]` (23)
 
-### `backend/model/search.py` — 40 строк
+### `backend/model/search.py` — 49 строк
 
 Кандидат в выдаче поиска — то, чем карточка ещё не стала.
 
 Зависит от: `backend.model.kinds`
 
-- `class SearchHit` (18)
+- `class SearchHit` (27)
 - `class PersonHit` (11)
 
 ### `backend/model/suggestion.py` — 15 строк
@@ -358,6 +358,25 @@
   - `async def _second_try(self, card: SourceCard, asked: str) -> bytes | None | Refusal` (12)
   - `async def card_for_link(self, link: ExternalLink) -> SourceCard | Missing | Refusal` (20)
 
+### `backend/service/merging.py` — 183 строк
+
+Одна игра — одна строка выдачи.
+
+Зависит от: `backend.model`, `backend.service.titles`
+
+- `def _a_set(hit: SearchHit) -> bool` (2)
+- `def _asked_for(hit: SearchHit, asked: list[str]) -> bool` (11)
+- `def _keys(hit: SearchHit, *, alone: bool) -> set[str]` (13)
+- `def _dressed(hit: SearchHit) -> bool` (5)
+- `def _rank(hit: SearchHit) -> tuple` (6)
+- `class _Groups` (42)
+  - `def head(self, one: int) -> int` (4)
+  - `def _shown(self, head: int) -> dict[Source, set[str]]` (7)
+  - `def _joinable(self, one: int, other: int) -> bool` (7)
+  - `def join(self, one: int, other: int) -> None` (6)
+- `def _grouped(flat: list[SearchHit]) -> list[int]` (28)
+- `def merged(answers: list[list[SearchHit]], query: str) -> list[list[SearchHit]]` (39)
+
 ### `backend/service/people.py` — 84 строк
 
 Что найдётся по человеку или студии.
@@ -397,17 +416,17 @@
 - `async def discard_card(library: LibraryRepository, posters: PosterService, removed: RemovedRepository, item_id: int) -> None` (19)
 - `async def remove_card(library: LibraryRepository, posters: PosterService, item_id: int) -> None` (24)
 
-### `backend/service/search.py` — 120 строк
+### `backend/service/search.py` — 126 строк
 
 Что найдётся по запросу.
 
-Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `backend.unique`
+Зависит от: `backend.model`, `backend.service.asking`, `backend.service.filmography`, `backend.service.hits`, `backend.service.merging`, `backend.sources.registry`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.views`, `backend.unique`
 
 - `def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]` (18)
 - `class SearchParts` (12)
-- `class SearchService` (57)
+- `class SearchService` (62)
   - `async def local(self, kind: Kind, query: str) -> list[CardView]` (3)
-  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (35)
+  - `async def external(self, kind: Kind, query: str) -> ExternalSearch` (40)
 
 ### `backend/service/series.py` — 62 строк
 
@@ -418,6 +437,15 @@
 - `def _kept(fresh: int | None, stored: int | None) -> int | None` (4)
 - `class SeriesRefresh` (38)
   - `async def refresh(self, item_id: int) -> None` (28)
+
+### `backend/service/titles.py` — 73 строк
+
+Приведение чужого названия к сравнимому виду.
+
+Зависит от: —
+
+- `def flattened(name: str) -> str` (17)
+- `def without_edition(name: str) -> str` (12)
 
 ### `backend/sources/backoff.py` — 31 строк
 
@@ -463,31 +491,32 @@
 - `def parsed(log: Logger, source: str, note: str, produce: Callable[[], T]) -> T | Refusal` (18)
 - `def parsed_or(log: Logger, source: str, note: str, produce: Callable[[], T], fallback: T) -> T` (12)
 
-### `backend/sources/gog/client.py` — 171 строк
+### `backend/sources/gog/client.py` — 174 строк
 
 Разговор с GOG по сети.
 
 Зависит от: `backend.model`, `backend.sources.errors`, `backend.sources.gog.parse`, `backend.sources.http`, `backend.sources.undocumented`
 
-- `class GogClient` (137)
+- `class GogClient` (140)
   - `def name(self) -> str` (4)
   - `async def _payload(self, query: str, product_types: str | None=None) -> dict | Refusal` (18)
   - `async def _catalog(self, query: str, product_types: str | None=None) -> list | Refusal` (7)
-  - `async def search(self, query: str, kind: Kind) -> Outcome` (5)
+  - `async def search(self, query: str, kind: Kind) -> Outcome` (8)
   - `async def _title(self, source_id: str) -> str | Outcome` (20)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (21)
   - `async def resolve_slug(self, slug: str) -> Outcome` (33)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/gog/parse.py` — 110 строк
+### `backend/sources/gog/parse.py` — 131 строк
 
 Перевод ответов GOG в наши типы.
 
 Зависит от: `backend.model`, `backend.sources.convert`, `backend.unique`
 
 - `def _marks(row: dict) -> tuple[tuple[GenreSource, str], ...]` (12)
-- `def parse_catalog(payload: dict) -> list[SourceCard]` (24)
-- `def to_hit(card: SourceCard) -> SearchHit` (12)
+- `def parse_catalog(payload: dict) -> list[SourceCard]` (27)
+- `def to_hit(card: SourceCard, slug: str='') -> SearchHit` (18)
+- `def parse_hits(payload: dict) -> list[SearchHit]` (10)
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
@@ -641,14 +670,14 @@
 - `def _number(raw: str | None) -> float | None` (10)
 - `def parse_ratings(payload: dict) -> Ratings` (21)
 
-### `backend/sources/registry.py` — 71 строк
+### `backend/sources/registry.py` — 75 строк
 
 Кто отвечает за какой тип содержимого.
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-- `class Sources` (52)
-  - `def catalog_for(self, kind: Kind) -> list` (8)
+- `class Sources` (56)
+  - `def catalog_for(self, kind: Kind) -> list` (12)
   - `def people_for(self, kind: Kind) -> TmdbClient | None` (6)
   - `def client_for(self, source: Source)` (9)
   - `def rating_sources(self, kind: Kind) -> list` (6)
@@ -1347,7 +1376,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 93 модулей
+## tests — 95 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1405,13 +1434,13 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_gog.py` — 445 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_gog.py` — 464 строк ⚠ подошёл к 300
 
 GOG: поиск не умеет отвечать «не найдено», и отрицательный факт отсюда не
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.gog.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 30
+Тестов: 31
 
 - `def answering(body) -> SourceHttp` (3)
 
@@ -1899,6 +1928,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `def local_view(source_id='157336', title='Интерстеллар') -> CardView` (3)
 
+### `tests/backend/test_merging.py` — 188 строк
+
+Одна игра — одна строка выдачи.
+
+Зависит от: `backend.model`, `backend.service.merging`
+
+Тестов: 15
+
+- `def row(source: Source, source_id: str, title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (6)
+- `def titles(answers: list[list[SearchHit]]) -> list[str]` (2)
+
 ### `tests/backend/test_migrations.py` — 126 строк
 
 Схема из миграций против схемы из объявлений.
@@ -1997,16 +2037,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 - `async def rows(engine) -> list[tuple]` (7)
 
-### `tests/backend/test_search.py` — 377 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 418 строк ⚠ подошёл к 300
 
 Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
 
 Зависит от: `backend.model`, `backend.service.search`, `tests.conftest`
 
-Тестов: 24
+Тестов: 26
 
 
-### `tests/backend/test_search_genres.py` — 158 строк
+### `tests/backend/test_search_genres.py` — 161 строк
 
 Жанры кандидата: чужие метки разворачиваются нашим справочником.
 
@@ -2089,6 +2129,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Зависит от: `backend.model`, `backend.storage.repository.tags`
 
 Тестов: 28
+
+
+### `tests/backend/test_titles.py` — 73 строк
+
+Приведение чужого названия к сравнимому виду.
+
+Зависит от: `backend.service.titles`
+
+Тестов: 7
 
 
 ### `tests/backend/test_view_types.py` — 110 строк
