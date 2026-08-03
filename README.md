@@ -70,29 +70,30 @@ cd client; npm test
 
 ## Сборка
 
-Сначала страница, потом exe: `client/dist` едет внутрь бандла.
+Сначала страница, потом exe.
 
 ```powershell
-cd client; npm ci; npm run build; cd ..
+cd client; npm run build; cd ..
 
 pipenv run pyinstaller --onefile --noconsole `
-  --icon=icon.ico --name "Personal Rating" `
+  --icon="Personal Rating.ico" --name "Personal Rating" `
   --add-data "client/dist;client/dist" `
   --add-data "migrations;migrations" `
   --add-data "alembic.ini;." `
   --add-data ".env.example;." `
+  --add-data "Personal Rating.ico;." `
   --hidden-import aiosqlite `
+  --hidden-import logging.config `
   main.py
 
 cp "dist/Personal Rating.exe" "./Personal Rating.exe"
-rm -rf build/ dist/ "Personal Rating.spec"
+rm -rf build/ dist/ __pycache__/ "Personal Rating.spec"
 ```
 
 Что зачем: `client/dist` — страница, без неё окно пустое; `migrations` с
 `alembic.ini` — схема базы; `.env.example` — из него заводится файл настроек;
-`aiosqlite` PyInstaller сам не находит, потому что драйвер подключается по
-имени, а не импортом.
-
-Иконка в репозиторий не входит: положите `icon.ico` рядом с `main.py`.
+`Personal Rating.ico` — иконка окна; `aiosqlite` и `logging.config` PyInstaller
+не находит сам, потому что первый подключается по имени, а второй нужен только
+`migrations/env.py`, который alembic грузит на лету.
 
 Готовый `.exe` в репозиторий не попадает — он уезжает вложением в релиз.

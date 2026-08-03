@@ -3,6 +3,7 @@
 import logging
 import logging.handlers
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -16,6 +17,11 @@ from bridge.window import open_window
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
+
+# Куда класть данные. Под заморозкой `BASE_DIR` — это временная папка, куда
+# распаковался бандл: она стирается при выходе, и база с ключами исчезала бы
+# вместе с ней. Рядом с самим `.exe` — решение пользователя 03.08.2026.
+HOME = Path(sys.executable).parent if getattr(sys, "frozen", False) else BASE_DIR
 
 # Лог лежит рядом с программой и не растёт бесконечно.
 LOG_BYTES = 5 * 1024 * 1024
@@ -44,11 +50,15 @@ def main() -> None:
     # Корневой `.env` читается первым и побеждает: он у разработчика, а рабочий
     # лежит в папке данных. `load_dotenv` уже прочитанного не перебивает.
     load_dotenv()
-    folder = load_config(os.environ, BASE_DIR).data_dir
+    folder = load_config(os.environ, HOME).data_dir
     ensure_env(folder, BASE_DIR / TEMPLATE_NAME)
     load_dotenv(folder / ".env")
 
-    config = load_config(os.environ, BASE_DIR)
+    config = load_config(os.environ, HOME)
+    # Alembic поднимает схему своим процессом и путь к базе берёт из окружения.
+    # Без этой строки под заморозкой он взял бы своё умолчание — временную папку
+    # бандла, — и приложение читало бы пустую базу рядом с exe.
+    os.environ["DATA_DIR"] = str(config.data_dir)
     setup_logging(config)
 
     # Сборка уезжает функцией: бэкенд обязан родиться внутри чужого потока —

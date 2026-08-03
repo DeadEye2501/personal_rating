@@ -272,3 +272,14 @@ def test_a_build_torn_off_by_something_worse_still_wakes_the_caller():
     # тесте, и жалоба повиснет на невиновном соседе.
     wait_until(lambda: all(alive.name != "backend"
                            for alive in threading.enumerate()))
+
+
+def test_closing_a_thread_that_never_started_is_quiet():
+    """Закрытие идёт из `finally`, то есть и тогда, когда до `start` дело не
+    дошло вовсе: сорвался шаг перед ним.
+
+    Своего цикла у непущенного потока нет, и обращение к нему даёт `AttributeError`
+    поверх настоящей ошибки — в трассировке видно второе, а искать надо первое.
+    Замерено на собранном exe: подлинная беда была в ненайденных миграциях, а
+    показал он падение закрытия."""
+    BackendThread(lambda: None).close()

@@ -1,6 +1,7 @@
 """Окно приложения и проверка того, чем оно рисует."""
 
 import logging
+from pathlib import Path
 
 import webview
 
@@ -10,6 +11,11 @@ from bridge.serve import Page
 logger = logging.getLogger(__name__)
 
 TITLE = "Personal Rating"
+
+# Рядом с корнем проекта, а под заморозкой — рядом с распакованным бандлом: у
+# `__file__` из `bridge/` оба случая считаются одинаково, как у страницы в
+# `serve.py`.
+ICON = Path(__file__).resolve().parent.parent / f"{TITLE}.ico"
 
 # Системный WebView2 — тот самый Chromium, в котором рисовался макет. Список
 # разрешённого, а не запрещённого: седьмой движок обязан упереться в проверку.
@@ -48,7 +54,8 @@ def open_window(thread, debug: bool = False) -> None:
         min_size=(MIN_WIDTH, MIN_HEIGHT),
         background_color=BACKGROUND,
     )
-    webview.start(func=_check_renderer, debug=debug)
+    webview.start(func=_check_renderer, debug=debug,
+                  icon=str(ICON) if ICON.is_file() else None)
     # Окно закрыли — гасим начатое и закрываем бэкенд. Отдельного флага
     # «мы закрываемся» не заводим: список живых задач ведёт поток.
     thread.close()

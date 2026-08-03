@@ -81,8 +81,12 @@ class BackendThread:
                 self._loop.call_soon_threadsafe(task.cancel)
 
     def close(self) -> None:
-        """Закрыть могут дважды — окно при закрытии и фикстура теста."""
-        if self._closed:
+        """Закрыть могут дважды — окно при закрытии и фикстура теста.
+
+        И до `start` тоже: закрытие идёт из `finally`, а сорваться может шаг
+        перед ним. Своего цикла у непущенного потока нет, и обращение к нему
+        легло бы `AttributeError` поверх настоящей ошибки."""
+        if self._closed or self._loop is None:
             return
         self._closed = True
         done: concurrent.futures.Future = concurrent.futures.Future()

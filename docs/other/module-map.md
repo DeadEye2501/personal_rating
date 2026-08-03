@@ -6,14 +6,14 @@
 
 ## . — 1 модулей
 
-### `main.py` — 75 строк
+### `main.py` — 93 строк
 
 Собирает зависимости, настраивает лог и поднимает окно.
 
 Зависит от: `backend.app`, `backend.config`, `backend.startup`, `bridge.thread`, `bridge.window`
 
 - `def setup_logging(config) -> None` (12)
-- `def main() -> None` (33)
+- `def main() -> None` (45)
 
 ## backend — 87 модулей
 
@@ -805,13 +805,13 @@
 - `def refuse_undocumented(http: SourceHttp, status: int) -> Refusal` (6)
 - `async def asked(http: SourceHttp, url: str, params: dict | None=None) -> httpx.Response | Refusal` (17)
 
-### `backend/startup.py` — 72 строк
+### `backend/startup.py` — 76 строк
 
 Всё, чего не хватает приложению до первого запроса: рабочая папка с файлом
 
 Зависит от: —
 
-- `def ensure_env(data_dir: Path, template: Path) -> None` (18)
+- `def ensure_env(data_dir: Path, template: Path) -> None` (22)
 - `def upgrade_schema(base_dir: Path | None=None) -> None` (22)
 
 ### `backend/storage/entity.py` — 34 строк
@@ -1253,18 +1253,18 @@
 - `def _single(query: dict, name: str) -> str | None` (3)
 - `def _answer(start_response, status: str, kind: str, body: bytes, cache: str | None=None)` (7)
 
-### `bridge/thread.py` — 185 строк
+### `bridge/thread.py` — 189 строк
 
 Поток бэкенда: свой цикл asyncio, список живых задач, отмена всех разом.
 
 Зависит от: —
 
 - `class Closed(Exception)` (2)
-- `class BackendThread` (156)
+- `class BackendThread` (160)
   - `def start(self) -> None` (5)
   - `def run(self, factory: Callable[[Any], Coroutine], op: int | None=None) -> concurrent.futures.Future` (10)
   - `def cancel(self, ops) -> None` (16)
-  - `def close(self) -> None` (9)
+  - `def close(self) -> None` (13)
   - `def _live(self) -> None` (21)
   - `def _refuse(self, error: BaseException) -> None` (6)
   - `def _begin(self, factory, op, answer) -> None` (23)
@@ -1272,14 +1272,14 @@
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
 
-### `bridge/window.py` — 62 строк
+### `bridge/window.py` — 69 строк
 
 Окно приложения и проверка того, чем оно рисует.
 
 Зависит от: `bridge.api`, `bridge.serve`
 
 - `def supported(renderer: str | None) -> bool` (2)
-- `def open_window(thread, debug: bool=False) -> None` (15)
+- `def open_window(thread, debug: bool=False) -> None` (16)
 - `def _check_renderer() -> None` (6)
 
 ### `bridge/wire.py` — 55 строк
@@ -2432,13 +2432,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def call(page, path, query='')` (10)
   - `def start(status, headers)` (3)
 
-### `tests/bridge/test_thread.py` — 274 строк
+### `tests/bridge/test_thread.py` — 285 строк
 
 Граница потоков: что обязано быть правдой у стыка двух циклов.
 
 Зависит от: `bridge.thread`, `tests.bridge.conftest`
 
-Тестов: 21
+Тестов: 22
 
 
 ### `tests/bridge/test_window.py` — 126 строк

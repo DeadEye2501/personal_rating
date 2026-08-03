@@ -10,6 +10,7 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `BASE_DIR` = `Path(__file__).resolve().parent`
+- `HOME` = `Path(sys.executable).parent if getattr(sys, 'fro…`
 - `LOG_BYTES` = `5 * 1024 * 1024`
 - `LOG_FILES` = `3`
 
@@ -616,6 +617,7 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `TITLE` = `'Personal Rating'`
+- `ICON` = `Path(__file__).resolve().parent.parent / f'{TITL…`
 - `RENDERER` = `'edgechromium'`
 - `MIN_WIDTH` = `1200`
 - `MIN_HEIGHT` = `600`
