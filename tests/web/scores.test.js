@@ -159,12 +159,12 @@ describe('ярлык средней оценки игры', () => {
     // оставалось бы «хорошо». Границы названы пользователем 04.08.2026.
     setScale(5)
 
-    expect(verdictOfMean(1.5)).toBe('плохо')
-    expect(verdictOfMean(1.51)).toBe('посредственно')
-    expect(verdictOfMean(2.5)).toBe('посредственно')
-    expect(verdictOfMean(2.51)).toBe('средне')
-    expect(verdictOfMean(4.5)).toBe('хорошо')
-    expect(verdictOfMean(4.51)).toBe('отлично')
+    expect(verdictOfMean(1.5)).toBe('Плохо')
+    expect(verdictOfMean(1.51)).toBe('Посредственно')
+    expect(verdictOfMean(2.5)).toBe('Посредственно')
+    expect(verdictOfMean(2.51)).toBe('Средне')
+    expect(verdictOfMean(4.5)).toBe('Хорошо')
+    expect(verdictOfMean(4.51)).toBe('Отлично')
   })
 
   it('цвет средней берётся той же ступенью, что и слово', () => {
@@ -208,7 +208,7 @@ describe('две шкалы', () => {
     setScale(5)
 
     expect(scale()).toEqual([1, 2, 3, 4, 5])
-    expect(labelOf(3)).toBe('средне')
+    expect(labelOf(3)).toBe('Средне')
     expect(colorOf(4)).toBe('var(--score-8)')
     expect(colorOf(5)).toBe('var(--score-10)')
   })
