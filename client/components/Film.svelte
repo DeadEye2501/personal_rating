@@ -129,6 +129,11 @@
              тут единственное, что говорит об оценке. -->
         <div class="film__scores film__scores--avg">
           <Stars score={mean} tone={toneOfMean(mean)} />
+          <!-- Свой ряд, а не тот, что стоит в строках сторон: у игры видимая
+               строка меняется со свёрнутостью, и ряд обязан ехать с ней. -->
+          <Acts wished={view.in_wishlist}
+                onedit={() => onedit(view)}
+                ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
         </div>
       {:else}
         <div class="film__scores">

@@ -123,7 +123,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (146)
+### components/Film.svelte (151)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -292,9 +292,9 @@
 
 ## styles — 29 файлов
 
-### styles/acts.css (45)
+### styles/acts.css (56)
 - Ряд действий карточки: правка, удаление, закладка.
-- селекторы (8): .film__acts, .film__wish,
+- селекторы (9): .film__acts, .film.is-collapsed .film__acts, .film__wish,
 .film__act, .film__wish .material-symbols-outlined,
 .film__act  .material-symbols-outlined, .film__wish:hover,
 .film__act:hover, .film__wish.is-on, .film__act[data-act="delete"]:hover, .film__act,
@@ -361,8 +361,7 @@
 
 ### styles/film.css (162)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
-- селекторы (20): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__acts,
-.film.is-collapsed .film__poster,
+- селекторы (20): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__poster,
 .film.is-collapsed .film__chips,
 .film.is-collapsed .film__facts,
 .film.is-collapsed .film__synopsis,

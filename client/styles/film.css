@@ -43,8 +43,8 @@
   transform: rotate(180deg);
 }
 
-/* Свёрнутая карточка — одна строка: название и оценка. */
-.film.is-collapsed .film__acts,
+/* Свёрнутая карточка — одна строка: название, действия и оценка. Ряд действий
+   не прячется, а переезжает — куда, сказано в `acts.css`. */
 .film.is-collapsed .film__poster,
 .film.is-collapsed .film__chips,
 .film.is-collapsed .film__facts,
