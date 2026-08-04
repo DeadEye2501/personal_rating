@@ -123,7 +123,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (105)
+### components/Film.svelte (146)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
 
@@ -184,9 +184,9 @@
 - Плашка сообщений: одна на всё приложение.
 - принимает: message
 
-### components/Stars.svelte (73)
+### components/Stars.svelte (75)
 - Ряд звёзд по числу ступеней: кликабельный или неподвижный с дробной.
-- принимает: score, onpick, onhover
+- принимает: score, onpick, onhover, tone
 
 ### components/Synopsis.svelte (128)
 - Описание карточки, обрезанное до трёх строк, с раскрытием и сворачиванием.
@@ -262,9 +262,9 @@
 - Куда встаёт строка, которую тащат указателем.
 - отдаёт: dragged
 
-### state/scores.js (107)
+### state/scores.js (125)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
-- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, toneOf, verdictOf
+- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, toneOf, toneOfMean, verdictOf, verdictOfMean
 
 ### state/scroll.js (23)
 - Арифметика своей полосы прокрутки.
@@ -441,10 +441,11 @@
 - объявляет: --halo-h, --neon
 - берёт: --body-m, --ease, --error, --glass-error, --r-full
 
-### styles/stars.css (84)
+### styles/stars.css (105)
 - Своя оценка: ряд звёзд, дробная звезда и ярлык словом.
-- селекторы (16): .film__scores, .film__aspect, .stars, .stars button,
-.stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars.is-flash .is-on .material-symbols-outlined, @keyframes star-flash, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect
+- селекторы (20): .film__scores, .film__aspect, .stars, .stars button,
+.stars > span, .stars .star--part, .stars .star--part i, .stars .star--part i .material-symbols-outlined, .stars .material-symbols-outlined, .stars .is-on, .stars.is-flash .is-on .material-symbols-outlined, @keyframes star-flash, .stars .is-on .material-symbols-outlined, .film__verdict, .film__scores--sides, .film__side, .film__scores--sides .film__aspect, .film__scores--sides .film__verdict, .film__scores.film__scores--avg, .film.is-collapsed .film__scores--avg, .film.is-collapsed .film__scores--aspect,
+.film.is-collapsed .film__scores--sides
 - берёт: --body-m, --fill, --score, --tint-16, --tint-35, --title-s
 
 ### styles/taglist.css (98)

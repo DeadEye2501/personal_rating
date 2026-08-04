@@ -966,7 +966,7 @@
   - `async def forget(self, kind: Kind, source: Source, source_id: str) -> None` (14)
   - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (20)
 
-### `backend/storage/repository/sections.py` — 187 строк
+### `backend/storage/repository/sections.py` — 202 строк
 
 Вопросы к отфильтрованному набору раздела.
 
@@ -976,8 +976,8 @@
 - `def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (16)
 - `def _included(query: Select, filters: Filters) -> Select` (18)
 - `def _excluded(query: Select, filters: Filters) -> Select` (23)
-- `class SectionsRepository(Repository)` (81)
-  - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (12)
+- `class SectionsRepository(Repository)` (88)
+  - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (19)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (35)
   - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
@@ -1418,7 +1418,6 @@
 - `async def steam_genres(client: httpx.AsyncClient) -> dict[str, str]` (11)
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
-
 
 ### `scripts/record_fixtures.py` — 281 строк
 
@@ -2185,13 +2184,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def search(sessions)` (4)
 
-### `tests/backend/test_sections.py` — 229 строк
+### `tests/backend/test_sections.py` — 298 строк
 
 Запросы разделов: что раздел показывает, в каком порядке и какой порцией.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 13
+Тестов: 16
 
 - `async def library(sessions)` (2)
 

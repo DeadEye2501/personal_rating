@@ -189,6 +189,75 @@ async def test_equal_scores_are_ordered_by_identifier(sessions, library, section
     assert second == sorted(ids)[3:]
 
 
+async def test_equal_scores_are_broken_by_the_time_of_rating(
+    sessions, library, sections
+):
+    """Ничью основного критерия разбивает дата раздела, свежим вверх.
+
+    Ожидаемый порядок не совпадает ни с порядком появления карточек, ни с
+    обратным: с двумя любой порядок совпал бы с одним из них, и снятый ключ
+    прошёл бы молча — порядок задал бы номер."""
+    ratings = RatingsRepository(sessions)
+    middle_id = await library.create(an_item("1", "На днях", year=2014))
+    new_id = await library.create(an_item("2", "Только что", year=2010))
+    old_id = await library.create(an_item("3", "Давно", year=2001))
+    await ratings.set_score(middle_id, 8.0, now=MOMENT - timedelta(days=2))
+    await ratings.set_score(new_id, 8.0, now=MOMENT)
+    await ratings.set_score(old_id, 8.0, now=MOMENT - timedelta(days=5))
+
+    found = await sections.ids(RATED, limit=50, offset=0)
+
+    assert found == [new_id, middle_id, old_id]
+
+
+async def test_equal_titles_are_broken_by_the_time_of_bookmarking(
+    sessions, library, sections
+):
+    """То же в отложенном, и дата там своя — закладки, а не оценки.
+
+    Ничья по названию достижима: одноимённых карточек схема не запрещает, а в
+    отложенном критериев всего два, и второй — как раз алфавит."""
+    wishlist = WishlistRepository(sessions)
+    middle_id = await library.create(an_item("1", "Тезис", year=2014))
+    new_id = await library.create(an_item("2", "Тезис", year=2010))
+    old_id = await library.create(an_item("3", "Тезис", year=2001))
+    await wishlist.add(middle_id, now=MOMENT - timedelta(days=2))
+    await wishlist.add(new_id, now=MOMENT)
+    await wishlist.add(old_id, now=MOMENT - timedelta(days=5))
+
+    found = await sections.ids(
+        replace(WANTED, order=Order(Sort.TITLE, descending=False)),
+        limit=50, offset=0,
+    )
+
+    assert found == [new_id, middle_id, old_id]
+
+
+async def test_the_rated_section_breaks_ties_by_its_own_date(
+    sessions, library, sections
+):
+    """Дата привязана к разделу, а не просто взята из двух подходящих колонок.
+
+    Отложены здесь все трое, и закладки расставлены против оценок: возьми
+    «Оценённые» чужую колонку — порядок выйдет обратным ожидаемому, а не
+    случайным. Без этого подмена одной таблицы на другую прошла бы молча:
+    оценки в тесте выше все равны, а закладок там нет вовсе."""
+    ratings = RatingsRepository(sessions)
+    wishlist = WishlistRepository(sessions)
+    middle_id = await library.create(an_item("1", "На днях", year=2014))
+    new_id = await library.create(an_item("2", "Только что", year=2010))
+    old_id = await library.create(an_item("3", "Давно", year=2001))
+    for item_id, rated_days, wished_days in [(middle_id, 2, 0), (new_id, 0, 5),
+                                             (old_id, 5, 2)]:
+        await ratings.set_score(item_id, 8.0,
+                                now=MOMENT - timedelta(days=rated_days))
+        await wishlist.add(item_id, now=MOMENT - timedelta(days=wished_days))
+
+    found = await sections.ids(RATED, limit=50, offset=0)
+
+    assert found == [new_id, middle_id, old_id]
+
+
 async def test_the_other_side_of_the_order(sessions, library, sections):
     """Кнопка в шапке перебирает четыре критерия в две стороны."""
     ratings = RatingsRepository(sessions)

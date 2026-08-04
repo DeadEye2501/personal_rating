@@ -32,6 +32,14 @@ _KEYS = {
     Sort.ADDED_AT: wishlist.c.added_at,
 }
 
+# Чем раздел разбивает ничью основного критерия. Пустых значений тут не бывает:
+# `_narrow` уже оставил в «Оценённых» только оценённое, а в отложенном — только
+# отложенное.
+_SECONDARY = {
+    Section.RATED: rating.c.updated_at,
+    Section.WISHLIST: wishlist.c.added_at,
+}
+
 
 def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select:
     """Номера карточек, у которых есть хоть одна из этих меток или жанров.
@@ -122,11 +130,18 @@ class SectionsRepository(Repository):
 
     async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]:
         key = _KEYS[feed.order.key]
-        # Второй ключ — идентификатор: без него равные оценки перетасовывались
-        # бы между порциями, и карточка попадала бы в две сразу либо ни в одну.
+        # Ничью основного критерия разбивает дата раздела, и всегда свежим
+        # вверх, куда бы ни смотрел основной: «внутри равных сначала недавнее» —
+        # это своё правило, а не изнанка выбранного. Когда критерий и есть эта
+        # дата, второй ключ на равных значениях не решает ничего, и ветки на
+        # такой случай нет: она была бы кодом без наблюдаемого следствия.
+        #
+        # Третий ключ — идентификатор: без него равные даты перетасовывались бы
+        # между порциями, и карточка попадала бы в две сразу либо ни в одну.
         query = (
             self._narrow(select(item.c.id), feed.section, feed.kind, feed.filters)
             .order_by(key.desc() if feed.order.descending else key.asc(),
+                      _SECONDARY[feed.section].desc(),
                       item.c.id)
             .limit(limit)
             .offset(offset)

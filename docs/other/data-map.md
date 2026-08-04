@@ -561,6 +561,7 @@
 
 - `_COLUMN` = `cast(rating.c.score, Integer)`
 - `_KEYS` = `словарь из 5`
+- `_SECONDARY` = `словарь из 2`
 
 ### `backend/storage/rescale.py`
 
@@ -690,7 +691,6 @@
 - `STEAM_APP` = `'https://store.steampowered.com/api/appdetails'`
 - `GOG_CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `EXAMPLES_PER_GENRE` = `2`
-
 
 ### `scripts/record_fixtures.py`
 
