@@ -940,14 +940,14 @@
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
-### `backend/storage/repository/ratings.py` — 60 строк
+### `backend/storage/repository/ratings.py` — 68 строк
 
 Моя оценка карточки.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`
 
-- `class RatingsRepository(Repository)` (46)
-  - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (11)
+- `class RatingsRepository(Repository)` (54)
+  - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (19)
   - `async def set_score(self, item_id: int, score: float | None, now: datetime) -> None` (3)
   - `async def set_aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None, now: datetime) -> float | None` (16)
   - `async def set_review(self, item_id: int, review: str, now: datetime) -> None` (2)
@@ -966,7 +966,7 @@
   - `async def forget(self, kind: Kind, source: Source, source_id: str) -> None` (14)
   - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (20)
 
-### `backend/storage/repository/sections.py` — 202 строк
+### `backend/storage/repository/sections.py` — 201 строк
 
 Вопросы к отфильтрованному набору раздела.
 
@@ -976,8 +976,8 @@
 - `def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (16)
 - `def _included(query: Select, filters: Filters) -> Select` (18)
 - `def _excluded(query: Select, filters: Filters) -> Select` (23)
-- `class SectionsRepository(Repository)` (88)
-  - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (19)
+- `class SectionsRepository(Repository)` (84)
+  - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (15)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (35)
   - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
@@ -2102,14 +2102,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_ratings.py` — 188 строк
+### `tests/backend/test_ratings.py` — 258 строк
 
 Своя оценка карточки и её пересчёт.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 16
+Тестов: 19
 
+- `async def _rated_at(engine, item_id)` (8)
 
 ### `tests/backend/test_relevance.py` — 218 строк
 
@@ -2184,15 +2185,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def search(sessions)` (4)
 
-### `tests/backend/test_sections.py` — 298 строк
+### `tests/backend/test_sections.py` — 343 строк ⚠ подошёл к 300
 
 Запросы разделов: что раздел показывает, в каком порядке и какой порцией.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 16
+Тестов: 18
 
 - `async def library(sessions)` (2)
+- `async def _rated_then_changed(sessions, library) -> list[int]` (18)
 
 ### `tests/backend/test_series_refresh.py` — 196 строк
 

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import case, select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Rating, average_score
@@ -17,11 +17,19 @@ class RatingsRepository(Repository):
         statement = insert(rating_table).values(
             item_id=item_id, created_at=now, updated_at=now, **values
         )
+        # `created_at` — когда карточка стала оценённой, а не когда завелась
+        # строка: строку заводит и рецензия. Условие смотрит на колонки, а не на
+        # `values`: оценка там своя у каждого пути и может не лежать вовсе.
+        appeared = case(
+            (rating_table.c.score.is_(None)
+             & statement.excluded.score.is_not(None),
+             statement.excluded.created_at),
+            else_=rating_table.c.created_at,
+        )
         await self._run(
             statement.on_conflict_do_update(
                 index_elements=[rating_table.c.item_id],
-                # created_at не трогаем: он про первую оценку, а не про последнюю.
-                set_={**values, "updated_at": now},
+                set_={**values, "updated_at": now, "created_at": appeared},
             )
         )
 

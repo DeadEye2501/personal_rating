@@ -24,9 +24,12 @@ _COLUMN = cast(rating.c.score, Integer)
 
 # Порядок по названию идёт по приведённой строке: встроенный в SQLite lower()
 # умеет только ASCII, и «Аватар» с «аватаром» разъехались бы.
+#
+# Время оценки — `created_at`, когда её поставили: соседний `updated_at` уезжал
+# бы и от смены балла, и от рецензии, и от каждой шкалы игры.
 _KEYS = {
     Sort.SCORE: rating.c.score,
-    Sort.RATED_AT: rating.c.updated_at,
+    Sort.RATED_AT: rating.c.created_at,
     Sort.YEAR: item.c.year,
     Sort.TITLE: folded(item.c.title),
     Sort.ADDED_AT: wishlist.c.added_at,
@@ -36,7 +39,7 @@ _KEYS = {
 # `_narrow` уже оставил в «Оценённых» только оценённое, а в отложенном — только
 # отложенное.
 _SECONDARY = {
-    Section.RATED: rating.c.updated_at,
+    Section.RATED: rating.c.created_at,
     Section.WISHLIST: wishlist.c.added_at,
 }
 
@@ -130,14 +133,10 @@ class SectionsRepository(Repository):
 
     async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]:
         key = _KEYS[feed.order.key]
-        # Ничью основного критерия разбивает дата раздела, и всегда свежим
-        # вверх, куда бы ни смотрел основной: «внутри равных сначала недавнее» —
-        # это своё правило, а не изнанка выбранного. Когда критерий и есть эта
-        # дата, второй ключ на равных значениях не решает ничего, и ветки на
-        # такой случай нет: она была бы кодом без наблюдаемого следствия.
-        #
-        # Третий ключ — идентификатор: без него равные даты перетасовывались бы
-        # между порциями, и карточка попадала бы в две сразу либо ни в одну.
+        # Ничью разбивает дата раздела, и всегда свежим вверх: сторона у неё
+        # своя, а не изнанка выбранного критерия. Третий ключ — номер: без него
+        # равные даты перетасовывались бы между порциями, и карточка попадала бы
+        # в две сразу либо ни в одну.
         query = (
             self._narrow(select(item.c.id), feed.section, feed.kind, feed.filters)
             .order_by(key.desc() if feed.order.descending else key.asc(),

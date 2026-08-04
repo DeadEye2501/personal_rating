@@ -1,5 +1,7 @@
 """Своя оценка карточки и её пересчёт."""
 
+from datetime import timedelta
+
 import pytest
 from sqlalchemy import select
 
@@ -89,6 +91,74 @@ async def test_second_write_updates_and_keeps_created_at(sessions, engine, card)
     assert row.score == 9.0
     assert row.created_at == WHEN
     assert row.updated_at == LATER
+
+
+async def _rated_at(engine, item_id):
+    """Время оценки прямо из базы: наружу ни одна из двух дат не выходит вовсе,
+    и спросить их можно только так."""
+    async with engine.connect() as connection:
+        return (await connection.execute(
+            select(rating_table.c.created_at)
+            .where(rating_table.c.item_id == item_id)
+        )).one().created_at
+
+
+async def test_the_review_written_before_the_score_is_not_the_time_of_rating(
+    sessions, engine, card
+):
+    """`created_at` — момент, когда карточка стала оценённой, а не когда завелась
+    строка. Рецензия строку заводит, оценённой карточку не делает, и первая
+    оценка обязана переставить время на себя.
+
+    Вторая рецензия — обратная сторона того же условия: писать её можно сколько
+    угодно, времени оценки это не касается."""
+    much_later = LATER + timedelta(days=1)
+    item_id = await card()
+    repository = RatingsRepository(sessions)
+    await repository.set_review(item_id, "пока не смотрел", now=WHEN)
+    await repository.set_score(item_id, 8.0, now=LATER)
+
+    assert await _rated_at(engine, item_id) == LATER
+
+    await repository.set_review(item_id, "посмотрел", now=much_later)
+
+    assert await _rated_at(engine, item_id) == LATER
+
+
+async def test_rating_anew_after_taking_the_score_away_stamps_a_fresh_time(
+    sessions, engine, card
+):
+    """Снятая оценка — снятый факт: следующая ставится с нуля и временем себя.
+
+    Строка при этом никуда не девается — `set_score(None)` её не сносит, — то
+    есть отличить «оценка появилась» от «строка появилась» больше нечем, кроме
+    самой оценки."""
+    much_later = LATER + timedelta(days=1)
+    item_id = await card()
+    repository = RatingsRepository(sessions)
+    await repository.set_score(item_id, 3.0, now=WHEN)
+    await repository.set_score(item_id, None, now=LATER)
+    await repository.set_score(item_id, 4.0, now=much_later)
+
+    assert await _rated_at(engine, item_id) == much_later
+
+
+async def test_rating_a_game_anew_after_clearing_the_aspects_stamps_a_fresh_time(
+    sessions, engine, card
+):
+    """У игры оценка снимается снятием всех трёх шкал: среднее из ничего пусто.
+    Выставленная после этого шкала заводит оценку заново, а не правит прежнюю.
+
+    Путь сюда свой: `set_aspects` пишет оценку выведенной, а не переданной, и
+    условие «прежней оценки не было» обязано смотреть на неё же."""
+    much_later = LATER + timedelta(days=1)
+    item_id = await card(Kind.GAME)
+    repository = RatingsRepository(sessions)
+    await repository.set_aspects(item_id, 8, 7, 7, now=WHEN)
+    await repository.set_aspects(item_id, None, None, None, now=LATER)
+    await repository.set_aspects(item_id, 6, None, None, now=much_later)
+
+    assert await _rated_at(engine, item_id) == much_later
 
 
 async def test_a_second_write_does_not_add_a_second_row(sessions, engine, card):

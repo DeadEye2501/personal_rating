@@ -12,7 +12,7 @@ from backend.model import Kind, Order, Sort, Source
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.wishlist import WishlistRepository
-from tests.conftest import MOMENT, RATED, WANTED, an_item
+from tests.conftest import LATER, MOMENT, RATED, WANTED, an_item
 
 
 @pytest.fixture
@@ -256,6 +256,51 @@ async def test_the_rated_section_breaks_ties_by_its_own_date(
     found = await sections.ids(RATED, limit=50, offset=0)
 
     assert found == [new_id, middle_id, old_id]
+
+
+async def _rated_then_changed(sessions, library) -> list[int]:
+    """Три карточки: оценены по очереди, переоценены в обратном порядке.
+
+    После этого время появления оценки и время последней правки расходятся
+    полностью — по одному лента встаёт так, по другому ровно наоборот. Оценки
+    равны внутри каждого круга: перестановка с тройки на четвёрку — это правка
+    оценки, а не новая оценка, и порядка она не касается.
+
+    Отдаёт номера в ожидаемом порядке: сначала оценённый последним."""
+    ratings = RatingsRepository(sessions)
+    ids = [await library.create(an_item(str(number), f"Фильм {number}",
+                                        year=2000 + number))
+           for number in range(3)]
+    for number, item_id in enumerate(ids):
+        await ratings.set_score(item_id, 3.0, now=MOMENT + timedelta(days=number))
+    for number, item_id in enumerate(reversed(ids)):
+        await ratings.set_score(item_id, 4.0, now=LATER + timedelta(days=number))
+    return list(reversed(ids))
+
+
+async def test_the_time_of_rating_is_when_the_score_appeared(
+    sessions, library, sections
+):
+    """Критерий «по времени оценки» смотрит на появление оценки, а не на
+    последнюю правку."""
+    expected = await _rated_then_changed(sessions, library)
+
+    found = await sections.ids(replace(RATED, order=Order(Sort.RATED_AT)),
+                               limit=50, offset=0)
+
+    assert found == expected
+
+
+async def test_the_tie_breaker_is_when_the_score_appeared(
+    sessions, library, sections
+):
+    """То же и у вторичного ключа: он берёт ту же дату, что и критерий, а не
+    соседнюю колонку с временем правки."""
+    expected = await _rated_then_changed(sessions, library)
+
+    found = await sections.ids(RATED, limit=50, offset=0)
+
+    assert found == expected
 
 
 async def test_the_other_side_of_the_order(sessions, library, sections):
