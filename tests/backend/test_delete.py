@@ -38,7 +38,8 @@ async def furnished(sessions, posters, item_id: int, tag: str = "пересмо�
 async def test_deletion_summary_lists_what_will_be_lost(sessions, posters, card):
     item_id = await furnished(sessions, posters, await card())
     summary = await LibraryRepository(sessions).deletion_summary(item_id)
-    assert summary == {"has_rating": True, "tags": 1, "in_wishlist": True}
+    assert summary == {"has_rating": True, "has_review": False, "tags": 1,
+                       "in_wishlist": True}
 
 
 async def test_summary_counts_only_the_asked_card(sessions, posters, card):
@@ -48,24 +49,35 @@ async def test_summary_counts_only_the_asked_card(sessions, posters, card):
     bare = await card(source_id="2")
 
     summary = await LibraryRepository(sessions).deletion_summary(bare)
-    assert summary == {"has_rating": False, "tags": 0, "in_wishlist": False}
+    assert summary == EMPTY
 
+
+EMPTY = {"has_rating": False, "has_review": False, "tags": 0,
+         "in_wishlist": False}
 
 ALONE = [
-    ("has_rating", {"has_rating": True, "tags": 0, "in_wishlist": False}),
-    ("tags", {"has_rating": False, "tags": 1, "in_wishlist": False}),
-    ("in_wishlist", {"has_rating": False, "tags": 0, "in_wishlist": True}),
+    ("has_rating", {**EMPTY, "has_rating": True}),
+    ("has_review", {**EMPTY, "has_review": True}),
+    ("tags", {**EMPTY, "tags": 1}),
+    ("in_wishlist", {**EMPTY, "in_wishlist": True}),
 ]
 
 
 @pytest.mark.parametrize(("what", "expected"), ALONE)
-async def test_summary_tells_the_three_apart(sessions, card, what, expected):
-    """Каждое из трёх — своё, и на карточке, где есть только оно. Вешая всё
+async def test_summary_tells_the_four_apart(sessions, card, what, expected):
+    """Каждое из четырёх — своё, и на карточке, где есть только оно. Вешая всё
     сразу, тест не отличит перепутанные местами поля: сводка «всё есть» сойдётся
-    при любой путанице, а «ничего нет» — при любой другой."""
+    при любой путанице, а «ничего нет» — при любой другой.
+
+    Оценка и рецензия при этом лежат в одной строке базы, и различать их
+    обязательно: у карточки с одной рецензией вопрос «Оценка пропадёт?» — ложь в
+    обе стороны сразу."""
     item_id = await card()
+    ratings = RatingsRepository(sessions)
     if what == "has_rating":
-        await RatingsRepository(sessions).set_score(item_id, 9.0, now=WHEN)
+        await ratings.set_score(item_id, 9.0, now=WHEN)
+    elif what == "has_review":
+        await ratings.set_review(item_id, "смотрел, не понравилось", now=WHEN)
     elif what == "tags":
         tags = TagsRepository(sessions)
         await tags.assign(item_id, await tags.create(Kind.MOVIE, "один"))

@@ -19,7 +19,8 @@
 
   let { session, query = null, person = null, expected = [], root = null,
         tagged = {}, forgotten = [], saved = null, removed = null,
-        ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag } = $props()
+        reviewed = null, ontrouble, onmark, onperson, onopen, onedit, ondelete,
+        onreview, ontag } = $props()
 
   let views = $state([])
   // Список убранного вместо выдачи. Признак приходит из ответа, а не
@@ -194,9 +195,9 @@
     views = views.map((each) => same(each, view) ? { ...each, ...fields } : each)
   }
 
-  /** Оба эффекта слушают **только** свой сигнал: `views` они и читают, и пишут,
-   *  а такой круг проект уже ловил — эффект по своему же списку не кончается
-   *  никогда.
+  /** Все три эффекта ниже слушают **только** свой сигнал: `views` они и читают,
+   *  и пишут, а такой круг проект уже ловил — эффект по своему же списку не
+   *  кончается никогда.
    *
    *  Правленую карточку выдача перечитывает у себя, а не спрашивает источник
    *  заново: это поход в сеть ради того, что уже лежит в базе. */
@@ -208,6 +209,13 @@
   $effect(() => {
     const gone = removed
     if (gone) untrack(() => { views = without(views, gone) })
+  })
+
+  // Записанная рецензия правит свою строку на месте, как и в ленте: текст уже
+  // здесь, и перечитывать ради него карточку из базы незачем.
+  $effect(() => {
+    const written = reviewed
+    if (written) untrack(() => patch(written.view, written.fields))
   })
 
   function again(done) {
@@ -301,5 +309,5 @@
         applying(view, (full) => aspected(full, key, value)).catch(lost)}
       oncollapse={collapse} onedit={(view) => edit(view).catch(lost)}
       {ondelete} onwish={(view) => applying(view, wished).catch(lost)}
-      {ontag} />
+      {onreview} {ontag} />
 {/if}

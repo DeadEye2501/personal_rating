@@ -5,6 +5,7 @@
   import Confirm from '$components/Confirm.svelte'
   import FiltersModal from './FiltersModal.svelte'
   import LibraryScreen from './LibraryScreen.svelte'
+  import ReviewModal from './ReviewModal.svelte'
   import SearchScreen from './SearchScreen.svelte'
   import StatsScreen from './StatsScreen.svelte'
   import Topbar from './Topbar.svelte'
@@ -66,6 +67,15 @@
   // она нужна корнем наблюдателя: иначе запас догрузки не действует.
   let content = $state()
 
+  // Карточка, которой пишут рецензию, и записанное по ней.
+  //
+  // Сигнал несёт саму строку, а не номер: у ленты `patch` ищет по номеру, у
+  // выдачи поиска — по паре «источник плюс идентификатор», и обе половины умеют
+  // это сами. Момент — по той же причине, что у `saved` и `removed`: вторая
+  // правка тем же текстом иначе эффект не разбудит.
+  let reviewing = $state(null)
+  let reviewed = $state(null)
+
   // Карточка, которой правят теги, и её метки, уже сохранённые.
   let tagging = $state(null)
   // Метки, доехавшие до ленты раньше, чем она перечитается: карточка обязана
@@ -97,8 +107,8 @@
 
   const marks = $derived(tagged.asked === asked ? tagged.cards : {})
 
-  // Плашка одна на приложение, и говорят в неё все трое наложений и все четыре
-  // раздела — одинаково.
+  // Плашка одна на приложение, и говорят в неё все четыре наложения и все
+  // четыре раздела — одинаково.
   const complain = (text) => { trouble = { text } }
 
   // Своё сборка тоже не глотает: три её вызова моста — удаление, сводка и
@@ -306,8 +316,9 @@
                     onopen={open}
                     onedit={(view) => { editing = view }}
                     ondelete={askRemoval}
-                    {saved} {removed}
+                    {saved} {removed} {reviewed}
                     tagged={marks} {forgotten}
+                    onreview={(view) => { reviewing = view }}
                     ontag={(view) => { tagging = view }} />
           </section>
         {/key}
@@ -326,6 +337,17 @@
                     onforget={forget}
                     ontrouble={complain}
                     onclose={() => { modal = null }} />
+    {/key}
+  {/if}
+
+  <!-- `{#key}` по той же причине, что у соседей: подмена карточки под окном
+       переиспользовала бы его вместе с уже набранным чужим текстом. -->
+  {#if reviewing}
+    {#key reviewing.item_id}
+      <ReviewModal view={reviewing} ontrouble={complain}
+                   onsaved={(card, fields) => { reviewed = { view: card, fields,
+                                                            at: Date.now() } }}
+                   onclose={() => { reviewing = null }} />
     {/key}
   {/if}
 

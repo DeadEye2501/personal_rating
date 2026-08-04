@@ -917,7 +917,7 @@
   - `async def genres_of(self, item_id: int) -> list[Genre]` (8)
   - `async def list_for_kind(self, kind: GenreKind) -> list[Genre]` (10)
 
-### `backend/storage/repository/library.py` — 218 строк
+### `backend/storage/repository/library.py` — 228 строк
 
 Карточки библиотеки.
 
@@ -925,7 +925,7 @@
 
 - `def _named(entity: Entity, needle: str)` (13)
 - `def _values(item: Item) -> dict` (6)
-- `class LibraryRepository(Repository)` (171)
+- `class LibraryRepository(Repository)` (181)
   - `async def _one(self, statement: Select) -> Item | None` (2)
   - `async def create(self, item: Item) -> int` (5)
   - `async def get(self, item_id: int) -> Item | None` (2)
@@ -933,21 +933,21 @@
   - `async def list_by_kind(self, kind: Kind, limit: int, offset: int) -> list[Item]` (18)
   - `async def find_by_title(self, kind: Kind, title: str) -> list[Item]` (16)
   - `async def search(self, kind: Kind, query: str, limit: int) -> list[int]` (37)
-  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (12)
+  - `async def deletion_summary(self, item_id: int) -> dict[str, int | bool]` (22)
   - `async def delete(self, item_id: int) -> None` (5)
   - `async def refresh_series_counts(self, item_id: int, seasons_count: int | None, episodes_count: int | None, now: datetime) -> None` (14)
   - `async def replace_fields(self, item_id: int, item: Item) -> None` (13)
   - `async def link(self, item_id: int, source: Source, source_id: str, now: datetime) -> None` (15)
   - `async def unlink(self, item_id: int) -> None` (8)
 
-### `backend/storage/repository/ratings.py` — 68 строк
+### `backend/storage/repository/ratings.py` — 85 строк
 
 Моя оценка карточки.
 
 Зависит от: `backend.model`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.statements`, `backend.storage.tables`
 
-- `class RatingsRepository(Repository)` (54)
-  - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (19)
+- `class RatingsRepository(Repository)` (71)
+  - `async def _write(self, item_id: int, values: dict, now: datetime) -> None` (36)
   - `async def set_score(self, item_id: int, score: float | None, now: datetime) -> None` (3)
   - `async def set_aspects(self, item_id: int, visual: int | None, narrative: int | None, gameplay: int | None, now: datetime) -> float | None` (16)
   - `async def set_review(self, item_id: int, review: str, now: datetime) -> None` (2)
@@ -1767,7 +1767,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 3
 
 
-### `tests/backend/test_delete.py` — 156 строк
+### `tests/backend/test_delete.py` — 168 строк
 
 Удаление карточки из двух файлов базы и что пропадает вместе с ней.
 
@@ -2117,13 +2117,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_ratings.py` — 258 строк
+### `tests/backend/test_ratings.py` — 358 строк ⚠ подошёл к 300
 
 Своя оценка карточки и её пересчёт.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 19
+Тестов: 26
 
 - `async def _rated_at(engine, item_id)` (8)
 

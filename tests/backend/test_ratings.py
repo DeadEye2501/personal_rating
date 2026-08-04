@@ -50,12 +50,16 @@ async def test_unset_aspect_does_not_drag_the_score_down(sessions, card):
 
 
 async def test_clearing_all_aspects_leaves_no_score(sessions, card):
+    """Среднее из ничего пусто, и отдаётся оно тому, кто снимал: страница красит
+    звёзды по этому ответу, не перечитывая базу.
+
+    Хранилище на это отвечает отсутствием строки, а не пустой оценкой в ней, —
+    сторожит `test_clearing_all_three_aspects_leaves_no_empty_row`."""
     item_id = await card(Kind.GAME)
     repository = RatingsRepository(sessions)
     await repository.set_aspects(item_id, 8, 7, 7, now=WHEN)
     score = await repository.set_aspects(item_id, None, None, None, now=LATER)
     assert score is None
-    assert (await repository.get(item_id)).score is None
 
 
 async def test_the_first_write_stamps_both_times_with_now(sessions, engine, card):
@@ -130,9 +134,8 @@ async def test_rating_anew_after_taking_the_score_away_stamps_a_fresh_time(
 ):
     """Снятая оценка — снятый факт: следующая ставится с нуля и временем себя.
 
-    Строка при этом никуда не девается — `set_score(None)` её не сносит, — то
-    есть отличить «оценка появилась» от «строка появилась» больше нечем, кроме
-    самой оценки."""
+    Путь сюда лежит через опустевшую строку, которую запись сносит: время новой
+    оценки от этого не зависит и обязано быть её собственным."""
     much_later = LATER + timedelta(days=1)
     item_id = await card()
     repository = RatingsRepository(sessions)
@@ -149,8 +152,9 @@ async def test_rating_a_game_anew_after_clearing_the_aspects_stamps_a_fresh_time
     """У игры оценка снимается снятием всех трёх шкал: среднее из ничего пусто.
     Выставленная после этого шкала заводит оценку заново, а не правит прежнюю.
 
-    Путь сюда свой: `set_aspects` пишет оценку выведенной, а не переданной, и
-    условие «прежней оценки не было» обязано смотреть на неё же."""
+    Путь сюда свой: `set_aspects` пишет оценку выведенной, а не переданной, — и
+    лежит он через опустевшую строку, которую запись сносит. Время новой оценки
+    от этого не зависит и обязано быть её собственным."""
     much_later = LATER + timedelta(days=1)
     item_id = await card(Kind.GAME)
     repository = RatingsRepository(sessions)
@@ -159,6 +163,102 @@ async def test_rating_a_game_anew_after_clearing_the_aspects_stamps_a_fresh_time
     await repository.set_aspects(item_id, 6, None, None, now=much_later)
 
     assert await _rated_at(engine, item_id) == much_later
+
+
+async def test_taking_the_score_away_leaves_no_empty_row(sessions, engine, card):
+    """Строка отметок хранит четыре вещи: балл, три шкалы и рецензию. Не
+    осталось ни одной — хранить нечего, и строка уходит.
+
+    Иначе снятая оценка оставляет запись, которая не значит ничего: карточка с
+    ней и карточка без строки вовсе снаружи неразличимы."""
+    item_id = await card()
+    repository = RatingsRepository(sessions)
+    await repository.set_score(item_id, 8.0, now=WHEN)
+    await repository.set_score(item_id, None, now=LATER)
+
+    assert await repository.get(item_id) is None
+    async with engine.connect() as connection:
+        assert (await connection.execute(select(rating_table.c.item_id))).all() == []
+
+
+async def test_erasing_the_review_leaves_no_empty_row(sessions, card):
+    """Пустой текст — это «рецензии нет», и своего пути у него нет: у карточки,
+    которую не оценивали, стёртая рецензия обязана унести строку за собой."""
+    item_id = await card()
+    repository = RatingsRepository(sessions)
+    await repository.set_review(item_id, "посмотрел, не понравилось", now=WHEN)
+    await repository.set_review(item_id, "", now=LATER)
+
+    assert await repository.get(item_id) is None
+
+
+async def test_an_empty_review_does_not_touch_a_living_score(sessions, card):
+    """Пустота одной колонки — не повод сносить строку: рецензии нет, а оценка
+    есть, и она в той же строке."""
+    item_id = await card()
+    repository = RatingsRepository(sessions)
+    await repository.set_score(item_id, 8.0, now=WHEN)
+    await repository.set_review(item_id, "", now=LATER)
+
+    assert (await repository.get(item_id)).score == 8.0
+
+
+async def test_taking_the_score_away_keeps_the_row_with_a_review(sessions, card):
+    """Обратная сторона того же условия: снятая оценка уносит строку только
+    тогда, когда рецензии в ней тоже нет."""
+    item_id = await card()
+    repository = RatingsRepository(sessions)
+    await repository.set_review(item_id, "смотрел давно", now=WHEN)
+    await repository.set_score(item_id, 8.0, now=WHEN)
+    await repository.set_score(item_id, None, now=LATER)
+
+    stored = await repository.get(item_id)
+    assert (stored.score, stored.review) == (None, "смотрел давно")
+
+
+@pytest.mark.parametrize("kept", ["visual", "narrative", "gameplay"])
+async def test_a_single_aspect_holds_the_row_without_a_score(sessions, card, kept):
+    """Каждая шкала держит строку сама по себе, и проверяются они порознь: у
+    трёх условий разом сторож не отличит снятое одно от снятых всех.
+
+    Состояние достижимое: шкалы у игры выставлены, а `set_score(None)` снимает
+    средний балл, не трогая их. Снеси код условие по одной шкале — выставленная
+    оценка стороны ушла бы в никуда."""
+    item_id = await card(Kind.GAME)
+    repository = RatingsRepository(sessions)
+    await repository.set_aspects(item_id, **{"visual": None, "narrative": None,
+                                             "gameplay": None, kept: 7},
+                                 now=WHEN)
+    await repository.set_score(item_id, None, now=LATER)
+
+    assert getattr(await repository.get(item_id), kept) == 7
+
+
+async def test_emptying_one_card_does_not_touch_another(sessions, card):
+    """Снос идёт по своей карточке, а не по всем пустым разом. На одной карточке
+    это не наблюдается ничем: убери условие по номеру — и тест, где карточка
+    одна, останется зелёным, а в базе пропадала бы чужая строка."""
+    ratings = RatingsRepository(sessions)
+    mine = await card(source_id="1")
+    other = await card(source_id="2")
+    await ratings.set_review(other, "чужая рецензия", now=WHEN)
+
+    await ratings.set_score(mine, 8.0, now=WHEN)
+    await ratings.set_score(mine, None, now=LATER)
+
+    assert await ratings.get(mine) is None
+    assert (await ratings.get(other)).review == "чужая рецензия"
+
+
+async def test_clearing_all_three_aspects_leaves_no_empty_row(sessions, card):
+    """У игры оценка снимается снятием всех трёх шкал, и путь сюда свой:
+    `set_aspects` пишет разом четыре колонки из пяти."""
+    item_id = await card(Kind.GAME)
+    repository = RatingsRepository(sessions)
+    await repository.set_aspects(item_id, 8, 7, 7, now=WHEN)
+    await repository.set_aspects(item_id, None, None, None, now=LATER)
+
+    assert await repository.get(item_id) is None
 
 
 async def test_a_second_write_does_not_add_a_second_row(sessions, engine, card):

@@ -1,4 +1,4 @@
-/* Свои отметки на карточке: оценка и закладка. */
+/* Свои отметки на карточке: оценка, закладка и рецензия. */
 
 import { call } from '$api/bridge.js'
 
@@ -24,6 +24,14 @@ export async function wished(view) {
     ? call('marks.unwish', view.item_id)
     : call('marks.wish', view.item_id))
   return { in_wishlist: !view.in_wishlist }
+}
+
+/** Рецензия ложится в ту же строку базы, что и оценка, и доливается к ней:
+ *  запись одной не смеет стереть другую. Пустой текст — это «рецензии нет», и
+ *  он доезжает пустым: гасит кнопку сохранённая пустота, а не отдельный путь. */
+export async function reviewed(view, text) {
+  await call('marks.review', view.item_id, text)
+  return { rating: { ...view.rating, review: text } }
 }
 
 /** Три шкалы уезжают вместе, потому что средний балл считает база: у игры

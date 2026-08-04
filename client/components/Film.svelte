@@ -13,7 +13,7 @@
     from '$state/scores.js'
 
   let { view, collapsed = false, expected = [], on, oncollapse, onmark,
-        onperson, onopen, ontag, onscore, onaspect, onedit, ondelete,
+        onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete,
         onwish } = $props()
 
   // Год приклеивается здесь, а не в разметке: ведущий пробел текстового узла в
@@ -40,6 +40,17 @@
   const shownMean = $derived(average(
     ASPECTS.map((one) => showing(one.key, rating?.[one.key]) ?? null)))
 </script>
+
+<!-- Ряд действий стоит в четырёх раскладках сразу — у каждой строки оценок
+     своей, — и разъехаться они не вправе: кнопки на карточке одни и те же.
+     Рецензии у строки без номера нет вовсе, как и тега: писать её не к чему,
+     пока нет карточки. -->
+{#snippet acts()}
+  <Acts wished={view.in_wishlist} reviewed={Boolean(view.rating?.review)}
+        onedit={() => onedit(view)} ondelete={() => ondelete(view)}
+        onreview={view.item_id ? () => onreview(view) : null}
+        onwish={() => onwish(view)} />
+{/snippet}
 
 <article class="film" class:is-collapsed={collapsed}>
   <button type="button" class="icon-btn film__toggle" aria-expanded={!collapsed}
@@ -94,9 +105,7 @@
                  красилось бы четвёркой. -->
             <span class="film__verdict" style:--score={toneOfMean(shownMean)}
             >{verdictOfMean(shownMean)}</span>
-            <Acts wished={view.in_wishlist}
-                  onedit={() => onedit(view)}
-                  ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+            {@render acts()}
           </div>
         {:else}
           {#each ASPECTS as aspect, index (aspect.key)}
@@ -112,9 +121,7 @@
                     style:--score={toneOf(showing(aspect.key, rating?.[aspect.key]))}
               >{verdictOf(showing(aspect.key, rating?.[aspect.key]))}</span>
               {#if index === ASPECTS.length - 1}
-                <Acts wished={view.in_wishlist}
-                      onedit={() => onedit(view)}
-                      ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+                {@render acts()}
               {/if}
             </div>
           {/each}
@@ -131,9 +138,7 @@
           <Stars score={mean} tone={toneOfMean(mean)} />
           <!-- Свой ряд, а не тот, что стоит в строках сторон: у игры видимая
                строка меняется со свёрнутостью, и ряд обязан ехать с ней. -->
-          <Acts wished={view.in_wishlist}
-                onedit={() => onedit(view)}
-                ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+          {@render acts()}
         </div>
       {:else}
         <div class="film__scores">
@@ -141,9 +146,7 @@
                  onhover={(step) => { over = { ...over, score: step } }} />
           <span class="film__verdict" style:--score={toneOf(showing('score', mean))}
           >{verdictOf(showing('score', mean))}</span>
-          <Acts wished={view.in_wishlist}
-                onedit={() => onedit(view)}
-                ondelete={() => ondelete(view)} onwish={() => onwish(view)} />
+          {@render acts()}
         </div>
       {/if}
     </div>

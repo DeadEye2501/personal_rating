@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме проверок.
-import { aspected, scored, wished } from '../../client/app/marks.js'
+import { aspected, reviewed, scored, wished } from '../../client/app/marks.js'
 import { fake } from './fake.js'
 
 const film = { item_id: 7, rating: { score: 5 } }
@@ -69,6 +69,37 @@ describe('свои отметки на карточке', () => {
     expect(off).toEqual([['marks.unwish', [7]]])
   })
 
+  it('рецензия пишется к своей карточке и не трогает оценку', async () => {
+    // Оценка и рецензия живут в одной строке базы, и запись одной не смеет
+    // стереть другую: у карточки с баллом рецензия доливается к нему.
+    const asked = fake({ 'marks.review': { ok: null } })
+
+    const fields = await reviewed(film, 'смотрел трижды')
+
+    expect(asked).toEqual([['marks.review', [7, 'смотрел трижды']]])
+    expect(fields).toEqual({ rating: { score: 5, review: 'смотрел трижды' } })
+  })
+
+  it('пустой текст — это «рецензии нет», и он доезжает пустым', async () => {
+    // Отдельного «удалить рецензию» нет: гасит кнопку сохранённая пустота.
+    const asked = fake({ 'marks.review': { ok: null } })
+
+    const fields = await reviewed({ item_id: 7, rating: { review: 'было' } }, '')
+
+    expect(asked).toEqual([['marks.review', [7, '']]])
+    expect(fields.rating.review).toBe('')
+  })
+
+  it('рецензия у карточки без оценок вовсе не падает', async () => {
+    // Свежезаведённая карточка приезжает без `rating`: первая рецензия по ней —
+    // обычный ход, и заводит она ту же строку, что и первая звезда.
+    fake({ 'marks.review': { ok: null } })
+
+    const fields = await reviewed({ item_id: 3, rating: null }, 'коротко')
+
+    expect(fields.rating).toEqual({ review: 'коротко' })
+  })
+
   it('отказ записи доходит до просителя, а не глотается', async () => {
     // Молчание тут запрещено правилом отказов: не дошло до базы — человек
     // обязан узнать, а журнал получить след. Обещание отклоняется, и ловит его
@@ -89,6 +120,14 @@ describe('свои отметки на карточке', () => {
     fake({ 'marks.aspects': { fail: 'broken' } })
 
     await expect(aspected(game, 'visual', 3)).rejects.toMatchObject({ kind: 'broken' })
+  })
+
+  it('отказ записи рецензии доходит так же', async () => {
+    // Окно на этом остаётся открытым, чтобы набранное не пропало, — но узнать
+    // об отказе оно может только отклонённым обещанием.
+    fake({ 'marks.review': { fail: 'timeout' } })
+
+    await expect(reviewed(film, 'текст')).rejects.toMatchObject({ kind: 'timeout' })
   })
 
   it('оценка первой шкалы у карточки без оценок вовсе не падает', async () => {

@@ -1,8 +1,11 @@
-<!-- Ряд действий карточки: правка, удаление, закладка. -->
+<!-- Ряд действий карточки: правка, удаление, рецензия, закладка. -->
 <script>
   import Icon from '$components/Icon.svelte'
 
-  let { wished = false, onedit, ondelete, onwish } = $props()
+  // `onreview` пустует у строки, которой ещё нет в базе: писать рецензию не к
+  // чему, пока нет карточки. То же правило, что у кнопки тега.
+  let { wished = false, reviewed = false, onedit, ondelete, onreview,
+        onwish } = $props()
 </script>
 
 <div class="film__acts">
@@ -14,6 +17,12 @@
           onclick={ondelete}>
     <Icon name="delete" />
   </button>
+  {#if onreview}
+    <button type="button" class="icon-btn film__act" class:is-on={reviewed}
+            data-act="review" aria-label="Рецензия" onclick={onreview}>
+      <Icon name="description" />
+    </button>
+  {/if}
   <button type="button" class="icon-btn film__wish" class:is-on={wished}
           aria-pressed={wished} aria-label="Хочу посмотреть" onclick={onwish}>
     <Icon name="bookmark" />

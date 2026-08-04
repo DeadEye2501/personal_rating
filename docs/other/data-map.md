@@ -761,7 +761,8 @@
 
 ### `tests/backend/test_delete.py`
 
-- `ALONE` = `набор из 3`
+- `EMPTY` = `словарь из 4`
+- `ALONE` = `набор из 4`
 
 ### `tests/backend/test_denied.py`
 

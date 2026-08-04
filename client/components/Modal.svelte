@@ -5,8 +5,11 @@
 </script>
 
 <script>
-  let { narrow = false, ask = false, danger = false, card = false, label,
-        onclose, children } = $props()
+  // `wide` — общая геометрия карточки и рецензии: ширина, отступы, сетка.
+  // Своим признаком, а не выводом из двух соседних: вывод — это логика, а
+  // компоненту положено показывать переданное.
+  let { narrow = false, ask = false, danger = false, card = false,
+        review = false, wide = false, label, onclose, children } = $props()
 
   // Место в стопке занимается при создании, а не в эффекте: слушатель окна
   // ставится синхронно, и между созданием и первым эффектом окно уже ловит
@@ -48,6 +51,7 @@
 <div class="overlay" onpointerdown={press} onclick={outside}>
   <div class="modal" class:modal--narrow={narrow} class:modal--ask={ask}
        class:modal--danger={danger} class:modal--card={card}
+       class:modal--review={review} class:modal--wide={wide}
        role="dialog" aria-modal="true" aria-label={label}>
     {@render children()}
   </div>

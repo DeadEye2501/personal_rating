@@ -151,8 +151,18 @@ class LibraryRepository(Repository):
             .select_from(item_tag_table)
             .where(item_tag_table.c.item_id == item_id)
         )
+        # Оценка и рецензия лежат в одной строке, и наличием строки их не
+        # различить: рецензия заводит её сама, со `score = NULL`. Спрошенные
+        # порознь, они и в вопросе называются порознь — иначе карточке с одной
+        # рецензией окно обещало бы потерю оценки, которой нет, и молчало бы о
+        # том, что пропадёт на самом деле.
+        mine = await self._row(
+            select(rating_table.c.score, rating_table.c.review)
+            .where(rating_table.c.item_id == item_id)
+        )
         return {
-            "has_rating": await self._has_item(rating_table, item_id),
+            "has_rating": mine is not None and mine.score is not None,
+            "has_review": bool(mine is not None and mine.review),
             "tags": tags.count,
             "in_wishlist": await self._has_item(wishlist_table, item_id),
         }

@@ -19,8 +19,8 @@
   const PAGE = 50
 
   let { session, expected = [], root = null, tagged = {}, forgotten = [],
-        ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag,
-        saved = null, removed = null } = $props()
+        ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag,
+        saved = null, removed = null, reviewed = null } = $props()
 
   let views = $state([])
   let done = $state(false)
@@ -115,15 +115,23 @@
       each.item_id === view.item_id ? { ...each, ...fields } : each)
   }
 
-  /** Оба эффекта слушают **только** свой сигнал: `views` они и читают, и пишут,
-   *  а такой круг проект уже ловил — эффект по своему же списку не кончается
-   *  никогда.
+  /** Все три эффекта ниже слушают **только** свой сигнал: `views` они и читают,
+   *  и пишут, а такой круг проект уже ловил — эффект по своему же списку не
+   *  кончается никогда.
    *
    *  Записанной заново в списке может не быть — тогда перечитывать нечего, она
    *  придёт со следующей порцией. */
   $effect(() => {
     const done = saved
     if (done) untrack(() => again(done))
+  })
+
+  // Записанная рецензия правит свою строку на месте: перечитывать ради неё
+  // карточку из базы незачем — текст уже здесь, а перечитывание тянуло бы
+  // заодно и обложку.
+  $effect(() => {
+    const written = reviewed
+    if (written) untrack(() => patch(written.view, written.fields))
   })
 
   // Только удаление по номеру: строка без номера — это кандидат выдачи поиска,
@@ -153,4 +161,4 @@
         lost(error, 'Закладка не сохранилась'))}
       oncollapse={collapse}
       on={session.filters.on} {onmark} {onperson} {onopen}
-      {onedit} {ondelete} {ontag} />
+      {onedit} {ondelete} {onreview} {ontag} />

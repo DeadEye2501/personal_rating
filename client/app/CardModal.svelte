@@ -1,9 +1,9 @@
 <!-- Окно создания и правки карточки: поля показываются своему типу. -->
 <script>
-  import Button from '$components/Button.svelte'
   import Confirm from '$components/Confirm.svelte'
   import Field from '$components/Field.svelte'
   import Modal from '$components/Modal.svelte'
+  import ModalFoot from '$components/ModalFoot.svelte'
   import Picker from '$components/Picker.svelte'
   import PosterPick from '$components/PosterPick.svelte'
   import Scrollarea from '$components/Scrollarea.svelte'
@@ -224,7 +224,7 @@
   }
 </script>
 
-<Modal card label="Карточка" {onclose}>
+<Modal wide card label="Карточка" {onclose}>
   {#snippet children()}
     <div class="cardform__top">
       <!-- Картинка лежит рядом с формой, а не в ней: поля формы — это поля
@@ -294,14 +294,7 @@
 
     <!-- Кнопки «удалить» внутри окна нет: удаление живёт на карточке, и второго
          входа ему не нужно. -->
-    <div class="modalfoot">
-      <Button variant="btn--cancel" onclick={onclose}>
-        {#snippet children()}Отмена{/snippet}
-      </Button>
-      <Button variant="btn--go" disabled={saving} onclick={keep}>
-        {#snippet children()}Сохранить{/snippet}
-      </Button>
-    </div>
+    <ModalFoot ok="Сохранить" busy={saving} oncancel={onclose} onok={keep} />
   {/snippet}
 </Modal>
 

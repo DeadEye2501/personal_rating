@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest'
 
 import { question, worn } from '$state/removal.js'
 
-const nothing = { has_rating: false, tags: 0, in_wishlist: false }
+const nothing = { has_rating: false, has_review: false, tags: 0,
+                  in_wishlist: false }
 
 describe('фраза потери', () => {
   it('называет карточку по имени', () => {
@@ -48,8 +49,18 @@ describe('фраза потери', () => {
     // Целиком, а не по кускам: запятая, союз перед последним, название и хвост
     // порознь наблюдаются, а вместе — нет, и разъехаться они могут молча.
     expect(question({ title: 'Одиссея' },
-                { has_rating: true, tags: 2, in_wishlist: true }))
-      .toBe('Удалить «Одиссея»? Оценка, 2 тега и закладка пропадут вместе с ней.')
+                { has_rating: true, has_review: true, tags: 2, in_wishlist: true }))
+      .toBe('Удалить «Одиссея»? Оценка, рецензия, 2 тега и закладка'
+            + ' пропадут вместе с ней.')
+  })
+
+  it('рецензию называет своим словом, а не оценкой', () => {
+    // Живут они в одной строке базы, и слитые в одно «Оценка» соврали бы дважды:
+    // обещали бы потерю того, чего нет, и умолчали бы о том, что пропадёт.
+    const said = question({ title: 'Х' }, { ...nothing, has_review: true })
+
+    expect(said).toContain('Рецензия пропадёт')
+    expect(said).not.toContain('Оценка')
   })
 
   it('согласует глагол с формой числительного, а не с его величиной', () => {
@@ -73,7 +84,10 @@ describe('фраза потери', () => {
   it('закладку называет и без оценки', () => {
     const said = question({ title: 'Х' }, { ...nothing, in_wishlist: true })
 
-    expect(said).toContain('закладка')
+    // С прописной: перечисление начинает новое предложение, и первым в нём
+    // стоит она. Прежде на этом месте была строчная — вопрос читался как
+    // оборванный.
+    expect(said).toContain('Закладка пропадёт')
     expect(said).not.toContain('Оценка')
   })
 })

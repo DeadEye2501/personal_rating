@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import case, select
+from sqlalchemy import case, func, select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Rating, average_score
@@ -26,11 +26,28 @@ class RatingsRepository(Repository):
              statement.excluded.created_at),
             else_=rating_table.c.created_at,
         )
+        # Строка хранит четыре вещи: балл, три шкалы и рецензию. Не осталось ни
+        # одной — хранить нечего, и строка уходит: снаружи карточка с пустой
+        # строкой и карточка без строки вовсе неразличимы, а «оценку сняли»
+        # такая запись не значит — снятая оценка это её отсутствие.
+        #
+        # Условие смотрит на колонки после записи, а не на `values`: сюда ведут
+        # три пути, и каждый пишет своё подмножество. Рецензия сравнивается
+        # через `coalesce`: пустой её оставляет своя запись, пустотой —
+        # заведение строки оценкой.
+        emptied = clearing(rating_table, item_id).where(
+            rating_table.c.score.is_(None),
+            rating_table.c.visual.is_(None),
+            rating_table.c.narrative.is_(None),
+            rating_table.c.gameplay.is_(None),
+            func.coalesce(rating_table.c.review, "") == "",
+        )
         await self._run(
             statement.on_conflict_do_update(
                 index_elements=[rating_table.c.item_id],
                 set_={**values, "updated_at": now, "created_at": appeared},
-            )
+            ),
+            emptied,
         )
 
     async def set_score(self, item_id: int, score: float | None,

@@ -12,13 +12,13 @@
 - Что раздел запустил, то он и гасит при уходе.
 - отдаёт: owned
 
-## app — 16 файлов
+## app — 17 файлов
 
-### app/App.svelte (366)
+### app/App.svelte (388)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
-- берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
+- берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (317)
+### app/CardModal.svelte (310)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -33,9 +33,9 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (156)
+### app/LibraryScreen.svelte (164)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
-- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag, saved, removed
+- принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag, saved, removed, reviewed
 - берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
 
 ### app/LinkField.svelte (102)
@@ -43,9 +43,14 @@
 - принимает: item_id, kind, source, onunlinked, ontrouble
 - берёт: ./trouble.js
 
-### app/SearchScreen.svelte (305)
+### app/ReviewModal.svelte (78)
+- Своя рецензия к карточке: читают её здесь же, где и правят.
+- принимает: view, onsaved, onclose, ontrouble
+- берёт: ./marks.js, ./trouble.js
+
+### app/SearchScreen.svelte (313)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
-- принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, ontrouble, onmark, onperson, onopen, onedit, ondelete, ontag
+- принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, reviewed, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
 
 ### app/StatsScreen.svelte (60)
@@ -61,9 +66,9 @@
 - Порядок операций по одной строке выдачи.
 - отдаёт: rowTurns
 
-### app/marks.js (41)
-- Свои отметки на карточке: оценка и закладка.
-- отдаёт: aspected, scored, wished
+### app/marks.js (49)
+- Свои отметки на карточке: оценка, закладка и рецензия.
+- отдаёт: aspected, reviewed, scored, wished
 
 ### app/reread.js (47)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
@@ -85,11 +90,11 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale
 
-## components — 29 файлов
+## components — 30 файлов
 
-### components/Acts.svelte (21)
-- Ряд действий карточки: правка, удаление, закладка.
-- принимает: wished, onedit, ondelete, onwish
+### components/Acts.svelte (30)
+- Ряд действий карточки: правка, удаление, рецензия, закладка.
+- принимает: wished, reviewed, onedit, ondelete, onreview, onwish
 
 ### components/Aggregates.svelte (70)
 - Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой.
@@ -107,7 +112,7 @@
 - Метки карточки: жанры, теги и кнопка добавления тега.
 - принимает: genres, tags, on, onmark, ontag
 
-### components/Confirm.svelte (22)
+### components/Confirm.svelte (15)
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
 - принимает: label, text, ok, danger, onyes, onclose
 
@@ -123,9 +128,9 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (151)
+### components/Film.svelte (154)
 - Карточка ленты целиком.
-- принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onscore, onaspect, onedit, ondelete, onwish
+- принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete, onwish
 
 ### components/Gone.svelte (23)
 - Строка списка убранного: слева название, справа кнопка возврата. Свёрнутая карточка без возможности развернуть — разворачивать в ней нечего: кроме названия, источника и типа в таблице убранного ничего не лежит. Решение пользователя 03.08.2026.
@@ -140,9 +145,13 @@
 - Окно со списком строк: прокручиваемый список и, если есть, форма под ним.
 - принимает: label, narrow, onclose, items, footer
 
-### components/Modal.svelte (54)
+### components/Modal.svelte (58)
 - Оболочка любого наложения: затемнение, окно и два способа его закрыть.
-- принимает: narrow, ask, danger, card, label, onclose, children
+- принимает: narrow, ask, danger, card, review, wide, label, onclose, children
+
+### components/ModalFoot.svelte (21)
+- Ряд ответных кнопок внизу окна: отмена и согласие.
+- принимает: ok, danger, busy, oncancel, onok
 
 ### components/NewTag.svelte (36)
 - Форма заведения тега.
@@ -254,7 +263,7 @@
 - Перезапуск анимации на узле, который обязан его пережить.
 - отдаёт: redrawn
 
-### state/removal.js (47)
+### state/removal.js (56)
 - Фразы, которыми спрашивают про удаление: что пропадёт и кого это заденет.
 - отдаёт: question, worn
 
@@ -290,17 +299,17 @@
 - Обрезка текста по границе слова.
 - отдаёт: wordEnd
 
-## styles — 29 файлов
+## styles — 30 файлов
 
-### styles/acts.css (56)
-- Ряд действий карточки: правка, удаление, закладка.
-- селекторы (9): .film__acts, .film.is-collapsed .film__acts, .film__wish,
+### styles/acts.css (64)
+- Ряд действий карточки: правка, удаление, рецензия, закладка.
+- селекторы (10): .film__acts, .film.is-collapsed .film__acts, .film__wish,
 .film__act, .film__wish .material-symbols-outlined,
-.film__act  .material-symbols-outlined, .film__wish:hover,
-.film__act:hover, .film__wish.is-on, .film__act[data-act="delete"]:hover, .film__act,
+.film__act  .material-symbols-outlined, .film__act[data-act="review"] .material-symbols-outlined, .film__wish:hover,
+.film__act:hover, .film__acts .is-on, .film__act[data-act="delete"]:hover, .film__act,
 .film__wish, .film:hover .film__act,
 .film:hover .film__wish,
-.film__wish.is-on
+.film__acts .is-on
 - берёт: --error, --gutter, --icon-inset, --primary, --tint-30
 
 ### styles/aggr.css (61)
@@ -321,7 +330,7 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
-### styles/cardform.css (114)
+### styles/cardform.css (106)
 - Раскладка окна создания и правки карточки.
 - селекторы (14): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover
 - объявляет: --col-gap, --field-h, --poster-w, --row-gap
@@ -378,9 +387,9 @@
 - объявляет: --accent, --del, --icon-btn
 - берёт: --error, --fill-primary-14, --icon-btn, --primary, --r-full, --tint-30
 
-### styles/modal.css (111)
+### styles/modal.css (126)
 - Оболочка любого наложения: затемнение, тёмное стекло, неоновая кромка.
-- селекторы (9): .overlay, .modal, .modal--narrow, .modal--ask, .modal--danger, .ask__text, .modal::before, .modal::after, @keyframes modal-in
+- селекторы (10): .overlay, .modal, .modal--narrow, .modal--wide, .modal--ask, .modal--danger, .ask__text, .modal::before, .modal::after, @keyframes modal-in
 - объявляет: --neon
 - берёт: --body-l, --ease, --error, --glass, --neon, --primary, --r-card, --shade-25, --shade-32, --shade-60, --text, --tint-09, --tint-14
 
@@ -412,6 +421,12 @@
 .picker__hit.is-marked, .picker__poster, .picker__chosen, .picked, .picked__del, .picked__del .material-symbols-outlined
 - объявляет: --icon-btn
 - берёт: --body-m, --col-gap, --field-h, --fill-primary-hover, --poster-w, --primary, --shade-55, --surface-pop, --tint-09, --tint-75, --tint-80
+
+### styles/review.css (41)
+- Окно своей рецензии: рабочая область и ряд кнопок под ней.
+- селекторы (4): .modal--review, .review__text,
+.review__field, .review__text, .review__field
+- берёт: --body-l, --text
 
 ### styles/scorerow.css (34)
 - Строка оценки в списке: десять звёзд и ярлык словом.

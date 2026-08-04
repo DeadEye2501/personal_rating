@@ -326,7 +326,7 @@ def test_every_path_the_page_calls_exists_on_the_bridge():
     # Число, а не только вложенность: сверка ничего не стоит, если находить
     # пути перестал сам поиск. Оно и ловило четыре пути, потерянных прежним
     # выражением — те, что страница зовёт не прямо.
-    assert len(called) >= 38, f"путей найдено меньше, чем есть: {len(called)}"
+    assert len(called) >= 41, f"путей найдено меньше, чем есть: {len(called)}"
 
 
 def test_the_page_reads_exactly_what_the_summary_of_a_deletion_holds():
