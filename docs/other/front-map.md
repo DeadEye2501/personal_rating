@@ -168,7 +168,7 @@
 - Область, которая прокручивается вместо страницы.
 - принимает: children, box
 
-### components/Scrollbar.svelte (89)
+### components/Scrollbar.svelte (90)
 - Своя полоса прокрутки для того, что прокручивается.
 - принимает: box, area
 
@@ -266,9 +266,9 @@
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
 - отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, toneOf, toneOfMean, verdictOf, verdictOfMean
 
-### state/scroll.js (23)
-- Арифметика своей полосы прокрутки.
-- отдаёт: thumbOf
+### state/scroll.js (34)
+- Мерка и арифметика своей полосы прокрутки.
+- отдаёт: thumbFor, thumbOf
 
 ### state/section.js (20)
 - Запрос раздела: то, что уезжает мостом в `feed.page`.

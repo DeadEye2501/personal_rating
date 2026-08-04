@@ -1,7 +1,7 @@
 <!-- Своя полоса прокрутки для того, что прокручивается. -->
 <script>
   import { dragging } from '$state/dragging.js'
-  import { thumbOf } from '$state/scroll.js'
+  import { thumbFor } from '$state/scroll.js'
 
   // Сколько полоса висит после того, как прокрутка кончилась.
   const FADE = 700
@@ -21,11 +21,12 @@
   let hovered = false
   let timer
 
-  // Считает `state/scroll.js`, здесь остаётся замер DOM: арифметику ползунка
-  // иначе не сторожит ничто — компоненты по решению не проверяются.
+  // Считает `state/scroll.js`, вплоть до того, какие мерки снимать: ползунок
+  // уезжал за край дорожки именно на выборе мерки, а компоненты по решению не
+  // проверяются.
   function measure() {
     if (!box) return
-    thumb = thumbOf(box.clientHeight, box.scrollHeight, box.scrollTop)
+    thumb = thumbFor(box)
   }
 
   // Показана полоса или нет — про наведение и прокрутку; есть она вообще или

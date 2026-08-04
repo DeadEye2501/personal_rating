@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { thumbOf } from '$state/scroll.js'
+import { thumbFor, thumbOf } from '$state/scroll.js'
 
 describe('своя полоса прокрутки', () => {
   it('на коротком содержимом полосы нет вовсе', () => {
@@ -45,6 +45,20 @@ describe('своя полоса прокрутки', () => {
     const found = thumbOf(400, 1600, 1200)
 
     expect(found.offset).toBe(400 - found.height)
+  })
+
+  it('высоту области берёт дробной, а не округлённой', () => {
+    // `clientHeight` целое и округляет вверх: при настоящих 1059.6 он отдаёт
+    // 1060, и доведённый до низа ползунок встаёт на 0.4 пикселя ниже своей
+    // дорожки. Прятать переполнение от полосы до `html` некому, и страница
+    // получает вторую полосу прокрутки, которая ничего не прокручивает.
+    // Числа замерены на живом окне 04.08.2026.
+    const box = { clientHeight: 1060, scrollHeight: 151736, scrollTop: 150676,
+                  getBoundingClientRect: () => ({ height: 1059.6 }) }
+
+    const found = thumbFor(box)
+
+    expect(found.offset + found.height).toBeLessThanOrEqual(1059.6)
   })
 
   it('пиксель курсора стоит больше пикселя содержимого', () => {
