@@ -1405,7 +1405,7 @@
 - `def _marks(connection, rule_id: int, rule) -> None` (10)
 - `def downgrade() -> None` (5)
 
-## scripts — 2 модулей
+## scripts — 3 модулей
 
 ### `scripts/collect_game_genres.py` — 80 строк
 
@@ -1418,6 +1418,21 @@
 - `async def steam_genres(client: httpx.AsyncClient) -> dict[str, str]` (11)
 - `async def gog_genres(client: httpx.AsyncClient) -> dict[str, str]` (7)
 - `async def main() -> None` (7)
+
+### `scripts/import_movie_picker.py` — 185 строк
+
+Перенос из Movie Picker: оценённые фильмы со своей оценкой.
+
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`, `backend.storage.rescale`
+
+- `class Entry` (7)
+- `def old_entries(path: Path) -> list[Entry]` (11)
+- `async def identity(http: SourceHttp, key: str, entry: Entry) -> CardView | None` (24)
+- `async def imported(back, http: SourceHttp, key: str, entry: Entry) -> str` (27)
+- `async def transfer(back, http: SourceHttp, key: str, entries: list[Entry]) -> Counter` (10)
+  - `async def one(entry: Entry) -> str` (3)
+- `def settings()` (6)
+- `async def main() -> None` (18)
 
 ### `scripts/record_fixtures.py` — 281 строк
 

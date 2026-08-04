@@ -692,6 +692,22 @@
 - `GOG_CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `EXAMPLES_PER_GENRE` = `2`
 
+### `scripts/import_movie_picker.py`
+
+- `ROOT` = `Path(__file__).resolve().parent.parent`
+- `OLD_DB` = `Path('E:\\Files\\Archive\\Old Projects\\Movie Pi…`
+- `AT_ONCE` = `5`
+- `QUERY` = `"SELECT m.imdb_id, m.title, r.updated_at, r.rati…`
+- `WRITTEN` = `набор из 3`
+- `SKIPPED` = `набор из 3`
+- `FAILED` = `набор из 3`
+- `logger` = `logging.getLogger('import')`
+- `class Entry`
+  - `imdb_id: str`
+  - `title: str`
+  - `when: datetime`
+  - `score: float`
+
 ### `scripts/record_fixtures.py`
 
 - `ROOT` = `Path(__file__).resolve().parents[1]`
