@@ -94,6 +94,19 @@ def _required(payload: dict, block: str) -> dict:
     return found
 
 
+_DIRECTOR = "Director"
+
+# Чья это работа — решают те же роли, из-за которых человек попадает в состав
+# карточки: ролей у нас три, и продюсера среди них нет вовсе. `Creator` — это
+# шоураннер: замерено, что он совпадает с `created_by`, откуда его берёт
+# `parse_series`. Режиссёр сериала в карточку не пишется, но сериал, который он
+# снял, — его работа, и из выдачи по нему она не пропадает.
+_CREDITED_JOBS = {
+    Kind.MOVIE: (_DIRECTOR,),
+    Kind.SERIES: (_DIRECTOR, "Creator"),
+}
+
+
 # У фильма название в title, у сериала — в name; поле даты тоже разное. Знание
 # одно, и запись у него одна: отсюда ключи берут все три разборщика.
 _KEYS = {
@@ -132,13 +145,21 @@ def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]:
     """Фильмография человека. Разбираются оба списка: у режиссёра работы лежат
     в `crew`, у актёра — в `cast`, и у многих есть и то и другое.
 
+    Из `crew` берутся не все строки: там лежит вся съёмочная группа, и работа,
+    которую человек спродюсировал, снял оператором или где его лишь поблагодарили
+    в титрах, — не его. Замерено 05.08.2026: по Нолану так приезжает тринадцать
+    чужих фильмов из шестидесяти трёх, по Питту — шестьдесят шесть из ста
+    семидесяти семи.
+
     Одна работа приезжает дважды, если человек на ней в двух ролях. Повторы
     снимаются по идентификатору работы, а не сравнением кандидатов целиком:
     целиком они совпадают лишь пока разбор не читает ничего ролевого — ни
-    `character`, ни `job`, ни `order`, — и дедупликация ломалась бы от
-    добавления любого из этих полей."""
-    rows = [*payload.get("cast", []), *payload.get("crew", [])]
-    return unique_by(_hits(rows, kind), lambda one: one.source_id)
+    `character`, ни `order`, — и дедупликация ломалась бы от добавления любого
+    из этих полей. `job` читается здесь, до сборки, и в кандидата не попадает."""
+    made = [row for row in payload.get("crew", [])
+            if row.get("job") in _CREDITED_JOBS[kind]]
+    return unique_by(_hits([*payload.get("cast", []), *made], kind),
+                     lambda one: one.source_id)
 
 
 def parse_people(payload: dict) -> list[PersonHit]:
@@ -181,7 +202,7 @@ def parse_movie(payload: dict) -> SourceCard:
     people += [
         _person(row, PersonRole.DIRECTOR)
         for row in credits_block.get("crew", [])
-        if row.get("job") == "Director"
+        if row.get("job") == _DIRECTOR
     ]
 
     now = datetime.now()

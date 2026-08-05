@@ -42,6 +42,10 @@ PLAYTEST_APPID = 4926960
 NOLAN_TMDB = 525
 MURPHY_TMDB = 2037
 
+# Шоураннер: у него в сериальном crew есть и `Creator`, и `Executive Producer`,
+# а у Нолана этот список пуст вовсе — на нём отбор ролей не наблюдается.
+GILLIGAN_TMDB = 66633
+
 
 def save(source: str, case: str, response: httpx.Response) -> None:
     folder = OUT / source
@@ -94,6 +98,8 @@ async def record_tmdb(client: httpx.AsyncClient, key: str) -> None:
         f"{base}/person/{NOLAN_TMDB}/tv_credits", params=common))
     save("tmdb", "person_credits_actor", await client.get(
         f"{base}/person/{MURPHY_TMDB}/movie_credits", params=common))
+    save("tmdb", "person_credits_showrunner", await client.get(
+        f"{base}/person/{GILLIGAN_TMDB}/tv_credits", params=common))
     save("tmdb", "search_person", await client.get(
         f"{base}/search/person", params={**common, "query": "Christopher Nolan"}))
     save("tmdb", "search_person_empty", await client.get(

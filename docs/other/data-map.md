@@ -517,6 +517,8 @@
 ### `backend/sources/tmdb/parse.py`
 
 - `POSTER_BASE` = `'https://image.tmdb.org/t/p/w500'`
+- `_DIRECTOR` = `'Director'`
+- `_CREDITED_JOBS` = `словарь из 2`
 - `_KEYS` = `словарь из 2`
 
 ### `backend/sources/undocumented.py`
@@ -723,6 +725,7 @@
 - `PLAYTEST_APPID` = `4926960`
 - `NOLAN_TMDB` = `525`
 - `MURPHY_TMDB` = `2037`
+- `GILLIGAN_TMDB` = `66633`
 
 ## tests
 

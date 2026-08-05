@@ -772,7 +772,7 @@
   - `async def series_counts(self, source_id: str) -> Outcome` (6)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 226 строк
+### `backend/sources/tmdb/parse.py` — 247 строк
 
 Перевод ответов TMDB в наши типы.
 
@@ -789,7 +789,7 @@
 - `def _required(payload: dict, block: str) -> dict` (9)
 - `def _item(payload: dict, kind: Kind, now: datetime, **extra) -> Item` (20)
 - `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (2)
-- `def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]` (11)
+- `def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]` (19)
 - `def parse_people(payload: dict) -> list[PersonHit]` (5)
 - `def _hits(rows: list[dict], kind: Kind) -> list[SearchHit]` (25)
 - `def parse_movie(payload: dict) -> SourceCard` (18)
@@ -1434,14 +1434,14 @@
 - `def settings()` (6)
 - `async def main() -> None` (18)
 
-### `scripts/record_fixtures.py` — 281 строк
+### `scripts/record_fixtures.py` — 287 строк
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
 Зависит от: `backend.config`, `backend.sources.http`, `backend.sources.steam.client`
 
 - `def save(source: str, case: str, response: httpx.Response) -> None` (23)
-- `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (34)
+- `async def record_tmdb(client: httpx.AsyncClient, key: str) -> None` (36)
 - `async def record_steam(client: httpx.AsyncClient) -> None` (14)
 - `async def record_steam_items(client: httpx.AsyncClient) -> None` (38)
   - `def ask(appids: list[int], wanted: dict) -> str` (7)
@@ -1668,13 +1668,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def ask(transport: httpx.MockTransport)` (5)
 
-### `tests/backend/sources/test_tmdb_people.py` — 170 строк
+### `tests/backend/sources/test_tmdb_people.py` — 217 строк
 
 Фильмография человека и поиск человека по имени.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`, `tests.conftest`
 
-Тестов: 13
+Тестов: 17
 
 
 ### `tests/backend/sources/test_tmdb_search.py` — 187 строк

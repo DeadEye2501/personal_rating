@@ -24,6 +24,52 @@ def test_an_actor_is_found_in_the_cast(fixture):
     assert "Тёмный рыцарь" in [hit.title for hit in hits]
 
 
+def test_a_work_he_only_produced_is_not_his(fixture):
+    """Продюсер работы — не её автор, и в фильмографию она не идёт. «Человек из
+    стали» снят Снайдером, Нолан там `Producer` и `Story`; таких строк у него
+    тринадцать из шестидесяти трёх, и его собственные фильмы в них тонут."""
+    hits = parse_credits(fixture("tmdb/person_credits_movie.json"), Kind.MOVIE)
+
+    assert "Человек из стали" not in [hit.title for hit in hits]
+
+
+def test_a_series_he_created_is_his(fixture):
+    """Создатель сериала — это `Creator` в `crew`, и замерено, что он совпадает
+    с `created_by` карточки на всех шести сериалах двух проверенных шоураннеров.
+    Роль эта своя: убери её из отбора — и создатель находил бы только те свои
+    сериалы, которые ещё и снимал.
+
+    Потому и «Батл Крик», а не «Во все тяжкие»: на втором Гиллиган ещё и
+    `Director`, и за `Creator` такой тест упасть не может."""
+    hits = parse_credits(fixture("tmdb/person_credits_showrunner.json"),
+                         Kind.SERIES)
+
+    assert "Батл Крик" in [hit.title for hit in hits]
+
+
+def test_a_series_he_directed_is_his(fixture):
+    """Режиссёр сериала — тоже его автор, хотя карточка сериала режиссёров не
+    хранит вовсе: состав ей приходит из `aggregate_credits` и `created_by`.
+
+    Держится это свойство на одной работе: «Секретные материалы» Гиллиган снимал,
+    но не создавал, и других таких у него нет. Не будь её — убери `Director` из
+    сериального отбора, и не покраснело бы ничто: остальные его сериалы доезжают
+    через `Creator`."""
+    hits = parse_credits(fixture("tmdb/person_credits_showrunner.json"),
+                         Kind.SERIES)
+
+    assert "Секретные материалы" in [hit.title for hit in hits]
+
+
+def test_a_series_he_only_produced_is_not_his(fixture):
+    """Отбор ролей у сериалов свой, и мусор там тот же: «Жестокое царство»
+    Гиллиган консультировал, а не делал."""
+    hits = parse_credits(fixture("tmdb/person_credits_showrunner.json"),
+                         Kind.SERIES)
+
+    assert "Жестокое царство" not in [hit.title for hit in hits]
+
+
 def test_a_work_carries_everything_a_candidate_needs(fixture):
     """Замерено: строка фильмографии по составу полей совпадает с выдачей
     поиска. Перестань это быть правдой — карточки поедут без жанров, и фильтр
@@ -45,8 +91,9 @@ def test_a_work_carries_everything_a_candidate_needs(fixture):
 
 
 def test_the_same_work_is_not_returned_twice(fixture):
-    """Человек бывает на карточке и режиссёром, и продюсером — это две строки
-    `crew` и одна работа."""
+    """Человек бывает на карточке и режиссёром, и актёром — это строка в `crew`,
+    строка в `cast` и одна работа. У Нолана таких две: `Tarantella` и
+    `Cinema16: British Short Films`."""
     hits = parse_credits(fixture("tmdb/person_credits_movie.json"), Kind.MOVIE)
     ids = [hit.source_id for hit in hits]
 
