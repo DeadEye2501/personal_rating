@@ -1,0 +1,1397 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 300,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "TvJaAAAAMAAJ",
+      "etag": "x6aIowyXFHo",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/TvJaAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The Book of Frank Herbert",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "D A W Books, Incorporated",
+        "publishedDate": "1973",
+        "description": "Frank Herbert presents here ten of his finest stories, each of which in its own way suggests new aspects of the three questions upon which the future will eventually turn: What is man? What is man's world? What is man's fate?",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015007020566"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 198,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=TvJaAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=TvJaAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=TvJaAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=TvJaAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Book_of_Frank_Herbert.html?hl=&id=TvJaAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=TvJaAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Frank Herbert presents here ten of his finest stories, each of which in its own way suggests new aspects of the three questions upon which the future will eventually turn: What is man? What is man&#39;s world? What is man&#39;s fate?"
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "5SuPPwAACAAJ",
+      "etag": "wFp0RcBd5qc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/5SuPPwAACAAJ",
+      "volumeInfo": {
+        "title": "Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publishedDate": "1980",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0194242390"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780194242394"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 144,
+        "printType": "BOOK",
+        "categories": [
+          "English language"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=5SuPPwAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=2&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=5SuPPwAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune.html?hl=&id=5SuPPwAACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=5SuPPwAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "T1dLAAAAMAAJ",
+      "etag": "wEaTyN/zjWw",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/T1dLAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The Worlds of Frank Herbert",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Berkley Publishing Group",
+        "publishedDate": "1983",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015008381033"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 264,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 2,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.9.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=T1dLAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=T1dLAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=T1dLAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=3&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=T1dLAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Worlds_of_Frank_Herbert.html?hl=&id=T1dLAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=T1dLAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "wxRRmAEACAAJ",
+      "etag": "XWCSEJQ6tMg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/wxRRmAEACAAJ",
+      "volumeInfo": {
+        "title": "Whipping Star",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Tor Books",
+        "publishedDate": "2009-01-20",
+        "description": "In the far future, humankind has made contact with numerous other species: Gowachin, Laclac, Wreaves, Pan Spechi, Taprisiots, and Caleban, and has helped to form the ConSentiency to govern among the species. After suffering under a tyrannous pure democracy, the sentients of the galaxy find the need for a Bureau of Sabotage (BuSab) to slow the wheels of government, thereby preventing it from legislating recklessly. BuSab is allowed to sabotage and harass the governmental, administrative, and economic powers in the ConSentiency. Private citizens must not be harassed, and vital functions of society are also exempt. Jorj X. McKie is a born troublemaker who has become one of BuSab’s best agents. Drafted for the impossible task of establishing meaningful communication with an utterly alien entity who defies understanding, McKie finds himself racing against time to prevent a mad billionairess from wiping out all life in the ConSentiency.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0765317753"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780765317759"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 256,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=wxRRmAEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=wxRRmAEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=wxRRmAEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=4&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=wxRRmAEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Whipping_Star.html?hl=&id=wxRRmAEACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=wxRRmAEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A classic novel from the master of science fiction, Frank Herbert&#39;s Whipping Star. “Herbert is one of the most thought-provoking writers of our time; by focusing on ‘alien&#39; culture, he makes us examine what the true definition of ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "X_RaAAAAMAAJ",
+      "etag": "cePmzYSUAC0",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/X_RaAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The Green Brain",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publishedDate": "1966",
+        "description": "\"In an overpopulated world seeking living room in the jungles, the International Ecological Organization was systematically exterminating the voracious insects which made these areas uninhabitable. Using deadly foamal bombs and newly developed vibration weapons, men like Joao Martinho and his co-workers fought to clear the green hell of the Mato Grosso. But somehow those areas which had been completely cleared were becoming reinfested, despite the impenetrable vibration barriers. And tales came out of the jungles...of insects mutated to incredible sizes...of creatures who seemed to be men, but whose eyes gleamed with the chitinous sheen of insects...\"--Back cover.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015008918735"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 164,
+        "printType": "BOOK",
+        "categories": [
+          "Human-animal communication"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=X_RaAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=X_RaAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=X_RaAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=5&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=X_RaAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Green_Brain.html?hl=&id=X_RaAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=X_RaAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "&quot;In an overpopulated world seeking living room in the jungles, the International Ecological Organization was systematically exterminating the voracious insects which made these areas uninhabitable."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "BQvgzQEACAAJ",
+      "etag": "BnXJPJH7kkw",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/BQvgzQEACAAJ",
+      "volumeInfo": {
+        "title": "Chapter House Dune",
+        "subtitle": "The Sixth Dune Novel",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Gollancz",
+        "publishedDate": "2021-01-27",
+        "description": "The epic that began with the HUGO and NEBULA Award-winning classic DUNE -- now a major motion picture from the director of Blade Runner 2049 and Arrival -- continues ... The long-established galactic order is passing. The Honoured Matres, ruthless and all-conquering, have destroyed the planet Dune. In opposition, hard-pressed but still fighting back, the Bene Gesserit sisterhood co-ordinate their resistance from their as-yet undiscovered home world, Chapter House. Now as a new Scattering is planned, they still have one carefully nurtured asset: the sandworms, offspring of the only giant worm salvaged from Dune. Chapter House is to about to turn into a barren wasteland: Chapter House will be the new Dune.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "147323381X"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781473233812"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 480,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=BQvgzQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=BQvgzQEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=BQvgzQEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=6&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=BQvgzQEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Chapter_House_Dune.html?hl=&id=BQvgzQEACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=BQvgzQEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Presenting Chapter House Dune, the sixth book in one of the most influential series of all time, which has inspired countless other stories for more than half a century, this is an awe-inspiring world, and a story of truly epic scope."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "deRpPwAACAAJ",
+      "etag": "Td5HH0zjSlQ",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/deRpPwAACAAJ",
+      "volumeInfo": {
+        "title": "Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publishedDate": "2001",
+        "description": "The Duke of Atreides has been manoeuvred by his arch enemy, Baron Harkonnen, into administering the desert planet of Dune. Although it is almost completely without water, Dune is a planet of fabulous wealth, for it is the only source of a drug prized throughout the Galactic Empire. The Duke and his son, Paul, are expecting treachery and it duly comes - but from a shockingly unexpected place. Then, when Paul succeeds his father, he becomes a catalyst for the native people of Dune, whose knowledge of the ecology of the planet gives them vast power. They have been waiting for a leader like Paul Atreides, a leader who can harness that force...",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0575073349"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780575073340"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 445,
+        "printType": "BOOK",
+        "categories": [
+          "Dune (Imaginary place)"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=deRpPwAACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=deRpPwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=deRpPwAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=7&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=deRpPwAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune.html?hl=&id=deRpPwAACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=deRpPwAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "The Duke of Atreides has been manoeuvred by his arch enemy, Baron Harkonnen, into administering the desert planet of Dune."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "AG9FAKVurF0C",
+      "etag": "8e53dRtup0c",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/AG9FAKVurF0C",
+      "volumeInfo": {
+        "title": "Man of Two Worlds",
+        "authors": [
+          "Frank Herbert",
+          "Brian Herbert"
+        ],
+        "publisher": "Putnam Publishing Group",
+        "publishedDate": "1986",
+        "description": "Based on the premise that the Earth is a creation of an alien world, this science fiction adventure puts the future of both races in the hands of a confused man who is half human and half teenage alien.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0399131329"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780399131325"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 438,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.7.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=AG9FAKVurF0C&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=AG9FAKVurF0C&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=AG9FAKVurF0C&dq=inauthor:%22Frank+Herbert%22&hl=&cd=8&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=AG9FAKVurF0C&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Man_of_Two_Worlds.html?hl=&id=AG9FAKVurF0C"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=AG9FAKVurF0C&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Based on the premise that the Earth is a creation of an alien world, this science fiction adventure puts the future of both races in the hands of a confused man who is half human and half teenage alien."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "uvl8wgEACAAJ",
+      "etag": "yFzgJeUeXHs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/uvl8wgEACAAJ",
+      "volumeInfo": {
+        "title": "The Road to Dune",
+        "authors": [
+          "Brian Herbert",
+          "Kevin J. Anderson",
+          "Frank Herbert"
+        ],
+        "publisher": "Macmillan Audio",
+        "publishedDate": "2005-09-01",
+        "description": "Frank Herbert's Dune is widely known as the science fiction equivalent of The Lord of the Rings, and The Road to Dune is a companion work comparable to The Silmarillion, shedding light on and following the remarkable development of the bestselling science fiction novel of all time. Herein, the world's millions of Dune fans can now read---at long last---the unpublished chapters and scenes from Dune and Dune Messiah. The Road to Dune also includes the original correspondence between Frank Herbert and famed editor John W. Campbell, Jr.; excerpts from Herbert's correspondence during his years-long struggle to get his innovative work published; and the article \"They Stopped the Moving Sands,\" Herbert's original inspiration for Dune. The Road to Dune features newly discovered papers and manuscripts of Frank Herbert, and also \"Spice Planet,\" an original sixty-thousand-word short novel by Brian Herbert and Kevin J. Anderson, based on a detailed outline left by Frank Herbert. The Road to Dune is a treasure trove of essays, articles, and fiction that every reader of Dune will want to add to their shelf.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "159397776X"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781593977764"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=uvl8wgEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=9&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=uvl8wgEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Road_to_Dune.html?hl=&id=uvl8wgEACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=uvl8wgEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "The Road to Dune also includes the original correspondence between Frank Herbert and famed editor John W. Campbell, Jr.; excerpts from Herbert&#39;s correspondence during his years-long struggle to get his innovative work published; and the ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "q9ZYLwEACAAJ",
+      "etag": "7BWpRXEu0Os",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/q9ZYLwEACAAJ",
+      "volumeInfo": {
+        "title": "Destination Void",
+        "subtitle": "Prequel to the Pandora Sequence",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Createspace Independent Pub",
+        "publishedDate": "2012-06-17",
+        "description": "The starship Earthling, filled with thousands of hybernating colonists en route to a new world at Tau Ceti, is stranded beyond the solar system when the ship's three Organic Mental Cores-disembodied human brains that control the vessel's functions-go insane. An emergency skeleton crew sees only one chance for survival: to create an artificial consciousness in the Earthling's primary computer, which could guide them to their destination . . . or could destroy the human race. Frank Herbert's classic novel that begins the epic Pandora Sequence (written with Bill Ransom), which also includes The Jesus Incident, The Lazarus Effect, and The Ascension Factor.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "1614750459"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781614750451"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 264,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=q9ZYLwEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=q9ZYLwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=q9ZYLwEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=10&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=q9ZYLwEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Destination_Void.html?hl=&id=q9ZYLwEACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=q9ZYLwEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Frank Herbert&#39;s classic novel that begins the epic Pandora Sequence (written with Bill Ransom), which also includes The Jesus Incident, The Lazarus Effect, and The Ascension Factor.Library Edition"
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "I14bAQAAIAAJ",
+      "etag": "/8r9YrvlQSA",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/I14bAQAAIAAJ",
+      "volumeInfo": {
+        "title": "The Eyes of Heisenberg",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Berkley Books",
+        "publishedDate": "1966",
+        "description": "A New World in Embryo Public Law 10927 was clear and direct. Parents were permitted to watch the genetic alterations of their gametes by skilled surgeons...only no one ever requested it. When Lizbeth and Harvey Durant decided to invoke the Law; when Dr. Potter did not rearrange the most unusual genetic structure of their future son, barely an embryo growing in the State's special vat-the consequences of these decisions threatened to be catastrophic. For never before had anyone dared defy the Rulers' decrees . . . and if They found out, it was well known that the price of disobedience was the extermination of the human race...",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "STANFORD:36105027051635"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 174,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.8.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=I14bAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=I14bAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=I14bAQAAIAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=11&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=I14bAQAAIAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Eyes_of_Heisenberg.html?hl=&id=I14bAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=I14bAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A New World in Embryo Public Law 10927 was clear and direct."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "5A5hPgAACAAJ",
+      "etag": "+1kkRV0Of98",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/5A5hPgAACAAJ",
+      "volumeInfo": {
+        "title": "Chapterhouse",
+        "subtitle": "Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Putnam Publishing Group",
+        "publishedDate": "1985-04-01",
+        "description": "Fifteen thousand years after Leto II's death, the remnants of the Bene Gesserit contend with the ruthless leaders of an alien culture to forge a new civilization and preserve the best of the Old Empire",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0399130756"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780399130755"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 464,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=5A5hPgAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=12&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=5A5hPgAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Chapterhouse.html?hl=&id=5A5hPgAACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=5A5hPgAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "The desert planet Arrakis, called Dune, has been destroyed. Now the Bene Gesserit, heirs to Dune&#39;s powers, have colonized a green world and are turning it into a desert, mile by scorched mile."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "f_qWtwEACAAJ",
+      "etag": "6fLSdNsEWFE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/f_qWtwEACAAJ",
+      "volumeInfo": {
+        "title": "Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publishedDate": "1984",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0450057771"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780450057779"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 508,
+        "printType": "BOOK",
+        "categories": [
+          "Dune (Imaginary place)"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=f_qWtwEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=13&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=f_qWtwEACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune.html?hl=&id=f_qWtwEACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=f_qWtwEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "_xoXQQAACAAJ",
+      "etag": "BJqwYWH/NoU",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/_xoXQQAACAAJ",
+      "volumeInfo": {
+        "title": "Heretics of Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publishedDate": "1984",
+        "description": "Science fiction-roman.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0575034238"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780575034235"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 384,
+        "printType": "BOOK",
+        "categories": [
+          "Dune (Imaginary place)"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=_xoXQQAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=14&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=_xoXQQAACAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Heretics_of_Dune.html?hl=&id=_xoXQQAACAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=_xoXQQAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Science fiction-roman."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "TSlIEQAAQBAJ",
+      "etag": "WNZWzANHtjA",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/TSlIEQAAQBAJ",
+      "volumeInfo": {
+        "title": "Frank Herbert's Dune Saga 3-Book Boxed Set",
+        "subtitle": "Dune, Dune Messiah, and Children of Dune",
+        "authors": [
+          "FRANK. HERBERT"
+        ],
+        "publisher": "Penguin Group",
+        "publishedDate": "2025-11-04",
+        "description": "Perfect for longtime fans and new readers alike--a beautiful trade paperback boxed set of the first three novels in Frank Herbert's Dune Saga. In the far future, on a remote planet, an epic adventure awaits. Here are the first three novels of Frank Herbert's magnificent Dune saga--a triumph of the imagination and one of the bestselling science fiction series of all time. Includes Books 1 - 3: DUNE - DUNE MESSIAH - CHILDREN OF DUNE",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780593953679"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0593953673"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 706,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.1.1.0.preview.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=TSlIEQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=TSlIEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=TSlIEQAAQBAJ&printsec=frontcover&dq=inauthor:%22Frank+Herbert%22&hl=&cd=15&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=TSlIEQAAQBAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Frank_Herbert_s_Dune_Saga_3_Book_Boxed_S.html?hl=&id=TSlIEQAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Frank_Herbert_s_Dune_Saga_3_Book_Boxed_S-sample-pdf.acsm?id=TSlIEQAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=TSlIEQAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Dune Messiah: Set on the desert planet Arrakis, a world fully as real and as rich as our own, Dune Messiah continues the story of the man Muad&#39;dib, heir to a power unimaginable, bringing to completion the centuries-old scheme to create a ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "YuKwAAAAIAAJ",
+      "etag": "96fEujQS+54",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/YuKwAAAAIAAJ",
+      "volumeInfo": {
+        "title": "The White Plague",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Putnam Adult",
+        "publishedDate": "1982",
+        "description": "A gripping novel of global disaster--by the visionary creator of Dune.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCSC:32106016129139"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 454,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.8.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=YuKwAAAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=YuKwAAAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=YuKwAAAAIAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=16&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=YuKwAAAAIAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_White_Plague.html?hl=&id=YuKwAAAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=YuKwAAAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A gripping novel of global disaster--by the visionary creator of Dune."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "iPwFOI1Dz3cC",
+      "etag": "B3iKzx4TBhM",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/iPwFOI1Dz3cC",
+      "volumeInfo": {
+        "title": "The Heaven Makers",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Del Rey",
+        "publishedDate": "1977",
+        "description": "Strange aliens find ways of creating disasters on Earth in an effort to relieve their endless boredom until a government investigator checks into the matter.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0345302907"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780345302908"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 196,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.4.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=iPwFOI1Dz3cC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=iPwFOI1Dz3cC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=iPwFOI1Dz3cC&dq=inauthor:%22Frank+Herbert%22&hl=&cd=17&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=iPwFOI1Dz3cC&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Heaven_Makers.html?hl=&id=iPwFOI1Dz3cC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=iPwFOI1Dz3cC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Strange aliens find ways of creating disasters on Earth in an effort to relieve their endless boredom until a government investigator checks into the matter."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "nf5aAAAAMAAJ",
+      "etag": "NYXPiPPXxrw",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/nf5aAAAAMAAJ",
+      "volumeInfo": {
+        "title": "Dune",
+        "subtitle": "House Atreides",
+        "authors": [
+          "Brian Herbert",
+          "Kevin J. Anderson",
+          "Frank Herbert"
+        ],
+        "publisher": "Spectra",
+        "publishedDate": "1999",
+        "description": "A prequel to Frank Herbert's Dune, written by his son, based on a recently found manuscript. It is the story of a paleontologist sent to study the planet Arrakis, home to spices which give longevity.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015048917119"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 632,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 29,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "2.5.3.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=nf5aAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=nf5aAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=nf5aAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=18&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=nf5aAAAAMAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune.html?hl=&id=nf5aAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=nf5aAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "It is the story of a paleontologist sent to study the planet Arrakis, home to spices which give longevity. Frank Herbert&#39;s Dune chronicles became an enduring classic and the bestselling science fiction series of all time."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "CSn8Mk-bIhAC",
+      "etag": "9CVh1QI64GE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/CSn8Mk-bIhAC",
+      "volumeInfo": {
+        "title": "Dune Messiah",
+        "subtitle": "The inspiration for the new blockbuster film",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Hachette UK",
+        "publishedDate": "2011-07-14",
+        "description": "What The Lord of the Rings is to fantasy, Dune is to science fiction. Presenting Dune Messiah, the sequel to one of the most influential works of all time, which has inspired countless other stories for more than half a century, this is an awe-inspiring world, and a story of truly epic scope. 'An astonishing science fiction phenomenon' WASHINGTON POST Paul Atreides has succeeded in his crusade against House Harkonnen and Emperor Shaddam IV himself, but his victory has had profound consequences. War has been brought to the entire known universe, and billions have already perished. While former allies conspire to remove him from the throne, Paul accepts a gift from the Tleilaxu, a guild of genetic manipulators, hoping to find a single spark of peace and friendship amidst the betrayal and chaos around him. But this act may cost him the support of the Fremen, his most ardent supporters, and threaten the very existence of his new empire. As matters escalate, Paul will be forced to choose between his throne, his wife, his people and his future - and determine the fate of the entire universe. Read the series which inspired the Academy Award-winning and jaw-dropping cinematic events Dune: Part One (2021) and Dune: Part Two (2024). A science fiction spectacular like no other, this is a deeply climate conscious novel, and a compelling family saga for the ages. Dune reading order: Dune Dune Messiah Children of Dune God Emperor of Dune Heretics of Dune Chapterhouse Dune",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780575104426"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0575104422"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": false
+        },
+        "pageCount": 180,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 5,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "1.17.15.0.preview.2",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=CSn8Mk-bIhAC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=CSn8Mk-bIhAC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=CSn8Mk-bIhAC&dq=inauthor:%22Frank+Herbert%22&hl=&cd=19&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=CSn8Mk-bIhAC&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune_Messiah.html?hl=&id=CSn8Mk-bIhAC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=CSn8Mk-bIhAC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A science fiction spectacular like no other, this is a deeply climate conscious novel, and a compelling family saga for the ages. Dune reading order: Dune Dune Messiah Children of Dune God Emperor of Dune Heretics of Dune Chapterhouse Dune"
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "i9-wAAAAIAAJ",
+      "etag": "gROY3r929EY",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/i9-wAAAAIAAJ",
+      "volumeInfo": {
+        "title": "Chapterhouse, Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Putnam Publishing Group",
+        "publishedDate": "1985",
+        "description": "Science fiction-roman.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCSC:32106009338549"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 510,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 25,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.13.5.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=i9-wAAAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=i9-wAAAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=i9-wAAAAIAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&cd=20&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=i9-wAAAAIAAJ&dq=inauthor:%22Frank+Herbert%22&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Chapterhouse_Dune.html?hl=&id=i9-wAAAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=i9-wAAAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Science fiction-roman."
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "kind": "books#volume",
+  "id": "vDkkMwEACAAJ",
+  "etag": "M5tUHKaKAOg",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/vDkkMwEACAAJ",
+  "volumeInfo": {
+    "title": "Первый (второй) сборник стихов",
+    "authors": [
+      "Vserossiĭskiĭ soi︠u︡z poėtov"
+    ],
+    "publisher": "Всероссийский Союз Поэтов",
+    "publishedDate": "1921",
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "language": "ru",
+    "previewLink": "http://books.google.com/books?id=vDkkMwEACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=vDkkMwEACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=vDkkMwEACAAJ"
+  },
+  "saleInfo": {
+    "country": "AM",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "AM",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=vDkkMwEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

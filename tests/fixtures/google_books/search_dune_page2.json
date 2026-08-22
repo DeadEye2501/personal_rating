@@ -1,0 +1,1349 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 300,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "8EFb8rdMefAC",
+      "etag": "BARvEtstlo4",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/8EFb8rdMefAC",
+      "volumeInfo": {
+        "title": "Engineering Magazine",
+        "publishedDate": "1897",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "OXFORD:602930892"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 1436,
+        "printType": "BOOK",
+        "categories": [
+          "Engineering"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.0.1.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=8EFb8rdMefAC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=8EFb8rdMefAC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=8EFb8rdMefAC&pg=PA612&dq=dune&hl=&cd=21&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=8EFb8rdMefAC&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=8EFb8rdMefAC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=8EFb8rdMefAC&rdid=book-8EFb8rdMefAC&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Engineering_Magazine.epub?id=8EFb8rdMefAC&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=8EFb8rdMefAC&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> is the secret of all suc- cess in the fixation of shifting sand . It is simply a bank of sand of certain dimensions , with a certain slope suited to the condition of affairs . This protective , or littoral , <b>dune</b> is formed as&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "rqNGAQAAMAAJ",
+      "etag": "fS7MFOpXUgI",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/rqNGAQAAMAAJ",
+      "volumeInfo": {
+        "title": "Augustana Library Publications",
+        "publishedDate": "1898",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UIUC:30112044296678"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 726,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.7.7.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=rqNGAQAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=rqNGAQAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=rqNGAQAAMAAJ&pg=RA6-PA32&dq=dune&hl=&cd=22&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=rqNGAQAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=rqNGAQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=rqNGAQAAMAAJ&rdid=book-rqNGAQAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Augustana_Library_Publications.epub?id=rqNGAQAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=rqNGAQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> COMPLEX . The fundamental principles of <b>dune</b> formation established in the previous section must be recognized at the outset of this discussion in order to facilitate an understanding of the conditions which cause the origin and&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "biItAAAAMAAJ",
+      "etag": "m8+WgBbgDoc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/biItAAAAMAAJ",
+      "volumeInfo": {
+        "title": "Geographical Abstracts",
+        "subtitle": "Annual index",
+        "publishedDate": "1986",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015010081498"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 1382,
+        "printType": "BOOK",
+        "categories": [
+          "Geography"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.9.8.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=biItAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=biItAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=biItAAAAMAAJ&q=dune&dq=dune&hl=&cd=23&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=biItAAAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Geographical_Abstracts.html?hl=&id=biItAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=biItAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> FIELDS , REGIONAL STRATIGRAPHY OF AUSTRALIAN 84A / 0656 84A / 1148 <b>DUNE</b> FORMATION GROTE NETE VALLEY , CENTRAL BELGIUM . LATE WEICHSELI AN <b>DUNE</b> FORMATION ON THE HUMID TROPICAL SECTOR OF THE NORTH QUEENSLAND CO <b>DUNE</b> GEOMETRY . A TEST&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "P8XkAAAAMAAJ",
+      "etag": "P5aOYcx8+rE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/P8XkAAAAMAAJ",
+      "volumeInfo": {
+        "title": "Annual Reports of the Forest, Fish and Game Commissioner of the State of New York",
+        "authors": [
+          "New York (State). Forest, Fish and Game Commission"
+        ],
+        "publishedDate": "1899",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015082098131"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 576,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.6.8.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=P8XkAAAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=P8XkAAAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=P8XkAAAAMAAJ&pg=PA410-IA4&dq=dune&hl=&cd=24&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=P8XkAAAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=P8XkAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=P8XkAAAAMAAJ&rdid=book-P8XkAAAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Annual_Reports_of_the_Forest_Fish_and_Ga.epub?id=P8XkAAAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/Annual_Reports_of_the_Forest_Fish_and_Ga.pdf?id=P8XkAAAAMAAJ&hl=&output=pdf&sig=ACfU3U1JVwp0Q5bmELPkGd0MufKIP7dyMA&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=P8XkAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> of the height desired is formed artificially . The proper height of a protective <b>dune</b> is thirty - three feet . It should slope twenty- five degrees towards the sea , and may be sixty degrees on the land side . The <b>dune</b> must be at&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "7iI2AQAAMAAJ",
+      "etag": "lRl8F/YcCuQ",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/7iI2AQAAMAAJ",
+      "volumeInfo": {
+        "title": "Agricultural Journal of the Cape of Good Hope",
+        "authors": [
+          "Cape of Good Hope (Colony). Department of Agriculture"
+        ],
+        "publishedDate": "1896",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "PSU:000053200983"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 186,
+        "printType": "BOOK",
+        "categories": [
+          "Agriculture"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.9.8.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=7iI2AQAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=7iI2AQAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=7iI2AQAAMAAJ&pg=PA62&dq=dune&hl=&cd=25&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=7iI2AQAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=7iI2AQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=7iI2AQAAMAAJ&rdid=book-7iI2AQAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Agricultural_Journal_of_the_Cape_of_Good.epub?id=7iI2AQAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/Agricultural_Journal_of_the_Cape_of_Good.pdf?id=7iI2AQAAMAAJ&hl=&output=pdf&sig=ACfU3U1UD0pY-wWQvtfwO2GHUps9JJESGA&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=7iI2AQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> in the Landes may be interesting . In Fig . 3 is W v ८८ Fig 3 Dunc do bion ( Gironde ) Fig 4 L E <b>Dune</b> do Forge ( Gironde ) <b>Dune</b> 2 Av Ꮄ Fig 5 . Le The dimensions are : -Height 45 feet ; base 185 feet ; width of plateau 5 feet&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "V6E9AQAAMAAJ",
+      "etag": "F8qe25N6/Zk",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/V6E9AQAAMAAJ",
+      "volumeInfo": {
+        "title": "The Ecological Relations of the Vegetation on the Sand Dunes of Lake Michigan",
+        "authors": [
+          "Henry Chandler Cowles"
+        ],
+        "publishedDate": "1899",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "MSU:31293013582329"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 252,
+        "printType": "BOOK",
+        "categories": [
+          "Plant ecology"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.8.8.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=V6E9AQAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=V6E9AQAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=V6E9AQAAMAAJ&pg=PA177&dq=dune&hl=&cd=26&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=V6E9AQAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=V6E9AQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=V6E9AQAAMAAJ&rdid=book-V6E9AQAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/The_Ecological_Relations_of_the_Vegetati.epub?id=V6E9AQAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=V6E9AQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> - forming plants must be peren- nials ; otherwise the <b>dune</b> would be destroyed at the end of the growing season . Such annual dunes are very common on the beach . Clumps of Cakile have been seen , about which there is piled a miniature&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "HcwpAQAAMAAJ",
+      "etag": "4Y7oVDO6qPE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/HcwpAQAAMAAJ",
+      "volumeInfo": {
+        "title": "Long Island Forum",
+        "publishedDate": "1992",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "WISC:89082578980"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 516,
+        "printType": "BOOK",
+        "categories": [
+          "Long Island (N.Y.)"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.11.4.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=HcwpAQAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=HcwpAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=HcwpAQAAMAAJ&q=dune&dq=dune&hl=&cd=27&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=HcwpAQAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Long_Island_Forum.html?hl=&id=HcwpAQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=HcwpAQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>Dune</b> II is younger than <b>Dune</b> I but older than III and is also virtually sta- tionary . <b>Dune</b> III is the youngest and most active , moving at an aver- age rate of four feet per year . Assuming a continuing sediment supply , this <b>dune</b>&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "SiBSAQAAIAAJ",
+      "etag": "c1AteB91FEs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/SiBSAQAAIAAJ",
+      "volumeInfo": {
+        "title": "Geographical Abstracts Index",
+        "publishedDate": "1972",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "STANFORD:36105013245654"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 850,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "2.6.6.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=SiBSAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=SiBSAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=SiBSAQAAIAAJ&pg=PA182&dq=dune&hl=&cd=28&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=SiBSAQAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Geographical_Abstracts_Index.html?hl=&id=SiBSAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=SiBSAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "iiQXFa8RSq8C",
+      "etag": "axZ2401G+Sg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/iiQXFa8RSq8C",
+      "volumeInfo": {
+        "title": "Coastal Dune Plants of New South Wales",
+        "authors": [
+          "Peter J. Clarke"
+        ],
+        "publishedDate": "1989",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "ERDC:35925000963493"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 176,
+        "printType": "BOOK",
+        "categories": [
+          "Coastal plants"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.1.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=iiQXFa8RSq8C&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=iiQXFa8RSq8C&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=iiQXFa8RSq8C&q=dune&dq=dune&hl=&cd=29&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=iiQXFa8RSq8C&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Coastal_Dune_Plants_of_New_South_Wales.html?hl=&id=iiQXFa8RSq8C"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=iiQXFa8RSq8C&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> vegetation has provided a limited resource that now warrants protection . Education and Research Many <b>dune</b> species are particularly useful in illustrating general plant properties and interactions between plants and animals&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "VKCBAAAAMAAJ",
+      "etag": "9fTyYKrzcJs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/VKCBAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The Wadi Kubbaniya Skeleton",
+        "subtitle": "A Late Paleolithic Burial from Southern Egypt",
+        "authors": [
+          "Fred Wendorf",
+          "Romuald Schild"
+        ],
+        "publishedDate": "1986",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015046437896"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 102,
+        "printType": "BOOK",
+        "categories": [
+          "History"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=VKCBAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=VKCBAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=VKCBAAAAMAAJ&q=dune&dq=dune&hl=&cd=30&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=VKCBAAAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Wadi_Kubbaniya_Skeleton.html?hl=&id=VKCBAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=VKCBAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>Dune</b> ( Yellow <b>Dune</b> ) -cemented to consoli- dated <b>dune</b> sand with rare vertical jointings and very inconspicuous and ill - defined lamination , cementation increases toward top , yellow ( 10YR 8/6 ) to very pale brown ( 10YR 8/4 ) . Upper&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "YwwSAQAAIAAJ",
+      "etag": "CMqUUuxSEFc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/YwwSAQAAIAAJ",
+      "volumeInfo": {
+        "title": "Bulletin",
+        "authors": [
+          "Coastal Society"
+        ],
+        "publishedDate": "1980",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCSC:32106020375553"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 264,
+        "printType": "BOOK",
+        "categories": [
+          "Coasts"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.11.3.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=YwwSAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=YwwSAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=YwwSAQAAIAAJ&q=dune&dq=dune&hl=&cd=31&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=YwwSAQAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Bulletin.html?hl=&id=YwwSAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=YwwSAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> is the location of sand storage in the upper por- tion of the <b>dune</b> / beach profile and represents an area where terrestrial processes and marine processes inter- face . The presence of pioneer vegetation as well as bushes and&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "HcErAQAAMAAJ",
+      "etag": "IVAiYzwi9kA",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/HcErAQAAMAAJ",
+      "volumeInfo": {
+        "title": "The Forestal Conditions and Silvicultural Prospects of the Coastal Plain of New Jersey",
+        "subtitle": "With Remarks in Reference to Other Regions and Kindred Subjects",
+        "authors": [
+          "John Clayton Gifford"
+        ],
+        "publishedDate": "1900",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "MINN:31951D015498075"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 130,
+        "printType": "BOOK",
+        "categories": [
+          "Forests and forestry"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.6.6.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=HcErAQAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=HcErAQAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=HcErAQAAMAAJ&pg=PA302-IA4&dq=dune&hl=&cd=32&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=HcErAQAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=HcErAQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=HcErAQAAMAAJ&rdid=book-HcErAQAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/The_Forestal_Conditions_and_Silvicultura.epub?id=HcErAQAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/The_Forestal_Conditions_and_Silvicultura.pdf?id=HcErAQAAMAAJ&hl=&output=pdf&sig=ACfU3U1PP8JFuDvnUmj7XyjJFrf_c4V3RA&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=HcErAQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> was constructed straight along the shore from the mouth of the Gironde to Bayonne . This <b>dune</b> was the secret of the success in the fixation of these shifting sands . It is simply a bank of sand of certain dimensions , with a&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "NRwDAAAAMAAJ",
+      "etag": "FH7drd2BW6c",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/NRwDAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The Geographical Journal",
+        "publishedDate": "1900",
+        "description": "Includes the Proceedings of the Royal Geographical Society, formerly published separately.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015027349292"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 798,
+        "printType": "BOOK",
+        "categories": [
+          "Electronic journals"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.13.14.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=NRwDAAAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=NRwDAAAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=NRwDAAAAMAAJ&pg=PA3&dq=dune&hl=&cd=33&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=NRwDAAAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=NRwDAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=NRwDAAAAMAAJ&rdid=book-NRwDAAAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/The_Geographical_Journal.epub?id=NRwDAAAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/The_Geographical_Journal.pdf?id=NRwDAAAAMAAJ&hl=&output=pdf&sig=ACfU3U3H05r3NJHay0VrvrTMbOyugfnITA&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=NRwDAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> - tract , or <b>dune</b> - massif , throughout the sandy districts which I visited became clearer to me towards the end of my stay . This subject , to which my attention was drawn by M. Doyen , is dealt with more fully at the end of the&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "c9JQAQAAIAAJ",
+      "etag": "HUk6xGxCH7s",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/c9JQAQAAIAAJ",
+      "volumeInfo": {
+        "title": "The Australian Journal of Science",
+        "publishedDate": "1952",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "STANFORD:36105027374722"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 924,
+        "printType": "BOOK",
+        "categories": [
+          "Science"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.3.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=c9JQAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=c9JQAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=c9JQAQAAIAAJ&q=dune&dq=dune&hl=&cd=34&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=c9JQAQAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Australian_Journal_of_Science.html?hl=&id=c9JQAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=c9JQAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>Dune</b> 3 After this period of profile development <b>Dune</b> 2 was deposited above <b>Dune</b> 1 , also with pH of 9 , as was initially the case with <b>Dune</b> 1 . Figure 3iii shows the pH relations at this stage . <b>Dune</b> 2 was then subjected to leaching pro&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "giIvxpzz7LoC",
+      "etag": "HAieQaSpP3A",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/giIvxpzz7LoC",
+      "volumeInfo": {
+        "title": "Entomologica Scandinavica",
+        "authors": [
+          "Carl Hildebrand Lindroth"
+        ],
+        "publishedDate": "1973",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCD:31175001580755"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 360,
+        "printType": "BOOK",
+        "categories": [
+          "Entomology"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.1.0.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=giIvxpzz7LoC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=giIvxpzz7LoC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=giIvxpzz7LoC&q=dune&dq=dune&hl=&cd=35&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=giIvxpzz7LoC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Entomologica_Scandinavica.html?hl=&id=giIvxpzz7LoC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=giIvxpzz7LoC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>Dune</b> ridge , seaward <b>Dune</b> ridge , landward c Ammophila → Salix Cladonia Empetrum Calluna Bryophyta 2/1 Fig . 16. Distribution and density of Pardosa nigri- - ceps in the biotopes of the coastal sand dunes at Sandhammaren . ope Tindivid&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "IzTzAAAAMAAJ",
+      "etag": "VDjiAUVpO2g",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/IzTzAAAAMAAJ",
+      "volumeInfo": {
+        "title": "A Manual of Forestry ...: Forest protection, by W.R. Fisher ... being an English adaptation of \"Der forstschutz,\" by Dr. Richard Hess. 1895",
+        "authors": [
+          "Sir William Schlich"
+        ],
+        "publishedDate": "1895",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "WISC:89098735335"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 622,
+        "printType": "BOOK",
+        "categories": [
+          "Forests and forestry"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.7.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=IzTzAAAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=IzTzAAAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=IzTzAAAAMAAJ&pg=PA528&dq=dune&hl=&cd=36&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=IzTzAAAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=IzTzAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=IzTzAAAAMAAJ&rdid=book-IzTzAAAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/A_Manual_of_Forestry_Forest_protection_b.epub?id=IzTzAAAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/A_Manual_of_Forestry_Forest_protection_b.pdf?id=IzTzAAAAMAAJ&hl=&output=pdf&sig=ACfU3U0_eF15ltLQGS2t-HqnI-tKhhBfyA&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=IzTzAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> at once causes an inland draught of sand on both sides of it , which if not at once attended to will breach the <b>dune</b> . Men termed gardes cantonniers are therefore stationed along the littoral <b>dune</b> in Gascony , who cut away all&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "V8iEAAAAIAAJ",
+      "etag": "I9Auy3je12M",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/V8iEAAAAIAAJ",
+      "volumeInfo": {
+        "title": "The Poet and the Messenger",
+        "subtitle": "Dune-Glade, and Other Poems",
+        "authors": [
+          "Milton Smith Ray"
+        ],
+        "publishedDate": "1946",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCAL:B4500432"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 84,
+        "printType": "BOOK",
+        "categories": [
+          "American poetry"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=V8iEAAAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=V8iEAAAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=V8iEAAAAIAAJ&q=dune&dq=dune&hl=&cd=37&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=V8iEAAAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Poet_and_the_Messenger.html?hl=&id=V8iEAAAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=V8iEAAAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Milton Smith Ray. + The Poet and The Messenger <b>Dune</b> - Glade and Other."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "B1hSG45JCX4C",
+      "etag": "69SEbpsUruQ",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/B1hSG45JCX4C",
+      "volumeInfo": {
+        "title": "Dune",
+        "authors": [
+          "Frank Herbert"
+        ],
+        "publisher": "Penguin",
+        "publishedDate": "2005-08-02",
+        "description": "Frank Herbert’s classic masterpiece—a triumph of the imagination and one of the bestselling science fiction novels of all time. Set on the desert planet Arrakis, Dune is the story of Paul Atreides—who would become known as Muad'Dib—and of a great family's ambition to bring to fruition humankind's most ancient and unattainable dream. A stunning blend of adventure and mysticism, environmentalism and politics, Dune won the first Nebula Award, shared the Hugo Award, and formed the basis of what is undoubtedly the grandest epic in science fiction.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0441013597"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780441013593"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 548,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "averageRating": 4.5,
+        "ratingsCount": 25,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "3.8.10.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=B1hSG45JCX4C&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=B1hSG45JCX4C&dq=dune&hl=&cd=38&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=B1hSG45JCX4C&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune.html?hl=&id=B1hSG45JCX4C"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=B1hSG45JCX4C&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Set on the desert planet Arrakis, Dune is the story of Paul Atreides—who would become known as Muad&#39;Dib—and of a great family&#39;s ambition to bring to fruition humankind&#39;s most ancient and unattainable dream."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "4MtQAQAAIAAJ",
+      "etag": "ItKVKzg/uJs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/4MtQAQAAIAAJ",
+      "volumeInfo": {
+        "title": "Aeolian Geomorphology",
+        "subtitle": "Papers from the 4th International Conference on Aeolian Research, Oxford, UK, 1998",
+        "authors": [
+          "Ian Livingstone"
+        ],
+        "publishedDate": "1999",
+        "description": "The contents of this Supplementband reflect the range of issues that currently interest aeolian geomorphologists, and the papers have been grouped into sections on: dust entrainment, transport and deposition; wind erosion processes and landforme; and dune forms and palaeoenvironments. The final paper reports a new application of a technique for measuring dune movement (Stokes et al.). Another development is evident from the papers: Luminescence dating is now being widely and routinely applied in aeolian geomorphology, a change which is noticeable even since the last in this series of international conferences in 1994. All bar one of the papers in the section on dune forms and palaeoenvironments as well as the paper by Richardson et al. on loess in the USA make use of chronologies derived from luminescence dating. Before the advent of luminescence dating, aeolian geomorphologists frequently relied on stratigraphic associations and dates derived from interbedded, non-aeolian deposits. As this set shows the development of the technique has provided an explosion of new dates.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "STANFORD:36105028925977"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 234,
+        "printType": "BOOK",
+        "categories": [
+          "Eolian processes"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.9.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=4MtQAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=4MtQAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=4MtQAQAAIAAJ&q=dune&dq=dune&hl=&cd=39&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=4MtQAQAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Aeolian_Geomorphology.html?hl=&id=4MtQAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=4MtQAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> Kw 7 comprising only 2.75 % of the volume of <b>dune</b> Kw 9 , the largest . Dunes at Kharga east are less varied and consider- ably larger than those of Kharga west ( average volumes : Ke = 554 331 m3 cf Kw = 202070 m3 ) . Dunes from&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "5cg7AQAAMAAJ",
+      "etag": "PUp7GUGVX1o",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/5cg7AQAAMAAJ",
+      "volumeInfo": {
+        "title": "Annual Report",
+        "authors": [
+          "New York (State). Forest, Fish and Game Commission"
+        ],
+        "publishedDate": "1899",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCAL:C2564692"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 566,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.6.6.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=5cg7AQAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=5cg7AQAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=5cg7AQAAMAAJ&pg=PA410&dq=dune&hl=&cd=40&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=5cg7AQAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=5cg7AQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=5cg7AQAAMAAJ&rdid=book-5cg7AQAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Annual_Report.epub?id=5cg7AQAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=5cg7AQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> of the height desired is formed artificially . The proper height of a protective <b>dune</b> is thirty - three feet . It should slope twenty- five degrees towards the sea , and may be sixty degrees on the land side . The <b>dune</b> must be at&nbsp;..."
+      }
+    }
+  ]
+}

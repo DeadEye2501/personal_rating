@@ -35,6 +35,7 @@ def test_file_paths_sit_inside_data_dir(tmp_path):
 # который потом ищут в клиенте.
 KEYS = {
     "TMDB_API_KEY": ("tmdb_key", "ключ-tmdb"),
+    "GOOGLE_BOOKS_API_KEY": ("google_books_key", "ключ-google-books"),
     "MDBLIST_API_KEY": ("mdblist_key", "ключ-mdblist"),
     "OMDB_API_KEY": ("omdb_key", "ключ-omdb"),
     "POISKKINO_API_KEY": ("poiskkino_key", "ключ-poiskkino"),

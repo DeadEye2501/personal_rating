@@ -31,18 +31,18 @@
 - `def card_parts(sessions, posters: PosterService) -> dict` (13)
 - `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (66)
 
-### `backend/config.py` — 59 строк
+### `backend/config.py` — 61 строк
 
 Настройки приложения, прочитанные из окружения.
 
 Зависит от: —
 
-- `class Config` (21)
+- `class Config` (22)
   - `def library_db(self) -> Path` (2)
   - `def posters_db(self) -> Path` (2)
   - `def log_file(self) -> Path` (2)
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
-- `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (15)
+- `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (16)
 
 ### `backend/language.py` — 72 строк
 
@@ -1472,7 +1472,7 @@
 - `def settings()` (6)
 - `async def main() -> None` (18)
 
-### `scripts/record_fixtures.py` — 287 строк
+### `scripts/record_fixtures.py` — 373 строк ⚠ подошёл к 300
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -1488,7 +1488,10 @@
 - `async def record_omdb(client: httpx.AsyncClient, key: str) -> None` (13)
 - `async def record_kinopoisk_unofficial(client: httpx.AsyncClient, key: str) -> None` (19)
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
-- `async def main() -> None` (22)
+- `async def record_google_books(client: httpx.AsyncClient, key: str) -> None` (36)
+  - `async def asked(params: dict) -> httpx.Response` (6)
+- `async def record_deezer(client: httpx.AsyncClient) -> None` (22)
+- `async def main() -> None` (24)
 
 ## tests — 103 модулей
 
@@ -1759,7 +1762,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def build(sessions, engine, posters, transport=None) -> CardWriter` (9)
 - `async def writer(sessions, engine, posters)` (4)
 
-### `tests/backend/test_config.py` — 87 строк
+### `tests/backend/test_config.py` — 88 строк
 
 Чтение настроек из окружения и путей к файлам данных.
 

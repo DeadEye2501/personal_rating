@@ -1,0 +1,72 @@
+{
+  "kind": "books#volume",
+  "id": "0pkiAQAAIAAJ",
+  "etag": "L80unWdj+A8",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/0pkiAQAAIAAJ",
+  "volumeInfo": {
+    "title": "История России",
+    "subtitle": "материалы российско-американской научной конференции (г. Саратов, 18-22 мая 1992 года)",
+    "publisher": "Издательство Саратовского университета",
+    "publishedDate": "1994",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "5292017744"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9785292017745"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 254,
+    "printedPageCount": 270,
+    "dimensions": {
+      "height": "20.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "0.6.1.0.preview.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "imageLinks": {
+      "smallThumbnail": "http://books.google.com/books/content?id=0pkiAQAAIAAJ&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE73gRdnu1_728j3ze6vKQA8Xe1JE7NcYnUGGzhj_bHzjqmapOTf-U75xedNiw5_aLpLOyys75K_NAJQOs4qppWjfxSAOBsqwqsSdtueJFEo8yKhPHcN8luckgetltu1DWBUFFRn_&source=gbs_api",
+      "thumbnail": "http://books.google.com/books/content?id=0pkiAQAAIAAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE70aiJx1GPDcf6amQ2lu3AgKPzO6OEI_REP_xGi5fzki6GIjofSa4p7NiYjyxHySXx4luIfjZeo82pK9lafDxHZax5uawtJq7efyGVJrN0jr6kPrnalA51KmJhH2Zo-0bxnDhGgT&source=gbs_api",
+      "small": "http://books.google.com/books/content?id=0pkiAQAAIAAJ&printsec=frontcover&img=1&zoom=2&imgtk=AFLRE73s4jV2XmwAB2FZrBMUfHlOZuRD3CQNEcaYXqEiueO1Tdwfy6knzdgVkNw4EWXo6fqLl6gWdRW8f5qQjoEW0mddA5nlOpu0qMd6_VPxPKhj-IDt3JpRUrCdLtfElJK1F2haNV85&source=gbs_api",
+      "medium": "http://books.google.com/books/content?id=0pkiAQAAIAAJ&printsec=frontcover&img=1&zoom=3&imgtk=AFLRE73Y4ZJjqiHZ89tAf3ZfPOtr62ifBJ3tpPiIWbP5Uwr03w_okVEWRYOnhx4mVXkdHRU1no7Sri_YWfkQmWfJJVYvoyl_VtoYEjbxmyPRH91sfZSwJqa93g1ugIXjlIT7MnP5f48j&source=gbs_api",
+      "large": "http://books.google.com/books/content?id=0pkiAQAAIAAJ&printsec=frontcover&img=1&zoom=4&imgtk=AFLRE72QRB-DZ_88l-hzl6Jv43aPOK798SLEKVpnJgMTVVWkx1jBwbh_zcRJt6l4PiKscMU1yZ24QKKpOmkI1D9wGblZmKMdjbwQ9URDM2rVHl-LNRzw3EmPyjkIX2_izV7_cpWOY_oa&source=gbs_api",
+      "extraLarge": "http://books.google.com/books/content?id=0pkiAQAAIAAJ&printsec=frontcover&img=1&zoom=6&imgtk=AFLRE73fgHEEeqvEw0V4irhC3a8LjFgzcdHNLelRrYObZeEmLlvi-3R3hJeHQeUFEAfJf8Lt3qr7082QIVIS5A2NFyWDwqd9VuJfetr78Ihps9x1C9XPvLu0gNqnYG3nvkZHalKBzdHH&source=gbs_api"
+    },
+    "language": "ru",
+    "previewLink": "http://books.google.com/books?id=0pkiAQAAIAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=0pkiAQAAIAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=0pkiAQAAIAAJ"
+  },
+  "saleInfo": {
+    "country": "AM",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "AM",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=0pkiAQAAIAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

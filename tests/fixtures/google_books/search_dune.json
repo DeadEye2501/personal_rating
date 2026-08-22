@@ -1,0 +1,1387 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 300,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "4kbYExSCa6oC",
+      "etag": "dB7RdyumTKY",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/4kbYExSCa6oC",
+      "volumeInfo": {
+        "title": "The Science of Dune",
+        "subtitle": "An Unauthorized Exploration into the Real Science Behind Frank Herbert's Fictional Universe",
+        "authors": [
+          "Kevin R. Grazier"
+        ],
+        "publisher": "BenBella Books, Inc.",
+        "publishedDate": "2007-12-11",
+        "description": "Get excited for the 2021 Denis Villeneuve Dune film release, starring Timothée Chalamet, with The Science of Dune! Since its original publication in 1965, the Dune series has entranced generations of readers with its complex plotting, fascinating characters, grand scope, and incredible scientific predictions. This guide offers fascinating scientific speculation on topics including quantum physics, biochemistry, ecology, evolution, psychology, technology, and genetics. It scrutinizes Frank Herbert’s science fiction world by asking questions such as: Is the ecology of Dune realistic? Is it theoretically possible to get information from the future? Could humans really evolve as Herbert suggests? Which of Herbert’s inventions have already come to life? This companion is a must-have for any fan who wants to revisit the world of Dune and explore it even further.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9781935251408"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "1935251406"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 248,
+        "printType": "BOOK",
+        "categories": [
+          "Social Science"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "3.7.7.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=4kbYExSCa6oC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=4kbYExSCa6oC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=4kbYExSCa6oC&pg=PA84&dq=dune&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=4kbYExSCa6oC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Science_of_Dune.html?hl=&id=4kbYExSCa6oC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED_FOR_ACCESSIBILITY",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/The_Science_of_Dune-sample-epub.acsm?id=4kbYExSCa6oC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/The_Science_of_Dune-sample-pdf.acsm?id=4kbYExSCa6oC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=4kbYExSCa6oC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>Dune</b> include instances of Bene Gesserit code phrases and the speech patterns of various schools of espionage. physical an- thropologists focus on human biology whether it is human evolution or contemporary genetics. herbert looked at&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "uFUNEdf6UskC",
+      "etag": "WT25ebt0z+I",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/uFUNEdf6UskC",
+      "volumeInfo": {
+        "title": "Coastal Dune Management",
+        "subtitle": "Shared Experience of European Conservation Practice",
+        "authors": [
+          "John Houston",
+          "Paul J. Rooney",
+          "Sally E. Edmondson",
+          "P. J. Rooney"
+        ],
+        "publisher": "Liverpool University Press",
+        "publishedDate": "2001-01-01",
+        "description": "Elizabeth A. Kaye specializes in communications as part of her coaching and consulting practice. She has edited Requirements for Certification since the 2000-01 edition.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0853238545"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780853238546"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 476,
+        "printType": "BOOK",
+        "categories": [
+          "Technology & Engineering"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.9.8.0.preview.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=uFUNEdf6UskC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=uFUNEdf6UskC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=uFUNEdf6UskC&pg=PA316&dq=dune&hl=&cd=2&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=uFUNEdf6UskC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Coastal_Dune_Management.html?hl=&id=uFUNEdf6UskC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Coastal_Dune_Management-sample-pdf.acsm?id=uFUNEdf6UskC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=uFUNEdf6UskC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> CONSERVATION POLICY JEAN - LOUIS HERRIER and ILSE KILLEMAES Ministry of the Flemish Community , Department of Environment and Infrastructure , Belgium. Description. of. the. Flemish. Coastal. Dunes. Flanders has a nearly straight&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "BhInAQAAIAAJ",
+      "etag": "cav6B1sV8Kg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/BhInAQAAIAAJ",
+      "volumeInfo": {
+        "title": "The Making of Dune",
+        "authors": [
+          "Ed Naha"
+        ],
+        "publisher": "Berkley Trade",
+        "publishedDate": "1984",
+        "description": "With more than one hundred photographs, and interviews with Frank Herbert and members of the cast and crew, this book details the creation of an alien world in the Mexican desert",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCSC:32106011636484"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 328,
+        "printType": "BOOK",
+        "categories": [
+          "Performing Arts"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.5.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=BhInAQAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=BhInAQAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=BhInAQAAIAAJ&q=dune&dq=dune&hl=&cd=3&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=BhInAQAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Making_of_Dune.html?hl=&id=BhInAQAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=BhInAQAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Ed Naha. 1 . <b>DUNE</b>. Why make a movie out of <b>DUNE</b> ? The reasons are all in the book . Raffaella De Laurentiis , producer A lot of people have tried to film <b>DUNE</b> . They all failed . I tried writing a screenplay of it , once . It was rotten&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "_uEW-us4_GAC",
+      "etag": "y1WuLBcMwC4",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/_uEW-us4_GAC",
+      "volumeInfo": {
+        "title": "Sand Dune Stabilization, Shelterbelts and Afforestation in Dry Zones",
+        "publisher": "Food & Agriculture Org.",
+        "publishedDate": "1985-01-01",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9251022615"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789251022610"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 252,
+        "printType": "BOOK",
+        "categories": [
+          "Nature"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.8.10.0.preview.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=_uEW-us4_GAC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=_uEW-us4_GAC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=_uEW-us4_GAC&pg=PA71&dq=dune&hl=&cd=4&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=_uEW-us4_GAC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Sand_Dune_Stabilization_Shelterbelts_and.html?hl=&id=_uEW-us4_GAC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.com/books/download/Sand_Dune_Stabilization_Shelterbelts_and-sample-pdf.acsm?id=_uEW-us4_GAC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=_uEW-us4_GAC&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "VIII . MULCHING TECHNIQUE OF <b>DUNE</b> FIXATION : THE LAYER SYSTEM by B. Ben Salem 1 / 1 . INTRODUCTION Mulching of <b>dune</b> area has been adopted in many countries as a technique for stabilizing dunes and for countering wind erosion and other&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "cY7GpbLhengC",
+      "etag": "JIwKnRB/4ro",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/cY7GpbLhengC",
+      "volumeInfo": {
+        "title": "On the Sand-dune",
+        "authors": [
+          "K. S. Venkataramani"
+        ],
+        "publishedDate": "1923",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "OSU:32435006832927"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 80,
+        "printType": "BOOK",
+        "categories": [
+          "Indic prose literature"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.0.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=cY7GpbLhengC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=cY7GpbLhengC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=cY7GpbLhengC&q=dune&dq=dune&hl=&cd=5&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=cY7GpbLhengC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/On_the_Sand_dune.html?hl=&id=cY7GpbLhengC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=cY7GpbLhengC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... a mile . And I am alone on the sandy <b>dune</b> pining for things which will never be mine . ( 2 ) The stars are coming out on the milky way with the calm of cosmic vigils . Frail man ! Thou knowest not the music ON THE SAND-<b>DUNE</b> ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "xmuoJdl0YbUC",
+      "etag": "yi/M5+4D0UU",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/xmuoJdl0YbUC",
+      "volumeInfo": {
+        "title": "Dune Activity Book",
+        "authors": [
+          "Maida Silverman"
+        ],
+        "publisher": "Putnam Publishing Group",
+        "publishedDate": "1984-12",
+        "description": "Based on the 1984 motion picture adaptation of the novel by Frank Herbert.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0448233517"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780448233512"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 68,
+        "printType": "BOOK",
+        "categories": [
+          "Creative activities and seat work"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.4.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=xmuoJdl0YbUC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=xmuoJdl0YbUC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=xmuoJdl0YbUC&q=dune&dq=dune&hl=&cd=6&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=xmuoJdl0YbUC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune_Activity_Book.html?hl=&id=xmuoJdl0YbUC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=xmuoJdl0YbUC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> ! You&#39;ll want all these <b>DUNE</b> activity books : <b>DUNE</b> TM ACTIVITY BOOK <b>DUNE</b> TM COLORING AND ACTIVITY BOOK DUNET TM COLORING BOOK <b>DUNE</b> TM CUT - OUT ACTIVITY BOOK <b>DUNE</b> TM PUZZLES , GAMES , MAZES AND ACTIVITIES DUNET TM POP - UP PANORAMA&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "cD5EAAAAIAAJ",
+      "etag": "PM9ZeBP33VE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/cD5EAAAAIAAJ",
+      "volumeInfo": {
+        "title": "The Dune Country",
+        "authors": [
+          "Earl Howell Reed"
+        ],
+        "publisher": "New York : J. Lane ; Toronto : S.B. Gundy",
+        "publishedDate": "1916",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCAL:$B325453"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 300,
+        "printType": "BOOK",
+        "categories": [
+          "Indiana"
+        ],
+        "averageRating": 4,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.8.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=cD5EAAAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=cD5EAAAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=cD5EAAAAIAAJ&q=dune&dq=dune&hl=&cd=7&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=cD5EAAAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Dune_Country.html?hl=&id=cD5EAAAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=cD5EAAAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "Earl Howell Reed. 1 1 THE <b>DUNE</b> COUNTRY BY THE SAME AUTHOR THE VOICES OF."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "akUAAAAAMAAJ",
+      "etag": "u0Ac1ZMkuu4",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/akUAAAAAMAAJ",
+      "volumeInfo": {
+        "title": "Factory and Industrial Management",
+        "authors": [
+          "John Robertson Dunlap",
+          "Arthur Van Vlissingen",
+          "John M. Carmody"
+        ],
+        "publishedDate": "1898",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "NYPL:33433066359849"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 1120,
+        "printType": "BOOK",
+        "categories": [
+          "Engineering"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.14.15.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=akUAAAAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=akUAAAAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=akUAAAAAMAAJ&pg=PA612&dq=dune&hl=&cd=8&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=akUAAAAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=akUAAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=akUAAAAAMAAJ&rdid=book-akUAAAAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Factory_and_Industrial_Management.epub?id=akUAAAAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/Factory_and_Industrial_Management.pdf?id=akUAAAAAMAAJ&hl=&output=pdf&sig=ACfU3U04WNkZd0dNFyCuti5OIpGJbXsz6g&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=akUAAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> is the secret of all suc- cess in the fixation of shifting sand . It is simply a bank of sand of certain dimensions , with a certain slope suited to the condition of affairs . This protective , or littoral , <b>dune</b> is formed as&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "v_JEAQAAMAAJ",
+      "etag": "GLqVspYug/Q",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/v_JEAQAAMAAJ",
+      "volumeInfo": {
+        "title": "Vernal Dune",
+        "subtitle": "In which is Shown the End of an Era",
+        "authors": [
+          "Eugene Hall"
+        ],
+        "publishedDate": "1913",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "OSU:32435071319321"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 264,
+        "printType": "BOOK",
+        "categories": [
+          "Classism"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.7.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=v_JEAQAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=v_JEAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=v_JEAQAAMAAJ&q=dune&dq=dune&hl=&cd=9&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=v_JEAQAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Vernal_Dune.html?hl=&id=v_JEAQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=v_JEAQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> AT SUNRISE &quot; The chambers of the sun explored , Where tints of thousand hues are stored . &quot; THE Sun had just peeped above the horizon line , and its luminous glance was flashed back from glit- ter of dew - spangled leaf and bloom&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "xJrlryg-i_IC",
+      "etag": "ye1gbhHDTgw",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/xJrlryg-i_IC",
+      "volumeInfo": {
+        "title": "The Great Dune Buggy Race",
+        "authors": [
+          "편집부"
+        ],
+        "publisher": "LEAP FROG",
+        "publishedDate": "2001",
+        "description": "Tackle multiple math challenges and help Leap and his friends build the \"fastest dune buggy ever\" for the annual dune buggy race. He'll need help navigating the difficult race course. Children get to use their new math skills to help Leap win the race!",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "1586050303"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9781586050306"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 28,
+        "printType": "BOOK",
+        "categories": [
+          "Juvenile Nonfiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.6.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=xJrlryg-i_IC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=xJrlryg-i_IC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=xJrlryg-i_IC&q=dune&dq=dune&hl=&cd=10&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=xJrlryg-i_IC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_Great_Dune_Buggy_Race.html?hl=&id=xJrlryg-i_IC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=xJrlryg-i_IC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>Dune</b> Buggy Race Help Leap race to the finish line with 10 fun - filled activities and 200 lessons ! 2 bottles Children will tackle lots of math challenges and help Leap and his friends build the fastest <b>dune</b> buggy ever for the annual&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "DDEW8eJOjBgC",
+      "etag": "LSN9V5Z730k",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/DDEW8eJOjBgC",
+      "volumeInfo": {
+        "title": "Dune Erosion and Wave Height Determinations",
+        "authors": [
+          "Mark E. Leadon"
+        ],
+        "publishedDate": "1989",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UCR:31210024719070"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 12,
+        "printType": "BOOK",
+        "categories": [
+          "Beach erosion"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.4.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=DDEW8eJOjBgC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=DDEW8eJOjBgC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=DDEW8eJOjBgC&q=dune&dq=dune&hl=&cd=11&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=DDEW8eJOjBgC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune_Erosion_and_Wave_Height_Determinati.html?hl=&id=DDEW8eJOjBgC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=DDEW8eJOjBgC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> erosion model by the Beaches and Shores Resources Center in control line restudies , a 2.5 factor will be incorporated in all <b>dune</b> erosion model applications by the Bureau . This is considered to be a &quot; safety &quot; factor based on Dr&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "5hU2AAAAMAAJ",
+      "etag": "3oNKt912YVc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/5hU2AAAAMAAJ",
+      "volumeInfo": {
+        "title": "Dune and Moorland Life",
+        "authors": [
+          "Leif Lyneborg"
+        ],
+        "publisher": "Blandford",
+        "publishedDate": "1973",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "WISC:89042577262"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 146,
+        "printType": "BOOK",
+        "categories": [
+          "Nature"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "3.6.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=5hU2AAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=5hU2AAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=5hU2AAAAMAAJ&q=dune&dq=dune&hl=&cd=12&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=5hU2AAAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune_and_Moorland_Life.html?hl=&id=5hU2AAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=5hU2AAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> . It constitutes an anti - climax to the rich vege- tation of the green <b>dune</b> , and the reason is that a gradual leaching of the sand takes place , making it less nutritious for the plants . The vegetation of the grey <b>dune</b> is&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "sLDYjlFuLy0C",
+      "etag": "Ah077LVqmJs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/sLDYjlFuLy0C",
+      "volumeInfo": {
+        "title": "Land and Water Resources, Historical Changes, and Dune Criticality",
+        "subtitle": "Mustang and North Padre Islands, Texas",
+        "authors": [
+          "William Allen White"
+        ],
+        "publishedDate": "1978",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UIUC:30112026794997"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 56,
+        "printType": "BOOK",
+        "categories": [
+          "Coasts"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.4.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=sLDYjlFuLy0C&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=sLDYjlFuLy0C&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=sLDYjlFuLy0C&q=dune&dq=dune&hl=&cd=13&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=sLDYjlFuLy0C&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Land_and_Water_Resources_Historical_Chan.html?hl=&id=sLDYjlFuLy0C"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=sLDYjlFuLy0C&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> grass and small dunes will not be destroyed . The first <b>dune</b> ridge is also critical because it protects the back - island area from being washed over by most storms . It may also serve as an additional sand supply for beach&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "0cY9AAAAIAAJ",
+      "etag": "QvTa7Z2JJds",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/0cY9AAAAIAAJ",
+      "volumeInfo": {
+        "title": "Dune and Desert Folk",
+        "authors": [
+          "Bruce William McDaniel"
+        ],
+        "publishedDate": "1926",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "STANFORD:36105011592057"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 40,
+        "printType": "BOOK",
+        "categories": [
+          "Desert plants"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.6.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=0cY9AAAAIAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=0cY9AAAAIAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=0cY9AAAAIAAJ&q=dune&dq=dune&hl=&cd=14&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=0cY9AAAAIAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune_and_Desert_Folk.html?hl=&id=0cY9AAAAIAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=0cY9AAAAIAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b>. and. DESERT. FOLK. Page Twenty - three. The. Joshua. ( Cleistoyucca Ar- borescens ) and [ <b>DUNE</b> and DESERT FOLK Page Twenty - five. mass . are added : YUCCA- BISNAGA- MISTLETOE- SMOKE - TREE- CREOSOTE."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "u9IOAQAAMAAJ",
+      "etag": "W5WOhj7LDew",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/u9IOAQAAMAAJ",
+      "volumeInfo": {
+        "title": "Dune Buggies",
+        "publishedDate": "1968",
+        "description": "Color photographs and brief text describe different types of sand buggies and the excitement of a dune buggy treasure hunt in the desert.",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "PSU:000022242402"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 36,
+        "printType": "BOOK",
+        "categories": [
+          "Automobiles"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.4.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=u9IOAQAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=u9IOAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=u9IOAQAAMAAJ&q=dune&dq=dune&hl=&cd=15&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=u9IOAQAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Dune_Buggies.html?hl=&id=u9IOAQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=u9IOAQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> BUGGIES <b>DUNE</b> BUGGY RACING HORSES HOT AIR BALLOONS KARTING : FUN ON FOUR WHEELS THE MIGHTY MIDGETS MINIBIKES MOTORCYCLE RACING MOTORCYCLES SLOT CAR RACING SNOWMOBILES SURFING TEEN FAIR CAR SHOW VW BUGS mar OS ANGELES , CA 90039."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "ELnzAAAAMAAJ",
+      "etag": "iBndTtieQaU",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/ELnzAAAAMAAJ",
+      "volumeInfo": {
+        "title": "Botanical Gazette",
+        "publishedDate": "1899",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "UOM:39015001939480"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": true
+        },
+        "pageCount": 550,
+        "printType": "BOOK",
+        "categories": [
+          "Botany"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.6.7.0.full.1",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=ELnzAAAAMAAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=ELnzAAAAMAAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=ELnzAAAAMAAJ&pg=PA177&dq=dune&hl=&cd=16&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=ELnzAAAAMAAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=ELnzAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "FREE",
+        "isEbook": true,
+        "buyLink": "https://play.google.com/store/books/details?id=ELnzAAAAMAAJ&rdid=book-ELnzAAAAMAAJ&rdot=1&source=gbs_api"
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "ALL_PAGES",
+        "embeddable": true,
+        "publicDomain": true,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false,
+          "downloadLink": "http://books.google.com/books/download/Botanical_Gazette.epub?id=ELnzAAAAMAAJ&hl=&output=epub&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "downloadLink": "http://books.google.com/books/download/Botanical_Gazette.pdf?id=ELnzAAAAMAAJ&hl=&output=pdf&sig=ACfU3U29gPZRGUSAIvmaltTuL5wh1zkxCw&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=ELnzAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "FULL_PUBLIC_DOMAIN",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> - forming plants must be peren- nials ; otherwise the <b>dune</b> would be destroyed at the end of the growing season . Such annual dunes are very common on the beach . Clumps of Cakile have been seen , about which there is piled a miniature&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "FhAbWtKO4O4C",
+      "etag": "/OorobVVDZU",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/FhAbWtKO4O4C",
+      "volumeInfo": {
+        "title": "Canadian Journal of Earth Sciences",
+        "publishedDate": "2001",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "RUTGERS:39030028748061"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 1098,
+        "printType": "BOOK",
+        "categories": [
+          "Geology"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.3.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=FhAbWtKO4O4C&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=FhAbWtKO4O4C&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=FhAbWtKO4O4C&q=dune&dq=dune&hl=&cd=17&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=FhAbWtKO4O4C&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Canadian_Journal_of_Earth_Sciences.html?hl=&id=FhAbWtKO4O4C"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=FhAbWtKO4O4C&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... ( <b>dune</b> sands ) Tunstall sand hills SW1-02 6.0 68 ± 12 Seward sand hills SW2-02 8.0 109 ± 8 Bigstick sand hills SW3-02 ... ( <b>dune</b> sands ) <b>Dune</b> 1 BR18 94-30 ° 0.5 123 ± 6 <b>Dune</b> 1 DT2 94-319 0.5 94 ± 6 <b>Dune</b> 1 DT3 94-329 0.5 116 ± 7 <b>Dune</b> 1&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "0yTVAAAAMAAJ",
+      "etag": "qH8Y2fsZw7E",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/0yTVAAAAMAAJ",
+      "volumeInfo": {
+        "title": "The New Zealand Journal of Science and Technology",
+        "subtitle": "General section. B",
+        "publishedDate": "1945",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "IND:30000088787415"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 510,
+        "printType": "BOOK",
+        "categories": [
+          "Science"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.5.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=0yTVAAAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=0yTVAAAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=0yTVAAAAMAAJ&q=dune&dq=dune&hl=&cd=18&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=0yTVAAAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/The_New_Zealand_Journal_of_Science_and_T.html?hl=&id=0yTVAAAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=0yTVAAAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> sand , Okehu section 25-50 65 16-6 15 Brunswick <b>dune</b> sand , Ototoka section 37-94 66 25-6 16 Brunswick <b>dune</b> sand , Ototoka section 14-60 67 9.8 19 Brunswick <b>dune</b> sand , 120 chains south of Puketarata 9.80 82 8.0 Trig . , Nukumaru&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "BW-dGP3ji1AC",
+      "etag": "xfvHifffZ1Q",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/BW-dGP3ji1AC",
+      "volumeInfo": {
+        "title": "Notes on Sastrugi and Snow Dune Observations, A.N.A.R.E. Satellite Station, Vestfold Hills, 1961",
+        "authors": [
+          "N. T. Lied"
+        ],
+        "publishedDate": "1963",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "ERDC:89018753"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 14,
+        "printType": "BOOK",
+        "categories": [
+          "Snow Cover"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=BW-dGP3ji1AC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=BW-dGP3ji1AC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=BW-dGP3ji1AC&q=dune&dq=dune&hl=&cd=19&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=BW-dGP3ji1AC&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Notes_on_Sastrugi_and_Snow_Dune_Observat.html?hl=&id=BW-dGP3ji1AC"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=BW-dGP3ji1AC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>DUNE</b> OBSERVATIONS A. N. A. R. E. SATELLITE STATION , VESTFOLD HILLS , 1961 by N. T. Lied Central Office , Bureau of Meteorology , Melbourne Issued by the Director of Meteorology , Melbourne U. S. Army Cold Regions Research and&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "heQsAQAAMAAJ",
+      "etag": "3UrUpfLm1Vc",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/heQsAQAAMAAJ",
+      "volumeInfo": {
+        "title": "Coastal Zone '78",
+        "subtitle": "Symposium on Technical, Environmental, Socioeconomic, and Regulatory Aspects of Coastal Zone Management : San Francisco, California, March 14-16, 1978",
+        "publishedDate": "1978",
+        "industryIdentifiers": [
+          {
+            "type": "OTHER",
+            "identifier": "MINN:319510000690832"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 1026,
+        "printType": "BOOK",
+        "categories": [
+          "Coast changes"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.4.1.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=heQsAQAAMAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=heQsAQAAMAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.com/books?id=heQsAQAAMAAJ&q=dune&dq=dune&hl=&cd=20&source=gbs_api",
+        "infoLink": "http://books.google.com/books?id=heQsAQAAMAAJ&dq=dune&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Coastal_Zone_78.html?hl=&id=heQsAQAAMAAJ"
+      },
+      "saleInfo": {
+        "country": "AM",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "AM",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=heQsAQAAMAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "... <b>dune</b> . The result has been a lowering of the land surface . Although the <b>dune</b> has been severely restricted , there is no change in the horizontal dimensions of the <b>dune</b> zone which represents the width of the <b>dune</b> under natural&nbsp;..."
+      }
+    }
+  ]
+}

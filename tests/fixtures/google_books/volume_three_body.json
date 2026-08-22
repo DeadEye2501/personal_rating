@@ -1,0 +1,84 @@
+{
+  "kind": "books#volume",
+  "id": "-u8-DwAAQBAJ",
+  "etag": "039PFnWrbk4",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/-u8-DwAAQBAJ",
+  "volumeInfo": {
+    "title": "Задача трех тел",
+    "authors": [
+      "Лю Цысинь"
+    ],
+    "publisher": "Эксмо",
+    "publishedDate": "2017-11-15",
+    "description": "<p>Они придут, и Земля вновь станет гармоничным и процветающим миром...</p><p>В те времена, когда Китай переживал последствия жестокой «культурной революции», в ходе секретного военного проекта в космос были посланы сигналы, чтобы установить контакт с инопланетным разумом. Один из сигналов подхватила цивилизация, находящаяся на краю гибели, и теперь пришельцы готовятся вторгнуться на Землю. Узнав об этом, люди разделились на тех, кто готов отдать наш порочный мир под управление высшего разума, и тех, кто до последнего будет бороться против этого вторжения. </p><p>Блестящий научно-фантастический роман «Задача трех тел» из цикла «Воспоминания о прошлом Земли» самого популярного китайского писателя Лю Цысиня обрел широкое мировое признание и стал первой переводной книгой, номинированной на самые престижные литературные премии в области фантастики: «Хьюго», «Небьюлу», «Локус», «Прометей» и другие. По циклу снят сериал китайского производства «Задача трех тел», а также готовится экранизация от Netflix.</p><p>Подробный гид по творчеству Лю Цысиня читайте в ЛитРес: Журнале</p>",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "504089273X"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9785040892730"
+      }
+    ],
+    "readingModes": {
+      "text": true,
+      "image": false
+    },
+    "pageCount": 471,
+    "printedPageCount": 471,
+    "printType": "BOOK",
+    "categories": [
+      "Fiction / Science Fiction / Action & Adventure",
+      "Fiction / Science Fiction / Hard Science Fiction",
+      "Fiction / Science Fiction / Space Exploration",
+      "Fiction / Science Fiction / General"
+    ],
+    "averageRating": 5,
+    "ratingsCount": 1,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": true,
+    "contentVersion": "1.65.62.0.preview.2",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "imageLinks": {
+      "smallThumbnail": "http://books.google.com/books/publisher/content?id=-u8-DwAAQBAJ&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE70Ygw-6G_fKkmarr7baYqgckQJdkvRto_eVk5G8NC2R2d_SPh-35Ed6NqLRdYaEHGbgx8AqYj8mN5I8Pdc1kXAfe4fJIi3LozPg0PbxJX_h7phzJSW8Jbw4SEqQgRfgxeBohV93&source=gbs_api",
+      "thumbnail": "http://books.google.com/books/publisher/content?id=-u8-DwAAQBAJ&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE733pzmipCDctslI7SyxFitIIi_WcbXbQqAMXiIP6jxCUkE6tgRxZ42dRDdgEwNSqbtOlkoJcFbIoN7lz1alSuefkZvDHFll3RNXtdl6CiDtHsOH1Cm-JkCZiEl_U-uITSBX4NR6&source=gbs_api"
+    },
+    "language": "ru",
+    "previewLink": "http://books.google.com/books?id=-u8-DwAAQBAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=-u8-DwAAQBAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=-u8-DwAAQBAJ"
+  },
+  "layerInfo": {
+    "layers": [
+      {
+        "layerId": "geo",
+        "volumeAnnotationsVersion": "79"
+      }
+    ]
+  },
+  "saleInfo": {
+    "country": "AM",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "AM",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": true
+    },
+    "pdf": {
+      "isAvailable": true
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=-u8-DwAAQBAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

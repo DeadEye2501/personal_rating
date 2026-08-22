@@ -48,6 +48,7 @@
 - `class Config`
   - `data_dir: Path`
   - `tmdb_key: str`
+  - `google_books_key: str`
   - `mdblist_key: str`
   - `omdb_key: str`
   - `poiskkino_key: str`
@@ -760,6 +761,15 @@
 - `NOLAN_TMDB` = `525`
 - `MURPHY_TMDB` = `2037`
 - `GILLIGAN_TMDB` = `66633`
+- `THREE_BODY_GB` = `'-u8-DwAAQBAJ'`
+- `NO_COVER_GB` = `'vDkkMwEACAAJ'`
+- `NO_AUTHOR_GB` = `'0pkiAQAAIAAJ'`
+- `ABSENT_GB` = `'zzzzzzzzzzzz'`
+- `MALFORMED_GB` = `'нетТакого123'`
+- `BLOOD_TYPE_DEEZER` = `54717452`
+- `NO_GENRE_DEEZER` = `5752371`
+- `KINO_DEEZER` = `4505880`
+- `BUSY_GB` = `503`
 
 ## tests
 
@@ -790,7 +800,7 @@
 
 ### `tests/backend/test_config.py`
 
-- `KEYS` = `словарь из 5`
+- `KEYS` = `словарь из 6`
 
 ### `tests/backend/test_cover_reads.py`
 

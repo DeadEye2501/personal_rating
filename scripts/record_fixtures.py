@@ -46,6 +46,28 @@ MURPHY_TMDB = 2037
 # а у Нолана этот список пуст вовсе — на нём отбор ролей не наблюдается.
 GILLIGAN_TMDB = 66633
 
+# Том с полным путём BISAC: у него два пути, и у первого есть второй уровень —
+# ровно то, чем справочник книг и пользуется.
+THREE_BODY_GB = "-u8-DwAAQBAJ"
+# Том без обложки и без издательства: у четверти книг обложки нет, и строка
+# выдачи обязана пережить это, а не исчезнуть.
+NO_COVER_GB = "vDkkMwEACAAJ"
+# Том без автора: у Google `authors` бывает пуст, и состав карточки тогда пуст.
+NO_AUTHOR_GB = "0pkiAQAAIAAJ"
+# Годный по форме, но несуществующий том: отвечает 404 с телом. Негодный по
+# форме отвечает 503, и это занятость, а не отсутствие.
+ABSENT_GB = "zzzzzzzzzzzz"
+MALFORMED_GB = "нетТакого123"
+
+# «Группа крови»: одиннадцать треков, у всех `track_position` пуст, жанр один.
+BLOOD_TYPE_DEEZER = 54717452
+# Альбом без жанра вовсе: замерено, что таких у Deezer 12 из 57.
+NO_GENRE_DEEZER = 5752371
+KINO_DEEZER = 4505880
+
+# Занятость Google: тот же код, что у old-games.ru, и лечится так же.
+BUSY_GB = 503
+
 
 def save(source: str, case: str, response: httpx.Response) -> None:
     folder = OUT / source
@@ -259,6 +281,68 @@ async def record_oldgames(client: httpx.AsyncClient) -> None:
     save("oldgames", "missing_game", await client.get(f"{base}/game/99999999.html"))
 
 
+async def record_google_books(client: httpx.AsyncClient, key: str) -> None:
+    """Ответы боевой ручки v1, с ключом.
+
+    Поиск перепрашивается: Google душит очередь запросов и отвечает 503 на
+    половину из них. Замерено — повтор поднимает пять успешных из десяти до
+    восьми, а пауза не даёт ничего."""
+    print("Google Books")
+    base = "https://www.googleapis.com/books/v1/volumes"
+
+    async def asked(params: dict) -> httpx.Response:
+        for _ in range(4):
+            answer = await client.get(base, params={**params, "key": key})
+            if answer.status_code != BUSY_GB:
+                return answer
+        return answer
+
+    save("google_books", "search_dune", await asked(
+        {"q": "dune", "maxResults": 20, "startIndex": 0}))
+    save("google_books", "search_dune_page2", await asked(
+        {"q": "dune", "maxResults": 20, "startIndex": 20}))
+    save("google_books", "inauthor_herbert", await asked(
+        {"q": 'inauthor:"Frank Herbert"', "maxResults": 20}))
+
+    for case, volume in (("volume_three_body", THREE_BODY_GB),
+                         ("volume_no_cover", NO_COVER_GB),
+                         ("volume_no_author", NO_AUTHOR_GB),
+                         ("absent", ABSENT_GB),
+                         ("busy", MALFORMED_GB)):
+        save("google_books", case,
+             await client.get(f"{base}/{volume}", params={"key": key}))
+
+    # Без ключа суточная квота безымянного проекта равна нулю: 429 на первый
+    # же запрос. С негодным ключом ответ другой — 400.
+    save("google_books", "quota", await client.get(base, params={"q": "dune"}))
+    save("google_books", "bad_key", await client.get(
+        base, params={"q": "dune", "key": "мусор"}))
+
+
+async def record_deezer(client: httpx.AsyncClient) -> None:
+    """Ключа Deezer не требует вовсе.
+
+    Отказа по частоте здесь нет: он приходит под кодом 200 с телом
+    `{"error": {"code": 4}}`, и вызвать его можно только волной запросов —
+    такую фикстуру пишут руками, а не бьют по чужому сервису."""
+    print("Deezer")
+    base = "https://api.deezer.com"
+
+    save("deezer", "search_album_kino", await client.get(
+        f"{base}/search/album", params={"q": "Кино Группа крови"}))
+    save("deezer", "search_album_page2", await client.get(
+        f"{base}/search/album", params={"q": "rock", "index": 5, "limit": 5}))
+    save("deezer", "album_blood_type", await client.get(
+        f"{base}/album/{BLOOD_TYPE_DEEZER}"))
+    save("deezer", "album_no_genre", await client.get(
+        f"{base}/album/{NO_GENRE_DEEZER}"))
+    save("deezer", "absent", await client.get(f"{base}/album/999999999999"))
+    save("deezer", "search_artist_kino", await client.get(
+        f"{base}/search/artist", params={"q": "Кино"}))
+    save("deezer", "artist_albums_kino", await client.get(
+        f"{base}/artist/{KINO_DEEZER}/albums", params={"limit": 5}))
+
+
 async def main() -> None:
     load_dotenv(ROOT / ".env")
     config = load_config(os.environ, ROOT)
@@ -268,6 +352,7 @@ async def main() -> None:
         await record_steam_items(client)
         await record_gog(client)
         await record_oldgames(client)
+        await record_deezer(client)
 
         pairs = (
             ("TMDB", config.tmdb_key, record_tmdb),
@@ -275,6 +360,7 @@ async def main() -> None:
             ("OMDB", config.omdb_key, record_omdb),
             ("Кинопоиска", config.kinopoisk_unofficial_key,
              record_kinopoisk_unofficial),
+            ("Google Books", config.google_books_key, record_google_books),
         )
         for name, key, recorder in pairs:
             if not key:

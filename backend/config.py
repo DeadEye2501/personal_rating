@@ -16,6 +16,7 @@ FIVE = 5
 class Config:
     data_dir: Path
     tmdb_key: str
+    google_books_key: str
     mdblist_key: str
     omdb_key: str
     poiskkino_key: str
@@ -47,6 +48,7 @@ def load_config(env: Mapping[str, str], base_dir: Path) -> Config:
     return Config(
         data_dir=Path(override) if override else base_dir / DEFAULT_DATA_DIR,
         tmdb_key=value(env, "TMDB_API_KEY"),
+        google_books_key=value(env, "GOOGLE_BOOKS_API_KEY"),
         mdblist_key=value(env, "MDBLIST_API_KEY"),
         omdb_key=value(env, "OMDB_API_KEY"),
         poiskkino_key=value(env, "POISKKINO_API_KEY"),
