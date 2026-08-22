@@ -14,7 +14,7 @@
 
 ## app — 17 файлов
 
-### app/App.svelte (388)
+### app/App.svelte (393)
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
@@ -58,7 +58,7 @@
 - принимает: session, ontrouble
 - берёт: ./trouble.js
 
-### app/Topbar.svelte (147)
+### app/Topbar.svelte (149)
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, typed, onsession, onsearch, onadd, onfilter
 
@@ -215,7 +215,7 @@
 
 ## state — 21 файлов
 
-### state/card.js (107)
+### state/card.js (115)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
 - отдаёт: emptyCard, fieldsOf, formOf, shownFor, wrongNumbers
 
@@ -223,7 +223,7 @@
 - Адрес обложки у своей ручки.
 - отдаёт: byItem, bySource, stampOf
 
-### state/credits.js (19)
+### state/credits.js (24)
 - Роли состава: какие бывают и в чьём справочнике живёт каждая.
 - отдаёт: ROLES
 
@@ -239,7 +239,7 @@
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 
-### state/genres.js (6)
+### state/genres.js (11)
 - Пространство жанров у типа содержимого.
 - отдаёт: GENRE_KINDS
 
@@ -247,7 +247,7 @@
 - Доля каждого столбца от самого высокого.
 - отдаёт: heightsOf
 
-### state/kinds.js (13)
+### state/kinds.js (19)
 - Как тип содержимого называется человеку.
 - отдаёт: NOUNS
 
@@ -283,7 +283,7 @@
 - Запрос раздела: то, что уезжает мостом в `feed.page`.
 - отдаёт: requestOf
 
-### state/session.js (79)
+### state/session.js (80)
 - Выбранное в приложении вместе с переходами между выборами.
 - отдаёт: collapsedOf, flipped, newSession, swept, withClearedFilter, withCollapsed, withFilters, withForgotten, withKind, withMark, withNextSort, withSection, withToggledSection
 
@@ -409,10 +409,10 @@
 - Форма заведения тега под списком.
 - селекторы (3): .newtag, .newtag__ok, .newtag.is-filled .newtag__ok
 
-### styles/palette.css (119)
+### styles/palette.css (121)
 - Единственное место, где есть цвет. По месту пишется только var().
 - селекторы (2): @property --primary, :root
-- объявляет: --accent-game, --accent-movie, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
+- объявляет: --accent-book, --accent-game, --accent-movie, --accent-music, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
 ### styles/picker.css (105)
@@ -444,9 +444,9 @@
 .search__input::-webkit-search-decoration, .search__clear
 - берёт: --primary, --side-w, --text, --tint-05, --tint-10, --tint-28, --tint-35
 
-### styles/seg.css (70)
+### styles/seg.css (85)
 - Капсула переключателя типа содержимого.
-- селекторы (8): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__label, .seg__btn.is-active .seg__label, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
+- селекторы (9): .seg, .seg__btn, .seg__btn.is-active, .seg__btn .material-symbols-outlined, .seg__label, .seg__btn.is-active .seg__label, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
 - объявляет: --seg-w
 - берёт: --ease, --fill-primary-14, --primary, --r-full, --seg-w, --tint-05, --tint-45, --tint-75, --title-s
 

@@ -110,9 +110,42 @@ async def test_games_ask_nobody_about_people(registry):
     assert registry.people_for(Kind.GAME) is None
 
 
+@pytest.mark.parametrize("kind", [Kind.BOOK, Kind.MUSIC])
+async def test_kinds_without_sources_ask_nobody(registry, kind):
+    """Главная опасность всей работы. Реестр был написан как «игра или всё
+    остальное», и книга уехала бы в киношную ветку молча: поиск вернул бы
+    фильмы, обогащение пошло бы за оценками в MDBList, OMDb и Кинопоиск по
+    несуществующему `imdb_id`. Отказа не было бы ни одного."""
+    assert registry.catalog_for(kind) == []
+    assert registry.people_for(kind) is None
+    assert registry.rating_sources(kind) == []
+
+
+async def test_every_kind_has_a_row_in_the_table(registry):
+    """Умолчания у маршрутов нет намеренно: шестой тип, добавленный без строки,
+    обязан упасть на месте, а не достаться TMDB. Проверяется следствием — тем,
+    что ни один из объявленных типов на этом не падает."""
+    for kind in Kind:
+        registry.catalog_for(kind)
+        registry.people_for(kind)
+        registry.rating_sources(kind)
+
+
+async def test_a_kind_outside_the_table_is_refused_on_the_spot(registry):
+    """Обратная половина предыдущего: без неё «умолчания нет» не наблюдается
+    ничем — таблица, покрывающая все типы, зелена и с `.get(kind, [self.tmdb])`
+    внутри."""
+    with pytest.raises(KeyError):
+        registry.catalog_for("новый-тип")
+
+
 async def test_every_catalog_client_takes_the_same_arguments(registry):
-    """Ради этого реестр и существует: сервис зовёт их одинаково."""
-    for kind in (Kind.MOVIE, Kind.SERIES, Kind.GAME):
+    """Ради этого реестр и существует: сервис зовёт их одинаково.
+
+    Перебор идёт по всему перечислению, а не по списку типов: у книг и музыки
+    каталога нет, и тело цикла им просто не достаётся — зато список перестаёт
+    отставать от перечисления молча."""
+    for kind in Kind:
         for client in registry.catalog_for(kind):
             assert list(inspect.signature(client.search).parameters) == [
                 "query",

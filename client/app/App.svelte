@@ -32,9 +32,14 @@
   }
 
   // Фильмам достаётся значение по умолчанию из палитры, поэтому его тут нет:
-  // положить одно значение в два места значит дать ему разойтись. Остальные два
+  // положить одно значение в два места значит дать ему разойтись. Остальные
   // подставляются токенами, а не литералами — цвет живёт в палитре.
-  const ACCENTS = { series: 'var(--accent-series)', game: 'var(--accent-game)' }
+  const ACCENTS = {
+    series: 'var(--accent-series)',
+    game: 'var(--accent-game)',
+    book: 'var(--accent-book)',
+    music: 'var(--accent-music)',
+  }
 
   let session = $state(newSession())
 

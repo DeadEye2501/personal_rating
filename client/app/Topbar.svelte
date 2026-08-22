@@ -57,6 +57,8 @@
     { value: 'movie',  icon: 'movie',           label: 'Фильмы' },
     { value: 'series', icon: 'live_tv',         label: 'Сериалы' },
     { value: 'game',   icon: 'sports_esports',  label: 'Игры' },
+    { value: 'book',   icon: 'menu_book',       label: 'Книги' },
+    { value: 'music',  icon: 'music_note',      label: 'Музыка' },
   ]
 
   const VIEWS = [

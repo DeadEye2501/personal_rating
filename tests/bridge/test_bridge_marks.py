@@ -77,7 +77,7 @@ def test_a_review_goes_to_the_right_card_with_a_moment(spy, asked):
 
 
 def test_tags_come_for_the_asked_kind(spy, asked):
-    """Наборы тегов у трёх типов независимы."""
+    """Наборы тегов у типов содержимого независимы."""
     answers, log = asked
     answers["tags.list_for_kind"] = []
 
@@ -103,7 +103,7 @@ def test_reordering_survives_as_the_page_sent_it(spy, asked):
 
 
 def test_a_new_tag_belongs_to_one_kind(spy, asked):
-    """Наборы тегов у трёх типов независимы, и заведённый не тому типу тег
+    """Наборы тегов у типов содержимого независимы, и заведённый не тому типу тег
     оказался бы невидим там, где его завели."""
     answers, log = asked
     answers["tags.create"] = 7

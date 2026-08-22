@@ -17,41 +17,56 @@
 .seg {
   --seg-w: 338px;
 
+  /* Ширину подписи анимируем от нуля до её собственной, а не до потолка:
+     `interpolate-size` разрешает `width: auto` в переходе. Стоит на капсуле, а
+     не на корне, — свойство наследуется, и на корне оно поменяло бы правила
+     всем переходам приложения ради одного места. */
+  interpolate-size: allow-keywords;
+
   display: flex;
-  justify-content: center;
   width: var(--seg-w);
   gap: 2px;
   padding: 3px;
 }
 
+/* Выбранная вкладка забирает остаток капсулы, свёрнутые стоят по содержимому.
+   Иначе на коротком слове ряд кнопок съёживается и по краям капсулы остаётся
+   пустота разной величины — капсула при этом та же, а выглядит меньше. */
 .seg__btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   padding: 7px 16px;
   white-space: nowrap;
   border-radius: var(--r-full);
   color: var(--tint-45);
   font: var(--title-s);
-  transition: background .18s, color .18s;
+  transition: background .18s, color .18s, flex-grow .18s var(--ease);
 }
+.seg__btn.is-active { flex-grow: 1 }
 .seg__btn .material-symbols-outlined { font-size: 19px }
 
 /* Подпись свёрнутой вкладки занимает ноль вместе со своим отступом: оставленный
-   отступ дал бы зазор справа от иконки. Ширина едет пределом, а не самой
-   шириной: содержимое у подписей разное, и анимировать `auto` браузер не умеет.
+   отступ дал бы зазор справа от иконки.
+
+   Едет именно ширина, а не предел. Пределом она ехала бы не в такт: потолок в
+   девять литер вдвое шире настоящей подписи, поэтому приезжающая раскрывалась
+   бы за первые сорок процентов времени, а уезжающая всё это время держала бы
+   полную ширину — ряд сперва разъезжается, потом съезжается. Замерено по
+   кадрам: 345, 347, 331, 325, 322.
+
    Переход снимается сам под `prefers-reduced-motion` — правило в `base.css`. */
 .seg__label {
-  max-width: 0;
+  width: 0;
   margin-left: 0;
   opacity: 0;
   overflow: hidden;
-  transition: max-width .18s var(--ease), margin-left .18s var(--ease),
+  transition: width .18s var(--ease), margin-left .18s var(--ease),
               opacity .18s var(--ease);
 }
 .seg__btn.is-active .seg__label {
-  max-width: 9em;
+  width: auto;
   margin-left: 8px;
   opacity: 1;
 }

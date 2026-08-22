@@ -7,6 +7,8 @@ class Kind(StrEnum):
     MOVIE = "movie"
     SERIES = "series"
     GAME = "game"
+    BOOK = "book"
+    MUSIC = "music"
 
 
 class Source(StrEnum):
@@ -55,6 +57,8 @@ class PersonRole(StrEnum):
     DIRECTOR = "director"
     ACTOR = "actor"
     SHOWRUNNER = "showrunner"
+    AUTHOR = "author"
+    PERFORMER = "performer"
 
 
 class CompanyRole(StrEnum):
@@ -63,7 +67,12 @@ class CompanyRole(StrEnum):
 
 
 class GenreKind(StrEnum):
-    """Наборов жанров два: кино и игры."""
+    """Наборов жанров четыре, и два из них пусты до второго этапа: списки для
+    книг и музыки приедут из внешней базы вместе с клиентами под неё. Пустой
+    набор — штатное состояние, а не заглушка: `list_for_kind` честно отдаёт
+    пустой список, и фильтр жанров у этих двух типов пуст."""
 
     FILM = "film"
     GAME = "game"
+    BOOK = "book"
+    MUSIC = "music"

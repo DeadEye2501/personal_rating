@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { emptyCard, shownFor } from '$state/card.js'
 import { ROLES } from '$state/credits.js'
 
-const KINDS = ['movie', 'series', 'game']
+const KINDS = ['movie', 'series', 'game', 'book', 'music']
 
 // Пустым бывает и строкой, и списком: у полей ввода это `''` или `null`, у
 // полей с подсказкой — набор, в котором пока никого.
@@ -38,13 +38,13 @@ describe('форма карточки', () => {
     expect(shown).not.toContain('episodes_count')
   })
 
-  it('название спрашивают у всех трёх типов', () => {
+  it('название спрашивают у всех типов', () => {
     // Обязательно только оно: требовать год у короткометражки, которую помнишь
     // смутно, значит мешать.
     for (const kind of KINDS) expect(shownFor(kind)).toContain('title')
   })
 
-  it('роли состава разные у трёх типов', () => {
+  it('роли состава разные у разных типов', () => {
     // Режиссёр у фильма, шоураннер у сериала, разработчик с издателем у игры.
     // Актёры есть у кино и сериалов, а у игры состава не бывает вовсе.
     expect(shownFor('movie')).toContain('director')

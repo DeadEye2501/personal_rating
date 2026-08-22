@@ -84,7 +84,8 @@ def test_the_page_names_exactly_what_the_bridge_reads():
 
 
 def test_the_page_offers_exactly_the_kinds_the_backend_knows():
-    """Переключатель типа — три кнопки, и каждая уезжает в `Kind`."""
+    """Переключатель типа — кнопка на каждый тип, и каждая уезжает в
+    `Kind`."""
     assert values_of("KINDS", source("app/Topbar.svelte")) == set(Kind)
 
 
@@ -206,8 +207,8 @@ def test_sorting_is_offered_exactly_where_the_base_can_sort():
 
 
 def test_the_page_maps_every_kind_to_a_genre_set_the_base_has():
-    """Наборов жанров два на три типа содержимого: игры берут свой, кино и
-    сериалы делят оставшийся. Разъехавшись, таблица привезла бы во вкладку
+    """Наборов жанров четыре на пять типов содержимого: игры, книги и музыка
+    берут каждый свой, кино и сериалы делят оставшийся. Разъехавшись, таблица привезла бы во вкладку
     «Фильмы» игровые жанры — отказа тут не будет, отбор просто уйдёт номерами,
     которых у типа не бывает.
 
@@ -370,7 +371,7 @@ def test_the_page_sends_the_three_scales_in_the_order_the_bridge_reads_them():
 def test_the_page_has_a_word_form_for_every_kind():
     """Формы склонения — по одной тройке на тип содержимого. Пропуск роняет
     `plural` на `undefined` прямо в подтверждении удаления тега, а лишний ключ
-    остаётся мёртвым: типов ровно три, и новый заводится не здесь."""
+    остаётся мёртвым: набор типов задаёт `Kind`, а не этот файл."""
     forms = re.search(r"export const NOUNS = \{(.+?)\n\}",
                       source("state/kinds.js"), re.DOTALL)
 

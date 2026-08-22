@@ -226,6 +226,21 @@ async def test_games_never_go_outside_for_people(sessions, service):
     assert [one for one in client.asked if one[0] == "find_people"] == []
 
 
+async def test_a_book_is_searched_only_in_our_own_base(sessions, service):
+    """Внешние источники книг приедут вторым этапом. До тех пор внешняя половина
+    выдачи пуста — и пуста она должна быть по-настоящему, а не «как у кино».
+
+    Клиент подставлен отвечающий, и проверяется не только пустота выдачи, но и
+    то, что его не спросили: без второго утверждения тест зеленел бы и от
+    клиента, которому просто нечего было ответить."""
+    client = FakeSearch(Found([hit(title="Дюна")]))
+
+    result = await service(client).external(Kind.BOOK, "Дюна")
+
+    assert result.views == ()
+    assert client.asked == []
+
+
 async def test_a_refusal_is_reported_and_not_raised(sessions, service):
     """Отказ источника — состояние данных, а не ошибка."""
     refusal = Refusal(source="tmdb", reason=Reason.NETWORK)

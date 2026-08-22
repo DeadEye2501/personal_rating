@@ -98,8 +98,8 @@ def test_boundary_types_are_frozen(declared):
     """Через границу слоёв они ходят между потоками: разморозь один — и
     состояние карточки поедет вслед за ссылкой.
 
-    Присваивание проверяется на пустом объекте, минуя конструктор: у двадцати
-    трёх типов свои обязательные поля, и собирать каждый значило бы завести тот
+    Присваивание проверяется на пустом объекте, минуя конструктор: у каждого
+    типа границы свои обязательные поля, и собирать их значило бы завести тот
     самый список, который уже однажды отстал. Заморозку это наблюдает так же —
     её держит `__setattr__`, а не `__init__`."""
     # Обязательные поля заполняются пустотой: значения здесь ни при чём,
@@ -148,14 +148,15 @@ def test_rating_of_a_film_carries_no_aspects():
 # Значения ложатся в базу текстом — они часть схемы, а не деталь кода:
 # переименование здесь ломает уже записанные строки, а не только код.
 SCHEMA = [
-    (Kind, {"movie", "series", "game"}),
+    (Kind, {"movie", "series", "game", "book", "music"}),
     (Source, {"manual", "tmdb", "steam", "gog", "old_games"}),
     (IdSource, {"imdb", "kinopoisk", "steam", "gog"}),
     (RatingSource, {"imdb", "kinopoisk", "tmdb", "rotten", "metacritic",
                     "steam", "gog"}),
-    (PersonRole, {"director", "actor", "showrunner"}),
+    (PersonRole, {"director", "actor", "showrunner", "author",
+                  "performer"}),
     (CompanyRole, {"developer", "publisher"}),
-    (GenreKind, {"film", "game"}),
+    (GenreKind, {"film", "game", "book", "music"}),
     (GenreSource, {"tmdb", "steam", "gog", "old_games"}),
 ]
 
@@ -167,5 +168,10 @@ def test_enum_values_match_the_schema(enum, expected):
     здесь не виден, и ловят его те тесты, что читают сырую колонку, —
     `test_library.py` для `Kind` и `Source`, `test_credits.py` для ролей,
     `test_tmdb_card.py` для `IdSource`, `test_external_ratings.py` для
-    `RatingSource`, фикстура справочника для `GenreSource`."""
+    `RatingSource`, фикстура справочника для `GenreSource`.
+
+    Ловят не всех: у `BOOK`, `MUSIC`, `AUTHOR` и `PERFORMER` такого сторожа нет
+    — сырую колонку с ними читать негде, пока карточку этих типов заводят
+    только руками. Обмен их значений местами сегодня не поймает никто, и это
+    известно, а не упущено."""
     assert {member.value for member in enum} == expected

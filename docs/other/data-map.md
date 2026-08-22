@@ -128,6 +128,8 @@
   - `MOVIE` = `'movie'`
   - `SERIES` = `'series'`
   - `GAME` = `'game'`
+  - `BOOK` = `'book'`
+  - `MUSIC` = `'music'`
 - `class Source(StrEnum)`
   - `MANUAL` = `'manual'`
   - `TMDB` = `'tmdb'`
@@ -156,12 +158,16 @@
   - `DIRECTOR` = `'director'`
   - `ACTOR` = `'actor'`
   - `SHOWRUNNER` = `'showrunner'`
+  - `AUTHOR` = `'author'`
+  - `PERFORMER` = `'performer'`
 - `class CompanyRole(StrEnum)`
   - `DEVELOPER` = `'developer'`
   - `PUBLISHER` = `'publisher'`
 - `class GenreKind(StrEnum)`
   - `FILM` = `'film'`
   - `GAME` = `'game'`
+  - `BOOK` = `'book'`
+  - `MUSIC` = `'music'`
 
 ### `backend/model/link.py`
 
@@ -477,6 +483,12 @@
 
 ### `backend/sources/registry.py`
 
+- `class Route`
+  - `catalogs: tuple[str, ...]`
+  - `people: str | None`
+  - `ratings: tuple[str, ...]`
+- `FILM_RATINGS` = `набор из 3`
+- `ROUTES: dict[Kind, Route]` = `словарь из 5`
 - `class Sources`
   - `tmdb: TmdbClient`
   - `steam: SteamClient`
@@ -945,3 +957,8 @@
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
 - `TABLES` = `набор из 16`
 - `MINIMAL` = `словарь из 5`
+
+### `tests/fakes.py`
+
+- `class FakeSources`
+  - `NOBODY` = `frozenset({Kind.BOOK, Kind.MUSIC})`

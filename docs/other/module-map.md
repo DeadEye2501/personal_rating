@@ -124,20 +124,20 @@
 - `def new_source_id() -> str` (5)
 - `def new_manual_item(kind: Kind, title: str, **fields) -> Item` (13)
 
-### `backend/model/kinds.py` — 69 строк
+### `backend/model/kinds.py` — 78 строк
 
 Закрытые наборы значений, которыми описывается карточка.
 
 Зависит от: —
 
-- `class Kind(StrEnum)` (4)
+- `class Kind(StrEnum)` (6)
 - `class Source(StrEnum)` (8)
 - `class GenreSource(StrEnum)` (8)
 - `class IdSource(StrEnum)` (7)
 - `class RatingSource(StrEnum)` (11)
-- `class PersonRole(StrEnum)` (4)
+- `class PersonRole(StrEnum)` (6)
 - `class CompanyRole(StrEnum)` (3)
-- `class GenreKind(StrEnum)` (5)
+- `class GenreKind(StrEnum)` (10)
 
 ### `backend/model/link.py` — 66 строк
 
@@ -705,15 +705,16 @@
 - `def _number(raw: str | None) -> float | None` (10)
 - `def parse_ratings(payload: dict) -> Ratings` (21)
 
-### `backend/sources/registry.py` — 75 строк
+### `backend/sources/registry.py` — 100 строк
 
 Кто отвечает за какой тип содержимого.
 
 Зависит от: `backend.model`, `backend.sources.gog.client`, `backend.sources.http`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`
 
-- `class Sources` (56)
-  - `def catalog_for(self, kind: Kind) -> list` (12)
-  - `def people_for(self, kind: Kind) -> TmdbClient | None` (6)
+- `class Route` (9)
+- `class Sources` (58)
+  - `def catalog_for(self, kind: Kind) -> list` (13)
+  - `def people_for(self, kind: Kind) -> TmdbClient | None` (7)
   - `def client_for(self, source: Source)` (9)
   - `def rating_sources(self, kind: Kind) -> list` (6)
   - `async def aclose(self) -> None` (3)
@@ -1216,14 +1217,14 @@
   - `def wish(self, item_id: int) -> dict` (3)
   - `def unwish(self, item_id: int) -> dict` (2)
 
-### `bridge/refs.py` — 86 строк
+### `bridge/refs.py` — 87 строк
 
 Мост: справочники — жанры, люди, студии и шкала оценок.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Refs(Domain)` (51)
-  - `def genres(self, genre_kind: str) -> dict` (5)
+- `class Refs(Domain)` (52)
+  - `def genres(self, genre_kind: str) -> dict` (6)
   - `def suggest(self, domain: str, name: str, offset: int=0) -> dict` (8)
   - `def set_genres(self, item_id: int, genre_ids: list) -> dict` (7)
   - `def detach_all(self, domain: str, item_id: int) -> dict` (5)
@@ -1605,13 +1606,13 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 290 строк
+### `tests/backend/sources/test_registry.py` — 323 строк ⚠ подошёл к 300
 
 Реестр держится на том, что контракт у всех клиентов один.
 
 Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `tests.conftest`
 
-Тестов: 17
+Тестов: 20
 
 - `def sources()` (4)
 - `async def registry()` (9)
@@ -2053,7 +2054,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 171 строк
+### `tests/backend/test_model.py` — 177 строк
 
 Типы границы слоёв: их поля, значения и неизменность.
 
@@ -2172,13 +2173,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def removed(sessions)` (2)
 - `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 
-### `tests/backend/test_search.py` — 446 строк ⚠ подошёл к 300
+### `tests/backend/test_search.py` — 461 строк ⚠ подошёл к 300
 
 Поиск по чужим базам: выдача, отказы и переплетение выдач — как двух
 
 Зависит от: `backend.model`, `backend.service.search`, `tests.conftest`
 
-Тестов: 27
+Тестов: 28
 
 
 ### `tests/backend/test_search_genres.py` — 161 строк
@@ -2452,7 +2453,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/bridge/test_page_contract.py` — 400 строк ⚠ подошёл к 300
+### `tests/bridge/test_page_contract.py` — 401 строк ⚠ подошёл к 300
 
 Имена, которые страница и мост обязаны называть одинаково.
 
@@ -2542,7 +2543,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def stored(engine)` (12)
   - `async def put(name: str, **values) -> int` (7)
 
-### `tests/fakes.py` — 175 строк
+### `tests/fakes.py` — 186 строк
 
 Подставные заменители внешнего мира: клиенты источников, транспорты, часы.
 
@@ -2555,11 +2556,11 @@ Steam: отсутствие игры приходит под кодом 200, а 
   - `async def search(self, query: str, kind: Kind)` (7)
   - `async def find_people(self, name: str)` (5)
   - `async def credits_of(self, person_id: str, kind: Kind)` (7)
-- `class FakeSources` (30)
-  - `def catalog_for(self, _kind: Kind) -> list` (4)
-  - `def people_for(self, kind: Kind)` (6)
+- `class FakeSources` (41)
+  - `def catalog_for(self, kind: Kind) -> list` (5)
+  - `def people_for(self, kind: Kind)` (8)
   - `def client_for(self, _source: Source)` (4)
-  - `def rating_sources(self, kind: Kind) -> list` (5)
+  - `def rating_sources(self, kind: Kind) -> list` (8)
 - `class FakeClock` (12)
   - `def __call__(self) -> datetime` (2)
   - `def advance(self, delta: timedelta) -> None` (2)
