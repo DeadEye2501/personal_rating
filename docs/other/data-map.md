@@ -631,7 +631,7 @@
 - `TITLE` = `'Personal Rating'`
 - `ICON` = `Path(__file__).resolve().parent.parent / f'{TITL…`
 - `RENDERER` = `'edgechromium'`
-- `MIN_WIDTH` = `1200`
+- `MIN_WIDTH` = `1113`
 - `MIN_HEIGHT` = `600`
 - `WIDTH` = `1280`
 - `HEIGHT` = `820`

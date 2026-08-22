@@ -444,10 +444,11 @@
 .search__input::-webkit-search-decoration, .search__clear
 - берёт: --primary, --side-w, --text, --tint-05, --tint-10, --tint-28, --tint-35
 
-### styles/seg.css (40)
+### styles/seg.css (70)
 - Капсула переключателя типа содержимого.
-- селекторы (6): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
-- берёт: --fill-primary-14, --primary, --r-full, --tint-05, --tint-45, --tint-75, --title-s
+- селекторы (8): .seg, .seg__btn, .seg__btn .material-symbols-outlined, .seg__label, .seg__btn.is-active .seg__label, .seg__btn:hover, .seg__btn.is-active, .seg__btn.is-active:hover
+- объявляет: --seg-w
+- берёт: --ease, --fill-primary-14, --primary, --r-full, --seg-w, --tint-05, --tint-45, --tint-75, --title-s
 
 ### styles/snack.css (27)
 - Единственное место, где приложение что-то сообщает: и отказ источника, и непредвиденный сбой. Уехавшая вниз плашка пустая — отсутствие сообщений само себя ничем не обозначает.
@@ -472,7 +473,7 @@
 - селекторы (14): .tools, .tools__btn, .tools__btn .material-symbols-outlined, .tools__btn:hover, .tools__btn.is-active, .tools__btn:disabled, .tools__btn:has(.tools__dir) .material-symbols-outlined, .tools__dir, .tools__chart, .tools__chart rect, .is-drawing .tools__chart rect, .is-drawing .tools__chart rect:nth-child(2), .is-drawing .tools__chart rect:nth-child(3), @keyframes bar-grow
 - берёт: --ease, --fill-primary-14, --primary, --r-full, --side-w, --tint-05, --tint-25, --tint-45, --tint-75
 
-### styles/topbar.css (32)
+### styles/topbar.css (33)
 - Раскладка шапки: три зоны, из ширины которых выведен минимум окна.
 - селекторы (2): .topbar, .topbar__seg
 - объявляет: --corner, --side-w

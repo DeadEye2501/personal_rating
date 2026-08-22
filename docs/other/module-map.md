@@ -1285,7 +1285,7 @@
   - `def _finish(self, done) -> None` (6)
   - `async def _shutdown(self, done) -> None` (17)
 
-### `bridge/window.py` — 69 строк
+### `bridge/window.py` — 70 строк
 
 Окно приложения и проверка того, чем оно рисует.
 
