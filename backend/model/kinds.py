@@ -29,6 +29,8 @@ class GenreSource(StrEnum):
     STEAM = "steam"
     GOG = "gog"
     OLD_GAMES = "old_games"
+    GOOGLE_BOOKS = "google_books"
+    DEEZER = "deezer"
 
 
 class IdSource(StrEnum):
@@ -67,10 +69,10 @@ class CompanyRole(StrEnum):
 
 
 class GenreKind(StrEnum):
-    """Наборов жанров четыре, и два из них пусты до второго этапа: списки для
-    книг и музыки приедут из внешней базы вместе с клиентами под неё. Пустой
-    набор — штатное состояние, а не заглушка: `list_for_kind` честно отдаёт
-    пустой список, и фильтр жанров у этих двух типов пуст."""
+    """Наборов жанров четыре: кино, игры, книги и музыка.
+
+    Книжный и музыкальный заведены ревизией `0003` — 22 русских имени из BISAC,
+    который отдаёт Google Books, и 21 английское, взятое у Deezer как есть."""
 
     FILM = "film"
     GAME = "game"

@@ -142,6 +142,8 @@
   - `STEAM` = `'steam'`
   - `GOG` = `'gog'`
   - `OLD_GAMES` = `'old_games'`
+  - `GOOGLE_BOOKS` = `'google_books'`
+  - `DEEZER` = `'deezer'`
 - `class IdSource(StrEnum)`
   - `IMDB` = `'imdb'`
   - `KINOPOISK` = `'kinopoisk'`
@@ -660,14 +662,24 @@
 - `config` = `context.config`
 - `target_metadata` = `metadata`
 
+### `migrations/reference/deezer.py`
+
+- `DEEZER` = `набор из 21`
+
 ### `migrations/reference/gog.py`
 
 - `GOG` = `набор из 101`
+
+### `migrations/reference/google_books.py`
+
+- `GOOGLE_BOOKS` = `набор из 48`
 
 ### `migrations/reference/names.py`
 
 - `FILM` = `набор из 25`
 - `GAME` = `набор из 19`
+- `BOOK` = `набор из 22`
+- `MUSIC` = `набор из 21`
 
 ### `migrations/reference/old_games.py`
 
@@ -704,6 +716,7 @@
 
 - `revision: str` = `'0003'`
 - `down_revision: str | None` = `'0002'`
+- `BOOKS` = `набор из 2`
 
 ## scripts
 
@@ -798,13 +811,15 @@
 
 ### `tests/backend/test_genre_reference.py`
 
-- `MIGRATION` = `'migrations.versions.0002_genres'`
+- `MIGRATIONS` = `набор из 2`
 - `REFERENCE` = `Path(__file__).resolve().parents[1] / 'fixtures/…`
 - `FILM_GENRES` = `набор из 25`
 - `GAME_GENRES` = `набор из 19`
 - `COMPOSITE` = `словарь из 3`
-- `RULES` = `363`
-- `MARKS` = `385`
+- `RULES` = `432`
+- `MARKS` = `454`
+- `BOOK_GENRES` = `набор из 22`
+- `MUSIC_GENRES` = `набор из 21`
 
 ### `tests/backend/test_genre_resolution.py`
 

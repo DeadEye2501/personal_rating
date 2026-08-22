@@ -124,7 +124,7 @@
 - `def new_source_id() -> str` (5)
 - `def new_manual_item(kind: Kind, title: str, **fields) -> Item` (13)
 
-### `backend/model/kinds.py` — 78 строк
+### `backend/model/kinds.py` — 80 строк
 
 Закрытые наборы значений, которыми описывается карточка.
 
@@ -132,7 +132,7 @@
 
 - `class Kind(StrEnum)` (6)
 - `class Source(StrEnum)` (8)
-- `class GenreSource(StrEnum)` (8)
+- `class GenreSource(StrEnum)` (10)
 - `class IdSource(StrEnum)` (7)
 - `class RatingSource(StrEnum)` (11)
 - `class PersonRole(StrEnum)` (6)
@@ -1341,7 +1341,7 @@
 - `def _link(raw: str, kind: str | None)` (8)
 - `def _kind(kind: str | None) -> Kind | None` (4)
 
-## migrations — 10 модулей
+## migrations — 12 модулей
 
 ### `migrations/env.py` — 62 строк
 
@@ -1354,6 +1354,13 @@
 - `def migrate() -> None` (15)
   - `def prepare(dbapi_connection, _record)` (2)
 
+### `migrations/reference/deezer.py` — 36 строк
+
+Соответствия Deezer: номер жанра — наш музыкальный жанр.
+
+Зависит от: `migrations.reference.rule`
+
+
 ### `migrations/reference/gog.py` — 134 строк
 
 Соответствия GOG: жанры и теги магазина одним пространством.
@@ -1361,9 +1368,16 @@
 Зависит от: `migrations.reference.rule`
 
 
-### `migrations/reference/names.py` — 20 строк
+### `migrations/reference/google_books.py` — 97 строк
 
-Имена наших жанров: два набора, кино и игры.
+Соответствия Google Books: значение BISAC — наш книжный жанр.
+
+Зависит от: `migrations.reference.rule`
+
+
+### `migrations/reference/names.py` — 44 строк
+
+Имена наших жанров: четыре набора — кино, игры, книги и музыка.
 
 Зависит от: —
 
@@ -1419,14 +1433,15 @@
 - `def _marks(connection, rule_id: int, rule) -> None` (10)
 - `def downgrade() -> None` (5)
 
-### `migrations/versions/0003_tracks.py` — 37 строк
+### `migrations/versions/0003_tracks.py` — 97 строк
 
-Треки альбома отдельной таблицей.
+Треки альбома и справочник жанров книг и музыки.
 
-Зависит от: —
+Зависит от: `migrations.reference.deezer`, `migrations.reference.google_books`, `migrations.reference.names`
 
-- `def upgrade() -> None` (10)
-- `def downgrade() -> None` (2)
+- `def upgrade() -> None` (11)
+- `def _seed_genres(connection) -> None` (38)
+- `def downgrade() -> None` (6)
 
 ## scripts — 3 модулей
 
@@ -1868,13 +1883,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def library(sessions)` (2)
 
-### `tests/backend/test_genre_reference.py` — 236 строк
+### `tests/backend/test_genre_reference.py` — 289 строк
 
 Справочник жанров из миграции против записанного эталона.
 
 Зависит от: `tests.alembic_runner`
 
-Тестов: 11
+Тестов: 14
 
 - `def named(connection, source: str, ext_id: str) -> set[str]` (14)
 - `def counted(connection, table: str, where: str='') -> int` (4)
@@ -2076,7 +2091,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def shape(db_path: Path) -> dict` (12)
 - `def stamped(db_path: Path) -> list[str]` (8)
 
-### `tests/backend/test_model.py` — 177 строк
+### `tests/backend/test_model.py` — 178 строк
 
 Типы границы слоёв: их поля, значения и неизменность.
 

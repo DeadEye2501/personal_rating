@@ -12,7 +12,10 @@ from sqlalchemy import text
 
 from tests.alembic_runner import alembic
 
-MIGRATION = "migrations.versions.0002_genres"
+# Справочник разлит двумя миграциями: кино с играми ревизией 0002, книги с
+# музыкой — 0003. Читаются обе: сверка идёт со всей базой, и одна забытая
+# ревизия дала бы расхождение там, где всё верно.
+MIGRATIONS = ("migrations.versions.0002_genres", "migrations.versions.0003_tracks")
 
 # Эталон правил: снимок, снятый с объявления один раз и с тех пор замороженный.
 # Он не проверяет сегодняшний перенос из спеки — это работа глаз и ревью; его
@@ -45,8 +48,8 @@ COMPOSITE = {
     "10768": {"Военный", "Политика"},
 }
 
-RULES = 363
-MARKS = 385
+RULES = 432
+MARKS = 454
 
 
 def named(connection, source: str, ext_id: str) -> set[str]:
@@ -89,6 +92,55 @@ def test_game_set_has_nineteen_genres(migrated):
     assert len(rows) == 19
 
 
+BOOK_GENRES = {
+    "Фантастика", "Фэнтези", "Ужасы", "Детектив", "Приключения", "Романтика",
+    "Классика", "Исторический", "Юмор", "Драма", "Детское", "Рассказы",
+    "Сборник", "Проза", "Биография", "История", "Философия", "Психология",
+    "Саморазвитие", "Бизнес", "Наука", "Программирование",
+}
+
+MUSIC_GENRES = {
+    "African Music", "Alternative", "Asian Music", "Blues", "Brazilian Music",
+    "Classical", "Dance", "Electro", "Films/Games", "Folk", "Indian Music",
+    "Jazz", "Kids", "Latin Music", "Metal", "Pop", "R&B", "Rap/Hip Hop",
+    "Reggae", "Rock", "Soul & Funk",
+}
+
+
+def test_book_set_has_twenty_two_genres(migrated):
+    """Имена русские, как у кино: набор выведен из верхних двух уровней BISAC,
+    которые отдаёт Google Books, и утверждён пользователем 22.08.2026."""
+    rows = migrated.execute(
+        text("SELECT name FROM genre WHERE kind = 'book'")
+    ).scalars().all()
+    assert set(rows) == BOOK_GENRES
+    assert len(rows) == 22
+
+
+def test_music_set_has_twenty_one_genres(migrated):
+    """Имена английские, как у игр, и взяты у Deezer как есть — верхний уровень
+    его дерева без `All`, который жанром не является."""
+    rows = migrated.execute(
+        text("SELECT name FROM genre WHERE kind = 'music'")
+    ).scalars().all()
+    assert set(rows) == MUSIC_GENRES
+    assert len(rows) == 21
+
+
+def test_book_and_music_rules_lead_to_their_own_sets(migrated):
+    """Источник обязан вести в свой набор: перепутай `kind` в разливке — и
+    книжное правило привело бы в музыкальный жанр. Числа этого не видят, а
+    эталон сверяет имена, не проверяя, куда они привязаны."""
+    for source, kind in (("google_books", "book"), ("deezer", "music")):
+        wrong = migrated.execute(
+            text("SELECT count(*) FROM genre_rule r "
+                 "JOIN genre g ON g.id = r.genre_id "
+                 "WHERE r.source = :source AND g.kind != :kind"),
+            {"source": source, "kind": kind},
+        ).scalar()
+        assert wrong == 0, source
+
+
 def test_composite_genres_are_split_in_two(migrated):
     """У TMDB сборный жанр — это два наших, и записан он двумя правилами с
     одной меткой: правила с двумя жанрами не бывает."""
@@ -111,7 +163,8 @@ def test_every_source_has_the_rules_it_should(migrated):
             text("SELECT source, count(*) FROM genre_rule GROUP BY source")
         ).all()
     )
-    assert counts == {"tmdb": 30, "steam": 219, "gog": 101, "old_games": 13}
+    assert counts == {"tmdb": 30, "steam": 219, "gog": 101, "old_games": 13,
+                      "google_books": 48, "deezer": 21}
 
 
 def test_every_rule_requires_at_least_one_mark(migrated):
@@ -128,12 +181,12 @@ def test_every_rule_requires_at_least_one_mark(migrated):
 
 
 def declared_in_migration() -> dict[str, list[list]]:
-    """Правила, как их объявила миграция, — в форме эталона."""
-    module = import_module(MIGRATION)
+    """Правила, как их объявили миграции, — в форме эталона."""
     return {
         source: [[rule.genre, rule.required(), rule.forbidden(), rule.alone]
                  for rule in rules]
-        for source, rules, _kind in module.BOOKS
+        for name in MIGRATIONS
+        for source, rules, _kind in import_module(name).BOOKS
     }
 
 
@@ -221,7 +274,7 @@ def test_the_reference_can_be_rolled_back_and_laid_again(tmp_path):
         rules = counted(connection, "genre_rule")
         marks = counted(connection, "genre_rule_mark")
     engine.dispose()
-    assert (genres, rules) == (44, RULES)
+    assert (genres, rules) == (87, RULES)
     assert marks == MARKS
 
 

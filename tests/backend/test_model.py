@@ -157,7 +157,8 @@ SCHEMA = [
                   "performer"}),
     (CompanyRole, {"developer", "publisher"}),
     (GenreKind, {"film", "game", "book", "music"}),
-    (GenreSource, {"tmdb", "steam", "gog", "old_games"}),
+    (GenreSource, {"tmdb", "steam", "gog", "old_games", "google_books",
+                   "deezer"}),
 ]
 
 
