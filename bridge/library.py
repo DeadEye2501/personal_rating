@@ -45,6 +45,14 @@ class Library(Domain):
         return self._reply(
             lambda back: back.library.find_by_title(Kind(kind), title))
 
+    def set_tracks(self, item_id: int, titles: list[str]) -> dict:
+        """Треки правятся целиком, как и состав: снять всё и записать заново.
+        Порядок задаёт сам список — он и есть то, что человек набрал.
+
+        Своим вызовом, а не полем карточки: колонки под них у `Item` нет, и
+        уехав в поля, они уронили бы запись лишним доводом сборщика."""
+        return self._reply(lambda back: back.tracks.replace(item_id, titles))
+
     def unlink(self, item_id: int) -> dict:
         return self._reply(lambda back: back.library.unlink(item_id))
 

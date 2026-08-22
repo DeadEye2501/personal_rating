@@ -26,6 +26,7 @@
   - `genres: GenresRepository`
   - `people: CreditRepository`
   - `companies: CreditRepository`
+  - `tracks: TracksRepository`
   - `search: SearchService`
   - `finder: PeopleSearch`
   - `feed: LibraryService`
@@ -309,6 +310,7 @@
   - `companies: tuple[Credit, ...]` = `набор из 0`
   - `external: tuple[ExternalRating, ...]` = `набор из 0`
   - `external_ids: tuple[ExternalId, ...]` = `набор из 0`
+  - `tracks: tuple[str, ...]` = `набор из 0`
   - `rating: Rating | None` = `None`
   - `in_wishlist: bool` = `False`
 
@@ -531,6 +533,7 @@
 - `POSTER_BASE` = `'https://image.tmdb.org/t/p/w500'`
 - `_DIRECTOR` = `'Director'`
 - `_CREDITED_JOBS` = `словарь из 2`
+- `_PLAYS_HIMSELF` = `набор из 3`
 - `_KEYS` = `словарь из 2`
 
 ### `backend/sources/undocumented.py`
@@ -595,6 +598,7 @@
 - `item_genre` = `Table('item_genre', metadata, item_fk(nullable=F…`
 - `person` = `Table('person', metadata, Column('id', Integer, …`
 - `person_credit` = `Table('person_credit', metadata, item_fk(nullabl…`
+- `track` = `Table('track', metadata, item_fk(nullable=False)…`
 - `company` = `Table('company', metadata, Column('id', Integer,…`
 - `company_credit` = `Table('company_credit', metadata, item_fk(nullab…`
 - `external_id` = `Table('external_id', metadata, item_fk(nullable=…`
@@ -695,6 +699,11 @@
 - `revision: str` = `'0002'`
 - `down_revision: str | None` = `'0001'`
 - `BOOKS` = `набор из 4`
+
+### `migrations/versions/0003_tracks.py`
+
+- `revision: str` = `'0003'`
+- `down_revision: str | None` = `'0002'`
 
 ## scripts
 
@@ -902,6 +911,10 @@
 - `EDITIONS` = `набор из 3`
 - `FROZEN_EDITIONS` = `набор из 49`
 
+### `tests/backend/test_tracks.py`
+
+- `SIDE_A` = `набор из 3`
+
 ### `tests/backend/test_view_types.py`
 
 - `DRAMA` = `Genre(id=1, name='Драма', kind=GenreKind.FILM)`
@@ -955,7 +968,7 @@
 - `DRAMA` = `набор из 3`
 - `RATED` = `Feed(Section.RATED, Kind.MOVIE, Filters(), Order…`
 - `WANTED` = `Feed(Section.WISHLIST, Kind.MOVIE, Filters(), Or…`
-- `TABLES` = `набор из 16`
+- `TABLES` = `набор из 17`
 - `MINIMAL` = `словарь из 5`
 
 ### `tests/fakes.py`

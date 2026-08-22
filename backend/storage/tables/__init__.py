@@ -13,6 +13,7 @@ from backend.storage.tables.catalog import (
     item_genre,
     person,
     person_credit,
+    track,
 )
 from backend.storage.tables.mine import item_tag, rating, removed, tag, wishlist
 
@@ -33,5 +34,6 @@ __all__ = [
     "rating",
     "removed",
     "tag",
+    "track",
     "wishlist",
 ]

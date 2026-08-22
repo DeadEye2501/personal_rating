@@ -42,10 +42,10 @@ from tests.conftest import (
 )
 
 
-def mine(title: str, **fields):
+def mine(title: str, kind: Kind = Kind.MOVIE, **fields):
     """`new_manual_item` не подставляет `synced_at` сама — поле у `Item`
     обязательное, и передавать его должен вызывающий."""
-    return new_manual_item(Kind.MOVIE, title, synced_at=MOMENT, **fields)
+    return new_manual_item(kind, title, synced_at=MOMENT, **fields)
 
 
 async def assemble(tmp_path, transport=None):
@@ -247,6 +247,23 @@ async def test_the_cast_of_a_hand_made_card_is_kept(offline):
 
     assert [credit.name for credit in view.people] == ["Мэттью Макконахи"]
     assert [credit.name for credit in view.companies] == ["Syncopy"]
+
+
+async def test_the_tracks_of_a_hand_made_album_are_kept(offline):
+    """Треки заводит и показывает разный код: пишет их свой репозиторий, а
+    приезжают они пачечным чтением ленты. Не позови сборка одного из двух — и
+    альбом сохранится, а список окажется пустым при зелёных тестах обеих
+    половин: свои они собирают сами.
+
+    Порядок проверяется списком: он часть данных, и записан не по алфавиту."""
+    item_id = await offline.library.create(mine("A Night at the Opera",
+                                                kind=Kind.MUSIC))
+    await offline.tracks.replace(
+        item_id, ["Bohemian Rhapsody", "Love of My Life", "'39"])
+
+    view = (await offline.feed.views_of([item_id]))[0]
+
+    assert view.tracks == ("Bohemian Rhapsody", "Love of My Life", "'39")
 
 
 async def test_a_hand_made_card_gets_linked_to_a_source(offline):

@@ -1,7 +1,9 @@
-/* Строки фактов карточки: длительность, сезоны и серии, состав. */
+/* Строки фактов карточки: длительность, сезоны и серии, состав, треки. */
 
-// Сколько актёров показывает карточка. У сериала состав приезжает из
-// aggregate_credits — у «Andor» это 302 человека.
+// Сколько строк показывает одна строка фактов. У сериала состав приезжает из
+// aggregate_credits — у «Andor» это 302 человека, — а у альбома треков бывает
+// два десятка. Предел один на обе строки: место у них общее, и второе число
+// значило бы, что одна и та же строка сворачивается по-разному.
 const TOP = 5
 
 const SEASON = ['сезон', 'сезона', 'сезонов']
@@ -31,15 +33,22 @@ export function seriesOf(seasons, episodes) {
  *  номеру строки человека, и без него звать было бы нечего — имя тёзку не
  *  различает. */
 export function castOf(credits, role, limit = TOP) {
-  return ofRole(credits, role)
-    .toSorted((one, other) => (one.position ?? 0) - (other.position ?? 0))
-    .slice(0, limit)
+  return firstOf(
+    ofRole(credits, role)
+      .toSorted((one, other) => (one.position ?? 0) - (other.position ?? 0)),
+    limit)
 }
 
-/** Сколько людей этой роли не поместилось. Ноль значит «все на виду», и кнопки
- *  «… ещё» тогда не бывает: обещать ею нечего. */
-export const hiddenOf = (credits, role) =>
-  Math.max(0, ofRole(credits, role).length - TOP)
+/** Первые из списка. Вынесено на втором потребителе: так же сворачивается
+ *  список треков, а он не титры и роли не знает. */
+export const firstOf = (list, limit = TOP) => list.slice(0, limit)
+
+/** Сколько не поместилось. Ноль значит «все на виду», и кнопки «… ещё» тогда
+ *  не бывает: обещать ею нечего. */
+export const leftOf = (list) => Math.max(0, list.length - TOP)
+
+/** Сколько людей этой роли не поместилось. */
+export const hiddenOf = (credits, role) => leftOf(ofRole(credits, role))
 
 const ofRole = (credits, role) =>
   credits.filter((credit) => credit.role === role)

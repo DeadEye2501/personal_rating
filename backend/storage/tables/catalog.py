@@ -105,6 +105,18 @@ person_credit = Table(
     Index("ix_person_credit_person_id", "person_id"),
 )
 
+# Трек альбома. Своя таблица, а не строка титров: трек не человек и не студия,
+# а титры ведут в `person`, откуда имена идут в подсказку при вводе и в поиск
+# «все работы этого человека». Одноимённые исполнитель и трек — у альбомов дело
+# обычное, и они склеились бы в одну строку.
+track = Table(
+    "track", metadata,
+    item_fk(nullable=False),
+    Column("position", Integer, nullable=False),
+    Column("title", Text, nullable=False),
+    PrimaryKeyConstraint("item_id", "position"),
+)
+
 company = Table(
     "company", metadata,
     Column("id", Integer, primary_key=True),

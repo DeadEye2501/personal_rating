@@ -15,21 +15,21 @@
 - `def setup_logging(config) -> None` (12)
 - `def main() -> None` (45)
 
-## backend — 88 модулей
+## backend — 89 модулей
 
-### `backend/app.py` — 201 строк
+### `backend/app.py` — 204 строк
 
 Бэкенд, собранный целиком.
 
-Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.rescale`, `backend.storage.session`
+Зависит от: `backend.config`, `backend.model`, `backend.service.cards`, `backend.service.creation`, `backend.service.enrich`, `backend.service.library`, `backend.service.linking`, `backend.service.loading`, `backend.service.people`, `backend.service.posters`, `backend.service.removal`, `backend.service.search`, `backend.service.series`, `backend.sources.build`, `backend.sources.http`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.tracks`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `backend.storage.rescale`, `backend.storage.session`
 
-- `class Backend` (76)
+- `class Backend` (77)
   - `async def create_manual_card(self, item: Item, now: datetime) -> int` (16)
   - `async def delete_card(self, item_id: int) -> None` (9)
   - `async def restore_removed(self, kind: Kind, source: Source, source_id: str) -> None` (9)
   - `async def aclose(self) -> None` (8)
 - `def card_parts(sessions, posters: PosterService) -> dict` (13)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (65)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (66)
 
 ### `backend/config.py` — 59 строк
 
@@ -225,13 +225,13 @@
 
 - `class Tag` (5)
 
-### `backend/model/view.py` — 89 строк
+### `backend/model/view.py` — 92 строк
 
 Карточка в том виде, в каком её показывает лента.
 
 Зависит от: `backend.model.credit`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.rating`, `backend.model.search`, `backend.model.tag`
 
-- `class CardView` (32)
+- `class CardView` (35)
 - `def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...]=(), external: tuple[ExternalRating, ...]=()) -> CardView` (19)
 - `def view_from_item(item: Item) -> CardView` (18)
 
@@ -773,7 +773,7 @@
   - `async def series_counts(self, source_id: str) -> Outcome` (6)
   - `async def aclose(self) -> None` (2)
 
-### `backend/sources/tmdb/parse.py` — 247 строк
+### `backend/sources/tmdb/parse.py` — 266 строк
 
 Перевод ответов TMDB в наши типы.
 
@@ -790,7 +790,8 @@
 - `def _required(payload: dict, block: str) -> dict` (9)
 - `def _item(payload: dict, kind: Kind, now: datetime, **extra) -> Item` (20)
 - `def parse_search(payload: dict, kind: Kind) -> list[SearchHit]` (2)
-- `def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]` (19)
+- `def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]` (27)
+- `def _himself(character: str | None) -> bool` (2)
 - `def parse_people(payload: dict) -> list[PersonHit]` (5)
 - `def _hits(rows: list[dict], kind: Kind) -> list[SearchHit]` (25)
 - `def parse_movie(payload: dict) -> SourceCard` (18)
@@ -999,18 +1000,29 @@
   - `async def unassign(self, item_id: int, tag_id: int) -> None` (7)
   - `async def tags_of(self, item_id: int) -> list[Tag]` (8)
 
-### `backend/storage/repository/views.py` — 183 строк
+### `backend/storage/repository/tracks.py` — 33 строк
+
+Список треков альбома.
+
+Зависит от: `backend.storage.repository.base`, `backend.storage.statements`, `backend.storage.tables`
+
+- `class TracksRepository(Repository)` (24)
+  - `async def replace(self, item_id: int, titles: list[str]) -> None` (13)
+  - `async def of(self, item_id: int) -> list[str]` (9)
+
+### `backend/storage/repository/views.py` — 197 строк
 
 Пачечное чтение карточек для показа.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.tables`
 
-- `class ViewsRepository(Repository)` (150)
+- `class ViewsRepository(Repository)` (163)
   - `async def views_for(self, item_ids: list[int]) -> dict[int, CardView]` (5)
   - `async def in_order(self, item_ids: list[int]) -> list[CardView]` (9)
-  - `async def _fetch_all(self, session: AsyncSession, item_ids: list[int]) -> dict[int, CardView]` (35)
+  - `async def _fetch_all(self, session: AsyncSession, item_ids: list[int]) -> dict[int, CardView]` (37)
   - `async def _genres(self, session, item_ids)` (9)
   - `async def _tags(self, session, item_ids)` (9)
+  - `async def _tracks(self, session, item_ids)` (10)
   - `async def _credits(self, session, item_ids, entity: Entity)` (22)
   - `async def _by_source(self, session, table, item_ids, make)` (19)
   - `async def _external(self, session, item_ids)` (3)
@@ -1079,13 +1091,13 @@
 - `def clearing(table: Table, item_id: int) -> Delete` (6)
 - `def upserting(table: Table, values: dict, key: list[Column]) -> Insert` (14)
 
-### `backend/storage/tables/__init__.py` — 37 строк
+### `backend/storage/tables/__init__.py` — 39 строк
 
 Поверхность схемы: отсюда таблицы берут репозитории.
 
 Зависит от: `backend.storage.tables.base`, `backend.storage.tables.catalog`, `backend.storage.tables.mine`
 
-Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_rule`, `genre_rule_mark`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `removed`, `tag`, `wishlist`
+Отдаёт наружу: `company`, `company_credit`, `external_id`, `external_rating`, `genre`, `genre_rule`, `genre_rule_mark`, `item`, `item_genre`, `item_tag`, `metadata`, `person`, `person_credit`, `rating`, `removed`, `tag`, `track`, `wishlist`
 
 
 ### `backend/storage/tables/base.py` — 32 строк
@@ -1097,7 +1109,7 @@
 - `def item_fk(**kwargs: Any) -> Column` (6)
 - `def genre_fk(**kwargs: Any) -> Column` (5)
 
-### `backend/storage/tables/catalog.py` — 145 строк
+### `backend/storage/tables/catalog.py` — 157 строк
 
 Таблицы каталога: то, что наполняется из источников.
 
@@ -1177,16 +1189,17 @@
   - `def put(self, op: int, value) -> None` (10)
   - `def taken(self, op: int)` (4)
 
-### `bridge/library.py` — 103 строк
+### `bridge/library.py` — 111 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Library(Domain)` (58)
+- `class Library(Domain)` (66)
   - `def create(self, fields: dict) -> dict` (15)
   - `def replace(self, item_id: int, fields: dict) -> dict` (10)
   - `def same_title(self, kind: str, title: str) -> dict` (5)
+  - `def set_tracks(self, item_id: int, titles: list[str]) -> dict` (7)
   - `def unlink(self, item_id: int) -> dict` (2)
   - `def deletion_summary(self, item_id: int) -> dict` (2)
   - `def delete(self, item_id: int) -> dict` (5)
@@ -1328,7 +1341,7 @@
 - `def _link(raw: str, kind: str | None)` (8)
 - `def _kind(kind: str | None) -> Kind | None` (4)
 
-## migrations — 9 модулей
+## migrations — 10 модулей
 
 ### `migrations/env.py` — 62 строк
 
@@ -1406,6 +1419,15 @@
 - `def _marks(connection, rule_id: int, rule) -> None` (10)
 - `def downgrade() -> None` (5)
 
+### `migrations/versions/0003_tracks.py` — 37 строк
+
+Треки альбома отдельной таблицей.
+
+Зависит от: —
+
+- `def upgrade() -> None` (10)
+- `def downgrade() -> None` (2)
+
 ## scripts — 3 модулей
 
 ### `scripts/collect_game_genres.py` — 80 строк
@@ -1453,7 +1475,7 @@
 - `async def record_oldgames(client: httpx.AsyncClient) -> None` (16)
 - `async def main() -> None` (22)
 
-## tests — 102 модулей
+## tests — 103 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1669,13 +1691,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def ask(transport: httpx.MockTransport)` (5)
 
-### `tests/backend/sources/test_tmdb_people.py` — 217 строк
+### `tests/backend/sources/test_tmdb_people.py` — 245 строк
 
 Фильмография человека и поиск человека по имени.
 
 Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.tmdb.client`, `backend.sources.tmdb.parse`, `tests.conftest`
 
-Тестов: 17
+Тестов: 19
 
 
 ### `tests/backend/sources/test_tmdb_search.py` — 187 строк
@@ -2065,15 +2087,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def boundary_dataclasses()` (15)
 - `def boundary_denials()` (14)
 
-### `tests/backend/test_offline.py` — 456 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 473 строк ⚠ подошёл к 300
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
 Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 23
+Тестов: 24
 
-- `def mine(title: str, **fields)` (4)
+- `def mine(title: str, kind: Kind=Kind.MOVIE, **fields)` (4)
 - `async def assemble(tmp_path, transport=None)` (8)
 - `async def offline(tmp_path)` (4)
 
@@ -2290,6 +2312,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
+### `tests/backend/test_tracks.py` — 68 строк
+
+Треки альбома: порядок, перезапись целиком и уход вместе с карточкой.
+
+Зависит от: `backend.model`, `backend.storage.repository.tracks`
+
+Тестов: 4
+
+- `def tracks(sessions)` (2)
+
 ### `tests/backend/test_view_types.py` — 110 строк
 
 Карточка для показа: сборка из кандидата и из строки базы.
@@ -2299,13 +2331,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 9
 
 
-### `tests/backend/test_views.py` — 374 строк ⚠ подошёл к 300
+### `tests/backend/test_views.py` — 398 строк ⚠ подошёл к 300
 
-Пачечное чтение страницы: девять запросов на любое число карточек.
+Пачечное чтение страницы: десять запросов на любое число карточек.
 
-Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `tests.conftest`
+Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.tracks`, `backend.storage.repository.views`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 20
+Тестов: 21
 
 - `async def item_id(sessions)` (4)
 
@@ -2382,13 +2414,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 11
 
 
-### `tests/bridge/test_bridge_library.py` — 193 строк
+### `tests/bridge/test_bridge_library.py` — 210 строк
 
 Мост: карточка целиком — заведение, правка, отвязка, удаление.
 
 Зависит от: `backend.model`, `bridge.library`, `tests.builders`
 
-Тестов: 13
+Тестов: 14
 
 
 ### `tests/bridge/test_bridge_marks.py` — 200 строк
@@ -2522,7 +2554,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def row(source: Source, source_id: str, title: str, **fields) -> SearchHit` (8)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (3)
 
-### `tests/conftest.py` — 257 строк
+### `tests/conftest.py` — 258 строк
 
 Фикстуры тестов и поверхность общего.
 

@@ -120,6 +120,23 @@ def test_editing_a_card_that_is_gone_is_a_failure(spy, asked):
                                      "title": "Одиссея"})["fail"] == "denied"
 
 
+def test_tracks_travel_as_a_plain_list_of_names(spy, asked):
+    """Трек — это только название и место в списке. Порядок задаёт сам список,
+    и уезжает он как есть: нумеровать треки на странице значило бы завести
+    второе место, где живёт порядок.
+
+    Пишутся они своим вызовом, а не полем карточки: у `Item` такой колонки нет
+    вовсе, и уехав в поля, они уронили бы запись лишним доводом сборщика."""
+    answers, log = asked
+    answers["tracks.replace"] = None
+
+    assert Library(spy).set_tracks(7, ["Bohemian Rhapsody", "'39"]) == {"ok": None}
+
+    name, args, _ = log[0]
+    assert name == "tracks.replace"
+    assert args == (7, ["Bohemian Rhapsody", "'39"])
+
+
 def test_unlinking_names_the_card(spy, asked):
     answers, log = asked
     answers["library.unlink"] = None

@@ -1,4 +1,4 @@
-"""Пачечное чтение страницы: девять запросов на любое число карточек."""
+"""Пачечное чтение страницы: десять запросов на любое число карточек."""
 
 import pytest
 from sqlalchemy import event
@@ -23,6 +23,7 @@ from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.tags import TagsRepository
+from backend.storage.repository.tracks import TracksRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.storage.repository.wishlist import WishlistRepository
 from tests.conftest import ACTION, DRAMA, MOMENT, an_item
@@ -330,16 +331,16 @@ async def test_what_came_from_the_source_does_not_mix_between_cards(
 
 
 async def test_nothing_comes_back_when_none_of_the_asked_exists(sessions, item_id):
-    """Ветка «ни одной из спрошенных карточек нет» — своя: восемь запросов на
+    """Ветка «ни одной из спрошенных карточек нет» — своя: девять запросов на
     признаки для пустого набора никто задавать не должен."""
     assert await ViewsRepository(sessions).views_for([999998, 999999]) == {}
 
 
 async def test_a_page_costs_the_same_no_matter_how_many_cards(sessions, engine):
-    """Ради этого репозиторий и существует: девять запросов на страницу, а не
-    девять на карточку. Девять — по числу признаков: сама строка карточки,
+    """Ради этого репозиторий и существует: десять запросов на страницу, а не
+    десять на карточку. Десять — по числу признаков: сама строка карточки,
     жанры, теги, люди, студии, внешние оценки, внешние идентификаторы, своя
-    оценка и закладка.
+    оценка, закладка и треки.
 
     Считаем настоящие запросы к базе, а не вызовы внутреннего метода: тот
     вызывается из одного безусловного места, и его счётчик показывал бы единицу
@@ -367,8 +368,31 @@ async def test_a_page_costs_the_same_no_matter_how_many_cards(sessions, engine):
         event.remove(engine.sync_engine, "before_cursor_execute", count)
 
     assert len(views) == 20
-    # Девять признаков — девять запросов, и число не растёт с размером порции.
-    assert for_one == 9, counted
+    # Десять признаков — десять запросов, и число не растёт с размером порции.
+    assert for_one == 10, counted
     assert for_many == for_one
     # Ни одной из спрошенных карточек нет — спрашивать признаки не у кого.
     assert for_none == 1, counted
+
+
+async def test_an_album_brings_its_tracks_and_a_film_brings_none(sessions, card):
+    """Треки едут в показе тем же пачечным чтением, что жанры и состав: без
+    этого карточка альбома спрашивала бы их своим запросом на каждую строку
+    ленты.
+
+    Порядок наблюдается списком, а не набором: он часть данных, и записан он не
+    по алфавиту нарочно.
+
+    Фильм в паре не для симметрии: пустой кортеж у него обязан приехать из
+    чтения, а не из умолчания типа — потеряй сборка вызов, оба ответа остались
+    бы пустыми и разошлись бы молча только у альбома."""
+    album = await card(kind=Kind.MUSIC, source_id="album",
+                       title="A Night at the Opera")
+    film = await card(kind=Kind.MOVIE, source_id="film", title="Интерстеллар")
+    await TracksRepository(sessions).replace(
+        album, ["Bohemian Rhapsody", "Love of My Life", "'39"])
+
+    views = await ViewsRepository(sessions).views_for([album, film])
+
+    assert views[album].tracks == ("Bohemian Rhapsody", "Love of My Life", "'39")
+    assert views[film].tracks == ()

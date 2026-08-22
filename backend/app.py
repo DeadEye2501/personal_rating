@@ -34,6 +34,7 @@ from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.sections import SectionsRepository
 from backend.storage.repository.tags import TagsRepository
+from backend.storage.repository.tracks import TracksRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.storage.repository.wishlist import WishlistRepository
 from backend.storage.rescale import apply_scale
@@ -52,6 +53,7 @@ class Backend:
     genres: GenresRepository
     people: CreditRepository
     companies: CreditRepository
+    tracks: TracksRepository
 
     search: SearchService
     finder: PeopleSearch
@@ -182,6 +184,7 @@ async def build_backend(
         genres=genres,
         people=parts["people"],
         companies=parts["companies"],
+        tracks=TracksRepository(sessions),
         search=SearchService(library=library, views=views, sources=sources,
                              parts=SearchParts(genres=genres, removed=removed)),
         finder=PeopleSearch(views=views, people=parts["people"],

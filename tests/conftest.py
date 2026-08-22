@@ -135,6 +135,7 @@ TABLES = {
     "person", "person_credit", "company", "company_credit",
     "external_id", "external_rating",
     "rating", "tag", "item_tag", "wishlist", "removed",
+    "track",
 }
 
 # Минимально допустимая строка каждой таблицы: только обязательные колонки.

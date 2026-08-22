@@ -27,6 +27,7 @@ from backend.storage.tables import (
     item_tag,
     rating,
     tag,
+    track,
     wishlist,
 )
 
@@ -72,6 +73,7 @@ class ViewsRepository(Repository):
         identifiers = await self._identifiers(session, known)
         ratings = await self._ratings(session, known)
         bookmarked = await self._wishlist(session, known)
+        songs = await self._tracks(session, known)
 
         for item_id, view in views.items():
             views[item_id] = replace(
@@ -82,6 +84,7 @@ class ViewsRepository(Repository):
                 companies=tuple(studios[item_id]),
                 external=tuple(external[item_id]),
                 external_ids=tuple(identifiers[item_id]),
+                tracks=tuple(songs[item_id]),
                 rating=ratings.get(item_id),
                 in_wishlist=item_id in bookmarked,
             )
@@ -106,6 +109,17 @@ class ViewsRepository(Repository):
             .order_by(tag.c.position),
         )
         return self._by_card(rows, to_tag)
+
+    async def _tracks(self, session, item_ids):
+        """Порядок берётся из `position`: он часть данных, альбом слушают
+        подряд."""
+        rows = await self._read(
+            session,
+            select(track.c.item_id, track.c.title)
+            .where(track.c.item_id.in_(item_ids))
+            .order_by(track.c.position),
+        )
+        return self._by_card(rows, lambda row: row.title)
 
     async def _credits(self, session, item_ids, entity: Entity):
         """Люди и студии читаются одним кодом: для приложения эти две сущности

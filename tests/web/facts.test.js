@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { castOf, hiddenOf, plural, runtimeOf, seriesOf } from '$state/facts.js'
+import { castOf, firstOf, hiddenOf, leftOf, plural, runtimeOf, seriesOf }
+  from '$state/facts.js'
 
 const named = (credit) => credit.name
 
@@ -141,5 +142,30 @@ describe('спрятанные за «ещё»', () => {
 
     expect(shown).toHaveLength(20)
     expect(shown.at(-1).name).toBe('Актёр 19')
+  })
+
+  it('треков показывает столько же, сколько актёров', () => {
+    // У альбома их бывает двадцать, и без предела карточка занимала бы экран.
+    // Предел тот же, что у состава: строка одна и та же, и второго числа для
+    // неё быть не должно.
+    const album = Array.from({ length: 12 }, (_, at) => `Трек ${at}`)
+
+    expect(firstOf(album)).toHaveLength(5)
+    expect(firstOf(album)[0]).toBe('Трек 0')
+    expect(leftOf(album)).toBe(7)
+  })
+
+  it('короткий список показывается целиком и без кнопки', () => {
+    // Ноль спрятанных значит «все на виду»: обещать кнопкой нечего.
+    const short = ['Трек 0', 'Трек 1']
+
+    expect(firstOf(short)).toEqual(short)
+    expect(leftOf(short)).toBe(0)
+  })
+
+  it('развёрнутый список отдаётся целиком', () => {
+    const album = Array.from({ length: 12 }, (_, at) => `Трек ${at}`)
+
+    expect(firstOf(album, Infinity)).toHaveLength(12)
   })
 })
