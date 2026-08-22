@@ -4,7 +4,9 @@
 
   // `onreview` пустует у строки, которой ещё нет в базе: писать рецензию не к
   // чему, пока нет карточки. То же правило, что у кнопки тега.
-  let { wished = false, reviewed = false, onedit, ondelete, onreview,
+  // Подпись закладки приходит параметром: она зависит от типа карточки, а
+  // компонент про общее состояние не знает.
+  let { wished = false, wish, reviewed = false, onedit, ondelete, onreview,
         onwish } = $props()
 </script>
 
@@ -24,7 +26,7 @@
     </button>
   {/if}
   <button type="button" class="icon-btn film__wish" class:is-on={wished}
-          aria-pressed={wished} aria-label="Хочу посмотреть" onclick={onwish}>
+          aria-pressed={wished} aria-label={wish} onclick={onwish}>
     <Icon name="bookmark" />
   </button>
 </div>

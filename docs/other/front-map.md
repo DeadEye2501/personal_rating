@@ -18,7 +18,7 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (310)
+### app/CardModal.svelte (315)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -58,7 +58,7 @@
 - принимает: session, ontrouble
 - берёт: ./trouble.js
 
-### app/Topbar.svelte (149)
+### app/Topbar.svelte (152)
 - Сборка шапки: три зоны и всё, что в них нажимается.
 - принимает: session, typed, onsession, onsearch, onadd, onfilter
 
@@ -92,11 +92,11 @@
 
 ## components — 30 файлов
 
-### components/Acts.svelte (30)
+### components/Acts.svelte (32)
 - Ряд действий карточки: правка, удаление, рецензия, закладка.
-- принимает: wished, reviewed, onedit, ondelete, onreview, onwish
+- принимает: wished, wish, reviewed, onedit, ondelete, onreview, onwish
 
-### components/Aggregates.svelte (70)
+### components/Aggregates.svelte (76)
 - Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой.
 - принимает: view, expected, onopen
 
@@ -128,7 +128,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (154)
+### components/Film.svelte (156)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete, onwish
 
@@ -247,9 +247,9 @@
 - Доля каждого столбца от самого высокого.
 - отдаёт: heightsOf
 
-### state/kinds.js (19)
+### state/kinds.js (34)
 - Как тип содержимого называется человеку.
-- отдаёт: NOUNS
+- отдаёт: NOUNS, wishOf
 
 ### state/marking.js (30)
 - Метки карточек, наложенные поверх прочитанного из базы.
@@ -291,9 +291,9 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (124)
+### state/sources.js (132)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
-- отдаёт: MANUAL, cardSourceName, inOrder, nameOf, pagesOf, shownValue, stepOfSource
+- отдаёт: LINKED, MANUAL, cardSourceName, inOrder, linkableOf, nameOf, pagesOf, shownValue, stepOfSource
 
 ### state/trim.js (27)
 - Обрезка текста по границе слова.

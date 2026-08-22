@@ -8,6 +8,7 @@
   import Poster from '$components/Poster.svelte'
   import Stars from '$components/Stars.svelte'
   import Synopsis from '$components/Synopsis.svelte'
+  import { wishOf } from '$state/kinds.js'
   import { ASPECTS, average, meanOf, scale, toneOf, toneOfMean, verdictOf,
     verdictOfMean }
     from '$state/scores.js'
@@ -46,7 +47,8 @@
      Рецензии у строки без номера нет вовсе, как и тега: писать её не к чему,
      пока нет карточки. -->
 {#snippet acts()}
-  <Acts wished={view.in_wishlist} reviewed={Boolean(view.rating?.review)}
+  <Acts wished={view.in_wishlist} wish={wishOf(view.kind)}
+        reviewed={Boolean(view.rating?.review)}
         onedit={() => onedit(view)} ondelete={() => ondelete(view)}
         onreview={view.item_id ? () => onreview(view) : null}
         onwish={() => onwish(view)} />

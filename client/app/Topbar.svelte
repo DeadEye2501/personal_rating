@@ -5,6 +5,7 @@
   import ToolButton from '$components/ToolButton.svelte'
   import { isEmpty } from '$state/filters.js'
   import { redrawn } from '$state/redraw.js'
+  import { wishOf } from '$state/kinds.js'
   import { withCollapsed, withKind, withNextSort, withToggledSection }
     from '$state/session.js'
   import { IDLE_SORT, hasSort, stateAt } from '$state/sorting.js'
@@ -61,10 +62,12 @@
     { value: 'music',  icon: 'music_note',      label: 'Музыка' },
   ]
 
-  const VIEWS = [
+  // Подпись второго раздела зависит от типа, поэтому список считается, а не
+  // объявляется: у книги читают, у музыки слушают.
+  const VIEWS = $derived([
     { value: 'rated',    icon: 'thumb_up', label: 'Оценённые' },
-    { value: 'wishlist', icon: 'bookmark', label: 'Хочу посмотреть' },
-  ]
+    { value: 'wishlist', icon: 'bookmark', label: wishOf(session.kind) },
+  ])
 
   const FILTERS = [
     { field: 'genres', icon: 'category', label: 'Жанры' },

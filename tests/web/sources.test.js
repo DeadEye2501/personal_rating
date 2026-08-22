@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { stepOf } from '$state/scores.js'
 import {
-  inOrder, nameOf, pagesOf, shownValue, stepOfSource,
+  inOrder, linkableOf, nameOf, pagesOf, shownValue, stepOfSource,
 } from '$state/sources.js'
 
 describe('оценка агрегатора в строке', () => {
@@ -178,5 +178,17 @@ describe('адрес страницы источника', () => {
     }))
 
     expect(found.has('gog')).toBe(false)
+  })
+})
+
+describe('адрес в источник', () => {
+  it('бывает только там, где источник есть', () => {
+    // У книг и музыки клиентов нет вовсе, и вставленная ссылка отвечала бы
+    // отказом на каждое нажатие клавиши. Поле поэтому не показывается.
+    expect(linkableOf('movie')).toBe(true)
+    expect(linkableOf('series')).toBe(true)
+    expect(linkableOf('game')).toBe(true)
+    expect(linkableOf('book')).toBe(false)
+    expect(linkableOf('music')).toBe(false)
   })
 })

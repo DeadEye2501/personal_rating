@@ -54,8 +54,12 @@ def named_in_chosen() -> set[str]:
 
 
 def values_of(table: str, text: str) -> set[str]:
-    """Значения `value:` внутри одной таблицы, до её закрывающей скобки."""
-    start = text.index(f"const {table} = [")
+    """Значения `value:` внутри одной таблицы, до её закрывающей скобки.
+
+    Скобка ищется после имени, а не литералом `= [`: таблица, зависящая от
+    состояния, обёрнута в `$derived(...)`, и жёсткий литерал отставал бы от неё
+    падением на месте вместо расхождения наборов."""
+    start = text.index("[", text.index(f"const {table} = "))
     return set(re.findall(r"value: '(\w+)'", text[start:text.index("]", start)]))
 
 
@@ -77,6 +81,16 @@ def body_of(table: str, text: str) -> str:
 
 def keys_of(table: str, text: str) -> set[str]:
     return set(re.findall(r"[{,]\s*(\w+):", body_of(table, text)))
+
+
+def strings_of(table: str, text: str) -> set[str]:
+    """Значения плоского списка `const ИМЯ = ['a', 'b']`.
+
+    Третий разборщик рядом с двумя: `values_of` ищет `value:` в таблице
+    объектов, `keys_of` — ключи словаря, а этот список объявлен голыми
+    строками."""
+    start = text.index(f"const {table} = [")
+    return set(re.findall(r"'(\w+)'", text[start:text.index("]", start)]))
 
 
 def test_the_page_names_exactly_what_the_bridge_reads():
@@ -399,3 +413,15 @@ def test_the_page_asks_the_bridge_for_the_scale():
     молча: умолчание нотации совпадает с прежней шкалой, а число столбцов
     приезжает от базы — расхождение видно только глазами."""
     assert ("refs", "scale") in paths_of_the_page({"refs"})
+
+
+def test_the_page_offers_a_link_field_only_where_a_catalog_exists():
+    """Поле вставки ссылки у типа без источника разбирать нечего: любая
+    вставленная строка ответила бы отказом. Список на странице свой, и разойтись
+    с реестром он может молча — до второго этапа, когда книжный клиент приедет и
+    поле должно вернуться само."""
+    from backend.sources.registry import ROUTES
+
+    with_catalog = {kind.value for kind, route in ROUTES.items() if route.catalogs}
+
+    assert strings_of("LINKED", source("state/sources.js")) == with_catalog

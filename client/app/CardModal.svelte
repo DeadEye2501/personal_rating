@@ -13,7 +13,7 @@
     from '$state/card.js'
   import { ROLES } from '$state/credits.js'
   import { GENRE_KINDS } from '$state/genres.js'
-  import { MANUAL } from '$state/sources.js'
+  import { MANUAL, linkableOf } from '$state/sources.js'
   import LinkField from './LinkField.svelte'
   import { complaining } from './trouble.js'
 
@@ -252,9 +252,14 @@
           {/if}
         </div>
 
-        <LinkField bind:this={linker} item_id={form.item_id} kind={form.kind}
-                   {source} onunlinked={() => { source = '' }}
-                   ontrouble={(text) => ontrouble(text)} />
+        <!-- У типа без каталога вставленную ссылку разбирать нечего: любая
+             строка ответила бы отказом. Вернётся вместе с книжным клиентом —
+             набор сверяется с реестром сторожем границы. -->
+        {#if linkableOf(form.kind)}
+          <LinkField bind:this={linker} item_id={form.item_id} kind={form.kind}
+                     {source} onunlinked={() => { source = '' }}
+                     ontrouble={(text) => ontrouble(text)} />
+        {/if}
 
         <Field bind:value={form.synopsis} placeholder="Синопсис"
                variant="field--area" area />

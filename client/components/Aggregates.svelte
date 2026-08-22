@@ -31,6 +31,10 @@
   // единственный способ открыть у них карточку. Прочерк говорит, что оценки
   // нет, и ссылку оставляет; остальные уходят из ряда целиком.
   //
+  // У книг и музыки набор пуст всегда: источников оценки для них нет и не
+  // предвидится, поэтому пусты обе половины — и ожидаемые, и приехавшие. Ряда
+  // у них не бывает вовсе, и рисовать пустую коробку с её зазором незачем.
+  //
   // Просроченная пустая строка попадает в «цифры нет»: у показа нет способа
   // отличить её от свежей, а `stale_sources` есть только у бэкенда. Раз в
   // неделю на карточке без оценки это стоит мигания — прочерком у тех, чьё имя
@@ -45,26 +49,28 @@
     .filter((one) => one.value !== null || one.waiting || one.page))
 </script>
 
-<div class="film__aggr">
-  {#each shown as one (one.source)}
-    <span>
-      <!-- Открывает системный браузер, а не саму страницу: окно приложения без
-           адресной строки, и вернуться из Кинопоиска было бы нечем. -->
-      {#if one.page}
-        <a class="aggr" href={one.page}
-           onclick={(event) => { event.preventDefault(); onopen(one.page) }}
-        >{nameOf(one.source)}</a>
-      {:else}
-        <span class="aggr aggr--flat">{nameOf(one.source)}</span>
-      {/if}
-      {#if one.value !== null}
-        <b style:--score={sourceColorOf(stepOfSource(one.value, one.source))}
-        >{shownValue(one.value, one.source)}</b>
-      {:else if one.waiting}
-        <i class="aggr-wait" aria-hidden="true"></i>
-      {:else}
-        <b class="aggr-none">—</b>
-      {/if}
-    </span>
-  {/each}
-</div>
+{#if shown.length}
+  <div class="film__aggr">
+    {#each shown as one (one.source)}
+      <span>
+        <!-- Открывает системный браузер, а не саму страницу: окно приложения
+             без адресной строки, и вернуться из Кинопоиска было бы нечем. -->
+        {#if one.page}
+          <a class="aggr" href={one.page}
+             onclick={(event) => { event.preventDefault(); onopen(one.page) }}
+          >{nameOf(one.source)}</a>
+        {:else}
+          <span class="aggr aggr--flat">{nameOf(one.source)}</span>
+        {/if}
+        {#if one.value !== null}
+          <b style:--score={sourceColorOf(stepOfSource(one.value, one.source))}
+          >{shownValue(one.value, one.source)}</b>
+        {:else if one.waiting}
+          <i class="aggr-wait" aria-hidden="true"></i>
+        {:else}
+          <b class="aggr-none">—</b>
+        {/if}
+      </span>
+    {/each}
+  </div>
+{/if}
