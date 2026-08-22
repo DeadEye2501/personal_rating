@@ -33,6 +33,34 @@ def test_a_work_he_only_produced_is_not_his(fixture):
     assert "Человек из стали" not in [hit.title for hit in hits]
 
 
+def test_a_work_where_he_plays_himself_is_not_his(fixture):
+    """Камео «играет самого себя» — не работа человека, а разговор о нём:
+    документалки, телешоу, дорожки с архивной хроникой. Замерено 22.08.2026: у
+    Нолана таких строк тридцать две из тридцати трёх в `cast`, у Шварценеггера
+    104 из 171, у Тарантино 68 из 104 — настоящие работы в них тонут.
+
+    Помечает их TMDB английским `Self` и его вариантами, и русская локализация
+    их не переводит: на четырёх проверенных людях `Self` встретился 172 раза,
+    `Self (archive footage)` — 36, `Himself` — 4.
+
+    Отменяет решение от 05.08.2026 «`cast` не фильтруется»."""
+    hits = parse_credits(fixture("tmdb/person_credits_movie.json"), Kind.MOVIE)
+    titles = [hit.title for hit in hits]
+
+    assert "Бэтмен психология Темного рыцаря" not in titles
+    assert "Начало" in titles
+
+
+def test_a_played_role_survives_the_cameo_filter(fixture):
+    """Обратная половина: отсев обязан убирать камео, а не актёрские работы.
+    Без неё правило «выбросить весь `cast`» прошло бы предыдущий тест."""
+    hits = parse_credits(fixture("tmdb/person_credits_actor.json"), Kind.MOVIE)
+    titles = [hit.title for hit in hits]
+
+    assert "Тёмный рыцарь" in titles
+    assert "Carry On Ken" not in titles
+
+
 def test_a_series_he_created_is_his(fixture):
     """Создатель сериала — это `Creator` в `crew`, и замерено, что он совпадает
     с `created_by` карточки на всех шести сериалах двух проверенных шоураннеров.

@@ -106,6 +106,13 @@ _CREDITED_JOBS = {
     Kind.SERIES: (_DIRECTOR, "Creator"),
 }
 
+# Чем TMDB помечает камео «играет самого себя». Английские и в русской выдаче:
+# локализация `character` не переводит — замерено 22.08.2026 на четырёх людях,
+# `Self` встретился 172 раза, `Self (archive footage)` — 36, `Himself` — 4.
+# Сравнивается начало строки: за пометкой идёт уточнение — `Self - Host`,
+# `Self - Narrator (voice)`, `Self (archive footage)`.
+_PLAYS_HIMSELF = ("self", "himself", "herself")
+
 
 # У фильма название в title, у сериала — в name; поле даты тоже разное. Знание
 # одно, и запись у него одна: отсюда ключи берут все три разборщика.
@@ -151,15 +158,27 @@ def parse_credits(payload: dict, kind: Kind) -> list[SearchHit]:
     чужих фильмов из шестидесяти трёх, по Питту — шестьдесят шесть из ста
     семидесяти семи.
 
+    Из `cast` — тоже не все: камео «играет самого себя» это не работа человека,
+    а разговор о нём — документалки, телешоу, дорожки с архивной хроникой.
+    Замерено 22.08.2026: у Нолана таких строк тридцать две из тридцати трёх, у
+    Шварценеггера 104 из 171, у Тарантино 68 из 104. Решение пользователя того
+    же дня; до него `cast` не фильтровался вовсе.
+
     Одна работа приезжает дважды, если человек на ней в двух ролях. Повторы
     снимаются по идентификатору работы, а не сравнением кандидатов целиком:
     целиком они совпадают лишь пока разбор не читает ничего ролевого — ни
     `character`, ни `order`, — и дедупликация ломалась бы от добавления любого
-    из этих полей. `job` читается здесь, до сборки, и в кандидата не попадает."""
+    из этих полей. `job` и `character` читаются здесь, до сборки, и в кандидата
+    не попадают."""
+    played = [row for row in payload.get("cast", [])
+              if not _himself(row.get("character"))]
     made = [row for row in payload.get("crew", [])
             if row.get("job") in _CREDITED_JOBS[kind]]
-    return unique_by(_hits([*payload.get("cast", []), *made], kind),
-                     lambda one: one.source_id)
+    return unique_by(_hits([*played, *made], kind), lambda one: one.source_id)
+
+
+def _himself(character: str | None) -> bool:
+    return (character or "").strip().lower().startswith(_PLAYS_HIMSELF)
 
 
 def parse_people(payload: dict) -> list[PersonHit]:
