@@ -18,17 +18,17 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (315)
+### app/CardModal.svelte (343)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
 
-### app/CardTagsModal.svelte (82)
+### app/CardTagsModal.svelte (83)
 - Теги одной карточки: тот же список, но два состояния вместо трёх — исключать тег у конкретной карточки нечего.
 - принимает: view, onview, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/FiltersModal.svelte (148)
+### app/FiltersModal.svelte (149)
 - Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
@@ -90,11 +90,15 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale
 
-## components — 30 файлов
+## components — 31 файлов
 
 ### components/Acts.svelte (32)
 - Ряд действий карточки: правка, удаление, рецензия, закладка.
 - принимает: wished, wish, reviewed, onedit, ondelete, onreview, onwish
+
+### components/AddLine.svelte (40)
+- Строка с кнопкой добавления: набрал — подтвердил. Теги и треки.
+- принимает: placeholder, label, action, limit, oncreate
 
 ### components/Aggregates.svelte (76)
 - Оценки агрегаторов: цифра, кружок ожидания или прочерк со ссылкой.
@@ -111,6 +115,10 @@
 ### components/Chips.svelte (29)
 - Метки карточки: жанры, теги и кнопка добавления тега.
 - принимает: genres, tags, on, onmark, ontag
+
+### components/Chosen.svelte (21)
+- Выбранное рядом с полем: имена подряд, у каждого крестик.
+- принимает: names, label, ondrop
 
 ### components/Confirm.svelte (15)
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
@@ -153,11 +161,7 @@
 - Ряд ответных кнопок внизу окна: отмена и согласие.
 - принимает: ok, danger, busy, oncancel, onok
 
-### components/NewTag.svelte (36)
-- Форма заведения тега.
-- принимает: oncreate
-
-### components/Picker.svelte (260)
+### components/Picker.svelte (250)
 - Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
 - принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
@@ -215,7 +219,7 @@
 
 ## state — 21 файлов
 
-### state/card.js (115)
+### state/card.js (119)
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
 - отдаёт: emptyCard, fieldsOf, formOf, shownFor, wrongNumbers
 
@@ -299,7 +303,7 @@
 - Обрезка текста по границе слова.
 - отдаёт: wordEnd
 
-## styles — 30 файлов
+## styles — 31 файлов
 
 ### styles/acts.css (64)
 - Ряд действий карточки: правка, удаление, рецензия, закладка.
@@ -311,6 +315,10 @@
 .film:hover .film__wish,
 .film__acts .is-on
 - берёт: --error, --gutter, --icon-inset, --primary, --tint-30
+
+### styles/addline.css (25)
+- Строка с кнопкой добавления: у списка тегов и у списка треков.
+- селекторы (3): .addline, .addline__ok, .addline.is-filled .addline__ok
 
 ### styles/aggr.css (61)
 - Оценки агрегаторов и кружок на месте неприехавшей.
@@ -330,9 +338,9 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
-### styles/cardform.css (106)
+### styles/cardform.css (124)
 - Раскладка окна создания и правки карточки.
-- селекторы (14): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover
+- селекторы (17): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover, .cardform__pick, .cardform__pick > :first-child, .cardform__pick .addline
 - объявляет: --col-gap, --field-h, --poster-w, --row-gap
 - берёт: --body-l, --col-gap, --poster-w, --primary, --row-gap, --text-bright, --tint-18, --tint-22
 
@@ -347,6 +355,12 @@
 - объявляет: --add
 - берёт: --label-m, --primary, --r-full, --text-bright, --tint-06, --tint-09, --tint-30, --tint-55
 
+### styles/chosen.css (29)
+- Выбранное рядом с полем: имена подряд, у каждого крестик.
+- селекторы (4): .chosen, .chosen__one, .chosen__del, .chosen__del .material-symbols-outlined
+- объявляет: --icon-btn
+- берёт: --body-m, --field-h, --tint-80
+
 ### styles/facts.css (29)
 - Строки фактов карточки и имена в них.
 - селекторы (6): .film__facts, .film__facts dt, .film__facts dd, .film__role, .person, .person:hover
@@ -357,15 +371,15 @@
 - селекторы (1): .feed
 - берёт: --content-w
 
-### styles/field.css (74)
-- Строка ввода: общее у поиска в шапке, формы нового тега и полей карточки.
+### styles/field.css (75)
+- Строка ввода: общее у поиска в шапке, строки с кнопкой добавления и полей карточки.
 - селекторы (12): .field,
-.newtag, .field:focus-within,
-.newtag:focus-within, .field, .field__input, .field .field__input,
-.newtag__input, .field .field__input::placeholder,
-.newtag__input::placeholder, .field:hover .field__input::placeholder,
-.newtag__input:hover::placeholder, .field .field__input:focus::placeholder,
-.newtag__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
+.addline, .field:focus-within,
+.addline:focus-within, .field, .field__input, .field .field__input,
+.addline__input, .field .field__input::placeholder,
+.addline__input::placeholder, .field:hover .field__input::placeholder,
+.addline__input:hover::placeholder, .field .field__input:focus::placeholder,
+.addline__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
 ### styles/film.css (162)
@@ -405,22 +419,17 @@
 - объявляет: --halo-h
 - берёт: --halo-h, --neon, --opaque
 
-### styles/newtag.css (25)
-- Форма заведения тега под списком.
-- селекторы (3): .newtag, .newtag__ok, .newtag.is-filled .newtag__ok
-
 ### styles/palette.css (121)
 - Единственное место, где есть цвет. По месту пишется только var().
 - селекторы (2): @property --primary, :root
 - объявляет: --accent-book, --accent-game, --accent-movie, --accent-music, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
-### styles/picker.css (105)
-- Поле с подсказкой имён и выбранное рядом с ним.
-- селекторы (11): .cardform__pick, .cardform__pick .picker, .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
-.picker__hit.is-marked, .picker__poster, .picker__chosen, .picked, .picked__del, .picked__del .material-symbols-outlined
-- объявляет: --icon-btn
-- берёт: --body-m, --col-gap, --field-h, --fill-primary-hover, --poster-w, --primary, --shade-55, --surface-pop, --tint-09, --tint-75, --tint-80
+### styles/picker.css (73)
+- Поле с подсказкой имён: список совпадений и всплывающий постер. Строка, в которой оно стоит, — не его: она общая у состава, жанров и треков, и живёт в `cardform.css`.
+- селекторы (5): .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
+.picker__hit.is-marked, .picker__poster
+- берёт: --body-m, --fill-primary-hover, --primary, --shade-55, --surface-pop, --tint-09, --tint-75
 
 ### styles/review.css (41)
 - Окно своей рецензии: рабочая область и ряд кнопок под ней.

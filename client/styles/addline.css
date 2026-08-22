@@ -1,8 +1,8 @@
-/* Форма заведения тега под списком. */
+/* Строка с кнопкой добавления: у списка тегов и у списка треков. */
 
 /* Общее с полем карточки — в `field.css`; здесь только своё: форма ниже, стоит
    под списком и держит кнопку рядом со строкой. */
-.newtag {
+.addline {
   gap: 8px;
   min-height: 34px;
   margin-top: 10px;
@@ -10,7 +10,7 @@
 
 /* Вид общий, из `iconbutton.css`; здесь только появление — кнопка видна,
    только когда есть что подтверждать. */
-.newtag__ok {
+.addline__ok {
   flex: 0 0 auto;
   opacity: 0;
   transform: scale(.7);
@@ -18,7 +18,7 @@
   transition: opacity .16s, transform .16s, background .15s;
 }
 
-.newtag.is-filled .newtag__ok {
+.addline.is-filled .addline__ok {
   opacity: 1;
   transform: none;
   pointer-events: auto;

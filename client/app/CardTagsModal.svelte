@@ -2,7 +2,7 @@
      исключать тег у конкретной карточки нечего. -->
 <script>
   import ListModal from '$components/ListModal.svelte'
-  import NewTag from '$components/NewTag.svelte'
+  import AddLine from '$components/AddLine.svelte'
   import TagRow from '$components/TagRow.svelte'
   import { call } from '$api/bridge.js'
   import { NOUNS } from '$state/kinds.js'
@@ -70,7 +70,8 @@
     })
 </script>
 
-{#snippet form()}<NewTag oncreate={create} />{/snippet}
+{#snippet form()}<AddLine placeholder="+ Новый тег" label="Название нового тега" action="Добавить тег"
+                          limit={24} oncreate={create} />{/snippet}
 
 <ListModal label={`Теги ${NOUNS[kind][1]}`} {onclose} footer={form}>
   {#snippet items()}

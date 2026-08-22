@@ -3,7 +3,7 @@
 <script>
   import Confirm from '$components/Confirm.svelte'
   import ListModal from '$components/ListModal.svelte'
-  import NewTag from '$components/NewTag.svelte'
+  import AddLine from '$components/AddLine.svelte'
   import ScoreRow from '$components/ScoreRow.svelte'
   import TagRow from '$components/TagRow.svelte'
   import { call } from '$api/bridge.js'
@@ -118,7 +118,8 @@
   }
 </script>
 
-{#snippet form()}<NewTag oncreate={create} />{/snippet}
+{#snippet form()}<AddLine placeholder="+ Новый тег" label="Название нового тега" action="Добавить тег"
+                          limit={24} oncreate={create} />{/snippet}
 
 <ListModal narrow={field === 'scores'} label={title} {onclose}
            footer={editable ? form : null}>

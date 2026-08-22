@@ -6,6 +6,8 @@
   import ModalFoot from '$components/ModalFoot.svelte'
   import Picker from '$components/Picker.svelte'
   import PosterPick from '$components/PosterPick.svelte'
+  import AddLine from '$components/AddLine.svelte'
+  import Chosen from '$components/Chosen.svelte'
   import Scrollarea from '$components/Scrollarea.svelte'
   import { call } from '$api/bridge.js'
   import { stampOf } from '$state/covers.js'
@@ -186,6 +188,10 @@
     const item_id = form.item_id
     await call('refs.set_genres', item_id, form.genres.map((one) => one.id))
     await writeCredits(item_id)
+    // Своим вызовом, а не полем карточки: колонки под треки у `Item` нет, и
+    // уехав в поля, они уронили бы запись лишним доводом сборщика. Список
+    // пишется целиком, как и состав, — снять всё и записать заново.
+    if (shown.has('tracks')) await call('library.set_tracks', item_id, form.tracks)
     if (picture) await call('covers.store_upload', item_id, picture)
 
     // Привязка последней: внешнее доливает только пустое, и долить оно должно
@@ -286,6 +292,28 @@
                     onchosen={(list) => pick(one.role, list)} />
           {/if}
         {/each}
+
+        <!-- Треки стоят после состава, там же, где у фильма актёры, и той же
+             строкой из двух колонок. Ролью состава они при этом не являются:
+             за треком нет ни человека, ни студии, и подсказывать по нему
+             нечего — вместо поля с подсказкой стоит поле с кнопкой.
+
+             Повтор названия не отказ: на альбоме бывают две части одной вещи с
+             одним именем, — отсюда `true` без условий. -->
+        {#if shown.has('tracks')}
+          <div class="cardform__pick">
+            <AddLine placeholder="Треки" label="Название трека"
+                     action="Добавить трек"
+                     oncreate={(name) => {
+                       form.tracks = [...form.tracks, name]
+                       return true
+                     }} />
+            <Chosen names={form.tracks} label="Убрать трек"
+                    ondrop={(index) => {
+                      form.tracks = form.tracks.filter((_, at) => at !== index)
+                    }} />
+          </div>
+        {/if}
 
         <!-- Тем же полем, и второго поведения у него от этого не появляется:
              оно не знает, откуда взялись совпадения. Заводить новое умеет тот,

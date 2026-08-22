@@ -1,10 +1,11 @@
-/* Строка ввода: общее у поиска в шапке, формы нового тега и полей карточки. */
+/* Строка ввода: общее у поиска в шапке, строки с кнопкой добавления и полей
+   карточки. */
 
-/* Обёртка строки: у карточки это `.field`, у формы нового тега `.newtag`. Черта
-   проступает только под фокусом — в покое поле обозначает себя подсказкой, а
+/* Обёртка строки: у карточки это `.field`, у строки с кнопкой добавления —
+   `.addline`. Черта проступает только под фокусом — в покое поле обозначает себя подсказкой, а
    десяток линий разом превращает окно в бланк. */
 .field,
-.newtag {
+.addline {
   display: flex;
   align-items: center;
   padding: 0 2px;
@@ -12,7 +13,7 @@
   transition: border-color .18s;
 }
 .field:focus-within,
-.newtag:focus-within { border-bottom-color: var(--primary) }
+.addline:focus-within { border-bottom-color: var(--primary) }
 
 .field {
   /* Без этого поле не сожмётся ниже собственной ширины input, и заданная ширина
@@ -38,18 +39,18 @@
    селекторе не для веса, а для отбора: `.field__input` эти двое делят со
    строкой поиска, а у той и цвет, и подсказка свои. */
 .field .field__input,
-.newtag__input { color: var(--text-bright) }
+.addline__input { color: var(--text-bright) }
 
 .field .field__input::placeholder,
-.newtag__input::placeholder {
+.addline__input::placeholder {
   color: var(--text-dim);
   transition: color .16s;
 }
 .field:hover .field__input::placeholder,
-.newtag__input:hover::placeholder { color: var(--text-bright) }
+.addline__input:hover::placeholder { color: var(--text-bright) }
 
 .field .field__input:focus::placeholder,
-.newtag__input:focus::placeholder { color: transparent }
+.addline__input:focus::placeholder { color: transparent }
 
 /* Название — главное поле карточки, поэтому крупнее остальных. */
 .field--title .field__input { font: var(--title-l) }

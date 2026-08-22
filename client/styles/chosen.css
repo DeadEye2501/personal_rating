@@ -1,0 +1,29 @@
+/* Выбранное рядом с полем: имена подряд, у каждого крестик. */
+
+/* Не «таблетки», а имена подряд — так в макете. Показывают этот список двое:
+   поле с подсказкой у состава и жанров, и список треков у альбома. */
+.chosen {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--field-h);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 18px;
+}
+
+.chosen__one {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--tint-80);
+  font: var(--body-m);
+}
+
+/* Круг, цвет и красный отклик — общие, из `iconbutton.css`; здесь только
+   размер: у имени в строке кружок мельче, чем у строки списка. */
+.chosen__del { --icon-btn: 20px }
+.chosen__del .material-symbols-outlined { font-size: 15px }

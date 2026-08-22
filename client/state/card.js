@@ -12,13 +12,14 @@ const COMMON = ['title', 'original_title', 'year', 'synopsis', 'genres']
 //
 // У книги и альбома нет ни длительности, ни сезонов: своих полей им не
 // заводилось вовсе, решение 22.08.2026. Состав у них в одну строку — автор и
-// исполнитель; треки альбома придут своим списком, а не ролью человека.
+// исполнитель. Треки альбома стоят там же, где у фильма актёры, но ролью
+// состава не являются: за треком нет человека, и номера строки у него нет.
 const OWN = {
   movie: ['runtime', 'director', 'actor'],
   series: ['seasons_count', 'episodes_count', 'showrunner', 'actor'],
   game: ['developer', 'publisher'],
   book: ['author'],
-  music: ['performer'],
+  music: ['performer', 'tracks'],
 }
 
 export const shownFor = (kind) => [...COMMON, ...OWN[kind]]
@@ -47,6 +48,8 @@ export const emptyCard = (kind) => ({
   publisher: [],
   author: [],
   performer: [],
+  // Голыми названиями, а не парами «номер и имя»: у трека номера нет вовсе.
+  tracks: [],
 })
 
 // Поля, которые база держит числами. Форма всегда отдаёт строку — поле ввода
@@ -111,5 +114,6 @@ export function formOf(view) {
     genres: view.genres.map((one) => ({ id: one.id, name: one.name })),
     ...Object.fromEntries(ROLES.map(({ role, domain }) =>
       [role, picked(view[domain] ?? [], role)])),
+    tracks: [...(view.tracks ?? [])],
   }
 }

@@ -1,16 +1,7 @@
-/* Поле с подсказкой имён и выбранное рядом с ним. */
+/* Поле с подсказкой имён: список совпадений и всплывающий постер.
 
-/* Актёры и жанры: поле стоит под постером, той же ширины, а выбранное ложится
-   справа — в место, которое иначе пустует. */
-.cardform__pick {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--col-gap);
-}
-
-/* Точкой отсчёта поле больше не служит: обе всплывашки ушли в верхний слой, и
-   отсчитываются они от окна. */
-.cardform__pick .picker { flex: 0 0 var(--poster-w) }
+   Строка, в которой оно стоит, — не его: она общая у состава, жанров и
+   треков, и живёт в `cardform.css`. */
 
 /* Список совпадений висит над содержимым и ничего не сдвигает.
 
@@ -78,28 +69,5 @@
   pointer-events: none;
 }
 
-/* Выбранное — не «таблетки», а имена подряд, у каждого крестик. */
-.picker__chosen {
-  flex: 1;
-  min-width: 0;
-  min-height: var(--field-h);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0 18px;
-}
-
-.picked {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--tint-80);
-  font: var(--body-m);
-}
-/* Круг, цвет и красный отклик — общие, из `iconbutton.css`; здесь только
-   размер: у имени в строке кружок мельче, чем у строки списка. */
-.picked__del { --icon-btn: 20px }
-.picked__del .material-symbols-outlined { font-size: 15px }
+/* Выбранное лежит своим файлом, `chosen.css`: его показывают двое — поле с
+   подсказкой и список треков. */

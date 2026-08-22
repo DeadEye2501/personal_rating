@@ -1,7 +1,7 @@
 <!-- Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа. -->
 <script>
+  import Chosen from '$components/Chosen.svelte'
   import Field from '$components/Field.svelte'
-  import Icon from '$components/Icon.svelte'
   import { byItem } from '$state/covers.js'
   import { beside } from '$state/popup.js'
 
@@ -246,15 +246,5 @@
     {/if}
   </div>
 
-  <ul class="picker__chosen">
-    {#each chosen as one, index (one.name + index)}
-      <li class="picked">
-        {one.name}
-        <button type="button" class="icon-btn icon-btn--del picked__del"
-                aria-label="Убрать" onclick={() => drop(index)}>
-          <Icon name="close" />
-        </button>
-      </li>
-    {/each}
-  </ul>
+  <Chosen names={chosen.map((one) => one.name)} label="Убрать" ondrop={drop} />
 </div>
