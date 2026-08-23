@@ -145,6 +145,23 @@ async def test_books_still_have_no_ratings(registry):
     assert registry.rating_sources(Kind.BOOK) == []
 
 
+async def test_only_books_have_a_spare_source_of_covers(registry):
+    """Запасной источник обложек есть у книг и больше ни у кого.
+
+    Тождеством, как и у остальных полей маршрута: клиент обязан быть тот же
+    самый, что поднят сборкой. Проверка идёт по **боевому** реестру, а не по
+    двойнику из `tests/fakes.py`: тот знает то же правило своим литералом, и
+    разъехаться они могли молча. Сними `covers` у книг — запасная обложка не
+    искалась бы никогда; отдай его музыке — Deezer погнал бы альбомы в FantLab,
+    и оба раза весь набор оставался бы зелёным.
+
+    Остальные перебираются по самому перечислению, а не списком: списком
+    шестой тип с запасным источником остался бы незамеченным."""
+    assert registry.covers_for(Kind.BOOK) is registry.fantlab
+    for kind in set(Kind) - {Kind.BOOK}:
+        assert registry.covers_for(kind) is None, kind
+
+
 async def test_albums_are_searched_at_deezer(registry):
     """Тождеством, а не типом: клиент обязан быть тот же самый, что поднят
     сборкой, — второй такой же уехал бы в сеть со своим предохранителем.
@@ -292,19 +309,12 @@ async def test_a_tripped_breaker_leaves_the_others_alone(registry):
     assert isinstance(refused, Refusal)
 
 
-async def test_every_key_from_the_settings_reaches_its_own_source():
-    """Ключ, не доехавший до клиента, виден только отказом источника в бою — и
-    выглядит он как чужая поломка, а не как наша опечатка в сборке.
+def watching_keys() -> tuple[httpx.MockTransport, dict]:
+    """Транспорт, запоминающий по хосту уехавший ключ, и словарь запомненного.
 
-    Ключ сверяется с хостом, а не ищется в общем списке: MDBList и OMDB шлют
-    его под одним именем `apikey`, оба зеркала Кинопоиска — одним заголовком, и
-    перестановка их местами в общем списке не видна вовсе.
-
-    Google Books шлёт свой третьим именем, `key`. Без него подмена ключа в
-    сборке — `config.google_books_key` на любой соседний — оставляла бы весь
-    набор зелёным, а в бою каждая книга получала бы «ключ не принят»: сторож
-    настроек держит только левое звено, от переменной окружения до поля."""
-    seen = {}
+    Имён у ключа четыре, и перебираются они все: `api_key` у TMDB, `apikey` у
+    MDBList и OMDB, `key` у Google Books, заголовок у Кинопоиска."""
+    seen: dict = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen[request.url.host] = (
@@ -318,7 +328,23 @@ async def test_every_key_from_the_settings_reaches_its_own_source():
             return httpx.Response(403, json={"statusCode": 403})
         return httpx.Response(200, json={})
 
-    registry = build_sources(keyed(), transport=httpx.MockTransport(handler))
+    return httpx.MockTransport(handler), seen
+
+
+async def test_every_key_from_the_settings_reaches_its_own_source():
+    """Ключ, не доехавший до клиента, виден только отказом источника в бою — и
+    выглядит он как чужая поломка, а не как наша опечатка в сборке.
+
+    Ключ сверяется с хостом, а не ищется в общем списке: MDBList и OMDB шлют
+    его под одним именем `apikey`, оба зеркала Кинопоиска — одним заголовком, и
+    перестановка их местами в общем списке не видна вовсе.
+
+    Google Books шлёт свой третьим именем, `key`. Без него подмена ключа в
+    сборке — `config.google_books_key` на любой соседний — оставляла бы весь
+    набор зелёным, а в бою каждая книга получала бы «ключ не принят»: сторож
+    настроек держит только левое звено, от переменной окружения до поля."""
+    transport, seen = watching_keys()
+    registry = build_sources(keyed(), transport=transport)
 
     await registry.tmdb.search("что угодно", Kind.MOVIE)
     await registry.google_books.search("что угодно", Kind.BOOK)

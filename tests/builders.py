@@ -9,6 +9,7 @@ from PIL import Image
 
 from backend.model import (
     Credit,
+    GenreSource,
     Item,
     Kind,
     PersonRole,
@@ -51,7 +52,10 @@ def an_item(source_id: str, title: str, **fields) -> Item:
     шесть полей, и повторять их в каждом тесте значит спрятать среди них то
     одно, ради которого тест написан."""
     return Item(
-        id=0,
+        # Номер по умолчанию нулевой — карточки в базе ещё нет. Называют его
+        # там, где карточка притворяется прочитанной: так её отдаёт двойник
+        # библиотеки в проверках отдачи страницы.
+        id=fields.pop("id", 0),
         kind=fields.pop("kind", Kind.MOVIE),
         source=fields.pop("source", Source.TMDB),
         source_id=source_id,
@@ -86,6 +90,17 @@ def picture(width: int, height: int, fmt: str = "PNG") -> bytes:
 # Готовая обложка: 2:3 — форма постера, а не случайные числа, и объявлена она
 # один раз. Здесь же, чтобы три модуля не рисовали по картинке на импорте.
 POSTER = picture(600, 900, fmt="JPEG")
+
+# Картинка, которой обрезка достаётся: ни афиша, ни квадрат. На своей форме
+# обрезка не зовётся вовсе (`already_shaped`), и тип содержимого до неё не
+# доезжает — значит и проверить проводку формы на такой картинке нечем.
+UNSHAPED = picture(1200, 800, fmt="JPEG")
+
+
+def size_of(data: bytes) -> tuple[int, int]:
+    """Стороны картинки. Рядом с `picture`, а не в модуле проверок: спрашивают
+    их пятеро — обрезка, сервис обложек, загрузчик, привязка и хранилище."""
+    return Image.open(io.BytesIO(data)).size
 
 
 STORES = (Source.STEAM, Source.GOG, Source.OLD_GAMES)
@@ -122,6 +137,25 @@ def row(source: Source, source_id: str, title: str, **fields) -> SearchHit:
 def titles(answers: list[list[SearchHit]]) -> list[str]:
     """Названия всех строк всех выдач подряд — то, что видно на экране."""
     return [one.title for answer in answers for one in answer]
+
+
+def film_card(**overrides) -> SourceCard:
+    """Фильм из TMDB — карточка, приезжающая от источника.
+
+    Здесь, а не в модуле проверок, по тому же доводу, что и `album_card`: её
+    просят двое — правила слияния полей и сама привязка, — и своими копиями они
+    разъехались бы молча."""
+    fields = dict(
+        item=an_item("157336", "Interstellar", year=2014, runtime=169,
+                     synopsis="Официальный синопсис",
+                     poster_url="https://example.com/poster.jpg"),
+        genre_ext_ids=((GenreSource.TMDB, "878"),),
+        people=(Credit("Кристофер Нолан", PersonRole.DIRECTOR,
+                       source=Source.TMDB, source_id="525"),),
+        companies=(), external_ids=(), ratings=(),
+    )
+    fields.update(overrides)
+    return SourceCard(**fields)
 
 
 def album_card(source_id: str = "54717452", **overrides) -> SourceCard:

@@ -1,7 +1,6 @@
 """Привязка ручной карточки к внешней базе и правила слияния."""
 
 import logging
-from datetime import date
 
 import pytest
 
@@ -12,15 +11,13 @@ from backend.model import (
     ExternalRating,
     GenreSource,
     IdSource,
-    Item,
     Kind,
     PersonRole,
     RatingSource,
     Source,
-    SourceCard,
     new_manual_item,
 )
-from backend.service.linking import Linker, merge_fields, overwrite_fields
+from backend.service.linking import Linker
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.external import (
     ExternalIdsRepository,
@@ -35,107 +32,16 @@ from tests.conftest import (
     capture,
     MOMENT,
     POSTER,
+    UNSHAPED,
     an_item,
     card_parts,
+    film_card,
     film_genres,
     ours,
     picture,
     responding,
+    size_of,
 )
-
-
-def incoming(**overrides) -> SourceCard:
-    fields = dict(
-        item=an_item("157336", "Interstellar", year=2014, runtime=169,
-                     synopsis="Официальный синопсис",
-                     poster_url="https://example.com/poster.jpg"),
-        genre_ext_ids=((GenreSource.TMDB, "878"),),
-        people=(Credit("Кристофер Нолан", PersonRole.DIRECTOR,
-                       source=Source.TMDB, source_id="525"),),
-        companies=(), external_ids=(), ratings=(),
-    )
-    fields.update(overrides)
-    return SourceCard(**fields)
-
-
-def mine(**fields) -> Item:
-    """Ручная карточка как объект: слияние проверяется без базы."""
-    return Item(id=1, kind=Kind.MOVIE, source=Source.MANUAL, source_id="u",
-                title="Интерстеллар", synced_at=MOMENT, **fields)
-
-
-def test_merge_keeps_what_the_human_typed():
-    merged = merge_fields(mine(synopsis="Мой текст"), incoming().item)
-
-    assert merged.title == "Интерстеллар"
-    assert merged.synopsis == "Мой текст"
-
-
-def test_merge_fills_only_the_empty():
-    merged = merge_fields(mine(), incoming().item)
-
-    assert merged.year == 2014
-    assert merged.runtime == 169
-
-
-FULL = an_item(
-    "83867", "Andor", kind=Kind.SERIES, original_title="Andor",
-    year=2022, released_at=date(2022, 9, 21), synopsis="Официальный синопсис",
-    poster_url="https://example.com/andor.jpg", runtime=48,
-    seasons_count=2, episodes_count=24,
-)
-
-
-def test_every_field_a_source_may_fill_is_filled():
-    """Все девять полей поимённо: проверка на трёх из них молчит, когда из набора
-    выпадает четвёртое — а выпасть может любое, набор задан списком."""
-    merged = merge_fields(mine(), FULL)
-
-    assert (merged.title, merged.original_title) == ("Интерстеллар", "Andor")
-    assert (merged.year, merged.released_at) == (2022, date(2022, 9, 21))
-    assert merged.synopsis == "Официальный синопсис"
-    assert merged.poster_url == "https://example.com/andor.jpg"
-    assert merged.runtime == 48
-    assert (merged.seasons_count, merged.episodes_count) == (2, 24)
-
-
-def test_merge_never_moves_identity_or_the_sync_mark():
-    merged = merge_fields(mine(), incoming().item)
-
-    assert (merged.id, merged.source, merged.source_id) == (1, Source.MANUAL, "u")
-    assert merged.synced_at == MOMENT
-
-
-def test_overwrite_takes_the_incoming_over_the_own():
-    merged = overwrite_fields(mine(synopsis="Набросок"), incoming().item)
-
-    assert merged.title == "Interstellar"
-    assert merged.synopsis == "Официальный синопсис"
-
-
-def test_overwrite_does_not_touch_the_kind_of_the_card():
-    """Тип содержимого источник не перезаписывает даже под галочкой: что делать
-    со ссылкой на сериал у карточки фильма — не решено, и менять его молча
-    нельзя. Попади `kind` в список доливаемых полей — галочка превратила бы
-    фильм в сериал.
-
-    Слияние без галочки той же проверки не требует: оно доливает только пустое,
-    а непустой `kind` не пуст никогда — упасть такое утверждение не может."""
-    series = incoming(item=an_item("1396", "Во все тяжкие", kind=Kind.SERIES)).item
-
-    assert overwrite_fields(mine(), series).kind is Kind.MOVIE
-
-
-def test_overwrite_keeps_what_the_source_never_sent():
-    """Разборщики кладут в непришедшее пустую строку, а не оставляют поле
-    незаполненным: у TMDB на русском пустой синопсис — обычное дело, и написанный
-    руками текст исчез бы безвозвратно."""
-    empty = incoming(item=an_item("157336", "Interstellar")).item
-
-    merged = overwrite_fields(mine(synopsis="Мой текст", runtime=100), empty)
-
-    assert merged.synopsis == "Мой текст"
-    assert merged.runtime == 100
 
 
 @pytest.fixture
@@ -160,7 +66,7 @@ async def manual_card(sessions, **fields) -> int:
 async def test_linking_moves_the_card_to_the_source(linker, sessions):
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(), now=LATER)
+    await linker.link(item_id, film_card(), now=LATER)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.source, stored.source_id) == (Source.TMDB, "157336")
@@ -170,7 +76,7 @@ async def test_linking_moves_the_card_to_the_source(linker, sessions):
 async def test_linking_fills_the_gaps(linker, sessions):
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(), now=LATER)
+    await linker.link(item_id, film_card(), now=LATER)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert stored.year == 2014
@@ -183,7 +89,7 @@ async def test_linking_refreshes_the_sync_mark(linker, sessions, overwrite):
     галочкой — то же: отметка источника не должна затирать момент привязки."""
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(), now=LATER, overwrite=overwrite)
+    await linker.link(item_id, film_card(), now=LATER, overwrite=overwrite)
 
     assert (await LibraryRepository(sessions).get(item_id)).synced_at == LATER
 
@@ -194,7 +100,7 @@ async def test_the_type_of_the_card_is_never_changed(linker, sessions):
     молча нельзя."""
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(item=an_item(
+    await linker.link(item_id, film_card(item=an_item(
         "83867", "Andor", kind=Kind.SERIES, seasons_count=2,
     )), now=LATER)
 
@@ -207,7 +113,7 @@ async def test_a_filled_cast_is_not_topped_up(linker, sessions):
     ours = await people(sessions).create_manual("Мой режиссёр")
     await people(sessions).attach(item_id, ours, PersonRole.DIRECTOR)
 
-    await linker.link(item_id, incoming(), now=LATER)
+    await linker.link(item_id, film_card(), now=LATER)
 
     names = [c.name for c in await people(sessions).credits_of(item_id)]
     assert names == ["Мой режиссёр"]
@@ -218,7 +124,7 @@ async def test_an_empty_cast_is_filled(linker, sessions):
     превращается в случайный список."""
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(people=(
+    await linker.link(item_id, film_card(people=(
         Credit("Кристофер Нолан", PersonRole.DIRECTOR,
                source=Source.TMDB, source_id="525"),
         Credit("Мэттью Макконахи", PersonRole.ACTOR, position=0,
@@ -239,7 +145,7 @@ async def test_a_chosen_genre_is_not_topped_up(linker, sessions):
     item_id = await manual_card(sessions)
     await GenresRepository(sessions).set_for_item(item_id, [1])
 
-    await linker.link(item_id, incoming(genre_ext_ids=((GenreSource.TMDB, "12"),)),
+    await linker.link(item_id, film_card(genre_ext_ids=((GenreSource.TMDB, "12"),)),
                       now=LATER)
 
     names = [g.name for g in await GenresRepository(sessions).genres_of(item_id)]
@@ -249,7 +155,7 @@ async def test_a_chosen_genre_is_not_topped_up(linker, sessions):
 async def test_an_empty_genre_set_is_filled(linker, sessions):
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(), now=LATER)
+    await linker.link(item_id, film_card(), now=LATER)
 
     names = [g.name for g in await GenresRepository(sessions).genres_of(item_id)]
     assert names == ["фантастика"]
@@ -261,7 +167,7 @@ async def test_overwrite_takes_everything_the_source_gave(linker, sessions):
     ours = await people(sessions).create_manual("Мой режиссёр")
     await people(sessions).attach(item_id, ours, PersonRole.DIRECTOR)
 
-    await linker.link(item_id, incoming(), now=LATER, overwrite=True)
+    await linker.link(item_id, film_card(), now=LATER, overwrite=True)
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.title, stored.synopsis) == ("Interstellar",
@@ -279,7 +185,7 @@ async def test_overwrite_does_not_wipe_what_the_source_never_had(linker, session
     studio = await companies(sessions).create("Моя студия")
     await companies(sessions).attach(item_id, studio, CompanyRole.DEVELOPER)
 
-    await linker.link(item_id, incoming(people=(), companies=()), now=LATER,
+    await linker.link(item_id, film_card(people=(), companies=()), now=LATER,
                       overwrite=True)
 
     assert [c.name for c in await people(sessions).credits_of(item_id)] == [
@@ -294,7 +200,7 @@ async def test_overwrite_does_not_wipe_genres_the_source_never_had(linker, sessi
     item_id = await manual_card(sessions)
     await GenresRepository(sessions).set_for_item(item_id, [1])
 
-    await linker.link(item_id, incoming(genre_ext_ids=()), now=LATER,
+    await linker.link(item_id, film_card(genre_ext_ids=()), now=LATER,
                       overwrite=True)
 
     names = [g.name for g in await GenresRepository(sessions).genres_of(item_id)]
@@ -307,7 +213,7 @@ async def test_overwrite_does_replace_the_genres_the_source_gave(linker, session
     item_id = await manual_card(sessions)
     await GenresRepository(sessions).set_for_item(item_id, [1])
 
-    await linker.link(item_id, incoming(genre_ext_ids=((GenreSource.TMDB, "12"),)),
+    await linker.link(item_id, film_card(genre_ext_ids=((GenreSource.TMDB, "12"),)),
                       now=LATER, overwrite=True)
 
     names = [g.name for g in await GenresRepository(sessions).genres_of(item_id)]
@@ -318,7 +224,7 @@ async def test_identifiers_and_ratings_arrive_with_the_link(linker, sessions):
     """Привязка — это ещё и то, чем карточка известна чужим базам."""
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(
+    await linker.link(item_id, film_card(
         external_ids=(ExternalId(IdSource.IMDB, "tt0816692"),),
         ratings=(ExternalRating(RatingSource.TMDB, 8.4, MOMENT),),
     ), now=LATER)
@@ -337,7 +243,7 @@ async def test_linking_to_an_occupied_identity_is_refused(linker, sessions):
     ours = await manual_card(sessions, title="Мой дубль")
 
     with pytest.raises(ItemExists):
-        await linker.link(ours, incoming(), now=LATER)
+        await linker.link(ours, film_card(), now=LATER)
 
     assert (await library.get(ours)).source is Source.MANUAL
 
@@ -352,7 +258,7 @@ async def test_an_identifier_taken_by_another_card_stops_everything(linker, sess
     ours = await manual_card(sessions, title="Моя")
 
     with pytest.raises(ItemExists):
-        await linker.link(ours, incoming(external_ids=(taken,)), now=LATER)
+        await linker.link(ours, film_card(external_ids=(taken,)), now=LATER)
 
     stored = await LibraryRepository(sessions).get(ours)
     assert stored.source is Source.MANUAL
@@ -366,7 +272,7 @@ async def test_an_identifier_of_this_very_card_is_not_in_the_way(linker, session
     item_id = await manual_card(sessions)
     await ExternalIdsRepository(sessions).put(item_id, taken)
 
-    await linker.link(item_id, incoming(external_ids=(taken,)), now=LATER)
+    await linker.link(item_id, film_card(external_ids=(taken,)), now=LATER)
 
     assert (await LibraryRepository(sessions).get(item_id)).source is Source.TMDB
 
@@ -374,7 +280,7 @@ async def test_an_identifier_of_this_very_card_is_not_in_the_way(linker, session
 async def test_a_manual_card_gets_its_poster_on_linking(linker, sessions):
     item_id = await manual_card(sessions)
 
-    await linker.link(item_id, incoming(), now=LATER)
+    await linker.link(item_id, film_card(), now=LATER)
 
     assert await linker.posters._store.get(item_id) == POSTER
 
@@ -385,7 +291,7 @@ async def test_an_own_poster_is_not_replaced(linker, sessions):
     await linker.posters.store_upload(item_id, picture(400, 400), Kind.MOVIE, now=MOMENT)
     ours = await linker.posters._store.get(item_id)
 
-    await linker.link(item_id, incoming(), now=LATER)
+    await linker.link(item_id, film_card(), now=LATER)
 
     assert await linker.posters._store.get(item_id) == ours
 
@@ -404,7 +310,7 @@ async def test_the_cover_is_taken_from_the_merged_card_and_not_from_the_source(
     built = Linker(**card_parts(sessions, posters, transport))
     item_id = await manual_card(sessions, poster_url="https://example.com/my-own.jpg")
 
-    await built.link(item_id, incoming(), now=LATER)
+    await built.link(item_id, film_card(), now=LATER)
     await built.posters.aclose()
 
     assert [str(request.url) for request in seen] == [
@@ -412,12 +318,37 @@ async def test_the_cover_is_taken_from_the_merged_card_and_not_from_the_source(
     ]
 
 
+async def test_a_linked_album_gets_a_square_cover(sessions, posters):
+    """Привязка везёт к обрезке тип **карточки**, а не чужой.
+
+    Путь свой, третий: у загрузчика обложку качает круг, у заливки — окно, а
+    здесь — привязка вставленной ссылки, и подмена типа именно тут не
+    наблюдалась ничем. Альбом лёг бы в хранилище афишей с обрезанными боками.
+
+    Картинка чужой формы нарочно: квадратную обрезка не трогает вовсе, и тип до
+    неё не доехал бы. Тип у приезжающей карточки нарочно **киношный**: с
+    одинаковым обе стороны неразличимы, а тип карточка не меняет никогда —
+    решение проекта, и обложке достаётся её собственный."""
+    built = Linker(**card_parts(sessions, posters,
+                                responding(content=UNSHAPED)))
+    item_id = await manual_card(sessions, kind=Kind.MUSIC, title="Группа крови")
+
+    await built.link(item_id, film_card(item=an_item(
+        "54717452", "Группа крови", kind=Kind.MOVIE, source=Source.DEEZER,
+        poster_url="https://cdn.deezer.com/1000x1000.jpg")), now=LATER)
+    stored = await posters.get(item_id)
+    await built.posters.aclose()
+
+    width, height = size_of(stored)
+    assert width == height, f"альбом лёг в хранилище как {width}×{height}"
+
+
 async def test_overwrite_replaces_the_own_poster(linker, sessions):
     """Обратная сторона: с галочкой приезжает обложка источника."""
     item_id = await manual_card(sessions)
     await linker.posters.store_upload(item_id, picture(400, 400), Kind.MOVIE, now=MOMENT)
 
-    await linker.link(item_id, incoming(), now=LATER, overwrite=True)
+    await linker.link(item_id, film_card(), now=LATER, overwrite=True)
 
     assert await linker.posters._store.get(item_id) == POSTER
 
@@ -432,7 +363,7 @@ async def test_a_refused_poster_leaves_the_link_in_place(sessions, engine, poste
     item_id = await manual_card(sessions)
 
     with caplog.at_level(logging.WARNING):
-        await linker.link(item_id, incoming(), now=LATER)
+        await linker.link(item_id, film_card(), now=LATER)
 
     assert (await LibraryRepository(sessions).get(item_id)).source is Source.TMDB
     assert not await linker.posters._store.has(item_id)
@@ -446,7 +377,7 @@ async def test_a_card_without_a_poster_url_keeps_its_own(linker, sessions):
     await linker.posters.store_upload(item_id, picture(400, 400), Kind.MOVIE, now=MOMENT)
     ours = await linker.posters._store.get(item_id)
 
-    await linker.link(item_id, incoming(item=an_item(
+    await linker.link(item_id, film_card(item=an_item(
         "157336", "Interstellar",
     )), now=LATER, overwrite=True)
 

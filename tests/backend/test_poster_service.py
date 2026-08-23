@@ -12,7 +12,14 @@ from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
 from tests.conftest import capture, responding, unreachable
 from tests.conftest import MOMENT as WHEN
-from tests.conftest import POSTER, POSTER_SOURCES, picture, poster_service
+from tests.conftest import (
+    POSTER,
+    POSTER_SOURCES,
+    UNSHAPED,
+    picture,
+    poster_service,
+    size_of,
+)
 
 
 @pytest.fixture
@@ -281,6 +288,65 @@ async def test_an_upload_is_cropped(service):
 
     stored = await service._store.get(1)
     assert Image.open(io.BytesIO(stored)).size == TARGET_SIZE
+
+
+async def test_a_downloaded_album_cover_is_not_reshaped_into_a_poster(posters):
+    """Скачанная обложка альбома приходит квадратом — у Deezer 1000×1000, — и
+    трогать её незачем: она уже в нашей форме.
+
+    Тип решает, какая форма «наша», и наблюдается это байтами: подставь сюда
+    киношный, и `already_shaped` ответит «резать надо», а обрезка вернёт афишу
+    500×750 с обрезанными боками. Ни один сторож пути скачанной обложки типа до
+    этого не наблюдал."""
+    square = picture(1000, 1000, fmt="JPEG")
+    service = poster_service(posters, responding(content=square))
+    try:
+        data = await service.fetch(Source.DEEZER,
+                                   "https://cdn.deezer.com/1000x1000.jpg",
+                                   Kind.MUSIC)
+    finally:
+        await service.aclose()
+
+    assert data == square, "квадрат прошёл через обрезку"
+
+
+async def test_a_downloaded_album_cover_of_a_foreign_shape_comes_out_square(posters):
+    """Вторая половина той же проводки: чужую форму обрезка приводит, и
+    приводит **к квадрату**, а не к афише. Свидетель — не квадратная картинка:
+    на квадратной обрезка не зовётся вовсе."""
+    service = poster_service(posters, responding(content=UNSHAPED))
+    try:
+        data = await service.fetch(Source.DEEZER, "https://cdn.deezer.com/w.jpg",
+                                   Kind.MUSIC)
+    finally:
+        await service.aclose()
+
+    width, height = size_of(data)
+    assert width == height, f"альбом приведён к {width}×{height}"
+
+
+async def test_a_half_written_download_is_a_refusal_and_not_an_absence(posters):
+    """Картинка, оборвавшаяся на середине, — отказ, а не «обложки нет».
+
+    Разница видна не здесь, а на карточке: «нет» означает, что скачивать нечего
+    и повторять незачем, и карточка запишется без обложки навсегда. Отказ же
+    отменяет запись, и при следующем показе всё повторится.
+
+    Наблюдается родом ответа: заголовок у обрезанного PNG читается, а пиксели
+    нет, то есть путь идёт ровно через `BadImage`.
+
+    Форма у картинки чужая нарочно: своей (2:3) обрезка не досталась бы вовсе —
+    `already_shaped` читает один заголовок и отдала бы битые байты как есть."""
+    half = picture(1200, 800)[:200]
+    service = poster_service(posters, responding(content=half))
+    try:
+        answer = await service.fetch(Source.TMDB, "https://e.com/p.png",
+                                     Kind.MOVIE)
+    finally:
+        await service.aclose()
+
+    assert isinstance(answer, Refusal), "битая картинка сошла за «обложки нет»"
+    assert answer.reason is Reason.BROKEN
 
 
 async def test_an_uploaded_album_cover_is_stored_square(service):

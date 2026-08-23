@@ -25,7 +25,9 @@ from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.views import ViewsRepository
 from tests.conftest import (
     PICTURE,
+    UNSHAPED,
     an_item,
+    size_of,
     FakeCatalog,
     FakeSources,
     capture,
@@ -75,8 +77,9 @@ async def loader(sessions, posters):
     """Оснастка загрузки. Обложка приходит из подставного транспорта:
     настоящей сети в тестах нет."""
 
-    def build(outcome, poster_status: int = 200) -> Rig:
-        transport, asked = capture(content=PICTURE, status=poster_status)
+    def build(outcome, poster_status: int = 200,
+              poster: bytes = PICTURE) -> Rig:
+        transport, asked = capture(content=poster, status=poster_status)
         parts = card_parts(sessions, posters, transport)
         client = FakeCatalog(outcome)
         return Rig(
@@ -135,6 +138,47 @@ async def test_a_lent_cover_address_reaches_the_stored_card(sessions, loader):
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert stored.poster_url == lent
+
+
+async def test_an_album_cover_is_stored_square(sessions, loader, posters):
+    """Тип содержимого доезжает от строки выдачи до обрезки: у альбома обложка
+    квадратная.
+
+    Подмени тип на киношный в любом звене — и в хранилище лёг бы альбом,
+    срезанный по бокам до афиши, а увидеть это можно было бы только глазами.
+    До сегодняшнего дня ни один сторож пути скачанной обложки типа не наблюдал:
+    наблюдалась одна заливка руками."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "54717452", "Группа крови", kind=Kind.MUSIC, source=Source.DEEZER,
+        poster_url=DETAIL_COVER))), poster=UNSHAPED)
+    came = view_from_hit(hit("54717452", "Группа крови", kind=Kind.MUSIC,
+                             source=Source.DEEZER, poster_url=SEARCH_COVER))
+
+    item_id = await rig.load.ensure(came)
+
+    width, height = size_of(await posters.get(item_id))
+    assert width == height, f"альбом лёг в хранилище как {width}×{height}"
+
+
+async def test_the_second_try_keeps_the_shape_of_its_own_kind(sessions, loader,
+                                                              posters):
+    """Второй заход за обложкой — по адресу детального ответа — везёт тип
+    карточки, а не чужой.
+
+    Путь этот не редкость: у кандидата адреса может не быть вовсе, и тогда
+    единственная обложка альбома приезжает здесь. Свидетелем — пустой адрес в
+    строке выдачи: первый заход при нём не спрашивает ничего."""
+    rig = loader(Found(SourceCard(item=an_item(
+        "54717452", "Группа крови", kind=Kind.MUSIC, source=Source.DEEZER,
+        poster_url=DETAIL_COVER))), poster=UNSHAPED)
+    came = view_from_hit(hit("54717452", "Группа крови", kind=Kind.MUSIC,
+                             source=Source.DEEZER, poster_url=""))
+
+    item_id = await rig.load.ensure(came)
+
+    assert [str(one.url) for one in rig.requests] == [DETAIL_COVER]
+    width, height = size_of(await posters.get(item_id))
+    assert width == height, f"альбом лёг в хранилище как {width}×{height}"
 
 
 async def test_the_card_wins_over_the_pair_for_its_own_language(sessions, loader):

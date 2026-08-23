@@ -11,7 +11,7 @@ from backend.service.images import (
     BadImage,
     crop_to_cover,
 )
-from tests.conftest import picture
+from tests.conftest import picture, size_of
 
 
 def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes:
@@ -21,10 +21,6 @@ def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes:
     buffer = io.BytesIO()
     source.save(buffer, format="PNG")
     return buffer.getvalue()
-
-
-def size_of(data: bytes) -> tuple[int, int]:
-    return Image.open(io.BytesIO(data)).size
 
 
 def red_box(data: bytes) -> tuple[int, int, int, int] | None:
@@ -67,6 +63,27 @@ def test_a_square_keeps_the_middle_of_a_wide_picture():
     assert abs(left - (size_of(square)[0] - right)) <= 2, "полоса не по центру"
 
 
+def test_a_square_is_cut_by_its_ratio_and_not_by_the_squeeze():
+    """Квадрат даёт **пропорция обрезки**, а не размер на выходе.
+
+    Стороны равными выйдут в любом случае: `crop_to_cover` ужимает вырезанное до
+    `SQUARE_SIZE`, и афишная обрезка просто сплющилась бы в квадрат — с
+    обрезанными боками и растянутым содержимым. Поэтому наблюдается доля полосы,
+    а не размер: квадрат берёт от широкой картинки половину ширины, и полоса
+    шириной в десятую занимает в нём пятую часть, а афишная обрезка взяла бы
+    треть.
+
+    Соседняя проверка размера этого не различает вовсе — на ней и держалась
+    единственная сторожевая нить квадрата."""
+    wide = painted((1000, 500), (450, 0, 550, 500))
+
+    square = crop_to_cover(wide, Kind.MUSIC)
+    left, _, right, _ = red_box(square)
+    share = (right - left) / size_of(square)[0]
+
+    assert 0.17 <= share <= 0.23, f"полоса заняла {share:.2f} вместо пятой части"
+
+
 def test_the_target_size_is_five_hundred_by_seven_fifty():
     """Единственное место, где размер написан литералом: остальные сверяют его с
     `TARGET_SIZE`, то есть с самим объявлением, и переедут вместе с ним. А выбран
@@ -84,6 +101,34 @@ def test_a_tall_picture_comes_out_the_target_size():
 
 def test_an_already_correct_ratio_is_only_resized():
     assert size_of(crop_to_cover(picture(600, 900), Kind.MOVIE)) == TARGET_SIZE
+
+
+def test_a_full_size_cover_weighs_about_what_the_storage_counts_on():
+    """Качество сжатия выбрано под арифметику хранилища: спека считает его из
+    примерно 80 КБ на постер, а фотография с телефона эту арифметику ломает.
+
+    Наблюдается весом, потому что весом оно и выбрано: у качества нет другого
+    следствия, ради которого его ставили.
+
+    Границы замерены на этой самой картинке 23.08.2026: при 88 она весит 81 КБ,
+    при 75 (умолчание Pillow, то есть потерянный довод) — 60, при 95 — 108, при
+    30 — 33. Ловится отсюда и потеря довода, и всякий заметный сдвиг; соседние
+    ступени, 85 и 90, не ловятся нарочно — вес зависит ещё и от версии Pillow, и
+    сторож на две ступени краснел бы от чужого обновления.
+
+    Картинка рисуется шумом нарочно: одноцветная сжимается в пару килобайт при
+    любом качестве и не различает ничего."""
+    noisy = Image.new("RGB", (500, 750))
+    pixels = noisy.load()
+    for x in range(500):
+        for y in range(750):
+            pixels[x, y] = ((x * 7) % 256, (y * 5) % 256, ((x + y) * 3) % 256)
+    buffer = io.BytesIO()
+    noisy.save(buffer, format="PNG")
+
+    weight = len(crop_to_cover(buffer.getvalue(), Kind.MOVIE))
+
+    assert 72_000 <= weight <= 92_000, f"обложка весит {weight // 1024} КБ"
 
 
 def test_a_small_picture_is_not_blown_up():

@@ -1646,7 +1646,7 @@
 - `async def record_fantlab(client: httpx.AsyncClient) -> None` (14)
 - `async def main() -> None` (28)
 
-## tests — 109 модулей
+## tests — 110 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1841,17 +1841,19 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 402 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_registry.py` — 428 строк ⚠ подошёл к 300
 
 Реестр держится на том, что контракт у всех клиентов один.
 
 Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `backend.unique`, `tests.conftest`
 
-Тестов: 25
+Тестов: 26
 
 - `def sources()` (4)
 - `async def registry()` (9)
 - `def keyed()` (13)
+- `def watching_keys() -> tuple[httpx.MockTransport, dict]` (20)
+  - `def handler(request: httpx.Request) -> httpx.Response` (11)
 
 ### `tests/backend/sources/test_steam.py` — 303 строк ⚠ подошёл к 300
 
@@ -1967,13 +1969,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 13
 
 
-### `tests/backend/test_cover_reads.py` — 99 строк
+### `tests/backend/test_cover_reads.py` — 142 строк
 
 Обложка видимой карточки: лежащая отдаётся, недостающая скачивается.
 
 Зависит от: `backend.model`, `tests.conftest`
 
-Тестов: 7
+Тестов: 9
 
 - `async def covers(posters)` (5)
 
@@ -2135,16 +2137,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 
-### `tests/backend/test_images.py` — 172 строк
+### `tests/backend/test_images.py` — 217 строк
 
 Обрезка залитой руками картинки до формы обложки.
 
 Зависит от: `backend.model`, `backend.service.images`, `tests.conftest`
 
-Тестов: 18
+Тестов: 20
 
 - `def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes` (7)
-- `def size_of(data: bytes) -> tuple[int, int]` (2)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
 
 ### `tests/backend/test_language.py` — 83 строк
@@ -2195,16 +2196,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def loader(sessions)` (6)
   - `def build(client) -> Loader` (3)
 
-### `tests/backend/test_linking.py` — 507 строк ⚠ за пределом 500
+### `tests/backend/test_linking.py` — 438 строк ⚠ подошёл к 300
 
 Привязка ручной карточки к внешней базе и правила слияния.
 
 Зависит от: `backend.model`, `backend.service.linking`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.tracks`, `tests.conftest`
 
-Тестов: 33
+Тестов: 27
 
-- `def incoming(**overrides) -> SourceCard` (12)
-- `def mine(**fields) -> Item` (4)
 - `async def linker(sessions, engine, posters)` (5)
 - `async def manual_card(sessions, **fields) -> int` (9)
 
@@ -2217,19 +2216,19 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/backend/test_loading.py` — 542 строк ⚠ за пределом 500
+### `tests/backend/test_loading.py` — 586 строк ⚠ за пределом 500
 
 Три круга загрузки: кандидат становится карточкой в базе.
 
 Зависит от: `backend.model`, `backend.service.cards`, `backend.service.loading`, `backend.service.posters`, `backend.storage.repository.library`, `backend.storage.repository.views`, `tests.conftest`
 
-Тестов: 26
+Тестов: 28
 
 - `def candidate(source_id='157336', poster=SEARCH_COVER) -> CardView` (6)
 - `def source_card(source_id='157336', poster=DETAIL_COVER) -> SourceCard` (7)
 - `class Rig` (8)
-- `async def loader(sessions, posters)` (19)
-  - `def build(outcome, poster_status: int=200) -> Rig` (13)
+- `async def loader(sessions, posters)` (20)
+  - `def build(outcome, poster_status: int=200, poster: bytes=PICTURE) -> Rig` (14)
 
 ### `tests/backend/test_manual_cards.py` — 213 строк
 
@@ -2239,6 +2238,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 14
 
+
+### `tests/backend/test_merge_fields.py` — 95 строк
+
+Правила слияния полей при привязке: что остаётся своим, что доливается.
+
+Зависит от: `backend.model`, `backend.service.linking`, `tests.conftest`
+
+Тестов: 7
+
+- `def mine(**fields) -> Item` (4)
 
 ### `tests/backend/test_merge_results.py` — 92 строк
 
@@ -2344,13 +2353,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
 - `def outside_questions(asked: list[tuple]) -> list[tuple]` (4)
 
-### `tests/backend/test_poster_service.py` — 349 строк ⚠ подошёл к 300
+### `tests/backend/test_poster_service.py` — 415 строк ⚠ подошёл к 300
 
 Путь обложки от источника до хранилища.
 
 Зависит от: `backend.model`, `backend.service.images`, `backend.service.posters`, `backend.sources.http`, `backend.storage.posters`, `tests.conftest`
 
-Тестов: 23
+Тестов: 26
 
 - `async def service(posters)` (4)
 
@@ -2739,13 +2748,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def keys_and_values(table: str, text: str) -> dict[str, str]` (6)
 - `def paths_of_the_page(domains: set[str]) -> set[tuple[str, str]]` (8)
 
-### `tests/bridge/test_serve.py` — 237 строк
+### `tests/bridge/test_serve.py` — 268 строк
 
 Отдача страницы, ресурсов и обложек.
 
-Зависит от: `backend.model`, `bridge.serve`
+Зависит от: `backend.model`, `bridge.serve`, `tests.conftest`
 
-Тестов: 17
+Тестов: 19
 
 - `def call(page, path, query='')` (10)
   - `def start(status, headers)` (3)
@@ -2777,28 +2786,30 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/builders.py` — 143 строк
+### `tests/builders.py` — 177 строк
 
 Строители данных для тестов: карточки, кандидаты, картинки, записанное.
 
 Зависит от: `backend.model`, `backend.storage.repository.library`, `backend.storage.repository.ratings`
 
 - `def recorded(relative: str)` (9)
-- `def an_item(source_id: str, title: str, **fields) -> Item` (15)
+- `def an_item(source_id: str, title: str, **fields) -> Item` (18)
 - `async def rated(sessions, source_id: str, score: float | None, **fields) -> int` (12)
 - `def picture(width: int, height: int, fmt: str='PNG') -> bytes` (6)
+- `def size_of(data: bytes) -> tuple[int, int]` (4)
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (16)
 - `def row(source: Source, source_id: str, title: str, **fields) -> SearchHit` (8)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (3)
+- `def film_card(**overrides) -> SourceCard` (17)
 - `def album_card(source_id: str='54717452', **overrides) -> SourceCard` (17)
 
-### `tests/conftest.py` — 260 строк
+### `tests/conftest.py` — 266 строк
 
 Фикстуры тестов и поверхность общего.
 
 Зависит от: `backend.config`, `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
 
-Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `album_card`, `an_item`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
+Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `UNSHAPED`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `album_card`, `an_item`, `film_card`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `size_of`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
 
 - `def ours(caplog) -> list[str]` (8)
 - `async def film_genres(engine) -> None` (13)

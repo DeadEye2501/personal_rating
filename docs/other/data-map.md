@@ -981,10 +981,6 @@
 - `BANNED_IN_BRIDGE` = `набор из 6`
 - `ALLOWED_FROM_BACKEND` = `набор из 2`
 
-### `tests/backend/test_linking.py`
-
-- `FULL` = `an_item('83867', 'Andor', kind=Kind.SERIES, orig…`
-
 ### `tests/backend/test_links.py`
 
 - `ADDRESSES` = `набор из 12`
@@ -1000,6 +996,10 @@
   - `client: FakeCatalog`
   - `posters: PosterService`
   - `requests: list`
+
+### `tests/backend/test_merge_fields.py`
+
+- `FULL` = `an_item('83867', 'Andor', kind=Kind.SERIES, orig…`
 
 ### `tests/backend/test_merging_sets.py`
 
@@ -1107,6 +1107,7 @@
 - `LATER` = `datetime(2026, 7, 30, 12, 0)`
 - `PICTURE` = `b'\x89PNG\r\n\x1a\n' + b'0' * 512`
 - `POSTER` = `picture(600, 900, fmt='JPEG')`
+- `UNSHAPED` = `picture(1200, 800, fmt='JPEG')`
 - `STORES` = `набор из 3`
 
 ### `tests/conftest.py`

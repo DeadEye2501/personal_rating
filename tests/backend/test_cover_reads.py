@@ -3,7 +3,15 @@
 import pytest
 
 from backend.model import Kind, Refusal, Source
-from tests.conftest import MOMENT, PICTURE, capture, poster_service
+from tests.conftest import (
+    MOMENT,
+    PICTURE,
+    UNSHAPED,
+    capture,
+    poster_service,
+    responding,
+    size_of,
+)
 
 # Вторая картинка нужна, чтобы отличить «отдали лежащее» от «скачали заново»:
 # с одинаковыми байтами эти два случая неразличимы. Подпись JPEG, а не PNG.
@@ -73,6 +81,41 @@ async def test_a_card_without_a_cover_asks_nobody(covers):
     assert await service.poster_for(1, Source.TMDB, "", MOMENT,
                                     Kind.MOVIE) is None
     assert asked == []
+
+
+async def test_a_shown_album_keeps_its_square_and_the_store_gets_it(posters):
+    """Показ карточки — главный путь обложки: по нему она и приезжает в ленту,
+    и **ложится в хранилище**. Тип обязан доехать до обрезки и здесь, иначе
+    альбом сохранился бы афишей с обрезанными боками — навсегда, потому что
+    лежащее в хранилище больше не перекачивается.
+
+    Оба следствия сразу: отданное и сохранённое."""
+    service = poster_service(posters, responding(content=UNSHAPED))
+    try:
+        data = await service.poster_for(1, Source.DEEZER,
+                                        "https://cdn.deezer.com/w.jpg", MOMENT,
+                                        Kind.MUSIC)
+        stored = await service._store.get(1)
+    finally:
+        await service.aclose()
+
+    assert size_of(data)[0] == size_of(data)[1], "отдали афишу"
+    assert size_of(stored)[0] == size_of(stored)[1], "в хранилище легла афиша"
+
+
+async def test_a_shown_candidate_keeps_its_square_too(posters):
+    """У кандидата номера нет, класть обложку некуда — но показывается она тем
+    же путём, и тип по нему едет свой. Ветка отдельная, и подмена типа в ней
+    молчала бы, даже если соседняя сторожится."""
+    service = poster_service(posters, responding(content=UNSHAPED))
+    try:
+        data = await service.poster_for(None, Source.DEEZER,
+                                        "https://cdn.deezer.com/w.jpg", MOMENT,
+                                        Kind.MUSIC)
+    finally:
+        await service.aclose()
+
+    assert size_of(data)[0] == size_of(data)[1], "кандидату отдали афишу"
 
 
 async def test_a_refusal_is_returned_and_nothing_is_stored(posters):

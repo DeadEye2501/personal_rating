@@ -4,8 +4,9 @@ WSGI зовётся напрямую: сервер здесь не подним�
 
 from datetime import datetime
 
-from backend.model import Item, Kind, Reason, Refusal, Source
+from backend.model import Kind, Reason, Refusal, Source
 from bridge.serve import Page
+from tests.conftest import an_item
 
 PNG = b"\x89PNG\r\n\x1a\nthe rest"
 JPEG = b"\xff\xd8\xff\xe0the rest"
@@ -98,10 +99,8 @@ def test_a_cover_of_a_library_card_is_taken_by_its_number(tmp_path, spy, asked):
     """Источник и адрес берёт сам обработчик: страница знает только `item_id`,
     и подсказке при вводе имени больше и не из чего исходить."""
     answers, log = asked
-    answers["library.get"] = Item(id=12, kind=Kind.MOVIE, source=Source.TMDB,
-                                  source_id="1", title="Одиссея",
-                                  synced_at=datetime(2026, 7, 31),
-                                  poster_url="https://image/1.jpg")
+    answers["library.get"] = an_item("1", "Одиссея", id=12,
+                                     poster_url="https://image/1.jpg")
     answers["posters.poster_for"] = PNG
 
     status, headers, body = call(Page(spy, tmp_path), "/poster", "item=12")
@@ -135,6 +134,38 @@ def test_a_cover_of_a_candidate_is_taken_by_its_address(tmp_path, spy, asked):
     _, args, _ = log[0]
     assert args[0] is None
     assert args[1] is Source.TMDB
+
+
+def test_the_kind_of_a_stored_card_reaches_the_cover(tmp_path, spy, asked):
+    """Тип уезжает обрезке: у альбома обложка квадратная, у остальных афиша.
+
+    Тип здесь **музыкальный**, а не киношный: подмену на киношный — ровно ту,
+    которой боится проводка формы, — на карточке кино не отличить ни от чего.
+    Соседняя проверка держит первые четыре довода, а пятый не держал никто."""
+    answers, log = asked
+    answers["library.get"] = an_item("54717452", "Группа крови", id=12,
+                                     kind=Kind.MUSIC, source=Source.DEEZER,
+                                     poster_url="https://cdn.deezer.com/1.jpg")
+    answers["posters.poster_for"] = JPEG
+
+    call(Page(spy, tmp_path), "/poster", "item=12")
+
+    _, args, _ = log[1]
+    assert args[4] is Kind.MUSIC, f"обрезке уехал тип {args[4]}"
+
+
+def test_the_kind_of_a_candidate_reaches_the_cover(tmp_path, spy, asked):
+    """У кандидата тип приезжает доводом ручки — своей карточки в базе нет, — и
+    доехать до обрезки обязан он же: альбом из выдачи показывается квадратом,
+    как и заведённый."""
+    answers, log = asked
+    answers["posters.poster_for"] = JPEG
+
+    call(Page(spy, tmp_path), "/poster",
+         "source=deezer&url=https%3A%2F%2Fcdn%2F1.jpg&kind=music")
+
+    _, args, _ = log[0]
+    assert args[4] is Kind.MUSIC, f"обрезке уехал тип {args[4]}"
 
 
 def test_a_cover_that_did_not_arrive_is_not_found(tmp_path, spy, asked):
