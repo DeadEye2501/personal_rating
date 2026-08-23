@@ -1,0 +1,17 @@
+{
+ "matches": [
+  {
+   "autors": "[autor=9781]Татьяна Тронина[/autor]",
+   "correct": 1,
+   "edition_id": 365174,
+   "isbn": "978-5-04-168446-4",
+   "name": "Снежный сон",
+   "notes": "",
+   "plan_date": "",
+   "publisher": "[pub=324]Эксмо[/pub]",
+   "series": "Нити любви. Романы Т. Трониной",
+   "year": 2022
+  }
+ ],
+ "total_found": 1
+}

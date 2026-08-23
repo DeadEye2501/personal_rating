@@ -9,6 +9,7 @@
 обе продолжали бы отвечать успешно."""
 
 from collections.abc import Callable, Iterable
+from dataclasses import replace
 from datetime import datetime
 
 from backend.model import (
@@ -21,6 +22,7 @@ from backend.model import (
     Source,
     view_from_hit,
 )
+from backend.naming import capitalized
 from backend.service.genres import book_for, genres_of
 from backend.sources.convert import from_search
 from backend.storage.repository.genres import GenresRepository
@@ -105,9 +107,29 @@ async def to_views(hits: list[SearchHit], genres: GenresRepository,
     ))
     return [
         view_from_hit(
-            hit,
+            written(hit),
             genres_of(book, hit.genre_ext_ids),
             from_search(hit.source, hit.source_rating, clock()),
         )
         for hit in hits
     ]
+
+
+def written(hit: SearchHit) -> SearchHit:
+    """Строка выдачи в нашем написании: первая буква заглавная у всего, что
+    человек читает (`backend.naming`).
+
+    Здесь, а не в `view_from_hit`: модель по решению проекта не зависит ни от
+    чего нашего, и правило записи в неё не заходит. И не в разборе источника:
+    источник отвечает за то, что он прислал, а как это пишется у нас — наше
+    дело.
+
+    Нужно потому, что кандидат ещё не записан, а виден раньше всего: разойдись
+    показ с записью, «не дрочись» превращалось бы в «Не дрочись» ровно в тот
+    миг, когда карточку заводят."""
+    return replace(
+        hit,
+        title=capitalized(hit.title),
+        original_title=capitalized(hit.original_title),
+        synopsis=capitalized(hit.synopsis),
+    )

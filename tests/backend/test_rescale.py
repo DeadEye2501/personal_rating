@@ -136,13 +136,13 @@ async def test_a_card_without_a_score_survives_the_pass(sessions):
     """Пустая оценка остаётся пустой, а не становится нулём: карточка списка дел
     живёт без оценки, и приехавший ноль показал бы её оценённой."""
     item_id = await rated(sessions, "157336", None)
-    await RatingsRepository(sessions).set_review(item_id, "потом", MOMENT)
+    await RatingsRepository(sessions).set_review(item_id, "Потом", MOMENT)
 
     await apply_scale(sessions, 5)
 
     got = await RatingsRepository(sessions).get(item_id)
     assert got.score is None
-    assert got.review == "потом"
+    assert got.review == "Потом"
 
 
 async def test_a_broken_pass_leaves_neither_scores_nor_the_mark(sessions,

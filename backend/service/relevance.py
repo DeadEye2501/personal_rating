@@ -12,9 +12,14 @@
 """
 
 from backend.model import Kind, SearchHit
-from backend.service.titles import flattened
+from backend.titles import flattened
 
 __all__ = ["relevant"]
+
+# Кому отсев нужен: тем источникам, у которых нет понятия «не найдено». У GOG
+# его нет вовсе, у Google Books `totalItems` всегда 300 — на любой запрос
+# найдётся триста книг, и чем глубже страница, тем меньше в ней запроса.
+_ASKED_STRICTLY = frozenset({Kind.GAME, Kind.BOOK})
 
 
 def _asked(query: str) -> set[str]:
@@ -65,6 +70,14 @@ def relevant(answers: list[list[SearchHit]],
     «Криминальным чтивом» нет ни одного: общий отсев отменил бы поиск по имени
     целиком.
 
+    **Книги отсеиваются наравне с играми** — решение пользователя 23.08.2026,
+    «если я ищу властелина колец, то я должен получить властелина колец». Болезнь
+    у Google Books та же, что у GOG: `totalItems` он отдаёт всегда 300, и на
+    третьей странице по «властелин колец» приезжают «Семья и школа» и
+    библиографические указатели. Цена замерена в тот же день на живой выдаче: из
+    шестидесяти строк остаётся шесть, и вместе с мусором уходят «Хранители
+    кольца» и транслитерация «Vlastelin Kolec» — слов запроса в них нет.
+
     **Кино и сериалы не трогает вовсе**, и это не перестраховка. Правило
     замерено на играх и держится их свойством: у GOG нет понятия «не найдено»,
     поэтому на бессмыслицу он отвечает чем попало. У TMDB оно есть, а сверх того
@@ -80,6 +93,7 @@ def relevant(answers: list[list[SearchHit]],
     asked = _asked(query)
     if not asked:
         return answers
-    if not all(one.kind is Kind.GAME for answer in answers for one in answer):
+    if not all(one.kind in _ASKED_STRICTLY
+               for answer in answers for one in answer):
         return answers
     return [[one for one in answer if _knows(one, asked)] for answer in answers]

@@ -31,7 +31,7 @@ async def test_the_case_does_not_matter_in_russian(sessions, search):
     названия не совпали бы никогда."""
     await rated(sessions, "157336", None, title="Интерстеллар")
 
-    found = await search.local(Kind.MOVIE, "ИНТЕРСТЕЛЛАР")
+    found = await search.local(Kind.MOVIE, "иНТЕРСТЕЛЛАР")
 
     assert len(found) == 1
 
@@ -50,7 +50,7 @@ async def test_the_type_of_content_never_mixes(sessions, search):
     await rated(sessions, "292030", None, title="Интерстеллар: игра",
                 kind=Kind.GAME)
 
-    found = await search.local(Kind.MOVIE, "Интерстеллар")
+    found = await search.local(Kind.MOVIE, "интерстеллар")
 
     assert len(found) == 1
 
@@ -93,14 +93,14 @@ async def test_the_found_cards_are_whole(sessions, search):
     показывать её впереди чужой было бы незачем."""
     item_id = await rated(sessions, "157336", 9.0, title="Интерстеллар")
     tags = TagsRepository(sessions)
-    tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
+    tag_id = await tags.create(Kind.MOVIE, "Пересмотреть")
     await tags.assign(item_id, tag_id)
 
-    found = await search.local(Kind.MOVIE, "Интер")
+    found = await search.local(Kind.MOVIE, "интер")
 
     assert found[0].item_id == item_id
     assert found[0].rating.score == 9.0
-    assert [t.name for t in found[0].tags] == ["пересмотреть"]
+    assert [t.name for t in found[0].tags] == ["Пересмотреть"]
 
 
 async def test_an_empty_query_finds_nothing(sessions, search):
@@ -129,7 +129,7 @@ async def test_no_more_than_a_portion_comes_back(sessions, search):
     for number in range(25):
         await rated(sessions, str(number), None, title=f"Фильм {number}")
 
-    found = await search.local(Kind.MOVIE, "Фильм")
+    found = await search.local(Kind.MOVIE, "фильм")
 
     assert len(found) == 20
 
@@ -145,7 +145,7 @@ async def test_the_search_does_not_touch_the_clock(sessions, search):
     await rated(sessions, "27205", None, title="Интерстеллар давний",
                 synced_at=MOMENT - timedelta(days=4000))
 
-    found = await search.local(Kind.MOVIE, "Интерстеллар")
+    found = await search.local(Kind.MOVIE, "интерстеллар")
 
     # Набор, а не порядок: порядок здесь алфавитный и сторожится соседним тестом,
     # а падение этого должно говорить про свежесть — что давняя карточка из

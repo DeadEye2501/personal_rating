@@ -6,6 +6,7 @@ from sqlalchemy import delete, select, tuple_
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import CardView, Item, Kind, Source
+from backend.naming import capitalized
 from backend.storage.repository.base import Repository
 from backend.storage.tables import removed as removed_table
 
@@ -31,7 +32,8 @@ class RemovedRepository(Repository):
         await self._run(
             insert(removed_table)
             .values(kind=item.kind, source=item.source,
-                    source_id=item.source_id, title=item.title)
+                    source_id=item.source_id,
+                    title=capitalized(item.title))
             .on_conflict_do_nothing()
         )
 

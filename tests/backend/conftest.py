@@ -31,7 +31,8 @@ async def service(sessions):
     """Сервис поиска на подставных клиентах. Здесь, а не в двух модулях по
     копии: проверки выдачи и проверки жанров кандидата разъехались по файлам,
     когда первый упёрся в предел, — и обёртка уехала следом дважды."""
-    return lambda *clients: search_service(sessions, *clients)
+    return lambda *clients, covers=None: search_service(sessions, *clients,
+                                                        covers=covers)
 
 
 @pytest.fixture

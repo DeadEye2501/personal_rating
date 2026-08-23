@@ -2,7 +2,7 @@
 
 import pytest
 
-from backend.model import Refusal, Source
+from backend.model import Kind, Refusal, Source
 from tests.conftest import MOMENT, PICTURE, capture, poster_service
 
 # Вторая картинка нужна, чтобы отличить «отдали лежащее» от «скачали заново»:
@@ -22,7 +22,8 @@ async def test_a_stored_cover_comes_back_without_the_network(covers):
     service, asked = covers
     await service._store.put(1, STORED, MOMENT)
 
-    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
+    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT,
+                                    Kind.MOVIE)
 
     assert data == STORED
     assert asked == []
@@ -36,7 +37,8 @@ async def test_empty_bytes_in_the_store_are_still_an_answer(covers):
     service, asked = covers
     await service._store.put(1, b"", MOMENT)
 
-    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
+    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT,
+                                    Kind.MOVIE)
 
     assert data == b""
     assert asked == []
@@ -45,7 +47,8 @@ async def test_empty_bytes_in_the_store_are_still_an_answer(covers):
 async def test_a_missing_cover_is_downloaded_and_kept(covers):
     service, asked = covers
 
-    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
+    data = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT,
+                                    Kind.MOVIE)
 
     assert data == PICTURE
     assert await service._store.get(1) == PICTURE
@@ -58,7 +61,7 @@ async def test_a_candidate_gets_its_cover_but_nothing_is_stored(covers):
     service, _ = covers
 
     data = await service.poster_for(None, Source.TMDB, "https://e.com/p.jpg",
-                                    MOMENT)
+                                    MOMENT, Kind.MOVIE)
 
     assert data == PICTURE
     assert not await service._store.has(1)
@@ -67,7 +70,8 @@ async def test_a_candidate_gets_its_cover_but_nothing_is_stored(covers):
 async def test_a_card_without_a_cover_asks_nobody(covers):
     service, asked = covers
 
-    assert await service.poster_for(1, Source.TMDB, "", MOMENT) is None
+    assert await service.poster_for(1, Source.TMDB, "", MOMENT,
+                                    Kind.MOVIE) is None
     assert asked == []
 
 
@@ -76,7 +80,7 @@ async def test_a_refusal_is_returned_and_nothing_is_stored(posters):
     service = poster_service(posters, transport)
 
     result = await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg",
-                                      MOMENT)
+                                      MOMENT, Kind.MOVIE)
 
     assert isinstance(result, Refusal)
     assert await service._store.get(1) is None
@@ -87,7 +91,9 @@ async def test_the_second_show_of_the_same_card_costs_nothing(covers):
     те же обложки заново."""
     service, asked = covers
 
-    await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
-    await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT)
+    await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT,
+                                    Kind.MOVIE)
+    await service.poster_for(1, Source.TMDB, "https://e.com/p.jpg", MOMENT,
+                                    Kind.MOVIE)
 
     assert len(asked) == 1

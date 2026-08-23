@@ -268,12 +268,14 @@ async def test_every_source_has_its_own_breaker(registry):
     # Оба зеркала Кинопоиска заведены под одним именем: наружу источник один, и
     # в `Refusal.source` человек должен увидеть «kinopoisk», а не имя зеркала.
     assert sorted(one.name for one in registry.connections) == [
-        "deezer", "gog", "google_books", "kinopoisk", "kinopoisk", "mdblist",
-        "old_games", "omdb", "steam", "tmdb",
+        "deezer", "fantlab", "gog", "google_books", "kinopoisk", "kinopoisk",
+        "mdblist", "old_games", "omdb", "steam", "tmdb",
     ]
     assert len(breakers) == len({id(one) for one in breakers})
-    # Девять источников, но соединений десять: у Кинопоиска два зеркала.
-    assert len(breakers) == 10
+    # Десять источников, но соединений одиннадцать: у Кинопоиска два зеркала.
+    # Десятый — FantLab: карточек он не отдаёт, только обложки, а предохранитель
+    # ему нужен свой, как и всем.
+    assert len(breakers) == 11
 
 
 async def test_a_tripped_breaker_leaves_the_others_alone(registry):

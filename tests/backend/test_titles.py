@@ -5,7 +5,7 @@
 
 import pytest
 
-from backend.service.titles import EDITION_WORDS, flattened, without_edition
+from backend.titles import EDITION_WORDS, flattened, without_edition
 
 SAME = [
     ("римские и арабские", "Fallout II", "Fallout 2"),

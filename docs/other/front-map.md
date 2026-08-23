@@ -48,7 +48,7 @@
 - принимает: view, onsaved, onclose, ontrouble
 - берёт: ./marks.js, ./trouble.js
 
-### app/SearchScreen.svelte (374)
+### app/SearchScreen.svelte (401)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, reviewed, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -223,7 +223,7 @@
 - Форма карточки: из каких полей она состоит у каждого типа содержимого.
 - отдаёт: emptyCard, fieldsOf, formOf, shownFor, wrongNumbers
 
-### state/covers.js (25)
+### state/covers.js (29)
 - Адрес обложки у своей ручки.
 - отдаёт: byItem, bySource, stampOf
 

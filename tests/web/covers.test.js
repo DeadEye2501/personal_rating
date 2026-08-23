@@ -39,16 +39,24 @@ describe('адрес обложки', () => {
   it('у кандидата номера нет, и обложка идёт через источник', () => {
     // Кандидат в базу ещё не попал: спросить его обложку можно только тем, чем
     // он сам себя называет.
-    expect(bySource('tmdb', 'https://i.tmdb/p/x.jpg'))
-      .toBe('/poster?source=tmdb&url=https%3A%2F%2Fi.tmdb%2Fp%2Fx.jpg')
+    expect(bySource('tmdb', 'https://i.tmdb/p/x.jpg', 'movie'))
+      .toBe('/poster?source=tmdb&url=https%3A%2F%2Fi.tmdb%2Fp%2Fx.jpg&kind=movie')
   })
 
   it('адрес источника уезжает закодированным целиком', () => {
     // В адресе обложки бывает и `&`, и `?`: подставленный как есть, он стал бы
     // вторым доводом ручки, и она получила бы обрезанный адрес.
-    const asked = bySource('gog', 'https://x/y?a=1&b=2')
+    const asked = bySource('gog', 'https://x/y?a=1&b=2', 'game')
 
     expect(asked).toContain('%3Fa%3D1%26b%3D2')
-    expect(asked.split('&')).toHaveLength(2)
+    // Доводов ровно три: источник, кодированный адрес и тип. Раскодированный
+    // адрес добавил бы четвёртый и пятый.
+    expect(asked.split('&')).toHaveLength(3)
+  })
+
+  it('тип кандидата уезжает вместе с адресом', () => {
+    // Без него ручка не знает формы: обложку чужой формы бэкенд приводит к
+    // нашей, а у альбома она квадратная.
+    expect(bySource('deezer', 'https://cdn/x.jpg', 'music')).toContain('kind=music')
   })
 })

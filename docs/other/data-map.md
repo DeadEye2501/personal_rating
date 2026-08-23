@@ -153,6 +153,7 @@
   - `KINOPOISK` = `'kinopoisk'`
   - `STEAM` = `'steam'`
   - `GOG` = `'gog'`
+  - `ISBN` = `'isbn'`
 - `class RatingSource(StrEnum)`
   - `IMDB` = `'imdb'`
   - `KINOPOISK` = `'kinopoisk'`
@@ -281,6 +282,8 @@
   - `genre_ext_ids: tuple[tuple[GenreSource, str], ...]` = `field(default_factory=tuple)`
   - `source_rating: float | None` = `None`
   - `aliases: tuple[str, ...]` = `field(default_factory=tuple)`
+  - `external_ids: tuple[ExternalId, ...]` = `field(default_factory=tuple)`
+  - `single: bool` = `False`
 - `class PersonHit`
   - `source_id: str`
 
@@ -324,6 +327,24 @@
   - `tracks: tuple[str, ...]` = `набор из 0`
   - `rating: Rating | None` = `None`
   - `in_wishlist: bool` = `False`
+
+### `backend/publishers.py`
+
+- `FORMS` = `frozenset({'ooo', 'zao', 'oao', 'pao', 'ip', 'nk…`
+- `WORDS` = `frozenset({'izdatelstvo', 'izdatelstva', 'izdate…`
+- `LOOKALIKE` = `'acehkmoptxby'`
+- `_AS_CYRILLIC` = `str.maketrans(LOOKALIKE, 'асенкмортхву')`
+- `_LOOKALIKE_LIMIT` = `4`
+- `_TRANSLIT` = `словарь из 33`
+- `KEPT_WHOLE` = `frozenset({'penguin group', 'signal books', 'ard…`
+- `_PARENS` = `re.compile('[(\\[].*?[)\\]]')`
+- `_QUOTED` = `re.compile('[«"“„]{1,2}([^«»"“”„]+)[»"”]{1,2}')`
+- `_JOINED` = `re.compile('\\s(и|and)\\s', re.I)`
+- `_SEPARATORS` = `re.compile('[,;:/]')`
+- `_DOUBLED` = `re.compile('(.)\\1+')`
+- `PER_EDIT` = `8`
+- `LEAST_BONES` = `6`
+- `VOWELS` = `'aeiouy'`
 
 ### `backend/service/asking.py`
 
@@ -384,6 +405,10 @@
 - `_ABSENT` = `404`
 - `POSTER_SOURCES` = `набор из 6`
 
+### `backend/service/relevance.py`
+
+- `_ASKED_STRICTLY` = `frozenset({Kind.GAME, Kind.BOOK})`
+
 ### `backend/service/search.py`
 
 - `COMMANDS` = `frozenset({'удалено', 'удаленное', 'удаленный', …`
@@ -395,13 +420,6 @@
 
 - `logger` = `logging.getLogger(__name__)`
 - `REFRESH_TTL` = `timedelta(days=30)`
-
-### `backend/service/titles.py`
-
-- `ROMAN` = `словарь из 20`
-- `EDITION_WORDS` = `frozenset({'edition', 'editions', 'ed', 'goty', …`
-- `SYMBOLS` = `str.maketrans({'™': ' ', '®': ' ', '©': ' ', '℠'…`
-- `ARTICLES` = `frozenset({'the', 'a', 'an'})`
 
 ### `backend/sources/busy.py`
 
@@ -428,10 +446,20 @@
 ### `backend/sources/deezer/parse.py`
 
 - `NO_GENRE` = `-1`
+- `_SINGLE` = `'single'`
 
 ### `backend/sources/errors.py`
 
 - `BROKEN_BY_PARSING` = `набор из 5`
+
+### `backend/sources/fantlab/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `SOURCE` = `'fantlab'`
+- `SEARCH` = `'https://api.fantlab.ru/search-editions'`
+- `ORIGINAL` = `'https://fantlab.ru/images/editions/orig/{editio…`
+- `SMALL` = `'https://fantlab.ru/images/editions/big/{edition…`
+- `_PICTURES` = `набор из 4`
 
 ### `backend/sources/gog/client.py`
 
@@ -457,7 +485,8 @@
 ### `backend/sources/google_books/parse.py`
 
 - `_GENERAL` = `'General'`
-- `_ZOOM` = `re.compile('zoom=\\d+')`
+- `_COVERS` = `набор из 5`
+- `_PUBLISHER` = `'/books/publisher/content'`
 
 ### `backend/sources/http.py`
 
@@ -538,6 +567,7 @@
   - `catalogs: tuple[str, ...]`
   - `people: str | None`
   - `ratings: tuple[str, ...]`
+  - `covers: str | None` = `None`
 - `FILM_RATINGS` = `набор из 3`
 - `ROUTES: dict[Kind, Route]` = `словарь из 5`
 - `class Sources`
@@ -547,6 +577,7 @@
   - `old_games: OldGamesClient`
   - `google_books: GoogleBooksClient`
   - `deezer: DeezerClient`
+  - `fantlab: FantLabClient`
   - `mdblist: MdbListClient`
   - `omdb: OmdbClient`
   - `kinopoisk: KinopoiskClient`
@@ -607,8 +638,9 @@
   - `credit: Table`
   - `roles: Callable[[str], PersonRole | CompanyRole]`
   - `position: Column | None` = `None`
+  - `alike: Callable[[str, str], bool] | None` = `None`
 - `PEOPLE` = `Entity(person, person_credit, PersonRole, person…`
-- `COMPANIES` = `Entity(company, company_credit, CompanyRole)`
+- `COMPANIES` = `Entity(company, company_credit, CompanyRole, ali…`
 
 ### `backend/storage/posters.py`
 
@@ -627,6 +659,7 @@
 ### `backend/storage/repository/library.py`
 
 - `_FIELDS` = `набор из 13`
+- `_WRITTEN` = `набор из 3`
 
 ### `backend/storage/repository/removed.py`
 
@@ -669,6 +702,13 @@
 - `tag` = `Table('tag', metadata, Column('id', Integer, pri…`
 - `item_tag` = `Table('item_tag', metadata, item_fk(nullable=Fal…`
 - `wishlist` = `Table('wishlist', metadata, item_fk(primary_key=…`
+
+### `backend/titles.py`
+
+- `ROMAN` = `словарь из 20`
+- `EDITION_WORDS` = `frozenset({'edition', 'editions', 'ed', 'goty', …`
+- `SYMBOLS` = `str.maketrans({'™': ' ', '®': ' ', '©': ' ', '℠'…`
+- `ARTICLES` = `frozenset({'the', 'a', 'an'})`
 
 ## bridge
 
@@ -836,6 +876,10 @@
 
 - `BUSY_BODY` = `словарь из 1`
 
+### `tests/backend/sources/test_fantlab.py`
+
+- `PICNIC` = `словарь из 2`
+
 ### `tests/backend/sources/test_gog.py`
 
 - `WANTED` = `'1456460669'`
@@ -970,6 +1014,10 @@
 
 - `WORDS` = `набор из 6`
 
+### `tests/backend/test_search.py`
+
+- `PICNIC` = `словарь из 2`
+
 ### `tests/backend/test_series_refresh.py`
 
 - `LONG_AGO` = `MOMENT - timedelta(days=40)`
@@ -1039,7 +1087,7 @@
 
 - `PNG` = `b'\x89PNG\r\n\x1a\nthe rest'`
 - `JPEG` = `b'\xff\xd8\xff\xe0the rest'`
-- `CANDIDATE` = `'source=tmdb&url=https%3A%2F%2Fimage%2F1.jpg'`
+- `CANDIDATE` = `'source=tmdb&url=https%3A%2F%2Fimage%2F1.jpg&kin…`
 
 ### `tests/builders.py`
 

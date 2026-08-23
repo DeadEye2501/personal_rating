@@ -93,7 +93,7 @@ async def test_link_swaps_two_fields_and_keeps_everything_else(sessions):
     repository = LibraryRepository(sessions)
     item_id = await repository.create(
         new_manual_item(Kind.MOVIE, "Интерстеллар", year=2014,
-                        synopsis="мой текст", synced_at=WHEN)
+                        synopsis="Мой текст", synced_at=WHEN)
     )
     await RatingsRepository(sessions).set_score(item_id, 9.0, now=WHEN)
 
@@ -105,16 +105,16 @@ async def test_link_swaps_two_fields_and_keeps_everything_else(sessions):
     assert stored.source_id == "157336"
     assert stored.title == "Интерстеллар"
     assert stored.year == 2014
-    assert stored.synopsis == "мой текст"
+    assert stored.synopsis == "Мой текст"
     # Оценка держится за item.id, а он не менялся.
     assert (await RatingsRepository(sessions).get(item_id)).score == 9.0
 
 
 async def test_link_takes_only_the_asked_card(sessions):
     repository = LibraryRepository(sessions)
-    mine = await repository.create(new_manual_item(Kind.MOVIE, "мой", synced_at=WHEN))
+    mine = await repository.create(new_manual_item(Kind.MOVIE, "Мой", synced_at=WHEN))
     other = await repository.create(
-        new_manual_item(Kind.MOVIE, "чужой", synced_at=WHEN)
+        new_manual_item(Kind.MOVIE, "Чужой", synced_at=WHEN)
     )
 
     await repository.link(mine, Source.TMDB, "157336", now=LATER)
@@ -142,12 +142,12 @@ async def test_link_to_an_occupied_identity_is_refused(sessions):
     """Идентичность занята — дубль завести не даём."""
     repository = LibraryRepository(sessions)
     taken = await repository.create(
-        new_manual_item(Kind.MOVIE, "уже есть", synced_at=WHEN)
+        new_manual_item(Kind.MOVIE, "Уже есть", synced_at=WHEN)
     )
     await repository.link(taken, Source.TMDB, "157336", now=LATER)
 
     mine = await repository.create(
-        new_manual_item(Kind.MOVIE, "мой дубль", synced_at=WHEN)
+        new_manual_item(Kind.MOVIE, "Мой дубль", synced_at=WHEN)
     )
     with pytest.raises(ItemExists):
         await repository.link(mine, Source.TMDB, "157336", now=LATER)
@@ -183,10 +183,10 @@ async def test_unlink_gives_a_fresh_identity_to_each_card(sessions):
     ограничение уникальности не даст завести вторую."""
     repository = LibraryRepository(sessions)
     first = await repository.create(
-        new_manual_item(Kind.MOVIE, "первая", synced_at=WHEN)
+        new_manual_item(Kind.MOVIE, "Первая", synced_at=WHEN)
     )
     second = await repository.create(
-        new_manual_item(Kind.MOVIE, "вторая", synced_at=WHEN)
+        new_manual_item(Kind.MOVIE, "Вторая", synced_at=WHEN)
     )
     await repository.link(first, Source.TMDB, "1", now=LATER)
     await repository.link(second, Source.TMDB, "2", now=LATER)
@@ -201,9 +201,9 @@ async def test_unlink_gives_a_fresh_identity_to_each_card(sessions):
 
 async def test_unlink_takes_only_the_asked_card(sessions):
     repository = LibraryRepository(sessions)
-    mine = await repository.create(new_manual_item(Kind.MOVIE, "мой", synced_at=WHEN))
+    mine = await repository.create(new_manual_item(Kind.MOVIE, "Мой", synced_at=WHEN))
     other = await repository.create(
-        new_manual_item(Kind.MOVIE, "чужой", synced_at=WHEN)
+        new_manual_item(Kind.MOVIE, "Чужой", synced_at=WHEN)
     )
     await repository.link(mine, Source.TMDB, "1", now=LATER)
     await repository.link(other, Source.TMDB, "2", now=LATER)

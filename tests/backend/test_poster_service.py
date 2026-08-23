@@ -22,18 +22,39 @@ async def service(posters):
     await built.aclose()
 
 
-async def test_a_downloaded_poster_is_not_re_encoded(service):
-    """Скачанный уже 2:3. Перекодировать его — потерять качество и запас под
-    высокую плотность экрана, который спека держит сознательно."""
-    data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+async def test_a_downloaded_poster_in_our_shape_is_not_re_encoded(service):
+    """Скачанный у кино и игр уже 2:3. Перекодировать его — потерять качество и
+    запас под высокую плотность экрана, который спека держит сознательно."""
+    data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg",
+                               Kind.MOVIE)
 
     assert data == POSTER
     assert Image.open(io.BytesIO(data)).size == (600, 900)
 
 
+async def test_a_downloaded_cover_of_a_foreign_shape_goes_through_the_crop(posters):
+    """Книжная обложка приходит какой угодно: у Google это и 1808×2552, и
+    128×194, и скан страницы. Форму ей задаёт та же обрезка, что и залитой
+    руками картинке, — иначе рамка карточки срезала бы у неё бока или верх.
+
+    Замерено живьём 23.08.2026: с обложками своей формы приложение до книг и не
+    сталкивалось, и правило «скачанное не трогаем» держалось на этом. Второй
+    такой источник — old-games.ru: коробочный скан 120×146, замерено там же."""
+    wide = picture(1808, 2552)
+    service = poster_service(posters, responding(content=wide))
+    try:
+        data = await service.fetch(Source.GOOGLE_BOOKS,
+                                   "https://books.google.com/c?id=1", Kind.BOOK)
+    finally:
+        await service.aclose()
+
+    assert data != wide, "обложка чужой формы обязана пройти обрезку"
+    assert Image.open(io.BytesIO(data)).size == TARGET_SIZE
+
+
 async def test_no_url_means_nothing_to_wait_for(service):
     """Обложки нет в самом источнике — он отдал всё, что имел."""
-    assert await service.fetch(Source.TMDB, "") is None
+    assert await service.fetch(Source.TMDB, "", Kind.MOVIE) is None
 
 
 async def test_a_missing_picture_is_an_absence_and_not_a_refusal(posters):
@@ -51,7 +72,7 @@ async def test_a_missing_picture_is_an_absence_and_not_a_refusal(posters):
     байты, а хранилище остаётся пустым. С телом-текстом проверка сторожила бы
     подпись формата, а не код."""
     service = poster_service(posters, responding(404, content=POSTER))
-    result = await service.fetch(Source.TMDB, "https://example.com/missing.jpg")
+    result = await service.fetch(Source.TMDB, "https://example.com/missing.jpg", Kind.MOVIE)
     await service.aclose()
 
     assert result is None
@@ -61,7 +82,7 @@ async def test_a_server_failure_is_still_a_refusal(posters):
     """Пятисотые от «нет картинки» отличаются тем, что повторить их стоит:
     карточка не пишется, и следующий показ спросит снова."""
     service = poster_service(posters, responding(500, content=POSTER))
-    result = await service.fetch(Source.TMDB, "https://example.com/p.jpg")
+    result = await service.fetch(Source.TMDB, "https://example.com/p.jpg", Kind.MOVIE)
     await service.aclose()
 
     assert isinstance(result, Refusal)
@@ -75,7 +96,7 @@ async def test_an_empty_body_is_a_refusal(posters):
     Причина здесь `BROKEN`, а не `NETWORK`: CDN ответил, просто ответил ничем, —
     и подмена причины заставила бы вызывающего считать это временным обрывом."""
     service = poster_service(posters, responding(content=b""))
-    result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+    result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg", Kind.MOVIE)
     await service.aclose()
 
     assert isinstance(result, Refusal)
@@ -87,7 +108,7 @@ async def test_a_page_instead_of_a_picture_is_a_refusal(posters):
     проходит насквозь, и HTML лёг бы в хранилище как обложка — а карточка
     считалась бы при этом полной."""
     service = poster_service(posters, responding(text="<html>404 not found</html>"))
-    result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+    result = await service.fetch(Source.TMDB, "https://example.com/poster.jpg", Kind.MOVIE)
     await service.aclose()
 
     assert isinstance(result, Refusal)
@@ -98,7 +119,7 @@ async def test_a_refusal_of_the_client_passes_through_as_it_was(posters):
     """Сеть не отозвалась — это отказ клиента, и подменять его причину нельзя:
     по ней наверху решают, ждать или сказать человеку «нет связи»."""
     service = poster_service(posters, unreachable())
-    result = await service.fetch(Source.GOG, "https://example.com/poster.jpg")
+    result = await service.fetch(Source.GOG, "https://example.com/poster.jpg", Kind.MOVIE)
     await service.aclose()
 
     assert isinstance(result, Refusal)
@@ -111,7 +132,7 @@ async def test_png_is_a_picture_too(posters):
     PNG, и отказ на нём означал бы, что карточка не пишется никогда."""
     body = picture(600, 900)
     service = poster_service(posters, responding(content=body))
-    result = await service.fetch(Source.GOG, "https://example.com/cover.png")
+    result = await service.fetch(Source.GOG, "https://example.com/cover.png", Kind.MOVIE)
     await service.aclose()
 
     assert result == body
@@ -122,7 +143,7 @@ async def test_webp_is_a_picture_too(posters):
     безнаказанно, а с ней уходит и весь webp — CDN отдаёт его охотно."""
     body = picture(600, 900, fmt="WEBP")
     service = poster_service(posters, responding(content=body))
-    result = await service.fetch(Source.STEAM, "https://example.com/cover.webp")
+    result = await service.fetch(Source.STEAM, "https://example.com/cover.webp", Kind.MOVIE)
     await service.aclose()
 
     assert result == body
@@ -133,7 +154,7 @@ async def test_the_poster_is_asked_at_the_address_it_was_given(posters):
     или чужой хост неотличимы от «обложки нет»."""
     transport, seen = capture(content=POSTER)
     service = poster_service(posters, transport)
-    await service.fetch(Source.TMDB, "https://cdn.example.com/w500/poster.jpg")
+    await service.fetch(Source.TMDB, "https://cdn.example.com/w500/poster.jpg", Kind.MOVIE)
     await service.aclose()
 
     assert [str(request.url) for request in seen] == [
@@ -144,7 +165,10 @@ async def test_the_poster_is_asked_at_the_address_it_was_given(posters):
 async def test_each_source_is_asked_through_its_own_client(posters):
     """Молчание одного CDN не должно выключать обложки остальных, а спрашивать
     надо того, у кого карточка: с общим клиентом на всех этого не видно."""
-    bodies = {source: picture(600, 900 + number, fmt="JPEG")
+    # Размеры разные, но пропорция у всех ровно 2:3: обложка чужой формы прошла
+    # бы обрезку и вернулась другими байтами, а проверяется здесь не она, а то,
+    # чьим клиентом спросили.
+    bodies = {source: picture(600 + 2 * number, 900 + 3 * number, fmt="JPEG")
               for number, source in enumerate(POSTER_SOURCES)}
     clients = {
         source: SourceHttp(f"cdn:{source}", transport=responding(content=body))
@@ -153,7 +177,7 @@ async def test_each_source_is_asked_through_its_own_client(posters):
     service = PosterService(clients, posters)
 
     for source, body in bodies.items():
-        assert await service.fetch(source, "https://example.com/p.jpg") == body
+        assert await service.fetch(source, "https://example.com/p.jpg", Kind.MOVIE) == body
     await service.aclose()
 
 
@@ -175,32 +199,34 @@ async def test_a_dead_cdn_does_not_close_the_others(posters):
         posters,
     )
 
-    refused = await service.fetch(Source.TMDB, "https://example.com/p.jpg")
+    refused = await service.fetch(Source.TMDB, "https://example.com/p.jpg", Kind.MOVIE)
     assert isinstance(refused, Refusal)
     assert refused.reason is Reason.NETWORK
 
-    assert await service.fetch(Source.STEAM, "https://example.com/p.jpg") == body
+    assert await service.fetch(Source.STEAM, "https://example.com/p.jpg", Kind.MOVIE) == body
     await service.aclose()
 
 
 async def test_an_unknown_source_is_a_refusal(service):
     """Ручная карточка обложку не скачивает: адреса у неё нет, и клиента тоже."""
-    result = await service.fetch(Source.MANUAL, "https://example.com/p.jpg")
+    result = await service.fetch(Source.MANUAL, "https://example.com/p.jpg", Kind.MOVIE)
 
     assert isinstance(result, Refusal)
     assert result.source == "poster:manual"
 
 
-async def test_a_downloaded_poster_is_stored_byte_for_byte(service):
-    """Обрезается только залитое с диска: скачанное ложится как приехало."""
-    data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg")
+async def test_a_downloaded_poster_of_our_shape_is_stored_byte_for_byte(service):
+    """Скачанное нашей формы ложится в хранилище как приехало: перекодировать
+    его — потерять качество на ровном месте. Чужой формы проходит обрезку, см.
+    `test_a_downloaded_cover_of_a_foreign_shape_goes_through_the_crop`."""
+    data = await service.fetch(Source.TMDB, "https://example.com/poster.jpg", Kind.MOVIE)
     await service.save(1, data, now=WHEN)
 
     assert await service._store.get(1) == data
 
 
 async def test_an_upload_is_cropped(service):
-    """Залитая с диска — единственное, что обрезается."""
+    """Залитая с диска обрезается всегда: формы у неё не обещал никто."""
     await service.store_upload(1, picture(4000, 1000), Kind.MOVIE, now=WHEN)
 
     stored = await service._store.get(1)
@@ -268,6 +294,6 @@ async def test_closing_the_service_closes_every_client(posters):
 
     for source in POSTER_SOURCES:
         assert isinstance(
-            await service.fetch(source, "https://example.com/poster.jpg"),
+            await service.fetch(source, "https://example.com/poster.jpg", Kind.MOVIE),
             Refusal,
         )

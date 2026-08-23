@@ -173,12 +173,12 @@ async def test_a_new_card_does_not_inherit_a_cover_left_by_a_deleted_one(offline
 
 async def test_tags_are_edited(offline):
     item_id = await offline.library.create(mine("Своё"))
-    tag_id = await offline.tags.create(Kind.MOVIE, "пересмотреть")
+    tag_id = await offline.tags.create(Kind.MOVIE, "Пересмотреть")
 
     await offline.tags.assign(item_id, tag_id)
 
     assert [tag.name for tag in await offline.tags.tags_of(item_id)] == [
-        "пересмотреть"
+        "Пересмотреть"
     ]
 
 
@@ -306,7 +306,7 @@ async def test_every_poster_source_got_its_own_named_client(offline):
     named = set()
     for source in POSTER_SOURCES:
         result = await offline.posters.poster_for(
-            None, source, "https://example.com/p.jpg", MOMENT
+            None, source, "https://example.com/p.jpg", MOMENT, Kind.MOVIE
         )
         assert isinstance(result, Refusal), f"{source}: обложку никто не просил"
         assert result.reason is Reason.NETWORK, f"{source}: клиента нет в наборе"
@@ -331,7 +331,7 @@ async def test_the_built_backend_asks_google_for_books(offline):
 async def test_the_data_folder_is_made_if_it_is_not_there(tmp_path):
     """Первый запуск на чистой машине: папки данных ещё нет. Хранилище постеров
     само её не создаёт — sqlite просто не откроется."""
-    fresh = tmp_path / "которой-нет"
+    fresh = tmp_path / "Которой-нет"
     config = load_config({"DATA_DIR": str(fresh)}, base_dir=tmp_path)
 
     backend = await build_backend(config,
@@ -373,7 +373,7 @@ async def test_the_assembly_wires_the_three_services_nobody_asked_about(offline)
     ручной карточки заканчивается, не дойдя до сети. Ни одного из трёх не
     получить, если поле осталось пустым или в него передали соседа."""
     assert await offline.genres.list_for_kind(GenreKind.FILM) == [], (
-        "схема поднята без миграций, справочник пуст")
+        "Схема поднята без миграций, справочник пуст")
 
     # У перезапроса сериала возвращаемого значения нет вовсе, и наблюдать надо
     # след: он ходит в сеть, а сеть мертва — значит момент синхронизации обязан

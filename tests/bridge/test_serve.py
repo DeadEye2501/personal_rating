@@ -9,7 +9,9 @@ from bridge.serve import Page
 
 PNG = b"\x89PNG\r\n\x1a\nthe rest"
 JPEG = b"\xff\xd8\xff\xe0the rest"
-CANDIDATE = "source=tmdb&url=https%3A%2F%2Fimage%2F1.jpg"
+# Тип у кандидата обязателен: без него обрезка не знает формы, и ручка
+# отвечает отказом ещё до похода в бэкенд.
+CANDIDATE = "source=tmdb&url=https%3A%2F%2Fimage%2F1.jpg&kind=movie"
 
 
 def call(page, path, query=""):
@@ -224,3 +226,12 @@ def test_a_page_file_that_will_not_read_is_not_found(tmp_path, spy, caplog):
     status, _, _ = call(Page(spy, tmp_path), "/index.html")
 
     assert status.startswith("404")
+
+
+def test_a_candidate_without_a_type_is_a_bad_request(spy, tmp_path):
+    """Тип кандидата приезжает со страницы, и без него обложку обрезать нечем.
+    Отказ здесь, а не 404: пустой ответ читался бы как «обложки нет»."""
+    status, _, _ = call(Page(spy, tmp_path), "/poster",
+                        "source=tmdb&url=https%3A%2F%2Fimage%2F1.jpg")
+
+    assert status.startswith("400")

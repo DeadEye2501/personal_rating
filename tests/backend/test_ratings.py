@@ -119,12 +119,12 @@ async def test_the_review_written_before_the_score_is_not_the_time_of_rating(
     much_later = LATER + timedelta(days=1)
     item_id = await card()
     repository = RatingsRepository(sessions)
-    await repository.set_review(item_id, "пока не смотрел", now=WHEN)
+    await repository.set_review(item_id, "Пока не смотрел", now=WHEN)
     await repository.set_score(item_id, 8.0, now=LATER)
 
     assert await _rated_at(engine, item_id) == LATER
 
-    await repository.set_review(item_id, "посмотрел", now=much_later)
+    await repository.set_review(item_id, "Посмотрел", now=much_later)
 
     assert await _rated_at(engine, item_id) == LATER
 
@@ -186,7 +186,7 @@ async def test_erasing_the_review_leaves_no_empty_row(sessions, card):
     которую не оценивали, стёртая рецензия обязана унести строку за собой."""
     item_id = await card()
     repository = RatingsRepository(sessions)
-    await repository.set_review(item_id, "посмотрел, не понравилось", now=WHEN)
+    await repository.set_review(item_id, "Посмотрел, не понравилось", now=WHEN)
     await repository.set_review(item_id, "", now=LATER)
 
     assert await repository.get(item_id) is None
@@ -208,12 +208,12 @@ async def test_taking_the_score_away_keeps_the_row_with_a_review(sessions, card)
     тогда, когда рецензии в ней тоже нет."""
     item_id = await card()
     repository = RatingsRepository(sessions)
-    await repository.set_review(item_id, "смотрел давно", now=WHEN)
+    await repository.set_review(item_id, "Смотрел давно", now=WHEN)
     await repository.set_score(item_id, 8.0, now=WHEN)
     await repository.set_score(item_id, None, now=LATER)
 
     stored = await repository.get(item_id)
-    assert (stored.score, stored.review) == (None, "смотрел давно")
+    assert (stored.score, stored.review) == (None, "Смотрел давно")
 
 
 @pytest.mark.parametrize("kept", ["visual", "narrative", "gameplay"])
@@ -241,13 +241,13 @@ async def test_emptying_one_card_does_not_touch_another(sessions, card):
     ratings = RatingsRepository(sessions)
     mine = await card(source_id="1")
     other = await card(source_id="2")
-    await ratings.set_review(other, "чужая рецензия", now=WHEN)
+    await ratings.set_review(other, "Чужая рецензия", now=WHEN)
 
     await ratings.set_score(mine, 8.0, now=WHEN)
     await ratings.set_score(mine, None, now=LATER)
 
     assert await ratings.get(mine) is None
-    assert (await ratings.get(other)).review == "чужая рецензия"
+    assert (await ratings.get(other)).review == "Чужая рецензия"
 
 
 async def test_clearing_all_three_aspects_leaves_no_empty_row(sessions, card):
@@ -277,10 +277,10 @@ async def test_review_survives_a_score_change(sessions, card):
     item_id = await card()
     repository = RatingsRepository(sessions)
     await repository.set_score(item_id, 7.0, now=WHEN)
-    await repository.set_review(item_id, "хорошо", now=WHEN)
+    await repository.set_review(item_id, "Хорошо", now=WHEN)
     await repository.set_score(item_id, 8.0, now=LATER)
     stored = await repository.get(item_id)
-    assert stored.review == "хорошо"
+    assert stored.review == "Хорошо"
     assert stored.score == 8.0
 
 
@@ -289,7 +289,7 @@ async def test_a_review_does_not_touch_the_aspects(sessions, card):
     item_id = await card(Kind.GAME)
     repository = RatingsRepository(sessions)
     await repository.set_aspects(item_id, 8, 7, 7, now=WHEN)
-    await repository.set_review(item_id, "затянуто", now=LATER)
+    await repository.set_review(item_id, "Затянуто", now=LATER)
 
     stored = await repository.get(item_id)
     assert (stored.visual, stored.narrative, stored.gameplay) == (8, 7, 7)
@@ -314,7 +314,7 @@ async def test_a_review_does_not_touch_the_score(sessions, card):
     item_id = await card()
     repository = RatingsRepository(sessions)
     await repository.set_score(item_id, 7.0, now=WHEN)
-    await repository.set_review(item_id, "хорошо", now=LATER)
+    await repository.set_review(item_id, "Хорошо", now=LATER)
 
     assert (await repository.get(item_id)).score == 7.0
 

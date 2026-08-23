@@ -2,6 +2,7 @@
 
 from sqlalchemy import insert, select
 
+from backend.naming import capitalized
 from backend.storage.repository.base import Repository
 from backend.storage.statements import clearing
 from backend.storage.tables import track
@@ -18,7 +19,7 @@ class TracksRepository(Repository):
         await self._run(clearing(track, item_id))
         if titles:
             await self._run(insert(track).values([
-                {"item_id": item_id, "position": at, "title": title}
+                {"item_id": item_id, "position": at, "title": capitalized(title)}
                 for at, title in enumerate(titles)
             ]))
 

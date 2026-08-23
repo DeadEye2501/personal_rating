@@ -2,7 +2,7 @@
 
 import asyncio
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 
 from backend.model import (
@@ -10,6 +10,7 @@ from backend.model import (
     CardView,
     ExternalSearch,
     Found,
+    IdSource,
     Kind,
     Outcome,
     SearchHit,
@@ -67,6 +68,26 @@ def _has_more(clients: list, outcomes: list[Outcome]) -> bool:
     return any(client.PAGES and isinstance(outcome, Found)
                and len(outcome.value) >= SEARCH_SIZE
                for client, outcome in zip(clients, outcomes, strict=True))
+
+
+def _albums(answers: list[list[SearchHit]]) -> list[list[SearchHit]]:
+    """Выдачи без синглов — решение пользователя 23.08.2026.
+
+    Приложение оценивает альбомы, и сингл в нём не строка выдачи, а мусор:
+    непоказанный, он всё равно доехал бы до заведения карточки. Замерено в тот
+    же день: по «дельфин» из двадцати строк семь помечены синглом.
+
+    Здесь, а не в разборе строки: полнота порции считается по сырому ответу
+    источника, и укоротивший её отсев объявил бы двадцатую строку последней.
+    Обе половины выдачи, а не только каталог: альбомы исполнителя приезжают тем
+    же разбором, и синглов у него не меньше."""
+    return [[one for one in answer if not one.single] for answer in answers]
+
+
+def _isbn_of(hit: SearchHit) -> str:
+    """ISBN строки, если источник его дал. У сканов и журналов его нет вовсе."""
+    return next((one.value for one in hit.external_ids
+                 if one.source is IdSource.ISBN), "")
 
 
 def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]:
@@ -173,12 +194,41 @@ class SearchService:
         together = unique_by(_weave(works),
                              lambda one: (one.source, one.source_id))
         woven = await self._narrowed(answers, together, query)
+        shown = await self._covered(woven, kind)
 
         return ExternalSearch(
-            views=tuple(await to_views(woven, self._genres, self._clock)),
+            views=tuple(await to_views(shown, self._genres, self._clock)),
             refusals=tuple(once(refusals + refused)),
             more=_has_more(clients, outcomes),
         )
+
+    async def _covered(self, rows: list[SearchHit], kind: Kind) -> list[SearchHit]:
+        """Строки, которым добыта обложка на стороне, — тем, у кого её нет.
+
+        Спрашивается здесь, при поиске, а не при заведении карточки: решение
+        пользователя 23.08.2026, обложка нужна человеку в тот миг, когда он
+        выбирает из выдачи, а не после. Строк тут не больше двадцати — порция
+        уже отрезана, — и спрашиваются они разом.
+
+        Ищет запасной источник по ISBN и сверяет два признака сразу; у кого
+        ISBN нет, тот и не спрашивается. Отказ ничего не ломает: строка
+        показывается без обложки, как и раньше.
+
+        Каталогам с обложкой это не стоит ничего: `covers_for` отвечает пустотой
+        всем, кроме книг."""
+        client = self._sources.covers_for(kind)
+        empty = [one for one in rows if not one.poster_url]
+        if client is None or not empty:
+            return rows
+
+        found = await answered_all(
+            (client.cover_for(_isbn_of(one), one.title), client.name)
+            for one in empty
+        )
+        covers = {id(row): answer.value for row, answer in zip(empty, found)
+                  if isinstance(answer, Found)}
+        return [replace(one, poster_url=covers[id(one)]) if id(one) in covers
+                else one for one in rows]
 
     async def _namesakes(self, query: str, kind: Kind, offset: int):
         """Работы тёзок — только на первой порции.
@@ -203,6 +253,9 @@ class SearchService:
         фильмы: общего слова у «Джона Траволты» с «Криминальным чтивом» нет ни
         одного, и общий отсев отменил бы поиск по имени целиком.
 
+        **Синглы** уходят следом и из обеих половин: у альбомов исполнителя
+        их не меньше, чем в выдаче поиска.
+
         **Убранное человеком** — вторым: мусор в базу не ходит, и чем меньше
         строк доживёт до запроса `known`, тем он дешевле.
 
@@ -214,5 +267,5 @@ class SearchService:
         только видимое: победитель с сороковой строки убил бы проигравшего со
         второй, и на экран не попал бы ни один из двух."""
         kept = await without_removed(
-            self._removed, [*relevant(answers, query), together])
+            self._removed, _albums([*relevant(answers, query), together]))
         return _weave(merged([one[:SEARCH_SIZE] for one in kept], query))

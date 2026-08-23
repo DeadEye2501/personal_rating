@@ -19,7 +19,11 @@ from backend.model import (
 from backend.sources.backoff import daily_quota
 from backend.sources.busy import asked_until_free
 from backend.sources.errors import absent, parsed, refuse_code
-from backend.sources.google_books.parse import parse_card, parse_search
+from backend.sources.google_books.parse import (
+    parse_by_author,
+    parse_card,
+    parse_search,
+)
 from backend.sources.http import SourceHttp
 
 logger = logging.getLogger(__name__)
@@ -119,7 +123,7 @@ class GoogleBooksClient:
 
         Тёзки от этого не склеиваются больше, чем склеены: одноимённые авторы у
         Google неразличимы в самом источнике — та же цена, что у студий Steam и
-        GOG, которых склеивают по имени с самого начала."""
+        GOG, у которых идентичности нет вовсе."""
         return Found([PersonHit(source_id=name)])
 
     async def credits_of(self, person_id: str, kind: Kind) -> Outcome:
@@ -131,7 +135,8 @@ class GoogleBooksClient:
         `Brian Herbert`. Отбора среди найденных снаружи людей нет: правило от
         31.07.2026, общее для всех источников."""
         return await self._taken(
-            BASE, f"книги автора {person_id} не разобрались", parse_search,
+            BASE, f"книги автора {person_id} не разобрались",
+            lambda payload: parse_by_author(payload, person_id),
             q=f'inauthor:"{person_id}"', maxResults=SEARCH_SIZE)
 
     async def card(self, source_id: str, kind: Kind) -> Outcome:

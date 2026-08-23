@@ -151,7 +151,7 @@ SCHEMA = [
     (Kind, {"movie", "series", "game", "book", "music"}),
     (Source, {"manual", "tmdb", "steam", "gog", "old_games",
               "google_books", "deezer"}),
-    (IdSource, {"imdb", "kinopoisk", "steam", "gog"}),
+    (IdSource, {"imdb", "kinopoisk", "steam", "gog", "isbn"}),
     (RatingSource, {"imdb", "kinopoisk", "tmdb", "rotten", "metacritic",
                     "steam", "gog"}),
     (PersonRole, {"director", "actor", "showrunner", "author",

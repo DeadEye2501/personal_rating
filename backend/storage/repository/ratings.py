@@ -6,6 +6,7 @@ from sqlalchemy import case, func, select
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Rating, average_score
+from backend.naming import capitalized
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_rating
 from backend.storage.statements import clearing
@@ -72,7 +73,9 @@ class RatingsRepository(Repository):
         return score
 
     async def set_review(self, item_id: int, review: str, now: datetime) -> None:
-        await self._write(item_id, {"review": review}, now)
+        """Первая буква поднимается и здесь: рецензия — такой же читаемый текст,
+        как синопсис, и правило записи у них одно (`backend.naming`)."""
+        await self._write(item_id, {"review": capitalized(review)}, now)
 
     async def get(self, item_id: int) -> Rating | None:
         return await self._maybe(

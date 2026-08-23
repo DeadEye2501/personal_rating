@@ -313,3 +313,36 @@ async def test_a_code_outside_two_hundred_is_a_refusal():
 
     assert isinstance(answer, Refusal), "чужой код принят за пустую выдачу"
     assert answer.reason is Reason.BROKEN
+
+
+def test_a_single_is_marked_and_the_row_stays_in_the_answer():
+    """Приложение оценивает альбомы, и сингл в нём не строка выдачи, а мусор:
+    замерено 23.08.2026 живьём — по «дельфин» из двадцати строк семь помечены
+    `single`, у шести ровно один трек, и называются они словом запроса, но
+    исполнители там чужие.
+
+    Разбор его **помечает**, а выбрасывает сервис: полноту порции он считает по
+    сырому ответу источника, и укоротивший её отсев объявил бы двадцатую строку
+    последней. Тип записи называет сам источник — гадать по числу треков не
+    нужно."""
+    payload = {"data": [
+        {"id": 1, "title": "Группа крови", "record_type": "album"},
+        {"id": 2, "title": "Дельфин", "record_type": "single"},
+        {"id": 3, "title": "Хлопок и Нейтрино", "record_type": "ep"},
+    ]}
+
+    assert [(hit.title, hit.single) for hit in parse_albums(payload)] == [
+        ("Группа крови", False),
+        ("Дельфин", True),
+        ("Хлопок и Нейтрино", False),
+    ]
+
+
+def test_a_row_without_a_record_type_is_not_a_single():
+    """Незнакомый ответ синглом не считается: меткой служит названное синглом, а
+    не отсутствие слова «альбом» — иначе смена словаря у источника вычистила бы
+    выдачу целиком."""
+    payload = {"data": [{"id": 1, "title": "Без типа"}]}
+
+    assert [(hit.title, hit.single) for hit in parse_albums(payload)] \
+        == [("Без типа", False)]

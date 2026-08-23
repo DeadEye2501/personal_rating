@@ -47,7 +47,7 @@ from tests.conftest import (
 def incoming(**overrides) -> SourceCard:
     fields = dict(
         item=an_item("157336", "Interstellar", year=2014, runtime=169,
-                     synopsis="официальный синопсис",
+                     synopsis="Официальный синопсис",
                      poster_url="https://example.com/poster.jpg"),
         genre_ext_ids=((GenreSource.TMDB, "878"),),
         people=(Credit("Кристофер Нолан", PersonRole.DIRECTOR,
@@ -65,10 +65,10 @@ def mine(**fields) -> Item:
 
 
 def test_merge_keeps_what_the_human_typed():
-    merged = merge_fields(mine(synopsis="мой текст"), incoming().item)
+    merged = merge_fields(mine(synopsis="Мой текст"), incoming().item)
 
     assert merged.title == "Интерстеллар"
-    assert merged.synopsis == "мой текст"
+    assert merged.synopsis == "Мой текст"
 
 
 def test_merge_fills_only_the_empty():
@@ -80,7 +80,7 @@ def test_merge_fills_only_the_empty():
 
 FULL = an_item(
     "83867", "Andor", kind=Kind.SERIES, original_title="Andor",
-    year=2022, released_at=date(2022, 9, 21), synopsis="официальный синопсис",
+    year=2022, released_at=date(2022, 9, 21), synopsis="Официальный синопсис",
     poster_url="https://example.com/andor.jpg", runtime=48,
     seasons_count=2, episodes_count=24,
 )
@@ -93,7 +93,7 @@ def test_every_field_a_source_may_fill_is_filled():
 
     assert (merged.title, merged.original_title) == ("Интерстеллар", "Andor")
     assert (merged.year, merged.released_at) == (2022, date(2022, 9, 21))
-    assert merged.synopsis == "официальный синопсис"
+    assert merged.synopsis == "Официальный синопсис"
     assert merged.poster_url == "https://example.com/andor.jpg"
     assert merged.runtime == 48
     assert (merged.seasons_count, merged.episodes_count) == (2, 24)
@@ -107,10 +107,10 @@ def test_merge_never_moves_identity_or_the_sync_mark():
 
 
 def test_overwrite_takes_the_incoming_over_the_own():
-    merged = overwrite_fields(mine(synopsis="набросок"), incoming().item)
+    merged = overwrite_fields(mine(synopsis="Набросок"), incoming().item)
 
     assert merged.title == "Interstellar"
-    assert merged.synopsis == "официальный синопсис"
+    assert merged.synopsis == "Официальный синопсис"
 
 
 def test_overwrite_does_not_touch_the_kind_of_the_card():
@@ -132,9 +132,9 @@ def test_overwrite_keeps_what_the_source_never_sent():
     руками текст исчез бы безвозвратно."""
     empty = incoming(item=an_item("157336", "Interstellar")).item
 
-    merged = overwrite_fields(mine(synopsis="мой текст", runtime=100), empty)
+    merged = overwrite_fields(mine(synopsis="Мой текст", runtime=100), empty)
 
-    assert merged.synopsis == "мой текст"
+    assert merged.synopsis == "Мой текст"
     assert merged.runtime == 100
 
 
@@ -174,7 +174,7 @@ async def test_linking_fills_the_gaps(linker, sessions):
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert stored.year == 2014
-    assert stored.synopsis == "официальный синопсис"
+    assert stored.synopsis == "Официальный синопсис"
 
 
 @pytest.mark.parametrize("overwrite", [False, True])
@@ -257,7 +257,7 @@ async def test_an_empty_genre_set_is_filled(linker, sessions):
 
 async def test_overwrite_takes_everything_the_source_gave(linker, sessions):
     """На случай, когда карточка заводилась на скорую руку."""
-    item_id = await manual_card(sessions, synopsis="набросок")
+    item_id = await manual_card(sessions, synopsis="Набросок")
     ours = await people(sessions).create_manual("Мой режиссёр")
     await people(sessions).attach(item_id, ours, PersonRole.DIRECTOR)
 
@@ -265,7 +265,7 @@ async def test_overwrite_takes_everything_the_source_gave(linker, sessions):
 
     stored = await LibraryRepository(sessions).get(item_id)
     assert (stored.title, stored.synopsis) == ("Interstellar",
-                                               "официальный синопсис")
+                                               "Официальный синопсис")
     names = [c.name for c in await people(sessions).credits_of(item_id)]
     assert names == ["Кристофер Нолан"]
 
@@ -332,9 +332,9 @@ async def test_identifiers_and_ratings_arrive_with_the_link(linker, sessions):
 async def test_linking_to_an_occupied_identity_is_refused(linker, sessions):
     library = LibraryRepository(sessions)
     await library.create(
-        an_item("157336", "уже есть")
+        an_item("157336", "Уже есть")
     )
-    ours = await manual_card(sessions, title="мой дубль")
+    ours = await manual_card(sessions, title="Мой дубль")
 
     with pytest.raises(ItemExists):
         await linker.link(ours, incoming(), now=LATER)
@@ -347,9 +347,9 @@ async def test_an_identifier_taken_by_another_card_stops_everything(linker, sess
     то есть после того, как источник уже переставлен, а поля уже слиты.
     Карточка осталась бы привязанной наполовину."""
     taken = ExternalId(IdSource.IMDB, "tt0816692")
-    other = await manual_card(sessions, title="чужая")
+    other = await manual_card(sessions, title="Чужая")
     await ExternalIdsRepository(sessions).put(other, taken)
-    ours = await manual_card(sessions, title="моя")
+    ours = await manual_card(sessions, title="Моя")
 
     with pytest.raises(ItemExists):
         await linker.link(ours, incoming(external_ids=(taken,)), now=LATER)

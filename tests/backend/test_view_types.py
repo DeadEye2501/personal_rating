@@ -31,10 +31,10 @@ def test_a_candidate_has_no_identifier_in_the_base():
 
 def test_a_candidate_carries_what_the_search_gave():
     view = view_from_hit(hit(original_title="Interstellar", year=2014,
-                             synopsis="про кукурузу",
+                             synopsis="Про кукурузу",
                              poster_url="https://example.com/p.jpg"))
     assert (view.title, view.original_title, view.year, view.synopsis) == (
-        "Интерстеллар", "Interstellar", 2014, "про кукурузу"
+        "Интерстеллар", "Interstellar", 2014, "Про кукурузу"
     )
     assert view.poster_url == "https://example.com/p.jpg"
 

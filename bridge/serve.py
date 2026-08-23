@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import parse_qs
 
-from backend.model import Source
+from backend.model import Kind, Source
 from bridge.thread import DEADLINE
 
 logger = logging.getLogger(__name__)
@@ -82,17 +82,21 @@ class Page:
         item = _single(query, "item")
         source = _single(query, "source")
         url = _single(query, "url")
+        # Тип нужен обрезке: обложку чужой формы бэкенд приводит к нашей, а у
+        # альбома она квадратная. Спрашивают его только про кандидата — у своей
+        # карточки тип лежит в строке базы, и она надёжнее страницы.
+        kind = _single(query, "kind")
         # Номер разбирается здесь: нечисловой — это поломка страницы, а не
         # отсутствие обложки, и отдав на него 404, мы спрятали бы её за
         # нормальным исходом. Заодно дальше по пути `int()` уже не нужен.
         number = int(item) if item and item.isdigit() else None
-        if number is None and not (source and url):
+        if number is None and not (source and url and kind):
             return _answer(start_response, "400 Bad Request", "text/plain", b"")
 
         try:
             picture = self._thread.run(
-                lambda back: _fetched(back, number, source,
-                                      url)).result(DEADLINE)
+                lambda back: _fetched(back, number, source, url,
+                                      kind)).result(DEADLINE)
         except Exception:
             logger.exception("обложка не доехала")
             return _answer(start_response, "404 Not Found", "text/plain", b"")
@@ -112,18 +116,22 @@ class Page:
                        cache="max-age=86400")
 
 
-async def _fetched(back, item, source, url):
-    """У своей карточки источник и адрес берутся из неё самой: страница знает
-    только номер, а подсказке при вводе имени больше и не из чего исходить.
-    У кандидата номера нет вовсе — обложку тогда не сохраняем."""
+async def _fetched(back, item, source, url, kind):
+    """У своей карточки источник, адрес и тип берутся из неё самой: страница
+    знает только номер, а подсказке при вводе имени больше и не из чего
+    исходить. У кандидата номера нет вовсе — обложку тогда не сохраняем, а тип
+    приезжает доводом ручки.
+
+    Перечисления собираются здесь, внутри заявки: снаружи неизвестное значение
+    ушло бы исключением через границу потоков."""
     if item is None:
         return await back.posters.poster_for(None, Source(source), url,
-                                             datetime.now())
+                                             datetime.now(), Kind(kind))
     card = await back.library.get(item)
     if card is None:
         return None
-    return await back.posters.poster_for(card.id, card.source,
-                                         card.poster_url, datetime.now())
+    return await back.posters.poster_for(card.id, card.source, card.poster_url,
+                                         datetime.now(), card.kind)
 
 
 def _looks_like(picture: bytes) -> str:

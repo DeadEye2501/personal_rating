@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from backend.model import Kind, Source
 from backend.sources.deezer.client import DeezerClient
+from backend.sources.fantlab.client import FantLabClient
 from backend.sources.gog.client import GogClient
 from backend.sources.google_books.client import GoogleBooksClient
 from backend.sources.http import SourceHttp
@@ -28,6 +29,9 @@ class Route:
     catalogs: tuple[str, ...]
     people: str | None
     ratings: tuple[str, ...]
+    # Кто ищет обложку, когда у каталога её нет. Есть только у книг: замерено
+    # 23.08.2026, у Google картинки нет у большинства бумажных русских изданий.
+    covers: str | None = None
 
 
 FILM_RATINGS = ("mdblist", "omdb", "kinopoisk")
@@ -36,7 +40,7 @@ ROUTES: dict[Kind, Route] = {
     Kind.MOVIE: Route(("tmdb",), "tmdb", FILM_RATINGS),
     Kind.SERIES: Route(("tmdb",), "tmdb", FILM_RATINGS),
     Kind.GAME: Route(("steam", "gog", "old_games"), None, ()),
-    Kind.BOOK: Route(("google_books",), "google_books", ()),
+    Kind.BOOK: Route(("google_books",), "google_books", (), covers="fantlab"),
     Kind.MUSIC: Route(("deezer",), "deezer", ()),
 }
 
@@ -55,6 +59,7 @@ class Sources:
     old_games: OldGamesClient
     google_books: GoogleBooksClient
     deezer: DeezerClient
+    fantlab: FantLabClient
     mdblist: MdbListClient
     omdb: OmdbClient
     kinopoisk: KinopoiskClient
@@ -89,6 +94,15 @@ class Sources:
         равна его имени. У музыки отвечает Deezer, и у него идентичность
         исполнителя настоящая: `artist.id` и своя ручка его альбомов."""
         name = ROUTES[kind].people
+        return getattr(self, name) if name else None
+
+    def covers_for(self, kind: Kind) -> FantLabClient | None:
+        """Кто ищет обложку, когда каталог её не дал. У книг это FantLab,
+        у остальных никто: их источники обложку отдают сами.
+
+        Каталог FantLab — фантастика и смежное, и обычной прозы там не
+        найдётся; это принятое ограничение, а не недоделка."""
+        name = ROUTES[kind].covers
         return getattr(self, name) if name else None
 
     def client_for(self, source: Source):

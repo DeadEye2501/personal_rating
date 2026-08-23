@@ -100,8 +100,10 @@
     // клик не заводит.
     ready = false
     done = true
-    arrived(await numbered('search.by_person', domain, entity_id, forKind,
-                          { channel: 'search', ops }))
+    const found = await numbered('search.by_person', domain, entity_id, forKind,
+                                 { channel: 'search', ops })
+    arrived(found)
+    refused(found)
   }
 
   /** Очередная порция чужой выдачи: приезжает и первая, и все следующие.
@@ -113,11 +115,12 @@
    *  Конец называет источник, а не длина списка: из двадцати строк отсев
    *  нерелевантного и снятие убранного оставляют меньше, и считать по
    *  показанному значило бы вставать на первой же убранной строке. */
-  async function portion() {
+  async function portion(silent = false) {
     const next = await numbered('search.external',
                                 { channel: 'search', op: lastOp('search') })
     done = !next.more
     arrived(next)
+    refused(next, silent)
   }
 
   /** Отвечает ленте, есть ли смысл просить ещё.
@@ -131,10 +134,16 @@
   async function more() {
     if (done || !ready) return false
     try {
-      await portion()
+      await portion(true)
       return !done
     } catch (error) {
-      lost(error, 'Внешняя база недоступна')
+      // Молча, но со следом в журнале: плашка в проекте — про жест человека, а
+      // эту порцию просил не он, а лента. У Google Books `503` — обычная икота:
+      // замерено 23.08.2026, восемь запросов выдачи из десяти, и повтор вытянул
+      // не все. Красная надпись на прокрутке говорила бы «сломалось» там, где
+      // источник просто икнул; виток останавливается, а следующая прокрутка
+      // просит снова — метка дна опять попадает в поле зрения.
+      reported(error, 'search.external')
       return false
     }
   }
@@ -188,7 +197,25 @@
   function arrived(answer) {
     gone = answer.removed
     views = [...views, ...answer.views]
-    if (answer.refusals.length) ontrouble('Внешняя база недоступна')
+  }
+
+  /** Отказ источника в приехавшем ответе.
+   *
+   *  Плашка бывает при двух условиях сразу: спрашивал человек, а не лента, и
+   *  ответ не принёс **ни одной** строки. Иначе — только запись в журнал.
+   *
+   *  Оба условия из живого окна 23.08.2026. Половин у выдачи две — каталог и
+   *  книги автора, — и отказ одной при полной второй означает не «база
+   *  недоступна», а «часть ответа не доехала»: строки на экране, а плашка
+   *  говорит «сломалось». У Google Books `503` при этом обычная икота: восемь
+   *  запросов выдачи из десяти в том замере, и повтор вытянул не все.
+   *
+   *  Молчание не безнаказанное: пустая выдача с отказом плашку получает, и
+   *  человек узнаёт, что искать было некому. */
+  function refused(answer, silent = false) {
+    if (!answer.refusals.length) return
+    if (silent || answer.views.length) reported({ kind: 'refusal' }, 'search.external')
+    else ontrouble('Внешняя база недоступна')
   }
 
   /** Снять пометку об удалении. Карточка не возвращается — её нет; игра

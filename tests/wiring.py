@@ -37,16 +37,20 @@ def card_parts(sessions, store: PosterStore,
     return backend_card_parts(sessions, poster_service(store, transport))
 
 
-def search_service(sessions, *clients) -> SearchService:
+def search_service(sessions, *clients, covers=None) -> SearchService:
     """Поиск, собранный на подставных клиентах источников.
 
     Общий у двух модулей проверок — выдачи и жанров кандидата: разошлись бы они
     настройками, и одна из двух проверяла бы не тот сервис. Часы внедрены теми
     же, что у остальных записей: отметка времени бесплатной оценки иначе была бы
-    непроверяемой."""
+    непроверяемой.
+
+    `covers` — запасной источник обложек. Его нет у большинства проверок, и это
+    не умолчание для краткости: у книг он есть, у остальных типов никого, и
+    сервис обязан слушаться реестра."""
     return SearchService(LibraryRepository(sessions),
                          ViewsRepository(sessions),
-                         FakeSources(*clients),
+                         FakeSources(*clients, covers=covers),
                          SearchParts(genres=GenresRepository(sessions),
                                      removed=RemovedRepository(sessions)),
                          clock=lambda: MOMENT)

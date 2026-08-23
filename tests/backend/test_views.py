@@ -72,15 +72,15 @@ async def test_genres_come_with_the_card(sessions, reference, item_id):
 
 async def test_tags_come_in_their_manual_order(sessions, item_id):
     tags = TagsRepository(sessions)
-    first = await tags.create(Kind.MOVIE, "пересмотреть")
-    second = await tags.create(Kind.MOVIE, "с женой")
+    first = await tags.create(Kind.MOVIE, "Пересмотреть")
+    second = await tags.create(Kind.MOVIE, "С женой")
     await tags.assign(item_id, first)
     await tags.assign(item_id, second)
     await tags.reorder(Kind.MOVIE, [second, first])
 
     views = await ViewsRepository(sessions).views_for([item_id])
 
-    assert [t.name for t in views[item_id].tags] == ["с женой", "пересмотреть"]
+    assert [t.name for t in views[item_id].tags] == ["С женой", "Пересмотреть"]
 
 
 async def test_people_come_in_the_order_of_the_credits(sessions, item_id):
@@ -234,12 +234,12 @@ async def test_my_own_rating_comes_with_the_card(sessions, item_id):
     ratings = RatingsRepository(sessions)
     await ratings.set_aspects(item_id, visual=8, narrative=7, gameplay=7,
                               now=MOMENT)
-    await ratings.set_review(item_id, "лучшее, что видел", now=MOMENT)
+    await ratings.set_review(item_id, "Лучшее, что видел", now=MOMENT)
 
     rating = (await ViewsRepository(sessions).views_for([item_id]))[item_id].rating
 
     assert (rating.item_id, rating.visual, rating.narrative, rating.gameplay,
-            rating.review) == (item_id, 8, 7, 7, "лучшее, что видел")
+            rating.review) == (item_id, 8, 7, 7, "Лучшее, что видел")
     assert rating.score == pytest.approx(7.3333, abs=1e-4)
 
 
@@ -268,8 +268,8 @@ async def test_my_marks_do_not_mix_between_cards(sessions, item_id):
     third_id = await library.create(an_item("577922", "Довод"))
 
     tags = TagsRepository(sessions)
-    mine = await tags.create(Kind.MOVIE, "пересмотреть")
-    theirs = await tags.create(Kind.MOVIE, "с женой")
+    mine = await tags.create(Kind.MOVIE, "Пересмотреть")
+    theirs = await tags.create(Kind.MOVIE, "С женой")
     await tags.assign(item_id, mine)
     await tags.assign(other_id, theirs)
 
@@ -284,8 +284,8 @@ async def test_my_marks_do_not_mix_between_cards(sessions, item_id):
         [item_id, other_id, third_id]
     )
 
-    assert [t.name for t in views[item_id].tags] == ["пересмотреть"]
-    assert [t.name for t in views[other_id].tags] == ["с женой"]
+    assert [t.name for t in views[item_id].tags] == ["Пересмотреть"]
+    assert [t.name for t in views[other_id].tags] == ["С женой"]
     assert views[item_id].rating.score == 5.0
     assert views[other_id].rating.score == 8.0
     assert views[item_id].in_wishlist is False

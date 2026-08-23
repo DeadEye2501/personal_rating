@@ -481,9 +481,9 @@ async def test_the_two_rounds_go_together(sessions, loader, monkeypatch):
 
     fetch = rig.posters.fetch
 
-    async def watched(source, url):
+    async def watched(source, url, kind):
         order.append("обложка началась")
-        return await fetch(source, url)
+        return await fetch(source, url, kind)
 
     rig.client.card = slow_card
     monkeypatch.setattr(rig.posters, "fetch", watched)

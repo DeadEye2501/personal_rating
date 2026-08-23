@@ -5,6 +5,7 @@ import httpx
 from backend.config import Config
 from backend.model import Source
 from backend.sources.deezer.client import DeezerClient
+from backend.sources.fantlab.client import FantLabClient
 from backend.sources.gog.client import GogClient
 from backend.sources.google_books.client import GoogleBooksClient
 from backend.sources.http import SourceHttp
@@ -52,6 +53,8 @@ def build_sources(
         google_books=GoogleBooksClient(http(Source.GOOGLE_BOOKS),
                                        config.google_books_key),
         deezer=DeezerClient(http(Source.DEEZER)),
+        # Запасной по обложкам: ключа не требует, карточек не отдаёт.
+        fantlab=FantLabClient(http("fantlab")),
         mdblist=MdbListClient(http("mdblist"), config.mdblist_key),
         omdb=OmdbClient(http("omdb"), config.omdb_key),
         kinopoisk=kinopoisk,

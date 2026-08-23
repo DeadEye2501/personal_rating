@@ -18,6 +18,7 @@ from backend.model import (
     Suggestion,
     new_source_id,
 )
+from backend.naming import capitalized
 from backend.storage.repository.base import Repository
 from backend.storage.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.rows import to_credit
@@ -83,7 +84,7 @@ class CreditRepository(Repository):
     ) -> int:
         return await self._created(
             self._entity.table.insert()
-            .values(name=name, source=source, source_id=source_id)
+            .values(name=capitalized(name), source=source, source_id=source_id)
             .returning(self._entity.table.c.id),
             IdentityTaken(f"{source}:{source_id} уже занят"),
         )
@@ -130,7 +131,45 @@ class CreditRepository(Repository):
             return await self._identified(credit)
 
         found = await self.find_anonymous_by_name(credit.name)
+        if found is None and self._entity.alike is not None:
+            found = await self._written_alike(credit.name)
         return found if found is not None else await self.create(credit.name)
+
+    async def _written_alike(self, name: str) -> int | None:
+        """Уже заведённый, чьё имя — то же самое в другом написании.
+
+        Спрашивается **после** точного совпадения, а не вместо него. Правило
+        близости приведением снимает шелуху, и у имени, состоящего из неё одной
+        («Media», «Дом») или написанного письменностью, которой приведение не
+        знает («講談社»), ключ выходит пустым — а пустые близкими не считаются
+        никогда. Точное сравнение их и ловит, как ловило до правила.
+
+        Сравнение идёт в питоне, а не запросом: близость написаний считается
+        расстоянием между ними, и SQL такого не умеет. Держать приведение
+        колонкой тоже нельзя — по колонке ищется равенство, а нам нужна
+        близость.
+
+        Строки читаются все, и цена этого замерена, а не оценена на глаз:
+        23.08.2026 на двух тысячах безымянных студий — 35.7 мс на вызов у
+        длинных игровых имён и 13.6 мс у книжных. Почти вся она в питоне, и
+        держат её две отсечки внутри `alike`; до них было 205 мс. Студий у
+        карточки одна-две, а людей в базе тридцать тысяч — потому поиск по
+        имени у них и остался запросом.
+
+        Первый по номеру, а не ближайший, и цена названа: близость **не
+        транзитивна** — порог считается от длины пары, поэтому `A~B` и `B~C` не
+        обещают `A~C` (проверено ревью 23.08.2026 на именах в шестнадцать
+        букв). Значит написание, близкое к двум разным записям, прилипнет к
+        заведённой раньше, а не к своей. На живых именах порог выходит нулевым
+        или единичным, и случая этого замер не встретил ни разу; ближайшего
+        искать значило бы считать расстояние там, где сегодня хватает `bool`."""
+        rows = await self._rows(
+            select(self._entity.table.c.id, self._entity.table.c.name)
+            .where(self._entity.table.c.source_id.is_(None))
+            .order_by(self._entity.table.c.id)
+        )
+        return next((row.id for row in rows
+                     if self._entity.alike(row.name, name)), None)
 
     async def _identified(self, credit: Credit) -> int:
         """Строка того, кого источник знает по номеру.

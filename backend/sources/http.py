@@ -123,22 +123,47 @@ class SourceHttp:
         params: Mapping[str, object] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> httpx.Response | Refusal:
+        return await self._asked("GET", url, params, headers)
+
+    async def head(
+        self,
+        url: str,
+        params: Mapping[str, object] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> httpx.Response | Refusal:
+        """Есть ли что по этому адресу и что именно — без самой картинки.
+
+        Заведено на обложках FantLab: у крупного размера бывает 404 — три
+        издания из тринадцати, замерено 23.08.2026, — а качать 350 КБ ради
+        проверки незачем. Предохранитель, очередь и разбор отказа общие с
+        `get`: для них способ запроса не значит ничего."""
+        return await self._asked("HEAD", url, params, headers)
+
+    async def _asked(
+        self,
+        way: str,
+        url: str,
+        params: Mapping[str, object] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> httpx.Response | Refusal:
         if self.breaker.is_open():
             return Refusal(source=self.name, reason=self.breaker.reason,
                            detail="предохранитель взведён")
         if self._turn is None:
-            return await self._fetched(url, params, headers)
+            return await self._fetched(way, url, params, headers)
         async with self._turn:
-            return await self._fetched(url, params, headers)
+            return await self._fetched(way, url, params, headers)
 
     async def _fetched(
         self,
+        way: str,
         url: str,
         params: Mapping[str, object] | None,
         headers: Mapping[str, str] | None,
     ) -> httpx.Response | Refusal:
         try:
-            return await self._client.get(url, params=params, headers=headers)
+            return await self._client.request(way, url, params=params,
+                                              headers=headers)
         except httpx.HTTPError as error:
             logger.warning("%s: сеть — %s", self.name, error)
             # Пустая сеть — беда не этого запроса, а всех следующих.

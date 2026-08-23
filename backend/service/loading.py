@@ -104,7 +104,7 @@ class Loader:
         # детальный ответ её не ждёт.
         card, poster = await asyncio.gather(
             answered(client.card(view.source_id, view.kind), client.name),
-            self._posters.fetch(view.source, view.poster_url),
+            self._posters.fetch(view.source, view.poster_url, view.kind),
         )
 
         # Ответ карточки старше ответа обложки: упасть могут оба разом — они и
@@ -135,7 +135,9 @@ class Loader:
         уже он, превращая «обложки нет» в отказ на любой сетевой икоте."""
         if card.item.poster_url == asked:
             return None
-        return await self._posters.fetch(card.item.source, card.item.poster_url)
+        return await self._posters.fetch(card.item.source,
+                                         card.item.poster_url,
+                                         card.item.kind)
 
     async def card_for_link(
         self, link: ExternalLink

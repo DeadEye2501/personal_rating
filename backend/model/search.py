@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 
+from backend.model.external import ExternalId
 from backend.model.kinds import GenreSource, Kind, Source
 
 
@@ -33,6 +34,14 @@ class SearchHit:
     # показывать нечего. У old-games там лежит второе название игры, и склейка
     # берёт оба поля.
     aliases: tuple[str, ...] = field(default_factory=tuple)
+    # Чужие идентификаторы строки. Сегодня это ISBN книги: по нему запасной
+    # источник ищет обложку, когда у основного её нет, и им же сверяет, что
+    # нашлось то самое издание.
+    external_ids: tuple[ExternalId, ...] = field(default_factory=tuple)
+    # Сингл ли это. Отсев стоит не здесь, а в сервисе, вместе с остальными
+    # чистками выдачи: полноту порции считают по сырому ответу источника, и
+    # укоротивший её отсев в разборе объявил бы двадцатую строку последней.
+    single: bool = False
 
 
 @dataclass(frozen=True, slots=True)

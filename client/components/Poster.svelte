@@ -15,7 +15,7 @@
 
   const address = $derived(item_id
     ? byItem(item_id, cover)
-    : poster_url && bySource(source, poster_url))
+    : poster_url && bySource(source, poster_url, kind))
 
   // Помнится сорвавшийся адрес, а не признак «сломано»: признак заглушку уже
   // не снял бы никогда. А снимать надо — бэкенд обещает повторить попытку при

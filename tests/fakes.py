@@ -97,8 +97,9 @@ class FakeSources:
     # не предвидится.
     NO_RATINGS = frozenset({Kind.GAME, Kind.BOOK, Kind.MUSIC})
 
-    def __init__(self, *clients) -> None:
+    def __init__(self, *clients, covers=None) -> None:
         self._clients = list(clients)
+        self.covers = covers
 
     def catalog_for(self, kind: Kind) -> list:
         """Тип содержимого настоящий реестр разбирает сам, и проверяется он в
@@ -119,6 +120,16 @@ class FakeSources:
         if kind in self.NO_PEOPLE:
             return None
         return self._clients[0]
+
+    def covers_for(self, kind: Kind):
+        """Кто ищет обложку, когда каталог её не дал. Правило реестра, которое
+        здесь повторяется: запасной источник есть только у книг, и сервис обязан
+        слушаться реестра — без этой ветки не проверить, что фильмам и играм он
+        никого не спрашивает.
+
+        Двойник подставляется отдельно: у него другая поверхность — одна ручка
+        `cover_for`, — и путать его с каталожным клиентом нельзя."""
+        return self.covers if kind is Kind.BOOK else None
 
     def client_for(self, _source: Source):
         """Тот же довод про источник: подмену клиента источнику сторожат тесты

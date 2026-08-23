@@ -6,9 +6,9 @@ from datetime import datetime
 
 import httpx
 
-from backend.model import Kind, Reason, Refusal, Source
+from backend.model import BadImage, Kind, Reason, Refusal, Source
 from backend.service.asking import answered
-from backend.service.images import crop_to_cover
+from backend.service.images import already_shaped, crop_to_cover
 from backend.sources.errors import refuse_code
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
@@ -41,15 +41,21 @@ class PosterService:
         self._clients = dict(clients)
         self._store = store
 
-    async def fetch(self, source: Source, url: str) -> bytes | None | Refusal:
+    async def fetch(self, source: Source, url: str,
+                    kind: Kind) -> bytes | None | Refusal:
         """Обложка байтами, и исключения из этого пути не вылетает.
+
+        Тип нужен форме: чужую по форме обложку тут обрезает та же функция, что
+        и залитую руками, а у альбома обложка квадратная.
 
         Защита стоит здесь, а не у зовущих: их трое — загрузчик, писатель
         карточки и привязка, — и двое последних публичные, то есть за границей
         потоков, где второго канала для исключения нет."""
-        return await answered(self._fetched(source, url), self._name(source))
+        return await answered(self._fetched(source, url, kind),
+                              self._name(source))
 
-    async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal:
+    async def _fetched(self, source: Source, url: str,
+                       kind: Kind) -> bytes | None | Refusal:
         if not url:
             # Обложки нет в самом источнике — ждать нечего.
             return None
@@ -64,10 +70,10 @@ class PosterService:
             # Отказ клиента уходит наверх своей причиной: сеть, квота и частота
             # решаются там по-разному.
             return response
-        return self._picture(source, url, response)
+        return self._picture(source, url, response, kind)
 
-    def _picture(self, source: Source, url: str,
-                 response: httpx.Response) -> bytes | None | Refusal:
+    def _picture(self, source: Source, url: str, response: httpx.Response,
+                 kind: Kind) -> bytes | None | Refusal:
         if response.status_code == _ABSENT:
             # Обложки по этому адресу нет, и не будет: карточка живёт без неё,
             # как и та, у которой адрес пуст. Отказом это быть не может — у
@@ -94,11 +100,26 @@ class PosterService:
                            url, len(response.content))
             return self._refuse(source, "тело не изображение")
 
-        # Скачанное не трогаем: обрезка есть только у залитого руками.
-        # У киношных и игровых источников пропорция и так 2:3, у книжного она
-        # своя — замерено, `zoom=3` отдаёт 575×883, — и подгонять её нечем:
-        # обрезать пришлось бы название с обложки.
-        return response.content
+        if already_shaped(response.content, kind):
+            # Пришло в нашей форме — не трогаем: перекодировать значит потерять
+            # качество и запас под высокую плотность экрана. Так приходит
+            # большинство: у TMDB, Steam, GOG и Deezer обложка ровно 2:3 или
+            # ровно квадрат.
+            return response.content
+
+        # Чужая форма идёт через ту же обрезку, что и залитая руками картинка.
+        # Таких источников два: у Google Books обложки бывают и 1808×2552, и
+        # 128×194, у old-games.ru коробочный скан — 120×146, замерено 23.08.2026.
+        # Без обрезки рамка карточки срезала бы им бока или верх с низом, а в
+        # хранилище легло бы то, что каждый раз режется заново.
+        try:
+            return crop_to_cover(response.content, kind)
+        except BadImage as error:
+            # Заголовок картинки прочитался, а тело нет: обрезанный на середине
+            # файл. Отказ, а не пустота: «обложки нет» отменило бы повтор при
+            # следующем показе.
+            logger.warning("постер %s: не обрезалась, %s", url, error)
+            return self._refuse(source, "картинка не разобралась")
 
     @staticmethod
     def _name(source: Source) -> str:
@@ -114,19 +135,20 @@ class PosterService:
                        detail=detail)
 
     async def poster_for(self, item_id: int | None, source: Source, url: str,
-                         now: datetime) -> bytes | None | Refusal:
+                         now: datetime,
+                         kind: Kind) -> bytes | None | Refusal:
         """Обложка видимой карточки. Лежащая в хранилище отдаётся сразу.
 
         У кандидата `item_id` пуст: обложку показываем, но класть её некуда —
         сохранит её загрузчик вместе с карточкой."""
         if item_id is None:
-            return await self.fetch(source, url)
+            return await self.fetch(source, url, kind)
 
         stored = await self._store.get(item_id)
         if stored is not None:
             return stored
 
-        data = await self.fetch(source, url)
+        data = await self.fetch(source, url, kind)
         if data is None or isinstance(data, Refusal):
             return data
 
@@ -148,8 +170,9 @@ class PosterService:
 
     async def store_upload(self, item_id: int, data: bytes, kind: Kind,
                            now: datetime) -> None:
-        """Единственное место, где картинка обрезается: у залитой с диска форма
-        произвольная.
+        """У залитой с диска картинки форма произвольная, и обрезается она
+        всегда — в отличие от скачанной, которой обрезка достаётся, только если
+        источник прислал чужую форму.
 
         Тип нужен самой обрезке: у альбома обложка квадратная, у остальных
         афиша 2:3."""

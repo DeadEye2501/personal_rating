@@ -80,7 +80,7 @@ def year_in_text(value: str | None) -> int | None:
 
 def companies(payload: dict) -> tuple[Credit, ...]:
     """Магазины отдают студии голыми строками: идентичности у них нет, и
-    выдумывать суррогат незачем — таких склеивают по имени."""
+    выдумывать суррогат незачем — таких узнают по написанию."""
     return tuple(
         Credit(name=name, role=role)
         for role, key in (

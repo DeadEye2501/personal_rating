@@ -24,7 +24,7 @@ async def service(posters):
     return PosterService({}, posters)
 
 
-async def furnished(sessions, posters, item_id: int, tag: str = "пересмотреть") -> int:
+async def furnished(sessions, posters, item_id: int, tag: str = "Пересмотреть") -> int:
     """Навешивает на карточку всё, что должно уйти вместе с ней. Имя тега —
     параметр: набор один на тип содержимого, и двум карточкам нужен свой."""
     await RatingsRepository(sessions).set_score(item_id, 9.0, now=WHEN)
@@ -77,10 +77,10 @@ async def test_summary_tells_the_four_apart(sessions, card, what, expected):
     if what == "has_rating":
         await ratings.set_score(item_id, 9.0, now=WHEN)
     elif what == "has_review":
-        await ratings.set_review(item_id, "смотрел, не понравилось", now=WHEN)
+        await ratings.set_review(item_id, "Смотрел, не понравилось", now=WHEN)
     elif what == "tags":
         tags = TagsRepository(sessions)
-        await tags.assign(item_id, await tags.create(Kind.MOVIE, "один"))
+        await tags.assign(item_id, await tags.create(Kind.MOVIE, "Один"))
     else:
         await WishlistRepository(sessions).add(item_id, now=WHEN)
 
@@ -91,7 +91,7 @@ async def test_summary_counts_every_tag(sessions, card):
     """Тегов у карточки бывает несколько, и в сводке их число, а не «есть»."""
     item_id = await card()
     tags = TagsRepository(sessions)
-    for name in ("первый", "второй", "третий"):
+    for name in ("Первый", "Второй", "Третий"):
         await tags.assign(item_id, await tags.create(Kind.MOVIE, name))
 
     summary = await LibraryRepository(sessions).deletion_summary(item_id)
@@ -121,14 +121,14 @@ async def test_the_tag_itself_survives_the_card(sessions, posters, service, card
     names = [
         tag.name for tag in await TagsRepository(sessions).list_for_kind(Kind.MOVIE)
     ]
-    assert names == ["пересмотреть"]
+    assert names == ["Пересмотреть"]
 
 
 async def test_other_cards_are_untouched(sessions, posters, service, card):
     """Удаляется вторая, а не первая: снеси код постер по зашитому номеру —
     на паре, где удаляемая заведена первой, это прошло бы молча."""
     first = await furnished(sessions, posters, await card(source_id="1"))
-    second = await furnished(sessions, posters, await card(source_id="2"), "чужой")
+    second = await furnished(sessions, posters, await card(source_id="2"), "Чужой")
 
     await remove_card(LibraryRepository(sessions), service, second)
 
@@ -164,5 +164,5 @@ async def test_a_broken_deletion_leaves_the_card_not_the_poster(sessions, poster
         await remove_card(library, service, item_id)
 
     assert await posters.has(item_id) is False, \
-        "постер остался и достанется карточке с этим же номером"
+        "Постер остался и достанется карточке с этим же номером"
     assert await LibraryRepository(sessions).get(item_id) is not None

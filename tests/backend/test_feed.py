@@ -29,13 +29,13 @@ async def test_a_page_keeps_the_order_of_the_section(sessions, feed):
 async def test_a_page_carries_the_whole_card(sessions, feed):
     item_id = await rated(sessions, "1", 9.0, title="Интерстеллар")
     tags = TagsRepository(sessions)
-    tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
+    tag_id = await tags.create(Kind.MOVIE, "Пересмотреть")
     await tags.assign(item_id, tag_id)
 
     page = await feed.page(RATED)
 
     assert page[0].rating.score == 9.0
-    assert [t.name for t in page[0].tags] == ["пересмотреть"]
+    assert [t.name for t in page[0].tags] == ["Пересмотреть"]
 
 
 async def test_an_empty_section_is_an_empty_page(sessions, feed):
@@ -99,7 +99,7 @@ async def test_a_page_asks_with_the_filters_it_was_given(sessions, feed):
     tags = TagsRepository(sessions)
     tagged_id = await rated(sessions, "1", 7.0, title="С меткой")
     await rated(sessions, "2", 9.0, title="Без метки")
-    tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
+    tag_id = await tags.create(Kind.MOVIE, "Пересмотреть")
     await tags.assign(tagged_id, tag_id)
 
     page = await feed.page(replace(RATED, filters=Filters(tag_ids=(tag_id,))))
@@ -112,7 +112,7 @@ async def test_the_histogram_asks_with_the_filters_it_was_given(sessions, feed):
     tags = TagsRepository(sessions)
     tagged_id = await rated(sessions, "1", 7.0)
     await rated(sessions, "2", 9.0)
-    tag_id = await tags.create(Kind.MOVIE, "пересмотреть")
+    tag_id = await tags.create(Kind.MOVIE, "Пересмотреть")
     await tags.assign(tagged_id, tag_id)
 
     histogram = await feed.histogram(Kind.MOVIE, Filters(tag_ids=(tag_id,)))
@@ -144,7 +144,7 @@ async def test_a_page_leaves_the_synopsis_behind(sessions, feed):
 
     Привозит его второй круг, тот же, что и оценки агрегаторов: карточка попала
     в поле зрения — спросили."""
-    await rated(sessions, "1", 9.0, synopsis="про восстание")
+    await rated(sessions, "1", 9.0, synopsis="Про восстание")
 
     page = await feed.page(RATED)
 

@@ -12,6 +12,7 @@ from contextlib import aclosing
 import httpx
 
 from backend.model import (
+    IdSource,
     SEARCH_SIZE,
     CompanyRole,
     Found,
@@ -26,7 +27,12 @@ from backend.model import (
 from backend.sources.backoff import until_midnight
 from backend.sources.busy import ATTEMPTS
 from backend.sources.google_books.client import GoogleBooksClient
-from backend.sources.google_books.parse import parse_card, parse_search
+from backend.sources.google_books.parse import (
+    covers,
+    parse_by_author,
+    parse_card,
+    parse_search,
+)
 from backend.sources.http import SourceHttp
 from tests.conftest import FakeClock, counting, responding
 
@@ -201,18 +207,64 @@ def test_the_synopsis_comes_without_markup(fixture):
     assert card.item.synopsis.startswith("Они придут")
 
 
-def test_the_cover_is_asked_at_the_third_zoom(fixture):
-    """`zoom=2` дал бы 300×461 — самую мелкую обложку приложения, и рядом с
-    фильмами она мылила бы. Хвост адреса при подмене обязан уцелеть: у части
-    томов там стоит токен `imgtk`, без которого картинка не отдаётся."""
+def test_the_cover_of_a_publisher_volume_takes_the_step_nearest_our_size():
+    """У издательского тома верна любая ступень — замерено 23.08.2026 на семи
+    таких томах, — и берётся ближайшая к нашей мерке 500×750 сверху: `medium`
+    575×812. Самая крупная не берётся нарочно: обрезка ужимает до 500×750 и не
+    растягивает, так что `extraLarge` 2448×3116 дал бы тот же итог за впятеро
+    больший вес."""
+    publisher = "http://books.google.com/books/publisher/content?id=1"
+    payload = {"id": "1", "volumeInfo": {"title": "Дюна", "imageLinks": {
+        "smallThumbnail": f"{publisher}&zoom=5",
+        "thumbnail": f"{publisher}&zoom=1",
+        "small": f"{publisher}&w=300",
+        "medium": f"{publisher}&w=575",
+        "large": f"{publisher}&w=800",
+        "extraLarge": f"{publisher}&w=1800",
+    }}}
+
+    assert parse_card(payload).item.poster_url == f"{publisher}&w=575"
+
+
+def test_the_cover_of_a_scan_takes_the_thumbnail_and_no_bigger():
+    """У сканированного тома крупные ступени бывают полосой страницы: 300×48,
+    575×92, 800×128 при пропорции 6.25 — замерено 23.08.2026 на трёх сканах из
+    пяти. `thumbnail` при этом обложка у всех до единого, и берётся он.
+
+    Отличает скан сам адрес: `/books/content` против
+    `/books/publisher/content` у издательского."""
+    scan = "http://books.google.com/books/content?id=1"
+    payload = {"id": "1", "volumeInfo": {"title": "Скан", "imageLinks": {
+        "thumbnail": f"{scan}&zoom=1",
+        "medium": f"{scan}&zoom=3",
+        "extraLarge": f"{scan}&zoom=6",
+    }}}
+
+    assert parse_card(payload).item.poster_url == f"{scan}&zoom=1"
+
+
+def test_the_cover_falls_back_to_what_is_there():
+    """Ступеней у тома бывает две: в строке выдачи Google объявляет только
+    `thumbnail` и `smallThumbnail`, а у сканированных томов и в карточке нет ни
+    одной. Замерено 23.08.2026 на живых данных."""
+    thumbnail = {"id": "1", "volumeInfo": {
+        "title": "Дюна", "imageLinks": {"thumbnail": "http://g/t?zoom=1"}}}
+    without = {"id": "2", "volumeInfo": {"title": "Скан"}}
+
+    hits = parse_search({"items": [thumbnail, without]})
+
+    assert [hit.poster_url for hit in hits] == ["http://g/t?zoom=1", ""]
+
+
+def test_the_cover_of_a_volume_is_not_rebuilt_by_hand(fixture):
+    """Адрес уезжает как есть: у части томов в хвосте стоит токен `imgtk`, без
+    которого картинка не отдаётся."""
     payload = fixture("google_books/volume_three_body.json")
 
     card = parse_card(payload)
 
-    assert "zoom=3" in card.item.poster_url
-    assert "zoom=1" not in card.item.poster_url
-    assert card.item.poster_url.endswith(
-        payload["volumeInfo"]["imageLinks"]["thumbnail"].split("zoom=1")[1])
+    assert card.item.poster_url in payload["volumeInfo"]["imageLinks"].values()
+    assert "zoom=3" not in card.item.poster_url
 
 
 async def test_the_search_asks_google_with_the_query_and_the_key(fixture):
@@ -393,3 +445,102 @@ async def test_a_page_under_a_four_hundred_and_four_is_not_an_answer():
     answer = await carded(responding(404, text="<html>Not found</html>"))
 
     assert isinstance(answer, Refusal) and answer.reason is Reason.BROKEN
+
+
+def test_the_works_of_an_author_are_only_those_that_have_him():
+    """Ручки людей у Google нет вовсе, и `inauthor:` он понимает как пожелание:
+    замерено 23.08.2026 живьём — по `inauthor:"задача трех тел"` приезжают
+    «The Three-Body Problem» Валтонена и Марчала, то есть чужие книги под
+    видом работ автора.
+
+    Поэтому автор проверяется по ответу: у тома он обязан быть."""
+    payload = {"items": [
+        {"id": "1", "volumeInfo": {"title": "Дюна",
+                                   "authors": ["Фрэнк Герберт"]}},
+        {"id": "2", "volumeInfo": {"title": "The Three-Body Problem",
+                                   "authors": ["Mauri J. Valtonen"]}},
+        {"id": "3", "volumeInfo": {"title": "Новая литература"}},
+    ]}
+
+    assert [hit.title for hit in parse_by_author(payload, "Фрэнк Герберт")] \
+        == ["Дюна"]
+
+
+def test_a_part_of_the_name_is_enough_to_own_the_book():
+    """Человек набирает «толкин», а Google пишет его полным именем. Требовать
+    совпадения целиком значило бы не находить по фамилии вовсе."""
+    payload = {"items": [
+        {"id": "1", "volumeInfo": {"title": "Властелин колец",
+                                   "authors": ["Джон Рональд Руэл Толкин"]}},
+    ]}
+
+    assert [hit.title for hit in parse_by_author(payload, "толкин")] \
+        == ["Властелин колец"]
+
+
+def test_the_ladder_is_ordered_from_our_size_upwards():
+    """Берём не самую крупную ступень, а ближайшую к нашей мерке 500×750 —
+    решение пользователя 23.08.2026.
+
+    Замерено в тот же день на семи издательских томах: `small` — 300×423,
+    `medium` — 575×812, `large` — 800×1129, `extraLarge` — до 2448×3116.
+    Ближайшая сверху `medium`: обрезка ужмёт её до 500×750 без растягивания, а
+    `extraLarge` стоил бы двух мегабайт ради тех же 500 пикселей."""
+    links = {"thumbnail": "t", "small": "s", "medium": "m",
+             "large": "l", "extraLarge": "xl"}
+
+    assert covers(links) == ["m", "l", "xl", "s", "t"]
+
+
+def test_the_ladder_keeps_only_what_the_volume_declares():
+    """У русских изданий ступень одна: замерено 23.08.2026 — у «Властелина
+    Колец» издательства АСТ объявлен только `thumbnail` 128×195."""
+    assert covers({"thumbnail": "t", "smallThumbnail": "st"}) == ["t"]
+    assert covers({}) == []
+
+
+def test_a_string_of_publishers_becomes_several_companies():
+    """Google кладёт в `publisher` то одно издательство, то перечень: «ЛитРес,
+    АСТ» встречается семь раз на 260 строк живой выдачи. Это два разных
+    издательства — решение пользователя 23.08.2026, — и строкой они в базу
+    попадать не должны: тогда книга АСТ и книга «ЛитРес, АСТ» лежат под разными
+    издателями."""
+    payload = {"id": "1", "volumeInfo": {"title": "Дюна",
+                                         "publisher": "ЛитРес, АСТ"}}
+
+    names = [one.name for one in parse_card(payload).companies]
+
+    assert names == ["ЛитРес", "АСТ"]
+
+
+def test_a_publisher_with_a_conjunction_stays_one_company():
+    """«Манн, Иванов и Фербер» — одно издательство из трёх фамилий."""
+    payload = {"id": "1", "volumeInfo": {
+        "title": "Дюна", "publisher": "Манн, Иванов и Фербер"}}
+
+    assert [one.name for one in parse_card(payload).companies] \
+        == ["Манн, Иванов и Фербер"]
+
+
+def test_the_isbn_of_a_volume_travels_with_the_row():
+    """ISBN нужен запасному источнику обложек: по нему ищут издание, и им же
+    сверяют, что нашлось то самое. Берётся тринадцатизначный, а при его
+    отсутствии десятизначный — у Google бывают оба."""
+    payload = {"items": [{"id": "1", "volumeInfo": {
+        "title": "Пикник на обочине",
+        "industryIdentifiers": [{"type": "ISBN_10", "identifier": "5170829833"},
+                                {"type": "ISBN_13", "identifier": "9785170829835"}],
+    }}]}
+
+    hit = parse_search(payload)[0]
+
+    assert [(one.source, one.value) for one in hit.external_ids] \
+        == [(IdSource.ISBN, "9785170829835")]
+
+
+def test_a_volume_without_an_isbn_carries_nothing():
+    """У сканов и журналов ISBN нет вовсе — замерено, у восьми томов из десяти
+    он есть, у двух нет."""
+    payload = {"items": [{"id": "1", "volumeInfo": {"title": "Скан"}}]}
+
+    assert parse_search(payload)[0].external_ids == ()

@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import Select, delete, exists, func, select, update
 
 from backend.model import Item, ItemExists, Kind, Source, new_source_id
+from backend.naming import capitalized
 from backend.storage.entity import COMPANIES, PEOPLE, Entity
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_item
@@ -20,6 +21,10 @@ _FIELDS = (
     "released_at", "synopsis", "poster_url", "runtime", "seasons_count",
     "episodes_count", "synced_at",
 )
+
+# Что человек читает, а значит пишется с заглавной. Остальные поля колонки —
+# перечисления, числа, даты и адрес обложки: поднимать в них нечего.
+_WRITTEN = ("title", "original_title", "synopsis")
 
 
 def _named(entity: Entity, needle: str):
@@ -41,8 +46,13 @@ def _values(item: Item) -> dict:
     """Карточка в вид для вставки. `id` не берётся: его выдаёт база.
 
     Перечисления не переводятся в строку по пути: они `StrEnum`, то есть уже
-    строки, и в колонку ложатся своим значением."""
-    return {name: getattr(item, name) for name in _FIELDS}
+    строки, и в колонку ложатся своим значением.
+
+    Здесь же поднимается первая буква у всего, что человек читает: правило
+    записи, а не показа, см. `backend.naming`."""
+    values = {name: getattr(item, name) for name in _FIELDS}
+    return {name: capitalized(one) if name in _WRITTEN else one
+            for name, one in values.items()}
 
 
 class LibraryRepository(Repository):

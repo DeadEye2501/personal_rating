@@ -5,8 +5,12 @@
 в модели и зовётся ещё и с той стороны границы, мостом."""
 
 
+import httpx
+
 from backend.model import (
+    ExternalId,
     Found,
+    IdSource,
     Kind,
     Missing,
     PersonHit,
@@ -16,7 +20,14 @@ from backend.model import (
     Source,
 )
 from backend.service.search import SEARCH_SIZE
+from backend.sources.fantlab.client import FantLabClient
+from backend.sources.http import SourceHttp
 from tests.conftest import MOMENT, FakeSearch, hit
+
+PICNIC = {"matches": [{"edition_id": "118084", "isbn": "978-5-17-082983-5",
+                       "name": "Пикник на обочине", "year": 2014}],
+          "total_found": 1}
+
 
 
 
@@ -295,6 +306,38 @@ async def test_a_full_portion_means_there_is_more(sessions, service):
     assert answer.more is True
 
 
+async def test_singles_thrown_out_do_not_stop_the_feed(sessions, service):
+    """Отсев укорачивает порцию, а «есть ещё» считается до него.
+
+    Замерено 23.08.2026: по «дельфин» из двадцати строк Deezer семь помечены
+    синглом. Считай признак по показанному — тринадцать строк объявили бы конец
+    выдачи, и альбом со второй страницы был бы недостижим ничем: у музыки это
+    почти каждый поиск.
+
+    Свидетель — полная порция, где часть строк уходит отсевом; сам отсев
+    проверяется рядом, по числу показанных."""
+    rows = [hit(str(n), f"Дельфин {n}", kind=Kind.MUSIC, source=Source.DEEZER,
+                single=n % 3 == 0)
+            for n in range(SEARCH_SIZE)]
+
+    answer = await service(FakeSearch(Found(rows))).external(Kind.MUSIC, "дельфин")
+
+    assert answer.more is True, "отсев погасил догрузку"
+    assert len(answer.views) == SEARCH_SIZE - len(range(0, SEARCH_SIZE, 3))
+
+
+async def test_a_single_is_not_shown_in_the_search(sessions, service):
+    """Приложение оценивает альбомы: сингл не показывается и потому не заводится
+    в базу — решение пользователя 23.08.2026."""
+    rows = [hit("1", "Группа крови", kind=Kind.MUSIC, source=Source.DEEZER),
+            hit("2", "Дельфин", kind=Kind.MUSIC, source=Source.DEEZER,
+                single=True)]
+
+    answer = await service(FakeSearch(Found(rows))).external(Kind.MUSIC, "д")
+
+    assert [one.title for one in answer.views] == ["Группа крови"]
+
+
 async def test_the_end_of_the_source_stops_the_feed(sessions, service):
     """Обратная половина: источник отдал меньше запрошенного — признак гаснет,
     и лента перестаёт просить. Без неё бесконечный цикл в `Feed.more()`
@@ -561,3 +604,67 @@ async def test_a_portion_is_counted_per_source_and_not_per_page(sessions, servic
     assert len(result.views) == 2 * SEARCH_SIZE
 
 
+def _fantlab(payload: dict, picture: str = "image/jpeg") -> FantLabClient:
+    """Настоящий клиент запасного источника на подставном транспорте.
+
+    Настоящий, а не двойник, и это главное в проверке ниже: `_covered` зовёт у
+    него не только `cover_for`, но и `name` — подписывать им ответ. Двойник
+    отвечает на что угодно, и потерянное свойство прошло бы молча; живьём это
+    ровно так и случилось 23.08.2026, при зелёном наборе.
+
+    Транспорт различает две ручки: поиск издания и `HEAD` за картинкой."""
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "api.fantlab.ru":
+            return httpx.Response(200, json=payload)
+        return httpx.Response(200, headers={"content-type": picture})
+
+    return FantLabClient(SourceHttp("fantlab", transport=httpx.MockTransport(handler)))
+
+
+async def test_a_book_without_a_cover_gets_one_from_the_spare_source(
+    sessions, service
+):
+    """Обложка добывается на стороне и доезжает до строки выдачи.
+
+    Ради этого источник и заведён: у Google обложки местами нет вовсе, а
+    человек выбирает из выдачи глазами. Спрашивается это при поиске, а не при
+    заведении карточки, — решение пользователя 23.08.2026."""
+    naked = hit("VOL1", "Пикник на обочине", kind=Kind.BOOK,
+                source=Source.GOOGLE_BOOKS,
+                external_ids=(ExternalId(IdSource.ISBN, "9785170829835"),))
+    search = service(FakeSearch(Found([naked])), covers=_fantlab(PICNIC))
+
+    result = await search.external(Kind.BOOK, "пикник на обочине")
+
+    assert result.views[0].poster_url == (
+        "https://fantlab.ru/images/editions/orig/118084"
+    )
+
+
+async def test_a_book_the_spare_source_does_not_know_stays_bare(sessions, service):
+    """Отказ запасного источника ничего не ломает: строка показывается без
+    обложки, как показывалась бы и без него вовсе."""
+    naked = hit("VOL1", "Пикник на обочине", kind=Kind.BOOK,
+                source=Source.GOOGLE_BOOKS,
+                external_ids=(ExternalId(IdSource.ISBN, "9785170829835"),))
+    search = service(FakeSearch(Found([naked])),
+                     covers=_fantlab({"matches": [], "total_found": 0}))
+
+    result = await search.external(Kind.BOOK, "пикник на обочине")
+
+    assert result.views[0].poster_url == ""
+    assert result.refusals == ()
+
+
+async def test_a_film_asks_no_spare_source(sessions, service):
+    """Запасной источник есть только у книг: у остальных обложку отдаёт сам
+    каталог, и лишний запрос стоил бы порции лишних походов в сеть.
+
+    Свидетелем — клиент, который на любой вопрос отвечает картинкой: спроси его
+    сервис, и у фильма появился бы адрес FantLab."""
+    naked = hit("157336", "Интерстеллар")
+    search = service(FakeSearch(Found([naked])), covers=_fantlab(PICNIC))
+
+    result = await search.external(Kind.MOVIE, "интерстеллар")
+
+    assert result.views[0].poster_url == ""

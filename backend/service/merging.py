@@ -14,7 +14,7 @@ from dataclasses import replace
 
 from backend.language import in_latin, in_russian
 from backend.model import Kind, SearchHit, Source
-from backend.service.titles import flattened, without_edition
+from backend.titles import flattened, without_edition
 from backend.unique import unique
 
 # Слова сборника. Сборник — не издание: это несколько игр под одной строкой, и

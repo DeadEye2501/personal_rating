@@ -131,7 +131,8 @@ class Linker(CardParts):
                            overwrite: bool) -> None:
         if not overwrite and await self.posters.has(item_id):
             return
-        poster = await self.posters.fetch(item.source, item.poster_url)
+        poster = await self.posters.fetch(item.source, item.poster_url,
+                                          item.kind)
         if isinstance(poster, bytes):
             await self.posters.save(item_id, poster, item.synced_at)
         elif isinstance(poster, Refusal):

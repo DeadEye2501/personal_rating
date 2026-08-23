@@ -4,6 +4,7 @@ from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import Kind, Tag, TagExists, WrongTagKind
+from backend.naming import capitalized
 from backend.storage.repository.base import Repository
 from backend.storage.rows import to_tag
 from backend.storage.tables import item as item_table
@@ -25,7 +26,7 @@ class TagsRepository(Repository):
         )
         return await self._created(
             tag_table.insert()
-            .values(name=name, kind=kind, position=tail)
+            .values(name=capitalized(name), kind=kind, position=tail)
             .returning(tag_table.c.id),
             TagExists(f"{kind}:{name} уже заведён"),
         )
@@ -52,7 +53,8 @@ class TagsRepository(Repository):
     async def rename(self, tag_id: int, name: str) -> None:
         """Имя занято в этом наборе — отказ, а не чужое исключение наверх."""
         await self._written(
-            update(tag_table).where(tag_table.c.id == tag_id).values(name=name),
+            update(tag_table).where(tag_table.c.id == tag_id)
+            .values(name=capitalized(name)),
             TagExists(f"{name} уже заведён"),
         )
 

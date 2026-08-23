@@ -42,6 +42,9 @@ class IdSource(StrEnum):
     KINOPOISK = "kinopoisk"
     STEAM = "steam"
     GOG = "gog"
+    # У книги идентификатор международный, а не источника: по нему ищут издание
+    # в чужих каталогах и им же сверяют, что нашлось то самое.
+    ISBN = "isbn"
 
 
 class RatingSource(StrEnum):
