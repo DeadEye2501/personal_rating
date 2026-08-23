@@ -6,7 +6,7 @@
 import httpx
 
 from backend.app import card_parts as backend_card_parts
-from backend.service.posters import POSTER_SOURCES, PosterService
+from backend.service.posters import LENDERS, POSTER_SOURCES, PosterService
 from backend.service.search import SearchParts, SearchService
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
@@ -22,8 +22,8 @@ def poster_service(store: PosterStore,
                    transport: httpx.MockTransport) -> PosterService:
     """Сервис обложек с одним транспортом на все источники набора. Где важно, кого
     именно спросили, тест собирает клиентов сам."""
-    clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
-               for source in POSTER_SOURCES}
+    clients = {name: SourceHttp(f"cdn:{name}", transport=transport)
+               for name in (*POSTER_SOURCES, *LENDERS.values())}
     return PosterService(clients, store)
 
 

@@ -5,6 +5,7 @@
 потерь были занятостью. Считать её пустой выдачей значит терять половину
 каталога при зелёном наборе."""
 
+import asyncio
 from datetime import timedelta
 
 from contextlib import aclosing
@@ -208,6 +209,18 @@ def test_the_synopsis_comes_without_markup(fixture):
     assert card.item.synopsis.startswith("Они придут")
 
 
+def test_a_category_of_nothing_but_separators_becomes_no_mark():
+    """Путь BISAC из одних разделителей жанра не даёт. Пропусти его — и в
+    справочник уехала бы метка без имени, то есть жанр, которого у источника не
+    существует; в карточке он встал бы пустой строкой."""
+    payload = {"id": "1", "volumeInfo": {
+        "title": "Дюна",
+        "categories": ["/ /", "Fiction / Science Fiction / Hard Science Fiction"]}}
+
+    assert parse_card(payload).genre_ext_ids == (
+        (GenreSource.GOOGLE_BOOKS, "Science Fiction"),)
+
+
 def test_the_cover_of_a_publisher_volume_takes_the_step_nearest_our_size():
     """У издательского тома верна любая ступень — замерено 23.08.2026 на семи
     таких томах, — и берётся ближайшая к нашей мерке 500×750 сверху: `medium`
@@ -242,6 +255,27 @@ def test_the_cover_of_a_scan_takes_the_thumbnail_and_no_bigger():
     }}}
 
     assert parse_card(payload).item.poster_url == f"{scan}&zoom=1"
+
+
+def test_a_scan_without_a_thumbnail_falls_back_to_the_smallest_step():
+    """Запасная ступень у скана — самая мелкая из объявленных, а не последняя в
+    лестнице: лестница упорядочена близостью к нашей мерке, и `small` стоит в
+    ней после `extraLarge`. Возьми последнюю, и том, у которого объявлены
+    только `medium` и `large`, получил бы 800×1129 — ровно ту крупную ступень,
+    от которой ветка и защищает.
+
+    Случай краевой: `thumbnail` замерен у всех до единого. Написано так, как
+    объяснено в самом разборе — «у скана довольствуемся маленькой»."""
+    scan = "http://books.google.com/books/content?id=1"
+    links = {"medium": f"{scan}&zoom=3", "large": f"{scan}&zoom=4"}
+    volume = {"id": "1", "volumeInfo": {"title": "Скан", "imageLinks": links}}
+
+    assert parse_card(volume).item.poster_url == f"{scan}&zoom=3"
+
+    # Со `small` мельче становится он: без этой половины набор мог бы стоять в
+    # любом порядке, лишь бы крупная не была первой.
+    links["small"] = f"{scan}&w=300"
+    assert parse_card(volume).item.poster_url == f"{scan}&w=300"
 
 
 def test_the_cover_falls_back_to_what_is_there():
@@ -372,6 +406,20 @@ async def test_a_busy_answer_is_retried_and_not_taken_for_emptiness(replay):
     assert len(asked) == 2, "занятость обязана быть перепрошена, а не принята"
 
 
+async def test_a_busy_source_is_asked_three_times_and_no_more(replay):
+    """Повтор не вечен: при настоящей беде клиент отказывает, а не долбится.
+
+    Число литералом, а не из `ATTEMPTS`: сверка с объявлением зеленела бы при
+    любом значении — в том числе при десяти, то есть тридцати запросах на одну
+    книгу из суточной тысячи."""
+    transport, asked = counting(replay("google_books/busy.json"))
+
+    answer = await searched(transport)
+
+    assert isinstance(answer, Refusal) and answer.reason is Reason.RATE
+    assert len(asked) == 3
+
+
 async def test_a_busy_source_is_not_shut_off_by_the_breaker(replay):
     """`503` — штатный ответ занятого Google, и утечь в предохранитель он не
     должен: иначе после каждого поиска источник замолкал бы на пятнадцать
@@ -449,6 +497,91 @@ async def test_the_spare_key_takes_over_when_the_quota_runs_out():
     assert keys == ["кончился", "запасной", "запасной"]
 
 
+async def test_both_racing_requests_get_through_on_the_spare_key():
+    """Карточка и работы тёзок грузятся разом одним клиентом, и на исчерпанной
+    квоте `429` приходит обоим — это штатный путь книжного поиска, а не
+    редкость.
+
+    Проигравший гонку повторяет тем ключом, который сосед уже поставил.
+    Откажи он — отказ по квоте закрыл бы источник до полуночи, и вторым ключом
+    не было бы спрошено ни одного запроса: победитель получил бы «предохранитель
+    взведён» на своём же повторе.
+
+    Наблюдается ключами на проводе: обоим ответили выдачей и обоих спросили
+    запасным."""
+    keys = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        key = request.url.params.get("key")
+        keys.append(key)
+        if key == "кончился":
+            # Оба запроса успевают уйти первым ключом, иначе гонки не выйдет.
+            await asyncio.sleep(0.01)
+            return httpx.Response(429, json={"error": {"code": 429}})
+        return httpx.Response(200, json={"items": []})
+
+    http = SourceHttp("google_books", transport=httpx.MockTransport(handler))
+    client = GoogleBooksClient(http, ("кончился", "запасной"))
+
+    async with aclosing(client):
+        first, second = await asyncio.gather(
+            client.search("дюна", Kind.BOOK),
+            client.credits_of("Фрэнк Герберт", Kind.BOOK),
+        )
+
+    assert keys[:2] == ["кончился", "кончился"], "гонки не вышло, ключи по очереди"
+    assert isinstance(first, Found), "выдача отказала на исчерпанном ключе"
+    assert isinstance(second, Found), "работы автора отказали на исчерпанном ключе"
+    assert not http.breaker.is_open(), "источник закрыт, хотя ключ ещё есть"
+    assert keys.count("запасной") == 2, f"запасным спрошено не всё: {keys}"
+
+
+async def test_the_first_key_is_asked_again_the_next_day():
+    """Квота суточная, и в полночь оживает не только предохранитель, но и
+    первый ключ. Не вернись к нему номер — со вторых суток запас ключей равен
+    одному: спрашивается последний, а исчерпав его, источник закрывается, ни
+    разу не попробовав ключ с полной квотой. Окно приложения живёт открытым
+    сутками, так что случай штатный.
+
+    Наблюдается ключами на проводе: после полуночи первый спрошен снова."""
+    keys = []
+    clock = FakeClock()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        key = request.url.params.get("key")
+        keys.append(key)
+        if key == "вчерашний":
+            return httpx.Response(429, json={"error": {"code": 429}})
+        return httpx.Response(200, json={"items": []})
+
+    http = SourceHttp("google_books", clock=clock,
+                      transport=httpx.MockTransport(handler))
+    client = GoogleBooksClient(http, ("вчерашний", "запасной"))
+
+    async with aclosing(client):
+        await client.search("дюна", Kind.BOOK)
+        clock.advance(until_midnight(clock()) + timedelta(minutes=1))
+        await client.search("герберт", Kind.BOOK)
+
+    assert keys == ["вчерашний", "запасной", "вчерашний", "запасной"], keys
+
+
+async def test_a_client_without_keys_asks_with_an_empty_one():
+    """Ключей может не быть вовсе: переменная в `.env` пустая, и `load_config`
+    отдаёт пустой набор. Тогда ключ на проводе пустой, Google отвечает `400`, и
+    человек читает «ключ не принят» — то же, что при негодном.
+
+    Подставь клиент что угодно другое, и вместо понятной жалобы приехала бы
+    «кончилась квота»: без ключа вовсе ручка отвечает `429`."""
+    transport, asked = counting(responding(json={"items": []}))
+
+    async with aclosing(GoogleBooksClient(
+            SourceHttp("google_books", transport=transport), ())) as one:
+        await one.search("дюна", Kind.BOOK)
+
+    assert asked[0].url.params.get("key") == ""
+
+
 async def test_the_last_key_out_of_quota_closes_the_source():
     """Запасной ключ отодвигает отказ, но не отменяет его: кончились все —
     источник закрывается до полуночи, как закрывался с одним ключом.
@@ -510,6 +643,25 @@ def test_the_works_of_an_author_are_only_those_that_have_him():
 
     assert [hit.title for hit in parse_by_author(payload, "Фрэнк Герберт")] \
         == ["Дюна"]
+
+
+def test_a_namesake_of_the_author_does_not_own_his_book():
+    """Часть имени — не любая её часть: совпасть обязано **всё** спрошенное.
+
+    Замерено 23.08.2026: по «Frank Herbert» в двадцати строках приезжает и
+    `Brian Herbert` — фамилия та же, человек другой. Хватай клиент пересечение
+    вместо вхождения, и к Гербертам ехали бы книги сына, а к «Ивану Иванову» —
+    половина каталога."""
+    payload = {"items": [
+        {"id": "1", "volumeInfo": {"title": "Дюна",
+                                   "authors": ["Фрэнк Герберт"]}},
+        {"id": "2", "volumeInfo": {"title": "Дом Атрейдесов",
+                                   "authors": ["Брайан Герберт"]}},
+    ]}
+
+    kept = parse_by_author(payload, "Фрэнк Герберт")
+
+    assert [hit.title for hit in kept] == ["Дюна"]
 
 
 def test_a_part_of_the_name_is_enough_to_own_the_book():

@@ -15,7 +15,7 @@ from backend.service.library import LibraryService
 from backend.service.linking import Linker
 from backend.service.loading import Loader
 from backend.service.people import PeopleSearch
-from backend.service.posters import POSTER_SOURCES, PosterService
+from backend.service.posters import LENDERS, POSTER_SOURCES, PosterService
 from backend.service.removal import discard_card
 from backend.service.search import SearchParts, SearchService
 from backend.service.series import SeriesRefresh
@@ -160,9 +160,12 @@ async def build_backend(
 
     sources = build_sources(config, transport=transport)
     # Своя ветка на источник: у каждого свой предохранитель и свой заголовок.
+    # Заимодавцы стоят в том же наборе: одолженная обложка качается соединением
+    # того сайта, на котором лежит, — у книг её ищет FantLab, а карточка
+    # приезжает от Google.
     posters = PosterService(
-        {source: SourceHttp(poster_name(source), transport=transport)
-         for source in POSTER_SOURCES},
+        {name: SourceHttp(poster_name(name), transport=transport)
+         for name in (*POSTER_SOURCES, *LENDERS.values())},
         store,
     )
 

@@ -40,6 +40,13 @@ _GENERAL = "General"
 # значок.
 _COVERS = ("medium", "large", "extraLarge", "small", "thumbnail")
 
+# Те же ступени по возрастанию размера — этим порядком выбирается запасная у
+# скана. Отдельным набором, а не перевёрнутым `_COVERS`: тот упорядочен
+# близостью к нашей мерке, и `small` стоит в нём после `extraLarge` не потому,
+# что крупнее. `thumbnail` сюда не входит — до этого набора добираются только
+# тогда, когда его нет вовсе.
+_SMALLER_FIRST = ("small", "medium", "large", "extraLarge")
+
 # Чем издательский том отличается от сканированного — прямо в адресе.
 _PUBLISHER = "/books/publisher/content"
 
@@ -86,6 +93,12 @@ def _poster(info: dict) -> str:
     страницы. Цена названа — у скана с честными ступенями (один из пяти) мы
     берём 128 вместо 575.
 
+    Скан без `thumbnail` — случай краевой (замерено: объявлен у всех до
+    единого), и запасной ему идёт **самая мелкая** из объявленных, а не
+    последняя в лестнице: последняя у тома с одними `medium` и `large` — это
+    `large` 800×1129, то есть ровно та крупная ступень, от которой ветка и
+    защищает.
+
     Самая крупная не берётся нарочно, это решение пользователя того же дня:
     обрезка ужимает до 500×750 и не растягивает, поэтому `medium` 575×812 даёт
     тот же итог, что `extraLarge` 2448×3116, а весит впятеро меньше."""
@@ -94,7 +107,10 @@ def _poster(info: dict) -> str:
     if not ladder:
         return ""
     thumbnail = links.get("thumbnail", "")
-    return ladder[0] if _PUBLISHER in thumbnail else thumbnail or ladder[-1]
+    if _PUBLISHER in thumbnail:
+        return ladder[0]
+    return thumbnail or next(
+        links[name] for name in _SMALLER_FIRST if links.get(name))
 
 
 def _owned_by(asked: set[str], authors: list[str]) -> bool:

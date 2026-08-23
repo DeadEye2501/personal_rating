@@ -181,6 +181,56 @@ async def test_each_source_is_asked_through_its_own_client(posters):
     await service.aclose()
 
 
+async def test_a_lent_cover_is_asked_by_the_client_of_the_site_it_lies_on(posters):
+    """Обложку книге ищет FantLab, а карточка при этом приезжает от Google — и
+    в карточке от чужого источника не остаётся ни следа, различить их можно
+    только по хозяину адреса.
+
+    Качай такой адрес постерным соединением Google, и одна сетевая беда на
+    fantlab.ru закрывала бы на пятнадцать секунд **все** книжные обложки,
+    включая те, что лежат у самого Google, — а без обложки книга не заводится
+    вовсе. Плашка при этом называла бы человеку не тот источник.
+
+    Наблюдается обоими следствиями сразу: гугловое соединение цело, а отказ
+    назван именем того, кто правда не ответил."""
+    # Гугловому соединению дан мёртвый транспорт нарочно: спроси сервис его,
+    # и предохранитель взвёлся бы — то есть проверка ниже правда может упасть.
+    google = SourceHttp("google_books-poster", transport=unreachable())
+    service = PosterService(
+        {Source.GOOGLE_BOOKS: google,
+         "fantlab": SourceHttp("fantlab-poster",
+                               transport=responding(content=b"<html>"))},
+        posters,
+    )
+
+    answer = await service.fetch(
+        Source.GOOGLE_BOOKS,
+        "https://fantlab.ru/images/editions/orig/7", Kind.BOOK)
+    await service.aclose()
+
+    assert isinstance(answer, Refusal) and answer.reason is Reason.BROKEN
+    assert answer.source == "poster:fantlab", f"отказ назвал не того: {answer.source}"
+    assert not google.breaker.is_open(), "спросили не того, кому принадлежит адрес"
+
+
+async def test_the_source_own_address_stays_with_the_source(posters):
+    """Оговорка про хозяина адреса не отбирает у источника его собственные
+    картинки: у той же книги обложка чаще приезжает от самого Google."""
+    service = PosterService(
+        {Source.GOOGLE_BOOKS: SourceHttp(
+            "google_books-poster",
+            transport=responding(content=picture(600, 900, fmt="JPEG"))),
+         "fantlab": SourceHttp("fantlab-poster", transport=unreachable())},
+        posters,
+    )
+
+    answer = await service.fetch(
+        Source.GOOGLE_BOOKS, "https://books.google.com/c?id=1", Kind.BOOK)
+    await service.aclose()
+
+    assert isinstance(answer, bytes), f"свою обложку спросили не у себя: {answer}"
+
+
 async def test_a_dead_cdn_does_not_close_the_others(posters):
     """Предохранитель у каждого источника свой. Один на всех выключил бы обложки
     целиком из-за одного молчащего CDN — и на пятнадцать секунд, а не на запрос.

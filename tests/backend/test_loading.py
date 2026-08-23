@@ -117,6 +117,26 @@ async def test_the_stored_card_takes_both_names(sessions, loader):
     assert stored.original_title == "The Witcher 3: Wild Hunt"
 
 
+async def test_a_lent_cover_address_reaches_the_stored_card(sessions, loader):
+    """Адрес обложки, добытой на стороне, доезжает до базы.
+
+    У книги обложку ищет чужой каталог, и в карточке от Google её адреса нет
+    вовсе: приезжает он со строкой выдачи. Запиши пустое — и правило
+    «потерянная обложка скачается заново по `poster_url`» для книг перестало бы
+    выполняться, а на нём стоит порядок удаления двух файлов базы."""
+    lent = "https://fantlab.ru/images/editions/orig/118084"
+    rig = loader(Found(SourceCard(item=an_item(
+        "VOL1", "Пикник на обочине", kind=Kind.BOOK,
+        source=Source.GOOGLE_BOOKS, poster_url=""))))
+    came = view_from_hit(hit("VOL1", "Пикник на обочине", kind=Kind.BOOK,
+                             source=Source.GOOGLE_BOOKS, poster_url=lent))
+
+    item_id = await rig.load.ensure(came)
+
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.poster_url == lent
+
+
 async def test_the_card_wins_over_the_pair_for_its_own_language(sessions, loader):
     """Пара — фоллбек, и карточка сильнее: решение пользователя 03.08.2026.
 
@@ -459,12 +479,19 @@ async def test_the_cover_is_fetched_once_and_by_the_loader(sessions, loader):
     сам, уже по адресу детального ответа.
 
     Проверяется и число запросов, и адрес: по одному числу эти два пути
-    неразличимы — запрос всё равно один, просто чужой."""
+    неразличимы — запрос всё равно один, просто чужой.
+
+    Тем же проходом сторожится вторая половина доливки: в базу уезжает адрес
+    **карточки**, а не тот, по которому качали. Переставь стороны в
+    `_from_both`, и у Steam в базу навсегда легло бы угаданное имя файла из
+    выдачи — неверное у 38% игр, а перезапроса у игр не бывает."""
     rig = loader(Found(source_card()))
 
-    await rig.load.ensure(candidate())
+    item_id = await rig.load.ensure(candidate())
 
     assert [str(one.url) for one in rig.requests] == [SEARCH_COVER]
+    stored = await LibraryRepository(sessions).get(item_id)
+    assert stored.poster_url == DETAIL_COVER
 
 
 async def test_the_two_rounds_go_together(sessions, loader, monkeypatch):

@@ -400,7 +400,9 @@ async def test_the_repeat_is_not_endless():
     found = await searched(transport)
 
     assert isinstance(found, Refusal)
-    assert len(asked) == ATTEMPTS
+    # Число литералом, а не из `ATTEMPTS`: сверка с объявлением зеленела бы при
+    # любом значении, в том числе при десяти.
+    assert len(asked) == 3
 
 
 async def test_the_search_asks_the_catalog_with_the_query(fixture):

@@ -1,0 +1,113 @@
+{
+  "matches": [
+    {
+      "autors": "[autor=18620]Африкан Шебалов[/autor]",
+      "correct": 2,
+      "edition_id": 391057,
+      "isbn": "",
+      "name": "Рассвет",
+      "notes": "",
+      "plan_date": "",
+      "publisher": "[pub=10020]БПНФ[/pub]",
+      "series": "[series=1824]Библиотека приключений и научной фантастики (продолжатели)[/series]",
+      "year": 2023
+    },
+    {
+      "autors": "[autor=48448]Константин Кирицэ[/autor]",
+      "correct": 1,
+      "edition_id": 393873,
+      "isbn": "",
+      "name": "Рыцари черешневого цветка",
+      "notes": "",
+      "plan_date": "",
+      "publisher": "[pub=10020]БПНФ[/pub]",
+      "series": "[series=1824]Библиотека приключений и научной фантастики (продолжатели)[/series]",
+      "year": 2023
+    },
+    {
+      "autors": "[autor=143960]Максим Кальченко[/autor]",
+      "correct": 1,
+      "edition_id": 411270,
+      "isbn": "978-5-0000-0000-0",
+      "name": "[work=1853768]Страшные истории на ночь[/work]",
+      "notes": "",
+      "plan_date": "",
+      "publisher": "[pub=2718][Издательство в книге не указано][/pub]",
+      "series": "",
+      "year": 2022
+    },
+    {
+      "autors": "[autor=31567]Елена Щербиновская[/autor]",
+      "correct": 2,
+      "edition_id": 423463,
+      "isbn": "978-5-0000-0000-0",
+      "name": "Тайна белой волчицы",
+      "notes": "Прикрыта нагота, рунический шрифт, улучшен цвет.\r\nРазмеры: 165 х 245 мм.",
+      "plan_date": "",
+      "publisher": "[pub=3755]Нитусов[/pub]",
+      "series": "",
+      "year": 2024
+    },
+    {
+      "autors": "[autor=11949]Константин Комардин[/autor], [autor=104549]Анна Аносова[/autor]",
+      "correct": 2,
+      "edition_id": 423473,
+      "isbn": "978-5-0000-0000-0",
+      "name": "Сайт-о-Полис: сети подземелий",
+      "notes": "Размеры издания: 215 х 292 мм.",
+      "plan_date": "",
+      "publisher": "[pub=3755]Нитусов[/pub]",
+      "series": "",
+      "year": 2024
+    },
+    {
+      "autors": "[autor=11007]Эмили Бронте[/autor]",
+      "correct": 1,
+      "edition_id": 427426,
+      "isbn": "978-5-0000-0000-0",
+      "name": "Грозовой перевал",
+      "notes": "",
+      "plan_date": "",
+      "publisher": "Ашетт",
+      "series": "Вечная классика",
+      "year": 2020
+    },
+    {
+      "autors": "[autor=155083]Зелимхан Хаджиев[/autor]",
+      "correct": 0,
+      "edition_id": 436833,
+      "isbn": "978-5-0000-0000-0",
+      "name": "Celistic 2",
+      "notes": "",
+      "plan_date": "",
+      "publisher": "[pub=3755]Нитусов[/pub]",
+      "series": "",
+      "year": 2024
+    },
+    {
+      "autors": "[autor=135217]Анатолий Иоффе[/autor]",
+      "correct": 1,
+      "edition_id": 479842,
+      "isbn": "978-5-0000-0000-0",
+      "name": "Записки врача-гипнотизера",
+      "notes": "Сдано в набор 25 августа 1977 г. Подписано к печати 27 января 1978 г.\r\nЗаказ № 57. Цена 75 коп.\r\n\r\n",
+      "plan_date": "",
+      "publisher": "[pub=355]Западно-Сибирское книжное издательство[/pub]",
+      "series": "",
+      "year": 1978
+    },
+    {
+      "autors": "[autor=143154]Жан Распай[/autor]",
+      "correct": 1,
+      "edition_id": 483420,
+      "isbn": "978-5-0000-0000-0",
+      "name": "Стан Святых",
+      "notes": "",
+      "plan_date": "",
+      "publisher": "Imperium Scriptorum",
+      "series": "",
+      "year": 2025
+    }
+  ],
+  "total_found": 9
+}

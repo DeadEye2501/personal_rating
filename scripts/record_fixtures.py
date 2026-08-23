@@ -68,6 +68,16 @@ KINO_DEEZER = 4505880
 # Занятость Google: тот же код, что у old-games.ru, и лечится так же.
 BUSY_GB = 503
 
+# ISBN, которыми спрашивается запасной источник обложек. Первый — «Пикник на
+# обочине», издание с одним номером. Второй — «Властелин Колец», у которого в
+# строке два номера разом: переиздание в двух странах. Третий — тот самый чужой
+# номер Google: числится за «Властелином Колец», а ведёт на «Снежный сон»
+# Трониной. Четвёртый выдуман по форме и не находится ни у кого.
+PICNIC_ISBN = "978-5-17-082983-5"
+RINGS_ISBN = "978-5-271-46168-2"
+FOREIGN_ISBN = "978-5-04-168446-4"
+NOWHERE_ISBN = "978-5-00-000000-0"
+
 
 def save(source: str, case: str, response: httpx.Response) -> None:
     folder = OUT / source
@@ -343,6 +353,22 @@ async def record_deezer(client: httpx.AsyncClient) -> None:
         f"{base}/artist/{KINO_DEEZER}/albums", params={"limit": 5}))
 
 
+async def record_fantlab(client: httpx.AsyncClient) -> None:
+    """Ключа FantLab не требует, и берётся у него одно — поиск издания по ISBN.
+
+    Ручку самого издания не пишем: клиент её не зовёт вовсе — адрес картинки
+    собирается из номера издания по образцу."""
+    print("FantLab")
+    base = "https://api.fantlab.ru/search-editions"
+
+    for case, isbn in (("search_exact_isbn", PICNIC_ISBN),
+                       ("search_by_isbn", RINGS_ISBN),
+                       ("search_foreign_isbn", FOREIGN_ISBN),
+                       ("search_nothing", NOWHERE_ISBN)):
+        save("fantlab", case,
+             await client.get(base, params={"q": isbn, "page": 1}))
+
+
 async def main() -> None:
     load_dotenv(ROOT / ".env")
     config = load_config(os.environ, ROOT)
@@ -353,6 +379,7 @@ async def main() -> None:
         await record_gog(client)
         await record_oldgames(client)
         await record_deezer(client)
+        await record_fantlab(client)
 
         pairs = (
             ("TMDB", config.tmdb_key, record_tmdb),

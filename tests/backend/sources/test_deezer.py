@@ -9,6 +9,7 @@
 Тем же способом отличает отсутствие Steam: `success` внутри `200`."""
 
 from contextlib import aclosing
+from datetime import timedelta
 
 import httpx
 
@@ -26,7 +27,7 @@ from backend.model import (
 from backend.sources.deezer.client import ALL_ALBUMS, DeezerClient
 from backend.sources.deezer.parse import parse_albums, parse_artists, parse_card
 from backend.sources.http import SourceHttp
-from tests.conftest import counting, responding
+from tests.conftest import FakeClock, counting, responding
 
 # Отказ по частоте записать нечем: он приходит только на волну одновременных
 # запросов. Тело — дословно замеренное 22.08.2026.
@@ -190,6 +191,64 @@ async def test_an_unknown_error_code_is_not_taken_for_absence():
     assert isinstance(answer, Refusal) and answer.reason is Reason.BROKEN
 
 
+async def test_the_source_speaks_again_a_minute_after_a_rate_refusal():
+    """Срок отката назван минутой, и это замер, а не догадка: 120 запросов
+    подряд за 16.5 с проходят целиком, срывается только залп одновременных —
+    Deezer отпускает за секунды.
+
+    Наблюдается следствием, а не числом в отказе: до минуты источник молчит,
+    после — отвечает снова. Возьми клиент суточный срок, как у квоты Google, и
+    музыка пропала бы из поиска до полуночи из-за одного залпа."""
+    clock = FakeClock()
+    http = SourceHttp("deezer", clock=clock, transport=responding(json=BUSY_BODY))
+
+    async with aclosing(DeezerClient(http)) as one:
+        await one.card("54717452", Kind.MUSIC)
+
+        assert http.breaker.is_open()
+        clock.advance(timedelta(seconds=59))
+        assert http.breaker.is_open(), "источник открылся раньше срока"
+        clock.advance(timedelta(seconds=2))
+        assert not http.breaker.is_open(), "источник молчит дольше минуты"
+
+
+async def test_the_body_decides_before_the_code():
+    """Порядок «сначала тело, потом код» — всё содержание этого клиента, и
+    наблюдается он только там, где тело и код говорят разное.
+
+    Свидетель — отказ по частоте под чужим кодом: разберись код первым, и
+    вместо `RATE` приехал бы `BROKEN`, а предохранитель не взвёлся бы вовсе —
+    то есть следующая карточка прокрутки пошла бы в тот же залп."""
+    http = SourceHttp("deezer", transport=responding(500, json=BUSY_BODY))
+
+    async with aclosing(DeezerClient(http)) as one:
+        answer = await one.card("54717452", Kind.MUSIC)
+
+    assert isinstance(answer, Refusal) and answer.reason is Reason.RATE
+    assert http.breaker.is_open(), "предохранитель не взведён"
+
+
+async def test_an_error_that_is_not_an_object_becomes_a_refusal():
+    """Форма ошибки у Deezer объявлена объектом, и все замеренные такие. Придёт
+    строкой — классифицировать нечем, и это отказ, а не исключение: `error.get`
+    уронил бы `AttributeError` мимо обеих обёрток, и через границу потоков
+    ушла бы трассировка вместо названной жалобы."""
+    answer = await carded(responding(json={"error": "перегрев"}))
+
+    assert isinstance(answer, Refusal) and answer.reason is Reason.BROKEN
+    assert answer.detail.startswith("ошибка не объект"), answer.detail
+
+
+async def test_a_body_that_is_not_an_object_becomes_a_refusal():
+    """То же самое ярусом выше: разобравшееся тело бывает и списком — так
+    отвечает прокси, подставивший свой ответ. `payload.get` уронил бы
+    `AttributeError` там, где ловить его некому."""
+    answer = await carded(responding(json=[{"id": 1}]))
+
+    assert isinstance(answer, Refusal) and answer.reason is Reason.BROKEN
+    assert answer.detail == "тело не объект", answer.detail
+
+
 async def test_the_search_asks_the_album_handle(fixture):
     """Адрес и доводы запроса — то, чего не сторожит ни один разбор: подмени
     путь, и все проверки разбора останутся зелёными, а живой поиск замолчит.
@@ -284,6 +343,17 @@ async def test_the_albums_of_an_artist_come_by_identity(fixture):
     # 23.08.2026, у Мадонны 25 из 72. Порции у этого жеста нет ни в бэкенде, ни
     # на странице, и до обрезанного хвоста человек не добрался бы ничем.
     assert asked[0].url.params.get("limit") == str(ALL_ALBUMS)
+
+
+def test_a_row_of_an_artist_album_carries_its_year(fixture):
+    """Год в строке выдачи есть у одной ручки из двух: у альбомов исполнителя
+    он стоит у каждой строки, а в поиске его нет вовсе — замерено 23.08.2026.
+
+    Читается он поэтому по наличию, и без него карточка «Легенды» показалась бы
+    человеку без года, хотя источник его назвал."""
+    rows = parse_albums(fixture("deezer/artist_albums_kino.json"))
+
+    assert [one.year for one in rows][:3] == [2025, 2022, 2021]
 
 
 def test_an_artist_row_carries_the_identity_and_nothing_else(fixture):

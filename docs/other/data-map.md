@@ -404,6 +404,7 @@
 - `_SIGNATURES` = `набор из 3`
 - `_ABSENT` = `404`
 - `POSTER_SOURCES` = `набор из 6`
+- `LENDERS` = `словарь из 1`
 
 ### `backend/service/relevance.py`
 
@@ -486,6 +487,7 @@
 
 - `_GENERAL` = `'General'`
 - `_COVERS` = `набор из 5`
+- `_SMALLER_FIRST` = `набор из 4`
 - `_PUBLISHER` = `'/books/publisher/content'`
 
 ### `backend/sources/http.py`
@@ -865,6 +867,10 @@
 - `NO_GENRE_DEEZER` = `5752371`
 - `KINO_DEEZER` = `4505880`
 - `BUSY_GB` = `503`
+- `PICNIC_ISBN` = `'978-5-17-082983-5'`
+- `RINGS_ISBN` = `'978-5-271-46168-2'`
+- `FOREIGN_ISBN` = `'978-5-04-168446-4'`
+- `NOWHERE_ISBN` = `'978-5-00-000000-0'`
 
 ## tests
 
@@ -878,7 +884,12 @@
 
 ### `tests/backend/sources/test_fantlab.py`
 
-- `PICNIC` = `словарь из 2`
+- `PICNIC_ISBN` = `'978-5-17-082983-5'`
+- `RINGS_ISBN` = `'978-5-271-46168-2'`
+- `RINGS_SECOND_ISBN` = `'978-985-18-1698-5'`
+- `FOREIGN_ISBN` = `'978-5-04-168446-4'`
+- `OTHER_ISBN` = `'978-5-17-078696-1'`
+- `NOWHERE_ISBN` = `'978-5-00-000000-0'`
 
 ### `tests/backend/sources/test_gog.py`
 
@@ -1016,7 +1027,7 @@
 
 ### `tests/backend/test_search.py`
 
-- `PICNIC` = `словарь из 2`
+- `PICNIC` = `recorded('fantlab/search_exact_isbn.json')`
 
 ### `tests/backend/test_series_refresh.py`
 

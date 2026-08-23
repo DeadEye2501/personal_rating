@@ -316,6 +316,21 @@ async def test_every_poster_source_got_its_own_named_client(offline):
     assert len(named) == len(POSTER_SOURCES)
 
 
+async def test_the_built_backend_downloads_a_lent_cover_by_its_own_client(offline):
+    """Боевая сборка, а не двойник: соединение под чужой адрес заводится в
+    `app.py`, и тесты сервиса обложек со своими клиентами до неё не добираются.
+
+    Не заведись оно — обложка с fantlab.ru поехала бы постерным соединением
+    Google, и сетевая беда на одном сайте закрывала бы обложки другого."""
+    answer = await offline.posters.fetch(
+        Source.GOOGLE_BOOKS, "https://fantlab.ru/images/editions/orig/7",
+        Kind.BOOK)
+
+    assert isinstance(answer, Refusal)
+    assert answer.reason is Reason.NETWORK, "транспорт не доехал до заимодавца"
+    assert "fantlab" in answer.source, f"отказ назвал не того: {answer.source}"
+
+
 async def test_the_built_backend_asks_google_for_books(offline):
     """Боевая сборка, а не двойник: разъедься имя постерного соединения со
     значением `Source`, и книга осталась бы без обложки при зелёном наборе, а

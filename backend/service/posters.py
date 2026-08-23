@@ -3,6 +3,7 @@
 import logging
 from collections.abc import Mapping
 from datetime import datetime
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -10,6 +11,8 @@ from backend.model import BadImage, Kind, Reason, Refusal, Source
 from backend.service.asking import answered
 from backend.service.images import already_shaped, crop_to_cover
 from backend.sources.errors import refuse_code
+from backend.sources.fantlab.client import ORIGINAL
+from backend.sources.fantlab.client import SOURCE as FANTLAB
 from backend.sources.http import SourceHttp
 from backend.storage.posters import PosterStore
 
@@ -31,14 +34,40 @@ _ABSENT = 404
 POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG, Source.OLD_GAMES,
                   Source.GOOGLE_BOOKS, Source.DEEZER)
 
+# Чей адрес качается не соединением источника карточки. Обложку книге ищет
+# FantLab, а карточка приезжает от Google — и в самой карточке от чужого
+# каталога не остаётся ни следа, так что различить их можно только по хозяину
+# адреса.
+#
+# Своё соединение ему нужно по двум причинам сразу: одна сетевая беда на
+# fantlab.ru иначе закрывала бы на пятнадцать секунд все книжные обложки,
+# включая гугловые, — а без обложки книга не заводится вовсе, — и плашка
+# называла бы человеку не тот источник. Предохранитель у него при этом свой:
+# соединений к сайту два, и то, которым ищут издание, живёт у самого клиента.
+#
+# Хост берётся из адреса самого клиента, а не пишется здесь строкой: разойдись
+# они — и починка отменилась бы молча, адрес поехал бы прежним чужим
+# соединением при зелёном наборе.
+LENDERS = {urlsplit(ORIGINAL).hostname: FANTLAB}
+
+
+def _owner_of(url: str, source: Source) -> str:
+    """Чьё соединение качает этот адрес: обычно источника карточки, а у
+    одолженной обложки — того, на чьём сайте она лежит."""
+    return LENDERS.get(urlsplit(url).hostname or "", str(source))
+
 
 class PosterService:
     """Обложка едет от того же источника, что и карточка, и карточка её ждёт:
     не скачалась — не пишем ничего, повторим при следующем показе."""
 
-    def __init__(self, clients: Mapping[Source, SourceHttp],
+    def __init__(self, clients: Mapping[str, SourceHttp],
                  store: PosterStore) -> None:
-        self._clients = dict(clients)
+        # Ключ — имя источника строкой, а не значение `Source`: у заимодавца
+        # обложек своего значения там нет и быть не может — карточек он не
+        # приносит. `Source` при этом строка и сама, так что зовущие передают
+        # его как есть.
+        self._clients = {str(name): one for name, one in clients.items()}
         self._store = store
 
     async def fetch(self, source: Source, url: str,
@@ -52,7 +81,7 @@ class PosterService:
         карточки и привязка, — и двое последних публичные, то есть за границей
         потоков, где второго канала для исключения нет."""
         return await answered(self._fetched(source, url, kind),
-                              self._name(source))
+                              self._name(_owner_of(url, source)))
 
     async def _fetched(self, source: Source, url: str,
                        kind: Kind) -> bytes | None | Refusal:
@@ -60,19 +89,20 @@ class PosterService:
             # Обложки нет в самом источнике — ждать нечего.
             return None
 
-        client = self._clients.get(source)
+        owner = _owner_of(url, source)
+        client = self._clients.get(owner)
         if client is None:
-            logger.warning("постер: нет клиента для источника %s", source)
-            return self._refuse(source, f"нет клиента для {source}")
+            logger.warning("постер: нет клиента для источника %s", owner)
+            return self._refuse(owner, f"нет клиента для {owner}")
 
         response = await client.get(url)
         if not isinstance(response, httpx.Response):
             # Отказ клиента уходит наверх своей причиной: сеть, квота и частота
             # решаются там по-разному.
             return response
-        return self._picture(source, url, response, kind)
+        return self._picture(owner, url, response, kind)
 
-    def _picture(self, source: Source, url: str, response: httpx.Response,
+    def _picture(self, owner: str, url: str, response: httpx.Response,
                  kind: Kind) -> bytes | None | Refusal:
         if response.status_code == _ABSENT:
             # Обложки по этому адресу нет, и не будет: карточка живёт без неё,
@@ -88,7 +118,7 @@ class PosterService:
 
         if response.status_code != 200:
             logger.warning("постер %s: HTTP %s", url, response.status_code)
-            return refuse_code(self._name(source), response.status_code)
+            return refuse_code(self._name(owner), response.status_code)
 
         if not response.content.startswith(_SIGNATURES):
             # Читается подпись формата, а не разбирается картинка. CDN,
@@ -98,7 +128,7 @@ class PosterService:
             # подписи у пустоты нет.
             logger.warning("постер %s: тело не изображение, %s байт",
                            url, len(response.content))
-            return self._refuse(source, "тело не изображение")
+            return self._refuse(owner, "тело не изображение")
 
         if already_shaped(response.content, kind):
             # Пришло в нашей форме — не трогаем: перекодировать значит потерять
@@ -119,19 +149,19 @@ class PosterService:
             # файл. Отказ, а не пустота: «обложки нет» отменило бы повтор при
             # следующем показе.
             logger.warning("постер %s: не обрезалась, %s", url, error)
-            return self._refuse(source, "картинка не разобралась")
+            return self._refuse(owner, "картинка не разобралась")
 
     @staticmethod
-    def _name(source: Source) -> str:
+    def _name(owner: str) -> str:
         """Имя отказа собирается из источника, а не берётся у клиента: клиентов
         зовёт тот, кто их создал, а различать отказы надо по источнику."""
-        return f"poster:{source}"
+        return f"poster:{owner}"
 
-    def _refuse(self, source: Source, detail: str) -> Refusal:
+    def _refuse(self, owner: str, detail: str) -> Refusal:
         """Отказ по причине, которую кодом не выразить. Отказ по коду собирает
         общий `refuse_code` — фраза `HTTP <код>` лежит там одним местом на всех,
         кто её пишет."""
-        return Refusal(source=self._name(source), reason=Reason.BROKEN,
+        return Refusal(source=self._name(owner), reason=Reason.BROKEN,
                        detail=detail)
 
     async def poster_for(self, item_id: int | None, source: Source, url: str,

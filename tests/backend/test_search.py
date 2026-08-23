@@ -22,11 +22,12 @@ from backend.model import (
 from backend.service.search import SEARCH_SIZE
 from backend.sources.fantlab.client import FantLabClient
 from backend.sources.http import SourceHttp
-from tests.conftest import MOMENT, FakeSearch, hit
+from tests.builders import recorded
+from tests.conftest import MOMENT, FakeSearch, counting, hit, responding
 
-PICNIC = {"matches": [{"edition_id": "118084", "isbn": "978-5-17-082983-5",
-                       "name": "Пикник на обочине", "year": 2014}],
-          "total_found": 1}
+# Записанный ответ FantLab, а не его копия по месту: рукописная разошлась бы с
+# фикстурой молча — как уже разошлась, `edition_id` там был строкой.
+PICNIC = recorded("fantlab/search_exact_isbn.json")
 
 
 
@@ -654,6 +655,29 @@ async def test_a_book_the_spare_source_does_not_know_stays_bare(sessions, servic
 
     assert result.views[0].poster_url == ""
     assert result.refusals == ()
+
+
+async def test_a_book_that_already_has_a_cover_asks_nobody(sessions, service):
+    """Обложка добывается на стороне только тем, у кого её нет: у Google
+    картинка есть у большинства английских изданий, и спрашивать про них чужой
+    каталог значит слать порцию лишних запросов на каждый поиск — а показать
+    всё равно нечего нового.
+
+    Свидетелем — счётчик запросов: адрес строки при лишнем походе остался бы
+    прежним, потому что своя обложка сильнее, и подмена прошла бы молча."""
+    dressed = hit("VOL1", "Пикник на обочине", kind=Kind.BOOK,
+                  source=Source.GOOGLE_BOOKS,
+                  poster_url="https://books.google.com/c?id=1",
+                  external_ids=(ExternalId(IdSource.ISBN, "9785170829835"),))
+    transport, seen = counting(responding(json=PICNIC))
+    search = service(FakeSearch(Found([dressed])),
+                     covers=FantLabClient(
+                         SourceHttp("fantlab", transport=transport)))
+
+    result = await search.external(Kind.BOOK, "пикник на обочине")
+
+    assert result.views[0].poster_url == "https://books.google.com/c?id=1"
+    assert seen == [], "обложку искали тому, у кого она есть"
 
 
 async def test_a_film_asks_no_spare_source(sessions, service):

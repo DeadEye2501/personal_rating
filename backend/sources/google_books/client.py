@@ -2,6 +2,7 @@
 
 import logging
 from collections.abc import Callable
+from datetime import date
 from typing import ClassVar
 
 import httpx
@@ -62,10 +63,13 @@ class GoogleBooksClient:
     def __init__(self, http: SourceHttp, api_keys: tuple[str, ...]) -> None:
         self._http = http
         self._keys = api_keys
-        # Номер ключа, которым спрашивают сейчас. Двигается только вперёд:
-        # исчерпанный за сутки не оживёт до полуночи, и возвращаться к нему
-        # значит тратить на `429` по походу в сеть с каждого запроса.
+        # Номер ключа, которым спрашивают сейчас, и сутки, на которые он
+        # исчерпан. Внутри суток номер двигается только вперёд: исчерпанный
+        # ключ до полуночи не оживёт, и возвращаться к нему значит тратить на
+        # `429` по походу в сеть с каждого запроса. В полночь оживает и он —
+        # квота суточная, — а окно приложения живёт открытым сутками.
         self._at = 0
+        self._day: date | None = None
 
     @property
     def name(self) -> str:
@@ -108,12 +112,13 @@ class GoogleBooksClient:
         повторяется тем же вызовом, а отказом `429` становится только у
         последнего ключа."""
         while True:
+            self._forget_yesterday()
             asked_with = self._at
             response = await asked_until_free(
                 self._http, url, {"key": self._key, **extra})
             if not isinstance(response, httpx.Response):
                 return response
-            if response.status_code == 429 and self._next_key(asked_with):
+            if response.status_code == 429 and self._another_key(asked_with):
                 continue
             verdict = self._verdict(response)
             if verdict is not None:
@@ -128,17 +133,34 @@ class GoogleBooksClient:
         что при негодном."""
         return self._keys[self._at] if self._at < len(self._keys) else ""
 
-    def _next_key(self, asked_with: int) -> bool:
-        """Перейти к запасному ключу — если он есть и если его не взял сосед.
+    def _another_key(self, asked_with: int) -> bool:
+        """Есть ли чем повторить запрос, ответивший «квота кончилась».
 
-        Довод про соседа не теоретический: карточки грузятся разом, и на
-        исчерпанной квоте `429` приходит сразу нескольким запросам. Сдвинь
-        каждый — и второй ключ перешагнули бы, не спросив им ничего."""
-        if asked_with != self._at or self._at + 1 >= len(self._keys):
+        Сосед мог сдвинуть номер раньше нас: карточки грузятся разом, и на
+        исчерпанной квоте `429` приходит сразу нескольким запросам. Тогда
+        сдвигать нечего — запасной уже стоит, — а повторить надо им же.
+        Сдвинь номер и здесь, и запрос перешагнул бы через запасной: у пары
+        ключей он спросил бы пустой строкой и прочёл «ключ не принят». Откажи —
+        и вышло бы хуже: отказ по квоте закрывает источник до полуночи, а
+        значит и повтор соседа получил бы «предохранитель взведён»."""
+        if asked_with != self._at:
+            return True
+        if self._at + 1 >= len(self._keys):
             return False
         self._at += 1
         logger.info("%s: суточная квота ключа исчерпана, беру запасной", SOURCE)
         return True
+
+    def _forget_yesterday(self) -> None:
+        """Новые сутки — снова с первого ключа: суточная квота у него сброшена
+        вместе с квотой последнего.
+
+        Сутки считаются теми же часами, что и срок предохранителя (`clock` у
+        соединения, местное время): своих у ключа быть не должно — иначе
+        источник открылся бы раньше, чем оживает ключ, или наоборот."""
+        today = self._http.clock().date()
+        if today != self._day:
+            self._at, self._day = 0, today
 
     async def search(self, query: str, kind: Kind, offset: int = 0) -> Outcome:
         return await self._taken(BASE, "выдача поиска не разобралась",
