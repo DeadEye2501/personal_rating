@@ -29,8 +29,9 @@ revision: str = "0003"
 down_revision: str | None = "0002"
 
 # Тем же порядком и теми же именами, что в `0002`: сторож справочника читает
-# `BOOKS` у обеих ревизий одинаково.
-BOOKS = (
+# `RULE_BOOKS` у обеих ревизий одинаково. Имя про **книги правил**, а не про
+# книжный тип содержимого: у `0002` под ним лежат кино и игры.
+RULE_BOOKS = (
     ("google_books", GOOGLE_BOOKS, "book"),
     ("deezer", DEEZER, "music"),
 )
@@ -69,7 +70,7 @@ def _seed_genres(connection) -> None:
             )
             ids[(kind, name)] = result.lastrowid
 
-    for source, rules, kind in BOOKS:
+    for source, rules, kind in RULE_BOOKS:
         for rule in rules:
             result = connection.execute(
                 sa.text(

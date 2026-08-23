@@ -20,4 +20,4 @@ class Suggestion:
     name: str
     hint: str
     hint_item_id: int | None
-    hint_kind: Kind | None = None
+    hint_kind: Kind | None

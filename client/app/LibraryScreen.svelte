@@ -11,7 +11,7 @@
   import { requestOf } from '$state/section.js'
   import { flipped, swept } from '$state/session.js'
   import { aspected, scored, wished } from './marks.js'
-  import { refreshed, without } from './reread.js'
+  import { NOT_REREAD, again, without } from './reread.js'
   import { complaining } from './trouble.js'
   import { onCardShown } from './visible.js'
 
@@ -114,13 +114,13 @@
 
   /** Все три эффекта ниже слушают **только** свой сигнал: `views` они и читают,
    *  и пишут, а такой круг проект уже ловил — эффект по своему же списку не
-   *  кончается никогда.
-   *
-   *  Записанной заново в списке может не быть — тогда перечитывать нечего, она
-   *  придёт со следующей порцией. */
+   *  кончается никогда. */
   $effect(() => {
-    const done = saved
-    if (done) untrack(() => again(done))
+    const stored = saved
+    if (stored) {
+      untrack(() => again(views, stored, ops, (fresh) => patch(fresh, fresh))
+        ?.catch((error) => lost(error, NOT_REREAD)))
+    }
   })
 
   // Записанная рецензия правит свою строку на месте: перечитывать ради неё
@@ -139,12 +139,6 @@
     if (gone?.item_id) untrack(() => { views = without(views, gone) })
   })
 
-  function again(done) {
-    if (!views.some((each) => each.item_id === done.item_id)) return
-
-    refreshed(done, ops, (fresh) => patch(fresh, fresh))
-      .catch((error) => lost(error, 'Не удалось перечитать карточку'))
-  }
 </script>
 
 <Feed views={cards} {expected} {root} collapsed={session.collapsed} onmore={more}

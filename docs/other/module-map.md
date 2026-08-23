@@ -682,7 +682,7 @@
 
 - `def _genre_mark(path: str) -> str` (10)
 - `def _marks(info: dict) -> tuple[tuple[GenreSource, str], ...]` (6)
-- `def covers(links: dict) -> list[str]` (3)
+- `def _covers(links: dict) -> list[str]` (3)
 - `def _poster(info: dict) -> str` (35)
 - `def _owned_by(asked: set[str], authors: list[str]) -> bool` (5)
 - `def parse_by_author(payload: dict, name: str) -> list[SearchHit]` (23)
@@ -1585,7 +1585,7 @@
 - `def _marks(connection, rule_id: int, rule) -> None` (10)
 - `def downgrade() -> None` (5)
 
-### `migrations/versions/0003_tracks.py` — 97 строк
+### `migrations/versions/0003_tracks.py` — 98 строк
 
 Треки альбома и справочник жанров книг и музыки.
 
@@ -1646,7 +1646,7 @@
 - `async def record_fantlab(client: httpx.AsyncClient) -> None` (14)
 - `async def main() -> None` (28)
 
-## tests — 110 модулей
+## tests — 112 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1680,13 +1680,16 @@
 - `def found(*pairs) -> Found` (4)
 - `async def stored_ratings(sessions, item_id) -> dict` (3)
 
-### `tests/backend/sources/conftest.py` — 82 строк
+### `tests/backend/sources/conftest.py` — 122 строк
 
-Записанные ответы источников: живьём тесты не ходят никуда.
+Общее для проверок источников: тела ответов и строители клиентов.
 
-Зависит от: `tests.builders`
+Зависит от: `backend.sources.http`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.builders`
 
+- `def unofficial(transport) -> UnofficialClient` (8)
 - `def _meta(relative: str) -> dict` (3)
+- `def keys_of_google(exhausted: str, delay: float=0.0)` (24)
+  - `async def handler(request: httpx.Request) -> httpx.Response` (8)
 - `def fixture()` (3)
 - `def meta()` (2)
 - `def gog_catalog()` (21)
@@ -1713,7 +1716,7 @@
 Тестов: 14
 
 
-### `tests/backend/sources/test_deezer.py` — 418 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_deezer.py` — 423 строк ⚠ подошёл к 300
 
 Deezer: восьмой источник и единственный, откуда приходит музыка.
 
@@ -1754,17 +1757,26 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def client(handler) -> GogClient` (2)
 
-### `tests/backend/sources/test_google_books.py` — 744 строк ⚠ за пределом 500
+### `tests/backend/sources/test_google_books.py` — 405 строк ⚠ подошёл к 300
 
 Google Books: седьмой источник и единственный, откуда приходят книги.
 
-Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.google_books.client`, `backend.sources.google_books.parse`, `backend.sources.http`, `tests.conftest`
+Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.google_books.client`, `backend.sources.http`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 47
+Тестов: 18
 
 - `def client(transport: httpx.MockTransport) -> GoogleBooksClient` (5)
 - `async def searched(transport: httpx.MockTransport, query: str='дюна')` (3)
 - `async def carded(transport: httpx.MockTransport, source_id: str='-u8-DwAAQBAJ')` (3)
+
+### `tests/backend/sources/test_google_books_parse.py` — 373 строк ⚠ подошёл к 300
+
+Разбор ответов Google Books: строка выдачи, карточка тома, жанры и обложка.
+
+Зависит от: `backend.model`, `backend.sources.google_books.parse`
+
+Тестов: 27
+
 
 ### `tests/backend/sources/test_http.py` — 445 строк ⚠ подошёл к 300
 
@@ -1775,26 +1787,24 @@ Google Books: седьмой источник и единственный, от�
 Тестов: 26
 
 
-### `tests/backend/sources/test_kinopoisk.py` — 360 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_kinopoisk.py` — 356 строк ⚠ подошёл к 300
 
 Кинопоиск: два зеркала под одним именем, и телу здесь верить нельзя.
 
-Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.kinopoisk.poiskkino`, `tests.backend.sources.conftest`, `tests.conftest`
 
 Тестов: 22
 
 - `def primary(transport) -> PoiskkinoClient` (2)
-- `def fallback(transport) -> UnofficialClient` (2)
 
-### `tests/backend/sources/test_kinopoisk_unofficial.py` — 174 строк
+### `tests/backend/sources/test_kinopoisk_unofficial.py` — 171 строк
 
 Запасное зеркало Кинопоиска: оценка, отказы и дозапрос карточки.
 
-Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.conftest`
+Зависит от: `backend.model`, `backend.sources.http`, `backend.sources.ratings.kinopoisk.mirror`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.backend.sources.conftest`, `tests.conftest`
 
 Тестов: 11
 
-- `def fallback(transport) -> UnofficialClient` (2)
 
 ### `tests/backend/sources/test_mdblist.py` — 255 строк
 
@@ -1841,17 +1851,17 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 428 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_registry.py` — 451 строк ⚠ подошёл к 300
 
 Реестр держится на том, что контракт у всех клиентов один.
 
-Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `backend.unique`, `tests.conftest`
+Зависит от: `backend.config`, `backend.model`, `backend.sources.build`, `backend.sources.gog.client`, `backend.sources.oldgames.client`, `backend.sources.ratings.kinopoisk.client`, `backend.sources.ratings.mdblist.client`, `backend.sources.ratings.omdb.client`, `backend.sources.registry`, `backend.sources.steam.client`, `backend.sources.tmdb.client`, `backend.unique`, `tests.backend.sources.conftest`, `tests.conftest`
 
-Тестов: 26
+Тестов: 27
 
 - `def sources()` (4)
 - `async def registry()` (9)
-- `def keyed()` (13)
+- `def keyed()` (14)
 - `def watching_keys() -> tuple[httpx.MockTransport, dict]` (20)
   - `def handler(request: httpx.Request) -> httpx.Response` (11)
 
@@ -1988,13 +1998,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 6
 
 
-### `tests/backend/test_credits.py` — 384 строк ⚠ подошёл к 300
+### `tests/backend/test_credits.py` — 407 строк ⚠ подошёл к 300
 
 Люди и студии: одна реализация на две сущности, и различает их идентичность.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.library`
 
-Тестов: 28
+Тестов: 29
 
 
 ### `tests/backend/test_dangling.py` — 55 строк
@@ -2310,13 +2320,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def boundary_dataclasses()` (15)
 - `def boundary_denials()` (14)
 
-### `tests/backend/test_naming.py` — 176 строк
+### `tests/backend/test_naming.py` — 186 строк
 
 Как имя пишется у нас: первая буква заглавная, остальное от источника.
 
-Зависит от: `backend.model`, `backend.naming`, `backend.storage.entity`, `backend.storage.repository.credits`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.tracks`, `backend.storage.tables`, `tests.builders`, `tests.conftest`
+Зависит от: `backend.model`, `backend.naming`, `backend.storage.entity`, `backend.storage.repository.credits`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.tracks`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 9
+Тестов: 10
 
 
 ### `tests/backend/test_offline.py` — 500 строк ⚠ подошёл к 300
@@ -2372,13 +2382,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_publishers.py` — 263 строк
+### `tests/backend/test_publishers.py` — 302 строк ⚠ подошёл к 300
 
 Издательство книги: разбор строки и узнавание написаний.
 
 Зависит от: `backend.model`, `backend.publishers`, `backend.storage.entity`, `backend.storage.repository.credits`
 
-Тестов: 26
+Тестов: 28
 
 
 ### `tests/backend/test_ratings.py` — 358 строк ⚠ подошёл к 300
@@ -2402,7 +2412,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def row(title: str, *, original_title: str='', aliases: tuple[str, ...]=()) -> SearchHit` (5)
 - `def book(title: str) -> SearchHit` (3)
 
-### `tests/backend/test_removed.py` — 309 строк ⚠ подошёл к 300
+### `tests/backend/test_removed.py` — 310 строк ⚠ подошёл к 300
 
 Удалённое не возвращается: карточка уходит, а память о ней остаётся.
 
@@ -2410,8 +2420,6 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 Тестов: 19
 
-- `async def removed(sessions)` (2)
-- `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 - `async def rows(engine) -> list[tuple]` (7)
 
 ### `tests/backend/test_rescale.py` — 172 строк
@@ -2426,16 +2434,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def stored_mark(sessions) -> int` (3)
 - `async def built_on(tmp_path, scale: str)` (6)
 
-### `tests/backend/test_restore.py` — 149 строк
+### `tests/backend/test_restore.py` — 138 строк
 
 Список убранного: шесть слов в строке поиска показывают его вместо выдачи.
 
-Зависит от: `backend.model`, `backend.storage.repository.removed`, `tests.conftest`, `tests.wiring`
+Зависит от: `backend.model`, `tests.conftest`, `tests.wiring`
 
 Тестов: 8
 
-- `async def removed(sessions)` (2)
-- `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM)` (3)
 
 ### `tests/backend/test_search.py` — 694 строк ⚠ за пределом 500
 
@@ -2594,12 +2600,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/bridge/conftest.py` — 203 строк
+### `tests/bridge/conftest.py` — 211 строк
 
 Двойники бэкенда и потоки на них.
 
-Зависит от: `bridge.thread`
+Зависит от: `backend.model`, `bridge.thread`
 
+- `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (5)
 - `class FakeBackend` (66)
   - `async def echo(self, value)` (2)
   - `async def where(self)` (2)
@@ -2676,6 +2683,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
+### `tests/bridge/test_bridge_person.py` — 85 строк
+
+Мост: выдача по клику на имя — тот же поиск, но одной заявкой.
+
+Зависит от: `backend.model`, `bridge.search`, `tests.bridge.conftest`
+
+Тестов: 5
+
+
 ### `tests/bridge/test_bridge_refs.py` — 134 строк
 
 Мост: справочники — жанры, люди, студии.
@@ -2685,15 +2701,14 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 11
 
 
-### `tests/bridge/test_bridge_search.py` — 502 строк ⚠ за пределом 500
+### `tests/bridge/test_bridge_search.py` — 464 строк ⚠ подошёл к 300
 
 Мост: поиск — своё, чужое, складывание, заведение найденного.
 
 Зависит от: `backend.model`, `backend.model.results`, `bridge.search`, `tests.bridge.conftest`
 
-Тестов: 26
+Тестов: 22
 
-- `def a_view(source_id, item_id=None, title='Одиссея', source=Source.TMDB)` (3)
 - `def portions(answers, *given)` (10)
   - `def handler(*_args, **_kwargs)` (2)
 
@@ -2786,7 +2801,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 15
 
 
-### `tests/builders.py` — 177 строк
+### `tests/builders.py` — 187 строк
 
 Строители данных для тестов: карточки, кандидаты, картинки, записанное.
 
@@ -2800,16 +2815,17 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def hit(source_id: str='157336', title: str='Интерстеллар', **fields) -> SearchHit` (16)
 - `def row(source: Source, source_id: str, title: str, **fields) -> SearchHit` (8)
 - `def titles(answers: list[list[SearchHit]]) -> list[str]` (3)
+- `def a_game(source_id: str='38410', title: str='Fallout 2', source: Source=Source.STEAM) -> Item` (8)
 - `def film_card(**overrides) -> SourceCard` (17)
 - `def album_card(source_id: str='54717452', **overrides) -> SourceCard` (17)
 
-### `tests/conftest.py` — 266 строк
+### `tests/conftest.py` — 276 строк
 
 Фикстуры тестов и поверхность общего.
 
-Зависит от: `backend.config`, `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
+Зависит от: `backend.config`, `backend.model`, `backend.storage.posters`, `backend.storage.repository.library`, `backend.storage.repository.removed`, `backend.storage.repository.sections`, `backend.storage.session`, `backend.storage.tables`, `tests.alembic_runner`, `tests.builders`, `tests.fakes`, `tests.wiring`
 
-Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `UNSHAPED`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `album_card`, `an_item`, `film_card`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `size_of`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
+Отдаёт наружу: `LATER`, `MOMENT`, `PICTURE`, `POSTER`, `POSTER_SOURCES`, `UNSHAPED`, `FakeCatalog`, `FakeClient`, `FakeClock`, `FakeSearch`, `FakeSources`, `a_game`, `album_card`, `an_item`, `film_card`, `capture`, `card_parts`, `counting`, `hit`, `picture`, `size_of`, `poster_service`, `rated`, `recorded`, `responding`, `unreachable`
 
 - `def ours(caplog) -> list[str]` (8)
 - `async def film_genres(engine) -> None` (13)
@@ -2820,6 +2836,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def reference(engine)` (23)
 - `async def sessions(engine)` (4)
 - `async def posters(tmp_path)` (6)
+- `async def removed(sessions)` (4)
 - `async def card(sessions)` (11)
   - `async def make(kind: Kind=Kind.MOVIE, source_id: str='1', title: str='карточка') -> int` (5)
 - `async def stored(engine)` (12)

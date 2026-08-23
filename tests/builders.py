@@ -139,6 +139,16 @@ def titles(answers: list[list[SearchHit]]) -> list[str]:
     return [one.title for answer in answers for one in answer]
 
 
+def a_game(source_id: str = "38410", title: str = "Fallout 2",
+           source: Source = Source.STEAM) -> Item:
+    """Игра из магазина: тип и источник у неё те, ради которых её и заводят —
+    память об убранном и возврат убранного проверяются на играх.
+
+    Здесь, а не в модулях проверок: их двое, и своими копиями они разъехались бы
+    молча."""
+    return an_item(source_id, title, kind=Kind.GAME, source=source)
+
+
 def film_card(**overrides) -> SourceCard:
     """Фильм из TMDB — карточка, приезжающая от источника.
 

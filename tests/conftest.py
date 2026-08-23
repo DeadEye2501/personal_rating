@@ -21,6 +21,7 @@ from backend.model import (
 from backend.config import TEN
 from backend.storage.posters import PosterStore
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.sections import SectionsRepository
 from backend.storage.session import (
     create_engine,
@@ -36,6 +37,7 @@ from tests.builders import (
     POSTER,
     UNSHAPED,
     album_card,
+    a_game,
     an_item,
     film_card,
     hit,
@@ -74,6 +76,7 @@ __all__ = [
     "FakeClock",
     "FakeSearch",
     "FakeSources",
+    "a_game",
     "album_card",
     "an_item",
     "film_card",
@@ -235,6 +238,13 @@ async def posters(tmp_path):
     await store.open()
     yield store
     await store.close()
+
+
+@pytest.fixture
+async def removed(sessions):
+    """Память об убранном: её спрашивают двое — список убранного и возврат
+    строки в выдачу."""
+    return RemovedRepository(sessions)
 
 
 @pytest.fixture

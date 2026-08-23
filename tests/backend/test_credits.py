@@ -350,6 +350,29 @@ async def test_companies_work_the_same_way(sessions, card):
     assert isinstance(found[0].role, CompanyRole)
 
 
+async def test_a_close_spelling_sticks_to_the_one_entered_first(sessions):
+    """Близость написаний **не транзитивна**: порог считается от длины пары, и
+    имя, близкое к двум разным записям, придётся к одной из них.
+
+    Выбор назван решением: прилипает к заведённой раньше. Ближайшего искать
+    значило бы считать расстояние там, где сегодня хватает `да/нет`, а на живых
+    именах порог выходит нулевым или единичным — случая этого замер не встретил
+    ни разу.
+
+    Наблюдается номером: переверни перебор, и то же имя приросло бы к
+    заведённой позже — молча, и в базе завелась бы связь не с той студией."""
+    repository = companies(sessions)
+    first = await repository.create("Издательство Доубледай")
+    # Вторая близка и к первой, и к спрошенному написанию — замерено: все три
+    # пары близки взаимно. Без неё выбирать перебору не из чего.
+    await repository.create("Издательство Доубледэй")
+
+    same = await repository.ensure(Credit("Издательство Доублэдей",
+                                          CompanyRole.PUBLISHER))
+
+    assert same == first, "написание приросло к заведённой позже"
+
+
 async def test_companies_have_no_position(sessions, card):
     """У company_credit колонки position нет — просить её нечем."""
     item_id = await card()

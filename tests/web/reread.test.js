@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме проверок.
 import { numbered, textChannel } from '../../client/api/bridge.js'
-import { refreshed, without, withoutText } from '../../client/app/reread.js'
+import { again, without, withoutText } from '../../client/app/reread.js'
 import { fake, slow } from './fake.js'
 
 const own = { item_id: 5, source: 'tmdb', source_id: '157336' }
@@ -41,6 +41,10 @@ describe('удалённая строка уходит из списка', () =>
   })
 })
 
+// Строка из базы **всегда** несёт синопсис — `CardView` объявляет его полем без
+// умолчания, — и в подделке он пустой ровно поэтому: с рядом, у которого поля
+// нет вовсе, снятие `withoutText` не наблюдалось бы ничем.
+
 describe('строка из базы кладётся без пустого синопсиса', () => {
   it('поле снимается, остальные остаются', () => {
     // Лента синопсис не возит вовсе, и положенное доливом пустое поле стёрло бы
@@ -52,16 +56,48 @@ describe('строка из базы кладётся без пустого си
   })
 })
 
+describe('перечитывают только то, что ещё в списке', () => {
+  it('строку списка перечитывает', async () => {
+    const asked = fake({
+      'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
+      'feed.synopsis': { ok: 'про восстание' },
+    })
+    const put = []
+
+    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, [],
+                (view) => put.push(view))
+
+    expect(asked.map(([path]) => path)).toEqual(['feed.views_of', 'feed.synopsis'])
+    expect(put).toHaveLength(1)
+  })
+
+  it('о пропавшей не спрашивает никого', async () => {
+    // Раздел мог смениться, пока запись доезжала до базы: спрашивать базу о
+    // строке, которой на экране нет, значит платить походом за ответ, который
+    // некуда положить. Свидетель — счётчик спрошенного: без него «перечитали
+    // впустую» неотличимо от «не перечитывали».
+    const asked = fake({ 'feed.views_of': { ok: [] }, 'feed.synopsis': { ok: '' } })
+
+    const answer = again([{ item_id: 7 }], { item_id: 5, at: 1 }, [], () => {})
+
+    expect(answer).toBe(null)
+    expect(asked).toEqual([])
+  })
+})
+
 describe('перечитывание одной правленой карточки', () => {
   it('просит именно эту строку и кладёт приехавшую с меткой момента', async () => {
     // Метка едет в `cover`: адрес ручки обложки от содержимого не зависит, а
     // отдаёт она сутки кеша — без метки перезалитая картинка осталась бы
     // прежней и в ленте, и в окне правки.
-    const asked = fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] },
-                         'feed.synopsis': { ok: 'про восстание' } })
+    const asked = fake({
+      'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
+      'feed.synopsis': { ok: 'про восстание' },
+    })
     const put = []
 
-    await refreshed({ item_id: 5, at: 1700000000 }, [], (view) => put.push(view))
+    await again([{ item_id: 5 }], { item_id: 5, at: 1700000000 }, [],
+                (view) => put.push(view))
 
     expect(asked).toEqual([['feed.views_of', [expect.any(Number), [5]]],
                           ['feed.synopsis', [expect.any(Number), 5]]])
@@ -74,11 +110,12 @@ describe('перечитывание одной правленой карточ�
     // обложки: пустяковый отказ чтения текста оставил бы перезалитую картинку
     // прежней до завтра. Синопсис при этом не кладётся вовсе — строка остаётся
     // с показанным.
-    fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] },
+    fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
            'feed.synopsis': { fail: 'broken', detail: 'сломалось' } })
     const put = []
 
-    await refreshed({ item_id: 5, at: 1700000000 }, [], (view) => put.push(view))
+    await again([{ item_id: 5 }], { item_id: 5, at: 1700000000 }, [],
+                (view) => put.push(view))
 
     expect(put).toEqual([{ item_id: 5, title: 'Своё', cover: 1700000000 }])
   })
@@ -89,7 +126,7 @@ describe('перечитывание одной правленой карточ�
     fake({ 'feed.views_of': { ok: [] }, 'feed.synopsis': { ok: '' } })
     const put = []
 
-    await refreshed({ item_id: 5, at: 1 }, [], (view) => put.push(view))
+    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, [], (view) => put.push(view))
 
     expect(put).toEqual([])
   })
@@ -100,12 +137,12 @@ describe('перечитывание одной правленой карточ�
     // вопросов не равен — разойдись каналы, и ответ круга, отправленный до
     // правки, лёг бы поверх свежего текста. Человек увидел бы, как набранное
     // им откатывается само.
-    fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] },
+    fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
            'feed.synopsis': slow({ ok: 'прежний' }, { ok: 'свежий' }) })
     const round = numbered('feed.synopsis', 5, { channel: textChannel(5) })
     const put = []
 
-    await refreshed({ item_id: 5, at: 1 }, [], (view) => put.push(view))
+    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, [], (view) => put.push(view))
 
     await expect(round).rejects.toMatchObject({ kind: 'stale' })
     expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'свежий',
@@ -117,7 +154,7 @@ describe('перечитывание одной правленой карточ�
     fake({ 'feed.views_of': { ok: [] }, 'feed.synopsis': { ok: '' } })
     const ops = []
 
-    await refreshed({ item_id: 5, at: 1 }, ops, () => {})
+    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, ops, () => {})
 
     // Оба вызова: перечитанная строка и её синопсис.
     expect(ops).toHaveLength(2)

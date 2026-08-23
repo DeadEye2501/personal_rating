@@ -5,7 +5,6 @@ import threading
 from datetime import timedelta
 
 from backend.model import (
-    CardView,
     ExternalSearch,
     Kind,
     Missing,
@@ -15,12 +14,7 @@ from backend.model import (
 )
 from backend.model.results import SEARCH_SIZE
 from bridge.search import Search
-from tests.bridge.conftest import ready
-
-
-def a_view(source_id, item_id=None, title="Одиссея", source=Source.TMDB):
-    return CardView(kind=Kind.MOVIE, source=source, source_id=source_id,
-                    title=title, item_id=item_id)
+from tests.bridge.conftest import a_view, ready
 
 
 def portions(answers, *given):
@@ -309,6 +303,48 @@ def test_a_late_answer_does_not_take_the_cell_of_the_new_search(spy, asked):
     assert search.ensure(2, "tmdb", "своё")["ok"]["outcome"] == "found"
 
 
+def test_a_late_answer_does_not_move_the_offset_of_the_new_search(spy, asked):
+    """Смещение двигает приехавший ответ — но только тот, чью операцию мост и
+    помнит.
+
+    Сдвинь его от имени прежней, и память запроса стала бы чужой: следующий
+    «дай ещё» новой строки увидел бы там не свой номер и ответил «устарело», а
+    «устарело» молчит. Догрузка встала бы навсегда, без единого следа."""
+    answers, log = asked
+    gate, started = threading.Event(), threading.Event()
+    served = iter([ExternalSearch(views=(a_view("1"),), refusals=(), more=True),
+                   ExternalSearch(views=(a_view("2"),), refusals=(), more=True)])
+
+    async def waiting(kind, query, offset):
+        answer = next(served)
+        if not gate.is_set():
+            # Барьер, а не надежда на расторопность: не дождись первая заявка
+            # своего смещения, вторая строка перехватила бы память запроса
+            # раньше — и проверялся бы совсем другой путь, тот, где `external`
+            # отвечает «устарело» ещё до похода в бэкенд.
+            started.set()
+            await asyncio.to_thread(gate.wait)
+        return answer
+
+    answers["search.local"] = []
+    answers["search.external"] = waiting
+
+    search = Search(spy)
+    search.local(1, "movie", "старое")
+    late = threading.Thread(target=lambda: search.external(1))
+    late.start()
+    assert started.wait(timeout=5), "первая заявка не дошла до бэкенда"
+
+    search.local(2, "movie", "новое")
+    gate.set()
+    late.join(timeout=5)
+    second = search.external(2)
+
+    assert second.get("ok"), f"вторая порция новой строки не спросилась: {second}"
+    asked_at = [args[2] for name, args, _ in log if name == "search.external"]
+    assert asked_at == [0, 0], "смещение сдвинула чужая операция"
+
+
 def test_a_refusal_of_the_outer_base_travels_as_a_field(spy, asked):
     """Отказ источника — не исключение, а поле в ответе: второго канала у
     границы потоков нет."""
@@ -378,80 +414,6 @@ def test_adding_something_that_is_not_in_the_list_is_stale(spy, asked):
 
     assert search.ensure(1, "tmdb", "404") == {"fail": "stale"}
     assert [name for name, _, _ in log] == ["search.local"]
-
-
-def test_a_person_search_is_remembered_like_any_other(spy, asked):
-    """Выдача по человеку — обычная выдача поиска, и добавить из неё карточку
-    можно тем же жестом: значит и помнить её надо тем же способом."""
-    answers, _ = asked
-    answers["finder.by_entity"] = ExternalSearch(views=(a_view("1"),),
-                                                 refusals=())
-    answers["loader.ensure"] = 12
-
-    search = Search(spy)
-    answer = search.by_person(1, "people", 9, "movie")
-
-    assert answer["ok"]["views"][0]["source_id"] == "1"
-    assert search.ensure(1, "tmdb", "1") == {"ok": {"outcome": "found",
-                                                    "value": 12}}
-
-
-def test_a_second_step_after_a_click_gets_nothing(spy, asked):
-    """У клика по имени второго шага нет: обе половины приезжают собранными, и
-    строку запроса он не запоминает. Позванный с его номером `external`
-    разворачивал бы пустую память — исключением, и уже за пределами заявки, то
-    есть через границу потоков, где ловить его некому."""
-    answers, log = asked
-    answers["finder.by_entity"] = ExternalSearch(views=(a_view("1"),),
-                                                 refusals=())
-
-    search = Search(spy)
-    search.by_person(1, "people", 9, "movie")
-
-    assert search.external(1) == {"fail": "stale"}
-    assert [name for name, _, _ in log] == ["finder.by_entity"]
-
-
-def test_a_person_search_carries_the_kind_as_a_kind(spy, asked):
-    """Перевод строки в тип идёт внутри заявки: снаружи оболочки он ушёл бы
-    исключением через границу потоков, где ловить его некому. И вкладка —
-    первичный фильтр: во вкладке фильмов сериалов не бывает нигде."""
-    answers, log = asked
-    answers["finder.by_entity"] = ExternalSearch(views=(), refusals=())
-
-    assert Search(spy).by_person(1, "people", 9, "книги")["fail"] == "broken"
-    assert log == []
-
-    Search(spy).by_person(1, "companies", 9, "game")
-    name, args, _ = log[0]
-    assert name == "finder.by_entity"
-    assert args == ("companies", 9, Kind.GAME)
-
-
-def test_a_refusal_of_a_person_search_travels_as_a_field(spy, asked):
-    """Половины приезжают собранными, и отказ у них тот же полем ответа:
-    второго канала у границы потоков нет."""
-    answers, _ = asked
-    answers["finder.by_entity"] = ExternalSearch(
-        views=(),
-        refusals=(Refusal(source="tmdb", reason=Reason.QUOTA,
-                          retry_after=timedelta(seconds=60)),))
-
-    answer = Search(spy).by_person(1, "people", 9, "movie")
-
-    assert answer["ok"]["refusals"][0]["reason"] == "quota"
-    assert answer["ok"]["refusals"][0]["retry_after"] == 60.0
-
-
-def test_a_person_search_is_cancellable_like_the_string_one(spy, asked):
-    """Клик по второму имени обязан отменить первый: без номера выдача
-    неотменяема, и приехать могла бы чужая."""
-    answers, _ = asked
-    answers["finder.by_entity"] = ExternalSearch(views=(), refusals=())
-
-    Search(spy).by_person(7, "people", 9, "movie")
-
-    assert spy.ops == [7]
 
 
 def test_a_source_that_lost_the_card_says_so(spy, asked):

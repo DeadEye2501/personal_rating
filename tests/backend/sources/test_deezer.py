@@ -24,7 +24,7 @@ from backend.model import (
     Refusal,
     Source,
 )
-from backend.sources.deezer.client import ALL_ALBUMS, DeezerClient
+from backend.sources.deezer.client import DeezerClient
 from backend.sources.deezer.parse import parse_albums, parse_artists, parse_card
 from backend.sources.http import SourceHttp
 from tests.conftest import FakeClock, counting, responding
@@ -339,10 +339,15 @@ async def test_the_albums_of_an_artist_come_by_identity(fixture):
 
     assert isinstance(answer, Found) and answer.value
     assert asked[0].url.path == "/artist/4505880/albums"
-    # Размер просится явно: без него ручка отдаёт 25 строк и `next` — замерено
-    # 23.08.2026, у Мадонны 25 из 72. Порции у этого жеста нет ни в бэкенде, ни
-    # на странице, и до обрезанного хвоста человек не добрался бы ничем.
-    assert asked[0].url.params.get("limit") == str(ALL_ALBUMS)
+    # Размер просится явно и числом, а не из `ALL_ALBUMS`: сверка с объявлением
+    # зеленела бы при любом его значении, включая умолчание ручки — 25 строк с
+    # `next`, замерено 23.08.2026: у Мадонны 25 из 72, у Элвиса 25 из 42.
+    # Порции у этого жеста нет ни в бэкенде, ни на странице, и до обрезанного
+    # хвоста человек не добрался бы ничем.
+    #
+    # Тысяча, потому что предел ручки на ней не заканчивается: замерено там же,
+    # `limit=1000` отвечает так же и без ошибки.
+    assert asked[0].url.params.get("limit") == "1000"
 
 
 def test_a_row_of_an_artist_album_carries_its_year(fixture):

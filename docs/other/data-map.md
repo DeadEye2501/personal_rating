@@ -294,7 +294,7 @@
   - `name: str`
   - `hint: str`
   - `hint_item_id: int | None`
-  - `hint_kind: Kind | None` = `None`
+  - `hint_kind: Kind | None`
 
 ### `backend/model/tag.py`
 
@@ -808,13 +808,13 @@
 
 - `revision: str` = `'0002'`
 - `down_revision: str | None` = `'0001'`
-- `BOOKS` = `набор из 4`
+- `RULE_BOOKS` = `набор из 4`
 
 ### `migrations/versions/0003_tracks.py`
 
 - `revision: str` = `'0003'`
 - `down_revision: str | None` = `'0002'`
-- `BOOKS` = `набор из 2`
+- `RULE_BOOKS` = `набор из 2`
 
 ## scripts
 

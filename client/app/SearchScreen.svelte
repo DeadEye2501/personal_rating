@@ -12,7 +12,8 @@
   import { retagged } from '$state/marking.js'
   import { flipped, swept } from '$state/session.js'
   import { rowTurns } from './inturn.js'
-  import { keyOf, refreshed, same, without, withoutText } from './reread.js'
+  import { NOT_REREAD, again, keyOf, same, without, withoutText }
+    from './reread.js'
   import { aspected, scored, wished } from './marks.js'
   import { complaining, reported } from './trouble.js'
   import { onCardShown } from './visible.js'
@@ -310,8 +311,11 @@
    *  Правленую карточку выдача перечитывает у себя, а не спрашивает источник
    *  заново: это поход в сеть ради того, что уже лежит в базе. */
   $effect(() => {
-    const done = saved
-    if (done) untrack(() => again(done))
+    const stored = saved
+    if (stored) {
+      untrack(() => again(views, stored, ops, (fresh) => patch(fresh, fresh))
+        ?.catch((error) => lost(error, NOT_REREAD)))
+    }
   })
 
   $effect(() => {
@@ -326,12 +330,6 @@
     if (written) untrack(() => patch(written.view, written.fields))
   })
 
-  function again(done) {
-    if (!views.some((each) => each.item_id === done.item_id)) return
-
-    refreshed(done, ops, (fresh) => patch(fresh, fresh))
-      .catch((error) => lost(error, 'Не удалось перечитать карточку'))
-  }
 
   /** Показанная строка догружается целиком: сначала карточка от источника и
    *  запись в базу, потом оценки агрегаторов. Их спрашивают по `imdb_id`, а он

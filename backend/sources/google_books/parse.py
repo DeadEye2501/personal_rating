@@ -71,7 +71,7 @@ def _marks(info: dict) -> tuple[tuple[GenreSource, str], ...]:
     return tuple((GenreSource.GOOGLE_BOOKS, mark) for mark in unique(marks) if mark)
 
 
-def covers(links: dict) -> list[str]:
+def _covers(links: dict) -> list[str]:
     """Объявленные томом адреса обложки в порядке близости к нашей мерке."""
     return [links[name] for name in _COVERS if links.get(name)]
 
@@ -103,7 +103,7 @@ def _poster(info: dict) -> str:
     обрезка ужимает до 500×750 и не растягивает, поэтому `medium` 575×812 даёт
     тот же итог, что `extraLarge` 2448×3116, а весит впятеро меньше."""
     links = info.get("imageLinks", {})
-    ladder = covers(links)
+    ladder = _covers(links)
     if not ladder:
         return ""
     thumbnail = links.get("thumbnail", "")

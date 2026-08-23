@@ -186,7 +186,7 @@ def declared_in_migration() -> dict[str, list[list]]:
         source: [[rule.genre, rule.required(), rule.forbidden(), rule.alone]
                  for rule in rules]
         for name in MIGRATIONS
-        for source, rules, _kind in import_module(name).BOOKS
+        for source, rules, _kind in import_module(name).RULE_BOOKS
     }
 
 

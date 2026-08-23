@@ -33,7 +33,7 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (161)
+### app/LibraryScreen.svelte (155)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag, saved, removed, reviewed
 - берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
@@ -48,7 +48,7 @@
 - принимает: view, onsaved, onclose, ontrouble
 - берёт: ./marks.js, ./trouble.js
 
-### app/SearchScreen.svelte (417)
+### app/SearchScreen.svelte (415)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, reviewed, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -70,9 +70,9 @@
 - Свои отметки на карточке: оценка, закладка и рецензия.
 - отдаёт: aspected, reviewed, scored, wished
 
-### app/reread.js (60)
+### app/reread.js (83)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
-- отдаёт: keyOf, refreshed, same, without, withoutText
+- отдаёт: NOT_REREAD, again, keyOf, same, without, withoutText
 
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
@@ -275,9 +275,9 @@
 - Куда встаёт строка, которую тащат указателем.
 - отдаёт: dragged
 
-### state/scores.js (125)
+### state/scores.js (138)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
-- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, toneOf, toneOfMean, verdictOf, verdictOfMean
+- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, stepOfMean, toneOf, toneOfMean, verdictOf, verdictOfMean
 
 ### state/scroll.js (34)
 - Мерка и арифметика своей полосы прокрутки.

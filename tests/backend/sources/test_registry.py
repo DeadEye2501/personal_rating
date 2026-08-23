@@ -19,6 +19,7 @@ from backend.sources.registry import ROUTES
 from backend.sources.steam.client import SteamClient
 from backend.sources.tmdb.client import TmdbClient
 from backend.unique import unique
+from tests.backend.sources.conftest import keys_of_google
 from tests.conftest import counting, responding
 
 # Кто держит каталог и по какому типу его спрашивают — выведено из таблицы
@@ -56,6 +57,7 @@ def keyed():
         {
             "TMDB_API_KEY": "tmdb-key",
             "GOOGLE_BOOKS_API_KEY": "google-books-key",
+            "GOOGLE_BOOKS_API_KEY_2": "google-books-spare",
             "MDBLIST_API_KEY": "mdblist-key",
             "OMDB_API_KEY": "omdb-key",
             "POISKKINO_API_KEY": "poiskkino-key",
@@ -329,6 +331,27 @@ def watching_keys() -> tuple[httpx.MockTransport, dict]:
         return httpx.Response(200, json={})
 
     return httpx.MockTransport(handler), seen
+
+
+async def test_the_spare_key_of_google_books_reaches_the_wire_too():
+    """Ключей у Google два, и второй уезжает клиенту тем же путём, что первый.
+
+    Проверяется на боевой сборке: сторож настроек держит левое звено (переменная
+    окружения → поле), сторож клиента — правое (поле → провод), а середину —
+    `config.google_books_keys` в `sources/build.py` — не держал никто. Срежь там
+    набор до первого ключа, и запасной перестал бы существовать: книги умирали
+    бы на сутки при полном наборе зелёных тестов, ровно в тот день, ради
+    которого второй ключ и вписан.
+
+    Первый ключ отвечает исчерпанной квотой — иначе до второго очередь не
+    дойдёт вовсе."""
+    transport, seen = keys_of_google("google-books-key")
+    registry = build_sources(keyed(), transport=transport)
+
+    answer = await registry.google_books.search("дюна", Kind.BOOK)
+
+    assert isinstance(answer, Found), "запасной ключ до провода не доехал"
+    assert seen == ["google-books-key", "google-books-spare"]
 
 
 async def test_every_key_from_the_settings_reaches_its_own_source():

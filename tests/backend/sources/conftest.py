@@ -1,14 +1,54 @@
-"""Записанные ответы источников: живьём тесты не ходят никуда."""
+"""Общее для проверок источников: тела ответов и строители клиентов."""
+
+import asyncio
 
 import httpx
 import pytest
 
+from backend.sources.http import SourceHttp
+from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
 from tests.builders import recorded as _load
+
+
+def unofficial(transport) -> UnofficialClient:
+    """Запасное зеркало Кинопоиска на заданном транспорте.
+
+    Здесь, а не в модуле проверок: его спрашивают двое — свой модуль зеркала и
+    модуль пары «основное плюс запасное», — и своими копиями они разъехались бы
+    молча."""
+    return UnofficialClient(SourceHttp("kinopoisk", transport=transport),
+                            api_key="k")
 
 
 def _meta(relative: str) -> dict:
     """Код ответа и отобранные заголовки, записанные рядом с телом."""
     return _load(f"{relative.rsplit('.', 1)[0]}.meta.json")
+
+
+def keys_of_google(exhausted: str, delay: float = 0.0):
+    """Транспорт Google Books, у которого названный ключ исчерпал суточную
+    квоту, и список ключей, ушедших на провод.
+
+    Здесь, а не в модулях проверок: запасной ключ наблюдают трое — клиент, его
+    гонка и боевая сборка, — и своими копиями они разъехались бы молча.
+
+    `delay` держит ответ исчерпанного ключа: без задержки два одновременных
+    запроса уходят по очереди, и гонки, ради которой оговорка про соседа и
+    написана, не выходит вовсе. Обработчик асинхронный всегда — `MockTransport`
+    принимает и такой, а два его вида были бы вторым объявлением одного и того
+    же."""
+    seen: list[str] = []
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        key = request.url.params.get("key")
+        seen.append(key)
+        if key == exhausted:
+            if delay:
+                await asyncio.sleep(delay)
+            return httpx.Response(429, json={"error": {"code": 429}})
+        return httpx.Response(200, json={"items": []})
+
+    return httpx.MockTransport(handler), seen
 
 
 @pytest.fixture

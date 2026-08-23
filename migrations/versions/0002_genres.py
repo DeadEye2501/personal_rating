@@ -24,7 +24,7 @@ from migrations.reference.tmdb import TMDB
 revision: str = "0002"
 down_revision: str | None = "0001"
 
-BOOKS = (
+RULE_BOOKS = (
     ("tmdb", TMDB, "film"),
     ("steam", STEAM, "game"),
     ("gog", GOG, "game"),
@@ -44,7 +44,7 @@ def upgrade() -> None:
             )
             ids[(kind, name)] = result.lastrowid
 
-    for source, rules, kind in BOOKS:
+    for source, rules, kind in RULE_BOOKS:
         for rule in rules:
             result = connection.execute(
                 sa.text(

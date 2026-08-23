@@ -8,15 +8,12 @@ from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.mirror import SOURCE
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
+from tests.backend.sources.conftest import unofficial
 from tests.conftest import counting, responding
 
 
-def fallback(transport) -> UnofficialClient:
-    return UnofficialClient(SourceHttp("kinopoisk", transport=transport), api_key="k")
-
-
 async def test_fallback_empty_result_is_an_answer(replay):
-    result = await fallback(replay("kinopoisk/unofficial_not_found.json")).ratings(
+    result = await unofficial(replay("kinopoisk/unofficial_not_found.json")).ratings(
         "tt0000000", Kind.MOVIE
     )
 
@@ -25,7 +22,7 @@ async def test_fallback_empty_result_is_an_answer(replay):
 
 async def test_fallback_rating_comes_with_the_search(replay):
     """Одна оценка за один запрос: ratingKinopoisk лежит прямо здесь."""
-    result = await fallback(replay("kinopoisk/unofficial_found.json")).ratings(
+    result = await unofficial(replay("kinopoisk/unofficial_found.json")).ratings(
         "tt0816692", Kind.MOVIE
     )
 
@@ -46,7 +43,7 @@ async def test_fallback_asks_the_card_when_the_list_has_no_rating(replay):
 
     Оба ответа записаны с живого API: у «Интерстеллара» оценка в списке стоит, и
     на нём этот случай не наблюдается вовсе."""
-    result = await fallback(replay("kinopoisk/unofficial_list_without_rating.json",
+    result = await unofficial(replay("kinopoisk/unofficial_list_without_rating.json",
                                    "kinopoisk/unofficial_card.json")).ratings(
         "tt35309713", Kind.MOVIE
     )
@@ -85,7 +82,7 @@ async def test_fallback_keeps_the_number_when_the_card_says_nothing(replay):
     """Карточка ответила, а оценки нет и там — бывает у свежих. Пустое значение
     тогда законно, но номер Кинопоиска обязан доехать: по нему на карточке
     зажигается ссылка на источник, и второй запрос не должен её отнимать."""
-    result = await fallback(replay("kinopoisk/unofficial_list_without_rating.json",
+    result = await unofficial(replay("kinopoisk/unofficial_list_without_rating.json",
                                    "kinopoisk/unofficial_not_found.json")).ratings(
         "tt35309713", Kind.MOVIE
     )
@@ -99,7 +96,7 @@ async def test_fallback_quota_has_its_own_code(replay, meta):
     """402 — отдельный код, не путать с 429 по частоте."""
     assert meta("kinopoisk/unofficial_quota.json")["status"] == 402
 
-    result = await fallback(replay("kinopoisk/unofficial_quota.json")).ratings(
+    result = await unofficial(replay("kinopoisk/unofficial_quota.json")).ratings(
         "tt0816692", Kind.MOVIE
     )
 
@@ -111,7 +108,7 @@ async def test_fallback_html_from_nginx_does_not_crash_the_parser(replay, meta):
     """429 приходит от nginx с телом text/html — JSON на нём падает."""
     assert meta("kinopoisk/unofficial_rate.txt")["status"] == 429
 
-    result = await fallback(replay("kinopoisk/unofficial_rate.txt")).ratings(
+    result = await unofficial(replay("kinopoisk/unofficial_rate.txt")).ratings(
         "tt0816692", Kind.MOVIE
     )
 
@@ -124,7 +121,7 @@ async def test_fallback_rate_limit_trips_its_breaker_too():
     мы продолжили бы стучаться и выбрали бы суточную квоту на отказы."""
     transport, seen = counting(responding(429, text="<html>429</html>"))
 
-    client = fallback(transport)
+    client = unofficial(transport)
     first = await client.ratings("tt0816692", Kind.MOVIE)
     await client.ratings("tt0111161", Kind.MOVIE)
 
@@ -136,7 +133,7 @@ async def test_fallback_rate_limit_trips_its_breaker_too():
 async def test_fallback_bad_key_is_a_refusal(replay, meta):
     assert meta("kinopoisk/unofficial_bad_key.json")["status"] == 401
 
-    result = await fallback(replay("kinopoisk/unofficial_bad_key.json")).ratings(
+    result = await unofficial(replay("kinopoisk/unofficial_bad_key.json")).ratings(
         "tt0816692", Kind.MOVIE
     )
 
@@ -152,7 +149,7 @@ async def test_fallback_sends_the_key_in_the_header_and_keeps_the_tt_prefix():
         seen["url"] = str(request.url)
         return httpx.Response(200, json={"total": 0, "items": []})
 
-    await fallback(httpx.MockTransport(handler)).ratings("tt0816692", Kind.MOVIE)
+    await unofficial(httpx.MockTransport(handler)).ratings("tt0816692", Kind.MOVIE)
 
     assert seen["x-api-key"] == "k"
     assert "imdbId=tt0816692" in seen["url"]
@@ -168,7 +165,7 @@ async def test_an_honest_zero_is_not_an_absence():
         200, json={"total": 1, "items": [{"ratingKinopoisk": 0, "kinopoiskId": 1}]}
     )
 
-    result = await fallback(transport).ratings("tt0816692", Kind.MOVIE)
+    result = await unofficial(transport).ratings("tt0816692", Kind.MOVIE)
 
     assert isinstance(result, Found)
     assert result.value.values[0].value == 0.0

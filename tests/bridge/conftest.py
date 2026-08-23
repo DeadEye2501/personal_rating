@@ -10,7 +10,15 @@ from datetime import datetime
 
 import pytest
 
+from backend.model import CardView, Kind, Source
 from bridge.thread import BackendThread
+
+
+def a_view(source_id, item_id=None, title="Одиссея", source=Source.TMDB):
+    """Строка выдачи, какой её видит мост. Здесь, а не в модуле проверок: её
+    просят и строка поиска, и клик по имени."""
+    return CardView(kind=Kind.MOVIE, source=source, source_id=source_id,
+                    title=title, item_id=item_id)
 
 
 class FakeBackend:

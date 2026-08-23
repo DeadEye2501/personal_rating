@@ -9,16 +9,12 @@ from backend.model import Found, IdSource, Kind, Missing, RatingSource, Reason, 
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.kinopoisk.poiskkino import PoiskkinoClient
-from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
+from tests.backend.sources.conftest import unofficial
 from tests.conftest import FakeClock, counting, responding
 
 
 def primary(transport) -> PoiskkinoClient:
     return PoiskkinoClient(SourceHttp("kinopoisk", transport=transport), api_key="k")
-
-
-def fallback(transport) -> UnofficialClient:
-    return UnofficialClient(SourceHttp("kinopoisk", transport=transport), api_key="k")
 
 
 async def test_primary_reads_the_rating(replay):
@@ -212,7 +208,7 @@ async def test_primary_asks_for_the_fields_it_needs():
     assert seen["x-api-key"] == "k"
 
 
-async def test_a_refusal_switches_to_the_fallback():
+async def test_a_refusal_switches_to_the_unofficial():
     asked = []
 
     def refuse(request: httpx.Request) -> httpx.Response:
@@ -226,7 +222,7 @@ async def test_a_refusal_switches_to_the_fallback():
         )
 
     client = KinopoiskClient(
-        primary(httpx.MockTransport(refuse)), fallback(httpx.MockTransport(answer))
+        primary(httpx.MockTransport(refuse)), unofficial(httpx.MockTransport(answer))
     )
 
     result = await client.ratings("tt0816692", Kind.MOVIE)
@@ -248,7 +244,7 @@ async def test_an_honest_no_does_not_cost_a_second_request():
         return httpx.Response(200, json={"total": 1, "items": []})
 
     client = KinopoiskClient(
-        primary(httpx.MockTransport(absent)), fallback(httpx.MockTransport(never))
+        primary(httpx.MockTransport(absent)), unofficial(httpx.MockTransport(never))
     )
 
     result = await client.ratings("tt0000000", Kind.MOVIE)
@@ -270,7 +266,7 @@ async def test_a_found_answer_does_not_cost_a_second_request():
         return httpx.Response(200, json={"total": 0, "items": []})
 
     client = KinopoiskClient(
-        primary(httpx.MockTransport(answer)), fallback(httpx.MockTransport(never))
+        primary(httpx.MockTransport(answer)), unofficial(httpx.MockTransport(never))
     )
 
     result = await client.ratings("tt0816692", Kind.MOVIE)
@@ -284,7 +280,7 @@ async def test_both_mirrors_refusing_leaves_a_refusal():
     """Отказ запасного и есть итог: выдумывать вместо него ответ нельзя."""
     client = KinopoiskClient(
         primary(responding(403, json={"statusCode": 403})),
-        fallback(responding(402, json={"message": "Превышен лимит запросов"})),
+        unofficial(responding(402, json={"message": "Превышен лимит запросов"})),
     )
 
     result = await client.ratings("tt0816692", Kind.MOVIE)
@@ -303,7 +299,7 @@ async def test_the_log_tells_which_mirror_failed_to_parse(caplog):
     with caplog.at_level("WARNING"):
         assert isinstance(await primary(body).ratings("tt0816692", Kind.MOVIE),
                           Refusal)
-        assert isinstance(await fallback(body).ratings("tt0816692", Kind.MOVIE),
+        assert isinstance(await unofficial(body).ratings("tt0816692", Kind.MOVIE),
                           Refusal)
 
     # Фраза привязывается к модулю, а не ищется в общем логе: логгеры у зеркал
@@ -332,7 +328,7 @@ async def test_a_well_formed_body_under_a_failure_code_is_not_an_answer(fixture,
     видна."""
     bodies = {"primary": "kinopoisk/poiskkino_found.json",
               "fallback": "kinopoisk/unofficial_found.json"}
-    client = primary if mirror == "primary" else fallback
+    client = primary if mirror == "primary" else unofficial
 
     outcome = await client(
         responding(500, json=fixture(bodies[mirror]))

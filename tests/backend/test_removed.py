@@ -8,7 +8,6 @@
 ложных срабатываний тут не бывает по построению, названия не сравниваются
 вовсе."""
 
-import pytest
 import sqlalchemy
 
 from backend.model import Found, Kind, Source
@@ -17,20 +16,17 @@ from backend.service.removal import discard_card, remove_card
 from backend.service.search import SEARCH_SIZE
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.removed import RemovedRepository
-from tests.conftest import FakeSearch, an_item, hit, poster_service, unreachable
+from tests.conftest import (
+    FakeSearch,
+    a_game,
+    an_item,
+    hit,
+    poster_service,
+    unreachable,
+)
 from tests.wiring import search_service
 
 FALLOUT = (Kind.GAME, Source.STEAM, "38410")
-
-
-@pytest.fixture
-async def removed(sessions):
-    return RemovedRepository(sessions)
-
-
-def a_game(source_id: str = "38410", title: str = "Fallout 2",
-           source: Source = Source.STEAM):
-    return an_item(source_id, title, kind=Kind.GAME, source=source)
 
 
 async def rows(engine) -> list[tuple]:
@@ -253,12 +249,17 @@ async def test_the_list_of_removed_is_narrowed_by_the_tab(removed):
     вкладкой» неотличимо от «отдали всё, что есть»."""
     await removed.remember(a_game("38410", "Fallout 2"))
     await removed.remember(
-        an_item("550", "Бойцовский клуб", kind=Kind.MOVIE, source=Source.TMDB))
+        an_item("550", "бойцовский клуб", kind=Kind.MOVIE, source=Source.TMDB))
 
     games = await removed.listing(Kind.GAME)
+    films = await removed.listing(Kind.MOVIE)
 
     assert [(one.source_id, one.title) for one in games] == [
         ("38410", "Fallout 2")]
+    # Название человек в этом списке видит, и пишется оно по общему правилу.
+    # Свидетелем — фильм: он и заведён со строчной, а у Deezer строчные имена
+    # обычное дело — такая строка показалась бы здесь не как везде.
+    assert [one.title for one in films] == ["Бойцовский клуб"]
 
 
 async def test_the_list_of_removed_knows_the_source_of_each_row(removed):

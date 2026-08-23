@@ -8,22 +8,11 @@
 import pytest
 
 from backend.model import Found, Kind, Source
-from backend.storage.repository.removed import RemovedRepository
-from tests.conftest import FakeSearch, an_item, hit
+from tests.conftest import FakeSearch, a_game, an_item, hit
 from tests.wiring import search_service
 
 WORDS = ["удалено", "удалённое", "удаленный", "УДАЛЁННЫЕ", "deleted",
          "  removed  "]
-
-
-@pytest.fixture
-async def removed(sessions):
-    return RemovedRepository(sessions)
-
-
-def a_game(source_id: str = "38410", title: str = "Fallout 2",
-           source: Source = Source.STEAM):
-    return an_item(source_id, title, kind=Kind.GAME, source=source)
 
 
 @pytest.mark.parametrize("word", WORDS)

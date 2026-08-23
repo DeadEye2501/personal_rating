@@ -1,6 +1,24 @@
 """Как имя пишется у нас: первая буква заглавная, остальное от источника."""
 
+from sqlalchemy import select
+
+from backend.model import (
+    Credit,
+    Found,
+    Kind,
+    PersonRole,
+    Source,
+)
 from backend.naming import capitalized
+from backend.storage.entity import COMPANIES, PEOPLE
+from backend.storage.repository.credits import CreditRepository
+from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.ratings import RatingsRepository
+from backend.storage.repository.tags import TagsRepository
+from backend.storage.repository.tracks import TracksRepository
+from backend.storage.tables import company, person, rating, tag, track
+from backend.storage.tables import item as item_table
+from tests.conftest import MOMENT, FakeSearch, an_item, hit
 
 
 def test_a_lowercase_name_gets_its_capital():
@@ -46,14 +64,6 @@ async def test_a_card_is_stored_with_its_capitals(sessions):
     """Правило стоит на записи, а не на показе: в базе должно лежать то, что
     человек видит. Проверяется на строке базы, а не на возврате — вернуть можно
     и правильное, записав кривое."""
-    from sqlalchemy import select
-
-    from backend.model import Kind, Source
-    from backend.storage.repository.library import LibraryRepository
-    from backend.storage.tables import item as item_table
-
-    from tests.builders import an_item
-
     item_id = await LibraryRepository(sessions).create(an_item(
         "1", "не дрочись", kind=Kind.MUSIC, source=Source.DEEZER,
         original_title="horror vacui", synopsis="альбом жадного дельфина"))
@@ -67,6 +77,29 @@ async def test_a_card_is_stored_with_its_capitals(sessions):
     assert row.synopsis == "Альбом жадного дельфина"
 
 
+async def test_an_edited_card_is_stored_with_its_capitals_too(sessions):
+    """Пятая дверь записи — правка из окна карточки, и правило у неё то же.
+
+    Дверь своя: `replace_fields` пишет все поля разом и `create` не зовёт вовсе.
+    Сегодня обе идут через один сборщик значений, но перестань правка его
+    звать — и набранное человеком легло бы в базу как набрано, а показано было
+    бы как везде. Заметить это можно было бы только глазами."""
+    library = LibraryRepository(sessions)
+    item_id = await library.create(an_item("1", "Альбом", kind=Kind.MUSIC,
+                                           source=Source.DEEZER))
+
+    await library.replace_fields(item_id, an_item(
+        "1", "консумерки", kind=Kind.MUSIC, source=Source.DEEZER,
+        original_title="horror vacui", synopsis="альбом жадного дельфина"))
+
+    async with sessions() as session:
+        row = (await session.execute(
+            select(item_table).where(item_table.c.id == item_id))).one()
+
+    assert (row.title, row.original_title) == ("Консумерки", "Horror vacui")
+    assert row.synopsis == "Альбом жадного дельфина"
+
+
 async def test_a_person_a_studio_a_track_and_a_tag_are_stored_the_same_way(sessions):
     """Четыре двери записи, и правило у них одно: разойдись они, «жадный
     дельфин» оказался бы в базе дважды — исполнителем и строчным тёзкой.
@@ -74,17 +107,6 @@ async def test_a_person_a_studio_a_track_and_a_tag_are_stored_the_same_way(sessi
     Карточка проверяется соседним тестом, правка тега и рецензия — следующим:
     их двери человек открывает сам, и потерять правило там было бы виднее
     всего."""
-    from sqlalchemy import select
-
-    from backend.model import Credit, Kind, PersonRole
-    from backend.storage.entity import COMPANIES, PEOPLE
-    from backend.storage.repository.credits import CreditRepository
-    from backend.storage.repository.tags import TagsRepository
-    from backend.storage.repository.tracks import TracksRepository
-    from backend.storage.tables import company, person, tag, track
-    from tests.builders import an_item
-    from backend.storage.repository.library import LibraryRepository
-
     item_id = await LibraryRepository(sessions).create(an_item("1", "Альбом"))
     people = CreditRepository(sessions, PEOPLE)
     studios = CreditRepository(sessions, COMPANIES)
@@ -119,16 +141,6 @@ async def test_a_renamed_tag_and_a_review_keep_the_rule(sessions):
 
     Обе двери сняты ревью 23.08.2026 мутацией при зелёном наборе: сторожей у
     них не было вовсе."""
-    from sqlalchemy import select
-
-    from backend.model import Kind
-    from backend.storage.repository.library import LibraryRepository
-    from backend.storage.repository.ratings import RatingsRepository
-    from backend.storage.repository.tags import TagsRepository
-    from backend.storage.tables import rating, tag
-    from tests.conftest import MOMENT
-    from tests.builders import an_item
-
     tags = TagsRepository(sessions)
     tag_id = await tags.create(Kind.MUSIC, "переслушать")
     await tags.rename(tag_id, "послушать ещё раз")
@@ -160,8 +172,6 @@ async def test_a_candidate_of_the_search_is_shown_the_same_way_it_will_be_stored
 
     Правило стоит в сервисе, а не в `view_from_hit`: модель по решению проекта
     не зависит ни от чего нашего, и сторож границы это держит."""
-    from backend.model import Found, Kind, Source
-    from tests.conftest import FakeSearch, hit
 
     lowercase = hit("1", "не дрочись", kind=Kind.MUSIC, source=Source.DEEZER,
                     original_title="horror vacui",
