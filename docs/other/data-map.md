@@ -48,7 +48,7 @@
 - `class Config`
   - `data_dir: Path`
   - `tmdb_key: str`
-  - `google_books_key: str`
+  - `google_books_keys: tuple[str, ...]`
   - `mdblist_key: str`
   - `omdb_key: str`
   - `poiskkino_key: str`
@@ -330,7 +330,7 @@
 
 ### `backend/publishers.py`
 
-- `FORMS` = `frozenset({'ooo', 'zao', 'oao', 'pao', 'ip', 'nk…`
+- `FORMS` = `frozenset({'ao', 'ooo', 'zao', 'oao', 'pao', 'ip…`
 - `WORDS` = `frozenset({'izdatelstvo', 'izdatelstva', 'izdate…`
 - `LOOKALIKE` = `'acehkmoptxby'`
 - `_AS_CYRILLIC` = `str.maketrans(LOOKALIKE, 'асенкмортхву')`
@@ -908,7 +908,7 @@
 
 ### `tests/backend/test_config.py`
 
-- `KEYS` = `словарь из 6`
+- `KEYS` = `словарь из 5`
 
 ### `tests/backend/test_cover_reads.py`
 

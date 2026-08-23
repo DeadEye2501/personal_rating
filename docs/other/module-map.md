@@ -31,17 +31,18 @@
 - `def card_parts(sessions, posters: PosterService) -> dict` (14)
 - `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (66)
 
-### `backend/config.py` — 61 строк
+### `backend/config.py` — 77 строк
 
 Настройки приложения, прочитанные из окружения.
 
 Зависит от: —
 
-- `class Config` (22)
+- `class Config` (25)
   - `def library_db(self) -> Path` (2)
   - `def posters_db(self) -> Path` (2)
   - `def log_file(self) -> Path` (2)
 - `def value(env: Mapping[str, str], name: str) -> str` (4)
+- `def _google_books_keys(env: Mapping[str, str]) -> tuple[str, ...]` (11)
 - `def load_config(env: Mapping[str, str], base_dir: Path) -> Config` (16)
 
 ### `backend/language.py` — 72 строк
@@ -245,7 +246,7 @@
 
 - `def capitalized(text: str) -> str` (11)
 
-### `backend/publishers.py` — 295 строк
+### `backend/publishers.py` — 300 строк
 
 Издательство книги: как его пишут и как его узнавать.
 
@@ -653,16 +654,18 @@
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
-### `backend/sources/google_books/client.py` — 152 строк
+### `backend/sources/google_books/client.py` — 184 строк
 
 Разговор с Google Books по сети.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.errors`, `backend.sources.google_books.parse`, `backend.sources.http`
 
-- `class GoogleBooksClient` (103)
+- `class GoogleBooksClient` (135)
   - `def name(self) -> str` (4)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (21)
-  - `async def _taken(self, url: str, complaint: str, parse: Callable[[dict], object], **extra: object) -> Outcome` (16)
+  - `async def _taken(self, url: str, complaint: str, parse: Callable[[dict], object], **extra: object) -> Outcome` (25)
+  - `def _key(self) -> str` (5)
+  - `def _next_key(self, asked_with: int) -> bool` (11)
   - `async def search(self, query: str, kind: Kind, offset: int=0) -> Outcome` (4)
   - `async def find_people(self, name: str) -> Outcome` (12)
   - `async def credits_of(self, person_id: str, kind: Kind) -> Outcome` (12)
@@ -1619,7 +1622,7 @@
 - `def settings()` (6)
 - `async def main() -> None` (18)
 
-### `scripts/record_fixtures.py` — 373 строк ⚠ подошёл к 300
+### `scripts/record_fixtures.py` — 376 строк ⚠ подошёл к 300
 
 Разовая запись живых ответов источников в tests/fixtures/.
 
@@ -1638,7 +1641,7 @@
 - `async def record_google_books(client: httpx.AsyncClient, key: str) -> None` (36)
   - `async def asked(params: dict) -> httpx.Response` (6)
 - `async def record_deezer(client: httpx.AsyncClient) -> None` (22)
-- `async def main() -> None` (24)
+- `async def main() -> None` (27)
 
 ## tests — 109 модулей
 
@@ -1718,7 +1721,7 @@ Deezer: восьмой источник и единственный, откуд�
 - `def client(transport: httpx.MockTransport) -> DeezerClient` (3)
 - `async def carded(transport: httpx.MockTransport, source_id: str='54717452')` (3)
 
-### `tests/backend/sources/test_fantlab.py` — 165 строк
+### `tests/backend/sources/test_fantlab.py` — 164 строк
 
 FantLab: запасная обложка книги, которой нет у Google.
 
@@ -1748,15 +1751,15 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def client(handler) -> GogClient` (2)
 
-### `tests/backend/sources/test_google_books.py` — 546 строк ⚠ за пределом 500
+### `tests/backend/sources/test_google_books.py` — 592 строк ⚠ за пределом 500
 
 Google Books: седьмой источник и единственный, откуда приходят книги.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.google_books.client`, `backend.sources.google_books.parse`, `backend.sources.http`, `tests.conftest`
 
-Тестов: 38
+Тестов: 40
 
-- `def client(transport: httpx.MockTransport) -> GoogleBooksClient` (4)
+- `def client(transport: httpx.MockTransport) -> GoogleBooksClient` (5)
 - `async def searched(transport: httpx.MockTransport, query: str='дюна')` (3)
 - `async def carded(transport: httpx.MockTransport, source_id: str='-u8-DwAAQBAJ')` (3)
 
@@ -1952,13 +1955,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def build(sessions, engine, posters, transport=None) -> CardWriter` (9)
 - `async def writer(sessions, engine, posters)` (4)
 
-### `tests/backend/test_config.py` — 88 строк
+### `tests/backend/test_config.py` — 114 строк
 
 Чтение настроек из окружения и путей к файлам данных.
 
 Зависит от: `backend.config`
 
-Тестов: 11
+Тестов: 13
 
 
 ### `tests/backend/test_cover_reads.py` — 99 строк
@@ -2357,13 +2360,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 16
 
 
-### `tests/backend/test_publishers.py` — 254 строк
+### `tests/backend/test_publishers.py` — 263 строк
 
 Издательство книги: разбор строки и узнавание написаний.
 
 Зависит от: `backend.model`, `backend.publishers`, `backend.storage.entity`, `backend.storage.repository.credits`
 
-Тестов: 25
+Тестов: 26
 
 
 ### `tests/backend/test_ratings.py` — 358 строк ⚠ подошёл к 300
