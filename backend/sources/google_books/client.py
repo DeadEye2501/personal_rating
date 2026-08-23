@@ -59,9 +59,13 @@ class GoogleBooksClient:
 
     PAGES: ClassVar[bool] = True
 
-    def __init__(self, http: SourceHttp, api_key: str) -> None:
+    def __init__(self, http: SourceHttp, api_keys: tuple[str, ...]) -> None:
         self._http = http
-        self._key = api_key
+        self._keys = api_keys
+        # Номер ключа, которым спрашивают сейчас. Двигается только вперёд:
+        # исчерпанный за сутки не оживёт до полуночи, и возвращаться к нему
+        # значит тратить на `429` по походу в сеть с каждого запроса.
+        self._at = 0
 
     @property
     def name(self) -> str:
@@ -97,16 +101,44 @@ class GoogleBooksClient:
 
         Занятость перепрашивается до разбора: `503` у Google означает «занят
         сейчас», и принять его за пустую выдачу значит потерять половину книг —
-        замерено, пять запросов из десяти."""
-        response = await asked_until_free(
-            self._http, url, {"key": self._key, **extra})
-        if not isinstance(response, httpx.Response):
-            return response
-        verdict = self._verdict(response)
-        if verdict is not None:
-            return verdict
-        return parsed(logger, SOURCE, complaint,
-                      lambda: Found(parse(response.json())))
+        замерено, пять запросов из десяти.
+
+        Исчерпанная квота — не отказ, пока есть запасной ключ: суточная тысяча
+        считается на проект, и ключ от другого аккаунта продлевает день. Запрос
+        повторяется тем же вызовом, а отказом `429` становится только у
+        последнего ключа."""
+        while True:
+            asked_with = self._at
+            response = await asked_until_free(
+                self._http, url, {"key": self._key, **extra})
+            if not isinstance(response, httpx.Response):
+                return response
+            if response.status_code == 429 and self._next_key(asked_with):
+                continue
+            verdict = self._verdict(response)
+            if verdict is not None:
+                return verdict
+            return parsed(logger, SOURCE, complaint,
+                          lambda: Found(parse(response.json())))
+
+    @property
+    def _key(self) -> str:
+        """Ключ, которым спрашивают сейчас. Пустая строка, если не вписан ни
+        один: ручка ответит `400`, и человек прочтёт «ключ не принят» — то же,
+        что при негодном."""
+        return self._keys[self._at] if self._at < len(self._keys) else ""
+
+    def _next_key(self, asked_with: int) -> bool:
+        """Перейти к запасному ключу — если он есть и если его не взял сосед.
+
+        Довод про соседа не теоретический: карточки грузятся разом, и на
+        исчерпанной квоте `429` приходит сразу нескольким запросам. Сдвинь
+        каждый — и второй ключ перешагнули бы, не спросив им ничего."""
+        if asked_with != self._at or self._at + 1 >= len(self._keys):
+            return False
+        self._at += 1
+        logger.info("%s: суточная квота ключа исчерпана, беру запасной", SOURCE)
+        return True
 
     async def search(self, query: str, kind: Kind, offset: int = 0) -> Outcome:
         return await self._taken(BASE, "выдача поиска не разобралась",

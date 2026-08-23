@@ -16,7 +16,10 @@ FIVE = 5
 class Config:
     data_dir: Path
     tmdb_key: str
-    google_books_key: str
+    # Ключей у Google Books бывает несколько, и порядок значим: спрашивают
+    # первым, а на исчерпанной суточной квоте переходят к следующему. Один
+    # ключ — список из одного, и ничего не меняется.
+    google_books_keys: tuple[str, ...]
     mdblist_key: str
     omdb_key: str
     poiskkino_key: str
@@ -43,12 +46,25 @@ def value(env: Mapping[str, str], name: str) -> str:
     return env.get(name, "").strip()
 
 
+def _google_books_keys(env: Mapping[str, str]) -> tuple[str, ...]:
+    """Ключи Google Books по порядку: сперва основной, потом запасные.
+
+    Своей переменной на ключ, а не списком через запятую: ключ вписывают руками
+    в `.env`, и запятая внутри длинной строки — это опечатка, которую не видно
+    глазами. Пустые отбрасываются: вписан один ключ — источник работает с одним.
+
+    Суточная квота у Google на проект, а не на приложение, поэтому второй ключ
+    от другого аккаунта её и продлевает."""
+    named = ("GOOGLE_BOOKS_API_KEY", "GOOGLE_BOOKS_API_KEY_2")
+    return tuple(one for one in (value(env, name) for name in named) if one)
+
+
 def load_config(env: Mapping[str, str], base_dir: Path) -> Config:
     override = value(env, "DATA_DIR")
     return Config(
         data_dir=Path(override) if override else base_dir / DEFAULT_DATA_DIR,
         tmdb_key=value(env, "TMDB_API_KEY"),
-        google_books_key=value(env, "GOOGLE_BOOKS_API_KEY"),
+        google_books_keys=_google_books_keys(env),
         mdblist_key=value(env, "MDBLIST_API_KEY"),
         omdb_key=value(env, "OMDB_API_KEY"),
         poiskkino_key=value(env, "POISKKINO_API_KEY"),

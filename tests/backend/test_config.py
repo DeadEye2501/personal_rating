@@ -33,9 +33,11 @@ def test_file_paths_sit_inside_data_dir(tmp_path):
 # Значения нарочно разные: с одинаковыми перепутанные местами переменные
 # окружения прошли бы молча, а ключ не от того источника — это отказ в ответе,
 # который потом ищут в клиенте.
+#
+# Google Books в таблице нет: у него ключей несколько, и поле не строка, а
+# список. Его читает свой тест ниже.
 KEYS = {
     "TMDB_API_KEY": ("tmdb_key", "ключ-tmdb"),
-    "GOOGLE_BOOKS_API_KEY": ("google_books_key", "ключ-google-books"),
     "MDBLIST_API_KEY": ("mdblist_key", "ключ-mdblist"),
     "OMDB_API_KEY": ("omdb_key", "ключ-omdb"),
     "POISKKINO_API_KEY": ("poiskkino_key", "ключ-poiskkino"),
@@ -50,6 +52,30 @@ def test_every_key_is_read_from_its_own_variable():
     assert {field: getattr(config, field) for field, _ in KEYS.values()} == {
         field: value for field, value in KEYS.values()
     }
+
+
+def test_google_books_takes_its_keys_in_order():
+    """Ключей у Google Books бывает два, и порядок значим: первым спрашивают,
+    вторым продлевают день, когда суточная квота первого кончилась.
+
+    Порядок наблюдается значениями, а не длиной: перепутай их местами — и
+    запасной ключ тратился бы первым, а основной ждал бы полуночи."""
+    config = load_config({"GOOGLE_BOOKS_API_KEY": "ключ-основной",
+                          "GOOGLE_BOOKS_API_KEY_2": "ключ-запасной"},
+                         base_dir=Path("."))
+
+    assert config.google_books_keys == ("ключ-основной", "ключ-запасной")
+
+
+def test_a_single_google_books_key_stays_alone():
+    """Второй ключ необязателен: не вписан — источник работает с одним, как
+    работал до появления запасного. Пустая строка ключом не считается — с ней
+    Google отвечает отказом, и место в списке она заняла бы зря."""
+    config = load_config({"GOOGLE_BOOKS_API_KEY": "ключ-основной",
+                          "GOOGLE_BOOKS_API_KEY_2": "  "}, base_dir=Path("."))
+
+    assert config.google_books_keys == ("ключ-основной",)
+    assert load_config({}, base_dir=Path(".")).google_books_keys == ()
 
 
 def test_missing_keys_are_empty():

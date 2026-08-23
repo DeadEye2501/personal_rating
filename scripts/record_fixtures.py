@@ -360,7 +360,10 @@ async def main() -> None:
             ("OMDB", config.omdb_key, record_omdb),
             ("Кинопоиска", config.kinopoisk_unofficial_key,
              record_kinopoisk_unofficial),
-            ("Google Books", config.google_books_key, record_google_books),
+            # Записи хватает основного: запасной ключ — про суточную квоту
+            # в бою, а фикстур пишется полтора десятка.
+            ("Google Books", next(iter(config.google_books_keys), ""),
+             record_google_books),
         )
         for name, key, recorder in pairs:
             if not key:

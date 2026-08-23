@@ -42,7 +42,8 @@ KEY = "ключ-google-books"
 def client(transport: httpx.MockTransport) -> GoogleBooksClient:
     """Клиент на заданном транспорте. Ключ непустой: с пустым Google отвечает
     отказом по квоте, и такой клиент проверял бы не то."""
-    return GoogleBooksClient(SourceHttp("google_books", transport=transport), KEY)
+    return GoogleBooksClient(SourceHttp("google_books", transport=transport),
+                              (KEY,))
 
 
 async def searched(transport: httpx.MockTransport, query: str = "дюна"):
@@ -382,7 +383,7 @@ async def test_a_busy_source_is_not_shut_off_by_the_breaker(replay):
     busy = ["google_books/busy.json"] * ATTEMPTS
     http = SourceHttp("google_books",
                       transport=replay(*busy, "google_books/search_dune.json"))
-    one = GoogleBooksClient(http, KEY)
+    one = GoogleBooksClient(http, (KEY,))
 
     given_up = await one.search("дюна", Kind.BOOK)
     again = await one.search("дюна", Kind.BOOK)
@@ -405,7 +406,7 @@ async def test_the_quota_trips_the_breaker(replay):
     http = SourceHttp("google_books", clock=clock,
                       transport=replay("google_books/quota.json"))
 
-    answer = await GoogleBooksClient(http, KEY).search("дюна", Kind.BOOK)
+    answer = await GoogleBooksClient(http, (KEY,)).search("дюна", Kind.BOOK)
 
     assert isinstance(answer, Refusal) and answer.reason is Reason.QUOTA
     assert answer.retry_after == until_midnight(clock())
@@ -419,13 +420,58 @@ async def test_the_quota_trips_the_breaker(replay):
     assert not http.breaker.is_open()
 
 
+async def test_the_spare_key_takes_over_when_the_quota_runs_out():
+    """Суточная квота считается на проект, и ключ от другого аккаунта
+    продлевает день. Решение пользователя 23.08.2026.
+
+    Наблюдается ключом на проводе, а не тем, что ответ приехал: подставь клиент
+    первый ключ второй раз — выдача была бы та же самая, и подмена прошла бы
+    молча."""
+    keys = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        keys.append(request.url.params.get("key"))
+        if request.url.params.get("key") == "кончился":
+            return httpx.Response(429, json={"error": {"code": 429}})
+        return httpx.Response(200, json={"items": []})
+
+    http = SourceHttp("google_books", transport=httpx.MockTransport(handler))
+    client = GoogleBooksClient(http, ("кончился", "запасной"))
+
+    first = await client.search("дюна", Kind.BOOK)
+    second = await client.search("герберт", Kind.BOOK)
+
+    assert isinstance(first, Found), "запасной ключ не подставился"
+    assert isinstance(second, Found)
+    assert not http.breaker.is_open(), "источник закрыт, хотя ключ ещё есть"
+    # Исчерпанный ключ спрашивают один раз: возвращаться к нему до полуночи
+    # значит тратить по походу в сеть на каждом запросе.
+    assert keys == ["кончился", "запасной", "запасной"]
+
+
+async def test_the_last_key_out_of_quota_closes_the_source():
+    """Запасной ключ отодвигает отказ, но не отменяет его: кончились все —
+    источник закрывается до полуночи, как закрывался с одним ключом.
+
+    Без этого предохранитель не взводился бы вовсе, и каждая карточка
+    прокрутки шла бы в исчерпанную квоту досиживать свой таймаут."""
+    http = SourceHttp("google_books",
+                      transport=responding(429, json={"error": {"code": 429}}))
+
+    answer = await GoogleBooksClient(http, ("первый", "второй")).search(
+        "дюна", Kind.BOOK)
+
+    assert isinstance(answer, Refusal) and answer.reason is Reason.QUOTA
+    assert http.breaker.is_open()
+
+
 async def test_a_bad_key_is_not_a_quota(replay):
     """Замерено: без ключа Google отвечает `429`, с негодным — `400`. Смешай их,
     и негодный ключ закрыл бы источник до полуночи, а человек увидел бы
     «кончилась квота» там, где надо вписать другой ключ."""
     http = SourceHttp("google_books", transport=replay("google_books/bad_key.json"))
 
-    answer = await GoogleBooksClient(http, "не-ключ").search("дюна", Kind.BOOK)
+    answer = await GoogleBooksClient(http, ("не-ключ",)).search("дюна", Kind.BOOK)
 
     assert isinstance(answer, Refusal) and answer.reason is Reason.KEY
     assert not http.breaker.is_open(), "битый ключ сроком не лечится"

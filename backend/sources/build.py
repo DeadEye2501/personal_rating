@@ -51,7 +51,7 @@ def build_sources(
         gog=GogClient(http(Source.GOG)),
         old_games=OldGamesClient(http(Source.OLD_GAMES)),
         google_books=GoogleBooksClient(http(Source.GOOGLE_BOOKS),
-                                       config.google_books_key),
+                                       config.google_books_keys),
         deezer=DeezerClient(http(Source.DEEZER)),
         # Запасной по обложкам: ключа не требует, карточек не отдаёт.
         fantlab=FantLabClient(http("fantlab")),
