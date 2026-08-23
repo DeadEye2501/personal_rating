@@ -2,10 +2,48 @@
 
 import httpx
 
-from backend.model import Found, GenreSource, Kind, Reason, Refusal, Source
+from backend.model import (
+    SEARCH_SIZE,
+    Found,
+    GenreSource,
+    Kind,
+    Reason,
+    Refusal,
+    Source,
+)
 from backend.sources.http import SourceHttp
 from backend.sources.tmdb.client import TmdbClient
 from backend.sources.tmdb.parse import parse_search
+from tests.conftest import counting, responding
+
+
+async def asked_with(offset: int) -> httpx.Request:
+    """Запрос, ушедший в сеть при этом смещении.
+
+    Через транспорт, а не через двойника клиента: перевод смещения в номер
+    страницы живёт внутри самого клиента и до сервиса не доезжает вовсе."""
+    transport, seen = counting(responding(json={"results": []}))
+    client = TmdbClient(SourceHttp("tmdb", transport=transport), "ключ")
+    try:
+        await client.search("дюна", Kind.MOVIE, offset)
+    finally:
+        await client.aclose()
+    return seen[0]
+
+
+async def test_the_second_portion_asks_the_second_page():
+    """Ручка TMDB считает страницами, а проект — смещением в строках, и перевод
+    между ними живёт в клиенте. Замени его константой — и лента догружала бы
+    одну и ту же первую страницу без конца, а прокрутка выглядела бы
+    застрявшей."""
+    assert (await asked_with(SEARCH_SIZE)).url.params.get("page") == "2"
+
+
+async def test_the_first_portion_asks_the_first_page():
+    """Обратная половина: страницы у TMDB считаются с единицы, а смещение — с
+    нуля. Ошибись на один, и первая порция начиналась бы со второй страницы —
+    двадцать самых подходящих строк не показались бы никогда."""
+    assert (await asked_with(0)).url.params.get("page") == "1"
 
 
 def test_search_gives_candidates_not_cards(fixture):

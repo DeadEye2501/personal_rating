@@ -4,7 +4,7 @@
 страницу словарём, а обратно не собирается. Поэтому выдачу мост помнит, а
 страница называет кандидата парой «источник + идентификатор»."""
 
-from backend.model import ExternalSearch, Kind, merge_results
+from backend.model import SEARCH_SIZE, ExternalSearch, Kind, merge_results
 from bridge.answer import Domain, stale
 from bridge.kept import Kept
 from bridge.wire import outcome
@@ -14,7 +14,11 @@ class Search(Domain):
     def __init__(self, thread) -> None:
         super().__init__(thread)
         self._kept = Kept()
-        self._asked: tuple[int, str, str] | None = None
+        # Номер операции, запрос и сколько строк уже спрошено у источника.
+        # Смещение помнит мост, а не страница: тогда странице не нужно знать ни
+        # размера порции, ни арифметики — она зовёт `external` столько раз,
+        # сколько надо, и читает признак «есть ещё».
+        self._asked: tuple[int, str, str, int] | None = None
 
     def local(self, op: int, kind: str, query: str) -> dict:
         """Своё показывается сразу: локальная база отвечает за миллисекунды.
@@ -26,7 +30,7 @@ class Search(Domain):
         потоке, и допечатанная строка попадает сюда, пока первый шаг прежней
         операции ещё едет. Своей выдачи она в этот миг не запомнила, так что по
         ней старый второй шаг не отсечь, — и он ушёл бы в сеть с чужой строкой."""
-        self._asked = (op, kind, query)
+        self._asked = (op, kind, query, 0)
         return self._reply(lambda back: self._own(back, op, kind, query), op=op)
 
     def external(self, op: int) -> dict:
@@ -37,16 +41,22 @@ class Search(Domain):
         Запрос снимается здесь, а не внутри заявки: pywebview зовёт каждый метод
         в своём потоке, и к моменту ответа человек мог допечатать строку.
 
+        Зовётся столько раз, сколько прокрутка просит ещё: смещение мост
+        двигает сам, на порцию за вызов. Двигает **до** ответа, а не после:
+        pywebview зовёт каждый метод в своём потоке, и два «дай ещё» подряд
+        иначе ушли бы за одной и той же порцией.
+
         Пустая память запроса — это выдача по клику на имя: у неё второго шага
         нет вовсе, и разворачивать тут нечего. Без проверки это `TypeError` за
         пределами заявки, то есть исключение через границу потоков."""
         if self._kept.taken(op) is None or self._asked is None:
             return stale()
-        asked_op, kind, query = self._asked
+        asked_op, kind, query, offset = self._asked
         if asked_op != op:
             return stale()
-        return self._reply(lambda back: self._outer(back, op, kind, query),
-                           op=op)
+        self._asked = (asked_op, kind, query, offset + SEARCH_SIZE)
+        return self._reply(
+            lambda back: self._outer(back, op, kind, query, offset), op=op)
 
     def by_person(self, op: int, domain: str, entity_id: int,
                   kind: str) -> dict:
@@ -76,9 +86,15 @@ class Search(Domain):
         self._kept.put(op, views)
         return views
 
-    async def _outer(self, back, op, kind, query):
+    async def _outer(self, back, op, kind, query, offset):
+        """Странице уезжает **приращение**, а память копит всё.
+
+        Приращение потому, что лента дописывает приехавшее в конец: отдай он
+        накопленное — вторая порция склеила бы выдачу саму с собой. Память копит
+        всё потому, что из неё заводят кандидата (`ensure` ищет его в `Kept`), и
+        строка первой порции обязана заводиться и после приезда второй."""
         shown = self._kept.taken(op) or []
-        found = await back.search.external(Kind(kind), query)
+        found = await back.search.external(Kind(kind), query, offset)
         merged = merge_results(shown, list(found.views))
         if self._kept.taken(op) is not None:
             # Пока летел ответ, страница могла набрать новую строку и захватить
@@ -89,8 +105,9 @@ class Search(Domain):
         # заново, и всякое новое поле `ExternalSearch` теряется в такой сборке
         # молча — у него есть умолчание. Страница ветвится по этому признаку, и
         # без него список убранного нарисовался бы обычными карточками ленты.
-        return ExternalSearch(views=tuple(merged), refusals=found.refusals,
-                              removed=found.removed)
+        return ExternalSearch(views=tuple(merged[len(shown):]),
+                              refusals=found.refusals,
+                              removed=found.removed, more=found.more)
 
     async def _person(self, back, op, domain, entity_id, kind):
         answer = await back.finder.by_entity(domain, entity_id, kind)

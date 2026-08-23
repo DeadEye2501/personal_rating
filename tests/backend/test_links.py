@@ -16,6 +16,16 @@ ADDRESSES = [
     ("https://www.gog.com/game/arcanum_of_steamworks_and_magick_obscura",
      Source.GOG, "arcanum_of_steamworks_and_magick_obscura", Kind.GAME),
     ("https://www.gog.com/en/game/arcanum", Source.GOG, "arcanum", Kind.GAME),
+    # Четыре формы адреса книги, все замерены 22.08.2026: в трёх идентификатор
+    # тома стоит параметром `id`, в четвёртой — последним куском пути.
+    ("https://www.google.com/books/edition/_/wuiaEAAAQBAJ",
+     Source.GOOGLE_BOOKS, "wuiaEAAAQBAJ", Kind.BOOK),
+    ("http://books.google.com/books?id=TvJaAAAAMAAJ&dq=inauthor:%22Frank%22",
+     Source.GOOGLE_BOOKS, "TvJaAAAAMAAJ", Kind.BOOK),
+    ("https://play.google.com/store/books/details?id=vDkkMwEACAAJ",
+     Source.GOOGLE_BOOKS, "vDkkMwEACAAJ", Kind.BOOK),
+    ("https://books.google.com/books/about/Дюна?id=-u8-DwAAQBAJ",
+     Source.GOOGLE_BOOKS, "-u8-DwAAQBAJ", Kind.BOOK),
 ]
 
 
@@ -23,6 +33,14 @@ ADDRESSES = [
 def test_addresses_are_understood(raw, source, source_id, kind):
     link = parse_link(raw)
     assert (link.source, link.source_id, link.kind) == (source, source_id, kind)
+
+
+def test_a_google_search_with_an_identifier_is_not_a_book():
+    """Слово `books` ловится куском пути, а не где угодно в строке. Иначе
+    обычный поиск Google по слову «books» с любым параметром `id` разбирался бы
+    в книгу, и вставленная ссылка завела бы карточку несуществующего тома —
+    молча, потому что источник на чужой номер отвечает пустотой."""
+    assert parse_link("https://www.google.com/search?q=books&id=555") is None
 
 
 def test_the_type_comes_from_the_path():

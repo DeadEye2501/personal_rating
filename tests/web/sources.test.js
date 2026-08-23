@@ -183,12 +183,12 @@ describe('адрес страницы источника', () => {
 
 describe('адрес в источник', () => {
   it('бывает только там, где источник есть', () => {
-    // У книг и музыки клиентов нет вовсе, и вставленная ссылка отвечала бы
-    // отказом на каждое нажатие клавиши. Поле поэтому не показывается.
+    // У музыки клиента нет вовсе, и вставленная ссылка отвечала бы отказом на
+    // каждое нажатие клавиши. Поле поэтому не показывается.
     expect(linkableOf('movie')).toBe(true)
     expect(linkableOf('series')).toBe(true)
     expect(linkableOf('game')).toBe(true)
-    expect(linkableOf('book')).toBe(false)
+    expect(linkableOf('book')).toBe(true)
     expect(linkableOf('music')).toBe(false)
   })
 })

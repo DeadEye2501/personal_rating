@@ -2,6 +2,7 @@
 
 import logging
 from dataclasses import replace
+from typing import ClassVar
 
 import httpx
 
@@ -50,6 +51,11 @@ class GogClient:
     Аргумент `kind` есть ради общего контракта каталожных клиентов и
     игнорируется: у GOG содержимое одного типа."""
 
+    # Листать умеет — замерено, `page`, восемь страниц без пересечений. Но игры
+    # не догружаются решением пользователя 22.08.2026, и спрашивать вторую
+    # страницу у магазина некому.
+    PAGES: ClassVar[bool] = False
+
     def __init__(self, http: SourceHttp) -> None:
         self._http = http
 
@@ -86,9 +92,14 @@ class GogClient:
         return parsed(logger, "gog", "каталог не разобрался",
                       lambda: parse_catalog(payload))
 
-    async def search(self, query: str, kind: Kind) -> Outcome:
+    async def search(self, query: str, kind: Kind, offset: int = 0) -> Outcome:
         """Кандидаты собираются из тела ответа, а не из разобранных карточек:
-        слаг лежит в строке каталога и нужен склейке выдачи ключом."""
+        слаг лежит в строке каталога и нужен склейке выдачи ключом.
+
+        Смещение принимается ради общего контракта и никуда не уезжает: листать
+        каталог умеет — замерено, `page`, восемь страниц без пересечений, — но
+        играм догрузка не нужна решением пользователя, и перевод смещения в
+        номер страницы был бы кодом без сегодняшнего потребителя."""
         payload = await self._payload(query, PRODUCT_TYPES)
         if isinstance(payload, Refusal):
             return payload

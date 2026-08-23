@@ -14,6 +14,7 @@ from backend.model import (
     Kind,
     Refusal,
     SearchHit,
+    Source,
     merge_results,
 )
 from backend.service.filmography import Filmographies
@@ -65,7 +66,8 @@ class PeopleSearch:
         return await self._views.in_order(
             await repository.items_of(entity_id, kind))
 
-    async def _outside(self, domain: str, identity: tuple[str, str | None],
+    async def _outside(self, domain: str,
+                       identity: tuple[str, str | None, Source | None],
                        kind: Kind) -> tuple[list[SearchHit], list[Refusal]]:
         """У студий внешней половины нет вовсе, и решается это доменом, а не
         видом: ручки, по которой спрашивают компанию, нет ни у одного источника,
@@ -74,10 +76,13 @@ class PeopleSearch:
         if domain == "companies":
             return [], []
 
-        name, source_id = identity
-        works, refusals = (await self._works.of_person(source_id, kind)
-                           if source_id
-                           else await self._works.of_name(name, kind))
+        name, source_id, source = identity
+        # Номер отдаётся наружу только своему источнику: чужой уехал бы в запрос
+        # как есть и не нашёл бы ничего — молча, без единого отказа.
+        works, refusals = (
+            await self._works.of_person(source_id, kind)
+            if source_id and self._works.owns(source, kind)
+            else await self._works.of_name(name, kind))
         # Подряд, а не переплетением: у клика порции нет — показываются все
         # работы всех тёзок, — и человек читает их по одному человеку за раз.
         # Переплетает их строка поиска, где порция двадцать строк.

@@ -138,6 +138,7 @@
   - `STEAM` = `'steam'`
   - `GOG` = `'gog'`
   - `OLD_GAMES` = `'old_games'`
+  - `GOOGLE_BOOKS` = `'google_books'`
 - `class GenreSource(StrEnum)`
   - `TMDB` = `'tmdb'`
   - `STEAM` = `'steam'`
@@ -182,6 +183,7 @@
 - `_TMDB` = `re.compile('themoviedb\\.org/(movie|tv)/(\\d+)',…`
 - `_STEAM` = `re.compile('store\\.steampowered\\.com/(?:ageche…`
 - `_GOG` = `re.compile('gog\\.com/(?:[a-z-]+/)?game/([a-z0-9…`
+- `_GOOGLE_BOOKS` = `re.compile('google\\.[a-z.]+/(?:[a-z]+/)*books(?…`
 - `_BARE` = `re.compile('^\\d+$')`
 - `_TMDB_KINDS` = `словарь из 2`
 - `_FILMS` = `набор из 2`
@@ -255,10 +257,12 @@
 
 ### `backend/model/results.py`
 
+- `SEARCH_SIZE` = `20`
 - `class ExternalSearch`
   - `views: tuple[CardView, ...]`
   - `refusals: tuple[Refusal, ...]`
   - `removed: bool` = `False`
+  - `more: bool` = `False`
 
 ### `backend/model/search.py`
 
@@ -372,11 +376,10 @@
 - `logger` = `logging.getLogger(__name__)`
 - `_SIGNATURES` = `набор из 3`
 - `_ABSENT` = `404`
-- `POSTER_SOURCES` = `набор из 4`
+- `POSTER_SOURCES` = `набор из 5`
 
 ### `backend/service/search.py`
 
-- `SEARCH_SIZE` = `20`
 - `COMMANDS` = `frozenset({'удалено', 'удаленное', 'удаленный', …`
 - `class SearchParts`
   - `genres: GenresRepository`
@@ -394,6 +397,12 @@
 - `SYMBOLS` = `str.maketrans({'™': ' ', '®': ' ', '©': ' ', '℠'…`
 - `ARTICLES` = `frozenset({'the', 'a', 'an'})`
 
+### `backend/sources/busy.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `BUSY` = `503`
+- `ATTEMPTS` = `3`
+
 ### `backend/sources/convert.py`
 
 - `FREE_IN_SEARCH` = `словарь из 2`
@@ -408,10 +417,25 @@
 - `CATALOG` = `'https://catalog.gog.com/v1/catalog'`
 - `PRODUCT` = `'https://api.gog.com/products/{source_id}'`
 - `PRODUCT_TYPES` = `'in:game,pack'`
+- `class GogClient`
+  - `PAGES: ClassVar[bool]` = `False`
 
 ### `backend/sources/gog/parse.py`
 
 - `SPELLING` = `словарь из 5`
+
+### `backend/sources/google_books/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `SOURCE` = `'google_books'`
+- `BASE` = `'https://www.googleapis.com/books/v1/volumes'`
+- `class GoogleBooksClient`
+  - `PAGES: ClassVar[bool]` = `True`
+
+### `backend/sources/google_books/parse.py`
+
+- `_GENERAL` = `'General'`
+- `_ZOOM` = `re.compile('zoom=\\d+')`
 
 ### `backend/sources/http.py`
 
@@ -428,8 +452,8 @@
 - `BASE` = `'https://www.old-games.ru'`
 - `CATALOG` = `f'{BASE}/catalog/'`
 - `CARD` = `BASE + '/game/{source_id}.html'`
-- `BUSY` = `503`
-- `ATTEMPTS` = `3`
+- `class OldGamesClient`
+  - `PAGES: ClassVar[bool]` = `False`
 
 ### `backend/sources/oldgames/parse.py`
 
@@ -499,6 +523,7 @@
   - `steam: SteamClient`
   - `gog: GogClient`
   - `old_games: OldGamesClient`
+  - `google_books: GoogleBooksClient`
   - `mdblist: MdbListClient`
   - `omdb: OmdbClient`
   - `kinopoisk: KinopoiskClient`
@@ -513,6 +538,8 @@
 - `ITEMS_CONTEXT` = `словарь из 3`
 - `SIFT_WANTED` = `словарь из 2`
 - `CARD_WANTED` = `SIFT_WANTED | {'include_tag_count': 20}`
+- `class SteamClient`
+  - `PAGES: ClassVar[bool]` = `False`
 
 ### `backend/sources/steam/parse.py`
 
@@ -529,6 +556,7 @@
 - `RATE_BACKOFF` = `timedelta(minutes=1)`
 - `_ABSENT` = `набор из 2`
 - `class TmdbClient`
+  - `PAGES: ClassVar[bool]` = `True`
   - `_APPEND` = `словарь из 2`
 
 ### `backend/sources/tmdb/parse.py`
@@ -785,14 +813,19 @@
 
 - `SLUG` = `'arcanum_of_steamworks_and_magick_obscura'`
 
+### `tests/backend/sources/test_google_books.py`
+
+- `KEY` = `'ключ-google-books'`
+
 ### `tests/backend/sources/test_rating_provides.py`
 
 - `FULL_ANSWERS` = `набор из 3`
 
 ### `tests/backend/sources/test_registry.py`
 
+- `CATALOG_OWNERS` = `tuple(unique((name for route in ROUTES.values() …`
+- `KIND_OF` = `{name: kind for kind, route in ROUTES.items() fo…`
 - `SILENT` = `responding(json={})`
-- `CATALOG_OWNERS` = `набор из 4`
 
 ### `tests/backend/sources/test_steam_items.py`
 
@@ -868,7 +901,7 @@
 
 ### `tests/backend/test_links.py`
 
-- `ADDRESSES` = `набор из 6`
+- `ADDRESSES` = `набор из 10`
 - `SHOUTED` = `набор из 5`
 - `NONSENSE` = `набор из 9`
 
@@ -999,4 +1032,6 @@
 ### `tests/fakes.py`
 
 - `class FakeSources`
-  - `NOBODY` = `frozenset({Kind.BOOK, Kind.MUSIC})`
+  - `NO_CATALOG` = `frozenset({Kind.MUSIC})`
+  - `NO_PEOPLE` = `frozenset({Kind.GAME, Kind.MUSIC})`
+  - `NO_RATINGS` = `frozenset({Kind.GAME, Kind.BOOK, Kind.MUSIC})`

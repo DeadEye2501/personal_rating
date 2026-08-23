@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from backend.model import Kind, Source
 from backend.sources.gog.client import GogClient
+from backend.sources.google_books.client import GoogleBooksClient
 from backend.sources.http import SourceHttp
 from backend.sources.oldgames.client import OldGamesClient
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
@@ -34,7 +35,7 @@ ROUTES: dict[Kind, Route] = {
     Kind.MOVIE: Route(("tmdb",), "tmdb", FILM_RATINGS),
     Kind.SERIES: Route(("tmdb",), "tmdb", FILM_RATINGS),
     Kind.GAME: Route(("steam", "gog", "old_games"), None, ()),
-    Kind.BOOK: Route((), None, ()),
+    Kind.BOOK: Route(("google_books",), "google_books", ()),
     Kind.MUSIC: Route((), None, ()),
 }
 
@@ -51,6 +52,7 @@ class Sources:
     steam: SteamClient
     gog: GogClient
     old_games: OldGamesClient
+    google_books: GoogleBooksClient
     mdblist: MdbListClient
     omdb: OmdbClient
     kinopoisk: KinopoiskClient
@@ -66,15 +68,20 @@ class Sources:
         вовсе. Одну игру из двух-трёх источников склеивает `service/merging.py`;
         что не склеилось, остаётся на глазах человека — он убирает лишнее сам.
 
-        У книг и музыки не спрашивают никого: клиентов под них нет, и выдача
-        честно пуста."""
+        У книг источник один: у Open Library народная разметка, а Goodreads
+        закрыл выдачу ключей в 2020. У музыки клиента ещё нет, и выдача честно
+        пуста."""
         return [getattr(self, name) for name in ROUTES[kind].catalogs]
 
-    def people_for(self, kind: Kind) -> TmdbClient | None:
+    def people_for(self, kind: Kind) -> TmdbClient | GoogleBooksClient | None:
         """Кто умеет искать по человеку. У игр — никто, и это замерено, а не
         предположено: Steam по разработчику отдаёт разметку витрины, GOG молча
         игнорирует параметр и возвращает весь каталог. Людей же магазины не
-        отдают вовсе, только компании. У книг и музыки нет и каталога."""
+        отдают вовсе, только компании.
+
+        У книг отвечает тот же Google Books: своей ручки людей у него нет, и
+        автор ищется той же выдачей оператором `inauthor:` — идентичность автора
+        равна его имени. У музыки ответчик приезжает задачей 5."""
         name = ROUTES[kind].people
         return getattr(self, name) if name else None
 
@@ -86,6 +93,7 @@ class Sources:
             Source.STEAM: self.steam,
             Source.GOG: self.gog,
             Source.OLD_GAMES: self.old_games,
+            Source.GOOGLE_BOOKS: self.google_books,
         }.get(source)
 
     def rating_sources(self, kind: Kind) -> list:

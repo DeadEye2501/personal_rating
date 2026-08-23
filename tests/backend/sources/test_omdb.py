@@ -6,8 +6,9 @@ from datetime import datetime, timedelta
 import httpx
 
 from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
+from backend.sources.backoff import until_midnight
 from backend.sources.http import SourceHttp
-from backend.sources.ratings.omdb.client import OmdbClient, until_midnight
+from backend.sources.ratings.omdb.client import OmdbClient
 from backend.sources.ratings.omdb.parse import parse_ratings
 from tests.conftest import FakeClock, counting, responding
 

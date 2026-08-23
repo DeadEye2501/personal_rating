@@ -6,7 +6,7 @@
 молча обеднела бы: у клика внешняя половина осталась бы без работ тёзок, у
 строки — без работ вовсе."""
 
-from backend.model import Found, Kind, Refusal, SearchHit
+from backend.model import Found, Kind, Refusal, SearchHit, Source
 from backend.service.asking import answered, answered_all
 from backend.service.hits import once, split
 from backend.sources.registry import Sources
@@ -19,11 +19,29 @@ class Filmographies:
     def __init__(self, sources: Sources) -> None:
         self._sources = sources
 
+    def owns(self, source: Source | None, kind: Kind) -> bool:
+        """Тот ли это источник, чьи номера понимает ответчик за этот тип.
+
+        Спрашивают перед тем, как отдать номер наружу. Человека с карточки
+        фильма можно повесить на книгу руками — `suggest` отбирает людей без
+        оглядки на тип, `attach` вешает кого угодно куда угодно, — и номер TMDB,
+        отданный Google, уехал бы в запрос по автору как есть. Отказа не было бы
+        ни одного: источник ответил бы пустой выдачей, и клик молча не нашёл бы
+        ничего."""
+        # По имени, а не тождеством с `client_for`: имя соединения собирается
+        # сборкой из значения `Source` — там это записано и там же сторожится
+        # тестом реестра, — а спрашивать `client_for` пришлось бы за тем же
+        # ответом вторым путём. Пробовали 23.08.2026 и отвели: разбор в
+        # `docs/other/not-duplicates.md`.
+        client = self._sources.people_for(kind)
+        return client is not None and source is not None and client.name == source
+
     async def of_person(self, source_id: str,
                         kind: Kind) -> tuple[list[list[SearchHit]],
                                              list[Refusal]]:
         """У человека из TMDB идентификатор уже есть, и спрашивать его по имени
-        значило бы притащить тёзок туда, где их быть не должно."""
+        значило бы притащить тёзок туда, где их быть не должно. У автора Google
+        Books идентичности нет вовсе, и он всегда идёт вторым путём."""
         client = self._sources.people_for(kind)
         if client is None:
             return [], []

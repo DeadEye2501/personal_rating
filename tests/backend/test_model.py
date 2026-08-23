@@ -149,7 +149,8 @@ def test_rating_of_a_film_carries_no_aspects():
 # переименование здесь ломает уже записанные строки, а не только код.
 SCHEMA = [
     (Kind, {"movie", "series", "game", "book", "music"}),
-    (Source, {"manual", "tmdb", "steam", "gog", "old_games"}),
+    (Source, {"manual", "tmdb", "steam", "gog", "old_games",
+              "google_books"}),
     (IdSource, {"imdb", "kinopoisk", "steam", "gog"}),
     (RatingSource, {"imdb", "kinopoisk", "tmdb", "rotten", "metacritic",
                     "steam", "gog"}),

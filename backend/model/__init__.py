@@ -48,7 +48,11 @@ from backend.model.query import (
 )
 from backend.model.rating import Rating, average_score
 from backend.model.ratings import Ratings
-from backend.model.results import ExternalSearch, merge_results
+from backend.model.results import (
+    SEARCH_SIZE,
+    ExternalSearch,
+    merge_results,
+)
 from backend.model.search import PersonHit, SearchHit
 from backend.model.suggestion import Suggestion
 from backend.model.tag import Tag
@@ -56,6 +60,7 @@ from backend.model.view import CardView, view_from_hit, view_from_item
 
 
 __all__ = [
+    "SEARCH_SIZE",
     "BadImage",
     "Bucket",
     "CardView",

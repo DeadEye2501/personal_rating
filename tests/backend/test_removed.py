@@ -196,10 +196,26 @@ async def test_the_removal_reaches_every_answer_and_not_only_the_first(
     assert [one.title for one in result.views] == ["Fallout 2"]
 
 
+async def test_a_short_portion_after_cleaning_is_not_the_end(
+        sessions, reference, removed):
+    """Главное свойство догрузки. Из двадцати строк отсев убранного оставляет
+    меньше, и «пришло мало» не значит «кончилось»: конец называет источник, а не
+    длина списка после чистки. Считай мост по ней — и лента вставала бы на
+    первой же убранной строке."""
+    await removed.remember(an_item("0", "Дюна 0"))
+    full = FakeSearch(Found([hit(str(n), f"Дюна {n}")
+                             for n in range(SEARCH_SIZE)]))
+
+    result = await search_service(sessions, full).external(Kind.MOVIE, "дюна")
+
+    assert len(result.views) < SEARCH_SIZE
+    assert result.more is True
+
+
 async def test_a_removed_row_does_not_eat_a_slot(sessions, reference, removed):
     """Отсев стоит **до** среза порции. Иначе убранная строка занимала бы слот
     из двадцати, до экрана доезжало бы девятнадцать, а добрать двадцатую
-    неоткуда: догрузки у поиска нет вовсе."""
+    неоткуда: следующая порция начинается со следующего двадцатка."""
     await removed.remember(a_game("0"))
     many = FakeSearch(Found([
         hit(str(n), f"Игра {n}", source=Source.STEAM, kind=Kind.GAME)

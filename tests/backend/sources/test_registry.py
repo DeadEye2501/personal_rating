@@ -8,16 +8,26 @@ import httpx
 import pytest
 
 from backend.config import load_config
-from backend.model import Found, Kind, Refusal, Source
+from backend.model import SEARCH_SIZE, Found, Kind, Refusal, Source
 from backend.sources.gog.client import GogClient
 from backend.sources.oldgames.client import OldGamesClient
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
 from backend.sources.ratings.mdblist.client import MdbListClient
 from backend.sources.ratings.omdb.client import OmdbClient
 from backend.sources.build import build_sources
-from tests.conftest import responding
+from backend.sources.registry import ROUTES
 from backend.sources.steam.client import SteamClient
 from backend.sources.tmdb.client import TmdbClient
+from backend.unique import unique
+from tests.conftest import counting, responding
+
+# Кто держит каталог и по какому типу его спрашивают — выведено из таблицы
+# маршрутов, а не переписано списком: переписанный расходится не с ожидаемым, а
+# с самим собой, и новый источник остаётся непроверенным при зелёном наборе.
+CATALOG_OWNERS = tuple(unique(name for route in ROUTES.values()
+                              for name in route.catalogs))
+KIND_OF = {name: kind for kind, route in ROUTES.items()
+           for name in route.catalogs}
 
 SILENT = responding(json={})
 
@@ -110,15 +120,40 @@ async def test_games_ask_nobody_about_people(registry):
     assert registry.people_for(Kind.GAME) is None
 
 
-@pytest.mark.parametrize("kind", [Kind.BOOK, Kind.MUSIC])
-async def test_kinds_without_sources_ask_nobody(registry, kind):
+async def test_books_are_searched_at_google(registry):
+    """Источник книг один: у Open Library народная разметка, а Goodreads закрыл
+    выдачу ключей в 2020.
+
+    Тождеством, а не типом: клиент обязан быть тот же самый, что поднят
+    сборкой, — второй такой же уехал бы в сеть со своим предохранителем и со
+    своей квотой в тысячу запросов."""
+    assert registry.catalog_for(Kind.BOOK) == [registry.google_books]
+
+
+async def test_the_author_of_a_book_is_asked_at_google(registry):
+    """Тождеством, а не типом: ответчик за людей обязан быть тем же клиентом,
+    что и каталожный, — второй такой же уехал бы в сеть со своим
+    предохранителем и со своей квотой."""
+    assert registry.people_for(Kind.BOOK) is registry.google_books
+
+
+async def test_books_still_have_no_ratings(registry):
+    """Половина прежнего сторожа, которая осталась правдой: оценок у книг нет и
+    не предвидится — Goodreads закрыл выдачу ключей в 2020, у LiveLib
+    публичного API нет."""
+    assert registry.rating_sources(Kind.BOOK) == []
+
+
+async def test_music_asks_nobody(registry):
     """Главная опасность всей работы. Реестр был написан как «игра или всё
     остальное», и книга уехала бы в киношную ветку молча: поиск вернул бы
     фильмы, обогащение пошло бы за оценками в MDBList, OMDb и Кинопоиск по
-    несуществующему `imdb_id`. Отказа не было бы ни одного."""
-    assert registry.catalog_for(kind) == []
-    assert registry.people_for(kind) is None
-    assert registry.rating_sources(kind) == []
+    несуществующему `imdb_id`. Отказа не было бы ни одного.
+
+    У музыки клиент приезжает задачей 5, и до тех пор пустота у неё честная."""
+    assert registry.catalog_for(Kind.MUSIC) == []
+    assert registry.people_for(Kind.MUSIC) is None
+    assert registry.rating_sources(Kind.MUSIC) == []
 
 
 async def test_every_kind_has_a_row_in_the_table(registry):
@@ -142,14 +177,15 @@ async def test_a_kind_outside_the_table_is_refused_on_the_spot(registry):
 async def test_every_catalog_client_takes_the_same_arguments(registry):
     """Ради этого реестр и существует: сервис зовёт их одинаково.
 
-    Перебор идёт по всему перечислению, а не по списку типов: у книг и музыки
-    каталога нет, и тело цикла им просто не достаётся — зато список перестаёт
-    отставать от перечисления молча."""
+    Перебор идёт по всему перечислению, а не по списку типов: у музыки каталога
+    нет, и тело цикла ей просто не достаётся — зато список перестаёт отставать
+    от перечисления молча."""
     for kind in Kind:
         for client in registry.catalog_for(kind):
             assert list(inspect.signature(client.search).parameters) == [
                 "query",
                 "kind",
+                "offset",
             ], type(client)
             assert list(inspect.signature(client.card).parameters) == [
                 "source_id",
@@ -157,7 +193,7 @@ async def test_every_catalog_client_takes_the_same_arguments(registry):
             ], type(client)
 
 
-@pytest.mark.parametrize("name", ["tmdb", "steam", "gog", "old_games"])
+@pytest.mark.parametrize("name", CATALOG_OWNERS)
 async def test_each_catalog_client_sits_on_the_connection_of_its_own_name(registry, name):
     """Привязка «имя соединения — клиент» проверяется следствием, а не чтением
     `client.name`: имя в отказе клиенты подставляют литералом, поэтому
@@ -167,20 +203,46 @@ async def test_each_catalog_client_sits_on_the_connection_of_its_own_name(regist
     Взводим предохранитель на соединении с этим именем и спрашиваем каждого из
     четырёх: замолчать обязан ровно один, и это должен быть тот, чьё имя мы
     взвели. Обменяй соединения — замолчит не тот, и тест покраснеет."""
-    clients = {"tmdb": registry.tmdb, "steam": registry.steam,
-               "gog": registry.gog, "old_games": registry.old_games}
+    clients = {owner: getattr(registry, owner) for owner in CATALOG_OWNERS}
     for connection in registry.connections:
         if connection.name == name:
             connection.breaker.trip(timedelta(hours=1))
 
     silent = set()
     for owner, client in clients.items():
-        result = await client.search("что угодно", Kind.MOVIE
-                                    if owner == "tmdb" else Kind.GAME)
+        result = await client.search("что угодно", KIND_OF[owner])
         if isinstance(result, Refusal) and result.detail == "предохранитель взведён":
             silent.add(owner)
 
     assert silent == {name}
+
+
+async def test_the_paging_flag_matches_what_the_client_asks():
+    """Признак `PAGES` читает сервис поиска, и соврать он может молча в обе
+    стороны: ложный у листающего выключает догрузку насовсем, истинный у
+    нелистающего заставляет спрашивать вторую порцию, которой не бывает, — и
+    тратит запрос из суточной тысячи на каждый поиск.
+
+    Наблюдается не самим признаком, а тем, что клиент делает: запрос со
+    смещением сравнивается с запросом без него. Разошлись — клиент листает,
+    совпали — второй порции у него нет. Так подмена `True` на `False` перестаёт
+    быть невидимой: объявление и поведение сверяются друг с другом."""
+    transport, seen = counting(SILENT)
+    registry = build_sources(
+        load_config({"TMDB_API_KEY": "k"}, base_dir=Path(".")),
+        transport=transport,
+    )
+    try:
+        for kind in Kind:
+            for client in registry.catalog_for(kind):
+                asked = []
+                for offset in (0, SEARCH_SIZE):
+                    seen.clear()
+                    await client.search("дюна", kind, offset)
+                    asked.append([str(one.url) for one in seen])
+                assert (asked[0] != asked[1]) is client.PAGES, client.name
+    finally:
+        await registry.aclose()
 
 
 async def test_every_rating_client_takes_the_same_arguments(registry):
@@ -199,12 +261,12 @@ async def test_every_source_has_its_own_breaker(registry):
     # Оба зеркала Кинопоиска заведены под одним именем: наружу источник один, и
     # в `Refusal.source` человек должен увидеть «kinopoisk», а не имя зеркала.
     assert sorted(one.name for one in registry.connections) == [
-        "gog", "kinopoisk", "kinopoisk", "mdblist", "old_games", "omdb",
-        "steam", "tmdb",
+        "gog", "google_books", "kinopoisk", "kinopoisk", "mdblist",
+        "old_games", "omdb", "steam", "tmdb",
     ]
     assert len(breakers) == len({id(one) for one in breakers})
-    # Семь источников, но соединений восемь: у Кинопоиска два зеркала.
-    assert len(breakers) == 8
+    # Восемь источников, но соединений девять: у Кинопоиска два зеркала.
+    assert len(breakers) == 9
 
 
 async def test_a_tripped_breaker_leaves_the_others_alone(registry):
@@ -259,11 +321,14 @@ async def test_every_key_from_the_settings_reaches_its_own_source():
 
 async def test_a_card_goes_back_to_the_client_it_came_from(registry):
     """Все подставные клиенты в тестах сервисов аргумент игнорируют — если
-    словарь тут перепутан, заметить это можно только здесь."""
-    assert registry.client_for(Source.TMDB) is registry.tmdb
-    assert registry.client_for(Source.STEAM) is registry.steam
-    assert registry.client_for(Source.GOG) is registry.gog
-    assert registry.client_for(Source.OLD_GAMES) is registry.old_games
+    словарь тут перепутан, заметить это можно только здесь.
+
+    Перебором по перечислению, а не списком из четырёх строк: седьмой источник
+    в списке забыли бы, и карточка книги уходила бы обновляться в никуда."""
+    for source in Source:
+        if source is Source.MANUAL:
+            continue
+        assert registry.client_for(source) is getattr(registry, str(source)), source
 
 
 async def test_a_manual_card_has_no_client(registry):
@@ -285,9 +350,6 @@ async def test_closing_closes_every_connection():
         except RuntimeError:
             continue
         raise AssertionError(f"соединение {one.name} осталось открытым")
-
-
-CATALOG_OWNERS = ("tmdb", "steam", "gog", "old_games")
 
 
 @pytest.mark.parametrize("owner", [*CATALOG_OWNERS, "mdblist", "omdb"])

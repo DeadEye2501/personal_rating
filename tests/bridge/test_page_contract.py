@@ -164,7 +164,7 @@ def test_pages_are_built_only_for_ids_that_are_actually_stored():
     только IMDb и Кинопоиск: `IdSource` знает ещё Steam и GOG, но их не пишет
     ни один клиент. Строка про источник, которого в перечислении нет вовсе, —
     это ссылка в никуда."""
-    built = keys_of("PAGES", source("state/sources.js"))
+    built = keys_of("ADDRESS", source("state/sources.js"))
 
     assert built <= set(IdSource)
     assert built == {IdSource.IMDB, IdSource.KINOPOISK}

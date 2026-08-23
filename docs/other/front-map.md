@@ -48,7 +48,7 @@
 - принимает: view, onsaved, onclose, ontrouble
 - берёт: ./marks.js, ./trouble.js
 
-### app/SearchScreen.svelte (313)
+### app/SearchScreen.svelte (377)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, reviewed, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -70,9 +70,9 @@
 - Свои отметки на карточке: оценка, закладка и рецензия.
 - отдаёт: aspected, reviewed, scored, wished
 
-### app/reread.js (47)
+### app/reread.js (35)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
-- отдаёт: keyOf, merged, refreshed, same, without
+- отдаёт: keyOf, refreshed, same, without
 
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
@@ -295,7 +295,7 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (132)
+### state/sources.js (136)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: LINKED, MANUAL, cardSourceName, inOrder, linkableOf, nameOf, pagesOf, shownValue, stepOfSource
 

@@ -6,9 +6,12 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from backend.model import (
+    SEARCH_SIZE,
     CardView,
     ExternalSearch,
+    Found,
     Kind,
+    Outcome,
     SearchHit,
 )
 from backend.service.asking import answered_all
@@ -22,10 +25,6 @@ from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.removed import RemovedRepository
 from backend.storage.repository.views import ViewsRepository
 from backend.unique import unique_by
-
-# Ровно страница выдачи TMDB: одна порция стоит одного запроса. Величина —
-# настройка, а не свойство схемы.
-SEARCH_SIZE = 20
 
 # Слова, которыми вместо выдачи просят список убранного. Список закрытый и
 # выбран пользователем 03.08.2026 из двух: широкое правило «всякое слово на
@@ -51,6 +50,23 @@ def _asks_for_removed(query: str) -> bool:
     года не находился бы никогда. Команда — не название, ей нужны только регистр,
     края строки и `ё`, которую человек пишет и так, и так."""
     return query.strip().lower().replace("ё", "е") in COMMANDS
+
+
+def _has_more(clients: list, outcomes: list[Outcome]) -> bool:
+    """Есть ли, что догружать.
+
+    Полная порция — единственный признак, который у источников есть: `totalItems`
+    у Google всегда `300` и врёт, а у выдачи Steam числа нет вовсе. Считается по
+    сырой выдаче, до всякой чистки: из двадцати строк отсев нерелевантного,
+    снятие убранного и склейка изданий оставляют меньше, и короткая порция после
+    них означает «почистили», а не «кончилось».
+
+    Нелистающий источник «ещё» не обещает никогда, даже отдав полную порцию:
+    второй порции у него не бывает, и лента сходила бы за заведомо пустой
+    выдачей на каждый поиск игры."""
+    return any(client.PAGES and isinstance(outcome, Found)
+               and len(outcome.value) >= SEARCH_SIZE
+               for client, outcome in zip(clients, outcomes, strict=True))
 
 
 def _weave(answers: list[list[SearchHit]]) -> list[SearchHit]:
@@ -115,9 +131,14 @@ class SearchService:
         item_ids = await self._library.search(kind, query, limit=SEARCH_SIZE)
         return await self._views.in_order(item_ids)
 
-    async def external(self, kind: Kind, query: str) -> ExternalSearch:
+    async def external(self, kind: Kind, query: str,
+                       offset: int = 0) -> ExternalSearch:
         """Строка ищет и по названию, и по имени человека — всегда, а не «если
         названием ничего не нашлось»: решение пользователя 01.08.2026.
+
+        Смещение — вторая и следующие порции, которые просит прокрутка. Со
+        смещением спрашиваются только те, кто листать умеет: у остальных второй
+        порции не бывает вовсе, и запрос к ним ушёл бы впустую.
 
         Обе половины уходят разом: сроки ожидания у них свои, и спроси их по
         очереди — выдача ждала бы их сумму. У игр в первой половине два
@@ -128,10 +149,12 @@ class SearchService:
         if _asks_for_removed(query):
             gone = await self._removed.listing(kind)
             return ExternalSearch(views=tuple(gone), refusals=(), removed=True)
+        clients = [one for one in self._sources.catalog_for(kind)
+                   if offset == 0 or one.PAGES]
         outcomes, (works, refused) = await asyncio.gather(
-            answered_all((client.search(query, kind), client.name)
-                         for client in self._sources.catalog_for(kind)),
-            self._works.of_name(query, kind),
+            answered_all((one.search(query, kind, offset), one.name)
+                         for one in clients),
+            self._namesakes(query, kind, offset),
         )
 
         answers, refusals = split(outcomes)
@@ -154,7 +177,20 @@ class SearchService:
         return ExternalSearch(
             views=tuple(await to_views(woven, self._genres, self._clock)),
             refusals=tuple(once(refusals + refused)),
+            more=_has_more(clients, outcomes),
         )
+
+    async def _namesakes(self, query: str, kind: Kind, offset: int):
+        """Работы тёзок — только на первой порции.
+
+        Вторая половина выдачи не листается вовсе: фильмография приезжает
+        целиком одним запросом на каждого найденного тёзку. Спроси её на каждой
+        порции — приехало бы то же самое, на экран не попало бы ничего
+        (`merge_results` снимет повторы), а запросы ушли бы все, и у книг они из
+        тысячи суточных."""
+        if offset:
+            return [], []
+        return await self._works.of_name(query, kind)
 
     async def _narrowed(self, answers: list[list[SearchHit]],
                         together: list[SearchHit],

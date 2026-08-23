@@ -19,6 +19,7 @@ class Source(StrEnum):
     STEAM = "steam"
     GOG = "gog"
     OLD_GAMES = "old_games"
+    GOOGLE_BOOKS = "google_books"
 
 
 class GenreSource(StrEnum):

@@ -28,7 +28,8 @@ _ABSENT = 404
 # Набор объявлен здесь, а не у сборки: клиентов под него заводят двое — боевая
 # сборка и тесты, — и разойдись они, четвёртый источник молча остался бы без
 # обложек в одной из двух.
-POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG, Source.OLD_GAMES)
+POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG, Source.OLD_GAMES,
+                  Source.GOOGLE_BOOKS)
 
 
 class PosterService:
@@ -93,7 +94,10 @@ class PosterService:
                            url, len(response.content))
             return self._refuse(source, "тело не изображение")
 
-        # Скачанное не трогаем: у всех трёх источников оно уже 2:3.
+        # Скачанное не трогаем: обрезка есть только у залитого руками.
+        # У киношных и игровых источников пропорция и так 2:3, у книжного она
+        # своя — замерено, `zoom=3` отдаёт 575×883, — и подгонять её нечем:
+        # обрезать пришлось бы название с обложки.
         return response.content
 
     @staticmethod

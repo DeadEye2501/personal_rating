@@ -3,10 +3,19 @@
 import logging
 from collections.abc import Callable
 from datetime import timedelta
+from typing import ClassVar
 
 import httpx
 
-from backend.model import Found, Kind, Missing, Outcome, Reason, Refusal
+from backend.model import (
+    SEARCH_SIZE,
+    Found,
+    Kind,
+    Missing,
+    Outcome,
+    Reason,
+    Refusal,
+)
 from backend.sources.backoff import refuse_until
 from backend.sources.errors import parsed
 from backend.sources.http import SourceHttp
@@ -57,6 +66,10 @@ def classify(response: httpx.Response) -> Missing | Refusal | None:
 
 
 class TmdbClient:
+    # Листает: `page`, и `total_pages` у него правдив. Порция — ровно двадцать
+    # строк, то есть страница и есть порция выдачи.
+    PAGES: ClassVar[bool] = True
+
     # У сериала credits отдаёт последний сезон — один актёр вместо трёхсот.
     _APPEND = {
         Kind.MOVIE: "credits",
@@ -116,11 +129,16 @@ class TmdbClient:
         return parsed(logger, "tmdb", complaint,
                       lambda: Found(parse(answer.json())))
 
-    async def search(self, query: str, kind: Kind) -> Outcome:
+    async def search(self, query: str, kind: Kind, offset: int = 0) -> Outcome:
+        """Смещение переводится в номер страницы здесь: у ручки TMDB порции
+        считаются страницами, а идиома проекта — `limit`/`offset`, и разнобой на
+        границе стоил бы того, что каждый зовущий помнил бы, кто из пяти
+        клиентов какими единицами меряет."""
         path = "/search/tv" if kind is Kind.SERIES else "/search/movie"
         return await self._taken(
             f"{BASE}{path}", "выдача поиска не разобралась",
-            lambda payload: parse_search(payload, kind), query=query)
+            lambda payload: parse_search(payload, kind), query=query,
+            page=offset // SEARCH_SIZE + 1)
 
     async def credits_of(self, person_id: str, kind: Kind) -> Outcome:
         """Всё, что человек сделал, одним запросом.

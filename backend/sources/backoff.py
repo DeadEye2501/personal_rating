@@ -1,9 +1,34 @@
-"""Отказ, закрывающий источник на срок."""
+"""Закрытие источника на срок."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from backend.model import Reason, Refusal
 from backend.sources.http import SourceHttp
+
+
+def until_midnight(now: datetime) -> timedelta:
+    """Квота суточная, заголовков о ней не отдаёт ни OMDB, ни Google Books.
+    Пробовать раньше бессмысленно: придёт тот же отказ, а потраченный запрос не
+    вернуть.
+
+    Переехало сюда со второго появления: у Google Books квота ровно такая же —
+    тысяча запросов в сутки без `Retry-After`, — и своя константа была бы не
+    только повтором, но и хуже оригинала: фиксированные сутки от отказа вместо
+    ожидания сброса квоты."""
+    tomorrow = (now + timedelta(days=1)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    return tomorrow - now
+
+
+def daily_quota(http: SourceHttp) -> Refusal:
+    """Суточная квота кончилась: не ходить до полуночи и сказать тем же сроком.
+
+    Вынесено на втором появлении: так отказывают OMDB и Google Books, и у обоих
+    квота суточная, а `Retry-After` не шлёт ни один. Композиция из трёх вызовов
+    держалась только тем, что оба места написали её одинаково, — а инвариант
+    «названный срок равен сроку закрытия» ровно этим однажды и ломался."""
+    return refuse_until(http, Reason.QUOTA, until_midnight(http.clock()))
 
 
 def refuse_until(http: SourceHttp, reason: Reason, delay: timedelta,

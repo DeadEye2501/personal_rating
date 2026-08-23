@@ -1,10 +1,11 @@
-"""Семь клиентов источников, поднятых из настроек."""
+"""Восемь клиентов источников, поднятых из настроек."""
 
 import httpx
 
 from backend.config import Config
 from backend.model import Source
 from backend.sources.gog.client import GogClient
+from backend.sources.google_books.client import GoogleBooksClient
 from backend.sources.http import SourceHttp
 from backend.sources.oldgames.client import OldGamesClient
 from backend.sources.ratings.kinopoisk.client import KinopoiskClient
@@ -47,6 +48,8 @@ def build_sources(
         steam=SteamClient(http(Source.STEAM)),
         gog=GogClient(http(Source.GOG)),
         old_games=OldGamesClient(http(Source.OLD_GAMES)),
+        google_books=GoogleBooksClient(http(Source.GOOGLE_BOOKS),
+                                       config.google_books_key),
         mdblist=MdbListClient(http("mdblist"), config.mdblist_key),
         omdb=OmdbClient(http("omdb"), config.omdb_key),
         kinopoisk=kinopoisk,

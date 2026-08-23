@@ -1,10 +1,12 @@
 """Разговор с old-games.ru по сети."""
 
 import logging
+from typing import ClassVar
 
 import httpx
 
-from backend.model import Found, Kind, Outcome, Reason, Refusal
+from backend.model import Found, Kind, Outcome, Refusal
+from backend.sources.busy import asked_until_free
 from backend.sources.errors import parsed
 from backend.sources.http import SourceHttp
 from backend.sources.oldgames.parse import parse_card, parse_search
@@ -18,15 +20,6 @@ BASE = "https://www.old-games.ru"
 CATALOG = f"{BASE}/catalog/"
 CARD = BASE + "/game/{source_id}.html"
 
-# «Занят сейчас», а не отказ. Замерено тремя проходами: волна из тридцати даёт
-# два десятка `503`, но следующий же одиночный запрос проходит за обычные 0.7 с.
-# Кулдауна нет, `Retry-After` сервер не шлёт — значит повтор идёт немедленно.
-BUSY = 503
-
-# Сколько раз повторить, прежде чем сдаться. Повтор не вечен: при настоящей беде
-# клиент отказывает, а не долбится.
-ATTEMPTS = 3
-
 
 class OldGamesClient:
     """Единственный источник без API: отвечает страницами, а не JSON.
@@ -38,6 +31,9 @@ class OldGamesClient:
     Довод `kind` есть ради общего контракта каталожных клиентов и игнорируется:
     у сайта содержимое одного типа."""
 
+    # Не листает: вся выдача приезжает одним запросом, второй порции у неё нет.
+    PAGES: ClassVar[bool] = False
+
     def __init__(self, http: SourceHttp) -> None:
         self._http = http
 
@@ -48,25 +44,25 @@ class OldGamesClient:
     async def _page(self, url: str, params: dict | None = None) -> str | Refusal:
         """Тело страницы — или отказ, который уже всё решил.
 
-        Очередь к сайту держит `SourceHttp`, а не этот цикл: соединений к нему
+        Повтор при занятости общий, а классификация своя: у этого сайта не
+        описан ни один код, и любой не-200 неизвестен ровно так же, как был бы
+        неизвестен у магазина.
+
+        Очередь к сайту держит `SourceHttp`, а не повтор: соединений к нему
         два — карточки идут своим, обложки своим, — и предел, поставленный
         здесь, накрыл бы только половину."""
-        for attempt in range(ATTEMPTS):
-            response = await self._http.get(url, params=params)
-            if not isinstance(response, httpx.Response):
-                return response
-            if response.status_code == BUSY:
-                logger.info("old-games: занят, попытка %s из %s",
-                            attempt + 1, ATTEMPTS)
-                continue
-            if response.status_code != 200:
-                return refuse_undocumented(self._http, response.status_code)
-            return response.text
-        return Refusal(source=self._http.name, reason=Reason.RATE,
-                       detail=f"{ATTEMPTS} ответа подряд с кодом {BUSY}")
+        response = await asked_until_free(self._http, url, params)
+        if not isinstance(response, httpx.Response):
+            return response
+        if response.status_code != 200:
+            return refuse_undocumented(self._http, response.status_code)
+        return response.text
 
-    async def search(self, query: str, kind: Kind) -> Outcome:
+    async def search(self, query: str, kind: Kind, offset: int = 0) -> Outcome:
         """Вся выдача одним запросом и сразу: порции у этого источника нет.
+
+        Смещение принимается ради общего контракта и никуда не уезжает: просить
+        его у сайта нечем, и со смещением сервис сюда не придёт — `PAGES` ложно.
 
         Строка выдачи несёт всё, кроме обложки, разработчика и описания, — их
         добирает карточка. У магазинов иначе: там обложка приезжает прямо в

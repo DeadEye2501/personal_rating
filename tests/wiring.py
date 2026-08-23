@@ -20,7 +20,7 @@ from tests.fakes import FakeSources
 
 def poster_service(store: PosterStore,
                    transport: httpx.MockTransport) -> PosterService:
-    """Сервис обложек с одним транспортом на все три источника. Где важно, кого
+    """Сервис обложек с одним транспортом на все источники набора. Где важно, кого
     именно спросили, тест собирает клиентов сам."""
     clients = {source: SourceHttp(f"cdn:{source}", transport=transport)
                for source in POSTER_SOURCES}

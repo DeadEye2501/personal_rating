@@ -13,12 +13,97 @@ from backend.model import (
     Refusal,
     Source,
 )
+from backend.model.results import SEARCH_SIZE
 from bridge.search import Search
+from tests.bridge.conftest import ready
 
 
 def a_view(source_id, item_id=None, title="Одиссея", source=Source.TMDB):
     return CardView(kind=Kind.MOVIE, source=source, source_id=source_id,
                     title=title, item_id=item_id)
+
+
+def portions(answers, *given):
+    """Ответы `search.external` по порядку вызовов: догрузка иначе не
+    наблюдается вовсе — двойник отвечает одним и тем же на все вопросы, и
+    вторая порция была бы неотличима от повторённой первой."""
+    served = iter(given)
+
+    def handler(*_args, **_kwargs):
+        return ready(next(served))
+
+    answers["search.external"] = handler
+
+
+def test_the_second_portion_brings_only_what_is_new(spy, asked):
+    """Мост отдаёт странице приращение, а не всё накопленное: страница
+    дописывает приехавшее в конец списка. Отдай он накопленное — лента склеила
+    бы выдачу саму с собой."""
+    answers, _ = asked
+    answers["search.local"] = []
+    portions(answers,
+             ExternalSearch(views=(a_view("1"),), refusals=(), more=True),
+             ExternalSearch(views=(a_view("1"), a_view("2")), refusals=()))
+
+    search = Search(spy)
+    search.local(1, "movie", "одиссея")
+    first = search.external(1)
+    second = search.external(1)
+
+    assert [one["source_id"] for one in first["ok"]["views"]] == ["1"]
+    assert [one["source_id"] for one in second["ok"]["views"]] == ["2"]
+
+
+def test_the_second_portion_is_asked_further_along(spy, asked):
+    """Смещение помнит мост, а не страница: копия размера порции на странице
+    разъехалась бы молча — шаг меньше пропускал бы строки, шаг больше давал бы
+    повторы."""
+    answers, log = asked
+    answers["search.local"] = []
+    portions(answers,
+             ExternalSearch(views=(a_view("1"),), refusals=(), more=True),
+             ExternalSearch(views=(a_view("2"),), refusals=()))
+
+    search = Search(spy)
+    search.local(1, "movie", "одиссея")
+    search.external(1)
+    search.external(1)
+
+    asked_at = [args[2] for name, args, _ in log if name == "search.external"]
+    assert asked_at == [0, SEARCH_SIZE]
+
+
+def test_a_candidate_from_the_first_portion_can_still_be_added(spy, asked):
+    """Кандидата заводят из помнимой выдачи: `CardView` собрать из JSON нечем.
+    Приращение уезжает странице, а память копит по-прежнему всё — иначе строка
+    первой порции перестала бы заводиться, как только приехала вторая."""
+    answers, _ = asked
+    answers["search.local"] = []
+    answers["loader.ensure"] = 7
+    portions(answers,
+             ExternalSearch(views=(a_view("1"),), refusals=(), more=True),
+             ExternalSearch(views=(a_view("1"), a_view("2")), refusals=()))
+
+    search = Search(spy)
+    search.local(1, "movie", "одиссея")
+    search.external(1)
+    search.external(1)
+
+    assert search.ensure(1, "tmdb", "1")["ok"]["value"] == 7
+
+
+def test_the_page_is_told_there_is_more(spy, asked):
+    """Признак переносится поимённо, и на этом месте уже однажды теряли поле: у
+    него есть умолчание, и потерянное молча выглядит как «выдача кончилась»."""
+    answers, _ = asked
+    answers["search.local"] = []
+    answers["search.external"] = ExternalSearch(views=(a_view("1"),),
+                                                refusals=(), more=True)
+
+    search = Search(spy)
+    search.local(1, "movie", "одиссея")
+
+    assert search.external(1)["ok"]["more"] is True
 
 
 def test_local_comes_first_and_alone(spy, asked):
@@ -34,24 +119,36 @@ def test_local_comes_first_and_alone(spy, asked):
 
 def test_external_is_merged_with_what_was_shown(spy, asked):
     """Свой близнец чужого кандидата показывается один раз, и показывается
-    именно свой: у него есть оценка, теги и закладка."""
-    answers, _ = asked
+    именно свой: у него есть оценка, теги и закладка.
+
+    Наблюдается двумя половинами. Странице близнец не уезжает вовсе —
+    приращение его не несёт, а на экране уже стоит своя строка. В памяти же
+    остаётся именно своя: из неё заводят карточку, и уйди туда чужая, `ensure`
+    завёл бы вторую строку той же вещи."""
+    answers, log = asked
     answers["search.local"] = [a_view("1", item_id=5)]
     answers["search.external"] = ExternalSearch(
         views=(a_view("1"), a_view("2")), refusals=())
+    answers["loader.ensure"] = 7
 
     search = Search(spy)
     search.local(1, "movie", "одиссея")
     answer = search.external(1)
+    search.ensure(1, "tmdb", "1")
 
-    ids = [view["source_id"] for view in answer["ok"]["views"]]
-    assert ids == ["1", "2"]
-    assert answer["ok"]["views"][0]["item_id"] == 5
+    assert [view["source_id"] for view in answer["ok"]["views"]] == ["2"]
+    kept = [args[0] for name, args, _ in log if name == "loader.ensure"]
+    assert [one.item_id for one in kept] == [5]
 
 
-def test_the_local_half_comes_first(spy, asked):
+def test_the_local_half_never_comes_back(spy, asked):
     """Сначала своя половина целиком, потом чужая — правило одно на всю выдачу
-    поиска, и живёт оно в `merge_results`."""
+    поиска, и живёт оно в `merge_results`.
+
+    С приращением это наблюдается тем, что своя строка в нём не приезжает:
+    хвост отрезается по числу уже показанных, и переставь `merge_results`
+    половины местами — своё оказалось бы в хвосте, страница дописала бы его
+    вторым разом, и «Только своё» стояло бы в выдаче дважды."""
     answers, _ = asked
     answers["search.local"] = [a_view("9", item_id=5, title="Только своё")]
     answers["search.external"] = ExternalSearch(views=(a_view("1"),),
@@ -62,7 +159,7 @@ def test_the_local_half_comes_first(spy, asked):
 
     ids = [view["source_id"]
            for view in search.external(1)["ok"]["views"]]
-    assert ids == ["9", "1"]
+    assert ids == ["1"]
 
 
 def test_the_query_is_asked_once(spy, asked):

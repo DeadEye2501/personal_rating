@@ -55,15 +55,22 @@ async def test_a_credit_carries_the_row_of_the_person(sessions, card):
 
 
 async def test_the_identity_goes_out_only_when_someone_can_be_asked(sessions):
-    """Пара «имя и внешняя идентичность» — то, чем клик выбирает путь наружу.
-    У строки из TMDB идентичность есть, у заведённой руками её нет, хотя в базе
-    у неё свой `uuid4` под `manual`: спросить по нему некого."""
+    """Тройка «имя, внешняя идентичность и её хозяин» — то, чем клик выбирает
+    путь наружу. У строки из TMDB идентичность есть, у заведённой руками её нет,
+    хотя в базе у неё свой `uuid4` под `manual`: спросить по нему некого.
+
+    Хозяин уезжает наружу с 23.08.2026, и без него номер достался бы чужому
+    источнику: человека с карточки фильма можно повесить на книгу руками, а
+    номер TMDB, отданный Google, ушёл бы в `inauthor:\"550\"` — без отказа,
+    пустой выдачей."""
     repository = people(sessions)
     outer = await repository.create("Кристофер Нолан", Source.TMDB, "525")
     mine = await repository.create_manual("Василий Пупкин")
 
-    assert await repository.identity_of(outer) == ("Кристофер Нолан", "525")
-    assert await repository.identity_of(mine) == ("Василий Пупкин", None)
+    assert await repository.identity_of(outer) == ("Кристофер Нолан", "525",
+                                                   Source.TMDB)
+    assert await repository.identity_of(mine) == ("Василий Пупкин", None,
+                                                  Source.MANUAL)
     assert await repository.identity_of(404) is None
 
 

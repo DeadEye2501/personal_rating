@@ -10,7 +10,8 @@ import pytest
 
 from backend.model import Found, GenreSource, Kind, Refusal, Source
 from backend.sources.http import USER_AGENT, SourceHttp
-from backend.sources.oldgames.client import ATTEMPTS, CARD, OldGamesClient
+from backend.sources.busy import ATTEMPTS
+from backend.sources.oldgames.client import CARD, OldGamesClient
 from backend.sources.oldgames.parse import parse_card, parse_search
 from tests.conftest import counting, responding
 

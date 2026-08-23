@@ -65,7 +65,7 @@ async def test_the_query_and_the_kind_reach_both_halves(sessions, service):
     # молча. Порядком половины не связаны: они уходят разом.
     assert len(client.asked) == 3
     assert set(client.asked) == {
-        ("андор", Kind.SERIES),
+        ("андор", Kind.SERIES, 0),
         ("find_people", "андор"),
         ("credits_of", "525", Kind.SERIES),
     }
@@ -226,19 +226,120 @@ async def test_games_never_go_outside_for_people(sessions, service):
     assert [one for one in client.asked if one[0] == "find_people"] == []
 
 
-async def test_a_book_is_searched_only_in_our_own_base(sessions, service):
-    """Внешние источники книг приедут вторым этапом. До тех пор внешняя половина
+async def test_a_book_goes_outside_like_a_film(sessions, service):
+    """Сторож, утверждавший обратное, стоял здесь с первого этапа: у книг не
+    было источника, и внешняя половина выдачи была пуста по-настоящему.
+    Источник появился, и половина обязана наполниться — иначе книга ищется
+    только среди уже заведённых, а завести первую неоткуда."""
+    client = FakeSearch(Found([hit(title="Дюна", kind=Kind.BOOK,
+                                   source=Source.GOOGLE_BOOKS)]),
+                        name="google_books", people=Found([]))
+
+    result = await service(client).external(Kind.BOOK, "Дюна")
+
+    assert [one.title for one in result.views] == ["Дюна"]
+    assert ("Дюна", Kind.BOOK, 0) in client.asked
+
+
+async def test_a_book_query_asks_for_the_author_too(sessions, service):
+    """Следствие, приехавшее даром вместе с ответчиком за людей: строка ищет по
+    имени всегда — решение пользователя 01.08.2026, — и набранное в ней приводит
+    ещё и книги одноимённого автора. Ровно как у фильмов, и это условие задачи:
+    поведение у книг не отличается ничем."""
+    client = FakeSearch(Found([]), name="google_books",
+                        people=Found([PersonHit("Фрэнк Герберт")]),
+                        works=Found([hit(title="Дюна", kind=Kind.BOOK,
+                                         source=Source.GOOGLE_BOOKS)]))
+
+    result = await service(client).external(Kind.BOOK, "Фрэнк Герберт")
+
+    assert [one.title for one in result.views] == ["Дюна"]
+    assert ("find_people", "Фрэнк Герберт") in client.asked
+
+
+async def test_music_is_searched_only_in_our_own_base(sessions, service):
+    """Внешний источник музыки приедет задачей 5. До тех пор внешняя половина
     выдачи пуста — и пуста она должна быть по-настоящему, а не «как у кино».
 
     Клиент подставлен отвечающий, и проверяется не только пустота выдачи, но и
     то, что его не спросили: без второго утверждения тест зеленел бы и от
     клиента, которому просто нечего было ответить."""
-    client = FakeSearch(Found([hit(title="Дюна")]))
+    client = FakeSearch(Found([hit(title="Кино")]))
 
-    result = await service(client).external(Kind.BOOK, "Дюна")
+    result = await service(client).external(Kind.MUSIC, "Кино")
 
     assert result.views == ()
     assert client.asked == []
+
+
+async def test_the_offset_reaches_the_source(sessions, service):
+    """Смещение — единственное, чем вторая порция отличается от первой. Не
+    доедь оно до источника, лента догружала бы одно и то же двадцать строк
+    подряд, а человек видел бы, что прокрутка не двигается."""
+    client = FakeSearch(Found([hit()]))
+
+    await service(client).external(Kind.MOVIE, "дюна", offset=SEARCH_SIZE)
+
+    assert client.asked == [("дюна", Kind.MOVIE, SEARCH_SIZE)]
+
+
+async def test_a_full_portion_means_there_is_more(sessions, service):
+    """Конец выдачи называет источник, а не длина показанного. Полная порция —
+    единственное, что о нём известно: `totalItems` у Google всегда `300` и
+    врёт, замерено."""
+    full = Found([hit(str(n), f"Дюна {n}") for n in range(SEARCH_SIZE)])
+
+    answer = await service(FakeSearch(full)).external(Kind.MOVIE, "дюна")
+
+    assert answer.more is True
+
+
+async def test_the_end_of_the_source_stops_the_feed(sessions, service):
+    """Обратная половина: источник отдал меньше запрошенного — признак гаснет,
+    и лента перестаёт просить. Без неё бесконечный цикл в `Feed.more()`
+    выглядит как зависшее окно."""
+    answer = await service(FakeSearch(Found([hit()]))).external(Kind.MOVIE, "д")
+
+    assert answer.more is False
+
+
+async def test_a_source_that_cannot_page_is_not_asked_twice(sessions, service):
+    """Спрашивать нелистающий источник второй раз — не ошибка выдачи, а
+    потраченный запрос: у Google их тысяча в сутки. Наблюдается счётом
+    запросов, а не выдачей: выдача одинакова в обоих случаях."""
+    client = FakeSearch(Found([hit(source=Source.STEAM)]), name="steam",
+                        pages=False)
+
+    await service(client).external(Kind.GAME, "дюна", offset=SEARCH_SIZE)
+
+    assert client.asked == []
+
+
+async def test_a_full_portion_from_a_source_that_cannot_page_is_the_end(
+        sessions, service):
+    """Полная порция от того, кто листать не умеет, — всё равно конец: второй
+    порции у него не бывает. Скажи мост «есть ещё» — и лента сходила бы за
+    заведомо пустой выдачей на каждый поиск игры."""
+    full = Found([hit(str(n), f"Игра {n}", source=Source.STEAM, kind=Kind.GAME)
+                  for n in range(SEARCH_SIZE)])
+    client = FakeSearch(full, name="steam", pages=False)
+
+    answer = await service(client).external(Kind.GAME, "игра")
+
+    assert answer.more is False
+
+
+async def test_the_works_of_namesakes_are_asked_once_per_search(sessions,
+                                                                service):
+    """Вторая половина выдачи не листается вовсе, и перезапрашивать её на каждой
+    порции значит слать те же запросы впустую: их результат всё равно снимет
+    `merge_results`, а у книг из тысячи суточных уйдёт по два на порцию."""
+    client = FakeSearch(Found([]), people=Found([PersonHit("1")]),
+                        works=Found([hit()]))
+
+    await service(client).external(Kind.MOVIE, "нолан", offset=SEARCH_SIZE)
+
+    assert [one for one in client.asked if one[0] == "find_people"] == []
 
 
 async def test_a_refusal_is_reported_and_not_raised(sessions, service):
@@ -316,8 +417,8 @@ async def test_two_stores_are_asked_at_once(sessions, service):
     result = await service(steam, gog).external(Kind.GAME, "ведьмак")
 
     assert len(result.views) == 2
-    assert steam.asked == [("ведьмак", Kind.GAME)]
-    assert gog.asked == [("ведьмак", Kind.GAME)]
+    assert steam.asked == [("ведьмак", Kind.GAME, 0)]
+    assert gog.asked == [("ведьмак", Kind.GAME, 0)]
 
 
 async def test_two_stores_come_woven_and_not_in_blocks(sessions, service):

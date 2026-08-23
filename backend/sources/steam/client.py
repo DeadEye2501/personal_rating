@@ -3,6 +3,7 @@
 import json
 import logging
 from dataclasses import replace
+from typing import ClassVar
 from urllib.parse import quote
 
 import httpx
@@ -52,6 +53,9 @@ class SteamClient:
     """Аргумент `kind` есть ради общего контракта каталожных клиентов и
     игнорируется: у Steam содержимое одного типа."""
 
+    # Не листает: у ручки подсказки параметров смещения нет вовсе.
+    PAGES: ClassVar[bool] = False
+
     def __init__(self, http: SourceHttp) -> None:
         self._http = http
 
@@ -61,7 +65,11 @@ class SteamClient:
         который соберёт не он сам, а поймавший его исключение сервис."""
         return self._http.name
 
-    async def search(self, query: str, kind: Kind) -> Outcome:
+    async def search(self, query: str, kind: Kind, offset: int = 0) -> Outcome:
+        """Смещение принимается ради общего контракта и не уезжает никуда: у
+        ручки подсказки Steam параметров порции нет вовсе, и второй порции у неё
+        не бывает. Спрашивать её со смещением сервис не станет — `PAGES`
+        ложно, — а довод обязан быть у всех пяти: контракт сверяется поимённо."""
         # Строка поиска идёт частью пути, поэтому её надо экранировать: `?` и
         # `#` для URL структурные, и «Who's Your Daddy?!» уедет обрезанным до
         # «Who's Your Daddy». Steam при этом ответит 200 и найдёт не то, что

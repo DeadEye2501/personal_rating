@@ -16,7 +16,7 @@ ROLES = {"people": PersonRole, "companies": CompanyRole}
 
 class Refs(Domain):
     def genres(self, genre_kind: str) -> dict:
-        """Наборов четыре, и два из них пусты до второго этапа. Клиенту нужен
+        """Наборов четыре, и все четыре засеяны миграциями. Клиенту нужен
         только список — перевод чужих меток в наши жанры это внутренность
         записи карточки."""
         return self._reply(

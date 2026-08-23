@@ -67,7 +67,11 @@ const _place = (source) => {
  *
  * Имя без адреса остаётся подписью: оно не подсвечивается и не отзывается ни
  * на наведение, ни на щелчок. */
-const PAGES = {
+// Имя не `PAGES`: так зовётся признак «умеет листать» у клиентов источников по
+// ту сторону моста, и одно имя над двумя разными делами читалось бы как связь —
+// границу «страница ↔ питон» проект сторожит двенадцатью парами именно потому,
+// что такие совпадения обманывают читателя.
+const ADDRESS = {
   imdb: (value) => `https://www.imdb.com/title/${value}/`,
   kinopoisk: (value) => `https://www.kinopoisk.ru/film/${value}/`,
 }
@@ -102,7 +106,7 @@ export const nameOf = (source) => NAMES[source] ?? source
  * таблицей оценок значило показать `old_games` вместо «old-games.ru».
  * Ручной тут нет: её подпись не показывается вовсе. */
 const CARDS = { tmdb: 'TMDB', steam: 'Steam', gog: 'GOG',
-                old_games: 'old-games.ru' }
+                old_games: 'old-games.ru', google_books: 'Google Books' }
 
 /** Имя источника, из которого приехала карточка. */
 export const cardSourceName = (source) => CARDS[source] ?? source
@@ -114,7 +118,7 @@ export const cardSourceName = (source) => CARDS[source] ?? source
 export function pagesOf(view) {
   const found = new Map()
   for (const { source, value } of view.external_ids ?? []) {
-    if (PAGES[source]) found.set(source, PAGES[source](value))
+    if (ADDRESS[source]) found.set(source, ADDRESS[source](value))
   }
   const path = view.source === 'tmdb' ? TMDB_PATHS[view.kind] : null
   if (path) {
@@ -123,10 +127,10 @@ export function pagesOf(view) {
   return found
 }
 
-/** Типы, у которых бывает адрес в источник. У книг и музыки клиентов нет вовсе,
- *  и вставленная ссылка отвечала бы отказом на каждое нажатие клавиши. Набор
- *  сверяется с реестром бэкенда сторожем границы: приедет книжный клиент —
+/** Типы, у которых бывает адрес в источник. У музыки клиента нет вовсе, и
+ *  вставленная ссылка отвечала бы отказом на каждое нажатие клавиши. Набор
+ *  сверяется с реестром бэкенда сторожем границы: приедет клиент музыки —
  *  сторож покраснеет, и поле вернётся вместе с ним. */
-export const LINKED = ['movie', 'series', 'game']
+export const LINKED = ['movie', 'series', 'game', 'book']
 
 export const linkableOf = (kind) => LINKED.includes(kind)

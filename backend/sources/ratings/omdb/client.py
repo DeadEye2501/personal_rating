@@ -1,13 +1,12 @@
 """Разговор с OMDB по сети."""
 
 import logging
-from datetime import datetime, timedelta
 from typing import ClassVar
 
 import httpx
 
 from backend.model import Found, Kind, Missing, Outcome, RatingSource, Reason, Refusal
-from backend.sources.backoff import refuse_until
+from backend.sources.backoff import daily_quota
 from backend.sources.errors import parsed, refuse_code
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.parse import parse_ratings
@@ -15,15 +14,6 @@ from backend.sources.ratings.omdb.parse import parse_ratings
 logger = logging.getLogger(__name__)
 
 BASE = "https://www.omdbapi.com/"
-
-
-def until_midnight(now: datetime) -> timedelta:
-    """Квота суточная, заголовков OMDB не отдаёт. Пробовать раньше
-    бессмысленно: придёт тот же отказ, а потраченный запрос не вернуть."""
-    tomorrow = (now + timedelta(days=1)).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    return tomorrow - now
 
 
 class OmdbClient:
@@ -83,8 +73,7 @@ class OmdbClient:
         не из документации."""
         error = (payload.get("Error") or "").lower()
         if "limit" in error:
-            return refuse_until(self._http, Reason.QUOTA,
-                                until_midnight(self._http.clock()))
+            return daily_quota(self._http)
         if "key" in error:
             # Предохранитель не взводим: битый ключ сроком не лечится, и закрыв
             # источник на сутки, мы не дали бы человеку вписать новый.

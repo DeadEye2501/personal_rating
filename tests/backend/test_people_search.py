@@ -68,6 +68,56 @@ async def test_an_identified_person_is_asked_by_identifier(parts):
     assert not any(name == "find_people" for name, *_ in client.asked)
 
 
+async def test_clicking_an_author_goes_by_the_name(parts):
+    """У автора Google Books номера нет вовсе — `authors` голые строки, и строка
+    заводится безымянной. Путь тот же самый, каким сегодня ищется заведённый
+    руками режиссёр: по имени, и тёзки приезжают вместе с ним.
+
+    Поведение клика у книги не отличается от клика у фильма ничем — условие
+    пользователя 22.08.2026."""
+    client = FakeSearch(works=Found([]), people=Found([PersonHit("Фрэнк Герберт")]),
+                        name="google_books")
+    entity_id = await a_person(parts, "Фрэнк Герберт")
+
+    await finder_on(parts, client).by_entity("people", entity_id, Kind.BOOK)
+
+    assert ("find_people", "Фрэнк Герберт") in client.asked
+    assert ("credits_of", "Фрэнк Герберт", Kind.BOOK) in client.asked
+
+
+async def test_a_foreign_identifier_never_reaches_a_stranger(parts):
+    """Человека с карточки фильма можно повесить на книгу руками: `suggest`
+    отбирает людей без оглядки на тип, а `attach` вешает кого угодно куда
+    угодно. Отдай его номер книжному клиенту — и номер TMDB уехал бы в
+    `inauthor:"550"`; отказа не было бы, Google ответил бы пустой выдачей, и
+    клик молча не нашёл бы ничего.
+
+    Проверяется тем, что путь сворачивает на поиск по имени — тот самый, которым
+    ищется заведённый руками."""
+    client = FakeSearch(works=Found([]), people=Found([PersonHit("Лю Цысинь")]),
+                        name="google_books")
+    entity_id = await a_person(parts, "Лю Цысинь", source_id="550")
+
+    await finder_on(parts, client).by_entity("people", entity_id, Kind.BOOK)
+
+    assert ("find_people", "Лю Цысинь") in client.asked
+    assert ("credits_of", "550", Kind.BOOK) not in client.asked
+
+
+async def test_an_identifier_of_the_answering_source_is_taken_as_it_is(parts):
+    """Обратная половина: если номер принадлежит тому же источнику, который и
+    отвечает за людей этого типа, спрашивают по номеру — иначе сравнение
+    выродилось бы в «никогда не верить номеру», и клик по актёру TMDB притащил
+    бы тёзок."""
+    client = FakeSearch(works=Found([]), name="tmdb")
+    entity_id = await a_person(parts, source_id="525")
+
+    await finder_on(parts, client).by_entity("people", entity_id, Kind.MOVIE)
+
+    assert ("credits_of", "525", Kind.MOVIE) in client.asked
+    assert not any(name == "find_people" for name, *_ in client.asked)
+
+
 async def test_a_manual_person_is_asked_outside_by_name(parts):
     """Внешней идентичности у заведённого руками нет и присвоить ему чужую мы
     не вправе — снаружи остаётся имя."""

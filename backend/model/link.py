@@ -24,6 +24,17 @@ _STEAM = re.compile(r"store\.steampowered\.com/(?:agecheck/)?app/(\d+)", re.I)
 # У GOG в адресе не идентификатор, а слаг: числовой придётся искать в каталоге.
 # Необязательный сегмент — язык: `gog.com/en/game/...` приходит из письма.
 _GOG = re.compile(r"gog\.com/(?:[a-z-]+/)?game/([a-z0-9_]+)", re.I)
+# Форм адреса книги четыре, все замерены 22.08.2026: `books.google.com/books?id=`,
+# `play.google.com/store/books/details?id=`, `books.google.com/books/about/<имя>?id=`
+# и `google.com/books/edition/<имя>/<ID>`. Общее у первых трёх — параметр `id`, в
+# четвёртой идентификатор тома стоит последним куском пути.
+#
+# Слово `books` обязательно и обязано быть **куском пути**: без него под образец
+# попал бы любой адрес Google с `id=`, а найденное где угодно — ещё и обычный
+# поиск по слову «books» (`google.com/search?q=books&id=555`).
+_GOOGLE_BOOKS = re.compile(
+    r"google\.[a-z.]+/(?:[a-z]+/)*books(?:/\S*?)?"
+    r"(?:[?&]id=|/edition/[^/?\s]+/)([\w-]+)", re.I)
 _BARE = re.compile(r"^\d+$")
 
 _TMDB_KINDS = {"movie": Kind.MOVIE, "tv": Kind.SERIES}
@@ -57,6 +68,13 @@ def parse_link(raw: str, kind: Kind | None = None) -> ExternalLink | None:
         # бы той же игре вторую личность.
         return ExternalLink(source=Source.GOG, source_id=found.group(1).lower(),
                             kind=Kind.GAME)
+
+    found = _GOOGLE_BOOKS.search(text)
+    if found:
+        # Регистр не трогается: идентификатор тома у Google регистрозависим —
+        # `-u8-DwAAQBAJ` и `-U8-dWaaqbaj` для него разные тома.
+        return ExternalLink(source=Source.GOOGLE_BOOKS,
+                            source_id=found.group(1), kind=Kind.BOOK)
 
     # Голое число значит что-то только у кино: там источник один. У игр Steam и
     # GOG нумеруются независимо, и по числу их не различить.

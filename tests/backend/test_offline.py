@@ -302,7 +302,7 @@ async def test_every_poster_source_got_its_own_named_client(offline):
     Источник, которому в сборке не досталось клиента, дал бы `BROKEN`.
 
     Набор берётся из `POSTER_SOURCES`, а не переписывается литералом: второй
-    список тех же трёх источников разошёлся бы с первым молча."""
+    список тех же источников разошёлся бы с первым молча."""
     named = set()
     for source in POSTER_SOURCES:
         result = await offline.posters.poster_for(
@@ -314,6 +314,18 @@ async def test_every_poster_source_got_its_own_named_client(offline):
         named.add(result.source)
 
     assert len(named) == len(POSTER_SOURCES)
+
+
+async def test_the_built_backend_asks_google_for_books(offline):
+    """Боевая сборка, а не двойник: разъедься имя постерного соединения со
+    значением `Source`, и книга осталась бы без обложки при зелёном наборе, а
+    без обложки карточка не пишется вовсе.
+
+    Проверяются оба конца проводки: каталог, который спросит поиск, и клиент
+    обложек, которого спросит писатель."""
+    assert offline._sources.catalog_for(Kind.BOOK) == [
+        offline._sources.google_books]
+    assert Source.GOOGLE_BOOKS in offline.posters._clients
 
 
 async def test_the_data_folder_is_made_if_it_is_not_there(tmp_path):
