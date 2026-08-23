@@ -6,7 +6,7 @@ from datetime import datetime
 
 import httpx
 
-from backend.model import Reason, Refusal, Source
+from backend.model import Kind, Reason, Refusal, Source
 from backend.service.asking import answered
 from backend.service.images import crop_to_cover
 from backend.sources.errors import refuse_code
@@ -146,11 +146,14 @@ class PosterService:
         получить поверх неё чужую."""
         return await self._store.has(item_id)
 
-    async def store_upload(self, item_id: int, data: bytes,
+    async def store_upload(self, item_id: int, data: bytes, kind: Kind,
                            now: datetime) -> None:
         """Единственное место, где картинка обрезается: у залитой с диска форма
-        произвольная."""
-        await self.save(item_id, crop_to_cover(data), now)
+        произвольная.
+
+        Тип нужен самой обрезке: у альбома обложка квадратная, у остальных
+        афиша 2:3."""
+        await self.save(item_id, crop_to_cover(data, kind), now)
 
     async def aclose(self) -> None:
         for client in self._clients.values():

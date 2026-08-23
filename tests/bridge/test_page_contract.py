@@ -9,9 +9,12 @@ Vitest не читает `bridge/`. Ломаются они по-разному,
 Читается исходник страницы, а не собранный бандл: сборки может не быть вовсе, а
 имена обязаны совпадать и до неё."""
 
+import io
 import re
 from dataclasses import fields
 from pathlib import Path
+
+from PIL import Image
 
 from backend.model import (
     Rating,
@@ -30,7 +33,9 @@ from backend.model import (
 from backend.config import FIVE, TEN
 from bridge.answer import Domain, kebab
 from bridge.api import Api
+from backend.service.images import crop_to_cover
 from bridge.feed import FILTER_FIELDS
+from tests.conftest import picture
 
 WEB = Path(__file__).resolve().parents[2] / "client"
 # Читается исходник, а не собранное: в `dist` лежат те же строки, и сверка по
@@ -123,6 +128,25 @@ def test_every_rating_source_has_a_scale_and_a_name():
 
     assert keys_of("MAX", page) == set(RatingSource)
     assert keys_of("NAMES", page) == set(RatingSource)
+
+
+def test_the_square_cover_is_the_same_kind_on_both_sides():
+    """Форма обложки живёт по обе стороны моста: питон режет залитую руками
+    картинку, страница рисует под неё рамку. Разъедутся — альбом получит
+    квадратную картинку в афишной рамке или афишную в квадратной, и заметить
+    это можно только глазами.
+
+    Питоновская половина наблюдается следствием, а не чтением таблицы: тип
+    прогоняется через саму обрезку, и квадратом считается то, что вышло
+    квадратным."""
+    square = set()
+    for kind in Kind:
+        width, height = Image.open(
+            io.BytesIO(crop_to_cover(picture(400, 200), kind))).size
+        if width == height:
+            square.add(str(kind))
+
+    assert keys_of("SQUARE", source("state/kinds.js")) == square
 
 
 def test_every_card_source_has_a_name_on_the_page():

@@ -209,13 +209,13 @@
 - `class SearchHit` (27)
 - `class PersonHit` (11)
 
-### `backend/model/suggestion.py` — 15 строк
+### `backend/model/suggestion.py` — 23 строк
 
 Строка подсказки при вводе имени человека или студии.
 
-Зависит от: —
+Зависит от: `backend.model.kinds`
 
-- `class Suggestion` (9)
+- `class Suggestion` (15)
 
 ### `backend/model/tag.py` — 11 строк
 
@@ -325,14 +325,15 @@
 - `async def without_removed(removed: RemovedRepository, answers: list[list[SearchHit]]) -> list[list[SearchHit]]` (24)
 - `async def to_views(hits: list[SearchHit], genres: GenresRepository, clock: Callable[[], datetime]) -> list[CardView]` (15)
 
-### `backend/service/images.py` — 49 строк
+### `backend/service/images.py` — 70 строк
 
 Приведение залитой с диска картинки к виду обложки.
 
 Зависит от: `backend.model`
 
-- `def _centred_box(width: int, height: int) -> tuple[int, int, int, int]` (11)
-- `def crop_to_cover(data: bytes) -> bytes` (20)
+- `def _shape(kind: Kind) -> tuple[float, tuple[int, int]]` (4)
+- `def _centred_box(width: int, height: int, ratio: float) -> tuple[int, int, int, int]` (14)
+- `def crop_to_cover(data: bytes, kind: Kind) -> bytes` (25)
 
 ### `backend/service/library.py` — 41 строк
 
@@ -410,13 +411,13 @@
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
   - `async def _outside(self, domain: str, identity: tuple[str, str | None, Source | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (21)
 
-### `backend/service/posters.py` — 158 строк
+### `backend/service/posters.py` — 161 строк
 
 Путь обложки от источника до хранилища.
 
 Зависит от: `backend.model`, `backend.service.asking`, `backend.service.images`, `backend.sources.errors`, `backend.sources.http`, `backend.storage.posters`
 
-- `class PosterService` (124)
+- `class PosterService` (127)
   - `async def fetch(self, source: Source, url: str) -> bytes | None | Refusal` (7)
   - `async def _fetched(self, source: Source, url: str) -> bytes | None | Refusal` (16)
   - `def _picture(self, source: Source, url: str, response: httpx.Response) -> bytes | None | Refusal` (33)
@@ -426,7 +427,7 @@
   - `async def save(self, item_id: int, data: bytes, now: datetime) -> None` (2)
   - `async def delete(self, item_id: int) -> None` (4)
   - `async def has(self, item_id: int) -> bool` (4)
-  - `async def store_upload(self, item_id: int, data: bytes, now: datetime) -> None` (5)
+  - `async def store_upload(self, item_id: int, data: bytes, kind: Kind, now: datetime) -> None` (8)
   - `async def aclose(self) -> None` (4)
 
 ### `backend/service/relevance.py` — 85 строк
@@ -931,14 +932,14 @@
   - `async def _written(self, statement: Executable, taken: Exception) -> None` (7)
   - `async def _run(self, *statements: Executable) -> None` (23)
 
-### `backend/storage/repository/credits.py` — 301 строк ⚠ подошёл к 300
+### `backend/storage/repository/credits.py` — 305 строк ⚠ подошёл к 300
 
 Один репозиторий на людей и на студий — различает их только описатель.
 
 Зависит от: `backend.model`, `backend.storage.entity`, `backend.storage.repository.base`, `backend.storage.rows`, `backend.storage.session`, `backend.storage.statements`, `backend.storage.tables`
 
 - `def _outer(row) -> str | None` (17)
-- `class CreditRepository(Repository)` (243)
+- `class CreditRepository(Repository)` (247)
   - `def _link(self) -> Column` (2)
   - `def _folded_name(self) -> ColumnElement[str]` (2)
   - `def _same_name(self, name: str) -> ColumnElement[bool]` (2)
@@ -958,7 +959,7 @@
   - `async def items_of(self, entity_id: int, kind: Kind) -> list[int]` (25)
   - `async def suggest(self, name: str, limit: int=10, offset: int=0) -> list[Suggestion]` (21)
   - `def _linked(self, entity_id: int) -> Select` (12)
-  - `async def _hint(self, entity_id: int) -> tuple[str, int | None]` (21)
+  - `async def _hint(self, entity_id: int) -> tuple[str, int | None, Kind | None]` (25)
 - `def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 - `def companies(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository` (2)
 
@@ -1227,14 +1228,14 @@
   - `def cancel(self, ops: list) -> dict` (3)
   - `async def _cancelled(self, ops: list) -> None` (2)
 
-### `bridge/covers.py` — 37 строк
+### `bridge/covers.py` — 41 строк
 
 Мост: обложки — заливка своей картинки и наличие.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class Covers(Domain)` (11)
-  - `def store_upload(self, item_id: int, data: str) -> dict` (7)
+- `class Covers(Domain)` (15)
+  - `def store_upload(self, item_id: int, data: str, kind: str) -> dict` (11)
   - `def has(self, item_id: int) -> dict` (2)
 - `def _picture(data: str) -> bytes` (11)
 
@@ -2035,13 +2036,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 
-### `tests/backend/test_images.py` — 135 строк
+### `tests/backend/test_images.py` — 172 строк
 
 Обрезка залитой руками картинки до формы обложки.
 
-Зависит от: `backend.service.images`, `tests.conftest`
+Зависит от: `backend.model`, `backend.service.images`, `tests.conftest`
 
-Тестов: 15
+Тестов: 18
 
 - `def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes` (7)
 - `def size_of(data: bytes) -> tuple[int, int]` (2)
@@ -2235,7 +2236,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def a_person(parts, name='Кристофер Нолан', source_id=None) -> int` (6)
 - `def outside_questions(asked: list[tuple]) -> list[tuple]` (4)
 
-### `tests/backend/test_poster_service.py` — 261 строк
+### `tests/backend/test_poster_service.py` — 262 строк
 
 Путь обложки от источника до хранилища.
 
@@ -2387,13 +2388,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `def _genres_in(path: Path) -> int` (8)
 - `def _variables_of(text: str) -> set[str]` (3)
 
-### `tests/backend/test_suggestions.py` — 229 строк
+### `tests/backend/test_suggestions.py` — 244 строк
 
 Подсказка при вводе имени: тёзок различают по узнаваемой карточке.
 
 Зависит от: `backend.model`, `backend.storage.repository.credits`, `backend.storage.repository.ratings`, `backend.storage.repository.wishlist`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 16
+Тестов: 17
 
 - `async def person_with(sessions, name: str, item_ids: list[int]) -> int` (6)
 
@@ -2510,7 +2511,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Probe(Domain)` (5)
   - `def ask(self, what, op=None)` (2)
 
-### `tests/bridge/test_bridge_covers.py` — 52 строк
+### `tests/bridge/test_bridge_covers.py` — 55 строк
 
 Мост: обложки — заливка своей картинки и наличие.
 
@@ -2601,13 +2602,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 5
 
 
-### `tests/bridge/test_page_contract.py` — 427 строк ⚠ подошёл к 300
+### `tests/bridge/test_page_contract.py` — 451 строк ⚠ подошёл к 300
 
 Имена, которые страница и мост обязаны называть одинаково.
 
-Зависит от: `backend.config`, `backend.model`, `backend.sources.registry`, `bridge.answer`, `bridge.api`, `bridge.feed`
+Зависит от: `backend.config`, `backend.model`, `backend.service.images`, `backend.sources.registry`, `bridge.answer`, `bridge.api`, `bridge.feed`, `tests.conftest`
 
-Тестов: 24
+Тестов: 25
 
 - `def source(path: str) -> str` (2)
 - `def named_in_chosen() -> set[str]` (4)

@@ -192,7 +192,7 @@
     // уехав в поля, они уронили бы запись лишним доводом сборщика. Список
     // пишется целиком, как и состав, — снять всё и записать заново.
     if (shown.has('tracks')) await call('library.set_tracks', item_id, form.tracks)
-    if (picture) await call('covers.store_upload', item_id, picture)
+    if (picture) await call('covers.store_upload', item_id, picture, form.kind)
 
     // Привязка последней: внешнее доливает только пустое, и долить оно должно
     // поверх уже записанного человеком, а не наоборот.
@@ -239,7 +239,7 @@
       <!-- Момент едет вместе с карточкой: ручка обложки отдаёт сутки кеша, а
            её адрес от содержимого не зависит — без метки перезалитая картинка
            осталась бы в окне правки прежней, пока лента показывает новую. -->
-      <PosterPick item_id={form.item_id} stamp={stampOf(view)}
+      <PosterPick item_id={form.item_id} stamp={stampOf(view)} kind={form.kind}
                   onpicked={(data) => { picture = data }}
                   ontrouble={(text) => ontrouble(text)} />
 

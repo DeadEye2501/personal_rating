@@ -291,6 +291,7 @@
   - `name: str`
   - `hint: str`
   - `hint_item_id: int | None`
+  - `hint_kind: Kind | None` = `None`
 
 ### `backend/model/tag.py`
 
@@ -352,6 +353,8 @@
 
 - `TARGET_RATIO` = `2 / 3`
 - `TARGET_SIZE` = `набор из 2`
+- `SQUARE_RATIO` = `1.0`
+- `SQUARE_SIZE` = `набор из 2`
 - `_QUALITY` = `88`
 
 ### `backend/service/library.py`

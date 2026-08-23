@@ -382,7 +382,7 @@ async def test_a_manual_card_gets_its_poster_on_linking(linker, sessions):
 async def test_an_own_poster_is_not_replaced(linker, sessions):
     """Обложка — такое же поле: непустое значит занятое."""
     item_id = await manual_card(sessions)
-    await linker.posters.store_upload(item_id, picture(400, 400), now=MOMENT)
+    await linker.posters.store_upload(item_id, picture(400, 400), Kind.MOVIE, now=MOMENT)
     ours = await linker.posters._store.get(item_id)
 
     await linker.link(item_id, incoming(), now=LATER)
@@ -415,7 +415,7 @@ async def test_the_cover_is_taken_from_the_merged_card_and_not_from_the_source(
 async def test_overwrite_replaces_the_own_poster(linker, sessions):
     """Обратная сторона: с галочкой приезжает обложка источника."""
     item_id = await manual_card(sessions)
-    await linker.posters.store_upload(item_id, picture(400, 400), now=MOMENT)
+    await linker.posters.store_upload(item_id, picture(400, 400), Kind.MOVIE, now=MOMENT)
 
     await linker.link(item_id, incoming(), now=LATER, overwrite=True)
 
@@ -443,7 +443,7 @@ async def test_a_refused_poster_leaves_the_link_in_place(sessions, engine, poste
 async def test_a_card_without_a_poster_url_keeps_its_own(linker, sessions):
     """Источник обложки не дал — стирать свою нечем и незачем."""
     item_id = await manual_card(sessions)
-    await linker.posters.store_upload(item_id, picture(400, 400), now=MOMENT)
+    await linker.posters.store_upload(item_id, picture(400, 400), Kind.MOVIE, now=MOMENT)
     ours = await linker.posters._store.get(item_id)
 
     await linker.link(item_id, incoming(item=an_item(

@@ -3,7 +3,7 @@
 import base64
 from datetime import datetime
 
-from backend.model import BadImage
+from backend.model import BadImage, Kind
 from bridge.covers import Covers
 
 PNG = base64.b64encode(b"\x89PNG\r\n\x1a\n").decode()
@@ -16,14 +16,17 @@ def test_an_uploaded_picture_arrives_as_bytes(spy, asked):
     answers["posters.store_upload"] = None
 
     before = datetime.now()
-    Covers(spy).store_upload(12, PNG)
+    Covers(spy).store_upload(12, PNG, "movie")
     after = datetime.now()
 
     name, args, _ = log[0]
     assert name == "posters.store_upload"
     assert args[0] == 12
     assert args[1] == b"\x89PNG\r\n\x1a\n"
-    assert before <= args[2] <= after
+    # Тип переводится в `Kind` внутри заявки, а не приезжает строкой:
+    # обрезка ветвится по нему, и строка молча ушла бы в афишную ветку.
+    assert args[2] is Kind.MOVIE
+    assert before <= args[3] <= after
 
 
 def test_not_a_picture_is_a_kind_of_failure(spy, asked):
@@ -31,7 +34,7 @@ def test_not_a_picture_is_a_kind_of_failure(spy, asked):
     answers, _ = asked
     answers["posters.store_upload"] = BadImage("не картинка")
 
-    assert Covers(spy).store_upload(12, PNG)["fail"] == "bad-image"
+    assert Covers(spy).store_upload(12, PNG, "movie")["fail"] == "bad-image"
 
 
 def test_broken_base64_does_not_reach_the_backend(spy, asked):
@@ -40,7 +43,7 @@ def test_broken_base64_does_not_reach_the_backend(spy, asked):
     хвостом доехала бы до бэкенда."""
     _, log = asked
 
-    assert Covers(spy).store_upload(12, PNG + "!!")["fail"] == "bad-image"
+    assert Covers(spy).store_upload(12, PNG + "!!", "movie")["fail"] == "bad-image"
     assert log == []
 
 

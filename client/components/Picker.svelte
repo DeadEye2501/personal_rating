@@ -3,6 +3,7 @@
   import Chosen from '$components/Chosen.svelte'
   import Field from '$components/Field.svelte'
   import { byItem } from '$state/covers.js'
+  import { squareOf } from '$state/kinds.js'
   import { beside } from '$state/popup.js'
 
   // Разделитель строки подсказки: `U+2022 BULLET`. Обычная точка не годится —
@@ -11,8 +12,11 @@
 
   // Размер всплывающего постера. Числом здесь, а не в оформлении: по нему же
   // считается место у края окна, и вторым объявлением они разъехались бы.
-  // Пропорция 2:3 — та же, что у обложек везде.
+  //
+  // Высота одна на оба вида, разная ширина: у афиши пропорция 2:3, у альбома
+  // квадрат — та же пара, что у обложки ленты и у рамки окна.
   const POSTER = { width: 120, height: 180 }
+  const SQUARE_POSTER = { width: 180, height: 180 }
 
   // За сколько до конца списка просить следующую порцию. Не ноль: докрученный
   // до самого дна список успел бы упереться раньше, чем приедет ответ.
@@ -35,6 +39,7 @@
   let { label, hits = [], chosen = [], ontype, onchosen, oncreate, onmore }
     = $props()
 
+
   // Уже выбранного в списке нет: предложить его второй раз значит предложить
   // завести того же человека дважды.
   const offered = $derived(hits.filter(
@@ -45,6 +50,12 @@
   // подсвечено, Enter заводит нового.
   let marked = $state(-1)
   let hovered = $state(null)
+
+  // Форма всплывающей обложки берётся от **показываемой** карточки, а не от
+  // той, которую правят: человек бывает и в фильмах, и в альбомах, а подсказка
+  // показывает его самое высоко оценённое, какого бы типа оно ни было. Тип
+  // приезжает в самой строке подсказки, вместе с названием и номером.
+  const shape = $derived(squareOf(hovered?.hint_kind) ? SQUARE_POSTER : POSTER)
   // Постер идёт за указателем, поэтому запоминается точка, а не строка: у
   // длинной строки её край и её середина — разные места экрана.
   let at = $state({ left: 0, top: 0 })
@@ -188,7 +199,7 @@
    *  Переводить его никуда не надо: верхний слой и отсчитывается от окна. */
   function follow(event, hit) {
     hovered = hit
-    at = beside({ x: event.clientX, y: event.clientY }, POSTER,
+    at = beside({ x: event.clientX, y: event.clientY }, shape,
                 { width: window.innerWidth, height: window.innerHeight })
   }
 
@@ -239,8 +250,9 @@
          обрезает всё, что вылезает за его край. -->
     {#if poster && failed !== poster}
       <img class="picker__poster" popover="manual" bind:this={shot}
+           class:is-square={squareOf(hovered?.hint_kind)}
            src={poster} alt=""
-           style:width={`${POSTER.width}px`}
+           style:width={`${shape.width}px`}
            style:left={`${at.left}px`} style:top={`${at.top}px`}
            onerror={() => { failed = poster }}>
     {/if}

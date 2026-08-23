@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from sqlalchemy import insert as core_insert
 
-from backend.model import CompanyRole, PersonRole
+from backend.model import CompanyRole, Kind, PersonRole
 from backend.storage.repository.credits import companies, people
 from backend.storage.repository.ratings import RatingsRepository
 from backend.storage.repository.wishlist import WishlistRepository
@@ -43,6 +43,21 @@ async def test_the_hint_carries_the_card_identifier(sessions, card):
 
     found = await people(sessions).suggest("Кристофер")
     assert (found[0].entity_id, found[0].hint_item_id) == (person_id, only)
+
+
+async def test_the_hint_carries_the_kind_of_the_card_it_shows(sessions, card):
+    """Форма всплывающей обложки берётся от **показываемой** карточки, а не от
+    той, которую правят: обложка альбома квадратная, и в афишной рамке ей
+    срезало бы бока.
+
+    Человек бывает и там, и там — музыкант, снявшийся в фильме, — и подсказка
+    показывает его самое высоко оценённое, какого бы типа оно ни было."""
+    album = await card(kind=Kind.MUSIC, source_id="9", title="Группа крови")
+    person_id = await person_with(sessions, "Виктор Цой", [album])
+
+    found = await people(sessions).suggest("Виктор")
+
+    assert (found[0].entity_id, found[0].hint_kind) == (person_id, Kind.MUSIC)
 
 
 async def test_aggregator_scores_do_not_count(sessions, card):

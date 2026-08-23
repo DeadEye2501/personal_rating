@@ -124,11 +124,11 @@
 - Вопрос и две кнопки. Спрашивают им и то, что пропадёт навсегда, и то, что просто выглядит подозрительно, — цвет и слово согласия приходят снаружи.
 - принимает: label, text, ok, danger, onyes, onclose
 
-### components/Facts.svelte (91)
+### components/Facts.svelte (103)
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл, а у альбома — треки. Длинный список свёрнут до пятерых, пока не развернут.
 - принимает: view, onperson
 
-### components/Feed.svelte (84)
+### components/Feed.svelte (102)
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
@@ -136,7 +136,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (156)
+### components/Film.svelte (157)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete, onwish
 
@@ -161,17 +161,17 @@
 - Ряд ответных кнопок внизу окна: отмена и согласие.
 - принимает: ok, danger, busy, oncancel, onok
 
-### components/Picker.svelte (250)
+### components/Picker.svelte (262)
 - Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
 - принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
-### components/Poster.svelte (29)
+### components/Poster.svelte (35)
 - Обложка карточки с заглушкой.
-- принимает: item_id, source, poster_url, cover
+- принимает: item_id, source, poster_url, cover, kind
 
-### components/PosterPick.svelte (96)
+### components/PosterPick.svelte (102)
 - Обложка карточки: выбрать файлом, перетаскиванием или из буфера.
-- принимает: item_id, stamp, onpicked, ontrouble
+- принимает: item_id, stamp, kind, onpicked, ontrouble
 
 ### components/ScoreRow.svelte (24)
 - Строка оценки в списке: неподвижные звёзды и ярлык словом.
@@ -251,9 +251,9 @@
 - Доля каждого столбца от самого высокого.
 - отдаёт: heightsOf
 
-### state/kinds.js (34)
+### state/kinds.js (44)
 - Как тип содержимого называется человеку.
-- отдаёт: NOUNS, wishOf
+- отдаёт: NOUNS, squareOf, wishOf
 
 ### state/marking.js (30)
 - Метки карточек, наложенные поверх прочитанного из базы.
@@ -338,11 +338,11 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
-### styles/cardform.css (124)
+### styles/cardform.css (146)
 - Раскладка окна создания и правки карточки.
-- селекторы (17): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover, .cardform__pick, .cardform__pick > :first-child, .cardform__pick .addline
-- объявляет: --col-gap, --field-h, --poster-w, --row-gap
-- берёт: --body-l, --col-gap, --poster-w, --primary, --row-gap, --text-bright, --tint-18, --tint-22
+- селекторы (19): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster.is-square, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover, .cardform__pick, .cardform__pick > :first-child, .cardform__pick .addline
+- объявляет: --col-gap, --field-h, --poster-h, --poster-w, --row-gap
+- берёт: --body-l, --col-gap, --poster-h, --poster-w, --primary, --row-gap, --text-bright, --tint-18, --tint-22
 
 ### styles/chart.css (92)
 - Гистограмма оценок и её подвал.
@@ -382,14 +382,14 @@
 .addline__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (162)
+### styles/film.css (173)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
-- селекторы (20): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__poster,
+- селекторы (21): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__poster,
 .film.is-collapsed .film__chips,
 .film.is-collapsed .film__facts,
 .film.is-collapsed .film__synopsis,
 .film.is-collapsed .film__aggr,
-.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film__poster, .film__poster .material-symbols-outlined, .film__poster img,
+.film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film__poster, .film__poster.is-square, .film__poster .material-symbols-outlined, .film__poster img,
 .cardform__poster img, .film__body, .film__top,
 .film__bottom, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover, .film.is-gone .film__toggle .material-symbols-outlined
 - объявляет: --gutter, --icon-inset, --row-gap
@@ -425,10 +425,10 @@
 - объявляет: --accent-book, --accent-game, --accent-movie, --accent-music, --accent-series, --bg, --body-l, --body-m, --content-w, --ease, --error, --exclude, --fill-primary-14, --fill-primary-hover, --font, --glass, --glass-error, --label-l, --label-m, --opaque, --r-card, --r-full, --score-1, --score-10, --score-2, --score-3, --score-4, --score-5, --score-6, --score-7, --score-8, --score-9, --shade-25, --shade-32, --shade-55, --shade-60, --surface-pop, --text, --text-bright, --text-dim, --tint-02, --tint-035, --tint-05, --tint-06, --tint-07, --tint-09, --tint-10, --tint-14, --tint-16, --tint-18, --tint-22, --tint-25, --tint-28, --tint-30, --tint-34, --tint-35, --tint-40, --tint-45, --tint-55, --tint-75, --tint-80, --tint-85, --title-l, --title-s
 - берёт: --font, --primary
 
-### styles/picker.css (73)
+### styles/picker.css (77)
 - Поле с подсказкой имён: список совпадений и всплывающий постер. Строка, в которой оно стоит, — не его: она общая у состава, жанров и треков, и живёт в `cardform.css`.
-- селекторы (5): .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
-.picker__hit.is-marked, .picker__poster
+- селекторы (6): .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
+.picker__hit.is-marked, .picker__poster.is-square, .picker__poster
 - берёт: --body-m, --fill-primary-hover, --primary, --shade-55, --surface-pop, --tint-09, --tint-75
 
 ### styles/review.css (41)

@@ -254,8 +254,8 @@ class CreditRepository(Repository):
 
         found = []
         for row in rows:
-            title, item_id = await self._hint(row.id)
-            found.append(Suggestion(row.id, row.name, title, item_id))
+            hint = await self._hint(row.id)
+            found.append(Suggestion(row.id, row.name, *hint))
         return found
 
     def _linked(self, entity_id: int) -> Select:
@@ -265,17 +265,21 @@ class CreditRepository(Repository):
         Вынесено не ради краткости: потерять здесь отбор по человеку в одной
         ступени из четырёх — значит показать чужую карточку."""
         return (
-            select(item.c.title, item.c.id)
+            select(item.c.title, item.c.id, item.c.kind)
             .join_from(self._entity.credit, item,
                        self._entity.credit.c.item_id == item.c.id)
             .where(self._link == entity_id)
         )
 
-    async def _hint(self, entity_id: int) -> tuple[str, int | None]:
+    async def _hint(self, entity_id: int) -> tuple[str, int | None, Kind | None]:
         """Чем он известен в твоей библиотеке: сперва самое высоко оценённое
         тобой, потом самое свежее из отложенного, потом любая связанная
         карточка. Третья ступень не для красоты — человек, снявшийся только в
-        неоценённых и неотложенных карточках, обычное дело."""
+        неоценённых и неотложенных карточках, обычное дело.
+
+        Тип карточки уезжает вместе с названием и номером: по нему страница
+        выбирает форму всплывающей обложки, а отбора по типу здесь нет вовсе —
+        показывается самое высоко оценённое, каким бы оно ни было."""
         linked = self._linked(entity_id)
         steps = (
             linked.join(rating, rating.c.item_id == item.c.id)
@@ -290,8 +294,8 @@ class CreditRepository(Repository):
         for statement in steps:
             row = await self._row(statement)
             if row is not None:
-                return row.title, row.id
-        return "", None
+                return row.title, row.id, Kind(row.kind)
+        return "", None, None
 
 def people(sessions: async_sessionmaker[AsyncSession]) -> CreditRepository:
     return CreditRepository(sessions, PEOPLE)

@@ -64,6 +64,7 @@
   <!-- `cover` — метка перезаливки: её ставит раздел, перечитавший карточку
        после правки, и только она сбрасывает суточный кеш ручки. -->
   <Poster item_id={view.item_id} source={view.source} poster_url={view.poster_url}
+          kind={view.kind}
           cover={view.cover} />
 
   <!-- Две группы вместо строк подряд: зачем — в `film.css`, у раскладки тела. -->

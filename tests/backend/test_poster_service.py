@@ -5,7 +5,7 @@ import io
 import pytest
 from PIL import Image
 
-from backend.model import Reason, Refusal, Source
+from backend.model import Kind, Reason, Refusal, Source
 from backend.service.images import TARGET_SIZE, BadImage
 from backend.service.posters import PosterService
 from backend.sources.http import SourceHttp
@@ -201,7 +201,7 @@ async def test_a_downloaded_poster_is_stored_byte_for_byte(service):
 
 async def test_an_upload_is_cropped(service):
     """Залитая с диска — единственное, что обрезается."""
-    await service.store_upload(1, picture(4000, 1000), now=WHEN)
+    await service.store_upload(1, picture(4000, 1000), Kind.MOVIE, now=WHEN)
 
     stored = await service._store.get(1)
     assert Image.open(io.BytesIO(stored)).size == TARGET_SIZE
@@ -209,7 +209,8 @@ async def test_an_upload_is_cropped(service):
 
 async def test_a_bad_upload_is_a_named_error(service):
     with pytest.raises(BadImage):
-        await service.store_upload(1, "не картинка".encode(), now=WHEN)
+        await service.store_upload(1, "не картинка".encode(), Kind.MOVIE,
+                                   now=WHEN)
 
     assert await service._store.get(1) is None, "в хранилище лёг мусор"
 

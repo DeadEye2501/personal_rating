@@ -7,18 +7,22 @@ JSON-строкой."""
 import base64
 from datetime import datetime
 
-from backend.model import BadImage
+from backend.model import BadImage, Kind
 from bridge.answer import Domain
 
 
 class Covers(Domain):
-    def store_upload(self, item_id: int, data: str) -> dict:
-        """Обрезка по центру до 2:3 идёт на бэкенде, там же, где картинка и
-        хранится: в потоке интерфейса ей делать нечего."""
+    def store_upload(self, item_id: int, data: str, kind: str) -> dict:
+        """Обрезка идёт на бэкенде, там же, где картинка и хранится: в потоке
+        интерфейса ей делать нечего.
+
+        Тип приезжает строкой и переводится внутри заявки — как и везде на этой
+        границе: перевод снаружи оболочки ушёл бы исключением через границу
+        потоков. Нужен он самой обрезке: у альбома обложка квадратная."""
         now = datetime.now()
         return self._reply(
             lambda back: back.posters.store_upload(item_id, _picture(data),
-                                                   now))
+                                                   Kind(kind), now))
 
     def has(self, item_id: int) -> dict:
         return self._reply(lambda back: back.posters.has(item_id))

@@ -40,7 +40,7 @@ async def test_two_denials_of_different_operations_keep_different_types(sessions
     with pytest.raises(Denied) as taken:
         await tags.create(Kind.MOVIE, "драма")
     with pytest.raises(Denied) as broken:
-        crop_to_cover(b"not a picture")
+        crop_to_cover(b"not a picture", Kind.MOVIE)
 
     assert type(taken.value) is not type(broken.value)
 
