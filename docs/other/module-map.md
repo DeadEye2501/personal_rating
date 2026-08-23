@@ -246,9 +246,9 @@
 
 - `def capitalized(text: str) -> str` (11)
 
-### `backend/publishers.py` — 300 строк
+### `backend/publishers.py` — 305 строк ⚠ подошёл к 300
 
-Издательство книги: как его пишут и как его узнавать.
+Издательства, спрятанные в строке издателя от источника.
 
 Зависит от: `backend.titles`
 
@@ -655,22 +655,22 @@
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
-### `backend/sources/google_books/client.py` — 206 строк
+### `backend/sources/google_books/client.py` — 205 строк
 
 Разговор с Google Books по сети.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.errors`, `backend.sources.google_books.parse`, `backend.sources.http`
 
-- `class GoogleBooksClient` (156)
+- `class GoogleBooksClient` (165)
   - `def name(self) -> str` (4)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (21)
   - `async def _taken(self, url: str, complaint: str, parse: Callable[[dict], object], **extra: object) -> Outcome` (26)
   - `def _key(self) -> str` (5)
   - `def _another_key(self, asked_with: int) -> bool` (17)
   - `def _forget_yesterday(self) -> None` (10)
-  - `async def search(self, query: str, kind: Kind, offset: int=0) -> Outcome` (4)
+  - `async def search(self, query: str, kind: Kind, offset: int=0) -> Outcome` (10)
   - `async def find_people(self, name: str) -> Outcome` (12)
-  - `async def credits_of(self, person_id: str, kind: Kind) -> Outcome` (12)
+  - `async def credits_of(self, person_id: str, kind: Kind) -> Outcome` (15)
   - `async def card(self, source_id: str, kind: Kind) -> Outcome` (8)
   - `async def aclose(self) -> None` (2)
 
