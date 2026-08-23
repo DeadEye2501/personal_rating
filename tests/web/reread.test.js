@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме проверок.
+import { numbered, textChannel } from '../../client/api/bridge.js'
 import { refreshed, without, withoutText } from '../../client/app/reread.js'
-import { fake } from './fake.js'
+import { fake, slow } from './fake.js'
 
 const own = { item_id: 5, source: 'tmdb', source_id: '157336' }
 const twin = { item_id: null, source: 'steam', source_id: '157336' }
@@ -91,6 +92,24 @@ describe('перечитывание одной правленой карточ�
     await refreshed({ item_id: 5, at: 1 }, [], (view) => put.push(view))
 
     expect(put).toEqual([])
+  })
+
+  it('гасит ответ круга по той же карточке', async () => {
+    // Синопсис читают двое: второй круг на каждое появление карточки и это
+    // перечитывание. Читают они одну колонку, а порядок приезда порядку
+    // вопросов не равен — разойдись каналы, и ответ круга, отправленный до
+    // правки, лёг бы поверх свежего текста. Человек увидел бы, как набранное
+    // им откатывается само.
+    fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] },
+           'feed.synopsis': slow({ ok: 'прежний' }, { ok: 'свежий' }) })
+    const round = numbered('feed.synopsis', 5, { channel: textChannel(5) })
+    const put = []
+
+    await refreshed({ item_id: 5, at: 1 }, [], (view) => put.push(view))
+
+    await expect(round).rejects.toMatchObject({ kind: 'stale' })
+    expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'свежий',
+                           cover: 1 }])
   })
 
   it('кладёт номер операции в список отменяемых', async () => {

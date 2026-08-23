@@ -4,9 +4,9 @@
 
 ## api — 2 файлов
 
-### api/bridge.js (133)
+### api/bridge.js (142)
 - Единственное место страницы, которое знает про `window.pywebview`.
-- отдаёт: Failed, call, cancel, drop, lastOp, numbered, ready
+- отдаёт: Failed, call, cancel, drop, lastOp, numbered, ready, textChannel
 
 ### api/owned.svelte.js (18)
 - Что раздел запустил, то он и гасит при уходе.
@@ -18,7 +18,7 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (365)
+### app/CardModal.svelte (374)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -48,7 +48,7 @@
 - принимает: view, onsaved, onclose, ontrouble
 - берёт: ./marks.js, ./trouble.js
 
-### app/SearchScreen.svelte (401)
+### app/SearchScreen.svelte (417)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, reviewed, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -70,7 +70,7 @@
 - Свои отметки на карточке: оценка, закладка и рецензия.
 - отдаёт: aspected, reviewed, scored, wished
 
-### app/reread.js (59)
+### app/reread.js (60)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
 - отдаёт: keyOf, refreshed, same, without, withoutText
 
@@ -86,7 +86,7 @@
 - Единственный способ поступить с отказом операции.
 - отдаёт: complaining, reported
 
-### app/visible.js (111)
+### app/visible.js (112)
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale
 
@@ -128,7 +128,7 @@
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл, а у альбома — треки. Длинный список свёрнут до пятерых, пока не развернут.
 - принимает: view, onperson
 
-### components/Feed.svelte (112)
+### components/Feed.svelte (122)
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
@@ -161,7 +161,7 @@
 - Ряд ответных кнопок внизу окна: отмена и согласие.
 - принимает: ok, danger, busy, oncancel, onok
 
-### components/Picker.svelte (264)
+### components/Picker.svelte (263)
 - Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
 - принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
@@ -252,7 +252,7 @@
 - отдаёт: heightsOf
 
 ### state/kinds.js (44)
-- Как тип содержимого называется человеку.
+- Что зависит от типа содержимого: имена, склонения и форма обложки.
 - отдаёт: NOUNS, squareOf, wishOf
 
 ### state/marking.js (30)
@@ -428,7 +428,7 @@
 ### styles/picker.css (77)
 - Поле с подсказкой имён: список совпадений и всплывающий постер. Строка, в которой оно стоит, — не его: она общая у состава, жанров и треков, и живёт в `cardform.css`.
 - селекторы (6): .picker__hits, .picker__hits::-webkit-scrollbar, .picker__hit, .picker__hit:hover,
-.picker__hit.is-marked, .picker__poster.is-square, .picker__poster
+.picker__hit.is-marked, .picker__poster, .picker__poster.is-square
 - берёт: --body-m, --fill-primary-hover, --primary, --shade-55, --surface-pop, --tint-09, --tint-75
 
 ### styles/review.css (41)

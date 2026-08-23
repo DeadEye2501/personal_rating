@@ -41,7 +41,6 @@
   let { label, hits = [], chosen = [], ontype, onchosen, oncreate, onmore }
     = $props()
 
-
   // Уже выбранного в списке нет: предложить его второй раз значит предложить
   // завести того же человека дважды.
   const offered = $derived(hits.filter(

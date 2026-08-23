@@ -1,5 +1,7 @@
 <!-- Окно создания и правки карточки: поля показываются своему типу. -->
 <script>
+  import { untrack } from 'svelte'
+
   import Confirm from '$components/Confirm.svelte'
   import Field from '$components/Field.svelte'
   import Modal from '$components/Modal.svelte'
@@ -90,9 +92,15 @@
   //
   // Кладётся только в нетронутое поле: пока летел ответ, человек мог набрать
   // своё — или стереть набранное, — и затирать сделанное руками нельзя ничем.
+  //
+  // Снимок берётся `untrack`-ом, иначе эффект зависит от поля, которое сам же
+  // и правит: `form.synopsis` связан с текстовой областью, то есть меняется на
+  // каждую букву. Эффект перезапускался бы на каждое нажатие, снимал «нетронутое»
+  // заново и клал приехавшую из базы пустоту поверх набранного — у карточки без
+  // синопсиса текст стирался бы сам, ровно как перестанешь печатать.
   $effect(() => {
     if (!view?.item_id || view.synopsis) return
-    const untouched = form.synopsis
+    const untouched = untrack(() => form.synopsis)
     numbered('feed.synopsis', view.item_id, { channel: 'card:text' })
       .then((text) => { if (form.synopsis === untouched) form.synopsis = text })
       .catch((error) => lost(error, 'Не удалось прочитать синопсис'))
@@ -108,7 +116,8 @@
    *  номер — тем же полем выбирают и жанр, у которого никакого `entity_id`
    *  нет. */
   const hinted = (row) => ({ id: row.entity_id, name: row.name,
-                             hint: row.hint, hint_item_id: row.hint_item_id })
+                             hint: row.hint, hint_item_id: row.hint_item_id,
+                             hint_kind: row.hint_kind })
 
   /** Пустая строка спрашивается наравне с набранной: щёлкнув по полю, выбирают
    *  из уже заведённых, не набрав ни буквы.

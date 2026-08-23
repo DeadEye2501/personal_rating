@@ -455,6 +455,23 @@ def test_the_page_offers_a_link_field_only_where_a_catalog_exists():
     assert strings_of("LINKED", source("state/sources.js")) == with_catalog
 
 
+def test_the_page_carries_every_hint_field_its_picker_reads():
+    """Строку подсказки переводит `hinted()` в окне карточки, и `Picker` читает
+    у переведённой поля напрямую. Выброшенное переводчиком поле приезжает
+    `undefined`, и ошибка молчит: `squareOf(undefined)` честно отвечает `false`,
+    а квадратный всплывающий постер просто не показывается никогда.
+
+    Ровно так `hint_kind` и потерялся — при полном наборе зелёных тестов и при
+    поле, проведённом через базу, модель и мост. Соседний сторож этого не видит:
+    он держит, что страница не читает **лишнего**, а не что переводчик везёт
+    **всё**."""
+    picker = set(re.findall(r"\.(hint\w*)\b", source("components/Picker.svelte")))
+    carried = set(re.findall(r"\b(hint\w*):", source("app/CardModal.svelte")))
+
+    assert picker, "полей подсказки `Picker` больше не читает — сторож устарел"
+    assert picker <= carried, f"переводчик не везёт {picker - carried}"
+
+
 def test_the_page_reads_only_the_hint_fields_a_suggestion_really_has():
     """Подсказка имени уезжает на страницу словарём, и поля её `Picker` читает
     напрямую: `hint` — подпись строки, `hint_item_id` — обложка, `hint_kind` —
