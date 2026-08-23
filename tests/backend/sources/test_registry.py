@@ -19,7 +19,7 @@ from backend.sources.registry import ROUTES
 from backend.sources.steam.client import SteamClient
 from backend.sources.tmdb.client import TmdbClient
 from backend.unique import unique
-from tests.backend.sources.conftest import keys_of_google
+from tests.backend.sources.conftest import keys_of, keys_of_google
 from tests.conftest import counting, responding
 
 # Кто держит каталог и по какому типу его спрашивают — выведено из таблицы
@@ -311,26 +311,29 @@ async def test_a_tripped_breaker_leaves_the_others_alone(registry):
     assert isinstance(refused, Refusal)
 
 
-def watching_keys() -> tuple[httpx.MockTransport, dict]:
-    """Транспорт, запоминающий по хосту уехавший ключ, и словарь запомненного.
+def watching_keys() -> tuple[httpx.MockTransport, list]:
+    """Транспорт, у которого основное зеркало Кинопоиска отказывает, и список
+    ушедших запросов.
 
-    Имён у ключа четыре, и перебираются они все: `api_key` у TMDB, `apikey` у
-    MDBList и OMDB, `key` у Google Books, заголовок у Кинопоиска."""
-    seen: dict = {}
-
+    Список ведёт общий `counting`: развилка здесь по хосту, а не по числу
+    запросов, — считать до ответа не нужно."""
     def handler(request: httpx.Request) -> httpx.Response:
-        seen[request.url.host] = (
-            request.url.params.get("api_key")
-            or request.url.params.get("apikey")
-            or request.url.params.get("key")
-            or request.headers.get("x-api-key")
-        )
         # Основное зеркало отказывает, чтобы дошла очередь до запасного.
         if request.url.host == "api.poiskkino.dev":
             return httpx.Response(403, json={"statusCode": 403})
         return httpx.Response(200, json={})
 
-    return httpx.MockTransport(handler), seen
+    return counting(httpx.MockTransport(handler))
+
+
+def key_of(request: httpx.Request) -> str | None:
+    """Ключ, ушедший с этим запросом. Имён у него четыре, и перебираются они
+    все: `api_key` у TMDB, `apikey` у MDBList и OMDB, `key` у Google Books,
+    заголовок у Кинопоиска."""
+    return (request.url.params.get("api_key")
+            or request.url.params.get("apikey")
+            or request.url.params.get("key")
+            or request.headers.get("x-api-key"))
 
 
 async def test_the_spare_key_of_google_books_reaches_the_wire_too():
@@ -351,7 +354,7 @@ async def test_the_spare_key_of_google_books_reaches_the_wire_too():
     answer = await registry.google_books.search("дюна", Kind.BOOK)
 
     assert isinstance(answer, Found), "запасной ключ до провода не доехал"
-    assert seen == ["google-books-key", "google-books-spare"]
+    assert keys_of(seen) == ["google-books-key", "google-books-spare"]
 
 
 async def test_every_key_from_the_settings_reaches_its_own_source():
@@ -375,7 +378,7 @@ async def test_every_key_from_the_settings_reaches_its_own_source():
     await registry.omdb.ratings("tt0816692", Kind.MOVIE)
     await registry.kinopoisk.ratings("tt0816692", Kind.MOVIE)
 
-    assert seen == {
+    assert {one.url.host: key_of(one) for one in seen} == {
         "api.themoviedb.org": "tmdb-key",
         "www.googleapis.com": "google-books-key",
         "api.mdblist.com": "mdblist-key",

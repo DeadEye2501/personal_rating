@@ -22,7 +22,8 @@ from backend.model import (
     new_manual_item,
     view_from_hit,
 )
-from backend.service.posters import POSTER_SOURCES
+from backend.service.posters import LENDERS, POSTER_SOURCES
+from backend.sources.registry import ROUTES
 from backend.storage.posters import NotOpened
 from backend.storage.repository.external import (
     ExternalIdsRepository,
@@ -329,6 +330,20 @@ async def test_the_built_backend_downloads_a_lent_cover_by_its_own_client(offlin
     assert isinstance(answer, Refusal)
     assert answer.reason is Reason.NETWORK, "транспорт не доехал до заимодавца"
     assert "fantlab" in answer.source, f"отказ назвал не того: {answer.source}"
+
+
+async def test_every_lender_the_registry_names_has_its_own_connection():
+    """Заимодавец объявлен дважды: реестр знает, **кто** ищет обложку, когда
+    каталог её не дал, а сервис обложек — **чьим соединением** её потом качать.
+
+    Разъедься эти два объявления, и адрес нового заимодавца поехал бы
+    соединением источника карточки: беда буква в букву та, которую чинили
+    правкой про FantLab, и молчала бы она так же. Соседняя проверка сторожит
+    одного заимодавца поимённо, а эта — что поимённых хватает на всех."""
+    named = {route.covers for route in ROUTES.values() if route.covers}
+
+    assert named, "запасных источников обложки не осталось — сторож устарел"
+    assert named <= set(LENDERS.values()), f"без соединения: {named - set(LENDERS.values())}"
 
 
 async def test_the_built_backend_asks_google_for_books(offline):

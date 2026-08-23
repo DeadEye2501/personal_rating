@@ -1197,7 +1197,9 @@ async def test_a_refusal_inside_a_two_hundred_is_not_an_empty_album():
     лежало `{"error": {"code": 4}}`. Клиент, смотрящий на код ответа, записал
     бы в базу пустой альбом — и `synced_at` у него был бы свежий, то есть
     перезапроса не случилось бы никогда."""
-    answer = await carded(replay("deezer/quota.json"))
+    # Тело вписано руками: записать его нечем — отказ по частоте приходит
+    # только на волну запросов (см. таблицу фикстур выше).
+    answer = await carded(responding(json=BUSY_BODY))
     assert isinstance(answer, Refusal) and answer.reason is Reason.RATE
 
 

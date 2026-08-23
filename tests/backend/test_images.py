@@ -91,6 +91,17 @@ def test_the_target_size_is_five_hundred_by_seven_fifty():
     assert size_of(crop_to_cover(picture(2000, 1000), Kind.MOVIE)) == (500, 750)
 
 
+def test_the_square_size_is_five_hundred_by_five_hundred():
+    """Второй размер литералом, и по той же причине, что первый: остальные
+    сверяют его с `SQUARE_SIZE`, то есть с самим объявлением.
+
+    Взят он от той же мерки, из которой спека считает хранилище: обложка
+    альбома вдвое больше по стороне занимала бы вчетверо больше места, а
+    равенство сторон — единственное, что у квадрата сторожили до сих пор, — от
+    такой подмены не меняется вовсе."""
+    assert size_of(crop_to_cover(picture(2000, 1000), Kind.MUSIC)) == (500, 500)
+
+
 def test_a_wide_picture_comes_out_the_target_size():
     assert size_of(crop_to_cover(picture(2000, 1000), Kind.MOVIE)) == TARGET_SIZE
 

@@ -17,7 +17,7 @@
 
 ## backend — 99 модулей
 
-### `backend/app.py` — 208 строк
+### `backend/app.py` — 206 строк
 
 Бэкенд, собранный целиком.
 
@@ -29,7 +29,7 @@
   - `async def restore_removed(self, kind: Kind, source: Source, source_id: str) -> None` (9)
   - `async def aclose(self) -> None` (8)
 - `def card_parts(sessions, posters: PosterService) -> dict` (14)
-- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (69)
+- `async def build_backend(config: Config, transport: httpx.AsyncBaseTransport | None=None) -> Backend` (67)
 
 ### `backend/config.py` — 77 строк
 
@@ -655,18 +655,18 @@
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
-### `backend/sources/google_books/client.py` — 205 строк
+### `backend/sources/google_books/client.py` — 207 строк
 
 Разговор с Google Books по сети.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.errors`, `backend.sources.google_books.parse`, `backend.sources.http`
 
-- `class GoogleBooksClient` (165)
+- `class GoogleBooksClient` (167)
   - `def name(self) -> str` (4)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (21)
   - `async def _taken(self, url: str, complaint: str, parse: Callable[[dict], object], **extra: object) -> Outcome` (26)
   - `def _key(self) -> str` (5)
-  - `def _another_key(self, asked_with: int) -> bool` (17)
+  - `def _another_key(self, asked_with: int) -> bool` (19)
   - `def _forget_yesterday(self) -> None` (10)
   - `async def search(self, query: str, kind: Kind, offset: int=0) -> Outcome` (10)
   - `async def find_people(self, name: str) -> Outcome` (12)
@@ -692,7 +692,7 @@
 - `def parse_search(payload: dict) -> list[SearchHit]` (21)
 - `def parse_card(payload: dict) -> SourceCard` (31)
 
-### `backend/sources/http.py` — 182 строк
+### `backend/sources/http.py` — 179 строк
 
 Общая дверь в сеть для всех источников.
 
@@ -1680,16 +1680,17 @@
 - `def found(*pairs) -> Found` (4)
 - `async def stored_ratings(sessions, item_id) -> dict` (3)
 
-### `tests/backend/sources/conftest.py` — 122 строк
+### `tests/backend/sources/conftest.py` — 128 строк
 
 Общее для проверок источников: тела ответов и строители клиентов.
 
-Зависит от: `backend.sources.http`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.builders`
+Зависит от: `backend.sources.http`, `backend.sources.ratings.kinopoisk.unofficial`, `tests.builders`, `tests.fakes`
 
 - `def unofficial(transport) -> UnofficialClient` (8)
 - `def _meta(relative: str) -> dict` (3)
 - `def keys_of_google(exhausted: str, delay: float=0.0)` (24)
-  - `async def handler(request: httpx.Request) -> httpx.Response` (8)
+  - `async def handler(request: httpx.Request) -> httpx.Response` (6)
+- `def keys_of(seen: list) -> list[str]` (3)
 - `def fixture()` (3)
 - `def meta()` (2)
 - `def gog_catalog()` (21)
@@ -1757,7 +1758,7 @@ GOG: поиск не умеет отвечать «не найдено», и о�
 
 - `def client(handler) -> GogClient` (2)
 
-### `tests/backend/sources/test_google_books.py` — 405 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_google_books.py` — 407 строк ⚠ подошёл к 300
 
 Google Books: седьмой источник и единственный, откуда приходят книги.
 
@@ -1851,7 +1852,7 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 451 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_registry.py` — 454 строк ⚠ подошёл к 300
 
 Реестр держится на том, что контракт у всех клиентов один.
 
@@ -1862,8 +1863,9 @@ OMDB: единственный источник, у которого отказ 
 - `def sources()` (4)
 - `async def registry()` (9)
 - `def keyed()` (14)
-- `def watching_keys() -> tuple[httpx.MockTransport, dict]` (20)
-  - `def handler(request: httpx.Request) -> httpx.Response` (11)
+- `def watching_keys() -> tuple[httpx.MockTransport, list]` (13)
+  - `def handler(request: httpx.Request) -> httpx.Response` (5)
+- `def key_of(request: httpx.Request) -> str | None` (8)
 
 ### `tests/backend/sources/test_steam.py` — 303 строк ⚠ подошёл к 300
 
@@ -2147,13 +2149,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 
-### `tests/backend/test_images.py` — 217 строк
+### `tests/backend/test_images.py` — 228 строк
 
 Обрезка залитой руками картинки до формы обложки.
 
 Зависит от: `backend.model`, `backend.service.images`, `tests.conftest`
 
-Тестов: 20
+Тестов: 21
 
 - `def painted(size: tuple[int, int], band: tuple[int, int, int, int]) -> bytes` (7)
 - `def red_box(data: bytes) -> tuple[int, int, int, int] | None` (6)
@@ -2206,9 +2208,9 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def loader(sessions)` (6)
   - `def build(client) -> Loader` (3)
 
-### `tests/backend/test_linking.py` — 438 строк ⚠ подошёл к 300
+### `tests/backend/test_linking.py` — 441 строк ⚠ подошёл к 300
 
-Привязка ручной карточки к внешней базе и правила слияния.
+Привязка ручной карточки к внешней базе.
 
 Зависит от: `backend.model`, `backend.service.linking`, `backend.storage.repository.credits`, `backend.storage.repository.external`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.tracks`, `tests.conftest`
 
@@ -2329,13 +2331,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_offline.py` — 500 строк ⚠ подошёл к 300
+### `tests/backend/test_offline.py` — 515 строк ⚠ за пределом 500
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
-Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
 
-Тестов: 26
+Тестов: 27
 
 - `def mine(title: str, kind: Kind=Kind.MOVIE, **fields)` (4)
 - `async def assemble(tmp_path, transport=None)` (8)

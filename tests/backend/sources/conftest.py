@@ -8,6 +8,7 @@ import pytest
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.kinopoisk.unofficial import UnofficialClient
 from tests.builders import recorded as _load
+from tests.fakes import counting
 
 
 def unofficial(transport) -> UnofficialClient:
@@ -32,23 +33,28 @@ def keys_of_google(exhausted: str, delay: float = 0.0):
     Здесь, а не в модулях проверок: запасной ключ наблюдают трое — клиент, его
     гонка и боевая сборка, — и своими копиями они разъехались бы молча.
 
+    Список ушедшего ведёт общий `counting`, а не свой: развилка здесь по
+    **значению** ключа, а не по числу запросов, — значит счёт нужен после
+    ответа, и своего транспорту не требуется.
+
     `delay` держит ответ исчерпанного ключа: без задержки два одновременных
     запроса уходят по очереди, и гонки, ради которой оговорка про соседа и
     написана, не выходит вовсе. Обработчик асинхронный всегда — `MockTransport`
     принимает и такой, а два его вида были бы вторым объявлением одного и того
     же."""
-    seen: list[str] = []
-
     async def handler(request: httpx.Request) -> httpx.Response:
-        key = request.url.params.get("key")
-        seen.append(key)
-        if key == exhausted:
+        if request.url.params.get("key") == exhausted:
             if delay:
                 await asyncio.sleep(delay)
             return httpx.Response(429, json={"error": {"code": 429}})
         return httpx.Response(200, json={"items": []})
 
-    return httpx.MockTransport(handler), seen
+    return counting(httpx.MockTransport(handler))
+
+
+def keys_of(seen: list) -> list[str]:
+    """Ключи, ушедшие на провод, из списка запросов: спрашивают их трое."""
+    return [one.url.params.get("key") for one in seen]
 
 
 @pytest.fixture

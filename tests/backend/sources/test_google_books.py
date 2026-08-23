@@ -24,7 +24,7 @@ from backend.sources.backoff import until_midnight
 from backend.sources.busy import ATTEMPTS
 from backend.sources.google_books.client import GoogleBooksClient
 from backend.sources.http import SourceHttp
-from tests.backend.sources.conftest import keys_of_google
+from tests.backend.sources.conftest import keys_of, keys_of_google
 from tests.conftest import FakeClock, counting, responding
 
 KEY = "ключ-google-books"
@@ -260,7 +260,7 @@ async def test_the_spare_key_takes_over_when_the_quota_runs_out():
     Наблюдается ключом на проводе, а не тем, что ответ приехал: подставь клиент
     первый ключ второй раз — выдача была бы та же самая, и подмена прошла бы
     молча."""
-    transport, keys = keys_of_google("кончился")
+    transport, seen = keys_of_google("кончился")
     http = SourceHttp("google_books", transport=transport)
     client = GoogleBooksClient(http, ("кончился", "запасной"))
 
@@ -272,7 +272,7 @@ async def test_the_spare_key_takes_over_when_the_quota_runs_out():
     assert not http.breaker.is_open(), "источник закрыт, хотя ключ ещё есть"
     # Исчерпанный ключ спрашивают один раз: возвращаться к нему до полуночи
     # значит тратить по походу в сеть на каждом запросе.
-    assert keys == ["кончился", "запасной", "запасной"]
+    assert keys_of(seen) == ["кончился", "запасной", "запасной"]
 
 
 async def test_both_racing_requests_get_through_on_the_spare_key():
@@ -289,7 +289,7 @@ async def test_both_racing_requests_get_through_on_the_spare_key():
     запасным."""
     # Задержка ответа исчерпанного ключа: без неё оба запроса уходят по
     # очереди, и гонки не выйдет вовсе.
-    transport, keys = keys_of_google("кончился", delay=0.01)
+    transport, seen = keys_of_google("кончился", delay=0.01)
     http = SourceHttp("google_books", transport=transport)
     client = GoogleBooksClient(http, ("кончился", "запасной"))
 
@@ -299,6 +299,7 @@ async def test_both_racing_requests_get_through_on_the_spare_key():
             client.credits_of("Фрэнк Герберт", Kind.BOOK),
         )
 
+    keys = keys_of(seen)
     assert keys[:2] == ["кончился", "кончился"], "гонки не вышло, ключи по очереди"
     assert isinstance(first, Found), "выдача отказала на исчерпанном ключе"
     assert isinstance(second, Found), "работы автора отказали на исчерпанном ключе"
@@ -315,7 +316,7 @@ async def test_the_first_key_is_asked_again_the_next_day():
 
     Наблюдается ключами на проводе: после полуночи первый спрошен снова."""
     clock = FakeClock()
-    transport, keys = keys_of_google("вчерашний")
+    transport, seen = keys_of_google("вчерашний")
     http = SourceHttp("google_books", clock=clock, transport=transport)
     client = GoogleBooksClient(http, ("вчерашний", "запасной"))
 
@@ -324,7 +325,8 @@ async def test_the_first_key_is_asked_again_the_next_day():
         clock.advance(until_midnight(clock()) + timedelta(minutes=1))
         await client.search("герберт", Kind.BOOK)
 
-    assert keys == ["вчерашний", "запасной", "вчерашний", "запасной"], keys
+    assert keys_of(seen) == ["вчерашний", "запасной", "вчерашний",
+                             "запасной"], seen
 
 
 async def test_a_client_without_keys_asks_with_an_empty_one():

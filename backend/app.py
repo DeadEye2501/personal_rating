@@ -160,9 +160,7 @@ async def build_backend(
 
     sources = build_sources(config, transport=transport)
     # Своя ветка на источник: у каждого свой предохранитель и свой заголовок.
-    # Заимодавцы стоят в том же наборе: одолженная обложка качается соединением
-    # того сайта, на котором лежит, — у книг её ищет FantLab, а карточка
-    # приезжает от Google.
+    # Заимодавцы обложек стоят в том же наборе — довод у самого `LENDERS`.
     posters = PosterService(
         {name: SourceHttp(poster_name(name), transport=transport)
          for name in (*POSTER_SOURCES, *LENDERS.values())},

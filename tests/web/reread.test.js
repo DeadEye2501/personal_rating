@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме проверок.
-import { numbered, textChannel } from '../../client/api/bridge.js'
+import { onCardShown } from '../../client/app/visible.js'
 import { again, without, withoutText } from '../../client/app/reread.js'
 import { fake, slow } from './fake.js'
 
@@ -55,6 +55,11 @@ describe('строка из базы кладётся без пустого си
     expect(withoutText(fresh)).toEqual({ item_id: 5, title: 'Своё' })
   })
 })
+
+/** Перечитывание строки, которая в списке есть: сам вызов у четырёх проверок
+ *  один и тот же, а различаются они ответами подделки. */
+const refreshedRow = (put, at = 1) =>
+  again([{ item_id: 5 }], { item_id: 5, at }, [], (view) => put.push(view))
 
 describe('перечитывают только то, что ещё в списке', () => {
   it('строку списка перечитывает', async () => {
@@ -137,16 +142,25 @@ describe('перечитывание одной правленой карточ�
     // вопросов не равен — разойдись каналы, и ответ круга, отправленный до
     // правки, лёг бы поверх свежего текста. Человек увидел бы, как набранное
     // им откатывается само.
+    //
+    // Круг зовётся **своей дверью**, `onCardShown`, а не собранным здесь
+    // вызовом: имя канала он строит сам, и собери его проверка — она сторожила
+    // бы собственную строку, а не то, что канал у двух дверей общий.
     fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
-           'feed.synopsis': slow({ ok: 'прежний' }, { ok: 'свежий' }) })
-    const round = numbered('feed.synopsis', 5, { channel: textChannel(5) })
+           'feed.synopsis': slow({ ok: 'прежний' }, { ok: 'свежий' }),
+           'world.enrich': { ok: [] }, 'world.refresh_series': { ok: [] } })
+    const round = []
     const put = []
+    const circle = onCardShown({ item_id: 5, kind: 'movie', source: 'tmdb',
+                                 synced_at: null },
+                               [], (fields) => round.push(fields))
 
-    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, [], (view) => put.push(view))
+    await refreshedRow(put)
+    await circle
 
-    await expect(round).rejects.toMatchObject({ kind: 'stale' })
     expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'свежий',
                            cover: 1 }])
+    expect(round.some((one) => 'synopsis' in one)).toBe(false)
   })
 
   it('кладёт номер операции в список отменяемых', async () => {
