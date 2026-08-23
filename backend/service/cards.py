@@ -87,5 +87,9 @@ class CardWriter(CardParts):
 
         await self._write_external(item_id, card)
 
+        # Безусловно, как жанры и состав: карточка только что заведена, и
+        # стирать этим набором нечего. Пустой у всех, кроме музыки.
+        await self._tracks.replace(item_id, list(card.tracks))
+
         if poster is not None:
             await self.posters.save(item_id, poster, card.item.synced_at)

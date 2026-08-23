@@ -73,6 +73,8 @@ class Linker(CardParts):
 
         await self._write_external(item_id, card)
 
+        await self._fill_tracks(item_id, card, overwrite)
+
         await self._fill_poster(item_id, merged, overwrite)
 
     async def _check_identifiers(self, item_id: int, card: SourceCard) -> None:
@@ -111,6 +113,19 @@ class Linker(CardParts):
         if overwrite:
             await repository.detach_all(item_id)
         await self._attach_credits(repository, item_id, credits)
+
+    async def _fill_tracks(self, item_id: int, card: SourceCard,
+                           overwrite: bool) -> None:
+        if not card.tracks:
+            # Пустой набор не пишется никогда, даже при перезаписи: `replace`
+            # чистит список целиком, и альбом с набранными руками треками
+            # потерял бы их из-за источника, который треков не отдал.
+            return
+        if not overwrite and await self._tracks.of(item_id):
+            # Вписал один трек — список считается заполненным целиком, как
+            # состав и жанры.
+            return
+        await self._tracks.replace(item_id, list(card.tracks))
 
     async def _fill_poster(self, item_id: int, item: Item,
                            overwrite: bool) -> None:

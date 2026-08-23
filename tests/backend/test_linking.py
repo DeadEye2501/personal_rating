@@ -28,7 +28,9 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import ItemExists, LibraryRepository
+from backend.storage.repository.tracks import TracksRepository
 from tests.conftest import (
+    album_card,
     LATER,
     capture,
     MOMENT,
@@ -145,8 +147,12 @@ async def linker(sessions, engine, posters):
 
 
 async def manual_card(sessions, **fields) -> int:
+    """Карточка, заведённая руками. Тип называют там, где привязывают не кино:
+    альбому и книге он свой, а умолчание осталось киношным — привязок к нему в
+    этом модуле большинство."""
     return await LibraryRepository(sessions).create(
-        new_manual_item(Kind.MOVIE, fields.pop("title", "Интерстеллар"),
+        new_manual_item(fields.pop("kind", Kind.MOVIE),
+                        fields.pop("title", "Интерстеллар"),
                         synced_at=MOMENT, **fields)
     )
 
@@ -445,3 +451,57 @@ async def test_a_card_without_a_poster_url_keeps_its_own(linker, sessions):
     )), now=LATER, overwrite=True)
 
     assert await linker.posters._store.get(item_id) == ours
+
+
+async def test_linking_fills_only_the_empty_track_list(linker, sessions):
+    """Правило привязки: что человек написал, остаётся его. Непустое считается
+    занятым целиком — так же, как состав и жанры."""
+    tracks = TracksRepository(sessions)
+    item_id = await manual_card(sessions, kind=Kind.MUSIC, title="Свой альбом")
+    await tracks.replace(item_id, ["Своё"])
+
+    await linker.link(item_id, album_card(), MOMENT)
+
+    assert await tracks.of(item_id) == ["Своё"]
+
+
+async def test_an_empty_track_list_from_the_source_erases_nothing(linker,
+                                                                  sessions):
+    """`replace` чистит набор целиком, поэтому безусловный вызов при перезаписи
+    стёр бы набранное руками, когда источник треков не отдал. Ровно от этого
+    защищается ранним выходом сосед `_fill` в том же классе."""
+    tracks = TracksRepository(sessions)
+    item_id = await manual_card(sessions, kind=Kind.MUSIC, title="Свой альбом")
+    await tracks.replace(item_id, ["Своё"])
+
+    await linker.link(item_id, album_card(tracks=()), MOMENT, overwrite=True)
+
+    assert await tracks.of(item_id) == ["Своё"]
+
+
+async def test_overwriting_replaces_a_taken_track_list(linker, sessions):
+    """Третья ветвь правила, и без неё «доливаем только пустое» проверено на
+    двух из трёх: перезапись обязана заменить занятый список, иначе повторная
+    привязка альбома молча оставила бы старые треки.
+
+    У соседних семейств — состава, жанров, обложки — эта ветвь закрыта."""
+    tracks = TracksRepository(sessions)
+    item_id = await manual_card(sessions, kind=Kind.MUSIC, title="Свой альбом")
+    await tracks.replace(item_id, ["Своё"])
+
+    await linker.link(item_id, album_card(), MOMENT, overwrite=True)
+
+    assert await tracks.of(item_id) == ["Группа крови", "Закрой за мной дверь"]
+
+
+async def test_an_album_linked_to_an_empty_card_takes_the_tracks(linker,
+                                                                 sessions):
+    """Обратная половина: пустой набор — это не «занято», и треки источника в
+    него доливаются. Без неё правило «доливаем только пустое» держалось бы
+    только с одной стороны."""
+    tracks = TracksRepository(sessions)
+    item_id = await manual_card(sessions, kind=Kind.MUSIC, title="Свой альбом")
+
+    await linker.link(item_id, album_card(), MOMENT)
+
+    assert await tracks.of(item_id) == ["Группа крови", "Закрой за мной дверь"]

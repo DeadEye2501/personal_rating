@@ -7,7 +7,15 @@ from pathlib import Path
 
 from PIL import Image
 
-from backend.model import Item, Kind, SearchHit, Source
+from backend.model import (
+    Credit,
+    Item,
+    Kind,
+    PersonRole,
+    SearchHit,
+    Source,
+    SourceCard,
+)
 from backend.storage.repository.library import LibraryRepository
 from backend.storage.repository.ratings import RatingsRepository
 
@@ -114,3 +122,22 @@ def row(source: Source, source_id: str, title: str, **fields) -> SearchHit:
 def titles(answers: list[list[SearchHit]]) -> list[str]:
     """Названия всех строк всех выдач подряд — то, что видно на экране."""
     return [one.title for answer in answers for one in answer]
+
+
+def album_card(source_id: str = "54717452", **overrides) -> SourceCard:
+    """Альбом из Deezer: исполнитель на месте режиссёра, треки своим полем.
+
+    Здесь, а не у одного из двух модулей проверок: альбом нужен и писателю, и
+    привязке, и своими копиями они разъехались бы молча — у одной из двух
+    свидетель перестал бы быть тем, чем выглядит. Лейбла нет вовсе: он не
+    берётся решением пользователя 22.08.2026."""
+    fields = dict(
+        item=an_item(source_id, "Группа крови", kind=Kind.MUSIC,
+                     source=Source.DEEZER, year=1988,
+                     poster_url="https://example.com/p.jpg"),
+        people=(Credit("Кино", PersonRole.PERFORMER,
+                       source=Source.DEEZER, source_id="4505880"),),
+        tracks=("Группа крови", "Закрой за мной дверь"),
+    )
+    fields.update(overrides)
+    return SourceCard(**fields)

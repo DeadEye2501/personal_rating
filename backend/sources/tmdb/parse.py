@@ -17,7 +17,13 @@ from backend.model import (
     Source,
     SourceCard,
 )
-from backend.sources.convert import genres, identifier, rating, year
+from backend.sources.convert import (
+    found_people,
+    genres,
+    identifier,
+    rating,
+    year,
+)
 from backend.unique import unique_by
 
 POSTER_BASE = "https://image.tmdb.org/t/p/w500"
@@ -182,10 +188,10 @@ def _himself(character: str | None) -> bool:
 
 
 def parse_people(payload: dict) -> list[PersonHit]:
-    """Найденные приезжают все — это и есть ответ на поиск по имени. Поиск у
-    TMDB нечёткий, и близкие написания в ответе — тоже ответ."""
-    return [PersonHit(source_id=str(row["id"]))
-            for row in payload.get("results", [])]
+    """Найденные приезжают все — правило общее, и живёт оно в
+    `convert.found_people`. Здесь остаётся имя ключа: у TMDB список лежит в
+    `results`."""
+    return found_people(payload.get("results", []))
 
 
 def _hits(rows: list[dict], kind: Kind) -> list[SearchHit]:

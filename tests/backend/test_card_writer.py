@@ -28,9 +28,11 @@ from backend.storage.repository.external import (
 )
 from backend.storage.repository.genres import GenresRepository
 from backend.storage.repository.library import LibraryRepository
+from backend.storage.repository.tracks import TracksRepository
 from tests.conftest import MOMENT as WHEN
 from tests.conftest import (
     POSTER,
+    album_card,
     an_item,
     card_parts,
     film_genres,
@@ -412,3 +414,41 @@ async def test_the_poster_is_dated_by_the_moment_of_the_card(writer, tmp_path):
         connection.close()
 
     assert stored[0].startswith(WHEN.isoformat(sep=" "))
+
+
+async def test_an_album_from_the_source_keeps_its_tracks(writer, sessions):
+    """Частичной карточки из внешнего источника в базе не бывает, и треки —
+    такая же её часть, как состав. Альбом, записанный без них, выглядит целым:
+    `synced_at` у него свежий, то есть перезапроса не случилось бы никогда."""
+    item_id = await writer.save(album_card(), POSTER)
+
+    assert isinstance(item_id, int)
+    assert await TracksRepository(sessions).of(item_id) == [
+        "Группа крови", "Закрой за мной дверь"]
+
+
+async def test_a_broken_write_takes_the_tracks_with_it(writer, sessions,
+                                                       monkeypatch):
+    """Осиротевший трек достался бы следующей карточке с тем же номером: `item`
+    заведён без `AUTOINCREMENT`, и однажды так досталась чужая обложка.
+
+    Чинить тут нечего — `track` объявлен через `item_fk` с `ondelete="CASCADE"`,
+    и уборка карточки уносит треки сама. Тест сторожит, что каскад останется на
+    месте, а не проверяет свой код: срыв наводится **после** записи треков,
+    иначе проверять было бы нечего."""
+    written: list[int] = []
+    save = writer.posters.save
+
+    async def save_then_break(item_id, data, now):
+        await save(item_id, data, now)
+        written.append(item_id)
+        raise OSError("второй файл базы отвалился после записи")
+
+    monkeypatch.setattr(writer.posters, "save", save_then_break)
+
+    result = await writer.save(album_card(), POSTER)
+
+    assert isinstance(result, Refusal)
+    assert written, "до обложки дело не дошло — тест проверяет не то"
+    assert await TracksRepository(sessions).of(written[0]) == [], \
+        "треки откаченной карточки остались и достанутся следующей"

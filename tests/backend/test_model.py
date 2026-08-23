@@ -150,7 +150,7 @@ def test_rating_of_a_film_carries_no_aspects():
 SCHEMA = [
     (Kind, {"movie", "series", "game", "book", "music"}),
     (Source, {"manual", "tmdb", "steam", "gog", "old_games",
-              "google_books"}),
+              "google_books", "deezer"}),
     (IdSource, {"imdb", "kinopoisk", "steam", "gog"}),
     (RatingSource, {"imdb", "kinopoisk", "tmdb", "rotten", "metacritic",
                     "steam", "gog"}),

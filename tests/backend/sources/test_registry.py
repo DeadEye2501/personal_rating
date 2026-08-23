@@ -144,15 +144,21 @@ async def test_books_still_have_no_ratings(registry):
     assert registry.rating_sources(Kind.BOOK) == []
 
 
-async def test_music_asks_nobody(registry):
-    """Главная опасность всей работы. Реестр был написан как «игра или всё
-    остальное», и книга уехала бы в киношную ветку молча: поиск вернул бы
-    фильмы, обогащение пошло бы за оценками в MDBList, OMDb и Кинопоиск по
-    несуществующему `imdb_id`. Отказа не было бы ни одного.
+async def test_albums_are_searched_at_deezer(registry):
+    """Тождеством, а не типом: клиент обязан быть тот же самый, что поднят
+    сборкой, — второй такой же уехал бы в сеть со своим предохранителем.
 
-    У музыки клиент приезжает задачей 5, и до тех пор пустота у неё честная."""
-    assert registry.catalog_for(Kind.MUSIC) == []
-    assert registry.people_for(Kind.MUSIC) is None
+    Ту же ловушку сторожит и вторая половина: реестр был написан как «игра или
+    всё остальное», и альбом уехал бы в киношную ветку молча — поиск вернул бы
+    фильмы, обогащение пошло бы за оценками в MDBList, OMDb и Кинопоиск по
+    несуществующему `imdb_id`, и отказа не было бы ни одного."""
+    assert registry.catalog_for(Kind.MUSIC) == [registry.deezer]
+    assert registry.people_for(Kind.MUSIC) is registry.deezer
+
+
+async def test_music_asks_nobody_for_ratings(registry):
+    """Оценок у музыки нет и не предвидится: своей у Deezer нет вовсе, а
+    агрегатора альбомов проект не заводит."""
     assert registry.rating_sources(Kind.MUSIC) == []
 
 
@@ -177,9 +183,9 @@ async def test_a_kind_outside_the_table_is_refused_on_the_spot(registry):
 async def test_every_catalog_client_takes_the_same_arguments(registry):
     """Ради этого реестр и существует: сервис зовёт их одинаково.
 
-    Перебор идёт по всему перечислению, а не по списку типов: у музыки каталога
-    нет, и тело цикла ей просто не достаётся — зато список перестаёт отставать
-    от перечисления молча."""
+    Перебор идёт по всему перечислению, а не по списку типов: сегодня каталог
+    есть у всех пяти, но список типов отставал бы от перечисления молча, а
+    перебор — нет."""
     for kind in Kind:
         for client in registry.catalog_for(kind):
             assert list(inspect.signature(client.search).parameters) == [
@@ -261,12 +267,12 @@ async def test_every_source_has_its_own_breaker(registry):
     # Оба зеркала Кинопоиска заведены под одним именем: наружу источник один, и
     # в `Refusal.source` человек должен увидеть «kinopoisk», а не имя зеркала.
     assert sorted(one.name for one in registry.connections) == [
-        "gog", "google_books", "kinopoisk", "kinopoisk", "mdblist",
+        "deezer", "gog", "google_books", "kinopoisk", "kinopoisk", "mdblist",
         "old_games", "omdb", "steam", "tmdb",
     ]
     assert len(breakers) == len({id(one) for one in breakers})
-    # Восемь источников, но соединений девять: у Кинопоиска два зеркала.
-    assert len(breakers) == 9
+    # Девять источников, но соединений десять: у Кинопоиска два зеркала.
+    assert len(breakers) == 10
 
 
 async def test_a_tripped_breaker_leaves_the_others_alone(registry):

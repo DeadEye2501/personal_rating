@@ -26,6 +26,12 @@ ADDRESSES = [
      Source.GOOGLE_BOOKS, "vDkkMwEACAAJ", Kind.BOOK),
     ("https://books.google.com/books/about/Дюна?id=-u8-DwAAQBAJ",
      Source.GOOGLE_BOOKS, "-u8-DwAAQBAJ", Kind.BOOK),
+    # Адрес альбома у Deezer один, замерен 22.08.2026; необязательный сегмент
+    # перед ним — язык, ровно как у GOG.
+    ("https://www.deezer.com/album/54717452",
+     Source.DEEZER, "54717452", Kind.MUSIC),
+    ("https://www.deezer.com/ru/album/54717452",
+     Source.DEEZER, "54717452", Kind.MUSIC),
 ]
 
 

@@ -29,7 +29,7 @@ _ABSENT = 404
 # сборка и тесты, — и разойдись они, четвёртый источник молча остался бы без
 # обложек в одной из двух.
 POSTER_SOURCES = (Source.TMDB, Source.STEAM, Source.GOG, Source.OLD_GAMES,
-                  Source.GOOGLE_BOOKS)
+                  Source.GOOGLE_BOOKS, Source.DEEZER)
 
 
 class PosterService:

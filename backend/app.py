@@ -122,7 +122,7 @@ class Backend:
 
 
 def card_parts(sessions, posters: PosterService) -> dict:
-    """Семь частей одной карточки. Писатель и привязка собираются из одного и
+    """Восемь частей одной карточки. Писатель и привязка собираются из одного и
     того же — у них общая основа `CardParts`, — и набор имён у них обязан
     совпадать буквально, поэтому перечислен он здесь, а не у каждого сборщика."""
     return {
@@ -132,6 +132,7 @@ def card_parts(sessions, posters: PosterService) -> dict:
         "companies": companies(sessions),
         "ids": ExternalIdsRepository(sessions),
         "ratings": ExternalRatingsRepository(sessions),
+        "tracks": TracksRepository(sessions),
         "posters": posters,
     }
 

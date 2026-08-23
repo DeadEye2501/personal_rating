@@ -6,6 +6,7 @@
 from dataclasses import dataclass
 
 from backend.model import Kind, Source
+from backend.sources.deezer.client import DeezerClient
 from backend.sources.gog.client import GogClient
 from backend.sources.google_books.client import GoogleBooksClient
 from backend.sources.http import SourceHttp
@@ -36,7 +37,7 @@ ROUTES: dict[Kind, Route] = {
     Kind.SERIES: Route(("tmdb",), "tmdb", FILM_RATINGS),
     Kind.GAME: Route(("steam", "gog", "old_games"), None, ()),
     Kind.BOOK: Route(("google_books",), "google_books", ()),
-    Kind.MUSIC: Route((), None, ()),
+    Kind.MUSIC: Route(("deezer",), "deezer", ()),
 }
 
 
@@ -53,6 +54,7 @@ class Sources:
     gog: GogClient
     old_games: OldGamesClient
     google_books: GoogleBooksClient
+    deezer: DeezerClient
     mdblist: MdbListClient
     omdb: OmdbClient
     kinopoisk: KinopoiskClient
@@ -69,11 +71,14 @@ class Sources:
         что не склеилось, остаётся на глазах человека — он убирает лишнее сам.
 
         У книг источник один: у Open Library народная разметка, а Goodreads
-        закрыл выдачу ключей в 2020. У музыки клиента ещё нет, и выдача честно
-        пуста."""
+        закрыл выдачу ключей в 2020. У музыки тоже один — Deezer: ключа не
+        требует вовсе, обложка у него 1000×1000, а треки приезжают вместе с
+        карточкой."""
         return [getattr(self, name) for name in ROUTES[kind].catalogs]
 
-    def people_for(self, kind: Kind) -> TmdbClient | GoogleBooksClient | None:
+    def people_for(
+        self, kind: Kind
+    ) -> TmdbClient | GoogleBooksClient | DeezerClient | None:
         """Кто умеет искать по человеку. У игр — никто, и это замерено, а не
         предположено: Steam по разработчику отдаёт разметку витрины, GOG молча
         игнорирует параметр и возвращает весь каталог. Людей же магазины не
@@ -81,7 +86,8 @@ class Sources:
 
         У книг отвечает тот же Google Books: своей ручки людей у него нет, и
         автор ищется той же выдачей оператором `inauthor:` — идентичность автора
-        равна его имени. У музыки ответчик приезжает задачей 5."""
+        равна его имени. У музыки отвечает Deezer, и у него идентичность
+        исполнителя настоящая: `artist.id` и своя ручка его альбомов."""
         name = ROUTES[kind].people
         return getattr(self, name) if name else None
 
@@ -94,6 +100,7 @@ class Sources:
             Source.GOG: self.gog,
             Source.OLD_GAMES: self.old_games,
             Source.GOOGLE_BOOKS: self.google_books,
+            Source.DEEZER: self.deezer,
         }.get(source)
 
     def rating_sources(self, kind: Kind) -> list:

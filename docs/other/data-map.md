@@ -70,6 +70,7 @@
   - `companies: tuple[Credit, ...]` = `field(default_factory=tuple)`
   - `external_ids: tuple[ExternalId, ...]` = `field(default_factory=tuple)`
   - `ratings: tuple[ExternalRating, ...]` = `field(default_factory=tuple)`
+  - `tracks: tuple[str, ...]` = `field(default_factory=tuple)`
 
 ### `backend/model/credit.py`
 
@@ -139,6 +140,7 @@
   - `GOG` = `'gog'`
   - `OLD_GAMES` = `'old_games'`
   - `GOOGLE_BOOKS` = `'google_books'`
+  - `DEEZER` = `'deezer'`
 - `class GenreSource(StrEnum)`
   - `TMDB` = `'tmdb'`
   - `STEAM` = `'steam'`
@@ -184,6 +186,7 @@
 - `_STEAM` = `re.compile('store\\.steampowered\\.com/(?:ageche…`
 - `_GOG` = `re.compile('gog\\.com/(?:[a-z-]+/)?game/([a-z0-9…`
 - `_GOOGLE_BOOKS` = `re.compile('google\\.[a-z.]+/(?:[a-z]+/)*books(?…`
+- `_DEEZER` = `re.compile('deezer\\.com/(?:[a-z-]+/)?album/(\\d…`
 - `_BARE` = `re.compile('^\\d+$')`
 - `_TMDB_KINDS` = `словарь из 2`
 - `_FILMS` = `набор из 2`
@@ -376,7 +379,7 @@
 - `logger` = `logging.getLogger(__name__)`
 - `_SIGNATURES` = `набор из 3`
 - `_ABSENT` = `404`
-- `POSTER_SOURCES` = `набор из 5`
+- `POSTER_SOURCES` = `набор из 6`
 
 ### `backend/service/search.py`
 
@@ -406,6 +409,22 @@
 ### `backend/sources/convert.py`
 
 - `FREE_IN_SEARCH` = `словарь из 2`
+
+### `backend/sources/deezer/client.py`
+
+- `logger` = `logging.getLogger(__name__)`
+- `SOURCE` = `'deezer'`
+- `BASE` = `'https://api.deezer.com'`
+- `RATE_BACKOFF` = `timedelta(minutes=1)`
+- `BUSY` = `4`
+- `ABSENT` = `800`
+- `ALL_ALBUMS` = `1000`
+- `class DeezerClient`
+  - `PAGES: ClassVar[bool]` = `True`
+
+### `backend/sources/deezer/parse.py`
+
+- `NO_GENRE` = `-1`
 
 ### `backend/sources/errors.py`
 
@@ -524,6 +543,7 @@
   - `gog: GogClient`
   - `old_games: OldGamesClient`
   - `google_books: GoogleBooksClient`
+  - `deezer: DeezerClient`
   - `mdblist: MdbListClient`
   - `omdb: OmdbClient`
   - `kinopoisk: KinopoiskClient`
@@ -805,6 +825,10 @@
 
 - `ROOT` = `Path(__file__).resolve().parents[1]`
 
+### `tests/backend/sources/test_deezer.py`
+
+- `BUSY_BODY` = `словарь из 1`
+
 ### `tests/backend/sources/test_gog.py`
 
 - `WANTED` = `'1456460669'`
@@ -901,7 +925,7 @@
 
 ### `tests/backend/test_links.py`
 
-- `ADDRESSES` = `набор из 10`
+- `ADDRESSES` = `набор из 12`
 - `SHOUTED` = `набор из 5`
 - `NONSENSE` = `набор из 9`
 
@@ -1032,6 +1056,5 @@
 ### `tests/fakes.py`
 
 - `class FakeSources`
-  - `NO_CATALOG` = `frozenset({Kind.MUSIC})`
-  - `NO_PEOPLE` = `frozenset({Kind.GAME, Kind.MUSIC})`
+  - `NO_PEOPLE` = `frozenset({Kind.GAME})`
   - `NO_RATINGS` = `frozenset({Kind.GAME, Kind.BOOK, Kind.MUSIC})`

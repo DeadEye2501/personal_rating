@@ -257,19 +257,20 @@ async def test_a_book_query_asks_for_the_author_too(sessions, service):
     assert ("find_people", "Фрэнк Герберт") in client.asked
 
 
-async def test_music_is_searched_only_in_our_own_base(sessions, service):
-    """Внешний источник музыки приедет задачей 5. До тех пор внешняя половина
-    выдачи пуста — и пуста она должна быть по-настоящему, а не «как у кино».
+async def test_an_album_goes_outside_like_a_film(sessions, service):
+    """Последний тип, у которого внешней половины не было. Сторож, утверждавший
+    обратное, стоял здесь с первого этапа: источника у музыки не было, и
+    пустота была честной. Источник появился — половина обязана наполниться,
+    иначе альбом ищется только среди уже заведённых, а завести первый
+    неоткуда."""
+    client = FakeSearch(Found([hit(title="Группа крови", kind=Kind.MUSIC,
+                                   source=Source.DEEZER)]),
+                        name="deezer", people=Found([]))
 
-    Клиент подставлен отвечающий, и проверяется не только пустота выдачи, но и
-    то, что его не спросили: без второго утверждения тест зеленел бы и от
-    клиента, которому просто нечего было ответить."""
-    client = FakeSearch(Found([hit(title="Кино")]))
+    result = await service(client).external(Kind.MUSIC, "группа крови")
 
-    result = await service(client).external(Kind.MUSIC, "Кино")
-
-    assert result.views == ()
-    assert client.asked == []
+    assert [one.title for one in result.views] == ["Группа крови"]
+    assert ("группа крови", Kind.MUSIC, 0) in client.asked
 
 
 async def test_the_offset_reaches_the_source(sessions, service):

@@ -18,7 +18,7 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (343)
+### app/CardModal.svelte (345)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -295,7 +295,7 @@
 - Все состояния переключателя сортировки. Набор у раздела свой: в «Оценённых» восемь, в отложенном четыре, и выбирает его `cycleOf`.
 - отдаёт: ADDED_AT, IDLE_SORT, SORT_STATES, cycleOf, hasSort, nextSort, orderFor, stateAt
 
-### state/sources.js (136)
+### state/sources.js (140)
 - Всё, что страница знает о чужом источнике: имя, шкала, адрес страницы.
 - отдаёт: LINKED, MANUAL, cardSourceName, inOrder, linkableOf, nameOf, pagesOf, shownValue, stepOfSource
 

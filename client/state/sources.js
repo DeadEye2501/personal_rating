@@ -106,7 +106,8 @@ export const nameOf = (source) => NAMES[source] ?? source
  * таблицей оценок значило показать `old_games` вместо «old-games.ru».
  * Ручной тут нет: её подпись не показывается вовсе. */
 const CARDS = { tmdb: 'TMDB', steam: 'Steam', gog: 'GOG',
-                old_games: 'old-games.ru', google_books: 'Google Books' }
+                old_games: 'old-games.ru', google_books: 'Google Books',
+                deezer: 'Deezer' }
 
 /** Имя источника, из которого приехала карточка. */
 export const cardSourceName = (source) => CARDS[source] ?? source
@@ -127,10 +128,13 @@ export function pagesOf(view) {
   return found
 }
 
-/** Типы, у которых бывает адрес в источник. У музыки клиента нет вовсе, и
- *  вставленная ссылка отвечала бы отказом на каждое нажатие клавиши. Набор
- *  сверяется с реестром бэкенда сторожем границы: приедет клиент музыки —
- *  сторож покраснеет, и поле вернётся вместе с ним. */
-export const LINKED = ['movie', 'series', 'game', 'book']
+/** Типы, у которых бывает адрес в источник. С 23.08.2026 это **все пять**:
+ *  источник есть у каждого, и `linkableOf` сегодня истинен всегда.
+ *
+ *  Набор остаётся зеркалом реестра, а не превращается в `true`: его сверяет со
+ *  строками `ROUTES` сторож границы, и тип, у которого каталога не окажется,
+ *  потеряет поле вставки ссылки вместе со своей строкой. Незнакомое имя в
+ *  набор не входит и поля не получает — это же и наблюдается тестом. */
+export const LINKED = ['movie', 'series', 'game', 'book', 'music']
 
 export const linkableOf = (kind) => LINKED.includes(kind)

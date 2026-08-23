@@ -35,6 +35,10 @@ _GOG = re.compile(r"gog\.com/(?:[a-z-]+/)?game/([a-z0-9_]+)", re.I)
 _GOOGLE_BOOKS = re.compile(
     r"google\.[a-z.]+/(?:[a-z]+/)*books(?:/\S*?)?"
     r"(?:[?&]id=|/edition/[^/?\s]+/)([\w-]+)", re.I)
+# Адрес альбома у Deezer один и простой — `deezer.com/album/<номер>`, замерено;
+# необязательный сегмент перед ним — язык, `deezer.com/ru/album/…`, ровно как у
+# GOG.
+_DEEZER = re.compile(r"deezer\.com/(?:[a-z-]+/)?album/(\d+)", re.I)
 _BARE = re.compile(r"^\d+$")
 
 _TMDB_KINDS = {"movie": Kind.MOVIE, "tv": Kind.SERIES}
@@ -75,6 +79,11 @@ def parse_link(raw: str, kind: Kind | None = None) -> ExternalLink | None:
         # `-u8-DwAAQBAJ` и `-U8-dWaaqbaj` для него разные тома.
         return ExternalLink(source=Source.GOOGLE_BOOKS,
                             source_id=found.group(1), kind=Kind.BOOK)
+
+    found = _DEEZER.search(text)
+    if found:
+        return ExternalLink(source=Source.DEEZER, source_id=found.group(1),
+                            kind=Kind.MUSIC)
 
     # Голое число значит что-то только у кино: там источник один. У игр Steam и
     # GOG нумеруются независимо, и по числу их не различить.

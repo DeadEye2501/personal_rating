@@ -23,3 +23,7 @@ class SourceCard:
     companies: tuple[Credit, ...] = field(default_factory=tuple)
     external_ids: tuple[ExternalId, ...] = field(default_factory=tuple)
     ratings: tuple[ExternalRating, ...] = field(default_factory=tuple)
+    # Названия треков в порядке альбома. Только у музыки: у Deezer они приезжают
+    # в том же ответе, что и карточка, а порядок берётся по месту в списке —
+    # `track_position` там пуст у всех, замерено.
+    tracks: tuple[str, ...] = field(default_factory=tuple)
