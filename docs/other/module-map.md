@@ -225,7 +225,7 @@
 
 - `class Tag` (5)
 
-### `backend/model/view.py` — 101 строк
+### `backend/model/view.py` — 105 строк
 
 Карточка в том виде, в каком её показывает лента.
 
@@ -233,7 +233,7 @@
 
 - `class CardView` (35)
 - `def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...]=(), external: tuple[ExternalRating, ...]=()) -> CardView` (19)
-- `def view_from_item(item: Item) -> CardView` (27)
+- `def view_from_item(item: Item) -> CardView` (31)
 
 ### `backend/service/asking.py` — 39 строк
 
@@ -1239,16 +1239,16 @@
   - `def has(self, item_id: int) -> dict` (2)
 - `def _picture(data: str) -> bytes` (11)
 
-### `bridge/feed.py` — 75 строк
+### `bridge/feed.py` — 76 строк
 
 Мост: лента — страницы разделов и гистограмма.
 
 Зависит от: `backend.model`, `bridge.answer`
 
-- `class FeedBridge(Domain)` (38)
+- `class FeedBridge(Domain)` (39)
   - `def page(self, op: int, feed: dict, offset: int, limit: int) -> dict` (3)
   - `def views_of(self, op: int, item_ids: list) -> dict` (3)
-  - `def synopsis(self, op: int, item_id: int) -> dict` (11)
+  - `def synopsis(self, op: int, item_id: int) -> dict` (12)
   - `def histogram(self, op: int, kind: str, filters: dict) -> dict` (5)
 - `async def _text(back, item_id: int) -> str` (5)
 - `def _feed(feed: dict) -> Feed` (10)
