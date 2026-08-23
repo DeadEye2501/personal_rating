@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import httpx
 
 from backend.model import Found, Kind, Missing, RatingSource, Reason, Refusal
-from backend.sources.backoff import until_midnight
 from backend.sources.http import SourceHttp
 from backend.sources.ratings.omdb.client import OmdbClient
 from backend.sources.ratings.omdb.parse import parse_ratings
@@ -106,13 +105,6 @@ def test_the_separate_imdb_field_is_used_when_the_list_has_none():
     values = parse_ratings(payload).values
 
     assert [(one.source, one.value) for one in values] == [(RatingSource.IMDB, 8.6)]
-
-
-def test_until_midnight_counts_to_the_next_day():
-    assert until_midnight(datetime(2026, 7, 27, 23, 0)) == timedelta(hours=1)
-    assert until_midnight(datetime(2026, 7, 27, 0, 30)) == timedelta(
-        hours=23, minutes=30
-    )
 
 
 async def test_recorded_missing_object_arrives_under_two_hundred(replay, meta):

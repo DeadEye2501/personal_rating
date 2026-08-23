@@ -8,6 +8,8 @@
 
 Тем же способом отличает отсутствие Steam: `success` внутри `200`."""
 
+from contextlib import aclosing
+
 import httpx
 
 from backend.model import (
@@ -38,11 +40,8 @@ def client(transport: httpx.MockTransport) -> DeezerClient:
 
 
 async def carded(transport: httpx.MockTransport, source_id: str = "54717452"):
-    one = client(transport)
-    try:
+    async with aclosing(client(transport)) as one:
         return await one.card(source_id, Kind.MUSIC)
-    finally:
-        await one.aclose()
 
 
 def test_the_search_gives_a_row_for_every_album(fixture):
@@ -300,12 +299,17 @@ def test_an_artist_row_carries_the_identity_and_nothing_else(fixture):
 async def test_a_code_outside_two_hundred_is_a_refusal():
     """Тело разбирается до кода, но код не игнорируется вовсе.
 
-    Свидетель — **разбираемое** тело под чужим кодом: с неразбираемым отказ
-    приходил бы из разбора, и проверку кода можно было бы снять целиком, не
-    уронив ни одного теста. Здесь же снять её значит принять чужой код за
-    ответ: у поиска пустой `data` под `500` стал бы `Found([])`, то есть
-    «источник ответил, ничего не нашлось» — молча."""
-    answer = await carded(responding(500, json={"data": []}))
+    Свидетель — **разбираемое** тело под чужим кодом, и спрашивается им
+    **поиск**, а не карточка: у карточки пустое тело роняет разбор (`KeyError`
+    по `id`), отказ приходит из него, и проверку кода можно было бы снять
+    целиком, не уронив ни одного теста. У поиска пустой `data` разбирается
+    успешно — снятая проверка кода превратила бы `500` в `Found([])`, то есть в
+    «источник ответил, ничего не нашлось», молча."""
+    one = client(responding(500, json={"data": []}))
+    try:
+        answer = await one.search("группа крови", Kind.MUSIC)
+    finally:
+        await one.aclose()
 
-    assert isinstance(answer, Refusal), "чужой код принят за ответ"
+    assert isinstance(answer, Refusal), "чужой код принят за пустую выдачу"
     assert answer.reason is Reason.BROKEN

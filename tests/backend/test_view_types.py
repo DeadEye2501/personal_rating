@@ -88,9 +88,15 @@ def test_a_view_is_frozen():
         view.title = "другое"
 
 
-def test_a_view_of_an_item_carries_every_field():
-    """Тринадцать полей копируются вручную, и потеря любого тихая: карточка
-    просто покажет пустую строку. Сверяем все."""
+def test_a_view_of_an_item_carries_every_field_but_the_synopsis():
+    """Двенадцать полей копируются вручную, и потеря любого тихая: карточка
+    просто покажет пустую строку. Сверяем все.
+
+    Тринадцатое — синопсис — не копируется нарочно, и это решение от 23.08.2026:
+    его привозит второй круг, поштучно на показанную карточку. Отдельная строка
+    про него стоит первой не ради наблюдения — равенство ниже поймало бы утёкший
+    текст и без неё, — а чтобы упавший тест сразу называл, что именно случилось:
+    поле забыли или поле вернулось."""
     item = Item(
         id=42, kind=Kind.SERIES, source=Source.TMDB, source_id="83867",
         title="Андор", synced_at=datetime(2026, 7, 27),
@@ -101,10 +107,11 @@ def test_a_view_of_an_item_carries_every_field():
 
     view = view_from_item(item)
 
+    assert view.synopsis == "", "синопсис лента не возит — его везёт второй круг"
     assert view == CardView(
         item_id=42, kind=Kind.SERIES, source=Source.TMDB, source_id="83867",
         title="Андор", original_title="Andor", year=2022,
-        synopsis="про восстание", poster_url="https://example.com/p.jpg",
+        poster_url="https://example.com/p.jpg",
         runtime=48, seasons_count=2, episodes_count=24,
         synced_at=datetime(2026, 7, 27),
     )

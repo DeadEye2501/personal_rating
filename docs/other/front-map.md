@@ -18,7 +18,7 @@
 - Корень страницы: шапка, стопка разделов и плашка сообщений.
 - берёт: ./CardModal.svelte, ./CardTagsModal.svelte, ./FiltersModal.svelte, ./LibraryScreen.svelte, ./ReviewModal.svelte, ./SearchScreen.svelte, ./StatsScreen.svelte, ./Topbar.svelte, ./trouble.js, ./visible.js
 
-### app/CardModal.svelte (345)
+### app/CardModal.svelte (365)
 - Окно создания и правки карточки: поля показываются своему типу.
 - принимает: view, kind, onsave, onclose, ontrouble
 - берёт: ./LinkField.svelte, ./trouble.js
@@ -33,7 +33,7 @@
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
 
-### app/LibraryScreen.svelte (164)
+### app/LibraryScreen.svelte (161)
 - Обе половины библиотеки: «Оценённые» и «Хочу посмотреть». Различает их `session.section`, он же уезжает в запрос; второй файл был бы дословной копией, которую планы 8 и 9 правили бы дважды.
 - принимает: session, expected, root, tagged, forgotten, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag, saved, removed, reviewed
 - берёт: ./marks.js, ./reread.js, ./trouble.js, ./visible.js
@@ -48,7 +48,7 @@
 - принимает: view, onsaved, onclose, ontrouble
 - берёт: ./marks.js, ./trouble.js
 
-### app/SearchScreen.svelte (377)
+### app/SearchScreen.svelte (374)
 - Раздел «Поиск»: сначала своя выдача, потом внешняя. Спрашивают её двумя жестами — строкой в шапке и кликом по имени в карточке, — и показывает она их одинаково.
 - принимает: session, query, person, expected, root, tagged, forgotten, saved, removed, reviewed, ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag
 - берёт: ./inturn.js, ./reread.js, ./marks.js, ./trouble.js, ./visible.js
@@ -70,9 +70,9 @@
 - Свои отметки на карточке: оценка, закладка и рецензия.
 - отдаёт: aspected, reviewed, scored, wished
 
-### app/reread.js (35)
+### app/reread.js (59)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
-- отдаёт: keyOf, refreshed, same, without
+- отдаёт: keyOf, refreshed, same, without, withoutText
 
 ### app/tags.js (33)
 - Заведение тега с общим отказом.
@@ -86,7 +86,7 @@
 - Единственный способ поступить с отказом операции.
 - отдаёт: complaining, reported
 
-### app/visible.js (67)
+### app/visible.js (111)
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale
 
@@ -128,7 +128,7 @@
 - Строки фактов карточки: длительность или сезоны, кто сделал, кто играл, а у альбома — треки. Длинный список свёрнут до пятерых, пока не развернут.
 - принимает: view, onperson
 
-### components/Feed.svelte (99)
+### components/Feed.svelte (112)
 - Список карточек, который растёт порциями и не знает своей полной длины.
 - принимает: views, collapsed, expected, root, onmore, onshown, ...card
 
@@ -161,7 +161,7 @@
 - Ряд ответных кнопок внизу окна: отмена и согласие.
 - принимает: ok, danger, busy, oncancel, onok
 
-### components/Picker.svelte (262)
+### components/Picker.svelte (264)
 - Поле с подсказкой: печатаешь — снизу совпадения, выбранное ложится справа.
 - принимает: label, hits, chosen, ontype, onchosen, oncreate, onmore
 
@@ -338,9 +338,9 @@
 .is-on > .material-symbols-outlined, @keyframes fade-in, @media (prefers-reduced-motion: reduce)
 - берёт: --bg, --body-m, --fill-primary-hover, --primary, --text, --text-bright
 
-### styles/cardform.css (146)
+### styles/cardform.css (149)
 - Раскладка окна создания и правки карточки.
-- селекторы (19): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster.is-square, .cardform__poster, .cardform__poster .material-symbols-outlined, .cardform__poster:hover, .cardform__pick, .cardform__pick > :first-child, .cardform__pick .addline
+- селекторы (18): .modal--card, .cardform__top, .modal--card > .scrollarea > .scrollarea__box, .cardform__fields, .cardform__row, .cardform__row .field, .cardform__row .field--short, .cardform__valid, .cardform__check, .cardform__linked, .cardform__unlink, .cardform__poster, .cardform__poster.is-square, .cardform__poster .material-symbols-outlined, .cardform__poster:hover, .cardform__pick, .cardform__pick > :first-child, .cardform__pick .addline
 - объявляет: --col-gap, --field-h, --poster-h, --poster-w, --row-gap
 - берёт: --body-l, --col-gap, --poster-h, --poster-w, --primary, --row-gap, --text-bright, --tint-18, --tint-22
 
@@ -382,7 +382,7 @@
 .addline__input:focus::placeholder, .field--title .field__input, .field--area, .field--area .field__input, .field--area .field__input::-webkit-scrollbar
 - берёт: --body-l, --field-h, --primary, --text-bright, --text-dim, --title-l
 
-### styles/film.css (173)
+### styles/film.css (179)
 - Карточка ленты: рама, сворачивание, постер, текстовая колонка.
 - селекторы (21): .film, .film__toggle, .film__toggle .material-symbols-outlined, .film__toggle:hover, .film.is-collapsed .film__toggle .material-symbols-outlined, .film.is-collapsed .film__poster,
 .film.is-collapsed .film__chips,
@@ -392,8 +392,8 @@
 .film.is-collapsed .film__verdict, .film.is-collapsed, .film.is-collapsed .film__body, .film.is-collapsed .film__title, .film__poster, .film__poster.is-square, .film__poster .material-symbols-outlined, .film__poster img,
 .cardform__poster img, .film__body, .film__top,
 .film__bottom, .film__title, .film__synopsis, .film__synopsis.is-cut, .more, .more:hover, .film.is-gone .film__toggle .material-symbols-outlined
-- объявляет: --gutter, --icon-inset, --row-gap
-- берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --primary, --row-gap, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
+- объявляет: --gutter, --icon-inset, --poster-w, --row-gap
+- берёт: --body-l, --body-m, --ease, --gutter, --icon-inset, --poster-w, --primary, --row-gap, --text-bright, --tint-02, --tint-035, --tint-07, --tint-09, --tint-16, --tint-30, --tint-40, --tint-55, --title-l
 
 ### styles/iconbutton.css (40)
 - Круглая кнопка с одним глифом: шеврон карточки, закладка, крестик поиска.

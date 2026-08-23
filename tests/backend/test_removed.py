@@ -196,6 +196,23 @@ async def test_the_removal_reaches_every_answer_and_not_only_the_first(
     assert [one.title for one in result.views] == ["Fallout 2"]
 
 
+async def test_a_huge_batch_of_marks_is_still_answered(removed, engine):
+    """Набор спрашивается пачкой, и пачка бывает большой: клик по имени в музыке
+    приводит до двадцати пяти исполнителей, у каждого до тысячи альбомов, и все
+    они приходят сюда одним списком.
+
+    У SQLite предел на число подставляемых значений, а тройка кладёт по три на
+    строку — за ним запрос падает целиком, и поиск отвечает непредвиденным
+    сбоем. Проверяется тем, что убранное всё равно находится: без разбиения на
+    части этот вызов не доживает до ответа."""
+    await removed.remember(a_game("38410"))
+    many = [(Kind.GAME, Source.STEAM, str(n)) for n in range(20000)]
+
+    found = await removed.known([*many, FALLOUT])
+
+    assert found == {FALLOUT}
+
+
 async def test_a_short_portion_after_cleaning_is_not_the_end(
         sessions, reference, removed):
     """Главное свойство догрузки. Из двадцати строк отсев убранного оставляет

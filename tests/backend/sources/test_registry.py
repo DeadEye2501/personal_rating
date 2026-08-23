@@ -55,6 +55,7 @@ def keyed():
     return load_config(
         {
             "TMDB_API_KEY": "tmdb-key",
+            "GOOGLE_BOOKS_API_KEY": "google-books-key",
             "MDBLIST_API_KEY": "mdblist-key",
             "OMDB_API_KEY": "omdb-key",
             "POISKKINO_API_KEY": "poiskkino-key",
@@ -295,13 +296,19 @@ async def test_every_key_from_the_settings_reaches_its_own_source():
 
     Ключ сверяется с хостом, а не ищется в общем списке: MDBList и OMDB шлют
     его под одним именем `apikey`, оба зеркала Кинопоиска — одним заголовком, и
-    перестановка их местами в общем списке не видна вовсе."""
+    перестановка их местами в общем списке не видна вовсе.
+
+    Google Books шлёт свой третьим именем, `key`. Без него подмена ключа в
+    сборке — `config.google_books_key` на любой соседний — оставляла бы весь
+    набор зелёным, а в бою каждая книга получала бы «ключ не принят»: сторож
+    настроек держит только левое звено, от переменной окружения до поля."""
     seen = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen[request.url.host] = (
             request.url.params.get("api_key")
             or request.url.params.get("apikey")
+            or request.url.params.get("key")
             or request.headers.get("x-api-key")
         )
         # Основное зеркало отказывает, чтобы дошла очередь до запасного.
@@ -312,12 +319,14 @@ async def test_every_key_from_the_settings_reaches_its_own_source():
     registry = build_sources(keyed(), transport=httpx.MockTransport(handler))
 
     await registry.tmdb.search("что угодно", Kind.MOVIE)
+    await registry.google_books.search("что угодно", Kind.BOOK)
     await registry.mdblist.ratings("tt0816692", Kind.MOVIE)
     await registry.omdb.ratings("tt0816692", Kind.MOVIE)
     await registry.kinopoisk.ratings("tt0816692", Kind.MOVIE)
 
     assert seen == {
         "api.themoviedb.org": "tmdb-key",
+        "www.googleapis.com": "google-books-key",
         "api.mdblist.com": "mdblist-key",
         "www.omdbapi.com": "omdb-key",
         "api.poiskkino.dev": "poiskkino-key",

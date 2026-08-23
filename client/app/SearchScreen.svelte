@@ -12,7 +12,7 @@
   import { retagged } from '$state/marking.js'
   import { flipped, swept } from '$state/session.js'
   import { rowTurns } from './inturn.js'
-  import { keyOf, refreshed, same, without } from './reread.js'
+  import { keyOf, refreshed, same, without, withoutText } from './reread.js'
   import { aspected, scored, wished } from './marks.js'
   import { complaining, reported } from './trouble.js'
   import { onCardShown } from './visible.js'
@@ -223,7 +223,7 @@
     // молча, и строка осталась бы кандидатом навсегда.
     const [fresh] = await numbered('feed.views_of', [outcome.value],
                                    { channel: `views:${keyOf(view)}`, ops })
-    if (fresh) patch(fresh, fresh)
+    if (fresh) patch(fresh, withoutText(fresh))
     return { fresh }
   }
 
@@ -301,10 +301,7 @@
     const full = view.item_id ? view : await loaded(view)
     if (!full) return
 
-    const external = await onCardShown(full, ops)
-    // Признак ставится и когда не приехало ничего: он гасит кружки у тех, за
-    // кого спрашивать было нечем или некому.
-    patch(full, external ? { external, enriched: true } : { enriched: true })
+    await onCardShown(full, ops, (fields) => patch(full, fields))
   }
 
   async function loaded(view) {

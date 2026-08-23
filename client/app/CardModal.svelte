@@ -9,7 +9,7 @@
   import AddLine from '$components/AddLine.svelte'
   import Chosen from '$components/Chosen.svelte'
   import Scrollarea from '$components/Scrollarea.svelte'
-  import { call } from '$api/bridge.js'
+  import { call, numbered } from '$api/bridge.js'
   import { stampOf } from '$state/covers.js'
   import { emptyCard, fieldsOf, formOf, shownFor, wrongNumbers }
     from '$state/card.js'
@@ -76,6 +76,26 @@
     call('refs.genres', GENRE_KINDS[form.kind])
       .then((rows) => { genres = rows })
       .catch((error) => lost(error, 'Не удалось прочитать список жанров'))
+  })
+
+  // Синопсис читается у базы, только если его нет в самой карточке: лента его
+  // не возит (см. `view_from_item` в питоне), а до открытой на правку он обычно
+  // уже доехал вторым кругом — её ведь было видно, чтобы нажать карандаш.
+  // Остаётся случай, когда круг не доехал или отказал: без этого чтения человек
+  // не увидел бы в поле своего текста и правил бы вслепую.
+  //
+  // Стереть текст пустое поле не может: `said()` шлёт `null`, а `_known` в
+  // мосте выбрасывает `null` — незаполненное значит «не знаю», и колонка
+  // остаётся прежней. Поэтому чтение не задерживает запись ничем.
+  //
+  // Кладётся только в нетронутое поле: пока летел ответ, человек мог набрать
+  // своё — или стереть набранное, — и затирать сделанное руками нельзя ничем.
+  $effect(() => {
+    if (!view?.item_id || view.synopsis) return
+    const untouched = form.synopsis
+    numbered('feed.synopsis', view.item_id, { channel: 'card:text' })
+      .then((text) => { if (form.synopsis === untouched) form.synopsis = text })
+      .catch((error) => lost(error, 'Не удалось прочитать синопсис'))
   })
 
   // Пустая строка — это не «ничего не показывать», а весь список: щёлкнув по

@@ -36,7 +36,7 @@ RATE_BACKOFF = timedelta(minutes=1)
 # `800` — «такого у меня нет». Незнакомый код за отсутствие не принимается:
 # отрицательный факт живёт неделю, и чужая беда, записанная им, стёрла бы
 # альбом из выдачи на всё это время.
-BUSY = 4
+BUSY_CODE = 4
 ABSENT = 800
 
 # Сколько альбомов просить у исполнителя. Порции у этого жеста нет вовсе — ни в
@@ -91,7 +91,7 @@ class DeezerClient:
         code = error.get("code")
         if code == ABSENT:
             return Missing()
-        if code == BUSY:
+        if code == BUSY_CODE:
             return refuse_until(self._http, Reason.RATE, RATE_BACKOFF)
         return Refusal(source=SOURCE, reason=Reason.BROKEN,
                        detail=f"код ошибки {code}: {error.get('message')}")

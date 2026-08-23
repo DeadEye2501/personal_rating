@@ -11,7 +11,15 @@ const DAY = 24 * 60 * 60 * 1000
  *  подделке читалось бы как «мост сломан», а не «источник ответил пусто». */
 const world = (answers = {}) =>
   fake({ 'world.enrich': { ok: [] }, 'world.refresh_series': { ok: [] },
-         ...answers })
+         'feed.synopsis': { ok: 'про восстание' }, ...answers })
+
+/** Собранные правки карточки: круг кладёт их по мере приезда, и число правок —
+ *  такое же свойство, как их содержимое. */
+const shown = async (view, ops = []) => {
+  const put = []
+  await onCardShown(view, ops, (fields) => put.push(fields))
+  return put
+}
 
 /** Номер у каждой карточки свой: память спрошенных общая на весь сеанс, и
  *  повтор номера между тестами читался бы как «уже спрашивали». */
@@ -26,21 +34,53 @@ describe('карточка попала в поле зрения', () => {
     const asked = world()
     const one = card({ kind: 'series' })
 
-    await onCardShown(one, [])
+    await shown(one)
 
-    expect(asked).toHaveLength(1)
-    const [path, args] = asked[0]
-    expect(path).toBe('world.enrich')
+    const [, args] = asked.find(([path]) => path === 'world.enrich')
     expect(args.slice(1)).toEqual([one.item_id, 'series'])
   })
 
-  it('отдаёт приехавшие оценки наверх', async () => {
-    // Возврат обязателен: без него приехавшее некуда положить, и кружок на
-    // месте оценки крутится до перезахода в раздел.
+  it('кладёт приехавшие оценки правкой карточки', async () => {
+    // Без этого приехавшее некуда положить, и кружок на месте оценки крутится
+    // до перезахода в раздел.
     world({ 'world.enrich': { ok: [{ source: 'imdb', value: 8.7 }] } })
 
-    expect(await onCardShown(card(), []))
-      .toEqual([{ source: 'imdb', value: 8.7 }])
+    expect(await shown(card())).toContainEqual({
+      external: [{ source: 'imdb', value: 8.7 }],
+      enriched: true,
+    })
+  })
+
+  it('спрашивает синопсис своей ручкой и по номеру карточки', async () => {
+    // Лента его не возит вовсе: показ синопсиса на пятидесяти карточках порции
+    // стоит 150 мс из 186, а на экран их попадает четыре.
+    const asked = world()
+    const one = card()
+
+    await shown(one)
+
+    const [, args] = asked.find(([path]) => path === 'feed.synopsis')
+    expect(args.slice(1)).toEqual([one.item_id])
+  })
+
+  it('приехавший синопсис кладёт своей правкой, не дожидаясь оценок', async () => {
+    // Своей, а не общей с оценками: текст читается с диска за миллисекунды, а
+    // оценки идут в сеть до двадцати секунд. Снимок строки, собранный до сети,
+    // затирал бы всё, что случилось с ней за эти секунды, — правку синопсиса в
+    // том числе.
+    world({ 'world.enrich': slow({ ok: [] }) })
+
+    expect(await shown(card()))
+      .toEqual([{ synopsis: 'про восстание' }, { external: [], enriched: true }])
+  })
+
+  it('молчание синопсиса не стирает показанный', async () => {
+    // Пустое в правку не кладётся: карточка, которой синопсис уже доехал,
+    // осталась бы без него от любого повторного круга.
+    world({ 'feed.synopsis': { ok: '' } })
+
+    expect(await shown(card()).then((put) => put.some((one) => 'synopsis' in one)))
+      .toBe(false)
   })
 
   it('отказ агрегатора не роняет показ и не приносит оценок', async () => {
@@ -48,7 +88,7 @@ describe('карточка попала в поле зрения', () => {
     // плашки и без следа на карточке.
     world({ 'world.enrich': { fail: 'refused', detail: 'квота' } })
 
-    expect(await onCardShown(card(), [])).toBe(null)
+    expect(await shown(card())).toContainEqual({ enriched: true })
   })
 
   it('просроченный сериал сперва перезапрашивает сезоны', async () => {
@@ -57,9 +97,11 @@ describe('карточка попала в поле зрения', () => {
     const asked = world()
     const old = new Date(Date.now() - 60 * DAY).toISOString()
 
-    await onCardShown(card({ kind: 'series', synced_at: old }), [])
+    await shown(card({ kind: 'series', synced_at: old }))
 
-    expect(asked.map(([path]) => path))
+    // Порядок сверяется у двух вызовов наружу: синопсис к ним не относится и
+    // уходит первым, потому что ждать сеть ему незачем.
+    expect(asked.map(([path]) => path).filter((path) => path.startsWith('world.')))
       .toEqual(['world.refresh_series', 'world.enrich'])
   })
 
@@ -67,20 +109,34 @@ describe('карточка попала в поле зрения', () => {
     // У него нет номера строки: он ещё не в базе, и спрашивать о нём нечем.
     const asked = world()
 
-    expect(await onCardShown(card({ item_id: null }), [])).toBe(null)
+    expect(await shown(card({ item_id: null }))).toEqual([{ enriched: true }])
     expect(asked).toHaveLength(0)
   })
 
-  it('о той же карточке второй раз не спрашивает', async () => {
+  it('оценки о той же карточке второй раз не спрашивает', async () => {
     // Прокрутка вверх-вниз иначе гоняла бы круги загрузки по кругу, тратя
     // квоты агрегаторов.
     const asked = world()
     const one = card()
 
-    await onCardShown(one, [])
-    await onCardShown(one, [])
+    await shown(one)
+    await shown(one)
 
-    expect(asked).toHaveLength(1)
+    expect(asked.filter(([path]) => path === 'world.enrich')).toHaveLength(1)
+  })
+
+  it('а синопсис — спрашивает, и на каждый показ', async () => {
+    // Память сделала бы текст одноразовым: смена вкладки перечитывает ленту, а
+    // в приехавших из базы строках синопсиса нет вовсе — пропал бы на первом же
+    // переключении и не вернулся никогда.
+    const asked = world()
+    const one = card()
+
+    await shown(one)
+    const again = await shown(one)
+
+    expect(asked.filter(([path]) => path === 'feed.synopsis')).toHaveLength(2)
+    expect(again).toContainEqual({ synopsis: 'про восстание' })
   })
 
   it('забытую карточку спрашивает заново', async () => {
@@ -90,11 +146,11 @@ describe('карточка попала в поле зрения', () => {
     const asked = world()
     const one = card()
 
-    await onCardShown(one, [])
+    await shown(one)
     forgetCard(one.item_id)
-    await onCardShown(one, [])
+    await shown(one)
 
-    expect(asked).toHaveLength(2)
+    expect(asked.filter(([path]) => path === 'world.enrich')).toHaveLength(2)
   })
 
   it('забвение чужого номера памяти не трогает', async () => {
@@ -102,11 +158,11 @@ describe('карточка попала в поле зрения', () => {
     const asked = world()
     const one = card()
 
-    await onCardShown(one, [])
+    await shown(one)
     forgetCard(one.item_id + 1)
-    await onCardShown(one, [])
+    await shown(one)
 
-    expect(asked).toHaveLength(1)
+    expect(asked.filter(([path]) => path === 'world.enrich')).toHaveLength(1)
   })
 
   it('кладёт номер операции в список отменяемых', async () => {
@@ -114,8 +170,11 @@ describe('карточка попала в поле зрения', () => {
     world()
     const ops = []
 
-    await onCardShown(card(), ops)
+    await shown(card(), ops)
 
+    // Один номер, а не два: гасят тут поход в сеть за оценками. Чтение текста в
+    // отменяемые не кладётся нарочно — оно спрашивается на каждое появление
+    // карточки, и список рос бы прокруткой, а гасить в нём нечего.
     expect(ops).toHaveLength(1)
   })
 
@@ -129,11 +188,13 @@ describe('карточка попала в поле зрения', () => {
                            { ok: [{ source: 'imdb', value: 2 }] }),
     })
 
-    const late = onCardShown(card(), [])
-    const quick = onCardShown(card(), [])
+    const late = shown(card())
+    const quick = shown(card())
 
-    expect(await quick).toEqual([{ source: 'imdb', value: 2 }])
-    expect(await late).toEqual([{ source: 'imdb', value: 1 }])
+    expect(await quick).toContainEqual({ external: [{ source: 'imdb', value: 2 }],
+                                        enriched: true })
+    expect(await late).toContainEqual({ external: [{ source: 'imdb', value: 1 }],
+                                       enriched: true })
   })
 })
 

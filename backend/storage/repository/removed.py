@@ -1,11 +1,18 @@
 """Что человек убрал из выдачи насовсем."""
 
+from itertools import batched
+
 from sqlalchemy import delete, select, tuple_
 from sqlalchemy.dialects.sqlite import insert
 
 from backend.model import CardView, Item, Kind, Source
 from backend.storage.repository.base import Repository
 from backend.storage.tables import removed as removed_table
+
+# По сколько строк спрашивать за раз. Тройка кладёт по три подставляемых
+# значения на строку, а у SQLite их число ограничено: старый предел — 999, и
+# триста строк укладываются в него с запасом даже там.
+BATCH = 300
 
 
 class RemovedRepository(Repository):
@@ -73,13 +80,20 @@ class RemovedRepository(Repository):
 
         Тройкой, а не парой: у TMDB фильмы и сериалы нумеруются порознь и
         сталкиваются числами, и без типа содержимого удалённый фильм молча унёс
-        бы одноимённый по номеру сериал."""
-        if not marks:
-            return set()
-        rows = await self._rows(
-            select(removed_table.c.kind, removed_table.c.source,
-                   removed_table.c.source_id)
-            .where(tuple_(removed_table.c.kind, removed_table.c.source,
-                          removed_table.c.source_id).in_(marks))
-        )
-        return {(row.kind, row.source, row.source_id) for row in rows}
+        бы одноимённый по номеру сериал.
+
+        Пачками, а не одним запросом: «два-три десятка» верно для строки поиска,
+        а клик по имени в музыке приводит до двадцати пяти исполнителей, у
+        каждого до тысячи альбомов. У SQLite есть предел на число подставляемых
+        значений, тройка кладёт по три на строку, и за пределом падает **весь**
+        запрос — поиск отвечает непредвиденным сбоем."""
+        found: set[tuple[str, str, str]] = set()
+        for part in batched(marks, BATCH):
+            rows = await self._rows(
+                select(removed_table.c.kind, removed_table.c.source,
+                       removed_table.c.source_id)
+                .where(tuple_(removed_table.c.kind, removed_table.c.source,
+                              removed_table.c.source_id).in_(part))
+            )
+            found |= {(row.kind, row.source, row.source_id) for row in rows}
+        return found

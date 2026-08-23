@@ -74,7 +74,17 @@ def view_from_hit(hit: SearchHit, genres: tuple[Genre, ...] = (),
 
 def view_from_item(item: Item) -> CardView:
     """Карточка из базы без довесков: жанры, теги, состав и оценки доливает
-    ViewsRepository. Здесь только поля самой строки item."""
+    ViewsRepository. Здесь только поля самой строки item.
+
+    Синопсис не копируется нарочно, и это единственное поле `CardView`, которое
+    заполняется не здесь. Замерено 23.08.2026 в живом окне: построение порции
+    при переключении раздела стоит 186 мс, и **150 из них — показ синопсиса**:
+    он на каждой карточке читает разметку из JS, а у не поместившихся в три
+    строки ещё и подбирает длину перебором по высоте двойника (32 абзаца из 50).
+    Порция ленты — пятьдесят карточек, на экране их четыре.
+
+    Привозит его второй круг, тот же, что и оценки агрегаторов: карточка попала
+    в поле зрения — страница спросила `feed.synopsis`."""
     return CardView(
         item_id=item.id,
         kind=item.kind,
@@ -83,7 +93,6 @@ def view_from_item(item: Item) -> CardView:
         title=item.title,
         original_title=item.original_title,
         year=item.year,
-        synopsis=item.synopsis,
         poster_url=item.poster_url,
         runtime=item.runtime,
         seasons_count=item.seasons_count,

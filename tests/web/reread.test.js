@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 // Относительным путём, а не псевдонимом: у слоя сборки его нет и заводить
 // незачем — внутрь `app/` не импортирует никто, кроме проверок.
-import { refreshed, without } from '../../client/app/reread.js'
+import { refreshed, without, withoutText } from '../../client/app/reread.js'
 import { fake } from './fake.js'
 
 const own = { item_id: 5, source: 'tmdb', source_id: '157336' }
@@ -40,24 +40,52 @@ describe('удалённая строка уходит из списка', () =>
   })
 })
 
+describe('строка из базы кладётся без пустого синопсиса', () => {
+  it('поле снимается, остальные остаются', () => {
+    // Лента синопсис не возит вовсе, и положенное доливом пустое поле стёрло бы
+    // показанный текст: у кандидата выдачи он от источника, у своей карточки от
+    // второго круга.
+    const fresh = { item_id: 5, title: 'Своё', synopsis: '' }
+
+    expect(withoutText(fresh)).toEqual({ item_id: 5, title: 'Своё' })
+  })
+})
+
 describe('перечитывание одной правленой карточки', () => {
   it('просит именно эту строку и кладёт приехавшую с меткой момента', async () => {
     // Метка едет в `cover`: адрес ручки обложки от содержимого не зависит, а
     // отдаёт она сутки кеша — без метки перезалитая картинка осталась бы
     // прежней и в ленте, и в окне правки.
-    const asked = fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] } })
+    const asked = fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] },
+                         'feed.synopsis': { ok: 'про восстание' } })
     const put = []
 
     await refreshed({ item_id: 5, at: 1700000000 }, [], (view) => put.push(view))
 
-    expect(asked).toEqual([['feed.views_of', [expect.any(Number), [5]]]])
+    expect(asked).toEqual([['feed.views_of', [expect.any(Number), [5]]],
+                          ['feed.synopsis', [expect.any(Number), 5]]])
+    expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'про восстание',
+                           cover: 1700000000 }])
+  })
+
+  it('отказ чтения текста перечитывания не отменяет', async () => {
+    // С перечитанной строкой едет метка момента, а она сбрасывает суточный кеш
+    // обложки: пустяковый отказ чтения текста оставил бы перезалитую картинку
+    // прежней до завтра. Синопсис при этом не кладётся вовсе — строка остаётся
+    // с показанным.
+    fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё' }] },
+           'feed.synopsis': { fail: 'broken', detail: 'сломалось' } })
+    const put = []
+
+    await refreshed({ item_id: 5, at: 1700000000 }, [], (view) => put.push(view))
+
     expect(put).toEqual([{ item_id: 5, title: 'Своё', cover: 1700000000 }])
   })
 
   it('не кладёт ничего, если строки не приехало', async () => {
     // Карточку могли удалить из другого окна, пока перечитывание летело: без
     // проверки в ленту легла бы строка без названия и постера.
-    fake({ 'feed.views_of': { ok: [] } })
+    fake({ 'feed.views_of': { ok: [] }, 'feed.synopsis': { ok: '' } })
     const put = []
 
     await refreshed({ item_id: 5, at: 1 }, [], (view) => put.push(view))
@@ -67,11 +95,12 @@ describe('перечитывание одной правленой карточ�
 
   it('кладёт номер операции в список отменяемых', async () => {
     // Уход с раздела гасит начатое: без номера гасить нечего.
-    fake({ 'feed.views_of': { ok: [] } })
+    fake({ 'feed.views_of': { ok: [] }, 'feed.synopsis': { ok: '' } })
     const ops = []
 
     await refreshed({ item_id: 5, at: 1 }, ops, () => {})
 
-    expect(ops).toHaveLength(1)
+    // Оба вызова: перечитанная строка и её синопсис.
+    expect(ops).toHaveLength(2)
   })
 })

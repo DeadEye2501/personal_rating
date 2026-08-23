@@ -73,6 +73,34 @@ def test_the_second_portion_is_asked_further_along(spy, asked):
     assert asked_at == [0, SEARCH_SIZE]
 
 
+def test_a_broken_portion_does_not_swallow_its_rows(spy, asked):
+    """Сорвавшаяся порция обязана переспрашиваться той же, а не следующей.
+
+    Смещение двигает приехавший ответ, а не вызов: сдвинь его заранее, и обрыв
+    сети на второй порции унёс бы её двадцать строк навсегда — страница поймала
+    бы отказ, а следующая прокрутка спросила бы уже третью."""
+    answers, log = asked
+    answers["search.local"] = []
+    served = iter([RuntimeError("сеть отвалилась"),
+                   ExternalSearch(views=(a_view("2"),), refusals=())])
+
+    def handler(*_args, **_kwargs):
+        answer = next(served)
+        if isinstance(answer, Exception):
+            raise answer
+        return ready(answer)
+
+    answers["search.external"] = handler
+
+    search = Search(spy)
+    search.local(1, "movie", "одиссея")
+    assert "ok" not in search.external(1), "порция обязана была сорваться"
+    search.external(1)
+
+    asked_at = [args[2] for name, args, _ in log if name == "search.external"]
+    assert asked_at == [0, 0], "сорвавшаяся порция потеряна"
+
+
 def test_a_candidate_from_the_first_portion_can_still_be_added(spy, asked):
     """Кандидата заводят из помнимой выдачи: `CardView` собрать из JSON нечем.
     Приращение уезжает странице, а память копит по-прежнему всё — иначе строка

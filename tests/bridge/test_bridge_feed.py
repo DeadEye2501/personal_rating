@@ -2,6 +2,7 @@
 
 from backend.model import Kind, Section, Sort
 from bridge.feed import FeedBridge
+from tests.builders import an_item
 
 WISHED = {
     "section": "wishlist",
@@ -125,6 +126,30 @@ def test_one_card_is_reread_by_the_same_door(spy, asked):
     FeedBridge(spy).views_of(1, [12])
 
     assert log[0] == ("feed.views_of", ([12],), {})
+
+
+def test_the_synopsis_of_one_card_goes_by_its_number(spy, asked):
+    """Синопсис лента не возит — его спрашивают на показанную карточку, поштучно
+    (см. `view_from_item`). Своей ручки у бэкенда под это нет: строку по номеру
+    читает `library.get`, тот же, которым правка карточки кладётся поверх."""
+    answers, log = asked
+    answers["library.get"] = an_item("157336", "Дитя человеческое",
+                                     synopsis="про восстание")
+
+    answer = FeedBridge(spy).synopsis(7, 12)
+
+    assert log[0] == ("library.get", (12,), {})
+    assert answer == {"ok": "про восстание"}
+    assert spy.ops == [7], "без номера ушедшую операцию нечем гасить"
+
+
+def test_the_synopsis_of_a_card_that_is_gone_is_empty(spy, asked):
+    """Карточку могли удалить ровно между показом и вопросом о ней: показ из-за
+    этого падать не должен — синопсиса просто нет."""
+    answers, _ = asked
+    answers["library.get"] = None
+
+    assert FeedBridge(spy).synopsis(7, 12) == {"ok": ""}
 
 
 def test_the_histogram_uses_the_same_filters(spy, asked):

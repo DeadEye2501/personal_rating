@@ -207,6 +207,17 @@ async def test_an_upload_is_cropped(service):
     assert Image.open(io.BytesIO(stored)).size == TARGET_SIZE
 
 
+async def test_an_uploaded_album_cover_is_stored_square(service):
+    """Середина проводки квадратной обложки: тип обязан доехать от сервиса до
+    самой обрезки. Подмени его здесь на киношный — и альбом лёг бы в хранилище
+    афишей, срезанной по бокам, а увидеть это можно было бы только глазами."""
+    await service.store_upload(1, picture(4000, 1000), Kind.MUSIC, now=WHEN)
+
+    width, height = Image.open(io.BytesIO(await service._store.get(1))).size
+
+    assert width == height, "альбом лёг в хранилище афишей"
+
+
 async def test_a_bad_upload_is_a_named_error(service):
     with pytest.raises(BadImage):
         await service.store_upload(1, "не картинка".encode(), Kind.MOVIE,

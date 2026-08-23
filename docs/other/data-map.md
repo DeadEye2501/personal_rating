@@ -419,7 +419,7 @@
 - `SOURCE` = `'deezer'`
 - `BASE` = `'https://api.deezer.com'`
 - `RATE_BACKOFF` = `timedelta(minutes=1)`
-- `BUSY` = `4`
+- `BUSY_CODE` = `4`
 - `ABSENT` = `800`
 - `ALL_ALBUMS` = `1000`
 - `class DeezerClient`
@@ -627,6 +627,10 @@
 ### `backend/storage/repository/library.py`
 
 - `_FIELDS` = `набор из 13`
+
+### `backend/storage/repository/removed.py`
+
+- `BATCH` = `300`
 
 ### `backend/storage/repository/sections.py`
 

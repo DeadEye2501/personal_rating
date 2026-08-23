@@ -7,6 +7,8 @@
 
 from datetime import timedelta
 
+from contextlib import aclosing
+
 import httpx
 
 from backend.model import (
@@ -38,19 +40,13 @@ def client(transport: httpx.MockTransport) -> GoogleBooksClient:
 
 
 async def searched(transport: httpx.MockTransport, query: str = "дюна"):
-    one = client(transport)
-    try:
+    async with aclosing(client(transport)) as one:
         return await one.search(query, Kind.BOOK)
-    finally:
-        await one.aclose()
 
 
 async def carded(transport: httpx.MockTransport, source_id: str = "-u8-DwAAQBAJ"):
-    one = client(transport)
-    try:
+    async with aclosing(client(transport)) as one:
         return await one.card(source_id, Kind.BOOK)
-    finally:
-        await one.aclose()
 
 
 def test_the_search_gives_a_row_for_every_volume(fixture):

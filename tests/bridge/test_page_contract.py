@@ -29,6 +29,7 @@ from backend.model import (
     Section,
     Sort,
     Source,
+    Suggestion,
 )
 from backend.config import FIVE, TEN
 from bridge.answer import Domain, kebab
@@ -365,7 +366,7 @@ def test_every_path_the_page_calls_exists_on_the_bridge():
     # Число, а не только вложенность: сверка ничего не стоит, если находить
     # пути перестал сам поиск. Оно и ловило четыре пути, потерянных прежним
     # выражением — те, что страница зовёт не прямо.
-    assert len(called) >= 41, f"путей найдено меньше, чем есть: {len(called)}"
+    assert len(called) >= 42, f"путей найдено меньше, чем есть: {len(called)}"
 
 
 def test_the_page_reads_exactly_what_the_summary_of_a_deletion_holds():
@@ -442,10 +443,30 @@ def test_the_page_asks_the_bridge_for_the_scale():
 def test_the_page_offers_a_link_field_only_where_a_catalog_exists():
     """Поле вставки ссылки у типа без источника разбирать нечего: любая
     вставленная строка ответила бы отказом. Список на странице свой, и разойтись
-    с реестром он может молча — до второго этапа, когда книжный клиент приедет и
-    поле должно вернуться само."""
+    с реестром он может молча.
+
+    С 23.08.2026 источник есть у всех пяти типов, и список полон — сторож от
+    этого не лишний: он держит равенство двух наборов, а не наличие ссылки, и
+    покраснеет, как только страница и реестр разойдутся в любую сторону."""
     from backend.sources.registry import ROUTES
 
     with_catalog = {kind.value for kind, route in ROUTES.items() if route.catalogs}
 
     assert strings_of("LINKED", source("state/sources.js")) == with_catalog
+
+
+def test_the_page_reads_only_the_hint_fields_a_suggestion_really_has():
+    """Подсказка имени уезжает на страницу словарём, и поля её `Picker` читает
+    напрямую: `hint` — подпись строки, `hint_item_id` — обложка, `hint_kind` —
+    её форма.
+
+    Переименуй любое из них в питоне, и обе половины останутся зелёными:
+    `test_suggestions.py` переедет вместе с полем, а страница прочтёт
+    `undefined` — всплывающая обложка альбома молча станет афишной, потому что
+    `squareOf(undefined)` честно отвечает `false`."""
+    read = set()
+    for path in ("components/Picker.svelte", "app/CardModal.svelte"):
+        read |= set(re.findall(r"\.(hint\w*)\b", source(path)))
+
+    assert read, "полей подсказки страница больше не читает — сторож устарел"
+    assert read <= {field.name for field in fields(Suggestion)}

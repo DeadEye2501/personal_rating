@@ -130,3 +130,22 @@ async def test_the_histogram_goes_through_the_same_service(sessions, feed):
     assert len(histogram.buckets) == 10
     assert next(b.count for b in histogram.buckets if b.score == 9) == 1
     assert (histogram.total, histogram.average) == (1, 9.0)
+
+
+async def test_a_page_leaves_the_synopsis_behind(sessions, feed):
+    """Синопсис лента не возит вовсе, и это не экономия трафика.
+
+    Замерено 23.08.2026 в живом окне: переключение раздела блокирует главный
+    поток на 185 мс, и уносит их целиком `Synopsis.svelte` — он на каждой
+    карточке подбирает длину обрезки перебором, а перебор читает высоту
+    двойника. Выключи один синопсис, оставив все прочие части, — блокировки не
+    возникает вовсе. Пятьдесят карточек порции платят за текст, который на
+    экране виден у шести.
+
+    Привозит его второй круг, тот же, что и оценки агрегаторов: карточка попала
+    в поле зрения — спросили."""
+    await rated(sessions, "1", 9.0, synopsis="про восстание")
+
+    page = await feed.page(RATED)
+
+    assert page[0].synopsis == ""
