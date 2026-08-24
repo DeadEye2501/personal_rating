@@ -12,8 +12,34 @@ from backend.storage.repository.external import (
     ExternalRatingsRepository,
 )
 from backend.storage.repository.library import LibraryRepository
-from tests.conftest import MOMENT, FakeSources, an_item
+from backend.app import build_backend
+from backend.config import load_config
+from backend.storage.session import create_engine
+from backend.storage.tables import metadata
+from tests.conftest import MOMENT, FakeSources, an_item, unreachable
 from tests.wiring import search_service
+
+
+async def assemble(tmp_path, transport=None):
+    """Собранный бэкенд на своей базе и подставном транспорте.
+
+    Здесь, а не в модуле проверок: его просят двое — обещание офлайна и
+    проверки самой сборки, — и своими копиями они разъехались бы молча."""
+    engine = create_engine(tmp_path / "library.db")
+    async with engine.begin() as connection:
+        await connection.run_sync(metadata.create_all)
+    await engine.dispose()
+
+    config = load_config({"DATA_DIR": str(tmp_path)}, base_dir=tmp_path)
+    return await build_backend(config, transport=transport or unreachable())
+
+
+@pytest.fixture
+async def offline(tmp_path):
+    """Собранный бэкенд без сети: транспорт по умолчанию не дозванивается."""
+    backend = await assemble(tmp_path)
+    yield backend
+    await backend.aclose()
 
 
 @pytest.fixture

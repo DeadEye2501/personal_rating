@@ -441,7 +441,7 @@
   - `async def _own(self, repository: CreditRepository, entity_id: int, kind: Kind) -> list[CardView]` (7)
   - `async def _outside(self, domain: str, identity: tuple[str, str | None, Source | None], kind: Kind) -> tuple[list[SearchHit], list[Refusal]]` (21)
 
-### `backend/service/posters.py` — 214 строк
+### `backend/service/posters.py` — 216 строк
 
 Путь обложки от источника до хранилища.
 
@@ -655,18 +655,18 @@
 - `def find_slug(payload: dict, slug: str) -> str | None` (8)
 - `def title_of(payload: dict) -> str` (12)
 
-### `backend/sources/google_books/client.py` — 207 строк
+### `backend/sources/google_books/client.py` — 210 строк
 
 Разговор с Google Books по сети.
 
 Зависит от: `backend.model`, `backend.sources.backoff`, `backend.sources.busy`, `backend.sources.errors`, `backend.sources.google_books.parse`, `backend.sources.http`
 
-- `class GoogleBooksClient` (167)
+- `class GoogleBooksClient` (170)
   - `def name(self) -> str` (4)
   - `def _verdict(self, response: httpx.Response) -> Missing | Refusal | None` (21)
   - `async def _taken(self, url: str, complaint: str, parse: Callable[[dict], object], **extra: object) -> Outcome` (26)
   - `def _key(self) -> str` (5)
-  - `def _another_key(self, asked_with: int) -> bool` (19)
+  - `def _another_key(self, asked_with: int) -> bool` (22)
   - `def _forget_yesterday(self) -> None` (10)
   - `async def search(self, query: str, kind: Kind, offset: int=0) -> Outcome` (10)
   - `async def find_people(self, name: str) -> Outcome` (12)
@@ -692,13 +692,13 @@
 - `def parse_search(payload: dict) -> list[SearchHit]` (21)
 - `def parse_card(payload: dict) -> SourceCard` (31)
 
-### `backend/sources/http.py` — 179 строк
+### `backend/sources/http.py` — 180 строк
 
 Общая дверь в сеть для всех источников.
 
 Зависит от: `backend.model`
 
-- `def poster_name(source: str) -> str` (6)
+- `def poster_name(source: str) -> str` (7)
 - `def _limit(name: str) -> int | None` (4)
 - `class Breaker` (28)
   - `def is_open(self) -> bool` (7)
@@ -1646,7 +1646,7 @@
 - `async def record_fantlab(client: httpx.AsyncClient) -> None` (14)
 - `async def main() -> None` (28)
 
-## tests — 112 модулей
+## tests — 113 модулей
 
 ### `tests/alembic_runner.py` — 21 строк
 
@@ -1656,12 +1656,14 @@
 
 - `def alembic(db_path: Path, *command: str) -> None` (10)
 
-### `tests/backend/conftest.py` — 50 строк
+### `tests/backend/conftest.py` — 76 строк
 
 Фикстуры проверок бэкенда, общие у соседних модулей.
 
-Зависит от: `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `tests.conftest`, `tests.wiring`
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.enrich`, `backend.storage.repository.external`, `backend.storage.repository.library`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`, `tests.wiring`
 
+- `async def assemble(tmp_path, transport=None)` (12)
+- `async def offline(tmp_path)` (5)
 - `async def item_id(sessions)` (8)
 - `async def service(sessions)` (6)
 - `async def enrich(sessions)` (12)
@@ -1680,7 +1682,7 @@
 - `def found(*pairs) -> Found` (4)
 - `async def stored_ratings(sessions, item_id) -> dict` (3)
 
-### `tests/backend/sources/conftest.py` — 128 строк
+### `tests/backend/sources/conftest.py` — 139 строк
 
 Общее для проверок источников: тела ответов и строители клиентов.
 
@@ -1688,9 +1690,10 @@
 
 - `def unofficial(transport) -> UnofficialClient` (8)
 - `def _meta(relative: str) -> dict` (3)
-- `def keys_of_google(exhausted: str, delay: float=0.0)` (24)
+- `def keys_of_google(exhausted: str, delay: float=0.0)` (25)
   - `async def handler(request: httpx.Request) -> httpx.Response` (6)
-- `def keys_of(seen: list) -> list[str]` (3)
+- `def key_of(request: httpx.Request) -> str | None` (8)
+- `def keys_of(seen: list) -> list[str | None]` (3)
 - `def fixture()` (3)
 - `def meta()` (2)
 - `def gog_catalog()` (21)
@@ -1852,7 +1855,7 @@ OMDB: единственный источник, у которого отказ 
 - `def kinopoisk(transport) -> KinopoiskClient` (7)
 - `async def brought_by(build, recorded, replay) -> tuple[set, set]` (6)
 
-### `tests/backend/sources/test_registry.py` — 454 строк ⚠ подошёл к 300
+### `tests/backend/sources/test_registry.py` — 444 строк ⚠ подошёл к 300
 
 Реестр держится на том, что контракт у всех клиентов один.
 
@@ -1865,7 +1868,6 @@ OMDB: единственный источник, у которого отказ 
 - `def keyed()` (14)
 - `def watching_keys() -> tuple[httpx.MockTransport, list]` (13)
   - `def handler(request: httpx.Request) -> httpx.Response` (5)
-- `def key_of(request: httpx.Request) -> str | None` (8)
 
 ### `tests/backend/sources/test_steam.py` — 303 строк ⚠ подошёл к 300
 
@@ -1948,6 +1950,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `async def broken_request()` (2)
 - `async def cancelled_request()` (2)
 - `async def good_request()` (2)
+
+### `tests/backend/test_assembly.py` — 286 строк
+
+Собранный бэкенд: что к чему приведено в `build_backend`.
+
+Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `tests.backend.conftest`, `tests.conftest`
+
+Тестов: 11
+
+- `def mine(title: str, kind: Kind=Kind.MOVIE, **fields)` (4)
 
 ### `tests/backend/test_by_credit.py` — 155 строк
 
@@ -2331,17 +2343,15 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 10
 
 
-### `tests/backend/test_offline.py` — 515 строк ⚠ за пределом 500
+### `tests/backend/test_offline.py` — 252 строк
 
 Главное обещание приложения: без сети работает всё, кроме поиска чужого.
 
-Зависит от: `backend.app`, `backend.config`, `backend.model`, `backend.service.posters`, `backend.sources.registry`, `backend.storage.posters`, `backend.storage.repository.external`, `backend.storage.session`, `backend.storage.tables`, `tests.conftest`
+Зависит от: `backend.model`, `tests.conftest`
 
-Тестов: 27
+Тестов: 16
 
 - `def mine(title: str, kind: Kind=Kind.MOVIE, **fields)` (4)
-- `async def assemble(tmp_path, transport=None)` (8)
-- `async def offline(tmp_path)` (4)
 
 ### `tests/backend/test_outcome.py` — 43 строк
 

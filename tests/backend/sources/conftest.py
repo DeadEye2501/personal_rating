@@ -34,8 +34,9 @@ def keys_of_google(exhausted: str, delay: float = 0.0):
     гонка и боевая сборка, — и своими копиями они разъехались бы молча.
 
     Список ушедшего ведёт общий `counting`, а не свой: развилка здесь по
-    **значению** ключа, а не по числу запросов, — значит счёт нужен после
-    ответа, и своего транспорту не требуется.
+    **значению** ключа, и вложенному обработчику список не нужен вовсе. Там,
+    где развилка идёт по номеру запроса, так не выйдет — свой счёт держит,
+    например, `test_oldgames.py:busy`.
 
     `delay` держит ответ исчерпанного ключа: без задержки два одновременных
     запроса уходят по очереди, и гонки, ради которой оговорка про соседа и
@@ -52,9 +53,19 @@ def keys_of_google(exhausted: str, delay: float = 0.0):
     return counting(httpx.MockTransport(handler))
 
 
-def keys_of(seen: list) -> list[str]:
+def key_of(request: httpx.Request) -> str | None:
+    """Ключ, ушедший с этим запросом. Имён у него четыре, и перебираются они
+    все: `api_key` у TMDB, `apikey` у MDBList и OMDB, `key` у Google Books,
+    заголовок у Кинопоиска."""
+    return (request.url.params.get("api_key")
+            or request.url.params.get("apikey")
+            or request.url.params.get("key")
+            or request.headers.get("x-api-key"))
+
+
+def keys_of(seen: list) -> list[str | None]:
     """Ключи, ушедшие на провод, из списка запросов: спрашивают их трое."""
-    return [one.url.params.get("key") for one in seen]
+    return [key_of(one) for one in seen]
 
 
 @pytest.fixture

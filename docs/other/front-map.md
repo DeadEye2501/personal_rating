@@ -86,7 +86,7 @@
 - Единственный способ поступить с отказом операции.
 - отдаёт: complaining, reported
 
-### app/visible.js (125)
+### app/visible.js (127)
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale, textChannel
 
@@ -252,7 +252,7 @@
 - отдаёт: heightsOf
 
 ### state/kinds.js (44)
-- Всё, что у приложения зависит от типа содержимого.
+- Таблицы, у которых ключ — тип содержимого.
 - отдаёт: NOUNS, squareOf, wishOf
 
 ### state/marking.js (30)

@@ -326,7 +326,7 @@ async def test_the_first_key_is_asked_again_the_next_day():
         await client.search("герберт", Kind.BOOK)
 
     assert keys_of(seen) == ["вчерашний", "запасной", "вчерашний",
-                             "запасной"], seen
+                             "запасной"], keys_of(seen)
 
 
 async def test_a_client_without_keys_asks_with_an_empty_one():

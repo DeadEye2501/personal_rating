@@ -56,8 +56,10 @@ describe('строка из базы кладётся без пустого си
   })
 })
 
-/** Перечитывание строки, которая в списке есть: сам вызов у четырёх проверок
- *  один и тот же, а различаются они ответами подделки. */
+/** Перечитывание строки, которая в списке есть: у пяти проверок вызов один и
+ *  тот же, различаются они ответами подделки. Строки, которой в списке нет, и
+ *  список отменяемых зовутся своими вызовами — там предмет проверки как раз в
+ *  доводах. */
 const refreshedRow = (put, at = 1) =>
   again([{ item_id: 5 }], { item_id: 5, at }, [], (view) => put.push(view))
 
@@ -69,8 +71,7 @@ describe('перечитывают только то, что ещё в спис�
     })
     const put = []
 
-    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, [],
-                (view) => put.push(view))
+    await refreshedRow(put)
 
     expect(asked.map(([path]) => path)).toEqual(['feed.views_of', 'feed.synopsis'])
     expect(put).toHaveLength(1)
@@ -101,8 +102,7 @@ describe('перечитывание одной правленой карточ�
     })
     const put = []
 
-    await again([{ item_id: 5 }], { item_id: 5, at: 1700000000 }, [],
-                (view) => put.push(view))
+    await refreshedRow(put, 1700000000)
 
     expect(asked).toEqual([['feed.views_of', [expect.any(Number), [5]]],
                           ['feed.synopsis', [expect.any(Number), 5]]])
@@ -119,8 +119,7 @@ describe('перечитывание одной правленой карточ�
            'feed.synopsis': { fail: 'broken', detail: 'сломалось' } })
     const put = []
 
-    await again([{ item_id: 5 }], { item_id: 5, at: 1700000000 }, [],
-                (view) => put.push(view))
+    await refreshedRow(put, 1700000000)
 
     expect(put).toEqual([{ item_id: 5, title: 'Своё', cover: 1700000000 }])
   })
@@ -131,7 +130,7 @@ describe('перечитывание одной правленой карточ�
     fake({ 'feed.views_of': { ok: [] }, 'feed.synopsis': { ok: '' } })
     const put = []
 
-    await again([{ item_id: 5 }], { item_id: 5, at: 1 }, [], (view) => put.push(view))
+    await refreshedRow(put)
 
     expect(put).toEqual([])
   })

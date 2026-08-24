@@ -19,7 +19,7 @@ from backend.sources.registry import ROUTES
 from backend.sources.steam.client import SteamClient
 from backend.sources.tmdb.client import TmdbClient
 from backend.unique import unique
-from tests.backend.sources.conftest import keys_of, keys_of_google
+from tests.backend.sources.conftest import key_of, keys_of, keys_of_google
 from tests.conftest import counting, responding
 
 # Кто держит каталог и по какому типу его спрашивают — выведено из таблицы
@@ -315,8 +315,8 @@ def watching_keys() -> tuple[httpx.MockTransport, list]:
     """Транспорт, у которого основное зеркало Кинопоиска отказывает, и список
     ушедших запросов.
 
-    Список ведёт общий `counting`: развилка здесь по хосту, а не по числу
-    запросов, — считать до ответа не нужно."""
+    Список ведёт общий `counting`: развилка здесь по хосту, и вложенному
+    обработчику список не нужен."""
     def handler(request: httpx.Request) -> httpx.Response:
         # Основное зеркало отказывает, чтобы дошла очередь до запасного.
         if request.url.host == "api.poiskkino.dev":
@@ -324,16 +324,6 @@ def watching_keys() -> tuple[httpx.MockTransport, list]:
         return httpx.Response(200, json={})
 
     return counting(httpx.MockTransport(handler))
-
-
-def key_of(request: httpx.Request) -> str | None:
-    """Ключ, ушедший с этим запросом. Имён у него четыре, и перебираются они
-    все: `api_key` у TMDB, `apikey` у MDBList и OMDB, `key` у Google Books,
-    заголовок у Кинопоиска."""
-    return (request.url.params.get("api_key")
-            or request.url.params.get("apikey")
-            or request.url.params.get("key")
-            or request.headers.get("x-api-key"))
 
 
 async def test_the_spare_key_of_google_books_reaches_the_wire_too():
