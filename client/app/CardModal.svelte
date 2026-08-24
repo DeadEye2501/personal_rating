@@ -12,7 +12,6 @@
   import Chosen from '$components/Chosen.svelte'
   import Scrollarea from '$components/Scrollarea.svelte'
   import { call, numbered } from '$api/bridge.js'
-  import { stampOf } from '$state/covers.js'
   import { emptyCard, fieldsOf, formOf, shownFor, wrongNumbers }
     from '$state/card.js'
   import { ROLES } from '$state/credits.js'
@@ -21,7 +20,7 @@
   import LinkField from './LinkField.svelte'
   import { complaining } from './trouble.js'
 
-  let { view = null, kind, onsave, onclose, ontrouble } = $props()
+  let { view = null, kind, covers = 0, onsave, onclose, ontrouble } = $props()
 
   // Одно окно на создание и на правку: пустое заводит, заполненное правит, и
   // «Сохранить» само решает, что из двух. У новой тип берётся из тумблера
@@ -265,10 +264,10 @@
       <!-- Картинка лежит рядом с формой, а не в ней: поля формы — это поля
            карточки, а обложка живёт вторым файлом базы и уезжает отдельным
            вызовом уже после записи, когда у карточки появился номер. -->
-      <!-- Момент едет вместе с карточкой: ручка обложки отдаёт сутки кеша, а
-           её адрес от содержимого не зависит — без метки перезалитая картинка
+      <!-- Метка сеанса, а не карточки: ручка обложки отдаёт сутки кеша, а её
+           адрес от содержимого не зависит — без метки перезалитая картинка
            осталась бы в окне правки прежней, пока лента показывает новую. -->
-      <PosterPick item_id={form.item_id} stamp={stampOf(view)} kind={form.kind}
+      <PosterPick item_id={form.item_id} stamp={covers} kind={form.kind}
                   onpicked={(data) => { picture = data }}
                   ontrouble={(text) => ontrouble(text)} />
 

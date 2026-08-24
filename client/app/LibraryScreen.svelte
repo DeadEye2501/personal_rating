@@ -19,8 +19,9 @@
   const PAGE = 50
 
   let { session, expected = [], root = null, tagged = {}, forgotten = [],
-        ontrouble, onmark, onperson, onopen, onedit, ondelete, onreview, ontag,
-        saved = null, removed = null, reviewed = null } = $props()
+        covers = 0, ontrouble, onmark, onperson, onopen, onedit, ondelete,
+        onreview, ontag, saved = null, removed = null,
+        reviewed = null } = $props()
 
   let views = $state([])
   let done = $state(false)
@@ -145,7 +146,8 @@
 
 </script>
 
-<Feed views={cards} {expected} {root} collapsed={session.collapsed} onmore={more}
+<Feed views={cards} {expected} {root} {covers} collapsed={session.collapsed}
+      onmore={more}
       onshown={(view) => enrich(view).catch((error) =>
         lost(error, 'Не удалось прочитать библиотеку'))}
       onscore={(view, value) => score(view, value).catch((error) =>

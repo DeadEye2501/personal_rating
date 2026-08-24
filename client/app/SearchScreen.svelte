@@ -19,7 +19,7 @@
   import { onCardShown } from './visible.js'
 
   let { session, query = null, person = null, expected = [], root = null,
-        tagged = {}, forgotten = [], saved = null, removed = null,
+        tagged = {}, forgotten = [], covers = 0, saved = null, removed = null,
         reviewed = null, ontrouble, onmark, onperson, onopen, onedit, ondelete,
         onreview, ontag } = $props()
 
@@ -406,7 +406,7 @@
      Смещение помнит мост — здесь его нет ни числом, ни арифметикой.
 
      Отметки у недогруженной строки ждут её заведения — см. `applying`. -->
-<Feed views={cards} collapsed={session.collapsed} {expected} {root}
+<Feed views={cards} collapsed={session.collapsed} {expected} {root} {covers}
       onmore={() => more()}
       onshown={(view) => shown(view).catch(lost)}
       on={session.filters.on} {onmark} {onperson} {onopen}

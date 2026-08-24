@@ -112,6 +112,12 @@
 
   const marks = $derived(tagged.asked === asked ? tagged.cards : {})
 
+  // Метка, которой разделы сбрасывают суточный кеш ручки обложек. Момент
+  // последнего сохранения годится ей целиком: обложку заливают только в окне
+  // карточки и только вместе с сохранением, а адрес ручки нужен не точный, а
+  // другой. Своей ячейки поэтому не заводим.
+  const covers = $derived(saved?.at ?? 0)
+
   // Плашка одна на приложение, и говорят в неё все четыре наложения и все
   // четыре раздела — одинаково.
   const complain = (text) => { trouble = { text } }
@@ -321,7 +327,7 @@
                     onopen={open}
                     onedit={(view) => { editing = view }}
                     ondelete={askRemoval}
-                    {saved} {removed} {reviewed}
+                    {saved} {removed} {reviewed} {covers}
                     tagged={marks} {forgotten}
                     onreview={(view) => { reviewing = view }}
                     ontag={(view) => { tagging = view }} />
@@ -374,7 +380,7 @@
        карточки переиспользовала бы окно вместе с уже набранной формой первой. -->
   {#if editing !== undefined}
     {#key editing?.item_id ?? 'new'}
-      <CardModal view={editing} kind={session.kind} ontrouble={complain}
+      <CardModal view={editing} kind={session.kind} {covers} ontrouble={complain}
                  onsave={(item_id) => { saved = { item_id, at: Date.now() }
                                         editing = undefined }}
                  onclose={() => { editing = undefined }} />

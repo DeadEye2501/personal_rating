@@ -11,9 +11,9 @@
   import { wishOf } from '$state/kinds.js'
   import { ASPECTS, average, meanOf, scale, toneOf, verdictOf } from '$state/scores.js'
 
-  let { view, collapsed = false, expected = [], on, oncollapse, onmark,
-        onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete,
-        onwish } = $props()
+  let { view, collapsed = false, expected = [], covers = 0, on, oncollapse,
+        onmark, onperson, onopen, ontag, onreview, onscore, onaspect, onedit,
+        ondelete, onwish } = $props()
 
   // Год приклеивается здесь, а не в разметке: ведущий пробел текстового узла в
   // блоке `{#if}` Svelte срезает, и получается «Интерстеллар(2014)».
@@ -59,11 +59,10 @@
     <Icon name="expand_less" />
   </button>
 
-  <!-- `cover` — метка перезаливки: её ставит раздел, перечитавший карточку
-       после правки, и только она сбрасывает суточный кеш ручки. -->
-  <Poster item_id={view.item_id} source={view.source} poster_url={view.poster_url}
-          kind={view.kind}
-          cover={view.cover} />
+  <!-- `covers` — метка перезаливки, общая на весь сеанс: только она сбрасывает
+       суточный кеш ручки, и в строке ей жить нельзя — раздел перечитывает
+       строки из базы, а метки там нет. -->
+  <Poster {view} stamp={covers} />
 
   <!-- Две группы вместо строк подряд: зачем — в `film.css`, у раскладки тела. -->
   <div class="film__body">

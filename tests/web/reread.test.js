@@ -92,10 +92,7 @@ describe('перечитывают только то, что ещё в спис�
 })
 
 describe('перечитывание одной правленой карточки', () => {
-  it('просит именно эту строку и кладёт приехавшую с меткой момента', async () => {
-    // Метка едет в `cover`: адрес ручки обложки от содержимого не зависит, а
-    // отдаёт она сутки кеша — без метки перезалитая картинка осталась бы
-    // прежней и в ленте, и в окне правки.
+  it('просит именно эту строку и кладёт приехавшую', async () => {
     const asked = fake({
       'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
       'feed.synopsis': { ok: 'про восстание' },
@@ -106,22 +103,21 @@ describe('перечитывание одной правленой карточ�
 
     expect(asked).toEqual([['feed.views_of', [expect.any(Number), [5]]],
                           ['feed.synopsis', [expect.any(Number), 5]]])
-    expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'про восстание',
-                           cover: 1700000000 }])
+    expect(put).toEqual([{ item_id: 5, title: 'Своё',
+                           synopsis: 'про восстание' }])
   })
 
   it('отказ чтения текста перечитывания не отменяет', async () => {
-    // С перечитанной строкой едет метка момента, а она сбрасывает суточный кеш
-    // обложки: пустяковый отказ чтения текста оставил бы перезалитую картинку
-    // прежней до завтра. Синопсис при этом не кладётся вовсе — строка остаётся
-    // с показанным.
+    // Строка правленой карточки важнее её синопсиса: пустяковый отказ чтения
+    // текста оставил бы в ленте непере­читанную строку. Синопсис при этом не
+    // кладётся вовсе — строка остаётся с показанным.
     fake({ 'feed.views_of': { ok: [{ item_id: 5, title: 'Своё', synopsis: '' }] },
            'feed.synopsis': { fail: 'broken', detail: 'сломалось' } })
     const put = []
 
     await refreshedRow(put, 1700000000)
 
-    expect(put).toEqual([{ item_id: 5, title: 'Своё', cover: 1700000000 }])
+    expect(put).toEqual([{ item_id: 5, title: 'Своё' }])
   })
 
   it('не кладёт ничего, если строки не приехало', async () => {
@@ -157,8 +153,7 @@ describe('перечитывание одной правленой карточ�
     await refreshedRow(put)
     await circle
 
-    expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'свежий',
-                           cover: 1 }])
+    expect(put).toEqual([{ item_id: 5, title: 'Своё', synopsis: 'свежий' }])
     expect(round.some((one) => 'synopsis' in one)).toBe(false)
   })
 
