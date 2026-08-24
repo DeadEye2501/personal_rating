@@ -2,6 +2,10 @@
 
 from dataclasses import dataclass
 
+# Три стороны оценки игры. Имя у стороны одно на всю дорогу: поле `Rating`,
+# колонка таблицы, признак фильтра и ключ на странице — переводить его негде.
+ASPECTS = ("visual", "narrative", "gameplay")
+
 
 def average_score(*aspects: int | None) -> float | None:
     """Среднее выставленных шкал. Невыставленная шкала в счёт не идёт —

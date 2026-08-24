@@ -57,13 +57,13 @@
 - `def in_latin(name: str) -> bool` (17)
 - `def by_language(names: list[str]) -> tuple[str, str]` (20)
 
-### `backend/model/__init__.py` — 115 строк
+### `backend/model/__init__.py` — 116 строк
 
 Поверхность модели: отсюда типы границы слоёв импортирует клиент.
 
 Зависит от: `backend.model.card`, `backend.model.credit`, `backend.model.denied`, `backend.model.external`, `backend.model.genre`, `backend.model.item`, `backend.model.kinds`, `backend.model.link`, `backend.model.outcome`, `backend.model.query`, `backend.model.rating`, `backend.model.ratings`, `backend.model.results`, `backend.model.search`, `backend.model.suggestion`, `backend.model.tag`, `backend.model.view`
 
-Отдаёт наружу: `SEARCH_SIZE`, `BadImage`, `Bucket`, `CardView`, `CompanyRole`, `Credit`, `Denied`, `Dangling`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreRule`, `GenreSource`, `Histogram`, `IdSource`, `IdentityTaken`, `Item`, `ItemExists`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonHit`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `TagExists`, `WrongTagKind`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
+Отдаёт наружу: `ASPECTS`, `SEARCH_SIZE`, `BadImage`, `Bucket`, `CardView`, `CompanyRole`, `Credit`, `Denied`, `Dangling`, `ExternalId`, `ExternalLink`, `ExternalRating`, `ExternalSearch`, `Feed`, `Filters`, `Found`, `Genre`, `GenreKind`, `GenreRule`, `GenreSource`, `Histogram`, `IdSource`, `IdentityTaken`, `Item`, `ItemExists`, `Kind`, `Missing`, `Order`, `Outcome`, `PersonHit`, `PersonRole`, `Rating`, `RatingSource`, `Ratings`, `Reason`, `Refusal`, `SearchHit`, `Section`, `SeriesCounts`, `Sort`, `Source`, `SourceCard`, `Suggestion`, `Tag`, `TagExists`, `WrongTagKind`, `average_score`, `merge_results`, `new_manual_item`, `new_source_id`, `parse_link`, `view_from_hit`, `view_from_item`
 
 
 ### `backend/model/card.py` — 29 строк
@@ -161,7 +161,7 @@
 - `class Refusal` (8)
 - `Outcome: TypeAlias = Found | Missing | Refusal`
 
-### `backend/model/query.py` — 97 строк
+### `backend/model/query.py` — 110 строк
 
 Язык, которым лента разговаривает с базой о разделах.
 
@@ -170,12 +170,12 @@
 - `class Section(StrEnum)` (6)
 - `class Sort(StrEnum)` (11)
 - `class Order` (6)
-- `class Filters` (23)
+- `class Filters` (36)
 - `class Feed` (11)
 - `class Bucket` (5)
 - `class Histogram` (10)
 
-### `backend/model/rating.py` — 23 строк
+### `backend/model/rating.py` — 27 строк
 
 Своя оценка карточки.
 
@@ -1109,7 +1109,7 @@
   - `async def forget(self, kind: Kind, source: Source, source_id: str) -> None` (14)
   - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (27)
 
-### `backend/storage/repository/sections.py` — 208 строк
+### `backend/storage/repository/sections.py` — 237 строк
 
 Вопросы к отфильтрованному набору раздела.
 
@@ -1117,8 +1117,9 @@
 
 - `def _carrying(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (6)
 - `def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (16)
-- `def _included(query: Select, filters: Filters) -> Select` (18)
-- `def _excluded(query: Select, filters: Filters) -> Select` (23)
+- `def _outside(column: ColumnElement, values: tuple[int, ...]) -> ColumnElement` (12)
+- `def _included(query: Select, filters: Filters) -> Select` (25)
+- `def _excluded(query: Select, filters: Filters) -> Select` (21)
 - `class SectionsRepository(Repository)` (85)
   - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (15)
   - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (36)
@@ -1185,7 +1186,7 @@
   - `async def contains(self, item_id: int) -> bool` (2)
   - `async def list_ids(self, limit: int, offset: int) -> list[int]` (10)
 
-### `backend/storage/rescale.py` — 79 строк
+### `backend/storage/rescale.py` — 77 строк
 
 Приведение хранимых оценок к настроенной шкале.
 
@@ -1316,7 +1317,7 @@
   - `def has(self, item_id: int) -> dict` (2)
 - `def _picture(data: str) -> bytes` (11)
 
-### `bridge/feed.py` — 76 строк
+### `bridge/feed.py` — 79 строк
 
 Мост: лента — страницы разделов и гистограмма.
 
@@ -2098,15 +2099,16 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
-### `tests/backend/test_filters.py` — 297 строк
+### `tests/backend/test_filters.py` — 501 строк ⚠ за пределом 500
 
 Отбор ленты фильтрами: включённые, исключённые и их сочетания.
 
 Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.library`, `backend.storage.repository.ratings`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 13
+Тестов: 22
 
 - `async def library(sessions)` (2)
+- `async def _one_high_each(library, ratings) -> dict[str, int]` (14)
 
 ### `tests/backend/test_genre_reference.py` — 289 строк
 
@@ -2668,7 +2670,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 4
 
 
-### `tests/bridge/test_bridge_feed.py` — 188 строк
+### `tests/bridge/test_bridge_feed.py` — 198 строк
 
 Мост: лента — страницы разделов и гистограмма.
 

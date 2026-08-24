@@ -28,7 +28,7 @@
 - принимает: view, onview, onclose, ontrouble
 - берёт: ./tags.js, ./trouble.js
 
-### app/FiltersModal.svelte (149)
+### app/FiltersModal.svelte (170)
 - Три фильтра одной сборкой: жанры, теги и оценки. Списки разные, поведение строки общее; правку набора имеет только теговый.
 - принимает: field, kind, title, filters, onfilters, onforget, onclose, ontrouble
 - берёт: ./tags.js, ./tagset.js, ./trouble.js
@@ -70,7 +70,7 @@
 - Свои отметки на карточке: оценка, закладка и рецензия.
 - отдаёт: aspected, reviewed, scored, wished
 
-### app/reread.js (72)
+### app/reread.js (76)
 - Что раздел делает со своим списком, когда карточку записали или удалили.
 - отдаёт: NOT_REREAD, again, keyOf, same, without, withoutText
 
@@ -90,7 +90,7 @@
 - Что делать с карточкой, попавшей в поле зрения.
 - отдаёт: forgetCard, onCardShown, stale, textChannel
 
-## components — 31 файлов
+## components — 32 файлов
 
 ### components/Acts.svelte (32)
 - Ряд действий карточки: правка, удаление, рецензия, закладка.
@@ -149,9 +149,9 @@
 - Глиф Material Symbols.
 - принимает: name, extra
 
-### components/ListModal.svelte (19)
-- Окно со списком строк: прокручиваемый список и, если есть, форма под ним.
-- принимает: label, narrow, onclose, items, footer
+### components/ListModal.svelte (26)
+- Окно со списком строк: шапка над ним, если есть, прокручиваемый список и, если есть, форма под ним.
+- принимает: label, narrow, onclose, items, head, footer
 
 ### components/Modal.svelte (58)
 - Оболочка любого наложения: затемнение, окно и два способа его закрыть.
@@ -173,9 +173,13 @@
 - Обложка карточки: выбрать файлом, перетаскиванием или из буфера.
 - принимает: item_id, stamp, kind, onpicked, ontrouble
 
-### components/ScoreRow.svelte (24)
-- Строка оценки в списке: неподвижные звёзды и ярлык словом.
-- принимает: score, state, ontoggle
+### components/ScoreHead.svelte (14)
+- Шапка сетки фильтра по оценке: имена колонок над переключателями.
+- принимает: columns
+
+### components/ScoreRow.svelte (46)
+- Строка окна фильтра по оценке: одна ступень шкалы. Переключатель у неё один и стоит слева, а у игры их четыре — колонками справа, по одной на общую оценку и три шкалы.
+- принимает: score, columns
 
 ### components/Scrollarea.svelte (20)
 - Область, которая прокручивается вместо страницы.
@@ -239,7 +243,7 @@
 - Строки фактов карточки: длительность, сезоны и серии, состав, треки.
 - отдаёт: castOf, firstOf, hiddenOf, leftOf, plural, runtimeOf, seriesOf
 
-### state/filters.js (131)
+### state/filters.js (164)
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 
@@ -437,10 +441,11 @@
 .review__field, .review__text, .review__field
 - берёт: --body-l, --text
 
-### styles/scorerow.css (34)
-- Строка оценки в списке: десять звёзд и ярлык словом.
-- селекторы (5): .scorerow, .scorerow__stars, .scorerow__stars .material-symbols-outlined, .scorerow__stars .is-empty, .scorerow__label
-- берёт: --score, --tint-14, --title-s
+### styles/scorerow.css (66)
+- Строка оценки в списке: звёзды, ярлык словом и переключатели. У игры переключателей четыре, и строки выстраиваются сеткой под общей шапкой.
+- селекторы (9): .scorerow, .scorerow__stars, .scorerow__stars .material-symbols-outlined, .scorerow__stars .is-empty, .scorerow__label, .tagrow.scoregrid,
+.scorehead, .scoregrid .tagbox, .scorehead, .scorehead__name
+- берёт: --columns, --label-m, --score, --text-dim, --tint-14, --title-s
 
 ### styles/scrollarea.css (46)
 - Область со своей полосой прокрутки вместо системной.

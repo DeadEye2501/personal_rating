@@ -4,6 +4,7 @@
   import Confirm from '$components/Confirm.svelte'
   import ListModal from '$components/ListModal.svelte'
   import AddLine from '$components/AddLine.svelte'
+  import ScoreHead from '$components/ScoreHead.svelte'
   import ScoreRow from '$components/ScoreRow.svelte'
   import TagRow from '$components/TagRow.svelte'
   import { call } from '$api/bridge.js'
@@ -12,7 +13,7 @@
   import { dragging } from '$state/dragging.js'
   import { dragged } from '$state/reorder.js'
   import { GENRE_KINDS } from '$state/genres.js'
-  import { scale } from '$state/scores.js'
+  import { ASPECTS, scale } from '$state/scores.js'
   import { created } from './tags.js'
   import { dropped, ordered, wearers } from './tagset.js'
   import { complaining } from './trouble.js'
@@ -32,6 +33,19 @@
   // это десять чисел.
   const editable = $derived(field === 'tags')
 
+  // Колонки окна оценки. У игры их четыре — общая и три шкалы, — и отбирают
+  // они порознь: внутри колонки «или», между колонками «и». У остальных типов
+  // шкал не бывает вовсе, колонка одна и безымянная: называть в ней нечего.
+  const columns = $derived(kind === 'game'
+    ? [{ field: 'scores', label: 'Общая' },
+       ...ASPECTS.map((one) => ({ field: one.key, label: one.label }))]
+    : [{ field: 'scores' }])
+
+  // Сетка бывает только у окна оценки: `columns` считается по типу содержимого
+  // и про признак не знает, так что у жанров с тегами во вкладке игр он тоже
+  // насчитал бы четыре.
+  const grid = $derived(field === 'scores' && columns.length > 1)
+
   // Что спрашивать — двумя простыми значениями, а не по месту в эффекте: `kind`
   // приходит геттером над всем сеансом, и прочитанный там он будил бы запрос на
   // каждый щелчок по строке. Наборов тегов три, по одному на тип содержимого.
@@ -47,7 +61,9 @@
 
   const lost = complaining(title, ontrouble)
 
-  const toggle = (id) => onfilters(cycled(filters, field, id))
+  // Признак называется доводом, а не берётся из `field`: у окна оценки их
+  // четыре, по одному на колонку, и общее у них только само окно.
+  const toggle = (named, id) => onfilters(cycled(filters, named, id))
 
   /** Удаление тега бьёт по всей библиотеке и не отменяется, поэтому у тега с
    *  носителями оно спрашивает и называет их число. Ничей уходит молча: терять
@@ -118,22 +134,27 @@
   }
 </script>
 
+{#snippet head()}<ScoreHead {columns} />{/snippet}
+
 {#snippet form()}<AddLine placeholder="+ Новый тег" label="Название нового тега" action="Добавить тег"
                           limit={24} oncreate={create} />{/snippet}
 
-<ListModal narrow={field === 'scores'} label={title} {onclose}
-           footer={editable ? form : null}>
+<ListModal narrow={field === 'scores' && !grid} label={title} {onclose}
+           head={grid ? head : null} footer={editable ? form : null}>
   {#snippet items()}
     {#if field === 'scores'}
       {#each HIGH_FIRST as score (score)}
-        <ScoreRow {score} state={stateOf(filters, field, score)}
-                  ontoggle={() => toggle(score)} />
+        <ScoreRow {score} columns={columns.map((column) => ({
+          ...column,
+          state: stateOf(filters, column.field, score),
+          ontoggle: () => toggle(column.field, score),
+        }))} />
       {/each}
     {:else}
       {#each rows as row, at (row.id)}
         <TagRow name={row.name} state={stateOf(filters, field, row.id)}
                 moving={moving === row.id}
-                ontoggle={() => toggle(row.id)}
+                ontoggle={() => toggle(field, row.id)}
                 ondelete={editable ? () => remove(row) : null}
                 ongrab={editable ? (event) => grab(event, at) : null} />
       {/each}

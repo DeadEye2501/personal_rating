@@ -14,12 +14,10 @@ from sqlalchemy import select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from backend.config import TEN
-from backend.model import average_score
+from backend.model import ASPECTS, average_score
 from backend.storage.tables import rating
 
 logger = logging.getLogger(__name__)
-
-ASPECTS = ("visual", "narrative", "gameplay")
 
 
 def rescaled(value: float | None, scale: int) -> int | None:

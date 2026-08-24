@@ -227,9 +227,15 @@
   - `tag_ids: tuple[int, ...]` = `набор из 0`
   - `genre_ids: tuple[int, ...]` = `набор из 0`
   - `scores: tuple[int, ...]` = `набор из 0`
+  - `visual: tuple[int, ...]` = `набор из 0`
+  - `narrative: tuple[int, ...]` = `набор из 0`
+  - `gameplay: tuple[int, ...]` = `набор из 0`
   - `excluded_tag_ids: tuple[int, ...]` = `набор из 0`
   - `excluded_genre_ids: tuple[int, ...]` = `набор из 0`
   - `excluded_scores: tuple[int, ...]` = `набор из 0`
+  - `excluded_visual: tuple[int, ...]` = `набор из 0`
+  - `excluded_narrative: tuple[int, ...]` = `набор из 0`
+  - `excluded_gameplay: tuple[int, ...]` = `набор из 0`
 - `class Feed`
   - `section: Section`
   - `kind: Kind`
@@ -245,6 +251,7 @@
 
 ### `backend/model/rating.py`
 
+- `ASPECTS` = `набор из 3`
 - `class Rating`
   - `item_id: int`
   - `score: float | None`
@@ -676,7 +683,6 @@
 ### `backend/storage/rescale.py`
 
 - `logger` = `logging.getLogger(__name__)`
-- `ASPECTS` = `набор из 3`
 
 ### `backend/storage/tables/base.py`
 
@@ -721,7 +727,7 @@
 
 ### `bridge/feed.py`
 
-- `FILTER_FIELDS` = `набор из 6`
+- `FILTER_FIELDS` = `набор из 12`
 
 ### `bridge/refs.py`
 

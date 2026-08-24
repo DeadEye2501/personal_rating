@@ -48,7 +48,9 @@ describe('строка фильтра', () => {
     expect(isEmpty(EMPTY)).toBe(true)
     expect(chosen(EMPTY)).toEqual({
       tag_ids: [], genre_ids: [], scores: [],
+      visual: [], narrative: [], gameplay: [],
       excluded_tag_ids: [], excluded_genre_ids: [], excluded_scores: [],
+      excluded_visual: [], excluded_narrative: [], excluded_gameplay: [],
     })
   })
 
@@ -106,12 +108,12 @@ describe('строка фильтра', () => {
   })
 })
 
-describe('отсев выдачи поиска', () => {
-  // Спросить источник с фильтром нечем: у TMDB и магазинов нет ни наших тегов,
-  // ни наших оценок. Ответ приходит целиком, и уже показанное отсеивается по
-  // тем же признакам, что и лента.
-  const view = (fields) => ({ genres: [], tags: [], rating: null, ...fields })
+// Спросить источник с фильтром нечем: у TMDB и магазинов нет ни наших тегов,
+// ни наших оценок. Ответ приходит целиком, и уже показанное отсеивается по тем
+// же признакам, что и лента.
+const view = (fields) => ({ genres: [], tags: [], rating: null, ...fields })
 
+describe('отсев выдачи поиска', () => {
   it('без фильтра проходит всё', () => {
     expect(passes(view({}), EMPTY)).toBe(true)
   })
@@ -283,5 +285,102 @@ describe('забытая метка', () => {
     const both = cycled(cycled(EMPTY, 'tags', 3), 'genres', 3)
 
     expect(chosen(forgotten(both, 'tags', 3)).genre_ids).toEqual([3])
+  })
+})
+
+describe('фильтр по шкалам игры', () => {
+  it('шкала отбирает сама по себе, а не через общую оценку', () => {
+    // У обеих игр среднее ровно три, и общей оценкой они неразличимы: подмена
+    // шкалы на `score` прошла бы молча на любой другой паре.
+    const fun = cycled(EMPTY, 'gameplay', 5)
+
+    expect(chosen(fun).gameplay).toEqual([5])
+    expect(passes(view({ rating: { score: 3, visual: 2, narrative: 2, gameplay: 5 } }), fun))
+      .toBe(true)
+    expect(passes(view({ rating: { score: 3, visual: 5, narrative: 2, gameplay: 2 } }), fun))
+      .toBe(false)
+  })
+
+  it('внутри шкалы «или», между шкалами «и»', () => {
+    // «Геймплей и нарратив равны 4 или 5» — это два условия, а не одно: со
+    // «или» между шкалами отбор по паре расширял бы выдачу вместо сужения.
+    const both = cycled(cycled(cycled(EMPTY, 'gameplay', 4), 'gameplay', 5),
+                        'narrative', 5)
+
+    expect(passes(view({ rating: { narrative: 5, gameplay: 4 } }), both)).toBe(true)
+    expect(passes(view({ rating: { narrative: 5, gameplay: 2 } }), both)).toBe(false)
+    expect(passes(view({ rating: { narrative: 2, gameplay: 5 } }), both)).toBe(false)
+  })
+
+  it('невыставленная шкала не проходит отбор ни по одной ступени', () => {
+    // Среднее у такой игры считается по двум сторонам и равно пяти: отбор,
+    // спутавший шкалу с общей оценкой, привёл бы её на «геймплей 5».
+    const played = cycled(EMPTY, 'gameplay', 5)
+    const untouched = { score: 5, visual: 5, narrative: 5, gameplay: null }
+
+    expect(passes(view({ rating: untouched }), played)).toBe(false)
+  })
+
+  it('исключение по шкале невыставленную не задевает', () => {
+    const notFive = cycled(cycled(EMPTY, 'gameplay', 5), 'gameplay', 5)
+
+    expect(passes(view({ rating: { gameplay: 5 } }), notFive)).toBe(false)
+    expect(passes(view({ rating: { gameplay: null } }), notFive)).toBe(true)
+  })
+
+  it('кнопка оценки горит и гаснет за все четыре колонки разом', () => {
+    // Окно одно, значит и кнопка одна: выставленное в колонке шкалы иначе нечем
+    // ни увидеть, ни снять — повторное нажатие по горящей кнопке гасит признак,
+    // а модалку не открывает вовсе.
+    const fun = cycled(EMPTY, 'gameplay', 5)
+
+    expect(isEmpty(fun, 'scores')).toBe(false)
+    expect(isEmpty(cleared(fun, 'scores'), 'scores')).toBe(true)
+    expect(isEmpty(fun, 'tags')).toBe(true)
+  })
+
+  it('каждая шкала отсеивает по своей колонке', () => {
+    // Средние у всех трёх карточек равны, так что общей оценкой они
+    // неразличимы: подмена колонки на соседнюю прошла бы молча на паре.
+    const cards = {
+      visual: { score: 7 / 3, visual: 5, narrative: 1, gameplay: 1 },
+      narrative: { score: 7 / 3, visual: 1, narrative: 5, gameplay: 1 },
+      gameplay: { score: 7 / 3, visual: 1, narrative: 1, gameplay: 5 },
+    }
+
+    for (const key of Object.keys(cards)) {
+      const only = cycled(EMPTY, key, 5)
+      for (const [whose, rating] of Object.entries(cards)) {
+        expect(passes(view({ rating }), only)).toBe(whose === key)
+      }
+    }
+  })
+
+  it('каждая шкала уезжает мосту своим полем, обеими половинами', () => {
+    // Значения все разные нарочно: с одинаковыми перепутанные местами поля
+    // неотличимы, и исключение вычитало бы по чужой шкале при зелёном наборе.
+    const included = [['visual', 10], ['narrative', 9], ['gameplay', 8]]
+    const excluded = [['visual', 1], ['narrative', 2], ['gameplay', 3]]
+    let filters = EMPTY
+    for (const [key, step] of included) filters = cycled(filters, key, step)
+    for (const [key, step] of excluded) {
+      filters = cycled(cycled(filters, key, step), key, step)
+    }
+    const request = chosen(filters)
+
+    expect([request.visual, request.narrative, request.gameplay])
+      .toEqual([[10], [9], [8]])
+    expect([request.excluded_visual, request.excluded_narrative,
+            request.excluded_gameplay]).toEqual([[1], [2], [3]])
+  })
+
+  it('гашение оценки не трогает чужие признаки', () => {
+    // Кнопка ★ гасит четыре колонки, а не всё подряд: попади в её группу теги,
+    // отбор по тегу пропадал бы вместе с оценкой — и молча.
+    const both = cycled(cycled(EMPTY, 'gameplay', 5), 'tags', 3)
+    const left = cleared(both, 'scores')
+
+    expect(isEmpty(left, 'scores')).toBe(true)
+    expect(chosen(left).tag_ids).toEqual([3])
   })
 })

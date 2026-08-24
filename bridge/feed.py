@@ -3,10 +3,13 @@
 from backend.model import Feed, Filters, Kind, Order, Section, Sort
 from bridge.answer import Domain
 
-# Шесть кортежей `Filters` — по два на признак: включённые и исключённые.
-# Перечислены поимённо, потому что имя поля и есть контракт со страницей.
+# Двенадцать кортежей `Filters` — по два на признак: включённые и исключённые.
+# Признаков шесть: метки, жанры, общая оценка и три шкалы игры. Перечислены
+# поимённо, потому что имя поля и есть контракт со страницей.
 FILTER_FIELDS = ("tag_ids", "genre_ids", "scores",
-                 "excluded_tag_ids", "excluded_genre_ids", "excluded_scores")
+                 "visual", "narrative", "gameplay",
+                 "excluded_tag_ids", "excluded_genre_ids", "excluded_scores",
+                 "excluded_visual", "excluded_narrative", "excluded_gameplay")
 
 
 class FeedBridge(Domain):

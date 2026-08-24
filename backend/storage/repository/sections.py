@@ -1,10 +1,20 @@
 """Вопросы к отфильтрованному набору раздела."""
 
 
-from sqlalchemy import Column, Integer, Select, Table, cast, func, select
+from sqlalchemy import (
+    Column,
+    ColumnElement,
+    Integer,
+    Select,
+    Table,
+    cast,
+    func,
+    select,
+)
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from backend.model import (
+    ASPECTS,
     Bucket,
     Feed,
     Filters,
@@ -76,13 +86,28 @@ def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select:
     )
 
 
+def _outside(column: ColumnElement, values: tuple[int, ...]) -> ColumnElement:
+    """«Ни одно из этих значений» — вместе с теми, у кого значения нет вовсе.
+
+    У общей оценки значение считает `_COLUMN`, округлением до ступени; у шкалы
+    игры считать нечего, ступень и есть само число.
+
+    NULL здесь обязателен. В разделе «Хочу посмотреть» у отложенного, но не
+    оценённого, score пуст, а `NULL NOT IN (3)` в SQL — это NULL, а не истина:
+    строка отсеется, и карточки молча пропадут из раздела. То же и у шкалы
+    игры, которую не выставили: неоценённое исключением по оценке не
+    задевается."""
+    return column.is_(None) | column.not_in(values)
+
+
 def _included(query: Select, filters: Filters) -> Select:
     """«И» и между признаками, и внутри признака: каждый выбранный добавляет
     своё условие к остальным.
 
-    Оценка — исключение, и не по решению, а по устройству: она у карточки одна,
-    и «семь и восемь разом» не бывает ни у чего. Там выбранные столбцы
-    складываются по «или», как в гистограмме."""
+    Оценка и три шкалы игры — исключение, и не по решению, а по устройству:
+    каждая из них у карточки одна, и «семь и восемь разом» не бывает ни у чего.
+    Там выбранные столбцы складываются по «или», как в гистограмме. Между
+    шкалами при этом остаётся «и»."""
     if filters.tag_ids:
         query = query.where(item.c.id.in_(
             _carrying_all(item_tag, item_tag.c.tag_id, filters.tag_ids)
@@ -93,6 +118,12 @@ def _included(query: Select, filters: Filters) -> Select:
         ))
     if filters.scores:
         query = query.where(_COLUMN.in_(filters.scores))
+    # Шкалы игры целые — ступень им не считается, сравнение прямое. Имя признака
+    # и имя колонки — одно и то же слово, поэтому таблицы соответствий тут нет.
+    for name in ASPECTS:
+        chosen = getattr(filters, name)
+        if chosen:
+            query = query.where(rating.c[name].in_(chosen))
     return query
 
 
@@ -111,13 +142,11 @@ def _excluded(query: Select, filters: Filters) -> Select:
                       filters.excluded_genre_ids)
         ))
     if filters.excluded_scores:
-        # NULL здесь обязателен. В разделе «Хочу посмотреть» у отложенного, но
-        # не оценённого, score пуст, а `NULL NOT IN (3)` в SQL — это NULL, а не
-        # истина: строка отсеется, и карточки молча пропадут из раздела.
-        # Неоценённое исключением по оценке не задевается.
-        query = query.where(
-            _COLUMN.is_(None) | _COLUMN.not_in(filters.excluded_scores)
-        )
+        query = query.where(_outside(_COLUMN, filters.excluded_scores))
+    for name in ASPECTS:
+        dropped = getattr(filters, f"excluded_{name}")
+        if dropped:
+            query = query.where(_outside(rating.c[name], dropped))
     return query
 
 

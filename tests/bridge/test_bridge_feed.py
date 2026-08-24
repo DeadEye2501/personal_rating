@@ -54,23 +54,33 @@ def test_three_states_of_a_filter_row_become_two_tuples(spy, asked):
     assert filters.genre_ids == ()
 
 
-def test_all_six_kinds_of_filter_reach_the_backend(spy, asked):
-    """Признаков шесть — по два на каждый из трёх видов отбора. Забытый в
-    списке моста признак просто перестал бы работать, и молча: фильтр по
-    столбцу гистограммы не доехал бы до базы вовсе."""
+def test_all_twelve_kinds_of_filter_reach_the_backend(spy, asked):
+    """Признаков шесть — метки, жанры, общая оценка и три шкалы игры, — и у
+    каждого две половины, включённая и исключённая. Забытый в списке моста
+    признак просто перестал бы работать, и молча: отбор по нему не доехал бы до
+    базы вовсе.
+
+    Значения у всех разные нарочно: с одинаковыми перепутанные местами половины
+    были бы неотличимы, и исключение уехало бы вычитать по чужой шкале."""
     answers, log = asked
     answers["feed.page"] = []
     chosen = {"tag_ids": [1], "genre_ids": [2], "scores": [3],
-              "excluded_tag_ids": [4], "excluded_genre_ids": [5],
-              "excluded_scores": [6]}
+              "visual": [4], "narrative": [5], "gameplay": [6],
+              "excluded_tag_ids": [7], "excluded_genre_ids": [8],
+              "excluded_scores": [9], "excluded_visual": [10],
+              "excluded_narrative": [11], "excluded_gameplay": [12]}
 
     FeedBridge(spy).page(1, {**WISHED, "filters": chosen}, 0, 50)
 
     filters = log[0][1][0].filters
     assert (filters.tag_ids, filters.genre_ids, filters.scores) == ((1,), (2,),
                                                                     (3,))
+    assert (filters.visual, filters.narrative,
+            filters.gameplay) == ((4,), (5,), (6,))
     assert (filters.excluded_tag_ids, filters.excluded_genre_ids,
-            filters.excluded_scores) == ((4,), (5,), (6,))
+            filters.excluded_scores) == ((7,), (8,), (9,))
+    assert (filters.excluded_visual, filters.excluded_narrative,
+            filters.excluded_gameplay) == ((10,), (11,), (12,))
 
 
 def test_a_missing_filter_means_no_filter(spy, asked):

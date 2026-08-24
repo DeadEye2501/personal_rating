@@ -46,7 +46,7 @@ from backend.model.query import (
     Section,
     Sort,
 )
-from backend.model.rating import Rating, average_score
+from backend.model.rating import ASPECTS, Rating, average_score
 from backend.model.ratings import Ratings
 from backend.model.results import (
     SEARCH_SIZE,
@@ -60,6 +60,7 @@ from backend.model.view import CardView, view_from_hit, view_from_item
 
 
 __all__ = [
+    "ASPECTS",
     "SEARCH_SIZE",
     "BadImage",
     "Bucket",
