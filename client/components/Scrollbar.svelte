@@ -21,12 +21,20 @@
   let hovered = false
   let timer
 
+  // Последний отчёт наблюдателя о размере коробки. Хранится целиком, а не
+  // высотой из него: какую мерку брать — решение `state/scroll.js`, и обе
+  // прежние поломки полосы были именно на этом выборе.
+  let sized = null
+
   // Считает `state/scroll.js`, вплоть до того, какие мерки снимать: ползунок
   // уезжал за край дорожки именно на выборе мерки, а компоненты по решению не
   // проверяются.
   function measure() {
-    if (!box) return
-    thumb = thumbFor(box)
+    // До первого отчёта высоты нет вовсе, а посчитанная от нуля дорожка ушла бы
+    // в минус. Ждать долго не приходится: наблюдатель отчитывается сразу на
+    // `observe`, тем же кругом.
+    if (!box || !sized) return
+    thumb = thumbFor(box, sized)
   }
 
   // Показана полоса или нет — про наведение и прокрутку; есть она вообще или
@@ -44,10 +52,10 @@
 
   $effect(() => {
     if (!box || !area) return
-    measure()
 
-    const sized = new ResizeObserver(measure)
-    sized.observe(box)
+    // Первый замер делает сам наблюдатель: он отчитывается сразу на `observe`.
+    const watcher = new ResizeObserver(([entry]) => { sized = entry; measure() })
+    watcher.observe(box)
     // Размером содержимое не видно с двух сторон: список фильтруется, а область
     // упёрта в свой потолок и не шевелится; у `textarea` же набранный текст не
     // меняет вовсе ничего, кроме собственной высоты прокрутки.
@@ -59,7 +67,7 @@
     area.addEventListener('mouseleave', leave)
 
     return () => {
-      sized.disconnect()
+      watcher.disconnect()
       filled.disconnect()
       box.removeEventListener('input', measure)
       box.removeEventListener('scroll', scrolled)

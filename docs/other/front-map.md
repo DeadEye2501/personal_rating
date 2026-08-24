@@ -185,7 +185,7 @@
 - Область, которая прокручивается вместо страницы.
 - принимает: children, box
 
-### components/Scrollbar.svelte (90)
+### components/Scrollbar.svelte (98)
 - Своя полоса прокрутки для того, что прокручивается.
 - принимает: box, area
 
@@ -283,7 +283,7 @@
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
 - отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, stepOfScore, toneOf, verdictOf
 
-### state/scroll.js (34)
+### state/scroll.js (46)
 - Мерка и арифметика своей полосы прокрутки.
 - отдаёт: thumbFor, thumbOf
 

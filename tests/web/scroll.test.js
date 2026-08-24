@@ -53,12 +53,33 @@ describe('своя полоса прокрутки', () => {
     // дорожки. Прятать переполнение от полосы до `html` некому, и страница
     // получает вторую полосу прокрутки, которая ничего не прокручивает.
     // Числа замерены на живом окне 04.08.2026.
+    // Три величины разные нарочно: с одинаковыми проверка стала бы тавтологией
+    // — сравнением довода с ним же самим.
     const box = { clientHeight: 1060, scrollHeight: 151736, scrollTop: 150676,
-                  getBoundingClientRect: () => ({ height: 1059.6 }) }
+                  getBoundingClientRect: () => ({ height: 995.4 }) }
+    const sized = { borderBoxSize: [{ blockSize: 1059.6 }] }
 
-    const found = thumbFor(box)
+    const found = thumbFor(box, sized)
 
     expect(found.offset + found.height).toBeLessThanOrEqual(1059.6)
+    // От `clientHeight` вышло бы ровно 1032, от видимой высоты — 967.
+    expect(found.offset).toBeCloseTo(1031.597, 3)
+  })
+
+  it('высоту области берёт из довода, а не с самой коробки', () => {
+    // Пока окно въезжает анимацией `scale(.94)`, `getBoundingClientRect()`
+    // отдаёт высоту, сжатую превращением, а `scrollHeight` остаётся вёрстанным.
+    // Снятый в этот миг ползунок объявляется нужным там, где прокручивать
+    // нечего, и остаётся таким навсегда: превращение не будит ни наблюдателя
+    // размера, ни прокрутку. Числа замерены на живом окне 24.08.2026 — ползунок
+    // 263.3 при области 298, то есть ровно 298 × 0.94².
+    // `clientHeight` под превращением остаётся вёрстанным, сжата только
+    // видимая высота: 298 × 0.94 = 280.12.
+    const box = { clientHeight: 298, scrollHeight: 298, scrollTop: 0,
+                  getBoundingClientRect: () => ({ height: 280.12 }) }
+    const sized = { borderBoxSize: [{ blockSize: 298 }] }
+
+    expect(thumbFor(box, sized)).toBe(null)
   })
 
   it('пиксель курсора стоит больше пикселя содержимого', () => {
