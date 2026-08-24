@@ -1,0 +1,18 @@
+{
+  "why": "Ступень оценки считают двое: stepOfScore в client/state/scores.js и _COLUMN в backend/storage/repository/sections.py. Позвать питона со страницы нечем, поэтому связь у них одна — этот набор проб. Обе стороны прогоняют его через себя: tests/backend/test_histogram.py и tests/web/scores.test.js.",
+  "steps": [
+    { "score": 1.0, "step": 1 },
+    { "score": 1.5, "step": 2 },
+    { "score": 2.3333333333333335, "step": 2 },
+    { "score": 2.6666666666666665, "step": 3 },
+    { "score": 4.333333333333333, "step": 4 },
+    { "score": 4.5, "step": 5 },
+    { "score": 4.666666666666667, "step": 5 },
+    { "score": 5.0, "step": 5 },
+    { "score": 7.33, "step": 7 },
+    { "score": 7.5, "step": 8 },
+    { "score": 7.66, "step": 8 },
+    { "score": 9.5, "step": 10 },
+    { "score": 10.0, "step": 10 }
+  ]
+}

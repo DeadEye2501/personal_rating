@@ -1,9 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale,
-  sourceColorOf, stepOf, toneOf, toneOfMean, verdictOf, verdictOfMean } from '$state/scores.js'
+  sourceColorOf, stepOf, stepOfScore, toneOf, verdictOf } from '$state/scores.js'
+// Набор проб, общий с `tests/backend/test_histogram.py`: другой связи у двух
+// реализаций правила нет.
+import shared from '../score_steps.json'
 
 describe('нотация оценок', () => {
+  // Умолчание шкалы держится этим, а не порядком блоков: до `afterEach` файл
+  // был верен лишь потому, что этот блок стоит первым, а `setScale(5)` живёт
+  // в следующих.
+  afterEach(() => setScale(10))
+
   it('десять ступеней, и ни одна не повторяется', () => {
     const colours = Array.from({ length: 10 }, (_, index) => colorOf(index + 1))
     expect(new Set(colours).size).toBe(10)
@@ -48,12 +56,12 @@ describe('нотация оценок', () => {
     expect(scale()).toHaveLength(10)
   })
 
-  it('дробная оценка берёт ярлык по целой части', () => {
+  it('дробная оценка берёт ближайшую ступень, а половина уходит вверх', () => {
     // У игры оценка — среднее трёх шкал. Проба выше половины нарочно: на 7.33
-    // округление к ближайшему дало бы ту же семёрку, и подмена прошла бы
-    // незамеченной.
+    // округление вниз дало бы ту же семёрку, и подмена прошла бы незамеченной.
     expect(verdictOf(7.33)).toBe('Интересно')
-    expect(verdictOf(7.67)).toBe('Интересно')
+    expect(verdictOf(7.67)).toBe('Хорошо')
+    expect(verdictOf(7.5)).toBe('Хорошо')
   })
 
   it('снятая оценка не имеет ярлыка', () => {
@@ -102,10 +110,11 @@ describe('нотация оценок', () => {
       .toEqual(['visual', 'narrative', 'gameplay'])
   })
 
-  it('цвет своей оценки берётся по целой части', () => {
-    // Ярлык и цифра красятся одним и тем же: разъехавшись, они дали бы
-    // «Интересно» восьмой ступенью.
-    expect(toneOf(7.9)).toBe(colorOf(7))
+  it('цвет своей оценки берёт ближайшую ступень', () => {
+    // Пару «цвет и слово об одной ступени» держит соседний блок; здесь только
+    // счёт: по целой части 7.9 красилось бы седьмой ступенью.
+    expect(toneOf(7.9)).toBe(colorOf(8))
+    expect(toneOf(7.5)).toBe(colorOf(8))
     expect(toneOf(10)).toBe(colorOf(10))
   })
 
@@ -151,66 +160,48 @@ describe('ступени шкалы', () => {
   })
 })
 
-describe('ярлык средней оценки игры', () => {
+describe('одна ступень на слово, цвет и столбец', () => {
   afterEach(() => setScale(10))
 
-  it('берёт ближайшую ступень, а половину отдаёт нижней', () => {
-    // Своё правило, а не общее: `verdictOf` округляет вниз, и по нему 4.9
-    // оставалось бы «хорошо». Границы названы пользователем 04.08.2026.
+  it('на короткой шкале ступень считается так же', () => {
+    // Именно тут это и видно человеку: у пятибалльной каждая треть балла
+    // меняет слово. Границы названы пользователем 24.08.2026.
     setScale(5)
 
-    expect(verdictOfMean(1.5)).toBe('Плохо')
-    expect(verdictOfMean(1.51)).toBe('Посредственно')
-    expect(verdictOfMean(2.5)).toBe('Посредственно')
-    expect(verdictOfMean(2.51)).toBe('Средне')
-    expect(verdictOfMean(4.5)).toBe('Хорошо')
-    expect(verdictOfMean(4.51)).toBe('Отлично')
+    expect(verdictOf(1.33)).toBe('Плохо')
+    expect(verdictOf(1.5)).toBe('Посредственно')
+    expect(verdictOf(4.33)).toBe('Хорошо')
+    expect(verdictOf(4.5)).toBe('Отлично')
+    expect(verdictOf(4.67)).toBe('Отлично')
   })
 
-  it('цвет средней берётся той же ступенью, что и слово', () => {
-    // Свёрнутая карточка показывает одни звёзды: слова там нет, и цвет — всё,
-    // что говорит об оценке. Считанный по целой части, он красил бы 4.67
-    // четвёркой, тогда как игра эта — «отлично».
-    setScale(5)
-
-    expect(toneOfMean(4.67)).toBe(colorOf(5))
-    expect(toneOfMean(4.5)).toBe(colorOf(4))
-  })
-
-  it('слово и цвет средней всегда об одной ступени', () => {
+  it('слово и цвет всегда об одной ступени', () => {
     // Парой, а не двумя литералами порознь: соседние проверки называют по два
     // числа каждая, и разъехавшиеся правила молчали бы всюду, кроме этих
-    // четырёх. А обещание докстринга — «та же ступень», то есть про всю шкалу.
+    // четырёх. Свёрнутая карточка показывает одни звёзды, и цвет там —
+    // единственное, что говорит об оценке.
     //
-    // Десять ступеней, потому что на них цвета не повторяются: по цвету
-    // однозначно узнаётся ступень.
-    setScale(10)
+    // Обе шкалы, потому что на десяти `colorOf` и `sourceColorOf` совпадают
+    // значение в значение: уход цвета мимо таблицы своей шкалы виден только на
+    // пяти ступенях, где ей достаются цвета 1, 3, 5, 8 и 10.
+    for (const steps of [10, 5]) {
+      setScale(steps)
 
-    for (const score of [1, 1.5, 1.51, 4.5, 4.67, 7.5, 7.6, 9.99, 10]) {
-      const step = scale().find((one) => colorOf(one) === toneOfMean(score))
-      expect(labelOf(step)).toBe(verdictOfMean(score))
+      for (const score of scale().flatMap((one) => [one, one - 0.5, one - 0.33])) {
+        const step = scale().find((one) => colorOf(one) === toneOf(score))
+        expect(labelOf(step)).toBe(verdictOf(score))
+      }
     }
   })
 
-  it('цвет средней так же считается и на десяти ступенях', () => {
-    // Правило одно на обе шкалы: усреднённую строку показывают обе.
-    setScale(10)
-
-    expect(toneOfMean(7.6)).toBe(colorOf(8))
-    expect(toneOfMean(7.5)).toBe(colorOf(7))
-  })
-
-  it('у неоценённой игры цвет всё равно есть', () => {
-    // Неопределённая переменная не красит ничем, и звёзды пропали бы вовсе.
-    expect(toneOfMean(null)).toBe(colorOf(1))
-  })
-
-  it('у неоценённой игры ярлыка нет', () => {
-    // Место под слово остаётся, а сказать о нём нечего: ни одна сторона не
-    // выставлена.
-    setScale(5)
-
-    expect(verdictOfMean(null)).toBe('')
+  it('столбец в базе считается тем же счётом', () => {
+    // Ту же ступень считает питон — `_COLUMN` в
+    // `backend/storage/repository/sections.py`, — и позвать его отсюда нечем.
+    // Связь у двух реализаций одна: этот набор проб, вторую половину которого
+    // прогоняет `tests/backend/test_histogram.py`.
+    for (const probe of shared.steps) {
+      expect(stepOfScore(probe.score)).toBe(probe.step)
+    }
   })
 })
 

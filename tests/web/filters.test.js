@@ -191,13 +191,15 @@ describe('отсев выдачи поиска', () => {
     expect(passes(view({ tags: [] }), tagged)).toBe(false)
   })
 
-  it('фильтр по оценке смотрит на округлённую вниз', () => {
-    // У игр оценка — среднее трёх шкал: 7.33 попадает в семёрку, как и везде.
-    // Вторая проверка идёт выше середины нарочно: на 7.33 округление к
-    // ближайшему дало бы ту же семёрку, и подмена прошла бы незамеченной.
+  it('фильтр по оценке смотрит на ближайшую ступень', () => {
+    // Столбец у оценки тот же, что ступень на карточке: 7.33 — семёрка, 7.9 —
+    // восьмёрка. Разойдись они, карточка, подписанная «хорошо», не находилась
+    // бы фильтром «Хорошо».
     const seven = cycled(EMPTY, 'scores', 7)
+    const eight = cycled(EMPTY, 'scores', 8)
     expect(passes(view({ rating: { score: 7.33 } }), seven)).toBe(true)
-    expect(passes(view({ rating: { score: 7.9 } }), seven)).toBe(true)
+    expect(passes(view({ rating: { score: 7.9 } }), seven)).toBe(false)
+    expect(passes(view({ rating: { score: 7.9 } }), eight)).toBe(true)
     expect(passes(view({ rating: null }), seven)).toBe(false)
   })
 })

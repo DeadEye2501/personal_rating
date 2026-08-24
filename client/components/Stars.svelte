@@ -1,7 +1,7 @@
 <!-- Ряд звёзд по числу ступеней: кликабельный или неподвижный с дробной. -->
 <script>
   import Icon from '$components/Icon.svelte'
-  import { colorOf, partOf, scale } from '$state/scores.js'
+  import { partOf, scale, toneOf } from '$state/scores.js'
 
   // Кликабельный ряд — своя оценка; неподвижный с дробной звездой —
   // усреднённая у свёрнутой игры. Двух компонентов тут не нужно: отличие в
@@ -9,9 +9,7 @@
   //
   // Наведённое уходит наружу: слово-ярлык стоит рядом со звёздами, а не внутри
   // них, и показать будущую оценку иначе нечем.
-  // `tone` — цвет со стороны: усреднённая оценка красится по ближайшей ступени,
-  // а не по целой части, и своим счётом ряд этого не знает.
-  let { score = null, onpick = null, onhover = null, tone = null } = $props()
+  let { score = null, onpick = null, onhover = null } = $props()
 
   // Наведённая звезда. Пока курсор над рядом, ряд показывает, что получится, а
   // не то, что стоит.
@@ -19,11 +17,13 @@
   let row = $state()
 
   const shown = $derived(over ?? score)
+  // Целиком закрашенных звёзд — целая часть, и это не ступень: у среднего 4.5
+  // ряд показывает четыре с половиной звезды, а красится он пятой ступенью.
   const whole = $derived(Math.floor(shown ?? 0))
   // Дробная звезда бывает только у неподвижного ряда: у кликабельного оценка
   // целая, а наведённая — тем более.
   const part = $derived(score ? partOf(score) : 0)
-  const colour = $derived(tone ?? colorOf(Math.max(1, whole)))
+  const colour = $derived(toneOf(shown))
 
   function mark(step) {
     over = step

@@ -9,9 +9,7 @@
   import Stars from '$components/Stars.svelte'
   import Synopsis from '$components/Synopsis.svelte'
   import { wishOf } from '$state/kinds.js'
-  import { ASPECTS, average, meanOf, scale, toneOf, toneOfMean, verdictOf,
-    verdictOfMean }
-    from '$state/scores.js'
+  import { ASPECTS, average, meanOf, scale, toneOf, verdictOf } from '$state/scores.js'
 
   let { view, collapsed = false, expected = [], on, oncollapse, onmark,
         onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete,
@@ -104,10 +102,8 @@
                        onhover={(step) => { over = { ...over, [aspect.key]: step } }} />
               </span>
             {/each}
-            <!-- Цвет тем же счётом, что и само слово: по целой части «отлично»
-                 красилось бы четвёркой. -->
-            <span class="film__verdict" style:--score={toneOfMean(shownMean)}
-            >{verdictOfMean(shownMean)}</span>
+            <span class="film__verdict" style:--score={toneOf(shownMean)}
+            >{verdictOf(shownMean)}</span>
             {@render acts()}
           </div>
         {:else}
@@ -135,10 +131,10 @@
              три строки, короткой — ряд.
              Слова здесь нет: `.film__verdict` скрыт у свёрнутой, а сама строка
              только у свёрнутой и показывается — увидеть его было нельзя
-             никогда. Поэтому цвет звёзд и считается по ближайшей ступени: он
-             тут единственное, что говорит об оценке. -->
+             никогда. Значит цвет звёзд тут единственное, что говорит об
+             оценке. -->
         <div class="film__scores film__scores--avg">
-          <Stars score={mean} tone={toneOfMean(mean)} />
+          <Stars score={mean} />
           <!-- Свой ряд, а не тот, что стоит в строках сторон: у игры видимая
                строка меняется со свёрнутостью, и ряд обязан ехать с ней. -->
           {@render acts()}

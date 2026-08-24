@@ -136,7 +136,7 @@
 - Строка ввода окна карточки: однострочная или абзацем.
 - принимает: value, placeholder, variant, area, oninput, onkeydown, onfocus, onblur
 
-### components/Film.svelte (157)
+### components/Film.svelte (153)
 - Карточка ленты целиком.
 - принимает: view, collapsed, expected, on, oncollapse, onmark, onperson, onopen, ontag, onreview, onscore, onaspect, onedit, ondelete, onwish
 
@@ -199,7 +199,7 @@
 
 ### components/Stars.svelte (75)
 - Ряд звёзд по числу ступеней: кликабельный или неподвижный с дробной.
-- принимает: score, onpick, onhover, tone
+- принимает: score, onpick, onhover
 
 ### components/Synopsis.svelte (128)
 - Описание карточки, обрезанное до трёх строк, с раскрытием и сворачиванием.
@@ -239,7 +239,7 @@
 - Строки фактов карточки: длительность, сезоны и серии, состав, треки.
 - отдаёт: castOf, firstOf, hiddenOf, leftOf, plural, runtimeOf, seriesOf
 
-### state/filters.js (127)
+### state/filters.js (131)
 - Три состояния строки фильтра: не выбран, включён, исключён.
 - отдаёт: EMPTY, chosen, cleared, cycled, forgotten, isEmpty, marked, passes, stateOf
 
@@ -275,9 +275,9 @@
 - Куда встаёт строка, которую тащат указателем.
 - отдаёт: dragged
 
-### state/scores.js (138)
+### state/scores.js (135)
 - Нотация оценки: ярлык словом, ступень шкалы, среднее, доля звезды.
-- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, stepOfMean, toneOf, toneOfMean, verdictOf, verdictOfMean
+- отдаёт: ASPECTS, average, colorOf, labelOf, meanOf, partOf, scale, setScale, sourceColorOf, stepOf, stepOfScore, toneOf, verdictOf
 
 ### state/scroll.js (34)
 - Мерка и арифметика своей полосы прокрутки.

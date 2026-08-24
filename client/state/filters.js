@@ -1,5 +1,7 @@
 /* Три состояния строки фильтра: не выбран, включён, исключён. */
 
+import { stepOfScore } from '$state/scores.js'
+
 // Имена полей — контракт с мостом: он раскладывает их прямо в `Filters`.
 const FIELDS = ['tags', 'genres', 'scores']
 
@@ -119,9 +121,11 @@ export function passes(view, filters) {
 function ownedBy(view, field) {
   if (field === 'genres') return view.genres.map((one) => one.id)
   if (field === 'tags') return view.tags.map((one) => one.id)
-  // Дробные оценки округляются вниз — правило общее для всего показа.
+  // Столбец у оценки тот же, что ступень на карточке, и считает его общий
+  // `stepOfScore`: свой счёт здесь означал бы, что в поиске отбирается не то,
+  // что подписано.
   const score = view.rating?.score
-  return score ? [Math.floor(score)] : []
+  return score ? [stepOfScore(score)] : []
 }
 
 const without = (ids, id) => ids.filter((each) => each !== id)

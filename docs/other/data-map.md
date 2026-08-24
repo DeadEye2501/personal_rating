@@ -669,7 +669,7 @@
 
 ### `backend/storage/repository/sections.py`
 
-- `_COLUMN` = `cast(rating.c.score, Integer)`
+- `_COLUMN` = `cast(rating.c.score + 0.5, Integer)`
 - `_KEYS` = `словарь из 5`
 - `_SECONDARY` = `словарь из 2`
 
@@ -962,6 +962,10 @@
 - `STARDEW` = `набор из 10`
 - `STEAM_GENRES` = `словарь из 8`
 - `FROZEN_SPELLING` = `словарь из 5`
+
+### `tests/backend/test_histogram.py`
+
+- `SHARED_STEPS` = `json.loads((Path(__file__).resolve().parents[1] …`
 
 ### `tests/backend/test_images.py`
 

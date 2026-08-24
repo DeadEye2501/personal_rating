@@ -1109,7 +1109,7 @@
   - `async def forget(self, kind: Kind, source: Source, source_id: str) -> None` (14)
   - `async def known(self, marks: list[tuple[Kind, Source, str]]) -> set[tuple[str, str, str]]` (27)
 
-### `backend/storage/repository/sections.py` — 201 строк
+### `backend/storage/repository/sections.py` — 208 строк
 
 Вопросы к отфильтрованному набору раздела.
 
@@ -1119,9 +1119,9 @@
 - `def _carrying_all(link: Table, key: Column, ids: tuple[int, ...]) -> Select` (16)
 - `def _included(query: Select, filters: Filters) -> Select` (18)
 - `def _excluded(query: Select, filters: Filters) -> Select` (23)
-- `class SectionsRepository(Repository)` (84)
+- `class SectionsRepository(Repository)` (85)
   - `async def ids(self, feed: Feed, limit: int, offset: int) -> list[int]` (15)
-  - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (35)
+  - `async def histogram(self, kind: Kind, filters: Filters) -> Histogram` (36)
   - `def _narrow(self, query: Select, section: Section, kind: Kind, filters: Filters) -> Select` (16)
 
 ### `backend/storage/repository/tags.py` — 112 строк
@@ -2098,7 +2098,7 @@ Steam: отсутствие игры приходит под кодом 200, а 
 - `class Forgetful(ViewsRepository)` (13)
   - `async def views_for(self, item_ids: list[int]) -> dict` (4)
 
-### `tests/backend/test_filters.py` — 295 строк
+### `tests/backend/test_filters.py` — 297 строк
 
 Отбор ленты фильтрами: включённые, исключённые и их сочетания.
 
@@ -2151,13 +2151,13 @@ Steam: отсутствие игры приходит под кодом 200, а 
 Тестов: 12
 
 
-### `tests/backend/test_histogram.py` — 226 строк
+### `tests/backend/test_histogram.py` — 276 строк
 
 Гистограмма своих оценок по отфильтрованному набору.
 
 Зависит от: `backend.model`, `backend.storage.repository.genres`, `backend.storage.repository.sections`, `backend.storage.repository.tags`, `backend.storage.repository.wishlist`, `tests.conftest`
 
-Тестов: 19
+Тестов: 22
 
 - `async def columns(sections, kind: Kind=Kind.MOVIE, **filters) -> dict[int, int]` (3)
 

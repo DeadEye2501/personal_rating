@@ -1,5 +1,9 @@
 """Гистограмма своих оценок по отфильтрованному набору."""
 
+import json
+from collections import Counter
+from pathlib import Path
+
 import pytest
 
 from backend.model import Filters, Kind, Source
@@ -8,6 +12,12 @@ from backend.storage.repository.sections import SectionsRepository
 from backend.storage.repository.tags import TagsRepository
 from backend.storage.repository.wishlist import WishlistRepository
 from tests.conftest import DRAMA, MOMENT, rated
+
+# Набор проб, общий с `tests/web/scores.test.js`: другой связи у двух реализаций
+# правила нет.
+SHARED_STEPS = json.loads(
+    (Path(__file__).resolve().parents[1] / "score_steps.json")
+    .read_text(encoding="utf-8"))["steps"]
 
 
 async def columns(sections, kind: Kind = Kind.MOVIE, **filters) -> dict[int, int]:
@@ -47,21 +57,62 @@ async def test_a_score_lands_in_its_column(sessions, sections):
     assert buckets[7] == 0
 
 
-async def test_a_fraction_is_rounded_down(sessions, sections):
-    """У игр оценка — среднее трёх шкал, то есть 7.33: это столбец 7."""
+async def test_a_fraction_takes_the_nearest_column(sessions, sections):
+    """У игр оценка — среднее трёх шкал, и столбец у неё тот же, что ступень на
+    карточке: 7.33 — седьмой, 7.66 — восьмой. Разойдись они, игра, подписанная
+    «хорошо», стояла бы в столбце «интересно»."""
     await rated(sessions, "292030", 7.33, kind=Kind.GAME, source=Source.STEAM)
+    await rated(sessions, "275850", 7.66, kind=Kind.GAME, source=Source.STEAM)
 
     buckets = await columns(sections, Kind.GAME)
 
-    assert (buckets[7], buckets[8]) == (1, 0)
+    assert (buckets[7], buckets[8]) == (1, 1)
+
+
+async def test_a_half_goes_up(sessions, sections):
+    """Ровная половина бывает у игры с двумя выставленными шкалами из трёх, и
+    уходит она вверх: своего правила у половины нет."""
+    await rated(sessions, "292030", 7.5, kind=Kind.GAME, source=Source.STEAM)
+
+    assert (await columns(sections, Kind.GAME))[8] == 1
+
+
+async def test_the_columns_agree_with_the_page(sessions, sections):
+    """Ту же ступень считает страница — `stepOfScore` в
+    `client/state/scores.js`, — и позвать её отсюда нечем: питон не читает
+    `client/`, Vitest не читает `backend/`. Связь у двух реализаций одна —
+    общий набор проб, и вторую его половину прогоняет `tests/web/scores.test.js`.
+
+    Расходятся они молча и возвращают ровно тот дефект, ради которого правило
+    сводили: игра, названная «отлично», встала бы в столбец «хорошо»."""
+    for number, probe in enumerate(SHARED_STEPS):
+        await rated(sessions, str(number), probe["score"], kind=Kind.GAME,
+                    source=Source.STEAM)
+
+    buckets = await columns(sections, Kind.GAME)
+
+    empty = dict.fromkeys(range(1, 11), 0)
+    assert buckets == empty | Counter(probe["step"] for probe in SHARED_STEPS)
 
 
 async def test_a_ten_stays_a_ten(sessions, sections):
-    """Верхняя граница — единственное место, где округление вниз могло бы
-    выкинуть оценку за пределы шкалы."""
+    """Верхняя граница — единственное место, где округление могло бы выкинуть
+    оценку за пределы шкалы: к ближайшей ступени десятку ведут через 10.5."""
     await rated(sessions, "1", 10.0)
 
     assert (await columns(sections))[10] == 1
+
+
+async def test_the_top_of_the_short_scale_stays_in_the_scale(sessions):
+    """То же у пятиступенчатой, и своим случаем: столбец вне шкалы — это не
+    неверная колонка, а `KeyError` на весь раздел, а верхнюю границу считает
+    та же прибавленная половина."""
+    await rated(sessions, "1", 5.0)
+
+    histogram = await SectionsRepository(sessions, 5).histogram(
+        Kind.MOVIE, Filters())
+
+    assert next(b.count for b in histogram.buckets if b.score == 5) == 1
 
 
 async def test_a_one_lands_in_the_first_column(sessions, sections):
@@ -200,17 +251,16 @@ async def test_the_footer_counts_everything_in_the_columns(sessions, sections):
 
 
 async def test_the_average_is_not_collected_from_the_columns(sessions, sections):
-    """У игр оценка — среднее трёх шкал. Собранная из округлённых вниз
-    столбцов средняя занизила бы результат почти на полбалла."""
-    for number, score in enumerate([7.33, 7.66, 8.0]):
+    """У игр оценка — среднее трёх шкал. Собранная из округлённых столбцов
+    средняя врала бы на треть балла."""
+    for number, score in enumerate([7.33, 8.33]):
         await rated(sessions, str(number), score, kind=Kind.GAME,
                    source=Source.STEAM)
 
     histogram = await sections.histogram(Kind.GAME, Filters())
 
-    assert histogram.average == pytest.approx(7.6633, abs=1e-4)
-    # По столбцам вышло бы (7 + 7 + 8) / 3 = 7.33.
-    assert histogram.average > 7.5
+    # По столбцам вышло бы (7 + 8) / 2 = 7.5.
+    assert histogram.average == pytest.approx(7.83, abs=1e-4)
 
 
 async def test_the_footer_obeys_the_filters(sessions, reference, sections):

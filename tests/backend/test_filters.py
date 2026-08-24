@@ -140,19 +140,20 @@ async def test_a_tag_and_a_genre_are_joined_by_and(sessions, reference, library,
 
 
 async def test_a_score_filter_takes_whole_columns(sessions, library, sections):
-    """Фильтр по оценке говорит теми же столбцами, что и гистограмма: 7.33 у
-    игры — это столбец 7."""
+    """Фильтр по оценке говорит теми же столбцами, что и гистограмма, а те —
+    теми же ступенями, что и карточка: 7.66 у игры — это столбец 8. Проба выше
+    половины нарочно: на 7.33 округление вниз дало бы ту же семёрку."""
     ratings = RatingsRepository(sessions)
-    seven_id = await library.create(an_item("1", "Семёрка", year=2014))
+    eight_id = await library.create(an_item("1", "Восьмёрка", year=2014))
     nine_id = await library.create(an_item("2", "Девятка", year=2010))
-    await ratings.set_score(seven_id, 7.33, now=MOMENT)
+    await ratings.set_score(eight_id, 7.66, now=MOMENT)
     await ratings.set_score(nine_id, 9.0, now=MOMENT)
 
     found = await sections.ids(
-        replace(RATED, filters=Filters(scores=(7,))), limit=50, offset=0
+        replace(RATED, filters=Filters(scores=(8,))), limit=50, offset=0
     )
 
-    assert found == [seven_id]
+    assert found == [eight_id]
 
 
 async def test_two_scores_stay_joined_by_or(sessions, library, sections):
@@ -247,15 +248,16 @@ async def test_two_excluded_mean_neither_of_them(sessions, library, sections):
 
 async def test_an_excluded_score_removes_the_column(sessions, library, sections):
     """Оценка дробная, как у игры: исключается столбец, а не число. С ровной
-    семёркой округление в этой ветке можно было бы потерять незаметно."""
+    семёркой округление в этой ветке можно было бы потерять незаметно, а с
+    оценкой ниже половины — потерять его направление."""
     ratings = RatingsRepository(sessions)
-    seven_id = await library.create(an_item("1", "Семёрка", year=2014))
+    eight_id = await library.create(an_item("1", "Восьмёрка", year=2014))
     nine_id = await library.create(an_item("2", "Девятка", year=2010))
-    await ratings.set_score(seven_id, 7.33, now=MOMENT)
+    await ratings.set_score(eight_id, 7.66, now=MOMENT)
     await ratings.set_score(nine_id, 9.0, now=MOMENT)
 
     found = await sections.ids(
-        replace(RATED, filters=Filters(excluded_scores=(7,))),
+        replace(RATED, filters=Filters(excluded_scores=(8,))),
         limit=50, offset=0,
     )
 
